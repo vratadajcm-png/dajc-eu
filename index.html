@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAJC — coordination for heavy and oversized transport</title>
+<meta name="description" content="DAJC is building the coordination layer for heavy and oversized freight transport across Europe.">
+<link rel="icon" href="assets/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dajc-dark: #061A33;
+    --dajc-navy: #00265C;
+    --dajc-orange: #FF9F00;
+    --dajc-white: #F5F7FA;
+    --dajc-muted: #7C8DA6;
+    --dajc-line: rgba(124, 141, 166, 0.16);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--dajc-dark);
+    color: var(--dajc-white);
+    font-family: 'IBM Plex Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  body {
+    position: relative;
+    min-height: 100vh;
+  }
+
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--dajc-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--dajc-line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, black 40%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, black 40%, transparent 85%);
+    pointer-events: none;
+  }
+
+  .route-wrap {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .route-path-ghost {
+    fill: none;
+    stroke: var(--dajc-navy);
+    stroke-width: 2;
+    opacity: 0.55;
+  }
+
+  .route-path-active {
+    fill: none;
+    stroke: var(--dajc-orange);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 10 14;
+    animation: travel 5s linear infinite;
+  }
+
+  .route-marker {
+    fill: var(--dajc-orange);
+    offset-path: path('M -80 640 C 260 520, 420 700, 760 560 S 1180 380, 1540 460');
+    animation: marker-travel 5s linear infinite;
+  }
+
+  @keyframes travel {
+    to { stroke-dashoffset: -240; }
+  }
+
+  @keyframes marker-travel {
+    from { offset-distance: 0%; }
+    to { offset-distance: 100%; }
+  }
+
+  header.mark {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 2.2rem 2.4rem 0;
+  }
+
+  header.mark img {
+    width: 28px;
+    height: 28px;
+    opacity: 0.9;
+  }
+
+  header.mark span {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    color: var(--dajc-white);
+  }
+
+  main {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: calc(100vh - 64px);
+    padding: 6vh 1.5rem 8vh;
+  }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    margin: 0 0 1.4rem;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 5.4vw, 3.4rem);
+    line-height: 1.14;
+    max-width: 17ch;
+    margin: 0 0 1.6rem;
+    color: var(--dajc-white);
+  }
+
+  p.sub {
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--dajc-muted);
+    max-width: 44ch;
+    margin: 0;
+  }
+
+  footer {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 0.9rem;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--dajc-navy);
+    padding: 0 1.5rem 2.4rem;
+  }
+
+  footer .dot {
+    color: var(--dajc-line);
+  }
+
+  @media (max-width: 560px) {
+    header.mark { padding: 1.6rem 1.4rem 0; }
+    .route-marker, .route-path-active { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="grid-bg"></div>
+
+  <svg class="route-wrap" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+    <path class="route-path-ghost" d="M -80 640 C 260 520, 420 700, 760 560 S 1180 380, 1540 460" />
+    <path class="route-path-active" d="M -80 640 C 260 520, 420 700, 760 560 S 1180 380, 1540 460" />
+    <circle class="route-marker" r="5" />
+  </svg>
+
+  <header class="mark">
+    <img src="assets/dajc-icon-mono-white.png" alt="">
+    <span>DAJC</span>
+  </header>
+
+  <main>
+    <p class="eyebrow">Heavy &amp; oversize coordination — Europe</p>
+    <h1>The escort car is already on the road.</h1>
+    <p class="sub">We're building the coordination layer for heavy and oversized freight across Europe — one shipment, fully tracked, no broker in between. The platform is close behind.</p>
+  </main>
+
+  <footer>
+    <span>DAJC</span>
+    <span class="dot">&middot;</span>
+    <span>Coordination for heavy &amp; oversized transport</span>
+    <span class="dot">&middot;</span>
+    <span>team@dajc.eu</span>
+  </footer>
+
+</body>
+</html>
