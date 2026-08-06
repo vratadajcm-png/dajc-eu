@@ -48,9 +48,11 @@
     pointer-events: none;
   }
 
-  .route-wrap {
-    position: fixed;
-    inset: 0;
+  .route-inline {
+    display: block;
+    width: min(100%, 480px);
+    height: auto;
+    margin: 0.4rem auto 1.8rem;
     pointer-events: none;
   }
 
@@ -72,7 +74,7 @@
 
   .route-marker {
     fill: var(--dajc-orange);
-    offset-path: path('M -80 640 C 260 520, 420 700, 760 560 S 1180 380, 1540 460');
+    offset-path: path('M0 36 C 70 12, 130 50, 210 28 S 330 6, 480 24');
     animation: marker-travel 5s linear infinite;
   }
 
@@ -134,7 +136,7 @@
     font-weight: 700;
     font-size: clamp(1.6rem, 4.2vw, 2.4rem);
     line-height: 1.14;
-    max-width: 17ch;
+    max-width: 50ch;
     margin: 0 0 1.6rem;
     color: var(--dajc-white);
   }
@@ -169,21 +171,11 @@
   @media (max-width: 560px) {
     header.mark { padding: 1.6rem 1.4rem 0; }
   }
-
-  @media (max-width: 1024px) {
-    .route-marker, .route-path-active { display: none; }
-  }
 </style>
 </head>
 <body>
 
   <div class="grid-bg"></div>
-
-  <svg class="route-wrap" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
-    <path class="route-path-ghost" d="M -80 640 C 260 520, 420 700, 760 560 S 1180 380, 1540 460" />
-    <path class="route-path-active" d="M -80 640 C 260 520, 420 700, 760 560 S 1180 380, 1540 460" />
-    <circle class="route-marker" r="5" />
-  </svg>
 
   <header class="mark">
     <img src="assets/dajc-icon-mono-white.png" alt="">
@@ -192,8 +184,13 @@
 
   <main>
     <p class="eyebrow">EUROPEAN HEAVY &amp; OVERSIZE TRANSPORT PLATFORM</p>
-    <h1>The escort vehicle is already on the road. DAJC is launching soon.</h1>
-    <p class="sub">One transport order. One D-ID. Every step, partner and document connected — from planning to delivery across Europe.</p>
+    <h1>DAJC is a pan-European platform for managing heavy and oversized transport. It connects all participants, documents, permits, routes and shipment progress in one digital environment. Using AI and specialized applications, it simplifies planning, communication and transport execution without commissions.</h1>
+    <svg class="route-inline" viewBox="0 0 480 56" aria-hidden="true">
+      <path class="route-path-ghost" d="M0 36 C 70 12, 130 50, 210 28 S 330 6, 480 24" />
+      <path class="route-path-active" d="M0 36 C 70 12, 130 50, 210 28 S 330 6, 480 24" />
+      <circle class="route-marker" r="5" />
+    </svg>
+    <p class="sub">The escort vehicle has already set off. DAJC will follow soon.</p>
   </main>
 
   <footer>
