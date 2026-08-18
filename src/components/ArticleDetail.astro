@@ -1,0 +1,207 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  entry: CollectionEntry<'eu-oversize'> | CollectionEntry<'platform'>;
+  categoryLabel: string;
+}
+
+const { entry, categoryLabel } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+
+const publishedLabel = data.publishedAt.toLocaleDateString('en-GB', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+const updatedLabel = data.updatedAt?.toLocaleDateString('en-GB', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+<BaseLayout title={`${data.title} - DAJC`} description={data.description}>
+  <main class="article">
+    <div class="article__meta">
+      <span class="article__category">{categoryLabel}</span>
+      <span class="article__dot">&middot;</span>
+      <time datetime={data.publishedAt.toISOString()}>{publishedLabel}</time>
+    </div>
+
+    <h1>{data.title}</h1>
+    <p class="article__description">{data.description}</p>
+
+    <div class="article__content">
+      <Content />
+    </div>
+
+    {data.sources && data.sources.length > 0 && (
+      <div class="article__sources">
+        <h2>Sources</h2>
+        <ul>
+          {data.sources.map((source) => (
+            <li>
+              <a href={source.url} target="_blank" rel="noopener noreferrer">{source.name}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {updatedLabel && (
+      <p class="article__updated">Last updated: {updatedLabel}</p>
+    )}
+
+    <a class="article__back" href="/news">&larr; Back to News</a>
+  </main>
+</BaseLayout>
+
+<style>
+  .article {
+    position: relative;
+    z-index: 2;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 8vh 1.5rem 8vh;
+  }
+
+  .article__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    margin-bottom: 1.2rem;
+  }
+
+  .article__dot {
+    color: var(--dajc-line);
+  }
+
+  .article__meta time {
+    color: var(--dajc-muted);
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.7rem, 4vw, 2.4rem);
+    line-height: 1.2;
+    margin: 0 0 1rem;
+    color: var(--dajc-white);
+  }
+
+  .article__description {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--dajc-muted);
+    margin: 0 0 2.4rem;
+  }
+
+  .article__content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--dajc-white);
+  }
+
+  .article__content :global(h2) {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.25rem;
+    margin: 2.2rem 0 0.9rem;
+    color: var(--dajc-white);
+  }
+
+  .article__content :global(h3) {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.05rem;
+    margin: 1.8rem 0 0.7rem;
+    color: var(--dajc-white);
+  }
+
+  .article__content :global(p) {
+    margin: 0 0 1.1rem;
+    color: var(--dajc-muted);
+  }
+
+  .article__content :global(a) {
+    color: var(--dajc-orange);
+  }
+
+  .article__content :global(ul),
+  .article__content :global(ol) {
+    color: var(--dajc-muted);
+    padding-left: 1.4rem;
+    margin: 0 0 1.1rem;
+  }
+
+  .article__content :global(li) {
+    margin-bottom: 0.4rem;
+  }
+
+  .article__content :global(strong) {
+    color: var(--dajc-white);
+  }
+
+  .article__content :global(code) {
+    font-family: 'IBM Plex Mono', monospace;
+    background: rgba(124, 141, 166, 0.12);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+
+  .article__sources {
+    margin-top: 2.6rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--dajc-line);
+  }
+
+  .article__sources h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    color: var(--dajc-white);
+    margin: 0 0 0.8rem;
+  }
+
+  .article__sources ul {
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+
+  .article__sources li {
+    margin-bottom: 0.4rem;
+  }
+
+  .article__sources a {
+    color: var(--dajc-orange);
+    font-size: 14px;
+  }
+
+  .article__updated {
+    margin-top: 1.6rem;
+    font-size: 13px;
+    color: var(--dajc-muted);
+  }
+
+  .article__back {
+    display: inline-block;
+    margin-top: 2.4rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    text-decoration: none;
+  }
+
+  .article__back:hover {
+    text-decoration: underline;
+  }
+</style>

@@ -1,0 +1,188 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProviderCard from '../components/ProviderCard.astro';
+import { PROVIDER_CATEGORIES } from '../data/provider-categories';
+import { getCollection } from 'astro:content';
+
+const providers = (await getCollection('providers', ({ data }) => data.status === 'active')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+---
+<BaseLayout
+  title="DAJC Integration Ecosystem"
+  description="Explore the services, data sources and infrastructure areas being connected with the DAJC European heavy and oversized transport platform."
+>
+  <main class="partners-page">
+    <p class="eyebrow">DAJC Ecosystem</p>
+    <h1>DAJC Integration Ecosystem</h1>
+    <p class="partners-page__intro">
+      Connecting DAJC with the services, data providers and infrastructure used across European heavy and
+      oversized transport.
+    </p>
+    <p class="partners-page__explainer">
+      DAJC is preparing and developing technical connections across the heavy &amp; oversized transport
+      ecosystem. Specific integration providers will be listed here only when their public identification and
+      the description of the integration status have been confirmed.
+    </p>
+
+    <section class="integration-areas" aria-labelledby="integration-areas-heading">
+      <h2 id="integration-areas-heading">Integration areas</h2>
+      <div class="integration-areas__grid">
+        {PROVIDER_CATEGORIES.map((area) => (
+          <div class="integration-areas__item">{area}</div>
+        ))}
+      </div>
+    </section>
+
+    {providers.length > 0 && (
+      <section class="providers" aria-labelledby="providers-heading">
+        <h2 id="providers-heading">Integration providers</h2>
+        <div class="providers__grid">
+          {providers.map((provider) => (
+            <ProviderCard provider={provider} />
+          ))}
+        </div>
+      </section>
+    )}
+
+    <p class="partners-page__independence">Product decisions, rankings and recommendations remain independent.</p>
+
+    <div class="partners-page__disclaimer">
+      <p>
+        Third-party names, logos and trademarks will only be displayed where their use has been appropriately
+        approved. Any future listing will describe the actual integration or technical relationship and will
+        not imply endorsement, certification or partnership beyond what is expressly stated.
+      </p>
+      <p>All trademarks remain the property of their respective owners.</p>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .partners-page {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 8vh 1.5rem 8vh;
+  }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    margin: 0 0 1.2rem;
+    text-align: center;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    line-height: 1.15;
+    margin: 0 0 1rem;
+    color: var(--dajc-white);
+    text-align: center;
+  }
+
+  .partners-page__intro {
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--dajc-muted);
+    max-width: 56ch;
+    margin: 0 auto 1.2rem;
+    text-align: center;
+  }
+
+  .partners-page__explainer {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--dajc-muted);
+    max-width: 60ch;
+    margin: 0 auto 3rem;
+    text-align: center;
+  }
+
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--dajc-white);
+    margin: 0 0 1.2rem;
+    text-align: center;
+  }
+
+  .integration-areas {
+    margin-bottom: 3rem;
+  }
+
+  .integration-areas__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.8rem;
+  }
+
+  .integration-areas__item {
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 4px;
+    background: rgba(0, 38, 92, 0.18);
+    color: var(--dajc-white);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .providers {
+    margin-bottom: 3rem;
+  }
+
+  .providers__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .partners-page__independence {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--dajc-muted);
+    text-align: center;
+    margin: 0 0 2rem;
+  }
+
+  .partners-page__disclaimer {
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--dajc-line);
+  }
+
+  .partners-page__disclaimer p {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--dajc-muted);
+    text-align: center;
+    max-width: 64ch;
+    margin: 0 auto 0.6rem;
+  }
+
+  .partners-page__disclaimer p:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 560px) {
+    .partners-page {
+      padding: 6vh 1.2rem 6vh;
+    }
+
+    .partners-page__explainer {
+      margin-bottom: 2.4rem;
+    }
+
+    .integration-areas,
+    .providers {
+      margin-bottom: 2.4rem;
+    }
+  }
+</style>

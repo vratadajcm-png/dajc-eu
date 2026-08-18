@@ -1,0 +1,61 @@
+name: Daily Oversize Monitor
+
+# Runs every morning (Europe-time, see docs/NEWS_AUTOMATION.md for the exact
+# UTC/DST reasoning) and walks config/oversize-sources, writing whatever it
+# finds to data/oversize/<ISO week>/findings.json. Never touches
+# content/news - this only maintains the raw dataset the Friday publish
+# workflow reads from.
+#
+# This workflow does not deploy anything itself, but a commit here still
+# reaches `main`, which Vercel's Git integration watches. To stop that from
+# triggering a full (wasted) production rebuild for a data-only commit,
+# Vercel's Project Settings -> Ignored Build Step must be set to
+# `bash scripts/vercel-ignore-build.sh` - that script skips the Vercel
+# build/deploy whenever a commit only touches data/oversize/**. See
+# docs/NEWS_AUTOMATION.md "Vercel: skipping data-only deployments".
+
+on:
+  schedule:
+    # 06:00 UTC = 07:00 CET / 08:00 CEST - close enough to "morning Europe"
+    # without needing DST-aware cron math for a run that isn't time-critical
+    # (unlike the Friday publish window, see publish-weekly-oversize.yml).
+    - cron: '0 6 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: oversize-data
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run oversize monitor
+        run: npm run oversize:monitor
+
+      - name: Commit updated findings (only if meaningfully changed)
+        run: |
+          git config user.name "dajc-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/oversize
+          if git diff --cached --quiet; then
+            echo "No meaningful changes to data/oversize - nothing to commit."
+          else
+            git commit -m "data: daily oversize monitor update ($(date -u +%Y-%m-%d))"
+            git push
+          fi

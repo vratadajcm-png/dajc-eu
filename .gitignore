@@ -1,0 +1,18 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# environment
+.env
+.env.local
+
+# editor/OS
+.DS_Store
+
+# safety net: generate-weekly-article.mjs --dry-run always deletes its own
+# throwaway file before exiting, but ignore the pattern too in case a run
+# is killed mid-way and a temp file is left behind
+src/content/news/eu-oversize/_dry-run-*.md

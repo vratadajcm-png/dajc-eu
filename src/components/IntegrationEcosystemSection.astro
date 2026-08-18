@@ -1,0 +1,152 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  providers: CollectionEntry<'providers'>[];
+}
+
+const { providers } = Astro.props;
+
+// Currently always empty (no provider has both status: active and
+// logoApproved: true yet) - see src/content.config.ts. The homepage must
+// show no logo grid, no names and no statuses today, and this filter is
+// what enforces that; once a provider is genuinely approved for logo use,
+// it starts appearing here automatically, with no code change.
+const approvedLogos = providers.filter(
+  (provider) =>
+    provider.data.status === 'active' && provider.data.logoApproved === true && Boolean(provider.data.logo)
+);
+---
+<section class="ecosystem-teaser" aria-labelledby="ecosystem-teaser-heading">
+  <div class="ecosystem-teaser__inner">
+    <p class="ecosystem-teaser__eyebrow">Ecosystem</p>
+    <h2 id="ecosystem-teaser-heading">DAJC Integration Ecosystem</h2>
+    <p class="ecosystem-teaser__text">
+      Connecting DAJC with the services, data providers and infrastructure used across European heavy and
+      oversized transport.
+    </p>
+
+    {approvedLogos.length > 0 && (
+      <div class="ecosystem-teaser__logos">
+        {approvedLogos.map((provider) => (
+          <a
+            class="ecosystem-teaser__logo"
+            href={`/partners#provider-${provider.data.slug}`}
+            aria-label={`${provider.data.name} - view integration details`}
+          >
+            <img src={provider.data.logo} alt={`${provider.data.name} logo`} loading="lazy" />
+          </a>
+        ))}
+      </div>
+    )}
+
+    <a class="ecosystem-teaser__cta" href="/partners">Explore the integration ecosystem &rarr;</a>
+  </div>
+</section>
+
+<style>
+  .ecosystem-teaser {
+    position: relative;
+    z-index: 2;
+    padding: 3.5rem 1.5rem 3rem;
+    border-top: 1px solid var(--dajc-line);
+  }
+
+  .ecosystem-teaser__inner {
+    max-width: 960px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .ecosystem-teaser__eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    margin: 0 0 0.6rem;
+  }
+
+  .ecosystem-teaser__inner h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.3rem, 3vw, 1.7rem);
+    color: var(--dajc-white);
+    margin: 0 0 0.9rem;
+  }
+
+  .ecosystem-teaser__text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--dajc-muted);
+    max-width: 52ch;
+    margin: 0 auto;
+  }
+
+  .ecosystem-teaser__logos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0 0.2rem;
+  }
+
+  .ecosystem-teaser__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 1.3rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 4px;
+    background: rgba(0, 38, 92, 0.18);
+    transition: border-color 0.2s ease;
+  }
+
+  .ecosystem-teaser__logo:hover,
+  .ecosystem-teaser__logo:focus-visible {
+    border-color: var(--dajc-orange);
+  }
+
+  .ecosystem-teaser__logo img {
+    width: auto;
+    max-width: 100px;
+    height: auto;
+    max-height: 36px;
+    display: block;
+  }
+
+  .ecosystem-teaser__cta {
+    display: block;
+    width: fit-content;
+    margin: 1.6rem auto 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+  }
+
+  .ecosystem-teaser__cta:hover,
+  .ecosystem-teaser__cta:focus-visible {
+    border-color: var(--dajc-orange);
+  }
+
+  @media (max-width: 560px) {
+    .ecosystem-teaser {
+      padding: 2.6rem 1.2rem 2.4rem;
+    }
+
+    .ecosystem-teaser__logo {
+      padding: 0.8rem 1.1rem;
+    }
+
+    .ecosystem-teaser__logo img {
+      max-width: 88px;
+      max-height: 32px;
+    }
+  }
+</style>

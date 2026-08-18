@@ -1,0 +1,153 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatStatusLabel } from '../data/provider-status';
+
+interface Props {
+  provider: CollectionEntry<'providers'>;
+}
+
+const { provider } = Astro.props;
+const { data } = provider;
+
+// Fail-safe, data-driven visibility - see the comment above providersSchema
+// in src/content.config.ts for the full rationale. Nothing here is decided
+// by this component; it only reflects what the content data has already
+// been approved to show.
+const showLogo = data.status === 'active' && data.logoApproved === true && Boolean(data.logo);
+const showDescription = data.descriptionApproved === true;
+const statusLabel = formatStatusLabel(data.relationshipStatus, data.integrationStatus);
+---
+<article class="provider-card" id={`provider-${data.slug}`}>
+  {showLogo && (
+    <div class="provider-card__logo">
+      <img src={data.logo} alt={`${data.name} logo`} loading="lazy" />
+    </div>
+  )}
+  <div class="provider-card__body">
+    <p class="provider-card__category">{data.category}</p>
+    <h3 class="provider-card__name">{data.name}</h3>
+    {statusLabel && <p class="provider-card__status">{statusLabel}</p>}
+    {showDescription && data.shortDescription && (
+      <p class="provider-card__desc">{data.shortDescription}</p>
+    )}
+    {showDescription && data.collaborationArea && (
+      <p class="provider-card__collab"><strong>Collaboration area:</strong> {data.collaborationArea}</p>
+    )}
+    {data.website && (
+      <a class="provider-card__link" href={data.website} target="_blank" rel="noopener noreferrer">
+        Visit website &rarr;
+      </a>
+    )}
+  </div>
+</article>
+
+<style>
+  .provider-card {
+    display: flex;
+    gap: 1.4rem;
+    align-items: flex-start;
+    padding: 1.6rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 4px;
+    background: rgba(0, 38, 92, 0.18);
+    text-align: left;
+    scroll-margin-top: 5.5rem;
+  }
+
+  .provider-card__logo {
+    flex: 0 0 auto;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.2rem;
+  }
+
+  .provider-card__logo img {
+    width: 100%;
+    max-width: 100px;
+    height: auto;
+    display: block;
+  }
+
+  .provider-card__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .provider-card__category {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    margin: 0 0 0.4rem;
+  }
+
+  .provider-card__name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--dajc-white);
+    margin: 0 0 0.5rem;
+  }
+
+  .provider-card__status {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--dajc-muted);
+    margin: 0 0 0.7rem;
+  }
+
+  .provider-card__desc {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--dajc-muted);
+    margin: 0 0 0.8rem;
+  }
+
+  .provider-card__collab {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--dajc-muted);
+    margin: 0 0 1rem;
+  }
+
+  .provider-card__collab strong {
+    color: var(--dajc-white);
+    font-weight: 500;
+  }
+
+  .provider-card__link {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    text-decoration: none;
+  }
+
+  .provider-card__link:hover,
+  .provider-card__link:focus-visible {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 560px) {
+    .provider-card {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 1.3rem;
+    }
+
+    .provider-card__logo {
+      width: 80px;
+      padding-top: 0;
+    }
+
+    .provider-card__logo img {
+      max-width: 80px;
+    }
+  }
+</style>
