@@ -11,6 +11,8 @@ const latestNews = [...euOversize, ...platform]
   .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf())
   .slice(0, 3);
 
+const hasPublishedEuOversize = euOversize.length > 0;
+
 const activeProviders = (await getCollection('providers', ({ data }) => data.status === 'active')).sort(
   (a, b) => a.data.order - b.data.order
 );
@@ -32,7 +34,7 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
   </main>
 
   <IntegrationEcosystemSection providers={activeProviders} />
-  <NewsSection items={latestNews} />
+  <NewsSection items={latestNews} showEuOversizeLaunchNotice={!hasPublishedEuOversize} />
 </BaseLayout>
 
 <style>

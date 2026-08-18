@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import NewsCard from '../../components/NewsCard.astro';
+import EuOversizeLaunchNotice from '../../components/EuOversizeLaunchNotice.astro';
 import { getCollection } from 'astro:content';
 
 const euOversize = await getCollection('eu-oversize', ({ data }) => data.status === 'published');
@@ -9,6 +10,9 @@ const platform = await getCollection('platform', ({ data }) => data.status === '
 const allNews = [...euOversize, ...platform].sort(
   (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
 );
+
+const hasPublishedEuOversize = euOversize.length > 0;
+const hasPublishedPlatform = platform.length > 0;
 ---
 <BaseLayout
   title="News - DAJC"
@@ -25,8 +29,13 @@ const allNews = [...euOversize, ...platform].sort(
       <button type="button" class="news-filter" data-filter="platform" role="tab" aria-selected="false">Platform Updates</button>
     </div>
 
-    {allNews.length > 0 ? (
+    {allNews.length > 0 || !hasPublishedEuOversize ? (
       <div class="news-grid">
+        {!hasPublishedEuOversize && (
+          <div class="news-grid__item" data-category="eu-oversize">
+            <EuOversizeLaunchNotice />
+          </div>
+        )}
         {allNews.map((item) => (
           <div class="news-grid__item" data-category={item.collection}>
             <NewsCard entry={item} />
@@ -36,12 +45,23 @@ const allNews = [...euOversize, ...platform].sort(
     ) : (
       <p class="news-empty">No published articles yet - check back soon.</p>
     )}
+
+    {!hasPublishedPlatform && (
+      <p class="news-empty news-filter-empty" data-filter-empty="platform" hidden>
+        No Platform Updates published yet - check back soon.
+      </p>
+    )}
   </main>
 </BaseLayout>
 
 <script>
   const filters = document.querySelectorAll<HTMLButtonElement>('.news-filter');
   const items = document.querySelectorAll<HTMLElement>('.news-grid__item');
+  const platformEmpty = document.querySelector<HTMLElement>('[data-filter-empty="platform"]');
+  // Presence, not current visibility - the eu-oversize launch notice already
+  // covers the "eu-oversize" and "all" filters (see EuOversizeLaunchNotice),
+  // so this only needs to handle "Platform Updates" having nothing to show.
+  const hasPlatformItems = document.querySelectorAll('[data-category="platform"]').length > 0;
 
   filters.forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -57,6 +77,10 @@ const allNews = [...euOversize, ...platform].sort(
         const show = filter === 'all' || item.dataset.category === filter;
         item.style.display = show ? '' : 'none';
       });
+
+      if (platformEmpty) {
+        platformEmpty.hidden = !(filter === 'platform' && !hasPlatformItems);
+      }
     });
   });
 </script>
@@ -142,6 +166,10 @@ const allNews = [...euOversize, ...platform].sort(
     text-align: center;
     color: var(--dajc-muted);
     font-size: 14px;
+  }
+
+  .news-filter-empty {
+    margin-top: 1.6rem;
   }
 
   @media (max-width: 820px) {

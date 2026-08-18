@@ -1,12 +1,14 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import NewsCard from './NewsCard.astro';
+import EuOversizeLaunchNotice from './EuOversizeLaunchNotice.astro';
 
 interface Props {
   items: Array<CollectionEntry<'eu-oversize'> | CollectionEntry<'platform'>>;
+  showEuOversizeLaunchNotice: boolean;
 }
 
-const { items } = Astro.props;
+const { items, showEuOversizeLaunchNotice } = Astro.props;
 ---
 <section class="news-section" aria-labelledby="news-heading">
   <div class="news-section__inner">
@@ -15,8 +17,9 @@ const { items } = Astro.props;
       <h2 id="news-heading">News</h2>
     </div>
 
-    {items.length > 0 ? (
+    {items.length > 0 || showEuOversizeLaunchNotice ? (
       <div class="news-grid">
+        {showEuOversizeLaunchNotice && <EuOversizeLaunchNotice />}
         {items.map((item) => (
           <NewsCard entry={item} />
         ))}

@@ -1,0 +1,80 @@
+---
+import {
+  EU_OVERSIZE_FIRST_PUBLICATION,
+  EU_OVERSIZE_LAUNCH_DESCRIPTION,
+  getEuOversizeLaunchPhase,
+  formatEuOversizeLaunchDate,
+} from '../config/news';
+
+const phase = getEuOversizeLaunchPhase();
+const upcomingText = `Launches ${formatEuOversizeLaunchDate()}.`;
+const preparingText = 'The first EU Oversize Weekly is being prepared.';
+---
+<article class="launch-notice" data-eu-oversize-launch={EU_OVERSIZE_FIRST_PUBLICATION}>
+  <p class="launch-notice__eyebrow">EU Oversize Weekly</p>
+  <h3 class="launch-notice__title" data-upcoming-text={upcomingText} data-preparing-text={preparingText}>
+    {phase === 'upcoming' ? upcomingText : preparingText}
+  </h3>
+  <p class="launch-notice__desc">{EU_OVERSIZE_LAUNCH_DESCRIPTION}</p>
+</article>
+
+<script>
+  // This site is statically built (see astro.config.mjs). If a build ever
+  // happens to land shortly before the launch moment and no later build
+  // (e.g. the actual first-article publish) follows before a visitor loads
+  // the page after that moment, the pre-rendered HTML would otherwise keep
+  // asserting a launch time that has already passed. This corrects that one
+  // case client-side, without needing to know whether an article exists -
+  // if one did, the whole card would never have been rendered in the first
+  // place (see the `hasPublishedEuOversize` gate in the pages using this
+  // component).
+  document.querySelectorAll<HTMLElement>('[data-eu-oversize-launch]').forEach((card) => {
+    const launchTime = new Date(card.dataset.euOversizeLaunch ?? '').getTime();
+    if (Number.isNaN(launchTime) || Date.now() < launchTime) return;
+
+    const title = card.querySelector<HTMLElement>('.launch-notice__title');
+    if (title?.dataset.preparingText) {
+      title.textContent = title.dataset.preparingText;
+    }
+  });
+</script>
+
+<style>
+  .launch-notice {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.4rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 4px;
+    background: rgba(0, 38, 92, 0.18);
+    text-align: left;
+    height: 100%;
+  }
+
+  .launch-notice__eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    margin: 0;
+  }
+
+  .launch-notice__title {
+    margin: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.35;
+    color: var(--dajc-white);
+  }
+
+  .launch-notice__desc {
+    margin: 0;
+    color: var(--dajc-muted);
+    font-size: 14px;
+    line-height: 1.6;
+    flex-grow: 1;
+  }
+</style>
