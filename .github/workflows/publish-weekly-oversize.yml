@@ -21,8 +21,27 @@ name: Publish Weekly Oversize Article
 # that day). If a Friday publish appears to have been silently skipped,
 # check the Actions run history and use workflow_dispatch to publish it
 # manually - manual runs always skip the time gate entirely, see below.
+#
+# ============================= TEMPORARY =====================================
+# The `push` trigger below (and everything that references
+# `github.event_name == 'push'`) exists ONLY so this workflow's
+# workflow_dispatch UI becomes usable while it lives on a feature branch -
+# GitHub does not expose workflow_dispatch for a workflow that doesn't also
+# exist on the repository's default branch yet. A run triggered this way is
+# forced into dry_run mode unconditionally (see "Determine dry-run mode"
+# below) and is additionally blocked from the commit/push step by its own
+# explicit `github.event_name != 'push'` guard, on top of the normal
+# dry-run guard - two independent reasons a push-triggered run can never
+# publish anything.
+# REMOVE the `push:` block below (and the two `github.event_name == 'push'`
+# references further down) once this branch has been tested and merged to
+# main and workflow_dispatch is reachable normally from there.
+# ==============================================================================
 
 on:
+  push:
+    branches:
+      - feature/news-automation
   schedule:
     - cron: '0 10 * * 5'
     - cron: '0 11 * * 5'
@@ -47,9 +66,9 @@ jobs:
       - name: Check Europe/Prague local time
         id: check-time
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "push" ]; then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
-            echo "Manual run (workflow_dispatch) - skipping the time gate."
+            echo "Manual/test run (${{ github.event_name }}) - skipping the time gate."
             exit 0
           fi
           hour=$(TZ=Europe/Prague date +%H)
@@ -59,6 +78,22 @@ jobs:
           else
             echo "should_run=false" >> "$GITHUB_OUTPUT"
             echo "Not the target hour in Europe/Prague (got $hour, want 12) - this is the redundant DST-safety trigger, exiting quietly."
+          fi
+
+      # TEMPORARY (see the top-of-file note): forces dry_run=true for any
+      # run triggered by the temporary `push` trigger, regardless of any
+      # other input. For workflow_dispatch, honors the `dry_run` checkbox.
+      # For the real Friday `schedule` trigger, always resolves to false.
+      - name: Determine dry-run mode
+        id: dry-run-mode
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "dry_run=true" >> "$GITHUB_OUTPUT"
+            echo "Triggered by push to feature/news-automation (TEMPORARY test trigger) - forcing dry_run=true."
+          elif [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "dry_run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "dry_run=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout
@@ -84,14 +119,19 @@ jobs:
         if: steps.check-time.outputs.should_run == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: npm run oversize:publish -- ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+        run: npm run oversize:publish -- ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }}
 
       - name: Commit new article and refreshed data (only if something was actually written)
-        # Skipped entirely for dry runs as a second, belt-and-suspenders
-        # guard - the script itself never leaves a dry-run file on disk
-        # (see generate-weekly-article.mjs's --dry-run handling), so this
-        # `if` is defensive, not load-bearing.
-        if: steps.check-time.outputs.should_run == 'true' && github.event.inputs.dry_run != 'true'
+        # Three independent, redundant guards, all must hold for this step
+        # to run at all:
+        #  1. steps.dry-run-mode.outputs.dry_run != 'true' - normal dry-run guard.
+        #  2. github.event_name != 'push' - explicit extra guard for the
+        #     TEMPORARY push trigger (see top-of-file note): even if (1) had
+        #     a bug, a push-triggered run still could not reach this step.
+        #  3. Even if this step somehow ran anyway, the script itself never
+        #     leaves a dry-run file on disk (see generate-weekly-article.mjs),
+        #     so `git diff --cached` below would still find nothing to commit.
+        if: steps.check-time.outputs.should_run == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && github.event_name != 'push'
         run: |
           git config user.name "dajc-bot"
           git config user.email "bot@users.noreply.github.com"
