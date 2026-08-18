@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import NewsSection from '../components/NewsSection.astro';
+import IntegrationEcosystemSection from '../components/IntegrationEcosystemSection.astro';
 import { getCollection } from 'astro:content';
 
 const euOversize = await getCollection('eu-oversize', ({ data }) => data.status === 'published');
@@ -9,6 +10,10 @@ const platform = await getCollection('platform', ({ data }) => data.status === '
 const latestNews = [...euOversize, ...platform]
   .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf())
   .slice(0, 3);
+
+const activeProviders = (await getCollection('providers', ({ data }) => data.status === 'active')).sort(
+  (a, b) => a.data.order - b.data.order
+);
 ---
 <BaseLayout
   title="DAJC - EUROPEAN HEAVY & OVERSIZE TRANSPORT PLATFORM"
@@ -26,6 +31,7 @@ const latestNews = [...euOversize, ...platform]
     <p class="sub">The escort vehicle has already set off. DAJC will follow soon.</p>
   </main>
 
+  <IntegrationEcosystemSection providers={activeProviders} />
   <NewsSection items={latestNews} />
 </BaseLayout>
 
