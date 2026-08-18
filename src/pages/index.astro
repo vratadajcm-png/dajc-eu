@@ -1,0 +1,136 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NewsSection from '../components/NewsSection.astro';
+import { getCollection } from 'astro:content';
+
+const euOversize = await getCollection('eu-oversize', ({ data }) => data.status === 'published');
+const platform = await getCollection('platform', ({ data }) => data.status === 'published');
+
+const latestNews = [...euOversize, ...platform]
+  .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf())
+  .slice(0, 3);
+---
+<BaseLayout
+  title="DAJC - EUROPEAN HEAVY & OVERSIZE TRANSPORT PLATFORM"
+  description="DAJC is building the coordination layer for heavy and oversized freight transport across Europe."
+>
+  <main>
+    <p class="eyebrow">EUROPEAN HEAVY &amp; OVERSIZE TRANSPORT PLATFORM</p>
+    <h1>DAJC is building the coordination layer for heavy and oversized freight transport across Europe.</h1>
+    <p class="desc">DAJC is a pan-European platform for managing heavy and oversized transport. It connects all participants, documents, permits, routes and shipment progress in one digital environment. Using AI and specialized applications, it simplifies planning, communication and transport execution without commissions.</p>
+    <svg class="route-inline" viewBox="0 0 640 64" aria-hidden="true">
+      <path class="route-path-ghost" d="M0 38 C 50 12, 110 52, 160 28 C 210 10, 270 54, 320 34 C 370 12, 430 56, 480 24 C 530 8, 590 52, 640 30" />
+      <path class="route-path-active" d="M0 38 C 50 12, 110 52, 160 28 C 210 10, 270 54, 320 34 C 370 12, 430 56, 480 24 C 530 8, 590 52, 640 30" />
+      <circle class="route-marker" r="5" />
+    </svg>
+    <p class="sub">The escort vehicle has already set off. DAJC will follow soon.</p>
+  </main>
+
+  <NewsSection items={latestNews} />
+</BaseLayout>
+
+<style>
+  .route-inline {
+    display: block;
+    width: min(100%, 560px);
+    height: auto;
+    margin: 0.4rem auto 1.8rem;
+    pointer-events: none;
+  }
+
+  .route-path-ghost {
+    fill: none;
+    stroke: var(--dajc-navy);
+    stroke-width: 2;
+    opacity: 0.55;
+  }
+
+  .route-path-active {
+    fill: none;
+    stroke: var(--dajc-orange);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 10 14;
+    animation: travel 5s linear infinite;
+  }
+
+  .route-marker {
+    fill: var(--dajc-orange);
+    offset-path: path('M0 38 C 50 12, 110 52, 160 28 C 210 10, 270 54, 320 34 C 370 12, 430 56, 480 24 C 530 8, 590 52, 640 30');
+    animation: marker-travel 5s linear infinite;
+  }
+
+  @keyframes travel {
+    to {
+      stroke-dashoffset: -240;
+    }
+  }
+
+  @keyframes marker-travel {
+    from {
+      offset-distance: 0%;
+    }
+    to {
+      offset-distance: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .route-path-active {
+      animation: none;
+    }
+
+    .route-marker {
+      animation: none;
+      display: none;
+    }
+  }
+
+  main {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: calc(100vh - 64px);
+    padding: 6vh 1.5rem 8vh;
+  }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    margin: 0 0 1.4rem;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4.2vw, 2.4rem);
+    line-height: 1.14;
+    max-width: 50ch;
+    margin: 0 0 1.6rem;
+    color: var(--dajc-white);
+  }
+
+  p.desc {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--dajc-muted);
+    max-width: 56ch;
+    margin: 0 0 1.6rem;
+  }
+
+  p.sub {
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--dajc-muted);
+    max-width: 44ch;
+    margin: 0;
+  }
+</style>

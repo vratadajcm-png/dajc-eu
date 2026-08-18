@@ -1,0 +1,19 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import ArticleDetail from '../../../components/ArticleDetail.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('eu-oversize', ({ data }) => data.status === 'published');
+  return entries.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'eu-oversize'>;
+}
+
+const { entry } = Astro.props;
+---
+<ArticleDetail entry={entry} categoryLabel="EU Oversize Weekly" />

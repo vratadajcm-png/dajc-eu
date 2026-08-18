@@ -1,0 +1,102 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  entry: CollectionEntry<'eu-oversize'> | CollectionEntry<'platform'>;
+}
+
+const { entry } = Astro.props;
+const { data, collection } = entry;
+const href = `/news/${collection}/${data.slug}`;
+const categoryLabel = collection === 'eu-oversize' ? 'EU Oversize Weekly' : 'DAJC Platform Updates';
+const dateLabel = data.publishedAt.toLocaleDateString('en-GB', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+---
+<article class="news-card">
+  <div class="news-card__meta">
+    <span class="news-card__category">{categoryLabel}</span>
+    <span class="news-card__dot">&middot;</span>
+    <time class="news-card__date" datetime={data.publishedAt.toISOString()}>{dateLabel}</time>
+  </div>
+  <h3 class="news-card__title"><a href={href}>{data.title}</a></h3>
+  <p class="news-card__excerpt">{data.description}</p>
+  <a class="news-card__link" href={href}>Read more &rarr;</a>
+</article>
+
+<style>
+  .news-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.4rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 4px;
+    background: rgba(0, 38, 92, 0.18);
+    text-align: left;
+    height: 100%;
+  }
+
+  .news-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+  }
+
+  .news-card__dot {
+    color: var(--dajc-line);
+  }
+
+  .news-card__date {
+    color: var(--dajc-muted);
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  .news-card__title {
+    margin: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  .news-card__title a {
+    color: var(--dajc-white);
+    text-decoration: none;
+  }
+
+  .news-card__title a:hover {
+    color: var(--dajc-orange);
+  }
+
+  .news-card__excerpt {
+    margin: 0;
+    color: var(--dajc-muted);
+    font-size: 14px;
+    line-height: 1.6;
+    flex-grow: 1;
+  }
+
+  .news-card__link {
+    align-self: flex-start;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    text-decoration: none;
+    margin-top: 0.4rem;
+  }
+
+  .news-card__link:hover {
+    text-decoration: underline;
+  }
+</style>
