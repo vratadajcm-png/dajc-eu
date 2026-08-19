@@ -15,7 +15,7 @@ const { data } = provider;
 // been approved to show.
 const showLogo = data.status === 'active' && data.logoApproved === true && Boolean(data.logo);
 const showDescription = data.descriptionApproved === true;
-const statusLabel = formatStatusLabel(data.relationshipStatus, data.integrationStatus);
+const statusLabel = data.publicStatusLabel ?? formatStatusLabel(data.relationshipStatus, data.integrationStatus);
 ---
 <article class="provider-card" id={`provider-${data.slug}`}>
   {showLogo && (

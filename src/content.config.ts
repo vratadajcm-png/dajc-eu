@@ -65,6 +65,11 @@ const providersSchema = z.object({
   order: z.number().default(0),
   relationshipStatus: z.enum(RELATIONSHIP_STATUSES).optional(),
   integrationStatus: z.enum(INTEGRATION_STATUSES).optional(),
+  // Optional, explicitly-approved override for the public status line. When
+  // set, it is shown verbatim instead of the generic relationshipStatus +
+  // integrationStatus composition - use only when a specific wording has
+  // itself been approved (not just the underlying statuses).
+  publicStatusLabel: z.string().optional(),
   logo: z.string().optional(),
   logoApproved: z.boolean().default(false),
   descriptionApproved: z.boolean().default(false),
