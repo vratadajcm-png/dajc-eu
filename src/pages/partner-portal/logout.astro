@@ -1,0 +1,18 @@
+---
+export const prerender = false;
+
+import { notFoundIfPortalDisabled, redirectResponse } from '../../portal/lib/guards';
+import { revokeSession, validateCsrfToken } from '../../portal/lib/session';
+
+const disabled = notFoundIfPortalDisabled();
+if (disabled) return disabled;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const csrf = form.get('csrf_token');
+  if (validateCsrfToken(Astro.cookies, typeof csrf === 'string' ? csrf : null)) {
+    await revokeSession(Astro.cookies);
+  }
+}
+return redirectResponse('/partner-portal/login');
+---

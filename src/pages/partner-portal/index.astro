@@ -1,0 +1,13 @@
+---
+export const prerender = false;
+
+import { notFoundIfPortalDisabled, redirectResponse } from '../../portal/lib/guards';
+import { requireAdminPrincipal, requirePartnerContactPrincipal } from '../../portal/lib/session';
+
+const disabled = notFoundIfPortalDisabled();
+if (disabled) return disabled;
+
+if (await requireAdminPrincipal(Astro.cookies)) return redirectResponse('/partner-portal/admin');
+if (await requirePartnerContactPrincipal(Astro.cookies)) return redirectResponse('/partner-portal/dashboard');
+return redirectResponse('/partner-portal/login');
+---

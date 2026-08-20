@@ -1,0 +1,64 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../portal/components/PortalLayout.astro';
+import { notFoundIfPortalDisabled, redirectResponse } from '../../portal/lib/guards';
+import { requirePartnerContactPrincipal, ensureCsrfCookie } from '../../portal/lib/session';
+import { getPartnerById } from '../../portal/lib/partners';
+import { listApiClientsForPartner, listAccessGrantsForPartner, isGrantActive } from '../../portal/lib/accessGrants';
+
+const disabled = notFoundIfPortalDisabled();
+if (disabled) return disabled;
+
+const contact = await requirePartnerContactPrincipal(Astro.cookies);
+if (!contact) return redirectResponse('/partner-portal/login');
+
+const partner = await getPartnerById(contact.partnerId);
+if (!partner) return redirectResponse('/partner-portal/login');
+
+const [apiClients, grants] = await Promise.all([
+  listApiClientsForPartner(contact.partnerId),
+  listAccessGrantsForPartner(contact.partnerId),
+]);
+const activeGrants = grants.filter(isGrantActive);
+const csrfToken = ensureCsrfCookie(Astro.cookies, Astro.url);
+---
+<PortalLayout title="Dashboard">
+  <h1>{partner.legalName}</h1>
+  <p>Signed in as {contact.email} ({contact.role}) - status: <span class="badge">{partner.status}</span> -
+    <form class="inline" method="POST" action="/partner-portal/logout">
+      <input type="hidden" name="csrf_token" value={csrfToken} />
+      <button type="submit">Sign out</button>
+    </form>
+  </p>
+
+  <fieldset>
+    <legend>API clients</legend>
+    {apiClients.length === 0 && <p>No API clients provisioned yet.</p>}
+    <table>
+      <thead><tr><th>Environment</th><th>Status</th></tr></thead>
+      <tbody>
+        {apiClients.map((c) => <tr><td>{c.environment}</td><td>{c.revokedAt ? 'REVOKED' : c.status}</td></tr>)}
+      </tbody>
+    </table>
+  </fieldset>
+
+  <fieldset>
+    <legend>Active access grants</legend>
+    {activeGrants.length === 0 && <p>No active access grants yet.</p>}
+    <table>
+      <thead><tr><th>Tenant</th><th>Scope</th><th>Environment</th></tr></thead>
+      <tbody>
+        {activeGrants.map((g) => <tr><td>{g.tenantRef}</td><td>{g.scope}</td><td>{g.environment}</td></tr>)}
+      </tbody>
+    </table>
+  </fieldset>
+
+  <fieldset>
+    <legend>Documentation</legend>
+    <p>
+      Integration documentation scoped to your integration type, API version, environment and granted
+      scopes will appear here once the DAJC Outbound API is available. Nothing is published yet.
+    </p>
+  </fieldset>
+</PortalLayout>

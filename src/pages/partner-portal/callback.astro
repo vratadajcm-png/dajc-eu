@@ -1,0 +1,46 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../portal/components/PortalLayout.astro';
+import { notFoundIfPortalDisabled, redirectResponse } from '../../portal/lib/guards';
+import { setSessionCookies } from '../../portal/lib/session';
+import { consumeLoginToken, LoginTokenInvalidError } from '../../portal/lib/magicLink';
+import { checkAndRecordRateLimit } from '../../portal/lib/rateLimit';
+
+const disabled = notFoundIfPortalDisabled();
+if (disabled) return disabled;
+
+const rawToken = Astro.url.searchParams.get('token');
+let error: string | null = null;
+
+if (!rawToken) {
+  error = 'Missing sign-in link token.';
+} else {
+  const ip = Astro.clientAddress ?? 'unknown';
+  const rateLimit = await checkAndRecordRateLimit(ip, {
+    action: 'magic_link_callback',
+    windowSeconds: 15 * 60,
+    maxAttempts: 20,
+  });
+  if (!rateLimit.allowed) {
+    error = 'Too many attempts. Please try again later.';
+  } else {
+    try {
+      const { principalType, rawSessionToken, sessionExpiresAt } = await consumeLoginToken(rawToken);
+      setSessionCookies(Astro.cookies, rawSessionToken, sessionExpiresAt, Astro.url);
+      return redirectResponse(principalType === 'ADMIN' ? '/partner-portal/admin' : '/partner-portal/dashboard');
+    } catch (err) {
+      if (err instanceof LoginTokenInvalidError) {
+        error = err.message;
+      } else {
+        throw err;
+      }
+    }
+  }
+}
+---
+<PortalLayout title="Sign-in link">
+  <h1>Sign-in link</h1>
+  <p class="flash error">{error}</p>
+  <p><a href="/partner-portal/login">Request a new partner sign-in link</a> or <a href="/partner-portal/admin/login">a new admin sign-in link</a>.</p>
+</PortalLayout>

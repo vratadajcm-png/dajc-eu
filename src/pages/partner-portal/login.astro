@@ -1,0 +1,61 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../portal/components/PortalLayout.astro';
+import { notFoundIfPortalDisabled } from '../../portal/lib/guards';
+import { ensureCsrfCookie, validateCsrfToken } from '../../portal/lib/session';
+import { requestPartnerContactLoginToken } from '../../portal/lib/magicLink';
+import { sendMagicLinkEmail } from '../../portal/lib/email';
+import { checkAndRecordRateLimit } from '../../portal/lib/rateLimit';
+
+const disabled = notFoundIfPortalDisabled();
+if (disabled) return disabled;
+
+let sent = false;
+let error: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const csrf = form.get('csrf_token');
+  const email = String(form.get('email') ?? '').trim();
+
+  if (!validateCsrfToken(Astro.cookies, typeof csrf === 'string' ? csrf : null)) {
+    error = 'Your session expired, please try again.';
+  } else if (!email) {
+    error = 'Enter your email address.';
+  } else {
+    const ip = Astro.clientAddress ?? 'unknown';
+    const rateLimit = await checkAndRecordRateLimit(ip, {
+      action: 'partner_login_request',
+      windowSeconds: 15 * 60,
+      maxAttempts: 5,
+    });
+    if (!rateLimit.allowed) {
+      error = 'Too many attempts. Please try again later.';
+    } else {
+      const token = await requestPartnerContactLoginToken(email);
+      if (token) {
+        const loginUrl = new URL(`/partner-portal/callback?token=${encodeURIComponent(token.rawToken)}`, Astro.url.origin).toString();
+        await sendMagicLinkEmail({ to: email, loginUrl, expiresAt: token.expiresAt });
+      }
+      sent = true;
+    }
+  }
+}
+
+const csrfToken = ensureCsrfCookie(Astro.cookies, Astro.url);
+---
+<PortalLayout title="Partner sign-in">
+  <h1>DAJC Partner Portal - Sign in</h1>
+  {sent && <p class="flash success">If that address has active portal access, a sign-in link has been sent.</p>}
+  {error && <p class="flash error">{error}</p>}
+  {!sent && (
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value={csrfToken} />
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required autocomplete="email" />
+      <button type="submit">Send sign-in link</button>
+    </form>
+  )}
+  <p>New partners are onboarded by DAJC via invitation - there is no public sign-up.</p>
+</PortalLayout>

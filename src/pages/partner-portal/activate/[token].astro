@@ -1,0 +1,61 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../../portal/components/PortalLayout.astro';
+import { notFoundIfPortalDisabled, redirectResponse } from '../../../portal/lib/guards';
+import { ensureCsrfCookie, validateCsrfToken, setSessionCookies } from '../../../portal/lib/session';
+import { peekInvitationIsAcceptable, acceptInvitation, InvitationInvalidError } from '../../../portal/lib/invitations';
+import { checkAndRecordRateLimit } from '../../../portal/lib/rateLimit';
+
+const disabled = notFoundIfPortalDisabled();
+if (disabled) return disabled;
+
+const rawToken = Astro.params.token!;
+let error: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const csrf = form.get('csrf_token');
+
+  if (!validateCsrfToken(Astro.cookies, typeof csrf === 'string' ? csrf : null)) {
+    error = 'Your session expired, please reload this page and try again.';
+  } else {
+    const ip = Astro.clientAddress ?? 'unknown';
+    const rateLimit = await checkAndRecordRateLimit(ip, {
+      action: 'invitation_accept',
+      windowSeconds: 15 * 60,
+      maxAttempts: 10,
+    });
+    if (!rateLimit.allowed) {
+      error = 'Too many attempts. Please try again later.';
+    } else {
+      try {
+        const { rawSessionToken, sessionExpiresAt } = await acceptInvitation(rawToken);
+        setSessionCookies(Astro.cookies, rawSessionToken, sessionExpiresAt, Astro.url);
+        return redirectResponse('/partner-portal/dashboard');
+      } catch (err) {
+        if (err instanceof InvitationInvalidError) {
+          error = 'This invitation link is invalid, expired, or already used.';
+        } else {
+          throw err;
+        }
+      }
+    }
+  }
+}
+
+const acceptable = error ? false : await peekInvitationIsAcceptable(rawToken);
+const csrfToken = ensureCsrfCookie(Astro.cookies, Astro.url);
+---
+<PortalLayout title="Activate access">
+  <h1>Activate DAJC Partner Portal access</h1>
+  {error && <p class="flash error">{error}</p>}
+  {!error && !acceptable && <p class="flash error">This invitation link is invalid, expired, or already used.</p>}
+  {!error && acceptable && (
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value={csrfToken} />
+      <p>Click below to activate your access. This link can only be used once.</p>
+      <button type="submit">Activate my access</button>
+    </form>
+  )}
+</PortalLayout>

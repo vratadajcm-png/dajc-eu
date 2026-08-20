@@ -1,0 +1,52 @@
+---
+// Layout for every DAJC Partner Portal page. Deliberately does NOT import
+// the public site's Header/Footer (src/components/Header.astro,
+// Footer.astro) - the portal must never link to or from the public
+// marketing site (docs/PARTNER_PORTAL.md section 12). `noindex` is set
+// here as an extra layer on top of the middleware's X-Robots-Tag header
+// and the sitemap filter in astro.config.mjs.
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} - DAJC Partner Portal</title>
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      font-family: 'IBM Plex Sans', system-ui, sans-serif;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+      line-height: 1.5;
+      background: #0b0d10;
+      color: #e8eaed;
+    }
+    h1, h2 { font-family: 'Space Grotesk', system-ui, sans-serif; }
+    a { color: #ff7a1a; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid #2a2e35; font-size: 0.9rem; }
+    form.inline { display: inline; }
+    fieldset { border: 1px solid #2a2e35; border-radius: 8px; margin: 1.5rem 0; padding: 1rem 1.25rem; }
+    label { display: block; margin: 0.75rem 0 0.25rem; font-size: 0.85rem; }
+    input, textarea, select { width: 100%; box-sizing: border-box; padding: 0.5rem; background: #16191e; border: 1px solid #2a2e35; color: inherit; border-radius: 4px; }
+    button { margin-top: 0.75rem; padding: 0.5rem 1rem; background: #ff7a1a; color: #0b0d10; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; }
+    button.danger { background: #e05555; }
+    .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.75rem; background: #2a2e35; }
+    .flash { padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1rem; }
+    .flash.error { background: #3a1f1f; color: #ffb4b4; }
+    .flash.success { background: #1f3a24; color: #b4ffbf; }
+    .eyebrow { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.75rem; color: #9aa0a8; }
+  </style>
+</head>
+<body>
+  <p class="eyebrow">DAJC Partner Portal - private, unlisted</p>
+  <slot />
+</body>
+</html>

@@ -1,0 +1,348 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../../../portal/components/PortalLayout.astro';
+import { notFoundIfPortalDisabled, redirectResponse } from '../../../../portal/lib/guards';
+import { requireAdminPrincipal, ensureCsrfCookie, validateCsrfToken } from '../../../../portal/lib/session';
+import { getPartnerById, updatePartnerMetadata } from '../../../../portal/lib/partners';
+import { listContactsForPartner } from '../../../../portal/lib/partnerContacts';
+import { createInvitation, listInvitationsForPartner, revokeInvitation } from '../../../../portal/lib/invitations';
+import { sendInvitationEmail } from '../../../../portal/lib/email';
+import {
+  verifyPartner,
+  enableSandbox,
+  approveProduction,
+  suspendPartner,
+  revokePartner,
+  InvalidTransitionError,
+} from '../../../../portal/lib/partnerLifecycle';
+import {
+  createAccessGrant,
+  revokeAccessGrant,
+  rotateApiClient,
+  revokeApiClient,
+  listApiClientsForPartner,
+  listAccessGrantsForPartner,
+  GrantValidationError,
+} from '../../../../portal/lib/accessGrants';
+
+const disabled = notFoundIfPortalDisabled();
+if (disabled) return disabled;
+
+const admin = await requireAdminPrincipal(Astro.cookies);
+if (!admin) return redirectResponse('/partner-portal/admin/login');
+
+const partnerId = Astro.params.id!;
+let error: string | null = null;
+let success: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const csrf = form.get('csrf_token');
+  const intent = String(form.get('intent') ?? '');
+
+  if (!validateCsrfToken(Astro.cookies, typeof csrf === 'string' ? csrf : null)) {
+    error = 'Your session expired, please try again.';
+  } else {
+    try {
+      switch (intent) {
+        case 'verify':
+          await verifyPartner(partnerId, admin.email);
+          success = 'Partner verified.';
+          break;
+        case 'enable_sandbox':
+          await enableSandbox(partnerId, admin.email);
+          success = 'Sandbox enabled.';
+          break;
+        case 'approve_production':
+          await approveProduction(partnerId, admin.email);
+          success = 'Production approved.';
+          break;
+        case 'suspend':
+          await suspendPartner(partnerId, admin.email, String(form.get('reason') ?? ''));
+          success = 'Partner suspended.';
+          break;
+        case 'revoke_partner':
+          await revokePartner(partnerId, admin.email, String(form.get('reason') ?? ''));
+          success = 'Partner revoked.';
+          break;
+        case 'update_metadata':
+          await updatePartnerMetadata(
+            partnerId,
+            {
+              legalName: String(form.get('legalName') ?? ''),
+              website: String(form.get('website') ?? ''),
+              primaryContactName: String(form.get('primaryContactName') ?? ''),
+              primaryContactEmail: String(form.get('primaryContactEmail') ?? ''),
+            },
+            admin.email
+          );
+          success = 'Partner metadata updated.';
+          break;
+        case 'invite': {
+          const email = String(form.get('email') ?? '').trim();
+          if (!email) throw new Error('Email is required.');
+          const invitation = await createInvitation(partnerId, email, admin.email);
+          const activationUrl = new URL(
+            `/partner-portal/activate/${invitation.rawToken}`,
+            Astro.url.origin
+          ).toString();
+          await sendInvitationEmail({
+            to: email,
+            partnerLegalName: invitation.partnerLegalName,
+            activationUrl,
+            expiresAt: invitation.expiresAt,
+            partnerId,
+          });
+          success = `Invitation sent to ${email}.`;
+          break;
+        }
+        case 'revoke_invitation':
+          await revokeInvitation(String(form.get('invitationId') ?? ''), admin.email);
+          success = 'Invitation revoked.';
+          break;
+        case 'create_grant':
+          await createAccessGrant({
+            partnerId,
+            apiClientId: String(form.get('apiClientId') ?? ''),
+            tenantRef: String(form.get('tenantRef') ?? ''),
+            scope: String(form.get('scope') ?? ''),
+            environment: form.get('environment') === 'PRODUCTION' ? 'PRODUCTION' : 'SANDBOX',
+            actorEmail: admin.email,
+          });
+          success = 'Grant created.';
+          break;
+        case 'revoke_grant':
+          await revokeAccessGrant(String(form.get('grantId') ?? ''), admin.email);
+          success = 'Grant revoked.';
+          break;
+        case 'rotate_client':
+          await rotateApiClient(String(form.get('apiClientId') ?? ''), admin.email);
+          success = 'API client rotated.';
+          break;
+        case 'revoke_client':
+          await revokeApiClient(String(form.get('apiClientId') ?? ''), admin.email);
+          success = 'API client revoked.';
+          break;
+        default:
+          error = 'Unknown action.';
+      }
+    } catch (err) {
+      if (err instanceof InvalidTransitionError || err instanceof GrantValidationError || err instanceof Error) {
+        error = err.message;
+      } else {
+        throw err;
+      }
+    }
+  }
+}
+
+const partner = await getPartnerById(partnerId);
+if (!partner) return new Response('Not found', { status: 404 });
+
+const [contacts, invitationList, apiClientList, grantList] = await Promise.all([
+  listContactsForPartner(partnerId),
+  listInvitationsForPartner(partnerId),
+  listApiClientsForPartner(partnerId),
+  listAccessGrantsForPartner(partnerId),
+]);
+
+const csrfToken = ensureCsrfCookie(Astro.cookies, Astro.url);
+---
+<PortalLayout title={partner.legalName}>
+  <p><a href="/partner-portal/admin">&larr; All partners</a></p>
+  <h1>{partner.legalName} <span class="badge">{partner.status}</span></h1>
+  {error && <p class="flash error">{error}</p>}
+  {success && <p class="flash success">{success}</p>}
+
+  <fieldset>
+    <legend>Metadata</legend>
+    <p>Country: {partner.country} - Registration ID: {partner.registrationId} - VAT: {partner.vatId ?? '-'}</p>
+    <p>Use case: {partner.useCaseDescription}</p>
+    <p>Requested integration type: {partner.requestedIntegrationType}</p>
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value={csrfToken} />
+      <input type="hidden" name="intent" value="update_metadata" />
+      <label for="legalName">Legal name</label>
+      <input id="legalName" name="legalName" value={partner.legalName} />
+      <label for="website">Website</label>
+      <input id="website" name="website" value={partner.website ?? ''} />
+      <label for="primaryContactName">Primary contact name</label>
+      <input id="primaryContactName" name="primaryContactName" value={partner.primaryContactName} />
+      <label for="primaryContactEmail">Primary contact email</label>
+      <input id="primaryContactEmail" name="primaryContactEmail" value={partner.primaryContactEmail} />
+      <button type="submit">Save metadata</button>
+    </form>
+  </fieldset>
+
+  <fieldset>
+    <legend>Lifecycle</legend>
+    <p>
+      {partner.status === 'PENDING' && (
+        <form class="inline" method="POST">
+          <input type="hidden" name="csrf_token" value={csrfToken} />
+          <input type="hidden" name="intent" value="verify" />
+          <button type="submit">Verify partner</button>
+        </form>
+      )}
+      {partner.status === 'VERIFIED' && (
+        <form class="inline" method="POST">
+          <input type="hidden" name="csrf_token" value={csrfToken} />
+          <input type="hidden" name="intent" value="enable_sandbox" />
+          <button type="submit">Enable sandbox</button>
+        </form>
+      )}
+      {partner.status === 'SANDBOX' && (
+        <form class="inline" method="POST">
+          <input type="hidden" name="csrf_token" value={csrfToken} />
+          <input type="hidden" name="intent" value="approve_production" />
+          <button type="submit">Approve production</button>
+        </form>
+      )}
+    </p>
+    {['VERIFIED', 'SANDBOX', 'PRODUCTION'].includes(partner.status) && (
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value={csrfToken} />
+        <input type="hidden" name="intent" value="suspend" />
+        <label for="suspendReason">Suspension reason</label>
+        <input id="suspendReason" name="reason" required />
+        <button type="submit" class="danger">Suspend partner</button>
+      </form>
+    )}
+    {partner.status !== 'REVOKED' && (
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value={csrfToken} />
+        <input type="hidden" name="intent" value="revoke_partner" />
+        <label for="revokeReason">Revocation reason</label>
+        <input id="revokeReason" name="reason" required />
+        <button type="submit" class="danger">Revoke partner (terminal)</button>
+      </form>
+    )}
+  </fieldset>
+
+  <fieldset>
+    <legend>Contacts &amp; invitations</legend>
+    <table>
+      <thead><tr><th>Email</th><th>Role</th><th>Status</th><th>Last login</th></tr></thead>
+      <tbody>
+        {contacts.map((c) => (
+          <tr><td>{c.email}</td><td>{c.role}</td><td>{c.status}</td><td>{c.lastLoginAt?.toISOString().slice(0, 16) ?? '-'}</td></tr>
+        ))}
+      </tbody>
+    </table>
+    <table>
+      <thead><tr><th>Email</th><th>Status</th><th>Expires</th><th></th></tr></thead>
+      <tbody>
+        {invitationList.map((inv) => (
+          <tr>
+            <td>{inv.email}</td>
+            <td>{inv.status}</td>
+            <td>{inv.expiresAt.toISOString().slice(0, 16)}</td>
+            <td>
+              {inv.status === 'PENDING' && (
+                <form class="inline" method="POST">
+                  <input type="hidden" name="csrf_token" value={csrfToken} />
+                  <input type="hidden" name="intent" value="revoke_invitation" />
+                  <input type="hidden" name="invitationId" value={inv.id} />
+                  <button type="submit" class="danger">Revoke</button>
+                </form>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {partner.status !== 'PENDING' && partner.status !== 'REVOKED' && (
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value={csrfToken} />
+        <input type="hidden" name="intent" value="invite" />
+        <label for="inviteEmail">Invite contact email</label>
+        <input id="inviteEmail" name="email" type="email" required />
+        <button type="submit">Send invitation</button>
+      </form>
+    )}
+  </fieldset>
+
+  <fieldset>
+    <legend>API clients (registry metadata only - no secrets)</legend>
+    <table>
+      <thead><tr><th>Environment</th><th>Status</th><th>Rotated</th><th></th></tr></thead>
+      <tbody>
+        {apiClientList.map((c) => (
+          <tr>
+            <td>{c.environment}</td>
+            <td>{c.status}</td>
+            <td>{c.rotatedAt?.toISOString().slice(0, 16) ?? 'never'}</td>
+            <td>
+              {!c.revokedAt && (
+                <>
+                  <form class="inline" method="POST">
+                    <input type="hidden" name="csrf_token" value={csrfToken} />
+                    <input type="hidden" name="intent" value="rotate_client" />
+                    <input type="hidden" name="apiClientId" value={c.id} />
+                    <button type="submit">Rotate</button>
+                  </form>
+                  <form class="inline" method="POST">
+                    <input type="hidden" name="csrf_token" value={csrfToken} />
+                    <input type="hidden" name="intent" value="revoke_client" />
+                    <input type="hidden" name="apiClientId" value={c.id} />
+                    <button type="submit" class="danger">Revoke</button>
+                  </form>
+                </>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </fieldset>
+
+  <fieldset>
+    <legend>Access grants (tenant + scope + environment)</legend>
+    <table>
+      <thead><tr><th>Tenant ref</th><th>Scope</th><th>Env</th><th>Revoked</th><th></th></tr></thead>
+      <tbody>
+        {grantList.map((g) => (
+          <tr>
+            <td>{g.tenantRef}</td>
+            <td>{g.scope}</td>
+            <td>{g.environment}</td>
+            <td>{g.revokedAt ? 'yes' : 'no'}</td>
+            <td>
+              {!g.revokedAt && (
+                <form class="inline" method="POST">
+                  <input type="hidden" name="csrf_token" value={csrfToken} />
+                  <input type="hidden" name="intent" value="revoke_grant" />
+                  <input type="hidden" name="grantId" value={g.id} />
+                  <button type="submit" class="danger">Revoke</button>
+                </form>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {apiClientList.some((c) => !c.revokedAt) && (
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value={csrfToken} />
+        <input type="hidden" name="intent" value="create_grant" />
+        <label for="apiClientId">API client</label>
+        <select id="apiClientId" name="apiClientId" required>
+          {apiClientList.filter((c) => !c.revokedAt).map((c) => (
+            <option value={c.id}>{c.environment} - {c.id.slice(0, 8)}</option>
+          ))}
+        </select>
+        <label for="tenantRef">DAJC tenant/organization reference</label>
+        <input id="tenantRef" name="tenantRef" required />
+        <label for="scope">Scope (e.g. orders.read)</label>
+        <input id="scope" name="scope" required />
+        <label for="environment">Environment</label>
+        <select id="environment" name="environment">
+          <option value="SANDBOX">SANDBOX</option>
+          <option value="PRODUCTION">PRODUCTION</option>
+        </select>
+        <button type="submit">Create grant</button>
+      </form>
+    )}
+  </fieldset>
+</PortalLayout>

@@ -1,0 +1,48 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../../portal/components/PortalLayout.astro';
+import { notFoundIfPortalDisabled, redirectResponse } from '../../../portal/lib/guards';
+import { requireAdminPrincipal, ensureCsrfCookie } from '../../../portal/lib/session';
+import { listPartners } from '../../../portal/lib/partners';
+
+const disabled = notFoundIfPortalDisabled();
+if (disabled) return disabled;
+
+const admin = await requireAdminPrincipal(Astro.cookies);
+if (!admin) return redirectResponse('/partner-portal/admin/login');
+
+const partners = await listPartners();
+const csrfToken = ensureCsrfCookie(Astro.cookies, Astro.url);
+---
+<PortalLayout title="Admin - Partners">
+  <h1>Partners</h1>
+  <p>Signed in as {admin.email} - <a href="/partner-portal/admin/audit">Audit log</a> -
+    <form class="inline" method="POST" action="/partner-portal/logout">
+      <input type="hidden" name="csrf_token" value={csrfToken} />
+      <button type="submit">Sign out</button>
+    </form>
+  </p>
+
+  <p><a href="/partner-portal/admin/partners/new">+ Create partner</a></p>
+
+  <table>
+    <thead>
+      <tr><th>Legal name</th><th>Country</th><th>Status</th><th>Created</th><th></th></tr>
+    </thead>
+    <tbody>
+      {partners.map((p) => (
+        <tr>
+          <td>{p.legalName}</td>
+          <td>{p.country}</td>
+          <td><span class="badge">{p.status}</span></td>
+          <td>{p.createdAt.toISOString().slice(0, 10)}</td>
+          <td><a href={`/partner-portal/admin/partners/${p.id}`}>Manage</a></td>
+        </tr>
+      ))}
+      {partners.length === 0 && (
+        <tr><td colspan="5">No partners yet.</td></tr>
+      )}
+    </tbody>
+  </table>
+</PortalLayout>

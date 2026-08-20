@@ -1,0 +1,62 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../../portal/components/PortalLayout.astro';
+import { notFoundIfPortalDisabled } from '../../../portal/lib/guards';
+import { ensureCsrfCookie, validateCsrfToken } from '../../../portal/lib/session';
+import { requestAdminLoginToken } from '../../../portal/lib/magicLink';
+import { sendMagicLinkEmail } from '../../../portal/lib/email';
+import { checkAndRecordRateLimit } from '../../../portal/lib/rateLimit';
+
+const disabled = notFoundIfPortalDisabled();
+if (disabled) return disabled;
+
+let sent = false;
+let error: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const csrf = form.get('csrf_token');
+  const email = String(form.get('email') ?? '').trim();
+
+  if (!validateCsrfToken(Astro.cookies, typeof csrf === 'string' ? csrf : null)) {
+    error = 'Your session expired, please try again.';
+  } else if (!email) {
+    error = 'Enter your DAJC staff email address.';
+  } else {
+    const ip = Astro.clientAddress ?? 'unknown';
+    const rateLimit = await checkAndRecordRateLimit(ip, {
+      action: 'admin_login_request',
+      windowSeconds: 15 * 60,
+      maxAttempts: 5,
+    });
+    if (!rateLimit.allowed) {
+      error = 'Too many attempts. Please try again later.';
+    } else {
+      // Always show the same success message whether or not the email is
+      // allowlisted - see docs/PARTNER_PORTAL.md "Admin auth".
+      const token = await requestAdminLoginToken(email);
+      if (token) {
+        const loginUrl = new URL(`/partner-portal/callback?token=${encodeURIComponent(token.rawToken)}`, Astro.url.origin).toString();
+        await sendMagicLinkEmail({ to: email, loginUrl, expiresAt: token.expiresAt });
+      }
+      sent = true;
+    }
+  }
+}
+
+const csrfToken = ensureCsrfCookie(Astro.cookies, Astro.url);
+---
+<PortalLayout title="Admin sign-in">
+  <h1>DAJC Partner Portal - Admin sign-in</h1>
+  {sent && <p class="flash success">If that address is authorized, a sign-in link has been sent.</p>}
+  {error && <p class="flash error">{error}</p>}
+  {!sent && (
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value={csrfToken} />
+      <label for="email">DAJC staff email</label>
+      <input id="email" name="email" type="email" required autocomplete="email" />
+      <button type="submit">Send sign-in link</button>
+    </form>
+  )}
+</PortalLayout>

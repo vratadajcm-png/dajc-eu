@@ -1,0 +1,70 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../../../portal/components/PortalLayout.astro';
+import { notFoundIfPortalDisabled, redirectResponse } from '../../../../portal/lib/guards';
+import { requireAdminPrincipal, ensureCsrfCookie, validateCsrfToken } from '../../../../portal/lib/session';
+import { createPartner, createPartnerSchema } from '../../../../portal/lib/partners';
+
+const disabled = notFoundIfPortalDisabled();
+if (disabled) return disabled;
+
+const admin = await requireAdminPrincipal(Astro.cookies);
+if (!admin) return redirectResponse('/partner-portal/admin/login');
+
+let error: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const csrf = form.get('csrf_token');
+  if (!validateCsrfToken(Astro.cookies, typeof csrf === 'string' ? csrf : null)) {
+    error = 'Your session expired, please try again.';
+  } else {
+    const parsed = createPartnerSchema.safeParse({
+      legalName: form.get('legalName'),
+      country: form.get('country'),
+      registrationId: form.get('registrationId'),
+      vatId: form.get('vatId'),
+      website: form.get('website'),
+      primaryContactName: form.get('primaryContactName'),
+      primaryContactEmail: form.get('primaryContactEmail'),
+      useCaseDescription: form.get('useCaseDescription'),
+      requestedIntegrationType: form.get('requestedIntegrationType'),
+    });
+    if (!parsed.success) {
+      error = parsed.error.issues.map((i) => i.message).join(' ');
+    } else {
+      const { partnerId } = await createPartner(parsed.data, admin.email);
+      return redirectResponse(`/partner-portal/admin/partners/${partnerId}`);
+    }
+  }
+}
+
+const csrfToken = ensureCsrfCookie(Astro.cookies, Astro.url);
+---
+<PortalLayout title="Create partner">
+  <h1>Create partner</h1>
+  {error && <p class="flash error">{error}</p>}
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value={csrfToken} />
+    <label for="legalName">Legal / company name</label>
+    <input id="legalName" name="legalName" required />
+    <label for="country">Country (ISO 3166-1 alpha-2)</label>
+    <input id="country" name="country" maxlength="2" required placeholder="DE" />
+    <label for="registrationId">Company registration ID</label>
+    <input id="registrationId" name="registrationId" required />
+    <label for="vatId">VAT ID (optional)</label>
+    <input id="vatId" name="vatId" />
+    <label for="website">Company website (optional)</label>
+    <input id="website" name="website" type="url" placeholder="https://" />
+    <label for="primaryContactName">Primary contact name</label>
+    <input id="primaryContactName" name="primaryContactName" required />
+    <label for="primaryContactEmail">Verified business email</label>
+    <input id="primaryContactEmail" name="primaryContactEmail" type="email" required />
+    <label for="requestedIntegrationType">Requested integration type</label>
+    <input id="requestedIntegrationType" name="requestedIntegrationType" required placeholder="e.g. orders read-only" />
+    <label for="useCaseDescription">Integration / use-case description</label>
+    <textarea id="useCaseDescription" name="useCaseDescription" rows="4" required></textarea>
+    <button type="submit">Create partner (status: PENDING)</button>
+  </form>
+</PortalLayout>
