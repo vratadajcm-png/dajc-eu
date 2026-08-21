@@ -17,7 +17,7 @@
 // deleted by this script under any failure mode, including a --dry-run
 // invocation, which always deletes its own output before exiting.
 
-import { writeFile, unlink, mkdir } from 'node:fs/promises';
+import { writeFile, unlink, mkdir, appendFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -32,6 +32,8 @@ import { generateArticleWithOpenAI } from './lib/openai-client.mjs';
 import { generateArticleMock } from './lib/mock-generator.mjs';
 import { renderArticleMarkdown, toFrontmatterYaml } from './lib/render-article.mjs';
 import { runQualityGate } from './lib/quality-gate.mjs';
+import { checkOpenAiKeyPreflight } from './lib/preflight.mjs';
+import { formatNextPublicationLabel } from './lib/next-publication.mjs';
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -45,14 +47,46 @@ function parseArgs(argv) {
   return { mock, skipBuild, dryRun };
 }
 
-function abort(reason) {
+async function appendSummary(markdown) {
+  const summaryFile = process.env.GITHUB_STEP_SUMMARY;
+  if (!summaryFile) return;
+  try {
+    await appendFile(summaryFile, markdown.endsWith('\n') ? markdown : `${markdown}\n`);
+  } catch {
+    // best-effort only - never fail the run because the summary couldn't be written
+  }
+}
+
+async function abort(reason) {
   console.log(`\nNo article will be published: ${reason}`);
   console.log('This is expected behavior when there is not enough verified, significant data - not an error.');
+  await appendSummary(`### EU Oversize Weekly - no article this run\n\n${reason}\n`);
   process.exit(0);
+}
+
+// Distinct from abort(): a configuration error (e.g. a missing
+// OPENAI_API_KEY) is not "no news this week" - it must fail the run
+// (non-zero exit) so it shows up as a red workflow run instead of silently
+// looking identical to a normal quiet week.
+async function fail(reason) {
+  console.error(`\nConfiguration error - failing this run: ${reason}`);
+  await appendSummary(`### EU Oversize Weekly - configuration error\n\n${reason}\n`);
+  process.exit(1);
 }
 
 async function main() {
   const { mock, skipBuild, dryRun } = parseArgs(process.argv.slice(2));
+
+  // Preflight, before any network/data work: a missing key on a real run is
+  // a configuration error, not something worth spending verification time
+  // on first. See scripts/lib/preflight.mjs.
+  const apiKey = process.env.OPENAI_API_KEY;
+  const preflight = checkOpenAiKeyPreflight({ mock, apiKey });
+  if (!preflight.ok) {
+    await fail(preflight.reason);
+    return;
+  }
+
   const now = new Date();
   const thisWeek = isoWeekLabel(now);
 
@@ -77,10 +111,11 @@ async function main() {
     // separate throwaway path below (never `filePath` itself) - but if the
     // real article already exists there is nothing meaningful left to dry-
     // run either, so we abort the same way in both modes for consistency.
-    abort(
+    await abort(
       `${path.relative(ROOT, filePath)} already exists - refusing to overwrite a previously published article. ` +
         'Delete it manually first if you really want to regenerate this week\'s article.'
     );
+    return;
   }
   // Dry runs never write to the real target path, even transiently - a
   // separate, uniquely-named throwaway file is used for the build check
@@ -94,11 +129,17 @@ async function main() {
   const findingsMap = await loadWeekFindings(thisWeek);
   const findings = [...findingsMap.values()];
   console.log(`Findings on file for ${thisWeek}: ${findings.length}`);
-  if (findings.length === 0) abort(`no findings recorded for ${thisWeek}`);
+  if (findings.length === 0) {
+    await abort(`no findings recorded for ${thisWeek}`);
+    return;
+  }
 
   const preSelected = selectCandidates(findings);
   console.log(`Pre-selected for verification: ${preSelected.length}`);
-  if (preSelected.length === 0) abort('no candidates passed pre-selection');
+  if (preSelected.length === 0) {
+    await abort('no candidates passed pre-selection');
+    return;
+  }
 
   let verified;
   if (mock) {
@@ -109,11 +150,12 @@ async function main() {
     verified = result.verified;
     console.log(`Verification: ${verified.length} OK, ${result.failed.length} failed (unreachable source - dropped)`);
   }
-  if (verified.length === 0) abort('no candidates had a reachable source after verification');
+  if (verified.length === 0) {
+    await abort('no candidates had a reachable source after verification');
+    return;
+  }
 
   console.log(`\nSynthesizing article from ${verified.length} verified candidate(s)...`);
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!mock && !apiKey) abort('OPENAI_API_KEY is not set and --mock was not requested');
 
   let article;
   try {
@@ -136,10 +178,14 @@ async function main() {
     );
   }
   console.log(`Developments after cross-validation: ${article.developments.length}`);
-  if (article.developments.length === 0) abort('no developments survived cross-validation against verified sources');
+  if (article.developments.length === 0) {
+    await abort('no developments survived cross-validation against verified sources');
+    return;
+  }
 
   const publishedAt = now.toISOString().slice(0, 10);
-  const { frontmatter, body } = renderArticleMarkdown(article, { slug, publishedAt });
+  const nextPublicationLabel = formatNextPublicationLabel(now);
+  const { frontmatter, body } = renderArticleMarkdown(article, { slug, publishedAt, nextPublicationLabel });
 
   console.log('\nRunning quality gate...');
   const gate = runQualityGate({ frontmatter, body, developments: article.developments });
@@ -186,6 +232,18 @@ async function main() {
     console.log('\nDry run complete: verification, OpenAI synthesis, cross-validation, quality gate and build all passed.');
     console.log('No file was left on disk and nothing was committed or pushed. The real target path');
     console.log(`(${path.relative(ROOT, filePath)}) was never written to.`);
+    await appendSummary(
+      [
+        '### EU Oversize Weekly dry run successful',
+        '',
+        'No content was published.',
+        '',
+        `- Would-be article: \`${path.relative(ROOT, filePath)}\``,
+        `- Title: ${frontmatter.title}`,
+        `- Sources cited: ${frontmatter.sources.length}`,
+        '- Nothing was committed or pushed.',
+      ].join('\n')
+    );
     return;
   }
 
@@ -195,6 +253,15 @@ async function main() {
   console.log(`Sources cited: ${frontmatter.sources.length}`);
   console.log('\nSuggested commit message:');
   console.log(`  content: publish EU Oversize Weekly ${nextWeekLabel}`);
+  await appendSummary(
+    [
+      '### EU Oversize Weekly article generated',
+      '',
+      `- Article: \`${path.relative(ROOT, filePath)}\``,
+      `- Title: ${frontmatter.title}`,
+      `- Sources cited: ${frontmatter.sources.length}`,
+    ].join('\n')
+  );
 }
 
 main().catch((err) => {

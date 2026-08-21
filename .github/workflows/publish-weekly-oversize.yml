@@ -72,6 +72,27 @@ jobs:
             echo "dry_run=false" >> "$GITHUB_OUTPUT"
           fi
 
+      # Fails fast, before checkout/install/data-refresh spend any time or
+      # bandwidth, if OPENAI_API_KEY is missing - a real run without it is a
+      # configuration error (see generate-weekly-article.mjs's own preflight
+      # for the same check, kept as defense in depth for direct/local
+      # invocations that bypass this workflow). Never echoes the value.
+      - name: Pre-flight - verify OPENAI_API_KEY is configured
+        if: steps.check-time.outputs.should_run == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::OPENAI_API_KEY repository secret is not set (Settings -> Secrets and variables -> Actions -> New repository secret). Failing before any work is done - see docs/NEWS_AUTOMATION.md#github-secrets."
+            {
+              echo "### EU Oversize Weekly - pre-flight failed"
+              echo ""
+              echo "\`OPENAI_API_KEY\` is not configured. No data was refreshed, no article was generated, nothing was committed."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "Pre-flight OK: OPENAI_API_KEY is configured (value not printed)."
+
       - name: Checkout
         if: steps.check-time.outputs.should_run == 'true'
         uses: actions/checkout@v4
@@ -97,20 +118,19 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run oversize:publish -- ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }}
 
-      - name: Commit new article and refreshed data (only if something was actually written)
+      - name: Commit new article and refreshed data (explicit publish gate - only if something was actually written)
         # Skipped entirely for dry runs as a second, belt-and-suspenders
         # guard - the script itself never leaves a dry-run file on disk
         # (see generate-weekly-article.mjs's --dry-run handling), so this
-        # `if` is defensive, not load-bearing.
+        # `if` is defensive, not load-bearing. Also implicitly skipped if
+        # the previous step failed (its `if` has no failure()/always(), so
+        # GitHub Actions ANDs it with success()) - a hard preflight/quality-
+        # gate/build failure never reaches this step.
+        #
+        # The actual publish/data-only decision lives in
+        # scripts/publish-gate-commit.mjs (decidePublishCommit in
+        # scripts/lib/publish-gate.mjs, unit tested) rather than here, so a
+        # data/oversize-only refresh can never again be committed with a
+        # "content: publish..." message - see docs/NEWS_AUTOMATION.md.
         if: steps.check-time.outputs.should_run == 'true' && steps.dry-run-mode.outputs.dry_run != 'true'
-        run: |
-          git config user.name "dajc-bot"
-          git config user.email "bot@users.noreply.github.com"
-          git add data/oversize src/content/news/eu-oversize
-          if git diff --cached --quiet; then
-            echo "Nothing to publish this run (no article was generated, or no data changed) - not an error, see the previous step's log for why."
-          else
-            week=$(TZ=Europe/Prague date +%G-W%V)
-            git commit -m "content: publish EU Oversize Weekly ${week}"
-            git push
-          fi
+        run: node scripts/publish-gate-commit.mjs

@@ -451,12 +451,45 @@ design for now.
   same way. Already-published articles are unaffected either way - both
   workflows only ever add new files, they never modify or delete
   previously published articles.
-- **Pause without disabling**: remove/rotate the `OPENAI_API_KEY` secret -
-  `publish-weekly-oversize.yml` will then fail fast at the generation
-  step (`abort('OPENAI_API_KEY is not set...')` only fires for a
-  completely missing key at the script level; an invalid/revoked key
-  fails inside the OpenAI call itself, is caught, and exits 1 without
-  writing anything).
+- **Pause without disabling**: removing/rotating the `OPENAI_API_KEY`
+  secret no longer pauses this quietly - a completely missing key now
+  fails the "Pre-flight - verify OPENAI_API_KEY is configured" step
+  (non-zero exit, red run) before any checkout, data refresh, or OpenAI
+  usage happens, and `generate-weekly-article.mjs` has the same check as
+  a second line of defense for direct/local invocations
+  (`checkOpenAiKeyPreflight` in `scripts/lib/preflight.mjs`). This is
+  intentional: a missing key is a configuration error, not a normal
+  "nothing to publish this week" outcome, and must not look like one - see
+  "Incident: the first live run" below. If you want to pause without a
+  failing red run every Friday, disable the workflow instead (previous
+  bullet). An invalid/revoked (as opposed to missing) key still fails
+  inside the OpenAI call itself, is caught, and exits 1 without writing
+  anything.
+
+## Incident: the first live run (2026-08-21)
+
+The first scheduled run committed
+`content: publish EU Oversize Weekly 2026-W34` with no article - the diff
+only contained the routine `data/oversize` refresh. Root cause:
+`OPENAI_API_KEY` had never been added as a repository secret, so
+`generate-weekly-article.mjs` hit its (then silent, exit-0) abort branch
+after writing fresh findings but before generating anything, and the old
+commit step staged+committed `data/oversize` and
+`src/content/news/eu-oversize` together under one "publish" message
+regardless of which one, if either, had actually changed.
+
+Fixed by:
+- A missing key on a real run is now a hard failure (exit 1), checked as
+  a preflight both in the workflow (before checkout) and in the script
+  itself - see the bullet above.
+- The commit step now runs `scripts/publish-gate-commit.mjs`, which uses
+  `decidePublishCommit` (`scripts/lib/publish-gate.mjs`, unit tested in
+  `scripts/lib/__tests__/publish-gate.test.mjs`) as an explicit gate: only
+  a real new file under `src/content/news/eu-oversize` produces a
+  `content: publish EU Oversize Weekly <week>` commit. A data-only
+  refresh, if it commits at all, uses
+  `data: refresh oversize findings (no article published this run)` -
+  never the word "publish".
 
 ## Troubleshooting
 

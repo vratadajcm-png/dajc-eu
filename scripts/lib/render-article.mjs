@@ -40,7 +40,7 @@ function renderDevelopmentItem(item) {
   return lines.join('\n');
 }
 
-export function renderArticleMarkdown(article, { slug, publishedAt }) {
+export function renderArticleMarkdown(article, { slug, publishedAt, nextPublicationLabel }) {
   const grouped = new Map();
   for (const item of article.developments) {
     const list = grouped.get(item.country) || [];
@@ -87,6 +87,10 @@ export function renderArticleMarkdown(article, { slug, publishedAt }) {
   sections.push(
     ['## Sources', '', ...sourcesList.map((s) => `- [${mdEscape(s.name)}](${s.url})`)].join('\n')
   );
+
+  if (nextPublicationLabel) {
+    sections.push(`## Next EU Oversize Weekly\n\n${nextPublicationLabel}.`);
+  }
 
   const body = sections.join('\n\n') + '\n';
 

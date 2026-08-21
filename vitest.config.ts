@@ -1,9 +1,11 @@
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
-// Partner Portal unit/security tests only (src/portal/__tests__/**). The
-// rest of dajc.eu has no test suite to integrate with - see
-// docs/PARTNER_PORTAL.md.
+// Partner Portal unit/security tests (src/portal/__tests__/**, see
+// docs/PARTNER_PORTAL.md) plus the EU Oversize Weekly pipeline's pure
+// decision-logic tests (scripts/lib/__tests__/**, see
+// docs/NEWS_AUTOMATION.md). The rest of dajc.eu has no test suite to
+// integrate with.
 export default defineConfig({
   resolve: {
     alias: {
@@ -17,7 +19,7 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['src/portal/__tests__/**/*.test.ts'],
+    include: ['src/portal/__tests__/**/*.test.ts', 'scripts/lib/__tests__/**/*.test.mjs'],
     environment: 'node',
   },
 });
