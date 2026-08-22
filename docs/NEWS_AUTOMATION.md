@@ -42,10 +42,9 @@ src/content.config.ts               Astro content collection schema
   publish-weekly-oversize.yml
 ```
 
-Nothing here touches the homepage hero, header, footer, or global styles -
-the News system only adds the `News` section above the footer and the
-`/news` routes, reusing the same CSS custom properties (`--dajc-dark`,
-`--dajc-orange`, etc.) defined in `src/styles/global.css`.
+The homepage renders `News` before `Integration ecosystem`, so current
+operational intelligence is visible before the provider directory. The
+system reuses the global DAJC styles and does not alter the hero or header.
 
 ## Editorial specification
 
@@ -55,11 +54,12 @@ dispatchers - not a general traffic-news feed, and it must never summarize
 every item a source happens to publish. All content is written in
 professional English.
 
-- **8-12 distinct operational reports per article**, enforced by
-  `scripts/lib/quality-gate.mjs`. Never padded with filler to reach 8, never
-  split/duplicated to exceed 12 - if fewer than 8 verified, genuinely useful
-  reports are available, the run does not publish (see "Hard-failure
-  conditions" below).
+- **10-12 lead reports plus a Rest-of-Europe roundup**, enforced by
+  `scripts/lib/quality-gate.mjs`. The lead reports are the most consequential
+  items by operational impact. Every other verified, useful item belongs in
+  the Europe-wide roundup. A title or source may appear only once across the
+  complete edition. If fewer than 10 verified lead-quality reports are
+  available, the run does not publish; it never pads the edition with filler.
 - **Editorial priority order** (most important first, see the system prompt
   in `scripts/lib/openai-client.mjs`): truck driving bans; special movement
   windows/bans for exceptional or oversized transport; permit-rule/system
@@ -69,10 +69,12 @@ professional English.
   strategic routes; weather only when it creates a specific operational
   restriction; significant equipment/regulatory/market changes as secondary
   items.
-- **Whole-of-Europe scope.** The article must never default to any single
-  personal/habitual route (e.g. Czechia-Slovakia-Hungary-Romania) - a
-  specific route is named only when an official restriction actually
-  affects it.
+- **Whole-of-Europe scope without a fixed country list.** Countries are
+  selected from verified evidence and may change every week. There are no
+  quotas, preferred states, or habitual corridors. Romania, Lithuania,
+  Turkey, Spain, the United Kingdom, Denmark and every other covered European
+  market compete on the same operational-significance criteria. A specific
+  route is named only when an official restriction actually affects it.
 - **Every report states**: country; region/road/route where applicable;
   what applies or changed; affected vehicle category and weight/vehicle
   threshold (`vehicleScope`); exact date and **local time of the country
