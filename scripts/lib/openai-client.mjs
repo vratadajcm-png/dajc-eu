@@ -17,6 +17,29 @@ import OpenAI from 'openai';
 // what's current before relying on the default.
 const DEFAULT_MODEL = 'gpt-4o';
 
+const DEVELOPMENT_SCHEMA = {
+  type: 'object',
+  properties: {
+    country: { type: 'string' },
+    title: { type: 'string', description: 'Short factual headline for this development' },
+    whatChanged: { type: 'string', description: 'What applies or what changed - the substantive restriction, in professional English' },
+    where: { type: 'string', description: 'Region, road, route, or corridor this applies to' },
+    vehicleScope: { type: 'string', description: 'Affected vehicle category and the applicable weight/vehicle threshold. Empty string if not known.' },
+    timeWindow: { type: 'string', description: 'Exact date(s) and LOCAL time of the country concerned. Empty string if not known.' },
+    validFrom: { type: 'string', description: 'ISO date (YYYY-MM-DD) or empty string if unknown' },
+    validTo: { type: 'string', description: 'ISO date (YYYY-MM-DD) or empty string if unknown' },
+    impact: { type: 'string', description: 'Practical impact on heavy/oversized transport operations' },
+    recommendedAction: { type: 'string', description: 'Concrete, practical action for an operator or dispatcher - never a generic platitude' },
+    exemptions: { type: 'string', description: 'Important exemptions or permit-specific conditions. Empty string if none apply.' },
+    isDrivingBan: { type: 'boolean' },
+    isInfrastructure: { type: 'boolean' },
+    sourceUrl: { type: 'string', description: 'Must be copied EXACTLY from the supplied candidate - never invented' },
+    sourceName: { type: 'string', description: 'Must be copied EXACTLY from the supplied candidate - never invented' },
+  },
+  required: ['country', 'title', 'whatChanged', 'where', 'vehicleScope', 'timeWindow', 'validFrom', 'validTo', 'impact', 'recommendedAction', 'exemptions', 'isDrivingBan', 'isInfrastructure', 'sourceUrl', 'sourceName'],
+  additionalProperties: false,
+};
+
 const ARTICLE_JSON_SCHEMA = {
   name: 'eu_oversize_weekly_article',
   strict: true,
@@ -34,32 +57,13 @@ const ARTICLE_JSON_SCHEMA = {
       intro: { type: 'string', description: 'Short intro naming what matters most for the coming week, written for a European (not single-corridor) audience' },
       developments: {
         type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            country: { type: 'string' },
-            title: { type: 'string', description: 'Short factual headline for this development' },
-            whatChanged: { type: 'string', description: 'What applies or what changed - the substantive restriction, in professional English' },
-            where: { type: 'string', description: 'Region, road, route, or corridor this applies to' },
-            vehicleScope: { type: 'string', description: 'Affected vehicle category and the applicable weight/vehicle threshold. Empty string if not known.' },
-            timeWindow: { type: 'string', description: 'Exact date(s) and LOCAL time of the country concerned, e.g. "Saturday 29 August 2026, 07:00-20:00". Empty string if not known.' },
-            validFrom: { type: 'string', description: 'ISO date (YYYY-MM-DD) or empty string if unknown' },
-            validTo: { type: 'string', description: 'ISO date (YYYY-MM-DD) or empty string if unknown' },
-            impact: { type: 'string', description: 'Practical impact on heavy/oversized transport operations' },
-            recommendedAction: { type: 'string', description: 'Concrete, practical action for an operator or dispatcher - never a generic platitude' },
-            exemptions: { type: 'string', description: 'Important exemptions or permit-specific conditions. Empty string if none apply.' },
-            isDrivingBan: { type: 'boolean', description: 'true for a driving ban or a special movement window/restriction for exceptional or oversized transport' },
-            isInfrastructure: { type: 'boolean', description: 'true for a bridge/tunnel/height/width/axle-load/weight/road-closure restriction' },
-            sourceUrl: { type: 'string', description: 'Must be copied EXACTLY from the supplied candidate - never invented' },
-            sourceName: { type: 'string', description: 'Must be copied EXACTLY from the supplied candidate - never invented' },
-          },
-          required: [
-            'country', 'title', 'whatChanged', 'where', 'vehicleScope', 'timeWindow',
-            'validFrom', 'validTo', 'impact', 'recommendedAction', 'exemptions',
-            'isDrivingBan', 'isInfrastructure', 'sourceUrl', 'sourceName',
-          ],
-          additionalProperties: false,
-        },
+        items: DEVELOPMENT_SCHEMA,
+        description: 'The 10-12 most consequential lead reports, selected by operational impact without country quotas.',
+      },
+      europeRoundup: {
+        type: 'array',
+        items: DEVELOPMENT_SCHEMA,
+        description: 'All other verified, operationally useful European developments not selected as lead reports. Never duplicate a lead report.',
       },
       operatorChecklist: {
         type: 'array',
@@ -67,7 +71,7 @@ const ARTICLE_JSON_SCHEMA = {
         description: 'Short, practical checklist items for an operator/dispatcher preparing for the target week (e.g. "Check the individual exceptional-transport permit for country-specific conditions.")',
       },
     },
-    required: ['seoTitle', 'metaDescription', 'intro', 'developments', 'operatorChecklist'],
+    required: ['seoTitle', 'metaDescription', 'intro', 'developments', 'europeRoundup', 'operatorChecklist'],
     additionalProperties: false,
   },
 };
@@ -78,7 +82,7 @@ You will be given the exact target-week date range (Monday-Sunday, ISO dates) an
 
 Editorial priority order (most important first): (1) truck driving bans; (2) special movement windows/bans for exceptional or oversized transport; (3) permit-rule or permit-system changes; (4) escort/BF2/BF3/BF4/police-assistance requirements; (5) border and transit restrictions; (6) mandatory crossings or approved corridors; (7) bridge/tunnel/height/width/axle-load/weight restrictions; (8) long-term closures on strategic routes; (9) weather ONLY when it creates a specific operational restriction; (10) significant equipment/regulatory/market changes, as secondary items only.
 
-Geographic scope: cover the whole of Europe. Do not default to any specific personal or habitual route (e.g. Czechia-Slovakia-Hungary-Romania) - a specific route may be named only when an official restriction actually affects that route.
+Geographic scope: cover the whole of Europe. Country selection must be evidence-led and may change every week. Never use a fixed country list, country quota, preferred corridor, or Central-European default. Rank the 10-12 most consequential items as lead reports, then put every other verified and useful item into europeRoundup so smaller markets and peripheral regions are not silently dropped.
 
 Hard rules - violating any of these makes your output unusable:
 1. The target week is the ONLY window that matters. Exclude any development whose validTo date is before the target week starts. Exclude any development whose validFrom date is after the target week ends.
@@ -90,8 +94,9 @@ Hard rules - violating any of these makes your output unusable:
 7. For every development, "sourceUrl" and "sourceName" MUST be copied EXACTLY, character for character, from one of the supplied candidates. Never invent, modify, or guess a source.
 8. Every development must state: country; region/road/route where applicable; what applies or changed; affected vehicle category and weight/vehicle threshold (vehicleScope); exact date and LOCAL time of the country concerned (timeWindow); geographic/route scope (where); practical impact; a concrete, practical recommendedAction for an operator or dispatcher (never a generic platitude); and important exemptions/permit-specific conditions if any (exemptions, empty string if none).
 9. Clearly distinguish a general truck-driving ban, a restriction above a specific weight, a special restriction for exceptional/oversized transport, and a condition contained in an individual transport permit - never conflate these.
-10. If there is not enough genuinely relevant, sufficiently detailed information for the target week, return an EMPTY "developments" array - never pad the article with filler or marginal items to reach a target count, and never force a fixed number of items.
-11. Write in professional, practical, plain English for operators/dispatchers. No marketing language, no filler, no clickbait in the body (the seoTitle may use restrained tabloid-style urgency, but must stay accurate and must not exaggerate scope).`;
+10. developments must contain 10-12 distinct lead reports when enough verified material exists. If fewer than 10 genuinely useful candidates exist, return an EMPTY developments array. Never pad with filler.
+11. europeRoundup must contain the remaining verified, useful candidates that were not chosen as leads. Do not repeat any sourceUrl or title across the two arrays. Grouping happens later in the renderer; do not drop a country merely because it has only one item.
+12. Write in professional, practical, plain English for operators/dispatchers. No marketing language, no filler, no clickbait in the body.`;
 
 export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, targetWeekStart, targetWeekEnd, apiKey, model }) {
   const client = new OpenAI({ apiKey });

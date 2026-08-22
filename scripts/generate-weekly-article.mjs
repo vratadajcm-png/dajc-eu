@@ -209,12 +209,16 @@ async function main() {
 
   const { kept, droppedCount } = crossValidateDevelopments(article.developments, verified);
   article.developments = kept;
-  if (droppedCount > 0) {
+  const roundupValidation = crossValidateDevelopments(article.europeRoundup || [], verified);
+  article.europeRoundup = roundupValidation.kept;
+  const totalDropped = droppedCount + roundupValidation.droppedCount;
+  if (totalDropped > 0) {
     console.warn(
-      `Cross-validation: dropped ${droppedCount} development(s) whose sourceUrl did not match any verified candidate (possible model drift).`
+      `Cross-validation: dropped ${totalDropped} item(s) whose sourceUrl did not match any verified candidate (possible model drift).`
     );
   }
-  console.log(`Developments after cross-validation: ${article.developments.length}`);
+  console.log(`Lead reports after cross-validation: ${article.developments.length}`);
+  console.log(`Rest-of-Europe reports after cross-validation: ${article.europeRoundup.length}`);
   if (article.developments.length === 0) {
     await abort('no developments survived cross-validation against verified sources');
     return;
@@ -229,6 +233,7 @@ async function main() {
     frontmatter,
     body,
     developments: article.developments,
+    europeRoundup: article.europeRoundup,
     weekStart: targetWeekStart,
     weekEnd: targetWeekEnd,
   });

@@ -8,7 +8,7 @@ import { articleFrontmatterSchema } from './article-schema.mjs';
 import { validateDevelopmentDateRange } from './date-validation.mjs';
 
 const MIN_BODY_LENGTH = 400;
-const MIN_REPORTS = 8;
+const MIN_REPORTS = 10;
 const MAX_REPORTS = 12;
 const MIN_RECOMMENDED_ACTION_LENGTH = 10;
 
@@ -34,7 +34,7 @@ function isValidUrl(value) {
  * @param {{ frontmatter: object, body: string, developments: object[],
  *   weekStart?: Date, weekEnd?: Date }} args
  */
-export function runQualityGate({ frontmatter, body, developments, weekStart, weekEnd }) {
+export function runQualityGate({ frontmatter, body, developments, europeRoundup = [], weekStart, weekEnd }) {
   const errors = [];
 
   const parsed = articleFrontmatterSchema.safeParse(frontmatter);
@@ -70,8 +70,13 @@ export function runQualityGate({ frontmatter, body, developments, weekStart, wee
     const seenTitles = new Map();
     let hasDrivingBan = false;
 
-    items.forEach((item, i) => {
-      const label = `developments[${i}] ("${item.title || 'untitled'}")`;
+    const allItems = [
+      ...items.map((item, i) => ({ item, label: `developments[${i}]` })),
+      ...europeRoundup.map((item, i) => ({ item, label: `europeRoundup[${i}]` })),
+    ];
+
+    allItems.forEach(({ item, label: baseLabel }, i) => {
+      const label = `${baseLabel} ("${item.title || 'untitled'}")`;
 
       if (!item.title) errors.push(`${label.replace(/ \(".*"\)/, '')} is missing a title`);
       if (!item.sourceUrl) errors.push(`${label} has no sourceUrl`);
@@ -92,7 +97,7 @@ export function runQualityGate({ frontmatter, body, developments, weekStart, wee
 
       if (item.sourceUrl) {
         if (seenSourceUrls.has(item.sourceUrl)) {
-          errors.push(`${label} duplicates the sourceUrl already used by developments[${seenSourceUrls.get(item.sourceUrl)}] - the same source must not back two separate reports`);
+          errors.push(`${label} duplicates a sourceUrl already used by report ${seenSourceUrls.get(item.sourceUrl)} - lead reports and the Europe roundup must be disjoint`);
         } else {
           seenSourceUrls.set(item.sourceUrl, i);
         }
@@ -105,7 +110,7 @@ export function runQualityGate({ frontmatter, body, developments, weekStart, wee
       const normalized = normalizeTitle(item.title);
       if (normalized) {
         if (seenTitles.has(normalized)) {
-          errors.push(`${label} duplicates the title already used by developments[${seenTitles.get(normalized)}] - the same restriction must not be rendered as two reports`);
+          errors.push(`${label} duplicates a title already used by report ${seenTitles.get(normalized)} - lead reports and the Europe roundup must be disjoint`);
         } else {
           seenTitles.set(normalized, i);
         }
@@ -119,7 +124,7 @@ export function runQualityGate({ frontmatter, body, developments, weekStart, wee
     }
 
     const usedSourceUrls = new Set();
-    for (const item of items) {
+    for (const item of [...items, ...europeRoundup]) {
       if (item.sourceUrl) usedSourceUrls.add(item.sourceUrl);
       for (const extra of item.additionalSources || []) {
         if (extra.url) usedSourceUrls.add(extra.url);

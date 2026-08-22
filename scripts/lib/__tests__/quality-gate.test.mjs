@@ -39,11 +39,11 @@ function makeFrontmatter(developments) {
 const LONG_BODY = 'x'.repeat(500);
 
 describe('runQualityGate - report count', () => {
-  it('blocks publication with fewer than 8 reports', () => {
-    const developments = Array.from({ length: 7 }, (_, i) => makeDevelopment(i));
+  it('blocks publication with fewer than 10 reports', () => {
+    const developments = Array.from({ length: 9 }, (_, i) => makeDevelopment(i));
     const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
     expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /only 7 report/.test(e))).toBe(true);
+    expect(gate.errors.some((e) => /only 9 report/.test(e))).toBe(true);
   });
 
   it('blocks publication with more than 12 reports', () => {
@@ -59,8 +59,8 @@ describe('runQualityGate - report count', () => {
     expect(gate.ok).toBe(true);
   });
 
-  it('passes at the boundaries: 8 and 12', () => {
-    for (const count of [8, 12]) {
+  it('passes at the boundaries: 10 and 12', () => {
+    for (const count of [10, 12]) {
       const developments = Array.from({ length: count }, (_, i) => makeDevelopment(i));
       const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
       expect(gate.ok).toBe(true);
@@ -69,20 +69,29 @@ describe('runQualityGate - report count', () => {
 });
 
 describe('runQualityGate - duplicates', () => {
+  it('rejects a report duplicated between lead coverage and the Europe roundup', () => {
+    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
+    const europeRoundup = [{ ...makeDevelopment(20), sourceUrl: developments[0].sourceUrl }];
+    const all = [...developments, ...europeRoundup];
+    const gate = runQualityGate({ frontmatter: makeFrontmatter(all), body: LONG_BODY, developments, europeRoundup, weekStart, weekEnd });
+    expect(gate.ok).toBe(false);
+    expect(gate.errors.some((e) => /Europe roundup must be disjoint/.test(e))).toBe(true);
+  });
+
   it('rejects a duplicate sourceUrl across two reports', () => {
-    const developments = Array.from({ length: 8 }, (_, i) => makeDevelopment(i));
+    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
     developments[1] = { ...developments[1], sourceUrl: developments[0].sourceUrl };
     const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
     expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /duplicates the sourceUrl/.test(e))).toBe(true);
+    expect(gate.errors.some((e) => /duplicates a sourceUrl/.test(e))).toBe(true);
   });
 
   it('rejects a duplicated (normalized) title even with different sources', () => {
-    const developments = Array.from({ length: 8 }, (_, i) => makeDevelopment(i));
+    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
     developments[1] = { ...developments[1], title: developments[0].title.toUpperCase() + '  ' };
     const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
     expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /duplicates the title/.test(e))).toBe(true);
+    expect(gate.errors.some((e) => /duplicates a title/.test(e))).toBe(true);
   });
 
   // Two genuinely distinct restrictions for the same country/weekend (e.g.
@@ -90,7 +99,7 @@ describe('runQualityGate - duplicates', () => {
   // restrictions) must NOT be treated as duplicates just for sharing a
   // country and date range.
   it('allows two distinct reports for the same country and overlapping dates', () => {
-    const developments = Array.from({ length: 8 }, (_, i) => makeDevelopment(i, { country: 'Austria' }));
+    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i, { country: 'Austria' }));
     developments[1] = { ...developments[1], title: 'A completely different Austria report', country: 'Austria' };
     const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
     expect(gate.ok).toBe(true);

@@ -94,6 +94,18 @@ export function renderArticleMarkdown(article, { slug, publishedAt, nextPublicat
     sections.push(parts.join('\n').trim());
   }
 
+  const roundup = Array.isArray(article.europeRoundup) ? article.europeRoundup : [];
+  if (roundup.length > 0) {
+    const parts = [
+      '## Rest of Europe: verified operational roundup',
+      '',
+      'These verified items did not rank among the lead reports, but may still affect route execution. Coverage is evidence-led and is not limited to a fixed list of countries.',
+      '',
+    ];
+    for (const item of roundup) parts.push(renderDevelopmentItem(item), '');
+    sections.push(parts.join('\n').trim());
+  }
+
   const checklist =
     Array.isArray(article.operatorChecklist) && article.operatorChecklist.length > 0
       ? article.operatorChecklist
@@ -107,7 +119,7 @@ export function renderArticleMarkdown(article, { slug, publishedAt, nextPublicat
   }
 
   const uniqueSources = new Map();
-  for (const item of article.developments) {
+  for (const item of [...article.developments, ...roundup]) {
     uniqueSources.set(item.sourceUrl, { name: item.sourceName, url: item.sourceUrl });
     for (const extra of item.additionalSources || []) {
       uniqueSources.set(extra.url, { name: extra.name, url: extra.url });

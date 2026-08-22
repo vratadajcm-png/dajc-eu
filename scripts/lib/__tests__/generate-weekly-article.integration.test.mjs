@@ -86,6 +86,7 @@ beforeAll(() => {
           syntheticCandidate(1, 'permit_change'),
           syntheticCandidate(2, 'permit_system'),
           syntheticCandidate(3, 'escort_requirement'),
+          syntheticCandidate(4, 'border_restriction'),
         ],
       },
       null,
