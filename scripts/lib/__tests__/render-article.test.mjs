@@ -21,6 +21,25 @@ describe('categorizeDevelopment', () => {
 });
 
 describe('renderArticleMarkdown', () => {
+  it('renders non-lead verified items in a distinct Europe-wide roundup', () => {
+    const lead = {
+      country: 'Germany', title: 'Lead report', whatChanged: 'Change.', where: 'DE', impact: 'Impact.',
+      recommendedAction: 'Act.', isDrivingBan: true, isInfrastructure: false,
+      sourceUrl: 'https://example.test/lead', sourceName: 'Lead source',
+    };
+    const roundup = {
+      country: 'Romania', title: 'Romania roundup report', whatChanged: 'Change.', where: 'RO', impact: 'Impact.',
+      recommendedAction: 'Act.', isDrivingBan: false, isInfrastructure: true,
+      sourceUrl: 'https://example.test/roundup', sourceName: 'Roundup source',
+    };
+    const { body } = renderArticleMarkdown(makeArticle([lead], { europeRoundup: [roundup] }), {
+      slug: 'eu-oversize-weekly-2026-w99', publishedAt: '2026-08-21', nextPublicationLabel: null,
+    });
+    expect(body).toContain('## Rest of Europe: verified operational roundup');
+    expect(body).toContain('Romania roundup report');
+    expect(body.split('Romania roundup report').length - 1).toBe(1);
+  });
+
   // Regression test for the incident in the first published W35 article:
   // every development (Hildesheim, Monaco, Murrashi Bridge) was rendered
   // once under "Main developments" AND again under "Driving bans next
