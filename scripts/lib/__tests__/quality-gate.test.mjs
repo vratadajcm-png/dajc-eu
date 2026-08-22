@@ -37,13 +37,19 @@ function makeFrontmatter(developments) {
 }
 
 const LONG_BODY = 'x'.repeat(500);
-
 describe('runQualityGate - report count', () => {
+  it('blocks a generated edition with an empty Rest-of-Europe roundup', () => {
+    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
+    const result = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, europeRoundup: [], weekStart, weekEnd });
+    expect(result.ok).toBe(false);
+    expect(result.errors.some((e) => /roundup is empty/.test(e))).toBe(true);
+  });
+
   it('blocks publication with fewer than 10 reports', () => {
     const developments = Array.from({ length: 9 }, (_, i) => makeDevelopment(i));
-    const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
-    expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /only 9 report/.test(e))).toBe(true);
+    const result = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
+    expect(result.ok).toBe(false);
+    expect(result.errors.some((e) => /only 9 report/.test(e))).toBe(true);
   });
 
   it('blocks publication with more than 12 reports', () => {
