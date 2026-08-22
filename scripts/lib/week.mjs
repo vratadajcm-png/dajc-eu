@@ -18,6 +18,13 @@ export function isoWeekStart(date = new Date()) {
   return d;
 }
 
+/** Sunday 00:00 UTC of the ISO week containing `date` (isoWeekStart + 6 days). */
+export function isoWeekEnd(date = new Date()) {
+  const end = isoWeekStart(date);
+  end.setUTCDate(end.getUTCDate() + 6);
+  return end;
+}
+
 /** Human-readable "24-30 August 2026" style range for the ISO week of `date`. */
 export function isoWeekRangeLabel(date = new Date()) {
   const start = isoWeekStart(date);

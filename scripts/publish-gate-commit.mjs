@@ -12,8 +12,7 @@
 
 import { execFileSync } from 'node:child_process';
 import { appendFileSync } from 'node:fs';
-import { decidePublishCommit } from './lib/publish-gate.mjs';
-import { isoWeekLabel } from './lib/week.mjs';
+import { decidePublishCommit, extractArticleWeekFromStatus } from './lib/publish-gate.mjs';
 
 function git(args) {
   return execFileSync('git', args, { encoding: 'utf-8' });
@@ -42,14 +41,27 @@ function summary(line) {
 git(['config', 'user.name', 'dajc-bot']);
 git(['config', 'user.email', 'bot@users.noreply.github.com']);
 
-const articleAdded =
-  git(['status', '--porcelain', '--untracked-files=all', '--', 'src/content/news/eu-oversize']).trim()
-    .length > 0;
+const articleStatusOutput = git(['status', '--porcelain', '--untracked-files=all', '--', 'src/content/news/eu-oversize']);
+const articleAdded = articleStatusOutput.trim().length > 0;
 
 git(['add', 'data/oversize']);
 const dataChanged = !gitCleanDiff(['diff', '--cached', '--quiet', '--', 'data/oversize']);
 
-const week = isoWeekLabel(new Date());
+// The commit message's week must come from the article's own filename, not
+// from an independently recomputed "current week" - see
+// extractArticleWeekFromStatus in scripts/lib/publish-gate.mjs for the
+// incident this fixes (a W35 article committed as "...2026-W34").
+let week = null;
+if (articleAdded) {
+  const extraction = extractArticleWeekFromStatus(articleStatusOutput);
+  if (!extraction.ok) {
+    console.error(`::error::Cannot determine the published article's week: ${extraction.reason}`);
+    summary(`### EU Oversize Weekly publish gate - FAILED\n\nCannot determine the published article's week: ${extraction.reason}`);
+    process.exit(1);
+  }
+  week = extraction.week;
+}
+
 const decision = decidePublishCommit({ articleAdded, dataChanged, week });
 
 if (!decision.commit) {

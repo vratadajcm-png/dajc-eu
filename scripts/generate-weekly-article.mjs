@@ -25,7 +25,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 
 import { loadWeekFindings } from './lib/store.mjs';
-import { isoWeekLabel, isoWeekRangeLabel } from './lib/week.mjs';
+import { isoWeekLabel, isoWeekRangeLabel, isoWeekStart, isoWeekEnd } from './lib/week.mjs';
 import { selectCandidates } from './lib/select-candidates.mjs';
 import { verifyCandidates } from './lib/verify-candidates.mjs';
 import { generateArticleWithOpenAI } from './lib/openai-client.mjs';
@@ -34,6 +34,8 @@ import { renderArticleMarkdown, toFrontmatterYaml } from './lib/render-article.m
 import { runQualityGate } from './lib/quality-gate.mjs';
 import { checkOpenAiKeyPreflight } from './lib/preflight.mjs';
 import { formatNextPublicationLabel } from './lib/next-publication.mjs';
+import { resolveDrivingBanFindings } from './lib/driving-ban-calendar.mjs';
+import { crossValidateDevelopments } from './lib/cross-validate.mjs';
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -87,13 +89,22 @@ async function main() {
     return;
   }
 
-  const now = new Date();
+  // OVERSIZE_NOW lets tests (and manual troubleshooting) pin "now" to a
+  // fixed instant instead of the real wall clock - see
+  // scripts/lib/__tests__/generate-weekly-article.test.mjs. Unset in every
+  // real run (scheduled or workflow_dispatch), so production behavior is
+  // unaffected.
+  const now = process.env.OVERSIZE_NOW ? new Date(process.env.OVERSIZE_NOW) : new Date();
   const thisWeek = isoWeekLabel(now);
 
   const nextWeekDate = new Date(now);
   nextWeekDate.setUTCDate(nextWeekDate.getUTCDate() + 7);
   const nextWeekLabel = isoWeekLabel(nextWeekDate);
   const weekRangeLabel = isoWeekRangeLabel(nextWeekDate);
+  const targetWeekStart = isoWeekStart(nextWeekDate);
+  const targetWeekEnd = isoWeekEnd(nextWeekDate);
+  const targetWeekStartIso = targetWeekStart.toISOString().slice(0, 10);
+  const targetWeekEndIso = targetWeekEnd.toISOString().slice(0, 10);
 
   console.log(`EU Oversize Weekly generator - ${now.toISOString()}`);
   console.log(`Reading findings from ISO week: ${thisWeek}`);
@@ -127,15 +138,37 @@ async function main() {
     : filePath;
 
   const findingsMap = await loadWeekFindings(thisWeek);
-  const findings = [...findingsMap.values()];
-  console.log(`Findings on file for ${thisWeek}: ${findings.length}`);
-  if (findings.length === 0) {
-    await abort(`no findings recorded for ${thisWeek}`);
+  const rssFindings = [...findingsMap.values()];
+  console.log(`RSS-derived findings on file for ${thisWeek}: ${rssFindings.length}`);
+
+  // Maintained official driving-ban calendar layer (config/driving-ban-calendars):
+  // RSS monitoring alone cannot reliably surface a standing/seasonal driving
+  // ban that nobody re-announced this week, so these are resolved directly
+  // against the target week's date range instead. An "annual-calendar"
+  // entry (e.g. Italy's yearly decree) that has not been re-seeded for the
+  // target year is a configuration/maintenance error, not a quiet week -
+  // fail loudly instead of silently publishing without it.
+  const { findings: calendarFindings, maintenanceErrors } = resolveDrivingBanFindings({
+    weekStart: targetWeekStart,
+    weekEnd: targetWeekEnd,
+    year: targetWeekStart.getUTCFullYear(),
+  });
+  console.log(`Official driving-ban calendar findings for ${nextWeekLabel}: ${calendarFindings.length}`);
+  if (maintenanceErrors.length > 0) {
+    await fail(
+      `official driving-ban calendar needs maintenance:\n  - ${maintenanceErrors.join('\n  - ')}`
+    );
     return;
   }
 
-  const preSelected = selectCandidates(findings);
-  console.log(`Pre-selected for verification: ${preSelected.length}`);
+  const findings = [...calendarFindings, ...rssFindings];
+  if (findings.length === 0) {
+    await abort(`no findings recorded for ${thisWeek} and no official driving-ban calendar applies to ${nextWeekLabel}`);
+    return;
+  }
+
+  const preSelected = [...calendarFindings, ...selectCandidates(rssFindings)];
+  console.log(`Pre-selected for verification: ${preSelected.length} (${calendarFindings.length} from the official calendar, always included)`);
   if (preSelected.length === 0) {
     await abort('no candidates passed pre-selection');
     return;
@@ -146,12 +179,12 @@ async function main() {
     verified = preSelected.map((f) => ({ ...f, confidence: 'verified' }));
     console.log(`Verification: skipped (mock mode) - treating all ${verified.length} pre-selected candidates as verified`);
   } else {
-    const result = await verifyCandidates(preSelected);
+    const result = await verifyCandidates(preSelected, { weekStart: targetWeekStart, weekEnd: targetWeekEnd });
     verified = result.verified;
-    console.log(`Verification: ${verified.length} OK, ${result.failed.length} failed (unreachable source - dropped)`);
+    console.log(`Verification: ${verified.length} OK, ${result.failed.length} rejected (see reasons above)`);
   }
   if (verified.length === 0) {
-    await abort('no candidates had a reachable source after verification');
+    await abort('no candidates survived verification (relevance, target-week dates, and source reachability)');
     return;
   }
 
@@ -161,20 +194,24 @@ async function main() {
   try {
     article = mock
       ? await generateArticleMock({ candidates: verified, weekRangeLabel })
-      : await generateArticleWithOpenAI({ candidates: verified, weekRangeLabel, apiKey });
+      : await generateArticleWithOpenAI({
+          candidates: verified,
+          weekRangeLabel,
+          targetWeekStart: targetWeekStartIso,
+          targetWeekEnd: targetWeekEndIso,
+          apiKey,
+        });
   } catch (err) {
     console.error('Article generation failed:', err.message || err);
     process.exit(1);
     return;
   }
 
-  const verifiedUrls = new Set(verified.map((c) => c.sourceUrl));
-  const beforeCrossCheck = article.developments.length;
-  article.developments = article.developments.filter((item) => verifiedUrls.has(item.sourceUrl));
-  const droppedByCrossCheck = beforeCrossCheck - article.developments.length;
-  if (droppedByCrossCheck > 0) {
+  const { kept, droppedCount } = crossValidateDevelopments(article.developments, verified);
+  article.developments = kept;
+  if (droppedCount > 0) {
     console.warn(
-      `Cross-validation: dropped ${droppedByCrossCheck} development(s) whose sourceUrl did not match any verified candidate (possible model drift).`
+      `Cross-validation: dropped ${droppedCount} development(s) whose sourceUrl did not match any verified candidate (possible model drift).`
     );
   }
   console.log(`Developments after cross-validation: ${article.developments.length}`);
@@ -188,7 +225,13 @@ async function main() {
   const { frontmatter, body } = renderArticleMarkdown(article, { slug, publishedAt, nextPublicationLabel });
 
   console.log('\nRunning quality gate...');
-  const gate = runQualityGate({ frontmatter, body, developments: article.developments });
+  const gate = runQualityGate({
+    frontmatter,
+    body,
+    developments: article.developments,
+    weekStart: targetWeekStart,
+    weekEnd: targetWeekEnd,
+  });
   if (!gate.ok) {
     console.error('Quality gate FAILED:');
     for (const err of gate.errors) console.error(`  - ${err}`);

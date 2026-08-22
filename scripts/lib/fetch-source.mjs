@@ -5,6 +5,7 @@
 
 import Parser from 'rss-parser';
 import { FINDING_TYPES } from './findings.mjs';
+import { checkOperationalRelevance } from './relevance-filter.mjs';
 
 const FETCH_TIMEOUT_MS = 15_000;
 const MAX_ITEMS_PER_SOURCE = 15;
@@ -63,11 +64,14 @@ function classify(text) {
 const GENERAL_TRANSPORT_CONTEXT =
   /oversize|abnormal load|heavy transport|wide load|special transport|convoi exceptionnel|\bHGV\b|\blorry\b|\btruck\b|\bfreight\b|\bcargo\b|heavy vehicle|weight limit|height limit|axle load|\btoll\b|motorway|highway|reconstruction|construction works/i;
 
-const EXCLUSION_PATTERNS =
-  /\bweapon(s)?\b|firearm|narcotic|drug possession|arrested for|detained for|domestic violence|robbery|burglary|homicide|murder|assault charge|driving licence suspended|driving ban for the driver|deported|court sentence|criminal proceedings/i;
-
+// EXCLUSION_PATTERNS (crime/administrative noise) and the one-off-incident /
+// procurement-notice / unconfirmed-planned-works checks now live in
+// relevance-filter.mjs, shared with the Friday pipeline's independent
+// re-check in verify-candidates.mjs - see that file for why both call sites
+// exist. Kept here as the first, cheapest gate: a stuck-lorry incident or a
+// procurement notice should never even enter data/oversize/<week>/findings.json.
 function isRelevant(text, matchedType) {
-  if (EXCLUSION_PATTERNS.test(text)) return false;
+  if (!checkOperationalRelevance(text).ok) return false;
   if (matchedType) return true; // specific transport-restriction pattern already matched
   return GENERAL_TRANSPORT_CONTEXT.test(text);
 }
