@@ -9,22 +9,30 @@ top of it.
 ## Architecture overview
 
 ```
-config/oversize-sources/index.mjs   registry of European sources to monitor
+config/oversize-sources/index.mjs   registry of European sources to monitor (RSS)
+config/driving-ban-calendars/       maintained official driving-ban/exceptional-
+  index.mjs                        transport calendar layer (not RSS-dependent)
 data/oversize/<ISO week>/           raw findings gathered during that week
   findings.json
 scripts/
   oversize-monitor.mjs              daily: fetch sources -> data/oversize
-  generate-weekly-article.mjs       friday: data/oversize -> content/news
+  generate-weekly-article.mjs       friday: data/oversize + calendars -> content/news
+  publish-gate-commit.mjs           friday: explicit "did we publish?" commit gate
   lib/
     findings.mjs                    finding shape, dedup key, status transitions
     fetch-source.mjs                per-source fetch + relevance + classification
+    relevance-filter.mjs            shared "is this an operational restriction" gate
     select-candidates.mjs           pre-selection before verification/AI (cost control)
-    verify-candidates.mjs           re-checks source URLs are still reachable
-    openai-client.mjs               structured-output OpenAI call
+    driving-ban-calendar.mjs        resolves config/driving-ban-calendars for a target week
+    verify-candidates.mjs           relevance + target-week dates + source reachability
+    date-validation.mjs             deterministic validFrom/validTo vs. target-week checks
+    openai-client.mjs               structured-output OpenAI call, hardened prompt
     mock-generator.mjs              free local stand-in for openai-client.mjs
+    cross-validate.mjs              drops any development whose sourceUrl wasn't verified
     render-article.mjs              validated JSON -> frontmatter + Markdown
-    quality-gate.mjs                pre-publish blocking checks
+    quality-gate.mjs                pre-publish blocking checks (count, dedup, dates, ...)
     article-schema.mjs              zod schema mirroring src/content.config.ts
+    publish-gate.mjs                publish-vs-data-only commit decision + week extraction
     store.mjs / week.mjs            file I/O and ISO-week helpers
 src/content/news/eu-oversize/       published (and draft template) articles
 src/content/news/platform/          published (and draft template) articles
@@ -38,6 +46,49 @@ Nothing here touches the homepage hero, header, footer, or global styles -
 the News system only adds the `News` section above the footer and the
 `/news` routes, reusing the same CSS custom properties (`--dajc-dark`,
 `--dajc-orange`, etc.) defined in `src/styles/global.css`.
+
+## Editorial specification
+
+EU Oversize Weekly is a **professional operational briefing** for European
+heavy, oversized and special road transport operators, drivers and
+dispatchers - not a general traffic-news feed, and it must never summarize
+every item a source happens to publish. All content is written in
+professional English.
+
+- **8-12 distinct operational reports per article**, enforced by
+  `scripts/lib/quality-gate.mjs`. Never padded with filler to reach 8, never
+  split/duplicated to exceed 12 - if fewer than 8 verified, genuinely useful
+  reports are available, the run does not publish (see "Hard-failure
+  conditions" below).
+- **Editorial priority order** (most important first, see the system prompt
+  in `scripts/lib/openai-client.mjs`): truck driving bans; special movement
+  windows/bans for exceptional or oversized transport; permit-rule/system
+  changes; escort/BF2-BF4/police-assistance requirements; border/transit
+  restrictions; mandatory crossings/approved corridors; bridge/tunnel/
+  height/width/axle-load/weight restrictions; long-term closures on
+  strategic routes; weather only when it creates a specific operational
+  restriction; significant equipment/regulatory/market changes as secondary
+  items.
+- **Whole-of-Europe scope.** The article must never default to any single
+  personal/habitual route (e.g. Czechia-Slovakia-Hungary-Romania) - a
+  specific route is named only when an official restriction actually
+  affects it.
+- **Every report states**: country; region/road/route where applicable;
+  what applies or changed; affected vehicle category and weight/vehicle
+  threshold (`vehicleScope`); exact date and **local time of the country
+  concerned** (`timeWindow`); geographic/route scope (`where`); practical
+  impact; a concrete `recommendedAction` for an operator/dispatcher (never a
+  platitude); and important exemptions/permit-specific conditions
+  (`exemptions`), if any.
+- A general truck-driving ban, a restriction above a specific weight, a
+  special restriction for exceptional/oversized transport, and a condition
+  in an individual transport permit are always kept distinct - never
+  conflated into one description.
+- **Recurring weekend/seasonal driving bans** remain relevant even when no
+  news source re-published them this week, but only when they are known to
+  be valid for the target week's exact dates - see "Official driving-ban
+  calendar layer" below, which exists specifically because RSS monitoring
+  alone cannot guarantee this.
 
 ## Content model
 
@@ -141,14 +192,30 @@ transport-restriction patterns (driving ban, escort, border, bridge/
 tunnel, closure, roadworks, permit, route) or, if it only reaches the
 generic "infrastructure" fallback, additionally mention clear heavy/
 oversize-transport context (HGV, truck, freight, weight/height/axle
-limit, toll, motorway...). A hard exclusion list also blocks generic
-crime/administrative press-release noise (weapons, arrests, court
-proceedings) that some police-press-aggregator sources publish alongside
-the rare traffic-relevant item. This was tuned against real data during
+limit, toll, motorway...). This was tuned against real data during
 development - several police feeds (`de-polizei-blaulicht`, `pl-policja`,
 `uk-npcc`, `xk-kosovopolice`) turned out to publish almost entirely
 unrelated content; don't be surprised if they contribute 0 findings on
 most days.
+
+The actual exclusion logic lives in `scripts/lib/relevance-filter.mjs`
+(`checkOperationalRelevance`), shared between two independent call sites:
+
+1. **Ingestion** (`fetch-source.mjs`, daily monitor) - the cheapest, first
+   gate: a stuck-lorry incident or a procurement notice should never even
+   enter `data/oversize/<week>/findings.json`.
+2. **Weekly verification** (`verify-candidates.mjs`, Friday pipeline) - runs
+   the same check again, independently, before a candidate can reach the
+   OpenAI call. This exists because a candidate may already be sitting in
+   `data/oversize` from before this filter existed (or under a looser
+   version of it) - see "Incident: the first published W35 article" below.
+
+Blocked as generic crime/administrative noise: weapons, arrests, court
+proceedings, and similar. Blocked as "individually true but not an ongoing
+restriction": one-off vehicle breakdowns/stuck vehicles, one-off accidents/
+collisions, theft reports, procurement/tender notices, and unconfirmed
+planned/future works (see `NON_RESTRICTION_PATTERNS` in
+`relevance-filter.mjs` for the exact patterns and reasons).
 
 ## Source configuration
 
@@ -194,6 +261,49 @@ the obvious candidate (NDS / `ndsas.sk`) unreliable - its feed's `pubDate`
 tracks the CMS's `dateModified`, not the true publish date, so years-old
 press releases can appear "fresh". Don't add it back without
 independently re-checking that specific problem first.
+
+## Official driving-ban calendar layer
+
+RSS monitoring alone cannot reliably surface a standing or seasonal driving
+ban that no source happened to re-announce this particular week - the ban
+is still fully in force, but invisible to `fetch-source.mjs`. This is a
+distinct data source from `config/oversize-sources` (RSS/Atom feeds):
+`config/driving-ban-calendars/index.mjs` is a small, curated registry of the
+official rules themselves, resolved by `scripts/lib/driving-ban-calendar.mjs`
+directly against the target week's date range - no news item required.
+
+Each entry records: `country`; official `sourceUrl`/`sourceName`;
+`legalBasis`; `vehicleScope` (vehicle/weight threshold); `routeScope`;
+`exemptionNotes`; `lastVerified` date; and one of two `kind`s:
+
+- **`standing-rule`** - a fixed legal rule (e.g. "every Saturday/Sunday from
+  1 July to 31 August", or a year-round nightly ban) that needs no per-year
+  maintenance. `resolve(weekStart, weekEnd)` computes that week's actual
+  dates fresh every time.
+- **`annual-calendar`** - an official body republishes a dated calendar
+  every year (Germany's BALM summer-Saturday list, Poland's and Czechia's
+  summer weekend calendars, Italy's Ministerial Decree, Austria's summer
+  corridor order). `validYear` records which year's dates are seeded.
+  **Resolving for any other year returns a `maintenanceError` instead of
+  silently reusing a previous year's dates** - `generate-weekly-article.mjs`
+  treats this as a hard configuration failure (non-zero exit), the same as
+  a missing `OPENAI_API_KEY`. When a new year's official calendar is
+  published (e.g. Italy's 2027 decree), add its dates to the relevant entry
+  and bump `validYear` - see `scripts/lib/__tests__/driving-ban-calendar.test.mjs`
+  for the expected behavior both before and after that update.
+
+Seeded for W35 2026 (24-30 August): Germany, Poland, Czechia, Slovakia,
+Italy, France, Hungary, Austria (two entries - the general nationwide ban
+and the additional summer corridor restrictions, since the latter applies
+*in addition to*, not instead of, the former), and Switzerland. This is a
+curated seed, not an exhaustive multi-year calendar - extend the relevant
+entry's seeded dates as more of a year's official calendar is confirmed.
+
+`generate-weekly-article.mjs` merges `resolveDrivingBanFindings()`'s output
+with the week's RSS-derived findings before selection; calendar findings are
+always included (never subject to `select-candidates.mjs`'s per-source cap)
+and are still re-verified like any other candidate (relevance, target-week
+dates, source reachability) before reaching the model.
 
 ## Daily monitoring
 
@@ -258,28 +368,65 @@ Vercel's standard Astro defaults.
 
 ## Weekly synthesis (Friday pipeline)
 
+Publishes automatically **every Friday at 12:00 Europe/Prague**, straight
+to `src/content/news/eu-oversize/` on `main` - no manual Actions run
+required. Because GitHub Actions cron is UTC-only and can't express a
+single "12:00 in a DST-observing timezone" expression, the workflow's
+`schedule` trigger fires at **both** UTC times noon-Prague can fall on
+(`10:00 UTC` for CEST, `11:00 UTC` for CET); a `Check Europe/Prague local
+time` step gates the rest of the job on the actual wall-clock hour being
+12, so only the correct one of the two runs does anything - the other
+exits as a harmless no-op. `workflow_dispatch` (with an optional `dry_run`
+checkbox) is always available for a manual dry-run or emergency
+publication, and always skips the time gate. See
+`.github/workflows/publish-weekly-oversize.yml` for the exact cron
+expressions and gating logic - this design was already in place and is
+unchanged by this pass.
+
+A successful scheduled run pushes the new article commit straight to
+`main`, which the existing Vercel Git integration deploys automatically -
+no separate deployment step exists or is needed in this repository (see
+"Vercel: skipping data-only deployments" above for why a *data-only*
+commit is prevented from triggering a wasted rebuild; a real article
+commit always proceeds to a normal build+deploy).
+
 `scripts/generate-weekly-article.mjs` (`npm run oversize:publish`):
 
-1. Reads the **current** ISO week's findings (the ones gathered all week).
-2. `selectCandidates()` narrows ~100+ raw findings to a bounded, scored
-   subset (freshness + specific-type bonus, capped per source) - this is
-   the cost-control step: don't verify or pay to synthesize everything.
-3. `verifyCandidates()` re-checks each selected candidate's `sourceUrl` is
-   still reachable right now (HEAD, falls back to GET); anything
-   unreachable is dropped.
-4. Calls OpenAI (`scripts/lib/openai-client.mjs`, structured JSON output)
-   to select, group and phrase the verified candidates into an article
-   for the **upcoming** ISO week - the model is instructed to copy
-   `sourceUrl`/`sourceName` exactly from the input and never invent one.
+1. Reads the **current** ISO week's RSS-derived findings (gathered all
+   week), and resolves the **official driving-ban calendar layer** for the
+   **upcoming** week (`resolveDrivingBanFindings()` - see above). A missing
+   annual calendar for the required year is a hard failure here, before any
+   OpenAI cost is spent.
+2. `selectCandidates()` narrows the RSS findings to a bounded, scored
+   subset (freshness + specific-type bonus, capped per source) - the
+   cost-control step: don't verify or pay to synthesize everything.
+   Calendar findings bypass this cap and are always included.
+3. `verifyCandidates()` runs three independent checks per candidate:
+   operational relevance (`checkOperationalRelevance`, rejects one-off
+   incidents/procurement notices/unconfirmed works even if the daily
+   ingestion filter already let it through), target-week date overlap
+   (`validateDevelopmentDateRange` - rejects anything whose already-known
+   `validFrom`/`validTo` cannot overlap the target week), and source
+   reachability (HEAD, falling back to GET). Every rejection is logged with
+   its specific reason.
+4. Calls OpenAI (`scripts/lib/openai-client.mjs`, structured JSON output,
+   hardened system prompt - see "Hardened editorial prompt" below) to
+   select, group and phrase the verified candidates into an article for the
+   **upcoming** ISO week. The model is given the target week's exact ISO
+   start/end dates (not just a human-readable label) and is instructed to
+   copy `sourceUrl`/`sourceName` exactly from the input and never invent
+   one.
 5. **Cross-validates** every `sourceUrl` the model returned against the
-   actual verified set - anything that doesn't match exactly is dropped
-   before it can reach the article (defends against model drift/
-   hallucination; this is the concrete implementation of "AI never
-   creates an operational restriction without a source").
+   actual verified set (`scripts/lib/cross-validate.mjs`) - anything that
+   doesn't match exactly is dropped before it can reach the article
+   (defends against model drift/hallucination).
 6. Renders the surviving developments into frontmatter + Markdown
-   (`scripts/lib/render-article.mjs`), grouped into Main developments /
-   Driving bans next week / Infrastructure watch / What operators should
-   watch next week / Sources, per the required article structure.
+   (`scripts/lib/render-article.mjs`) under **mutually exclusive**
+   categories - `## Driving bans and exceptional-transport restrictions` /
+   `## Infrastructure restrictions` / `## Other operational developments` -
+   followed by `## Operator checklist`, `## Sources`, and
+   `## Next EU Oversize Weekly`. Each development is rendered **exactly
+   once**, in exactly one category (see "Duplicate rendering" below).
 7. Runs the quality gate (below). Only on success is the file written to
    `src/content/news/eu-oversize/<slug>.md` - and only if that exact path
    doesn't already exist (see "Never overwrites published content" below).
@@ -291,6 +438,43 @@ The article's title/date range targets the week *after* the one whose
 data was read (e.g. an article generated Friday in ISO week 2026-W34
 covers 2026-W35), matching a Friday briefing about the week ahead.
 
+### Duplicate rendering (fixed)
+
+The first published W35 article rendered every development under
+`## Main developments` **and again** under `## Driving bans next week` or
+`## Infrastructure watch`, because the old renderer treated
+`isDrivingBan`/`isInfrastructure` as additive overlays instead of a single
+category. `categorizeDevelopment()` in `render-article.mjs` now assigns
+each development to exactly one of `bans` / `infrastructure` / `other`, in
+that priority order, and each category is rendered as its own section at
+most once. `scripts/lib/__tests__/render-article.test.mjs` asserts a
+development's title+sourceUrl pair can never appear as a rendered report
+twice, even when both flags are true.
+
+### Hardened editorial prompt
+
+`scripts/lib/openai-client.mjs`'s system prompt now states, as hard rules
+the model must follow: only the exact target-week date range matters
+(exclude anything ending before it starts or starting after it ends); never
+turn an isolated accident, a stuck/broken-down vehicle, a theft report, or a
+routine police incident into an "ongoing restriction"; a procurement/tender
+notice is never a traffic restriction; planned/future works are not a
+restriction without a confirmed traffic impact and specific dates; never
+invent a bridge capacity, closure, diversion, width/height/weight limit, or
+validity date not present in the supplied candidate text; return an empty
+`developments` array rather than padding to a target count; a recurring
+ban may be included only when the candidate data shows it is already valid
+for the target week's exact dates; and every development must include a
+concrete `recommendedAction`. The JSON schema also carries `vehicleScope`,
+`timeWindow` and `exemptions` per development, and `operatorChecklist`
+(array of strings) instead of a single closing paragraph.
+
+None of this is trusted blindly - `verify-candidates.mjs` and
+`quality-gate.mjs` re-check dates, relevance and structure independently in
+plain code (see "Deterministic date validation" below), specifically
+because a prompt-following failure must not be able to reintroduce the
+class of error this fixes.
+
 ### Quality gate
 
 Implemented in `scripts/lib/quality-gate.mjs`, called from
@@ -301,10 +485,27 @@ publication if:
   (enforced via the same zod schema shape as `src/content.config.ts`,
   duplicated in `scripts/lib/article-schema.mjs` so it can run outside
   Astro's build - keep the two in sync if the schema changes),
-- `sources` is empty,
-- any development item is missing a `sourceUrl` or `sourceName`,
+- `sources` is empty, or cites a URL no report in the body actually uses,
+- any development item is missing a `sourceUrl`, an invalid-format
+  `sourceUrl`, a `sourceName`, a `title`, or a meaningful
+  `recommendedAction` (non-empty, not a placeholder like "n/a"),
 - the article body is empty or under ~400 characters (suspiciously short),
-- zero developments survived cross-validation.
+- **fewer than 8 or more than 12 developments** survived cross-validation -
+  the required 8-12 distinct operational reports (see "Editorial
+  specification" above),
+- **no development is a driving ban / exceptional-transport restriction** -
+  at least one is required every week,
+- **any development's `validFrom`/`validTo` doesn't overlap the target
+  week** (`validateDevelopmentDateRange`, `scripts/lib/date-validation.mjs`)
+  - an invalid ISO date, a reversed range, a `validTo` before the week
+  starts, or a `validFrom` after the week ends, all block publication. This
+  is deliberately independent of what the model was instructed to do.
+- **a duplicate `sourceUrl` or duplicate (normalized) title** across
+  developments - the same restriction must never be rendered as two
+  reports. Two genuinely distinct restrictions that happen to share a
+  country and weekend (e.g. Austria's general ban and its additional
+  summer corridor restrictions) are *not* flagged as duplicates - only an
+  exact source or title repeat is.
 
 If the gate fails, or the subsequent `astro build` fails, **no file is
 written or left behind** and the script exits with a non-zero code - the
@@ -312,15 +513,26 @@ previously published site is completely unaffected.
 
 ### Safety: never publish a low-quality article just because cron ran
 
-If there isn't enough verified, significant data in a given week - no
-findings on file, nothing survives pre-selection, nothing survives
-verification, or nothing survives cross-validation - the script logs the
-specific reason and exits **0** (success, no article). This is treated as
-normal, not an error: a quiet week genuinely may not have anything worth
-publishing. The GitHub Actions commit step then sees no file changes and
-does nothing. A real failure (OpenAI error, quality gate failure, build
-failure) exits **1**, so it's visible in the Actions tab, but still never
-leaves a partial/broken file behind.
+Two distinct outcomes, deliberately different exit codes:
+
+- **Genuinely nothing to check yet** - no RSS findings on file *and* no
+  official driving-ban calendar applies to the target week, or nothing
+  survives pre-selection - exits **0** (success, no article; the Actions
+  run is green). This is normal, not an error: with the calendar layer
+  seeded (see above), this case is now rare in practice, since a standing
+  rule like Austria's or Switzerland's applies most weeks regardless of
+  RSS activity.
+- **Something was checked, but the result doesn't clear the editorial bar**
+  - nothing survives verification or cross-validation, or the quality gate
+  rejects the result (including having fewer than 8 or more than 12
+  reports) - exits **1**, so it shows up as a **clearly failed** GitHub
+  Actions run. This is a deliberate policy: once the pipeline has gone far
+  enough to attempt a real article, coming up short is worth a human
+  looking at the log, not a silently green "nothing happened" run.
+
+Either way, the specific reason is always logged and written to
+`$GITHUB_STEP_SUMMARY`, and **no partial or broken file is ever left
+behind** under any of these outcomes.
 
 ### Never overwrites or deletes published content
 
@@ -490,6 +702,54 @@ Fixed by:
   refresh, if it commits at all, uses
   `data: refresh oversize findings (no article published this run)` -
   never the word "publish".
+
+## Incident: the first published W35 article (2026-08-21)
+
+The first article the pipeline actually published -
+`eu-oversize-weekly-2026-w35.md`, covering 24-30 August 2026 - passed the
+(then-existing) quality gate but was editorially unacceptable: a one-off
+"lorry got stuck" incident near Hildesheim was reported as an ongoing road
+closure; a routine procurement/tender notice for Murrashi Bridge
+rehabilitation works in Albania was reported as an active bridge
+restriction; a Monaco item valid only 21-23 August (before the 24-30 August
+target week even starts) was included; every development was rendered
+twice (once under "Main developments", again under "Driving bans next
+week"/"Infrastructure watch"); and the article covered only 3 low-value
+items instead of the 8-12 substantive, driving-ban-prioritized reports this
+briefing exists to provide.
+
+Separately, the commit that published it was labeled
+`content: publish EU Oversize Weekly 2026-W34` even though the article
+itself targets W35 - `scripts/publish-gate-commit.mjs` computed the commit
+message's week from `isoWeekLabel(new Date())` (the *data-collection*
+week), independently of, and one week behind, the week
+`generate-weekly-article.mjs` actually built the article for.
+
+Fixed by:
+- The relevance filter (`relevance-filter.mjs`) now rejects one-off
+  incidents, procurement notices, and unconfirmed planned works, checked
+  independently at both ingestion and weekly verification (see "Relevance
+  filtering" above).
+- `date-validation.mjs` deterministically rejects any development whose
+  `validTo` is before the target week or `validFrom` is after it,
+  independent of what the model does (see "Quality gate" above).
+- `render-article.mjs` renders each development in exactly one of three
+  mutually exclusive categories (see "Duplicate rendering" above).
+- The quality gate now requires 8-12 distinct reports, at least one driving
+  ban, no duplicate source/title, and a meaningful `recommendedAction` for
+  every report (see "Quality gate" above).
+- The maintained official driving-ban calendar layer
+  (`config/driving-ban-calendars`) now guarantees driving-ban coverage
+  every week regardless of RSS activity (see "Official driving-ban
+  calendar layer" above) - the corrected W35 article's 10 reports are
+  generated from this layer.
+- `scripts/publish-gate-commit.mjs` no longer computes its own week - it
+  derives the commit message's week from the actual newly-added article's
+  filename (`extractArticleWeekFromStatus`, `scripts/lib/publish-gate.mjs`),
+  failing loudly on an invalid or ambiguous filename instead of guessing.
+  See `scripts/lib/__tests__/publish-gate.test.mjs` for the regression test
+  (findings collected in W34, article targets W35, commit message reads
+  `content: publish EU Oversize Weekly 2026-W35`).
 
 ## Troubleshooting
 

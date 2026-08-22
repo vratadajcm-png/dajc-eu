@@ -2,6 +2,14 @@
 // mock-generator.mjs, after cross-validation in generate-weekly-article.mjs)
 // into frontmatter + Markdown body matching src/content.config.ts's schema
 // and the structure required for EU Oversize Weekly articles.
+//
+// Categorization is mutually exclusive and each development is rendered
+// EXACTLY ONCE - see scripts/lib/__tests__/render-article.test.mjs. This
+// fixes the incident where every development was rendered under "Main
+// developments" AND AGAIN under "Driving bans next week" and/or
+// "Infrastructure watch" whenever its isDrivingBan/isInfrastructure flags
+// were set, because the old renderer treated those flags as additive
+// overlays instead of a single categorization.
 
 function mdEscape(text) {
   return String(text ?? '').replace(/\r\n/g, '\n').trim();
@@ -10,6 +18,7 @@ function mdEscape(text) {
 function formatDateRange(item) {
   const from = item.validFrom ? item.validFrom : null;
   const to = item.validTo ? item.validTo : null;
+  if (from && to && from === to) return from;
   if (from && to) return `${from} to ${to}`;
   if (from) return `from ${from}`;
   if (to) return `until ${to}`;
@@ -22,8 +31,10 @@ function renderDevelopmentItem(item) {
   lines.push('');
   const meta = [];
   if (item.where) meta.push(`**Where:** ${mdEscape(item.where)}`);
+  if (item.vehicleScope) meta.push(`**Affected vehicles:** ${mdEscape(item.vehicleScope)}`);
   const range = formatDateRange(item);
-  if (range) meta.push(`**When:** ${range}`);
+  if (item.timeWindow) meta.push(`**When:** ${mdEscape(item.timeWindow)}`);
+  else if (range) meta.push(`**When:** ${range}`);
   if (meta.length) {
     lines.push(meta.join('  \n'));
     lines.push('');
@@ -36,52 +47,71 @@ function renderDevelopmentItem(item) {
     lines.push(`**Recommended action:** ${mdEscape(item.recommendedAction)}`);
     lines.push('');
   }
+  if (item.exemptions) {
+    lines.push(`**Exemptions/conditions:** ${mdEscape(item.exemptions)}`);
+    lines.push('');
+  }
   lines.push(`*Source: [${mdEscape(item.sourceName)}](${item.sourceUrl})*`);
+  for (const extra of item.additionalSources || []) {
+    lines.push(`*Also see: [${mdEscape(extra.name)}](${extra.url})*`);
+  }
   return lines.join('\n');
 }
 
+/**
+ * Assigns each development to exactly one category, in priority order.
+ * A driving ban / exceptional-transport movement restriction is reported
+ * there even if it also happens to touch infrastructure - it never appears
+ * a second time under "Infrastructure restrictions".
+ */
+export function categorizeDevelopment(item) {
+  if (item.isDrivingBan) return 'bans';
+  if (item.isInfrastructure) return 'infrastructure';
+  return 'other';
+}
+
+const SECTION_TITLES = {
+  bans: 'Driving bans and exceptional-transport restrictions',
+  infrastructure: 'Infrastructure restrictions',
+  other: 'Other operational developments',
+};
+
 export function renderArticleMarkdown(article, { slug, publishedAt, nextPublicationLabel }) {
-  const grouped = new Map();
+  const byCategory = { bans: [], infrastructure: [], other: [] };
   for (const item of article.developments) {
-    const list = grouped.get(item.country) || [];
-    list.push(item);
-    grouped.set(item.country, list);
+    byCategory[categorizeDevelopment(item)].push(item);
   }
 
   const sections = [];
 
   sections.push(`## Intro\n\n${mdEscape(article.intro)}`);
 
-  const mainParts = ['## Main developments', ''];
-  for (const [country, items] of grouped) {
-    mainParts.push(`### ${country}`);
-    mainParts.push('');
-    for (const item of items) {
-      mainParts.push(renderDevelopmentItem(item));
-      mainParts.push('');
-    }
-  }
-  sections.push(mainParts.join('\n').trim());
-
-  const bans = article.developments.filter((d) => d.isDrivingBan);
-  if (bans.length > 0) {
-    const parts = ['## Driving bans next week', ''];
-    for (const item of bans) parts.push(renderDevelopmentItem(item), '');
+  for (const category of ['bans', 'infrastructure', 'other']) {
+    const items = byCategory[category];
+    if (items.length === 0) continue;
+    const parts = [`## ${SECTION_TITLES[category]}`, ''];
+    for (const item of items) parts.push(renderDevelopmentItem(item), '');
     sections.push(parts.join('\n').trim());
   }
 
-  const infra = article.developments.filter((d) => d.isInfrastructure);
-  if (infra.length > 0) {
-    const parts = ['## Infrastructure watch', ''];
-    for (const item of infra) parts.push(renderDevelopmentItem(item), '');
-    sections.push(parts.join('\n').trim());
+  const checklist =
+    Array.isArray(article.operatorChecklist) && article.operatorChecklist.length > 0
+      ? article.operatorChecklist
+      : article.operatorsWatchNextWeek
+        ? [article.operatorsWatchNextWeek]
+        : [];
+  if (checklist.length > 0) {
+    sections.push(
+      ['## Operator checklist', '', ...checklist.map((c) => `- ${mdEscape(c)}`)].join('\n')
+    );
   }
-
-  sections.push(`## What operators should watch next week\n\n${mdEscape(article.operatorsWatchNextWeek)}`);
 
   const uniqueSources = new Map();
   for (const item of article.developments) {
     uniqueSources.set(item.sourceUrl, { name: item.sourceName, url: item.sourceUrl });
+    for (const extra of item.additionalSources || []) {
+      uniqueSources.set(extra.url, { name: extra.name, url: extra.url });
+    }
   }
   const sourcesList = [...uniqueSources.values()];
   sections.push(

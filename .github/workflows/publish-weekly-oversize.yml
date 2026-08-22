@@ -112,7 +112,7 @@ jobs:
         if: steps.check-time.outputs.should_run == 'true'
         run: npm run oversize:monitor
 
-      - name: Generate weekly article (verification + quality gate + build check happen inside this script)
+      - name: Generate weekly article (official driving-ban calendars, verification, quality gate, and build check all happen inside this script)
         if: steps.check-time.outputs.should_run == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
