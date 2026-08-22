@@ -247,6 +247,30 @@ export const oversizeSources = [
     type: 'bridge-tunnel-operator',
     priority: 1,
   },
+  // Additional national authorities completing the pan-European discovery
+  // surface. Entries without a confirmed feedUrl are intentionally retained:
+  // fetch-source.mjs may discover a standard feed, otherwise it logs the gap
+  // instead of pretending the country was checked successfully.
+  { id: 'ro-cnair', country: 'RO', authority: 'CNAIR', name: 'Romanian National Road Infrastructure Administration', url: 'https://www.cnadnr.ro', type: 'national-road-authority', priority: 1 },
+  { id: 'dk-vejdirektoratet', country: 'DK', authority: 'Vejdirektoratet', name: 'Danish Road Directorate', url: 'https://www.vejdirektoratet.dk', type: 'national-road-authority', priority: 1 },
+  { id: 'tr-kgm', country: 'TR', authority: 'Karayollari Genel Mudurlugu', name: 'Turkish General Directorate of Highways', url: 'https://www.kgm.gov.tr', type: 'national-road-authority', priority: 1 },
+  { id: 'se-trafikverket', country: 'SE', authority: 'Trafikverket', name: 'Swedish Transport Administration', url: 'https://www.trafikverket.se', type: 'national-road-authority', priority: 1 },
+  { id: 'fi-vayla', country: 'FI', authority: 'Vaylavirasto', name: 'Finnish Transport Infrastructure Agency', url: 'https://vayla.fi', type: 'national-road-authority', priority: 1 },
+  { id: 'ee-transpordiamet', country: 'EE', authority: 'Transpordiamet', name: 'Estonian Transport Administration', url: 'https://www.transpordiamet.ee', type: 'national-road-authority', priority: 1 },
+  { id: 'lv-lvceli', country: 'LV', authority: 'Latvijas Valsts celi', name: 'Latvian State Roads', url: 'https://lvceli.lv', type: 'national-road-authority', priority: 1 },
+  { id: 'ie-tii', country: 'IE', authority: 'Transport Infrastructure Ireland', name: 'Transport Infrastructure Ireland', url: 'https://www.tii.ie', type: 'national-road-authority', priority: 1 },
+  { id: 'pt-ip', country: 'PT', authority: 'Infraestruturas de Portugal', name: 'Infraestruturas de Portugal', url: 'https://www.infraestruturasdeportugal.pt', type: 'national-road-authority', priority: 1 },
+  { id: 'bg-api', country: 'BG', authority: 'Road Infrastructure Agency', name: 'Bulgarian Road Infrastructure Agency', url: 'https://www.api.bg', type: 'national-road-authority', priority: 1 },
+  { id: 'gr-yme', country: 'GR', authority: 'Ministry of Infrastructure and Transport', name: 'Greek Ministry of Infrastructure and Transport', url: 'https://www.yme.gr', type: 'ministry', priority: 1 },
+  { id: 'hr-hrvatske-ceste', country: 'HR', authority: 'Hrvatske ceste', name: 'Croatian Roads', url: 'https://hrvatske-ceste.hr', type: 'national-road-authority', priority: 1 },
+  { id: 'si-dars', country: 'SI', authority: 'DARS', name: 'Motorway Company in the Republic of Slovenia', url: 'https://www.dars.si', type: 'national-road-authority', priority: 1 },
+  { id: 'rs-putevi', country: 'RS', authority: 'Putevi Srbije', name: 'Roads of Serbia', url: 'https://www.putevi-srbije.rs', type: 'national-road-authority', priority: 1 },
+  { id: 'ba-jpdcfbih', country: 'BA', authority: 'JP Ceste FBiH', name: 'Roads of the Federation of Bosnia and Herzegovina', url: 'https://jpdcfbh.ba', type: 'national-road-authority', priority: 2 },
+  { id: 'me-monteput', country: 'ME', authority: 'Monteput', name: 'Monteput Montenegro', url: 'https://monteput.me', type: 'national-road-authority', priority: 2 },
+  { id: 'lu-pch', country: 'LU', authority: 'Ponts et Chaussees', name: 'Luxembourg Roads Administration', url: 'https://pch.gouvernement.lu', type: 'national-road-authority', priority: 2 },
+  { id: 'is-vegagerdin', country: 'IS', authority: 'Vegagerdin', name: 'Icelandic Road and Coastal Administration', url: 'https://www.vegagerdin.is', type: 'national-road-authority', priority: 2 },
+  { id: 'cy-public-works', country: 'CY', authority: 'Public Works Department', name: 'Cyprus Public Works Department', url: 'https://www.mcw.gov.cy', type: 'national-road-authority', priority: 2 },
+  { id: 'mt-transport', country: 'MT', authority: 'Transport Malta', name: 'Transport Malta', url: 'https://www.transport.gov.mt', type: 'national-road-authority', priority: 2 },
 ];
 
 // Note: no Slovak (SK) source is included yet. A prior, related audit found
