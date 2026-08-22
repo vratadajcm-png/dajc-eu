@@ -10,6 +10,7 @@ import { validateDevelopmentDateRange } from './date-validation.mjs';
 const MIN_BODY_LENGTH = 400;
 const MIN_REPORTS = 10;
 const MAX_REPORTS = 12;
+const MIN_ROUNDUP_REPORTS = 1;
 const MIN_RECOMMENDED_ACTION_LENGTH = 10;
 
 function normalizeTitle(title) {
@@ -34,8 +35,9 @@ function isValidUrl(value) {
  * @param {{ frontmatter: object, body: string, developments: object[],
  *   weekStart?: Date, weekEnd?: Date }} args
  */
-export function runQualityGate({ frontmatter, body, developments, europeRoundup = [], weekStart, weekEnd }) {
+export function runQualityGate({ frontmatter, body, developments, europeRoundup, weekStart, weekEnd }) {
   const errors = [];
+  const roundupItems = Array.isArray(europeRoundup) ? europeRoundup : [];
 
   const parsed = articleFrontmatterSchema.safeParse(frontmatter);
   if (!parsed.success) {
@@ -51,6 +53,9 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup 
   }
 
   const items = developments || [];
+  if (europeRoundup !== undefined && roundupItems.length < MIN_ROUNDUP_REPORTS) {
+    errors.push('Rest-of-Europe roundup is empty - at least one additional verified European development is required');
+  }
 
   if (items.length === 0) {
     errors.push('article has zero developments - nothing significant to report');
@@ -72,7 +77,7 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup 
 
     const allItems = [
       ...items.map((item, i) => ({ item, label: `developments[${i}]` })),
-      ...europeRoundup.map((item, i) => ({ item, label: `europeRoundup[${i}]` })),
+      ...roundupItems.map((item, i) => ({ item, label: `europeRoundup[${i}]` })),
     ];
 
     allItems.forEach(({ item, label: baseLabel }, i) => {
@@ -124,7 +129,7 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup 
     }
 
     const usedSourceUrls = new Set();
-    for (const item of [...items, ...europeRoundup]) {
+    for (const item of [...items, ...roundupItems]) {
       if (item.sourceUrl) usedSourceUrls.add(item.sourceUrl);
       for (const extra of item.additionalSources || []) {
         if (extra.url) usedSourceUrls.add(extra.url);
