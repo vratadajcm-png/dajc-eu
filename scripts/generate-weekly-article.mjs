@@ -222,12 +222,17 @@ async function main() {
   const leadFloor = ensureOfficialCalendarLeadFloor(article, verified);
   article = leadFloor.article;
 
-  const criticalFloor = ensureCriticalCoverage(article, verified);
+  const criticalFloor = ensureCriticalCoverage(article, verified, {
+    discoveryWindowStart: isoWeekStart(now),
+  });
   article = criticalFloor.article;
   if (criticalFloor.critical.length > 0) {
     console.log(
       `Critical-news floor: ${criticalFloor.critical.length} required verified change(s); added ${criticalFloor.addedToLeads} to leads and ${criticalFloor.addedToRoundup} to Rest of Europe.`
     );
+    for (const item of criticalFloor.critical) {
+      console.log(`  [required] ${item.country}: ${item.title} -> ${item.sourceUrl}`);
+    }
   }
 
   article.europeRoundup = sanitizeRoundup(
