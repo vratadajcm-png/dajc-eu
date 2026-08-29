@@ -14,6 +14,7 @@ import { fetchSourceFindings } from './lib/fetch-source.mjs';
 import { mergeFindings, markExpired } from './lib/findings.mjs';
 import { loadWeekFindings, saveWeekFindings } from './lib/store.mjs';
 import { isoWeekLabel } from './lib/week.mjs';
+import { coverageForSources, oversizeJurisdictions } from '../config/oversize-jurisdictions/index.mjs';
 
 async function main() {
   const now = new Date();
@@ -29,6 +30,7 @@ async function main() {
 
   let sourcesFeed = 0;
   let sourcesHtml = 0;
+  let sourcesHybrid = 0;
   let sourcesUnavailable = 0;
   const unavailable = [];
   const allCandidates = [];
@@ -60,6 +62,7 @@ async function main() {
 
     if (result.status === 'ok') {
       if (result.method === 'feed') sourcesFeed += 1;
+      else if (result.method === 'hybrid') sourcesHybrid += 1;
       else sourcesHtml += 1;
 
       const via = result.method || 'official source';
@@ -84,8 +87,18 @@ async function main() {
   console.log('\n=== SUMMARY ===');
   console.log(`sources checked: ${oversizeSources.length}`);
   console.log(`sources read via RSS/Atom: ${sourcesFeed}`);
-  console.log(`sources read via official HTML: ${sourcesHtml}`);
+  console.log(`sources read via official HTML only: ${sourcesHtml}`);
+  console.log(`sources read via RSS/Atom + official HTML: ${sourcesHybrid}`);
   console.log(`sources unavailable: ${sourcesUnavailable}`);
+
+  const jurisdictionCoverage = coverageForSources(oversizeSources);
+  const coverageGaps = jurisdictionCoverage.filter((item) => !item.covered);
+  console.log(`mandatory jurisdictions/territories covered by configured source mapping: ${jurisdictionCoverage.length - coverageGaps.length}/${oversizeJurisdictions.length}`);
+  if (coverageGaps.length > 0) {
+    console.error('Mandatory geographic coverage gaps:');
+    for (const gap of coverageGaps) console.error(`  - ${gap.nameCs} [${gap.id}]`);
+    process.exitCode = 1;
+  }
   console.log(`findings before this run: ${beforeCount}`);
   console.log(`findings after this run: ${merged.size}`);
   console.log(`new findings: ${statusCounts.new}`);
