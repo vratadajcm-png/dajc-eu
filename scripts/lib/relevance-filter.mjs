@@ -42,6 +42,18 @@ export const NON_RESTRICTION_PATTERNS = [
     reason: 'personal international-driving-permit guidance, not a freight operational restriction',
     pattern: /international driving permit|international driving licence|permiso internacional|conducir en el extranjero/i,
   },
+  {
+    reason: 'personal driver-licensing administration, not an oversize/freight operational change',
+    pattern: /permisos? de conducir|permiso por puntos|autoescuel|centro de formaci[oó]n|canjes? de permisos|recuperaci[oó]n de permisos|driving licen[cs]e|driver licen[cs]e|f[uü]hrerausweis/i,
+  },
+  {
+    reason: 'generic authority/navigation page, not a specific operational development',
+    pattern: /wetten,? regels en vergunningen|laws,? rules and permits|datenschutzerkl[aä]rung|newsletter baustellenmeldungen|^autobahnbr[uü]cken\b|^baustellenkarte\b/i,
+  },
+  {
+    reason: 'toll revenue/statistics report, not an operational toll-rule change',
+    pattern: /toll collection.{0,80}(?:billion|million|grew|growth|year[- ]on[- ]year|revenue)|(?:billion|million).{0,80}toll(?:s| collection)|mýtného.{0,80}(?:miliard|milion)|výběr mýta.{0,80}(?:miliard|milion)/i,
+  },
 ];
 
 /**
@@ -57,5 +69,17 @@ export function checkOperationalRelevance(text) {
   for (const { reason, pattern } of NON_RESTRICTION_PATTERNS) {
     if (pattern.test(safeText)) return { ok: false, reason };
   }
+
+  // HTML archives can expose old restrictions as if they were fresh because
+  // the monitor only discovered the page today. If text explicitly mentions
+  // years but none reaches the current year, treat it as historical archive
+  // material. Current-year text, undated standing information and maintained
+  // calendar findings remain eligible.
+  const years = [...safeText.matchAll(/\b(20\d{2})\b/g)].map((m) => Number(m[1]));
+  const currentYear = new Date().getUTCFullYear();
+  if (years.length > 0 && Math.max(...years) < currentYear) {
+    return { ok: false, reason: 'historical archive item predating the current year' };
+  }
+
   return { ok: true };
 }
