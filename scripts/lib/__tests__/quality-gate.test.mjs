@@ -42,7 +42,44 @@ describe('runQualityGate - report count', () => {
     const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
     const result = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, europeRoundup: [], weekStart, weekEnd });
     expect(result.ok).toBe(false);
-    expect(result.errors.some((e) => /roundup is empty/.test(e))).toBe(true);
+    expect(result.errors.some((e) => /roundup has only 0 report/.test(e))).toBe(true);
+  });
+
+  it('blocks a one-country Rest-of-Europe roundup', () => {
+    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
+    const europeRoundup = Array.from({ length: 3 }, (_, i) =>
+      makeDevelopment(30 + i, { country: 'Slovenia' })
+    );
+    const all = [...developments, ...europeRoundup];
+    const result = runQualityGate({
+      frontmatter: makeFrontmatter(all),
+      body: LONG_BODY,
+      developments,
+      europeRoundup,
+      weekStart,
+      weekEnd,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.errors.some((e) => /covers only 1 country/.test(e))).toBe(true);
+  });
+
+  it('accepts a Rest-of-Europe roundup spanning at least three countries', () => {
+    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
+    const europeRoundup = [
+      makeDevelopment(30, { country: 'Spain' }),
+      makeDevelopment(31, { country: 'Romania' }),
+      makeDevelopment(32, { country: 'Denmark' }),
+    ];
+    const all = [...developments, ...europeRoundup];
+    const result = runQualityGate({
+      frontmatter: makeFrontmatter(all),
+      body: LONG_BODY,
+      developments,
+      europeRoundup,
+      weekStart,
+      weekEnd,
+    });
+    expect(result.ok).toBe(true);
   });
 
   it('blocks publication with fewer than 10 reports', () => {
