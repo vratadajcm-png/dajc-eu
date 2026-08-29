@@ -45,6 +45,12 @@ describe('checkOperationalRelevance', () => {
     expect(result.ok).toBe(false);
   });
 
+  it('rejects personal international-driving-permit guidance', () => {
+    const result = checkOperationalRelevance('Conducir en el extranjero, permiso internacional: como solicitar el permiso internacional.');
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/international-driving-permit/);
+  });
+
   it('accepts a genuine, currently-applicable driving ban', () => {
     const result = checkOperationalRelevance(
       'Nationwide weekend driving ban for goods vehicles above 7.5 tonnes applies this Saturday and Sunday.'
