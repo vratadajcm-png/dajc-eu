@@ -37,7 +37,7 @@ import { formatNextPublicationLabel } from './lib/next-publication.mjs';
 import { resolveDrivingBanFindings } from './lib/driving-ban-calendar.mjs';
 import { crossValidateDevelopments } from './lib/cross-validate.mjs';
 import { ensureOfficialCalendarLeadFloor } from './lib/lead-floor.mjs';
-import { mergeRoundupSupplement, roundupNeedsSupplement } from './lib/roundup-breadth.mjs';
+import { mergeRoundupSupplement, roundupNeedsSupplement, sanitizeRoundup } from './lib/roundup-breadth.mjs';
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -220,6 +220,12 @@ async function main() {
 
   const leadFloor = ensureOfficialCalendarLeadFloor(article, verified);
   article = leadFloor.article;
+
+  article.europeRoundup = sanitizeRoundup(
+    article.europeRoundup,
+    article.developments,
+    { suppressEvergreenSunday: targetWeekEnd >= new Date('2026-09-01T00:00:00Z') }
+  );
   if (leadFloor.added > 0 || leadFloor.promoted > 0) {
     console.log(
       `Official-calendar lead floor: added ${leadFloor.added}, promoted ${leadFloor.promoted}; lead reports now ${article.developments.length}.`
