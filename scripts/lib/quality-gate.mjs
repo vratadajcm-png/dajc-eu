@@ -6,6 +6,7 @@
 
 import { articleFrontmatterSchema } from './article-schema.mjs';
 import { validateDevelopmentDateRange } from './date-validation.mjs';
+import { checkLongRoadClosure } from './closure-duration.mjs';
 
 const MIN_BODY_LENGTH = 400;
 const MIN_REPORTS = 10;
@@ -109,6 +110,9 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
       if (!item.recommendedAction || item.recommendedAction.trim().length < MIN_RECOMMENDED_ACTION_LENGTH) {
         errors.push(`${label} has no meaningful recommendedAction for an operator/dispatcher`);
       }
+
+      const closureCheck = checkLongRoadClosure(item);
+      if (!closureCheck.ok) errors.push(`${label}: ${closureCheck.reason}`);
 
       if (weekStart && weekEnd) {
         const dateCheck = validateDevelopmentDateRange(
