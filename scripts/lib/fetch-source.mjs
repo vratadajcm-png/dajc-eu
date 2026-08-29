@@ -17,7 +17,10 @@ const FETCH_TIMEOUT_MS = 12_000;
 const FETCH_RETRIES = 2;
 const MAX_ITEMS_PER_SOURCE = 15;
 const MAX_HTML_FINDINGS_PER_SOURCE = 20;
+const MAX_HTML_DETAILS_PER_SOURCE = 12;
 const MAX_HTML_ANCHORS_SCANNED = 300;
+const MAX_SUMMARY_CHARS = 1_800;
+const DETAIL_CONCURRENCY = 4;
 
 const COUNTRY_NAMES = {
   AL: 'Albania', AT: 'Austria', BA: 'Bosnia and Herzegovina', BE: 'Belgium',
@@ -89,10 +92,37 @@ function stripHtml(value = '') {
     value
       .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
       .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript>/gi, ' ')
       .replace(/<[^>]+>/g, ' ')
   )
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function extractDetailText(html) {
+  const cleaned = html
+    .replace(/<nav\b[^>]*>[\s\S]*?<\/nav>/gi, ' ')
+    .replace(/<header\b[^>]*>[\s\S]*?<\/header>/gi, ' ')
+    .replace(/<footer\b[^>]*>[\s\S]*?<\/footer>/gi, ' ');
+
+  const scopes = [];
+  for (const tag of ['article', 'main']) {
+    const re = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'gi');
+    let match;
+    while ((match = re.exec(cleaned))) {
+      const text = stripHtml(match[1]);
+      if (text.length >= 120) scopes.push(text);
+    }
+  }
+
+  const text = scopes.sort((a, b) => b.length - a.length)[0] || stripHtml(cleaned);
+  return text.slice(0, MAX_SUMMARY_CHARS);
+}
+
+function extractDetailHeading(html) {
+  const match = html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
+  const title = stripHtml(match?.[1] || '');
+  return title.length >= 8 && title.length <= 280 ? title : null;
 }
 
 function normalizedHost(hostname) {
@@ -161,7 +191,7 @@ function toFinding({ source, title, summary, sourceUrl }) {
     location: guessLocation(text, source.authority),
     type,
     title,
-    summary: summary ? summary.slice(0, 600) : null,
+    summary: summary ? summary.slice(0, MAX_SUMMARY_CHARS) : null,
     validFrom: null,
     validTo: null,
     impact: null,
@@ -202,6 +232,13 @@ export function extractHtmlFindings(html, source, pageUrl = source.url) {
     // feeds, but not for arbitrary website navigation/content links.
     const matchedType = classify(text);
     if (!matchedType || !checkOperationalRelevance(text).ok) continue;
+
+    // Avoid generic account/navigation anchors inheriting a restriction word
+    // from a larger container. Operational titles normally carry either a
+    // classification term or a route code; known generic UI labels do not.
+    const genericUiTitle =
+      /^(?:read more|more|details|learn more|login|log in|sign in|register|registration|account|edit registration|anmeldung|anmeldung bearbeiten|mehr erfahren|weiterlesen|zobrazit více|více|detaily)$/i;
+    if (genericUiTitle.test(title)) continue;
 
     seen.add(sourceUrl);
     findings.push(toFinding({
@@ -278,6 +315,51 @@ async function parseFeed(raw, source, feedUrl, parser) {
     }));
 }
 
+async function enrichHtmlFindings(findings, source, listingUrl) {
+  const enriched = [...findings];
+  const limit = Math.min(MAX_HTML_DETAILS_PER_SOURCE, enriched.length);
+  let nextIndex = 0;
+
+  async function worker() {
+    while (true) {
+      const index = nextIndex;
+      nextIndex += 1;
+      if (index >= limit) return;
+
+      const finding = enriched[index];
+      if (!finding?.sourceUrl || finding.sourceUrl === listingUrl) continue;
+
+      const fetched = await fetchTextWithRetry(
+        finding.sourceUrl,
+        'text/html, application/xhtml+xml, */*'
+      );
+      if (!fetched.ok) continue;
+
+      const detailText = extractDetailText(fetched.text);
+      if (detailText.length < 120 || !checkOperationalRelevance(detailText).ok) continue;
+
+      const detailHeading = extractDetailHeading(fetched.text);
+      const title = detailHeading && classify(`${detailHeading} ${detailText}`)
+        ? detailHeading
+        : finding.title;
+      const combined = `${title} ${detailText}`;
+
+      enriched[index] = {
+        ...finding,
+        title,
+        summary: detailText,
+        type: classify(combined) || finding.type,
+        location: guessLocation(combined, finding.location || source.authority),
+      };
+    }
+  }
+
+  await Promise.all(
+    Array.from({ length: Math.min(DETAIL_CONCURRENCY, limit) }, () => worker())
+  );
+  return enriched;
+}
+
 function htmlCandidates(source) {
   const configured = Array.isArray(source.htmlUrls) ? source.htmlUrls : [];
   return [...new Set([...configured, source.url].filter(Boolean))];
@@ -334,7 +416,14 @@ export async function fetchSourceFindings(source, { now = new Date().toISOString
 
     const htmlFindings = extractHtmlFindings(fetched.text, source, fetched.finalUrl);
     if (htmlFindings.length > 0) {
-      return { source: source.id, status: 'ok', method: 'html', sourceUrlUsed: fetched.finalUrl, findings: htmlFindings };
+      const enrichedFindings = await enrichHtmlFindings(htmlFindings, source, fetched.finalUrl);
+      return {
+        source: source.id,
+        status: 'ok',
+        method: 'html',
+        sourceUrlUsed: fetched.finalUrl,
+        findings: enrichedFindings,
+      };
     }
 
     // Some sites advertise a non-standard feed only from <link rel=alternate>.
