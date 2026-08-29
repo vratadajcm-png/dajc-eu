@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   mergeRoundupSupplement,
   roundupNeedsSupplement,
+  sanitizeRoundup,
 } from '../roundup-breadth.mjs';
 
 function item(country, n) {
@@ -29,6 +30,25 @@ describe('roundup breadth', () => {
     const merged = mergeRoundupSupplement(existing, supplement, new Set());
     expect(merged).toHaveLength(3);
     expect(merged.map((x) => x.country)).toEqual(['Spain', 'Romania', 'Denmark']);
+  });
+
+  it('removes roundup items whose source is already used by a lead', () => {
+    const lead = [{ ...item('Slovenia', 1), isDrivingBan: true }];
+    const roundup = [
+      { ...item('Slovenia', 1), isDrivingBan: true, title: 'Routine Sunday HGV ban reminder' },
+      item('Spain', 2),
+    ];
+    const cleaned = sanitizeRoundup(roundup, lead, { suppressEvergreenSunday: true });
+    expect(cleaned.map((x) => x.country)).toEqual(['Spain']);
+  });
+
+  it('removes routine evergreen Sunday reminders after the policy date', () => {
+    const roundup = [
+      { ...item('Austria', 1), isDrivingBan: true, title: 'Standard Sunday HGV driving ban' },
+      { ...item('France', 2), isDrivingBan: true, title: 'Exceptional transport weekend movement ban' },
+    ];
+    const cleaned = sanitizeRoundup(roundup, [], { suppressEvergreenSunday: true });
+    expect(cleaned.map((x) => x.country)).toEqual(['France']);
   });
 
   it('does not reuse a source already used by a lead report', () => {
