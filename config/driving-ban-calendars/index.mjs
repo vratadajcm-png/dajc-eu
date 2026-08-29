@@ -347,6 +347,7 @@ export const drivingBanCalendars = [
     country: 'IT',
     countryName: 'Italy',
     kind: 'annual-calendar',
+    suppressSundayOnlyFromWeeklyAfter: '2026-09-01',
     validYear: 2026,
     sourceUrl: 'https://www.mit.gov.it/normativa/decreto-ministeriale-n-325-del-12-dicembre-2025',
     sourceName: 'Ministero delle Infrastrutture e dei Trasporti - Decreto n. 325/2025',
