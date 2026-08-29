@@ -409,7 +409,7 @@ export const drivingBanCalendars = [
     country: 'FR',
     countryName: 'France',
     kind: 'standing-rule',
-    sourceUrl: 'https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000043418560',
+    sourceUrl: 'https://www.legifrance.gouv.fr/loda/id/JORFTEXT000043416004/',
     sourceName: 'Legifrance - Arrete du 16 avril 2021, Article 1',
     legalBasis: 'Article 1 of the Order of 16 April 2021 - permanent general goods-vehicle restriction',
     vehicleScope: 'Goods vehicles and combinations above 7.5t GVW, excluding the specialised and agricultural categories defined by the order',
