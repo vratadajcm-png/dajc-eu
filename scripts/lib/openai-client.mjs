@@ -80,7 +80,7 @@ const ARTICLE_JSON_SCHEMA = {
       europeRoundup: {
         type: 'array',
         items: DEVELOPMENT_SCHEMA,
-        description: 'A compact, genuinely pan-European roundup: at least 3 useful reports from at least 3 distinct countries when that breadth exists. Never duplicate a lead report.',
+        description: 'A compact, genuinely pan-European roundup with at least 10 concise reports from at least 6 distinct countries. Never duplicate a lead report.',
       },
       operatorChecklist: {
         type: 'array',
@@ -113,7 +113,7 @@ Hard rules - violating any of these makes your output unusable:
 9. Clearly distinguish a general truck-driving ban, a restriction above a specific weight, a special restriction for exceptional/oversized transport, and a condition contained in an individual transport permit - never conflate these.
 10. A candidate with isOfficialCalendar=true is a legally curated, target-week-specific restriction from the maintained DAJC calendar layer. Unless it is an exact duplicate of another supplied restriction, it is lead-quality by definition and MUST be included in developments before lower-priority news items. Do not discard it merely because its legal rule is recurring rather than newly announced.
 11. Before 1 September 2026, aim for 10-12 lead reports when enough verified material exists. From 1 September 2026 onward, do NOT pad the lead section merely to reach 10: 4-12 genuinely useful lead reports are acceptable, with quality over quantity. Build the lead set from seasonal/annual/exceptional official-calendar restrictions first, then add the most consequential remaining verified items. Never pad with evergreen Sunday bans or filler.
-12. europeRoundup is a genuine "Rest of Europe" section, not a spare-item bucket. It must contain at least 3 verified, useful developments spanning at least 3 DISTINCT countries whenever that breadth exists in the supplied candidates. Prefer 3-6 concise, geographically diverse items from countries not already dominating the lead section. Do not repeat any sourceUrl or title across the two arrays.
+12. europeRoundup is a genuine "Rest of Europe" section, not a spare-item bucket. It must contain at least 10 concise, verified, operationally useful developments spanning at least 6 DISTINCT countries. Prefer geographic diversity across the full configured Europe/territories coverage universe. Do not repeat any sourceUrl or title across the two arrays.
 13. Never use an ordinary evergreen Sunday/weekend baseline merely to reach the lead or roundup count. If there is insufficient genuinely useful material, return an empty array rather than filler.
 14. Write in professional, practical, plain English for operators/dispatchers. No marketing language, no filler, no clickbait in the body.`;
 
@@ -202,16 +202,17 @@ export async function generateRoundupSupplementWithOpenAI({
   apiKey,
   existingCountries = [],
   neededCountries = 1,
+  neededReports = 1,
   model,
 }) {
-  if (!candidates.length || neededCountries <= 0) return [];
+  if (!candidates.length || (neededCountries <= 0 && neededReports <= 0)) return [];
 
   const client = new OpenAI({ apiKey });
   const existing = new Set(existingCountries.filter(Boolean));
 
   const rankedCandidates = [...candidates]
     .sort((a, b) => roundupCandidateScore(b) - roundupCandidateScore(a))
-    .slice(0, 18);
+    .slice(0, 36);
 
   const payload = rankedCandidates.map((c) => ({
     country: c.country,
@@ -239,12 +240,12 @@ export async function generateRoundupSupplementWithOpenAI({
       {
         role: 'system',
         content:
-          'You are filling only the Rest of Europe section of EU Oversize Weekly. Select only genuinely useful, operationally actionable heavy/oversized-road-transport developments from the supplied verified candidates. Use distinct countries not already represented whenever possible. Never use generic driver-licence guidance, stale routine content, one-off crashes/crime, procurement, or filler. Every sourceUrl/sourceName must be copied EXACTLY from a supplied candidate. If there are not enough useful candidates, return fewer items rather than inventing anything.',
+          'You are filling only the Rest of Europe section of EU Oversize Weekly. Select only genuinely useful, operationally actionable heavy/oversized-road-transport developments from the supplied verified candidates. First maximise distinct countries not already represented, then add further strong unused reports until the requested report count is met. Never use generic driver-licence guidance, stale routine content, one-off crashes/crime, procurement, or filler. Every sourceUrl/sourceName must be copied EXACTLY from a supplied candidate. If there are not enough useful candidates, return fewer items rather than inventing anything.',
       },
       {
         role: 'user',
         content:
-          `Target week: ${targetWeekStart} to ${targetWeekEnd}. Existing roundup countries: ${[...existing].join(', ') || 'none'}. Need at least ${neededCountries} additional distinct countr${neededCountries === 1 ? 'y' : 'ies'}. Return 1-5 concise items, prioritising countries not in the existing set.\n\nVerified unused candidates:\n${JSON.stringify(payload, null, 2)}`,
+          `Target week: ${targetWeekStart} to ${targetWeekEnd}. Existing roundup countries: ${[...existing].join(', ') || 'none'}. Need at least ${neededCountries} additional distinct countr${neededCountries === 1 ? 'y' : 'ies'} and at least ${neededReports} additional concise report${neededReports === 1 ? '' : 's'}. Return up to 14 items, first maximising new-country breadth, then filling remaining report count with other genuinely useful unused candidates.\n\nVerified unused candidates:\n${JSON.stringify(payload, null, 2)}`,
       },
     ],
     response_format: { type: 'json_schema', json_schema: ROUNDUP_SUPPLEMENT_SCHEMA },
