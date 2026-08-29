@@ -267,7 +267,7 @@ independently re-checking that specific problem first.
 
 ## Official driving-ban calendar layer
 
-RSS monitoring alone cannot reliably surface a standing or seasonal driving
+Feed/HTML news monitoring alone cannot reliably surface a standing or seasonal driving
 ban that no source happened to re-announce this particular week - the ban
 is still fully in force, but invisible to `fetch-source.mjs`. This is a
 distinct data source from `config/oversize-sources` (RSS/Atom feeds):
@@ -284,9 +284,9 @@ Each entry records: `country`; official `sourceUrl`/`sourceName`;
   maintenance. `resolve(weekStart, weekEnd)` computes that week's actual
   dates fresh every time.
 - **`annual-calendar`** - an official body republishes a dated calendar
-  every year (Germany's BALM summer-Saturday list, Poland's and Czechia's
-  summer weekend calendars, Italy's Ministerial Decree, Austria's summer
-  corridor order). `validYear` records which year's dates are seeded.
+  every year (Germany's BALM summer-Saturday list, Poland's summer calendar,
+  Italy's Ministerial Decree, Slovenia's tourist-season Saturday dates, and
+  Austria's summer corridor order). `validYear` records which year's dates are seeded.
   **Resolving for any other year returns a `maintenanceError` instead of
   silently reusing a previous year's dates** - `generate-weekly-article.mjs`
   treats this as a hard configuration failure (non-zero exit), the same as
@@ -295,15 +295,20 @@ Each entry records: `country`; official `sourceUrl`/`sourceName`;
   and bump `validYear` - see `scripts/lib/__tests__/driving-ban-calendar.test.mjs`
   for the expected behavior both before and after that update.
 
-Seeded for W35 2026 (24-30 August): Germany, Poland, Czechia, Slovakia,
-Italy, France, Hungary, Austria (two entries - the general nationwide ban
-and the additional summer corridor restrictions, since the latter applies
-*in addition to*, not instead of, the former), and Switzerland. This is a
-curated seed, not an exhaustive multi-year calendar - extend the relevant
-entry's seeded dates as more of a year's official calendar is confirmed.
+Coverage is intentionally split by legally distinct regimes rather than by
+country count. For W35 2026 the resolver returns 14 verified calendar
+findings. For W36 (31 August-6 September) it returns 11 before any news
+monitor findings are considered, including: Czech general and Section 43(2)
+special-vehicle restrictions; Slovakia's Section 39 Sunday window effective
+from 1 September 2026; Italy's 6 September Decree 325/2025 ban; France's
+general-HGV and separate exceptional-transport regimes; Slovenia's standing
+Sunday rule and final 2026 tourist-season Saturday restriction; plus the
+applicable German, Austrian and Swiss rules. This avoids making publication
+quality depend on whether a standing ban happened to be re-announced in a
+news feed that week.
 
 `generate-weekly-article.mjs` merges `resolveDrivingBanFindings()`'s output
-with the week's RSS-derived findings before selection; calendar findings are
+with the week's monitor-derived RSS/official-HTML findings before selection; calendar findings are
 always included (never subject to `select-candidates.mjs`'s per-source cap)
 and are still re-verified like any other candidate (relevance, target-week
 dates, source reachability) before reaching the model.
@@ -314,10 +319,14 @@ dates, source reachability) before reaching the model.
 
 1. Computes the current ISO week (e.g. `2026-W34`).
 2. Loads `data/oversize/2026-W34/findings.json` if it exists.
-3. For every configured source, tries to fetch and parse its feed
-   (`scripts/lib/fetch-source.mjs`) - failures are logged and skipped,
-   never fatal.
-4. Classifies and relevance-filters each item into a candidate finding.
+3. For every configured source, prefers a verified RSS/Atom endpoint and
+   falls back to the authority's official HTML page/listing. Relevant HTML
+   links are constrained to the same official host and enriched from their
+   detail pages; a bounded worker pool scans up to six authorities in
+   parallel. Unreachable sources are logged as `UNAVAILABLE`, never hidden
+   behind a false successful check.
+4. Classifies and relevance-filters each feed item or official-HTML detail
+   into a candidate finding.
 5. Merges candidates into the existing findings by dedup key
    (`mergeFindings`), then marks anything whose `validTo` has passed as
    `expired` (`markExpired`).
@@ -400,7 +409,7 @@ commit always proceeds to a normal build+deploy).
    **upcoming** week (`resolveDrivingBanFindings()` - see above). A missing
    annual calendar for the required year is a hard failure here, before any
    OpenAI cost is spent.
-2. `selectCandidates()` narrows the RSS findings to a bounded, scored
+2. `selectCandidates()` narrows the monitor findings to a bounded, scored
    subset (freshness + specific-type bonus, capped per source) - the
    cost-control step: don't verify or pay to synthesize everything.
    Calendar findings bypass this cap and are always included.
