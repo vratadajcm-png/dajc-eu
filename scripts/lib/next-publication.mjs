@@ -25,5 +25,5 @@ export function formatNextPublicationLabel(from = new Date()) {
       .formatToParts(next)
       .find((part) => part.type === 'timeZoneName')?.value ?? '';
 
-  return `${datePart} between 08:00 and 13:59${timeZoneName ? ` ${timeZoneName}` : ''}`;
+  return `${datePart} at 12:00${timeZoneName ? ` ${timeZoneName}` : ''}`;
 }
