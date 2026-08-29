@@ -39,9 +39,17 @@ function developmentFromCandidate(c) {
   };
 }
 
-export function isCriticalWeeklyCandidate(candidate) {
+export function isCriticalWeeklyCandidate(candidate, { discoveryWindowStart } = {}) {
   if (!candidate || candidate.isOfficialCalendar || !candidate.sourceUrl) return false;
-  if (!['new', 'updated'].includes(candidate.status)) return false;
+
+  const firstSeen = candidate.firstSeenAt ? new Date(candidate.firstSeenAt) : null;
+  const discoveredThisWindow =
+    discoveryWindowStart &&
+    firstSeen &&
+    !Number.isNaN(firstSeen.getTime()) &&
+    firstSeen >= discoveryWindowStart;
+  const fresh = ['new', 'updated'].includes(candidate.status) || Boolean(discoveredThisWindow);
+  if (!fresh) return false;
 
   const text = `${candidate.title || ''} ${candidate.summary || ''}`;
   const directlyOversize = OVERSIZE_SIGNAL.test(text);
@@ -50,14 +58,14 @@ export function isCriticalWeeklyCandidate(candidate) {
   return directlyOversize && (HIGH_SIGNAL_TYPES.has(candidate.type) || regulatory);
 }
 
-export function criticalWeeklyCandidates(verifiedCandidates = []) {
-  return verifiedCandidates.filter(isCriticalWeeklyCandidate);
+export function criticalWeeklyCandidates(verifiedCandidates = [], options = {}) {
+  return verifiedCandidates.filter((candidate) => isCriticalWeeklyCandidate(candidate, options));
 }
 
 export function ensureCriticalCoverage(
   article,
   verifiedCandidates,
-  { maxLeads = 12 } = {}
+  { maxLeads = 12, discoveryWindowStart } = {}
 ) {
   const developments = [...(article.developments || [])];
   const europeRoundup = [...(article.europeRoundup || [])];
@@ -65,7 +73,7 @@ export function ensureCriticalCoverage(
     [...developments, ...europeRoundup].map((item) => item.sourceUrl).filter(Boolean)
   );
 
-  const critical = criticalWeeklyCandidates(verifiedCandidates);
+  const critical = criticalWeeklyCandidates(verifiedCandidates, { discoveryWindowStart });
   let addedToLeads = 0;
   let addedToRoundup = 0;
 
