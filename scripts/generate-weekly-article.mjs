@@ -245,7 +245,7 @@ async function main() {
       );
 
       console.log(
-        `Rest-of-Europe breadth repair needed: ${breadth.reportCount} report(s), ${breadth.countryCount} countr${breadth.countryCount === 1 ? 'y' : 'ies'}; requesting ${breadth.neededCountries || 1} additional distinct country candidate(s).`
+        `Rest-of-Europe repair needed: ${breadth.reportCount}/10 report(s), ${breadth.countryCount}/6 countries; requesting at least ${breadth.neededReports} more report(s) and ${breadth.neededCountries} more distinct country/countries.`
       );
 
       try {
@@ -255,7 +255,8 @@ async function main() {
           targetWeekEnd: targetWeekEndIso,
           apiKey,
           existingCountries: [...breadth.countries],
-          neededCountries: Math.max(1, breadth.neededCountries),
+          neededCountries: Math.max(0, breadth.neededCountries),
+          neededReports: Math.max(0, breadth.neededReports),
         });
         const supplementValidation = crossValidateDevelopments(supplement, remainingVerified);
         article.europeRoundup = mergeRoundupSupplement(
