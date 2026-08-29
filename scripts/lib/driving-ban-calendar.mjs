@@ -22,6 +22,18 @@ export function resolveDrivingBanFindings({ weekStart, weekEnd, year }) {
       continue;
     }
     for (const occurrence of result.occurrences || []) {
+      // Editorial policy: after 1 September 2026, evergreen Sunday/weekend
+      // baseline rules stay in the reference configuration but are not
+      // repeated every week. A real legal change can still surface through
+      // the monitored-news pipeline as a separate verified finding.
+      if (
+        entry.suppressFromWeeklyAfter &&
+        occurrence.validFrom &&
+        occurrence.validFrom >= entry.suppressFromWeeklyAfter
+      ) {
+        continue;
+      }
+
       findings.push({
         country: entry.countryName,
         region: null,
