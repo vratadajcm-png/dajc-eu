@@ -172,39 +172,59 @@ export const drivingBanCalendars = [
   },
 
   {
-    id: 'cz-summer-weekend-ban',
+    id: 'cz-weekend-ban',
     country: 'CZ',
     countryName: 'Czechia',
-    kind: 'annual-calendar',
-    validYear: 2026,
+    kind: 'standing-rule',
     sourceUrl: 'https://md.gov.cz/Dokumenty/Silnicni-doprava/Vyjimky-ze-zakazu-jizdy-%28povoleni%29',
     sourceName: 'Ministerstvo dopravy CR - Vyjimky ze zakazu jizdy',
-    legalBasis: '2026 summer weekend driving-ban calendar on motorways and Class I roads',
+    legalBasis: 'Section 43(1) of Act No. 361/2000 Coll. - Sunday/rest-day and summer Friday/Saturday restrictions',
     vehicleScope: 'Vehicles above 7.5t; vehicles above 3.5t towing a trailer',
     routeScope: 'Motorways and Class I roads',
     exemptionNotes:
       'Individual exemptions ("povoleni") can be granted by the Ministry of Transport for specific transports - check before assuming the ban applies without exception.',
-    lastVerified: '2026-08-21',
-    seededWeekends: [{ friday: '2026-08-28', saturday: '2026-08-29', sunday: '2026-08-30' }],
-    resolve(weekStart, _weekEnd, year) {
-      if (year !== this.validYear) {
-        return { maintenanceError: `No ${year} Czech summer weekend-ban calendar seeded (last seeded: ${this.validYear}).` };
+    lastVerified: '2026-08-29',
+    seasonFromMonthDay: '07-01',
+    seasonToMonthDay: '08-31',
+    resolve(weekStart) {
+      const friday = addDays(weekStart, 4);
+      const saturday = addDays(weekStart, 5);
+      const sunday = addDays(weekStart, 6);
+      const fridayIso = fmt(friday);
+      const saturdayIso = fmt(saturday);
+      const sundayIso = fmt(sunday);
+      const summer = inSeason(saturday, this.seasonFromMonthDay, this.seasonToMonthDay);
+
+      if (!summer) {
+        return {
+          occurrences: [
+            {
+              title: `Standard Sunday driving ban (${humanDate(sundayIso)})`,
+              whatChanged:
+                'The standing Sunday/rest-day driving ban applies on Czech motorways and Class I roads to the affected heavy vehicle categories.',
+              validFrom: sundayIso,
+              validTo: sundayIso,
+              timeWindow: `Sunday ${humanDate(sundayIso)} 13:00-22:00`,
+              impact: 'Affected vehicles cannot use Czech motorways or Class I roads during the Sunday ban window.',
+              recommendedAction:
+                'Plan Czech motorway/Class I-road transit outside 13:00-22:00 on Sunday, or confirm a valid statutory/individual exemption before departure.',
+            },
+          ],
+        };
       }
-      const friday = fmt(addDays(weekStart, 4));
-      const match = this.seededWeekends.find((w) => w.friday === friday);
-      if (!match) return { occurrences: [] };
+
       return {
         occurrences: [
           {
-            title: `Summer Friday/Saturday restriction plus the standard Sunday ban (${humanRange(match.friday, match.sunday)})`,
+            title: `Summer Friday/Saturday restriction plus the standard Sunday ban (${humanRange(fridayIso, sundayIso)})`,
             whatChanged:
-              'A summer-specific Friday and Saturday restriction applies on motorways and Class I roads, in addition to - and with different hours than - the standard Sunday driving ban.',
-            validFrom: match.friday,
-            validTo: match.sunday,
-            timeWindow: `Friday ${humanDate(match.friday)} 17:00-21:00 (summer restriction); Saturday ${humanDate(match.saturday)} 07:00-13:00 (summer restriction); Sunday ${humanDate(match.sunday)} 13:00-22:00 (standard Sunday ban)`,
+              'The Section 43 summer Friday and Saturday restrictions apply on motorways and Class I roads, in addition to the standing Sunday/rest-day ban.',
+            validFrom: fridayIso,
+            validTo: sundayIso,
+            timeWindow: `Friday ${humanDate(fridayIso)} 17:00-21:00; Saturday ${humanDate(saturdayIso)} 07:00-13:00; Sunday ${humanDate(sundayIso)} 13:00-22:00`,
             impact: 'Affected vehicles cannot use motorways and Class I roads during any of the three windows.',
             recommendedAction:
-              'Plan Czech motorway/Class I transits outside all three windows; the Sunday hours are not the same as the Friday/Saturday summer-specific hours.',
+              'Plan Czech motorway/Class I transits outside all three windows; the Sunday hours differ from the Friday/Saturday summer-specific hours.',
           },
         ],
       };
@@ -212,36 +232,107 @@ export const drivingBanCalendars = [
   },
 
   {
-    id: 'sk-section-39-seasonal-ban',
-    country: 'SK',
-    countryName: 'Slovakia',
+    id: 'cz-special-vehicle-seasonal-ban',
+    country: 'CZ',
+    countryName: 'Czechia',
     kind: 'standing-rule',
-    sourceUrl: 'https://static.slov-lex.sk/static/SK/ZZ/2009/8/20260801.print.html',
-    sourceName: 'Slov-Lex - Zakon c. 8/2009 Z. z., Section 39',
-    legalBasis: 'Section 39 of Act No. 8/2009 Coll. on Road Traffic (seasonal weekend driving ban)',
-    vehicleScope: 'Vehicles above 7.5t; vehicles above 3.5t towing a trailer',
-    routeScope: 'Motorways, roads for motor vehicles, and Class I roads',
+    sourceUrl: 'https://md.gov.cz/Media/Media-a-tiskove-zpravy/Stanovisko-MD-k-omezeni-jizdy-kamionu',
+    sourceName: 'Ministerstvo dopravy CR - stanovisko k Section 43(2)',
+    legalBasis: 'Section 43(2) of Act No. 361/2000 Coll. - seasonal restriction for wide special/animal-drawn vehicles and handcarts',
+    vehicleScope: 'Special vehicles, animal-drawn vehicles and handcarts with total width above 600 mm',
+    routeScope: 'Class I roads outside built-up areas',
     exemptionNotes:
-      'Section 39 sets out specific statutory exemptions - verify the current consolidated wording for the exact exemption list before relying on one.',
-    lastVerified: '2026-08-21',
-    seasonFromMonthDay: '07-01',
-    seasonToMonthDay: '08-31',
+      'This is a separate Section 43(2) regime and must not be confused with the general HGV restriction in Section 43(1). Check the vehicle legal classification before applying it.',
+    lastVerified: '2026-08-29',
+    seasonFromMonthDay: '04-15',
+    seasonToMonthDay: '09-30',
     resolve(weekStart) {
+      const friday = addDays(weekStart, 4);
       const saturday = addDays(weekStart, 5);
       const sunday = addDays(weekStart, 6);
       if (!inSeason(saturday, this.seasonFromMonthDay, this.seasonToMonthDay)) return { occurrences: [] };
+
+      const fridayIso = fmt(friday);
       const saturdayIso = fmt(saturday);
       const sundayIso = fmt(sunday);
       return {
         occurrences: [
           {
+            title: `Seasonal Class I-road restriction for wide special vehicles (${humanRange(fridayIso, sundayIso)})`,
+            whatChanged:
+              'A separate seasonal restriction applies to special vehicles, animal-drawn vehicles and handcarts over 600 mm wide on Class I roads outside built-up areas.',
+            validFrom: fridayIso,
+            validTo: sundayIso,
+            timeWindow: `Friday ${humanDate(fridayIso)} 15:00-21:00; Saturday ${humanDate(saturdayIso)} 07:00-11:00; Sunday ${humanDate(sundayIso)} 15:00-21:00`,
+            impact:
+              'Vehicles falling under this special legal classification cannot use affected Class I roads during the listed windows, even though the timing differs from the general HGV ban.',
+            recommendedAction:
+              'Confirm whether the planned vehicle is legally a "special vehicle" under Section 43(2); if it is, route or time the movement outside these Class I-road windows.',
+          },
+        ],
+      };
+    },
+  },
+
+  {
+    id: 'sk-section-39-weekend-ban',
+    country: 'SK',
+    countryName: 'Slovakia',
+    kind: 'standing-rule',
+    sourceUrl: 'https://static.slov-lex.sk/static/SK/ZZ/2009/8/20260901.html',
+    sourceName: 'Slov-Lex - Act No. 8/2009 Coll., Section 39',
+    legalBasis: 'Section 39 of Act No. 8/2009 Coll. on Road Traffic',
+    vehicleScope: 'Vehicles above 7.5t; vehicles above 3.5t towing a trailer',
+    routeScope: 'Motorways, roads for motor vehicles, and Class I roads',
+    exemptionNotes:
+      'Section 39 contains statutory exemptions including specified public-service, combined-transport, fuel-supply, dangerous-goods, humanitarian and emergency movements; verify the current consolidated wording for the specific transport.',
+    lastVerified: '2026-08-29',
+    seasonFromMonthDay: '07-01',
+    seasonToMonthDay: '08-31',
+    september2026Change: '2026-09-01',
+    resolve(weekStart) {
+      const saturday = addDays(weekStart, 5);
+      const sunday = addDays(weekStart, 6);
+      const saturdayIso = fmt(saturday);
+      const sundayIso = fmt(sunday);
+      const summer = inSeason(saturday, this.seasonFromMonthDay, this.seasonToMonthDay);
+      const postChange = sundayIso >= this.september2026Change;
+
+      if (!summer) {
+        return {
+          occurrences: [
+            {
+              title: `Section 39 Sunday driving ban (${humanDate(sundayIso)})`,
+              whatChanged:
+                postChange
+                  ? 'From 1 September 2026, the consolidated Section 39 Sunday/last-rest-day restriction applies from 06:00 to 22:00.'
+                  : 'The Section 39 Sunday/last-rest-day driving ban applies on motorways, roads for motor vehicles, and Class I roads.',
+              validFrom: sundayIso,
+              validTo: sundayIso,
+              timeWindow: `Sunday ${humanDate(sundayIso)} ${postChange ? '06:00' : '00:00'}-22:00`,
+              impact: 'Affected vehicles cannot use motorways, roads for motor vehicles, or Class I roads during the Sunday window.',
+              recommendedAction:
+                'Plan Slovak transit outside the Section 39 Sunday window and verify whether a statutory exemption covers the specific movement.',
+              sourceUrl: postChange
+                ? 'https://static.slov-lex.sk/static/SK/ZZ/2009/8/20260901.html'
+                : 'https://static.slov-lex.sk/static/SK/ZZ/2009/8/20260801.print.html',
+            },
+          ],
+        };
+      }
+
+      return {
+        occurrences: [
+          {
             title: `Section 39 seasonal weekend driving ban (${humanRange(saturdayIso, sundayIso)})`,
-            whatChanged: 'The Section 39 seasonal weekend driving ban applies on motorways, roads for motor vehicles, and Class I roads.',
+            whatChanged: 'The Section 39 summer Saturday and Sunday driving-ban regime applies on motorways, roads for motor vehicles, and Class I roads.',
             validFrom: saturdayIso,
             validTo: sundayIso,
             timeWindow: `Saturday ${humanDate(saturdayIso)} 07:00-19:00; Sunday ${humanDate(sundayIso)} 00:00-22:00`,
             impact: 'Affected vehicles cannot use motorways, roads for motor vehicles, or Class I roads during either window.',
-            recommendedAction: 'Plan Slovak transit outside the Saturday/Sunday windows; verify the current Section 39 exemption wording for the specific transport.',
+            recommendedAction:
+              'Plan Slovak transit outside the Saturday/Sunday windows and verify the current Section 39 exemptions for the specific transport.',
+            sourceUrl: 'https://static.slov-lex.sk/static/SK/ZZ/2009/8/20260801.print.html',
           },
         ],
       };
@@ -262,37 +353,87 @@ export const drivingBanCalendars = [
     routeScope: 'Outside built-up areas, nationwide',
     exemptionNotes:
       "The decree sets out specific exemptions and timing adjustments for vehicles arriving from abroad, port traffic, and other categories - always check the current decree text for the specific transport, including whether an existing exceptional-transport authorisation is still subject to the ban.",
-    lastVerified: '2026-08-21',
+    lastVerified: '2026-08-29',
     additionalSources: [
       {
         name: 'MIT - Mezzi pesanti, calendario 2026 dei divieti di circolazione stradale',
         url: 'https://www.mit.gov.it/index.php/comunicazione/news/mezzi-pesanti-calendario-2026-dei-divieti-di-circolazione-stradale',
       },
     ],
-    seededWeekends: [{ saturday: '2026-08-29', sunday: '2026-08-30' }],
-    resolve(weekStart, _weekEnd, year) {
+    seededPeriods: [
+      {
+        validFrom: '2026-08-29',
+        validTo: '2026-08-30',
+        timeWindow: 'Saturday 29 August 2026 08:00-16:00; Sunday 30 August 2026 07:00-22:00',
+      },
+      { validFrom: '2026-09-06', validTo: '2026-09-06', timeWindow: 'Sunday 6 September 2026 07:00-22:00' },
+      { validFrom: '2026-09-13', validTo: '2026-09-13', timeWindow: 'Sunday 13 September 2026 07:00-22:00' },
+      { validFrom: '2026-09-20', validTo: '2026-09-20', timeWindow: 'Sunday 20 September 2026 07:00-22:00' },
+      { validFrom: '2026-09-27', validTo: '2026-09-27', timeWindow: 'Sunday 27 September 2026 07:00-22:00' },
+      { validFrom: '2026-10-04', validTo: '2026-10-04', timeWindow: 'Sunday 4 October 2026 09:00-22:00' },
+    ],
+    resolve(weekStart, weekEnd, year) {
       if (year !== this.validYear) {
         return {
           maintenanceError: `No ${year} Italian Ministerial Decree driving-ban calendar seeded (last seeded: Decree 325/2025 for ${this.validYear}). A new decree must be issued and seeded for ${year} before publishing an Italy driving-ban report.`,
         };
       }
-      const saturday = fmt(addDays(weekStart, 5));
-      const match = this.seededWeekends.find((w) => w.saturday === saturday);
+
+      const startIso = fmt(weekStart);
+      const endIso = fmt(weekEnd);
+      const match = this.seededPeriods.find((p) => p.validTo >= startIso && p.validFrom <= endIso);
       if (!match) return { occurrences: [] };
+
       return {
         occurrences: [
           {
-            title: `Ministerial Decree 325/2025 weekend driving ban (${humanRange(match.saturday, match.sunday)})`,
+            title: `Ministerial Decree 325/2025 driving ban (${humanRange(match.validFrom, match.validTo)})`,
             whatChanged:
-              'The 2026 driving-ban calendar set by Ministerial Decree 325/2025 restricts goods vehicles above 7.5t outside built-up areas, and - per the decree - extends to exceptional vehicles/transports even when authorised, unless a specific exemption applies.',
-            validFrom: match.saturday,
-            validTo: match.sunday,
-            timeWindow: `Saturday ${humanDate(match.saturday)} 08:00-16:00; Sunday ${humanDate(match.sunday)} 07:00-22:00`,
+              'The 2026 calendar in Ministerial Decree 325/2025 restricts goods vehicles above 7.5t outside built-up areas and, under the decree, also applies to exceptional vehicles/transports even when authorised unless a specific exemption applies.',
+            validFrom: match.validFrom,
+            validTo: match.validTo,
+            timeWindow: match.timeWindow,
             impact:
-              'Affected vehicles - including, per the decree, authorised exceptional transports without a specific exemption - cannot operate outside built-up areas during either window.',
+              'Affected vehicles - including authorised exceptional transports without a specific exemption - cannot operate outside built-up areas during the listed window.',
             recommendedAction:
-              "Do not assume an existing exceptional-transport authorisation exempts the movement from this weekend ban; check the decree's specific exemptions for vehicles arriving from abroad or port traffic before departure.",
+              "Do not assume an existing exceptional-transport authorisation exempts the movement; check the decree's exemptions and timing adjustments for the specific transport before departure.",
             additionalSources: this.additionalSources,
+          },
+        ],
+      };
+    },
+  },
+
+  {
+    id: 'fr-general-hgv-weekend-ban',
+    country: 'FR',
+    countryName: 'France',
+    kind: 'standing-rule',
+    sourceUrl: 'https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000043418560',
+    sourceName: 'Legifrance - Arrete du 16 avril 2021, Article 1',
+    legalBasis: 'Article 1 of the Order of 16 April 2021 - permanent general goods-vehicle restriction',
+    vehicleScope: 'Goods vehicles and combinations above 7.5t GVW, excluding the specialised and agricultural categories defined by the order',
+    routeScope: 'Entire French road network',
+    exemptionNotes:
+      'Article 4 transport categories are exempt from the general restriction unless a prefect decides otherwise under the order. This is distinct from the separate exceptional-transport movement regime.',
+    lastVerified: '2026-08-29',
+    resolve(weekStart) {
+      const saturday = addDays(weekStart, 5);
+      const sunday = addDays(weekStart, 6);
+      const saturdayIso = fmt(saturday);
+      const sundayIso = fmt(sunday);
+      return {
+        occurrences: [
+          {
+            title: `General HGV weekend driving ban (${humanRange(saturdayIso, sundayIso)})`,
+            whatChanged:
+              'France\'s permanent general restriction for goods vehicles and combinations above 7.5t applies from Saturday evening through Sunday evening on the entire road network.',
+            validFrom: saturdayIso,
+            validTo: sundayIso,
+            timeWindow: `Saturday ${humanDate(saturdayIso)} 22:00 to Sunday ${humanDate(sundayIso)} 22:00`,
+            impact: 'Affected general-goods vehicles cannot operate on the French road network during the weekend window unless an Article 4 exemption applies.',
+            recommendedAction:
+              'Schedule general HGV transit outside Saturday 22:00-Sunday 22:00, and verify the Article 4 exemption list if the load may qualify.',
           },
         ],
       };
@@ -367,6 +508,80 @@ export const drivingBanCalendars = [
             timeWindow: `Saturday ${humanDate(saturdayIso)} from 15:00; Sunday ${humanDate(sundayIso)} until 22:00`,
             impact: 'Heavy vehicles above 7.5t cannot operate on the Hungarian road network during the ban window.',
             recommendedAction: 'Check again shortly before departure for a possible temporary relaxation announced during an official heat alert.',
+          },
+        ],
+      };
+    },
+  },
+
+  {
+    id: 'si-standing-sunday-hgv-ban',
+    country: 'SI',
+    countryName: 'Slovenia',
+    kind: 'standing-rule',
+    sourceUrl: 'https://www.promet.si/en/general-limitations',
+    sourceName: 'Promet.si - Limitation of cargo traffic in Slovenia',
+    legalBasis: 'Order on the Limiting of Traffic on Roads in the Republic of Slovenia',
+    vehicleScope: 'Heavy goods vehicles above 7.5t maximum authorised total weight',
+    routeScope: 'Roads covered by the Slovenian cargo-traffic restriction order',
+    exemptionNotes:
+      'Promet.si lists statutory exceptions including emergency/public-interest movements, specified perishable goods, certain combined transport and documented empty runs to loading/from unloading; verify the current list for the specific movement.',
+    lastVerified: '2026-08-29',
+    resolve(weekStart) {
+      const sunday = fmt(addDays(weekStart, 6));
+      return {
+        occurrences: [
+          {
+            title: `Sunday HGV driving restriction (${humanDate(sunday)})`,
+            whatChanged: 'Slovenia\'s standing Sunday/public-holiday restriction applies to HGVs above 7.5t.',
+            validFrom: sunday,
+            validTo: sunday,
+            timeWindow: `Sunday ${humanDate(sunday)} 08:00-22:00`,
+            impact: 'Affected HGVs cannot operate on roads covered by the restriction order during the Sunday window unless an exception applies.',
+            recommendedAction:
+              'Plan Slovenian HGV transit outside 08:00-22:00 on Sunday and verify the published exception list for the specific transport.',
+          },
+        ],
+      };
+    },
+  },
+
+  {
+    id: 'si-2026-tourist-saturday-ban',
+    country: 'SI',
+    countryName: 'Slovenia',
+    kind: 'annual-calendar',
+    validYear: 2026,
+    sourceUrl: 'https://www.promet.si/en/my-traffic',
+    sourceName: 'Promet.si - 2026 tourist-season HGV restriction',
+    legalBasis: '2026 high-tourist-season cargo restriction through the first weekend in September',
+    vehicleScope: 'Heavy goods vehicles above 7.5t maximum authorised total weight',
+    routeScope: 'Tourist-season restricted routes; coastal routes have the longer Saturday window stated by Promet.si',
+    exemptionNotes:
+      'The same published Slovenian cargo-restriction exceptions remain relevant. Route scope and coastal-road timing must be checked against the current Promet.si notice.',
+    lastVerified: '2026-08-29',
+    seededSaturdays: ['2026-08-29', '2026-09-05'],
+    resolve(weekStart, _weekEnd, year) {
+      if (year !== this.validYear) {
+        return {
+          maintenanceError: `No ${year} Slovenian tourist-season Saturday calendar seeded (last seeded: ${this.validYear}).`,
+        };
+      }
+      const saturday = fmt(addDays(weekStart, 5));
+      if (!this.seededSaturdays.includes(saturday)) return { occurrences: [] };
+      return {
+        occurrences: [
+          {
+            title: `Tourist-season Saturday HGV restriction (${humanDate(saturday)})`,
+            whatChanged:
+              'The 2026 tourist-season Saturday restriction for HGVs above 7.5t remains in force through the first weekend in September; coastal routes have a longer Saturday window.',
+            validFrom: saturday,
+            validTo: saturday,
+            timeWindow: `Saturday ${humanDate(saturday)} 08:00-13:00; coastal routes 06:00-16:00`,
+            impact:
+              'Affected HGVs must avoid the tourist-season restricted routes during the Saturday window, with the longer 06:00-16:00 restriction on coastal routes.',
+            recommendedAction:
+              'Check whether the planned Slovenian route is in the tourist-season restriction set and, on coastal routes, treat 06:00-16:00 as the operative Saturday window.',
           },
         ],
       };
