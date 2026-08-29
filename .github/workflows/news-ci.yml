@@ -46,4 +46,4 @@ jobs:
         if: github.head_ref == 'fix/editorial-september-roundup'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: npm run oversize:publish -- --dry-run
+        run: npm run oversize:publish -- --dry-run --refresh-existing
