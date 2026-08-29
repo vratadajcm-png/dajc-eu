@@ -1,0 +1,45 @@
+import { describe, expect, it } from 'vitest';
+import {
+  criticalWeeklyCandidates,
+  ensureCriticalCoverage,
+  isCriticalWeeklyCandidate,
+} from '../critical-floor.mjs';
+
+const swiss = {
+  country: 'Switzerland',
+  type: 'driving_ban',
+  title: 'Private escort rules for exceptional transports',
+  summary: 'Switzerland proposes simplified permits and nationwide private escort rules for Ausnahmetransporte.',
+  sourceUrl: 'https://example.test/ch',
+  sourceName: 'ASTRA',
+  status: 'new',
+};
+
+describe('critical weekly coverage', () => {
+  it('marks a fresh exceptional-transport regulatory change as critical', () => {
+    expect(isCriticalWeeklyCandidate(swiss)).toBe(true);
+  });
+
+  it('does not treat routine official-calendar baselines as critical', () => {
+    expect(isCriticalWeeklyCandidate({ ...swiss, isOfficialCalendar: true })).toBe(false);
+  });
+
+  it('does not force generic infrastructure news', () => {
+    expect(isCriticalWeeklyCandidate({
+      ...swiss,
+      type: 'infrastructure',
+      title: 'General bridge project',
+      summary: 'A general bridge project opened in 2026.',
+    })).toBe(false);
+  });
+
+  it('inserts an omitted critical item into the article', () => {
+    const result = ensureCriticalCoverage(
+      { developments: [], europeRoundup: [] },
+      [swiss]
+    );
+    expect(result.article.developments).toHaveLength(1);
+    expect(result.article.developments[0].sourceUrl).toBe(swiss.sourceUrl);
+    expect(criticalWeeklyCandidates([swiss])).toHaveLength(1);
+  });
+});
