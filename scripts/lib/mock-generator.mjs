@@ -29,14 +29,13 @@ export async function generateArticleMock({ candidates, weekRangeLabel }) {
     sourceUrl: c.sourceUrl,
     sourceName: c.sourceName,
   });
-  // Reserve up to three distinct countries for the Rest-of-Europe section
-  // before filling the lead list. This mirrors the live editorial contract
-  // that a "Rest of Europe" section must actually be geographically broad.
+  // Mirror the live editorial contract: reserve at least ten Rest-of-Europe
+  // items across at least six countries when the fixture provides enough data.
   const reservedRoundup = [];
   const reservedUrls = new Set();
   const reservedCountries = new Set();
 
-  for (let i = candidates.length - 1; i >= 0 && reservedCountries.size < 3; i -= 1) {
+  for (let i = candidates.length - 1; i >= 0 && reservedCountries.size < 6; i -= 1) {
     const candidate = candidates[i];
     const country = String(candidate.country || '').trim();
     if (!country || reservedCountries.has(country)) continue;
@@ -45,14 +44,18 @@ export async function generateArticleMock({ candidates, weekRangeLabel }) {
     reservedRoundup.unshift(candidate);
   }
 
-  const leadPool = candidates.filter((c) => !reservedUrls.has(c.sourceUrl));
+  for (let i = candidates.length - 1; i >= 0 && reservedRoundup.length < 10; i -= 1) {
+    const candidate = candidates[i];
+    if (!candidate?.sourceUrl || reservedUrls.has(candidate.sourceUrl)) continue;
+    reservedUrls.add(candidate.sourceUrl);
+    reservedRoundup.unshift(candidate);
+  }
+
+  const leadPool = candidates.filter((candidate) => !reservedUrls.has(candidate.sourceUrl));
   const developments = leadPool.slice(0, MAX_MOCK_DEVELOPMENTS).map(mapCandidate);
   const usedLeadUrls = new Set(developments.map((d) => d.sourceUrl));
-  const europeRoundup = [
-    ...reservedRoundup,
-    ...leadPool.slice(MAX_MOCK_DEVELOPMENTS),
-  ]
-    .filter((c) => !usedLeadUrls.has(c.sourceUrl))
+  const europeRoundup = reservedRoundup
+    .filter((candidate) => !usedLeadUrls.has(candidate.sourceUrl))
     .map(mapCandidate);
 
   return {
