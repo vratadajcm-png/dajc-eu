@@ -47,10 +47,10 @@ function runGenerate(args, envOverrides = {}) {
   }
 }
 
-function syntheticCandidate(n, type) {
+function syntheticCandidate(n, type, country = 'Testland') {
   return {
     id: `integration-test-${n}`,
-    country: 'Testland',
+    country,
     region: null,
     location: 'Test road',
     type,
@@ -82,15 +82,21 @@ beforeAll(() => {
       {
         week: thisWeek,
         updatedAt: now.toISOString(),
-        findings: [
-          syntheticCandidate(1, 'permit_change'),
-          syntheticCandidate(2, 'permit_system'),
-          syntheticCandidate(3, 'escort_requirement'),
-          syntheticCandidate(4, 'border_restriction'),
-          syntheticCandidate(5, 'bridge_restriction'),
-          syntheticCandidate(6, 'tunnel_restriction'),
-          syntheticCandidate(7, 'permit_change'),
-        ],
+        findings: Array.from({ length: 24 }, (_, i) => {
+          const types = [
+            'permit_change', 'permit_system', 'escort_requirement',
+            'border_restriction', 'bridge_restriction', 'tunnel_restriction',
+          ];
+          const countries = [
+            'Spain', 'Romania', 'Denmark', 'Portugal',
+            'Croatia', 'Switzerland', 'Belgium', 'Lithuania',
+          ];
+          return syntheticCandidate(
+            i + 1,
+            types[i % types.length],
+            countries[i % countries.length]
+          );
+        }),
       },
       null,
       2
