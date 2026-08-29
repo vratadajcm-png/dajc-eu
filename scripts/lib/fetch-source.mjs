@@ -315,7 +315,7 @@ async function parseFeed(raw, source, feedUrl, parser) {
     }));
 }
 
-async function enrichHtmlFindings(findings, source, listingUrl) {
+async function enrichDetailFindings(findings, source, listingUrl) {
   const enriched = [...findings];
   const limit = Math.min(MAX_HTML_DETAILS_PER_SOURCE, enriched.length);
   let nextIndex = 0;
@@ -392,7 +392,8 @@ export async function fetchSourceFindings(source, { now = new Date().toISOString
         const findings = await parseFeed(fetched.text, source, fetched.finalUrl, parser);
         readableFeed = fetched.finalUrl;
         if (findings.length > 0) {
-          return { source: source.id, status: 'ok', method: 'feed', sourceUrlUsed: fetched.finalUrl, findings };
+          const enrichedFindings = await enrichDetailFindings(findings, source, fetched.finalUrl);
+          return { source: source.id, status: 'ok', method: 'feed', sourceUrlUsed: fetched.finalUrl, findings: enrichedFindings };
         }
       } catch (err) {
         lastError = `feed parse failed: ${err?.message || err}`;
@@ -416,7 +417,7 @@ export async function fetchSourceFindings(source, { now = new Date().toISOString
 
     const htmlFindings = extractHtmlFindings(fetched.text, source, fetched.finalUrl);
     if (htmlFindings.length > 0) {
-      const enrichedFindings = await enrichHtmlFindings(htmlFindings, source, fetched.finalUrl);
+      const enrichedFindings = await enrichDetailFindings(htmlFindings, source, fetched.finalUrl);
       return {
         source: source.id,
         status: 'ok',
@@ -438,7 +439,8 @@ export async function fetchSourceFindings(source, { now = new Date().toISOString
       try {
         const findings = await parseFeed(feedFetch.text, source, feedFetch.finalUrl, parser);
         if (findings.length > 0) {
-          return { source: source.id, status: 'ok', method: 'feed', sourceUrlUsed: feedFetch.finalUrl, findings };
+          const enrichedFindings = await enrichDetailFindings(findings, source, feedFetch.finalUrl);
+          return { source: source.id, status: 'ok', method: 'feed', sourceUrlUsed: feedFetch.finalUrl, findings: enrichedFindings };
         }
         readableFeed = feedFetch.finalUrl;
       } catch {
