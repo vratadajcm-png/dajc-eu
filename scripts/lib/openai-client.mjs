@@ -94,9 +94,10 @@ Hard rules - violating any of these makes your output unusable:
 7. For every development, "sourceUrl" and "sourceName" MUST be copied EXACTLY, character for character, from one of the supplied candidates. Never invent, modify, or guess a source.
 8. Every development must state: country; region/road/route where applicable; what applies or changed; affected vehicle category and weight/vehicle threshold (vehicleScope); exact date and LOCAL time of the country concerned (timeWindow); geographic/route scope (where); practical impact; a concrete, practical recommendedAction for an operator or dispatcher (never a generic platitude); and important exemptions/permit-specific conditions if any (exemptions, empty string if none).
 9. Clearly distinguish a general truck-driving ban, a restriction above a specific weight, a special restriction for exceptional/oversized transport, and a condition contained in an individual transport permit - never conflate these.
-10. developments must contain 10-12 distinct lead reports when enough verified material exists. If fewer than 10 genuinely useful candidates exist, return an EMPTY developments array. Never pad with filler.
-11. europeRoundup must contain the remaining verified, useful candidates that were not chosen as leads. Do not repeat any sourceUrl or title across the two arrays. Grouping happens later in the renderer; do not drop a country merely because it has only one item.
-12. Write in professional, practical, plain English for operators/dispatchers. No marketing language, no filler, no clickbait in the body.`;
+10. A candidate with isOfficialCalendar=true is a legally curated, target-week-specific restriction from the maintained DAJC calendar layer. Unless it is an exact duplicate of another supplied restriction, it is lead-quality by definition and MUST be included in developments before lower-priority news items. Do not discard it merely because its legal rule is recurring rather than newly announced.
+11. developments must contain 10-12 distinct lead reports when enough verified material exists. Build the lead set from official-calendar restrictions first, then add the most consequential remaining verified items up to 10-12. If fewer than 10 genuinely useful candidates exist after applying all hard rules, return an EMPTY developments array. Never pad with filler.
+12. europeRoundup must contain the remaining verified, useful candidates that were not chosen as leads. Do not repeat any sourceUrl or title across the two arrays. Grouping happens later in the renderer; do not drop a country merely because it has only one item.
+13. Write in professional, practical, plain English for operators/dispatchers. No marketing language, no filler, no clickbait in the body.`;
 
 export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, targetWeekStart, targetWeekEnd, apiKey, model }) {
   const client = new OpenAI({ apiKey });
@@ -115,7 +116,13 @@ export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, ta
       validTo: c.validTo,
       vehicleScope: c.vehicleScope || '',
       timeWindow: c.timeWindow || '',
+      routeScope: c.routeScope || c.location || '',
+      impact: c.impact || '',
+      recommendedAction: c.recommendedAction || '',
       exemptions: c.exemptions || '',
+      isDrivingBan: Boolean(c.isDrivingBan || c.type === 'driving_ban'),
+      isInfrastructure: Boolean(c.isInfrastructure || /bridge|tunnel|road_closure|roadworks|route_restriction|infrastructure/.test(c.type || '')),
+      isOfficialCalendar: Boolean(c.isOfficialCalendar),
       sourceUrl: c.sourceUrl,
       sourceName: c.sourceName,
     })),
