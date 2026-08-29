@@ -4,6 +4,8 @@
 // This is the "diff/dedupe before sending to AI" step from the cost-control
 // requirement; it never decides what's TRUE, only what's worth checking.
 
+import { checkOperationalRelevance } from './relevance-filter.mjs';
+
 const SPECIFIC_TYPES = new Set([
   'permit_change', 'permit_system', 'driving_ban', 'escort_requirement',
   'police_escort', 'border_restriction', 'bridge_restriction',
@@ -14,7 +16,11 @@ const MAX_PER_SOURCE = 4;
 const MAX_TOTAL = 32;
 
 export function selectCandidates(findings) {
-  const active = findings.filter((f) => f.status !== 'expired' && f.status !== 'superseded');
+  const active = findings.filter((f) => {
+    if (f.status === 'expired' || f.status === 'superseded') return false;
+    const text = `${f.title || ''} ${f.summary || ''}`;
+    return checkOperationalRelevance(text).ok;
+  });
 
   const scored = active.map((f) => {
     let score = 0;
@@ -22,6 +28,10 @@ export function selectCandidates(findings) {
     else if (f.status === 'updated') score += 2;
     else score += 1;
     if (SPECIFIC_TYPES.has(f.type)) score += 3;
+    const text = `${f.title || ''} ${f.summary || ''}`;
+    if (/exceptional transport|oversize|abnormal load|ausnahmetransport|schwertransport|convoi exceptionnel|izvanredni prijevoz/i.test(text)) score += 6;
+    if (/escort|begleitung|pilot vehicle|doprovod|accompagnement/i.test(text)) score += 5;
+    if (/toll|vignette|road user charge|via toll/i.test(text)) score += 3;
     if (f.summary && f.summary.length > 40) score += 1;
     return { finding: f, score };
   });
