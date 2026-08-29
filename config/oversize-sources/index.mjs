@@ -280,13 +280,102 @@ export const oversizeSources = [
   { id: 'is-vegagerdin', country: 'IS', authority: 'Vegagerdin', name: 'Icelandic Road and Coastal Administration', url: 'https://www.vegagerdin.is', type: 'national-road-authority', priority: 2 },
   { id: 'cy-public-works', country: 'CY', authority: 'Public Works Department', name: 'Cyprus Public Works Department', url: 'https://www.mcw.gov.cy/mtcw/pwd/pwd.nsf/page41_gr/page41_gr?Count=1000&ExpandView=&OpenDocument=&Start=1', htmlUrls: ['https://www.mcw.gov.cy/mtcw/pwd/pwd.nsf/page41_gr/page41_gr?Count=1000&ExpandView=&OpenDocument=&Start=1'], type: 'national-road-authority', priority: 2 },
   { id: 'mt-transport', country: 'MT', authority: 'Transport Malta', name: 'Transport Malta', url: 'https://www.transport.gov.mt', type: 'national-road-authority', priority: 2 },
-];
 
-// Note: no Slovak (SK) source is included yet. A prior, related audit found
-// the obvious candidate (NDS / ndsas.sk) unreliable - its feed serves a
-// `pubDate` that tracks `dateModified` rather than the true publish date,
-// so years-old press releases can appear as "fresh". Add an SK source only
-// after independently confirming its date handling is trustworthy.
+  // Additional jurisdictions required by the DAJC Europe/territories coverage registry.
+  // These are official web-news/road-authority entry points; RSS is optional.
+  {
+    id: 'ad-govern-mobility',
+    country: 'AD',
+    authority: "Govern d'Andorra - Transports i Mobilitat",
+    name: "Govern d'Andorra - Transports i Mobilitat",
+    url: 'https://www.govern.ad/ca/ministeris-i-secretaries-d-estat/secretaria-d-estat-de-transicio-energetica-transports-i-mobilitat',
+    type: 'ministry',
+    priority: 2,
+  },
+  {
+    id: 'am-road-department',
+    country: 'AM',
+    authority: 'Road Department of Armenia',
+    name: 'Armenia Road Department - News',
+    url: 'https://armroad.am/en/news',
+    htmlUrls: ['https://armroad.am/en/news', 'https://armroad.am/en'],
+    type: 'national-road-authority',
+    priority: 2,
+  },
+  {
+    id: 'az-aayda',
+    country: 'AZ',
+    authority: 'State Agency of Azerbaijan Automobile Roads',
+    name: 'AAYDA - Azerbaijan Automobile Roads',
+    url: 'https://www.aayda.gov.az/en',
+    htmlUrls: ['https://www.aayda.gov.az/en'],
+    type: 'national-road-authority',
+    priority: 2,
+  },
+  {
+    id: 'li-llv-roads',
+    country: 'LI',
+    authority: 'Liechtenstein Civil Engineering and Geoinformation Office',
+    name: 'Liechtenstein - Traffic information',
+    url: 'https://www.llv.li/en/national-administration/civil-engineering-and-geoinformation-office/construction-site-information',
+    htmlUrls: [
+      'https://www.llv.li/en/national-administration/civil-engineering-and-geoinformation-office/construction-site-information',
+      'https://www.llv.li/en/national-administration/national-road-office-nro-',
+    ],
+    type: 'national-road-authority',
+    priority: 2,
+  },
+  {
+    id: 'ge-roads',
+    country: 'GE',
+    authority: 'Roads Department of Georgia',
+    name: 'Georgia Roads Department - News',
+    url: 'https://www.georoad.ge/?lang=eng',
+    htmlUrls: ['https://www.georoad.ge/?lang=eng'],
+    type: 'national-road-authority',
+    priority: 2,
+  },
+  {
+    id: 'sk-ssc',
+    country: 'SK',
+    authority: 'Slovenska sprava ciest',
+    name: 'Slovak Road Administration - Press releases',
+    url: 'https://www.ssc.sk/sk/o-nas/tlacove-spravy.ssc',
+    htmlUrls: ['https://www.ssc.sk/sk/o-nas/tlacove-spravy.ssc'],
+    type: 'national-road-authority',
+    priority: 1,
+  },
+  {
+    id: 'ru-rosavtodor',
+    country: 'RU',
+    authority: 'Federal Road Agency - Rosavtodor',
+    name: 'Rosavtodor - Press centre',
+    url: 'https://rosavtodor.gov.ru/press-center',
+    htmlUrls: ['https://rosavtodor.gov.ru/press-center'],
+    type: 'national-road-authority',
+    priority: 2,
+  },
+  {
+    id: 'kz-qazavtojol',
+    country: 'KZ',
+    authority: 'QazAvtoJol',
+    name: 'QazAvtoJol - Road news',
+    url: 'https://ru.qaj.kz/news/',
+    htmlUrls: ['https://ru.qaj.kz/news/', 'https://en.qaj.kz/news/'],
+    type: 'national-road-authority',
+    priority: 2,
+  },
+  {
+    id: 'fo-landsverk',
+    country: 'FO',
+    authority: 'Landsverk',
+    name: 'Faroe Islands Landsverk - News',
+    url: 'https://www.landsverk.fo/',
+    htmlUrls: ['https://www.landsverk.fo/'],
+    type: 'national-road-authority',
+    priority: 3,
+  },
+];
 
 export function getSourceById(id) {
   return oversizeSources.find((source) => source.id === id);
