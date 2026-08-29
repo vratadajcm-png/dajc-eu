@@ -38,6 +38,10 @@ export const NON_RESTRICTION_PATTERNS = [
     reason: 'planned/future works without a confirmed traffic restriction',
     pattern: /(is |are )?planning to (begin|start|carry out)|works (are )?expected to (begin|start)|feasibility study|preliminary design|out to tender/i,
   },
+  {
+    reason: 'personal international-driving-permit guidance, not a freight operational restriction',
+    pattern: /international driving permit|international driving licence|permiso internacional|conducir en el extranjero/i,
+  },
 ];
 
 /**

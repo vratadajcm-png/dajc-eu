@@ -1,0 +1,49 @@
+name: News Pipeline CI
+
+on:
+  pull_request:
+    paths:
+      - 'config/oversize-sources/**'
+      - 'config/driving-ban-calendars/**'
+      - 'scripts/**'
+      - '.github/workflows/*oversize*.yml'
+      - '.github/workflows/news-ci.yml'
+      - 'docs/NEWS_AUTOMATION.md'
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit and integration tests
+        run: npm test
+
+      - name: Build site
+        run: npm run build
+
+      - name: Exercise live official-source monitor
+        run: npm run oversize:monitor
+
+      - name: Live weekly article dry run (one-time validation)
+        if: github.head_ref == 'fix/weekly-publish-and-html-sources'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: npm run oversize:publish -- --dry-run

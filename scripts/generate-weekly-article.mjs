@@ -36,6 +36,7 @@ import { checkOpenAiKeyPreflight } from './lib/preflight.mjs';
 import { formatNextPublicationLabel } from './lib/next-publication.mjs';
 import { resolveDrivingBanFindings } from './lib/driving-ban-calendar.mjs';
 import { crossValidateDevelopments } from './lib/cross-validate.mjs';
+import { ensureOfficialCalendarLeadFloor } from './lib/lead-floor.mjs';
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -138,11 +139,11 @@ async function main() {
     : filePath;
 
   const findingsMap = await loadWeekFindings(thisWeek);
-  const rssFindings = [...findingsMap.values()];
-  console.log(`RSS-derived findings on file for ${thisWeek}: ${rssFindings.length}`);
+  const monitoredFindings = [...findingsMap.values()];
+  console.log(`Monitor-derived findings on file for ${thisWeek}: ${monitoredFindings.length}`);
 
   // Maintained official driving-ban calendar layer (config/driving-ban-calendars):
-  // RSS monitoring alone cannot reliably surface a standing/seasonal driving
+  // Feed/HTML monitoring alone cannot reliably surface a standing/seasonal driving
   // ban that nobody re-announced this week, so these are resolved directly
   // against the target week's date range instead. An "annual-calendar"
   // entry (e.g. Italy's yearly decree) that has not been re-seeded for the
@@ -161,13 +162,13 @@ async function main() {
     return;
   }
 
-  const findings = [...calendarFindings, ...rssFindings];
+  const findings = [...calendarFindings, ...monitoredFindings];
   if (findings.length === 0) {
     await abort(`no findings recorded for ${thisWeek} and no official driving-ban calendar applies to ${nextWeekLabel}`);
     return;
   }
 
-  const preSelected = [...calendarFindings, ...selectCandidates(rssFindings)];
+  const preSelected = [...calendarFindings, ...selectCandidates(monitoredFindings)];
   console.log(`Pre-selected for verification: ${preSelected.length} (${calendarFindings.length} from the official calendar, always included)`);
   if (preSelected.length === 0) {
     await abort('no candidates passed pre-selection');
@@ -211,6 +212,15 @@ async function main() {
   article.developments = kept;
   const roundupValidation = crossValidateDevelopments(article.europeRoundup || [], verified);
   article.europeRoundup = roundupValidation.kept;
+
+  const leadFloor = ensureOfficialCalendarLeadFloor(article, verified);
+  article = leadFloor.article;
+  if (leadFloor.added > 0 || leadFloor.promoted > 0) {
+    console.log(
+      `Official-calendar lead floor: added ${leadFloor.added}, promoted ${leadFloor.promoted}; lead reports now ${article.developments.length}.`
+    );
+  }
+
   const totalDropped = droppedCount + roundupValidation.droppedCount;
   if (totalDropped > 0) {
     console.warn(

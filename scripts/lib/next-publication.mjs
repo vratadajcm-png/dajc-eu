@@ -1,13 +1,21 @@
-// Formats when the next EU Oversize Weekly is expected, for the closing
-// section of each published article (see renderArticleMarkdown in
-// render-article.mjs). The pipeline runs every Friday, so "next" is always
-// 7 days after the run that is publishing the current article. Mirrors the
-// display format of formatEuOversizeLaunchDate in src/config/news.ts, kept
-// as its own small helper here since scripts/ is plain Node and doesn't
-// import from src/.
+// Formats the next scheduled Friday EU Oversize Weekly publication.
+// A catch-up/manual run may happen on Saturday (or another day), so "next"
+// must be the next Friday in Europe/Prague rather than blindly +7 days.
 export function formatNextPublicationLabel(from = new Date()) {
+  const weekday = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Prague',
+    weekday: 'short',
+  }).format(from);
+
+  const weekdayIndex = {
+    Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
+  }[weekday];
+
+  let daysUntilFriday = (5 - weekdayIndex + 7) % 7;
+  if (daysUntilFriday === 0) daysUntilFriday = 7;
+
   const next = new Date(from);
-  next.setUTCDate(next.getUTCDate() + 7);
+  next.setUTCDate(next.getUTCDate() + daysUntilFriday);
 
   const datePart = new Intl.DateTimeFormat('en-GB', {
     timeZone: 'Europe/Prague',
@@ -25,5 +33,5 @@ export function formatNextPublicationLabel(from = new Date()) {
       .formatToParts(next)
       .find((part) => part.type === 'timeZoneName')?.value ?? '';
 
-  return `${datePart} between 08:00 and 13:59${timeZoneName ? ` ${timeZoneName}` : ''}`;
+  return `${datePart} at 12:00${timeZoneName ? ` ${timeZoneName}` : ''}`;
 }

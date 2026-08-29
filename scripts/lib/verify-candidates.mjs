@@ -10,8 +10,10 @@
 // 2. Target-week date overlap (validateDevelopmentDateRange, date-validation.mjs)
 //    - rejects a candidate whose already-known validFrom/validTo cannot
 //      possibly overlap the week the article is actually being written for.
-// 3. Source reachability (HEAD, falling back to GET) - unchanged from
-//    before: a candidate is never published with a dead source link.
+// 3. Source reachability (HEAD, falling back to GET on any non-2xx HEAD).
+//    Some official government sites reject or mishandle HEAD while serving a
+//    normal GET successfully; a candidate is still never published with a
+//    genuinely dead source link.
 //
 // A candidate that fails any check is dropped and never reaches the model -
 // this is deliberately independent of what the model itself is instructed to
@@ -35,8 +37,10 @@ async function checkReachable(url) {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DajcOversizeVerify/1.0; +https://dajc.eu)' },
       redirect: 'follow',
     });
-    if (res.status === 405 || res.status === 501) {
-      // some servers reject HEAD - retry with GET before giving up
+    if (!res.ok) {
+      // Government/legal sites commonly return 403/405/501 (or another
+      // non-success status) to HEAD while the normal document GET is valid.
+      // Retry once with GET before declaring an official source unreachable.
       res = await fetch(url, {
         method: 'GET',
         signal: controller.signal,

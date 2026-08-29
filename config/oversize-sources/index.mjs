@@ -2,11 +2,11 @@
 //
 // This is a starting/curated set, not exhaustive pan-European coverage - see
 // docs/NEWS_AUTOMATION.md "How to add a new source" for how to extend it.
-// `feedUrl` is set only where a working RSS/Atom feed is already known; other
-// sources are attempted via generic feed-URL guessing at monitor runtime
-// (see scripts/lib/fetch-source.mjs) and simply produce zero findings until
-// a feed is confirmed or a dedicated adapter is added - the monitor never
-// crashes on a source it can't read, it just skips and logs it.
+// `feedUrl` is set only where a working RSS/Atom feed is already known. Every
+// source is also eligible for official-HTML ingestion through its `url`; use
+// optional `htmlUrls` when a dedicated official traffic/news listing is more
+// useful than the homepage. scripts/lib/fetch-source.mjs keeps RSS preferred,
+// then falls back to HTML without using unofficial aggregators.
 //
 // @typedef {'ministry'|'national-road-authority'|'regional-road-authority'|
 //   'police'|'abnormal-load-permit-authority'|'bridge-tunnel-operator'|
@@ -19,6 +19,7 @@
 // @property {string} name
 // @property {string} url - homepage/reference URL
 // @property {string} [feedUrl] - known working RSS/Atom feed URL, if any
+// @property {string[]} [htmlUrls] - preferred official HTML listing pages, if any
 // @property {SourceType} type
 // @property {1|2|3} priority
 
@@ -80,8 +81,11 @@ export const oversizeSources = [
     country: 'HU',
     authority: 'Magyar Kozut',
     name: 'Magyar Kozut Nonprofit Zrt.',
-    url: 'https://www.kozut.hu',
-    feedUrl: 'https://internet.kozut.hu/feed/',
+    url: 'https://internet.kozut.hu/hirek/',
+    htmlUrls: [
+      'https://internet.kozut.hu/hirek/',
+      'https://internet.kozut.hu/ugyfelszolgalat/utvonalengedely-uvr-e-office/altalanos-tajekoztato/forgalomkorlatozasok/',
+    ],
     type: 'national-road-authority',
     priority: 1,
   },
@@ -181,6 +185,7 @@ export const oversizeSources = [
     authority: 'Autobahn GmbH des Bundes',
     name: 'Autobahn GmbH - Aktuelles',
     url: 'https://www.autobahn.de/aktuelles/aktuell',
+    htmlUrls: ['https://www.autobahn.de/betrieb-verkehr/verkehrsmeldungen'],
     type: 'national-road-authority',
     priority: 1,
   },
@@ -207,7 +212,11 @@ export const oversizeSources = [
     country: 'CH',
     authority: 'ASTRA - Bundesamt fur Strassen',
     name: 'ASTRA - Medienmitteilungen',
-    url: 'https://www.astra.admin.ch/astra/de/home/dokumentation/medienmitteilungen.html',
+    url: 'https://www.astra.admin.ch/de/medienmitteilungen-zentrale',
+    htmlUrls: [
+      'https://www.astra.admin.ch/de/medienmitteilungen-zentrale',
+      'https://www.astra.admin.ch/astra/de/home/themen/nationalstrassen/baustellen/medienmitteilungen.html',
+    ],
     type: 'national-road-authority',
     priority: 1,
   },
@@ -249,8 +258,8 @@ export const oversizeSources = [
   },
   // Additional national authorities completing the pan-European discovery
   // surface. Entries without a confirmed feedUrl are intentionally retained:
-  // fetch-source.mjs may discover a standard feed, otherwise it logs the gap
-  // instead of pretending the country was checked successfully.
+  // fetch-source.mjs reads their official HTML and records a visible
+  // UNAVAILABLE state only when no official endpoint can be reached.
   { id: 'ro-cnair', country: 'RO', authority: 'CNAIR', name: 'Romanian National Road Infrastructure Administration', url: 'https://www.cnadnr.ro', type: 'national-road-authority', priority: 1 },
   { id: 'dk-vejdirektoratet', country: 'DK', authority: 'Vejdirektoratet', name: 'Danish Road Directorate', url: 'https://www.vejdirektoratet.dk', type: 'national-road-authority', priority: 1 },
   { id: 'tr-kgm', country: 'TR', authority: 'Karayollari Genel Mudurlugu', name: 'Turkish General Directorate of Highways', url: 'https://www.kgm.gov.tr', type: 'national-road-authority', priority: 1 },
@@ -263,13 +272,13 @@ export const oversizeSources = [
   { id: 'bg-api', country: 'BG', authority: 'Road Infrastructure Agency', name: 'Bulgarian Road Infrastructure Agency', url: 'https://www.api.bg', type: 'national-road-authority', priority: 1 },
   { id: 'gr-yme', country: 'GR', authority: 'Ministry of Infrastructure and Transport', name: 'Greek Ministry of Infrastructure and Transport', url: 'https://www.yme.gr', type: 'ministry', priority: 1 },
   { id: 'hr-hrvatske-ceste', country: 'HR', authority: 'Hrvatske ceste', name: 'Croatian Roads', url: 'https://hrvatske-ceste.hr', type: 'national-road-authority', priority: 1 },
-  { id: 'si-dars', country: 'SI', authority: 'DARS', name: 'Motorway Company in the Republic of Slovenia', url: 'https://www.dars.si', type: 'national-road-authority', priority: 1 },
+  { id: 'si-dars', country: 'SI', authority: 'Traffic Information Centre / DARS', name: 'Promet.si - official Slovenian traffic information', url: 'https://www.promet.si/en/general-limitations', htmlUrls: ['https://www.promet.si/en/my-traffic', 'https://www.promet.si/en/general-limitations'], type: 'national-road-authority', priority: 1 },
   { id: 'rs-putevi', country: 'RS', authority: 'Putevi Srbije', name: 'Roads of Serbia', url: 'https://www.putevi-srbije.rs', type: 'national-road-authority', priority: 1 },
   { id: 'ba-jpdcfbih', country: 'BA', authority: 'JP Ceste FBiH', name: 'Roads of the Federation of Bosnia and Herzegovina', url: 'https://jpdcfbh.ba', type: 'national-road-authority', priority: 2 },
   { id: 'me-monteput', country: 'ME', authority: 'Monteput', name: 'Monteput Montenegro', url: 'https://monteput.me', type: 'national-road-authority', priority: 2 },
   { id: 'lu-pch', country: 'LU', authority: 'Ponts et Chaussees', name: 'Luxembourg Roads Administration', url: 'https://pch.gouvernement.lu', type: 'national-road-authority', priority: 2 },
   { id: 'is-vegagerdin', country: 'IS', authority: 'Vegagerdin', name: 'Icelandic Road and Coastal Administration', url: 'https://www.vegagerdin.is', type: 'national-road-authority', priority: 2 },
-  { id: 'cy-public-works', country: 'CY', authority: 'Public Works Department', name: 'Cyprus Public Works Department', url: 'https://www.mcw.gov.cy', type: 'national-road-authority', priority: 2 },
+  { id: 'cy-public-works', country: 'CY', authority: 'Public Works Department', name: 'Cyprus Public Works Department', url: 'https://www.mcw.gov.cy/mtcw/pwd/pwd.nsf/page41_gr/page41_gr?Count=1000&ExpandView=&OpenDocument=&Start=1', htmlUrls: ['https://www.mcw.gov.cy/mtcw/pwd/pwd.nsf/page41_gr/page41_gr?Count=1000&ExpandView=&OpenDocument=&Start=1'], type: 'national-road-authority', priority: 2 },
   { id: 'mt-transport', country: 'MT', authority: 'Transport Malta', name: 'Transport Malta', url: 'https://www.transport.gov.mt', type: 'national-road-authority', priority: 2 },
 ];
 

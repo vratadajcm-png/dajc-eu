@@ -9,7 +9,7 @@ top of it.
 ## Architecture overview
 
 ```
-config/oversize-sources/index.mjs   registry of European sources to monitor (RSS)
+config/oversize-sources/index.mjs   registry of European official sources (RSS/HTML)
 config/driving-ban-calendars/       maintained official driving-ban/exceptional-
   index.mjs                        transport calendar layer (not RSS-dependent)
 data/oversize/<ISO week>/           raw findings gathered during that week
@@ -20,7 +20,7 @@ scripts/
   publish-gate-commit.mjs           friday: explicit "did we publish?" commit gate
   lib/
     findings.mjs                    finding shape, dedup key, status transitions
-    fetch-source.mjs                per-source fetch + relevance + classification
+    fetch-source.mjs                RSS + official-HTML fetch, relevance + classification
     relevance-filter.mjs            shared "is this an operational restriction" gate
     select-candidates.mjs           pre-selection before verification/AI (cost control)
     driving-ban-calendar.mjs        resolves config/driving-ban-calendars for a target week
@@ -39,7 +39,7 @@ src/content/news/platform/          published (and draft template) articles
 src/content.config.ts               Astro content collection schema
 .github/workflows/
   daily-oversize-monitor.yml
-  publish-weekly-oversize.yml
+  publish-weekly-oversize.yml       Friday noon + Saturday catch-up, idempotent
 ```
 
 The homepage renders `News` before `Integration ecosystem`, so current
@@ -231,32 +231,33 @@ planned/future works (see `NON_RESTRICTION_PATTERNS` in
   name: 'Statens vegvesen - Nyheter',
   url: 'https://www.vegvesen.no',
   feedUrl: 'https://www.vegvesen.no/rss',  // optional, set only when confirmed working
+  htmlUrls: ['https://.../traffic'],        // optional preferred official HTML listings
   type: 'national-road-authority',   // see SourceType in the file for the full list
   priority: 1,                        // 1 = high, 3 = supplementary
 }
 ```
 
-This is a **curated starting set** (~23 sources), not exhaustive
-pan-European coverage - the brief's full country list is a much larger
-undertaking. Sources with a confirmed `feedUrl` produce real findings
-today; sources without one are attempted via generic guesses
-(`<url>/feed`, `<url>/rss`) at runtime and simply produce zero findings
-until a working feed is found or a dedicated HTML-scraping adapter is
-built for them (out of scope for this pass - `scripts/lib/fetch-source.mjs`
-only knows how to read RSS/Atom).
+This is a **curated pan-European discovery set** (currently 43 configured
+official sources). RSS/Atom remains preferred when a verified `feedUrl`
+exists, but RSS is no longer required. If a feed yields nothing useful or
+is unavailable, `scripts/lib/fetch-source.mjs` fetches the authority's
+official HTML page, extracts operationally relevant same-domain links, and
+continues through the same relevance/classification pipeline. Optional
+`htmlUrls` can point at a better official traffic/news listing than the
+homepage (for example Autobahn GmbH's `Verkehrsmeldungen`). External-domain
+links are rejected by the HTML adapter, so this fallback does not silently
+turn into an unofficial aggregation layer.
 
 ### How to add a new source
 
-1. Confirm a real RSS/Atom feed exists (`curl -I <candidate-url>`,
-   check for `application/rss+xml` or `application/atom+xml`, or look for
-   a `<link rel="alternate">` tag on the homepage).
-2. Add an entry to `config/oversize-sources/index.mjs` with the verified
-   `feedUrl`.
-3. Run `npm run oversize:monitor` locally and confirm the new source
-   shows up as `OK` with a sensible item count.
-4. If the source is noisy (like the police aggregators above), consider
-   whether `GENERAL_TRANSPORT_CONTEXT` / `EXCLUSION_PATTERNS` in
-   `scripts/lib/fetch-source.mjs` need adjusting.
+1. Add the authority's official `url` to `config/oversize-sources/index.mjs`.
+2. If a verified RSS/Atom feed exists, add `feedUrl`; if a dedicated official
+   traffic/news listing is better than the homepage, add it to `htmlUrls`.
+3. Run `npm run oversize:monitor` and confirm the source reports `via feed`
+   or `via html` rather than `UNAVAILABLE`, with a sensible item count.
+4. If the source is noisy, tighten the source URL and/or the shared relevance
+   rules. Do not solve coverage gaps by adding unofficial aggregators when an
+   official source exists.
 
 **No Slovak (SK) source is configured yet.** A related prior audit found
 the obvious candidate (NDS / `ndsas.sk`) unreliable - its feed's `pubDate`
@@ -266,7 +267,7 @@ independently re-checking that specific problem first.
 
 ## Official driving-ban calendar layer
 
-RSS monitoring alone cannot reliably surface a standing or seasonal driving
+Feed/HTML news monitoring alone cannot reliably surface a standing or seasonal driving
 ban that no source happened to re-announce this particular week - the ban
 is still fully in force, but invisible to `fetch-source.mjs`. This is a
 distinct data source from `config/oversize-sources` (RSS/Atom feeds):
@@ -283,9 +284,9 @@ Each entry records: `country`; official `sourceUrl`/`sourceName`;
   maintenance. `resolve(weekStart, weekEnd)` computes that week's actual
   dates fresh every time.
 - **`annual-calendar`** - an official body republishes a dated calendar
-  every year (Germany's BALM summer-Saturday list, Poland's and Czechia's
-  summer weekend calendars, Italy's Ministerial Decree, Austria's summer
-  corridor order). `validYear` records which year's dates are seeded.
+  every year (Germany's BALM summer-Saturday list, Poland's summer calendar,
+  Italy's Ministerial Decree, Slovenia's tourist-season Saturday dates, and
+  Austria's summer corridor order). `validYear` records which year's dates are seeded.
   **Resolving for any other year returns a `maintenanceError` instead of
   silently reusing a previous year's dates** - `generate-weekly-article.mjs`
   treats this as a hard configuration failure (non-zero exit), the same as
@@ -294,15 +295,20 @@ Each entry records: `country`; official `sourceUrl`/`sourceName`;
   and bump `validYear` - see `scripts/lib/__tests__/driving-ban-calendar.test.mjs`
   for the expected behavior both before and after that update.
 
-Seeded for W35 2026 (24-30 August): Germany, Poland, Czechia, Slovakia,
-Italy, France, Hungary, Austria (two entries - the general nationwide ban
-and the additional summer corridor restrictions, since the latter applies
-*in addition to*, not instead of, the former), and Switzerland. This is a
-curated seed, not an exhaustive multi-year calendar - extend the relevant
-entry's seeded dates as more of a year's official calendar is confirmed.
+Coverage is intentionally split by legally distinct regimes rather than by
+country count. For W35 2026 the resolver returns 14 verified calendar
+findings. For W36 (31 August-6 September) it returns 11 before any news
+monitor findings are considered, including: Czech general and Section 43(2)
+special-vehicle restrictions; Slovakia's Section 39 Sunday window effective
+from 1 September 2026; Italy's 6 September Decree 325/2025 ban; France's
+general-HGV and separate exceptional-transport regimes; Slovenia's standing
+Sunday rule and final 2026 tourist-season Saturday restriction; plus the
+applicable German, Austrian and Swiss rules. This avoids making publication
+quality depend on whether a standing ban happened to be re-announced in a
+news feed that week.
 
 `generate-weekly-article.mjs` merges `resolveDrivingBanFindings()`'s output
-with the week's RSS-derived findings before selection; calendar findings are
+with the week's monitor-derived RSS/official-HTML findings before selection; calendar findings are
 always included (never subject to `select-candidates.mjs`'s per-source cap)
 and are still re-verified like any other candidate (relevance, target-week
 dates, source reachability) before reaching the model.
@@ -313,10 +319,14 @@ dates, source reachability) before reaching the model.
 
 1. Computes the current ISO week (e.g. `2026-W34`).
 2. Loads `data/oversize/2026-W34/findings.json` if it exists.
-3. For every configured source, tries to fetch and parse its feed
-   (`scripts/lib/fetch-source.mjs`) - failures are logged and skipped,
-   never fatal.
-4. Classifies and relevance-filters each item into a candidate finding.
+3. For every configured source, prefers a verified RSS/Atom endpoint and
+   falls back to the authority's official HTML page/listing. Relevant HTML
+   links are constrained to the same official host and enriched from their
+   detail pages; a bounded worker pool scans up to six authorities in
+   parallel. Unreachable sources are logged as `UNAVAILABLE`, never hidden
+   behind a false successful check.
+4. Classifies and relevance-filters each feed item or official-HTML detail
+   into a candidate finding.
 5. Merges candidates into the existing findings by dedup key
    (`mergeFindings`), then marks anything whose `validTo` has passed as
    `expired` (`markExpired`).
@@ -370,18 +380,20 @@ Vercel's standard Astro defaults.
 
 ## Weekly synthesis (Friday pipeline)
 
-Publishes automatically **every Friday between 08:00 and 13:59 Europe/Prague**, straight
-to `src/content/news/eu-oversize/` on `main` - no manual Actions run
-required. The workflow's two existing near-noon UTC triggers cover CET and
-CEST, while a `Check Europe/Prague local time` step accepts a scheduled run
-whenever it actually starts from 08:00 through 13:59 local time. This wider
-window tolerates moderate GitHub Actions scheduling delays. Both triggers
-may be accepted, but the week-specific article path and no-overwrite guard
-make the second run an idempotent no-op. `workflow_dispatch` (with an
-optional `dry_run` checkbox) is always available for a manual dry-run or
-emergency publication, and always skips the time gate. See
-`.github/workflows/publish-weekly-oversize.yml` for the exact cron
-expressions and gating logic.
+The primary publication target is **Friday at 12:00 Europe/Prague**. GitHub
+Actions still needs two UTC cron expressions for CET/CEST, but the workflow
+no longer checks the runner's current hour. Instead it selects the correct
+Friday cron from the **Prague UTC offset and the cron identity**. Therefore
+a GitHub delay that starts the runner at 23:00 still executes the intended
+Friday publication instead of silently becoming a green no-op.
+
+A separate **Saturday 06:00 UTC catch-up** trigger runs the same pipeline.
+Before dependency installation or any OpenAI work,
+`scripts/check-weekly-publication.mjs` checks the week-specific target
+article. If Friday already published it, the catch-up/duplicate run exits as
+an explicitly reported idempotent no-op; if the article is missing, it
+retries the real publication flow. `workflow_dispatch` remains available
+for manual dry-runs or emergency publication.
 
 A successful scheduled run pushes the new article commit straight to
 `main`, which the existing Vercel Git integration deploys automatically -
@@ -392,12 +404,12 @@ commit always proceeds to a normal build+deploy).
 
 `scripts/generate-weekly-article.mjs` (`npm run oversize:publish`):
 
-1. Reads the **current** ISO week's RSS-derived findings (gathered all
-   week), and resolves the **official driving-ban calendar layer** for the
+1. Reads the **current** ISO week's monitor-derived findings (RSS and
+   official HTML, gathered all week), and resolves the **official driving-ban calendar layer** for the
    **upcoming** week (`resolveDrivingBanFindings()` - see above). A missing
    annual calendar for the required year is a hard failure here, before any
    OpenAI cost is spent.
-2. `selectCandidates()` narrows the RSS findings to a bounded, scored
+2. `selectCandidates()` narrows the monitor findings to a bounded, scored
    subset (freshness + specific-type bonus, capped per source) - the
    cost-control step: don't verify or pay to synthesize everything.
    Calendar findings bypass this cap and are always included.
