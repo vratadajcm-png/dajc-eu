@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // Daily EU Oversize monitor - run by .github/workflows/daily-oversize-monitor.yml
-// every morning. Walks config/oversize-sources, fetches whatever feeds it
-// can, normalizes results into findings, deduplicates against the current
-// ISO week's data/oversize/<week>/findings.json, and writes the result back.
+// every morning. Walks config/oversize-sources, reads known RSS/Atom feeds
+// and official HTML fallbacks, normalizes results into findings, deduplicates
+// against the current ISO week's data/oversize/<week>/findings.json, and
+// writes the result back.
 //
 // Never touches content/news - this script only maintains the raw dataset
-// that the Friday editorial pipeline (generate-weekly-article.mjs) reads
-// from. A source being down or a feed being unparseable is logged and
-// skipped, never a fatal error (see docs/NEWS_AUTOMATION.md).
+// that the Friday editorial pipeline (generate-weekly-article.mjs) reads.
+// One source being down is logged and isolated, never fatal.
 
 import { oversizeSources } from '../config/oversize-sources/index.mjs';
 import { fetchSourceFindings } from './lib/fetch-source.mjs';
@@ -27,20 +27,28 @@ async function main() {
   const existing = await loadWeekFindings(weekLabel);
   const beforeCount = existing.size;
 
-  let sourcesOk = 0;
-  let sourcesNoFeed = 0;
+  let sourcesFeed = 0;
+  let sourcesHtml = 0;
+  let sourcesUnavailable = 0;
+  const unavailable = [];
   const allCandidates = [];
 
   for (const source of oversizeSources) {
     process.stdout.write(`[${source.id}] (${source.country}) ... `);
     const result = await fetchSourceFindings(source, { now: nowIso });
+
     if (result.status === 'ok') {
-      sourcesOk += 1;
-      console.log(`OK - ${result.findings.length} item(s) from ${result.feedUrlUsed}`);
+      if (result.method === 'feed') sourcesFeed += 1;
+      else sourcesHtml += 1;
+
+      const via = result.method || 'official source';
+      const used = result.sourceUrlUsed || source.url;
+      console.log(`OK - ${result.findings.length} item(s) via ${via} from ${used}`);
       allCandidates.push(...result.findings);
     } else {
-      sourcesNoFeed += 1;
-      console.log('no feed reachable - skipped');
+      sourcesUnavailable += 1;
+      unavailable.push({ id: source.id, country: source.country, error: result.error || 'unreachable' });
+      console.log(`UNAVAILABLE - ${result.error || 'no official endpoint reachable'}`);
     }
   }
 
@@ -54,8 +62,9 @@ async function main() {
 
   console.log('\n=== SUMMARY ===');
   console.log(`sources checked: ${oversizeSources.length}`);
-  console.log(`sources with a readable feed: ${sourcesOk}`);
-  console.log(`sources with no reachable feed: ${sourcesNoFeed}`);
+  console.log(`sources read via RSS/Atom: ${sourcesFeed}`);
+  console.log(`sources read via official HTML: ${sourcesHtml}`);
+  console.log(`sources unavailable: ${sourcesUnavailable}`);
   console.log(`findings before this run: ${beforeCount}`);
   console.log(`findings after this run: ${merged.size}`);
   console.log(`new findings: ${statusCounts.new}`);
@@ -63,14 +72,18 @@ async function main() {
   console.log(`active (unchanged) findings: ${statusCounts.active}`);
   console.log(`expired findings: ${statusCounts.expired}`);
   console.log(`superseded findings: ${statusCounts.superseded}`);
+
+  if (unavailable.length > 0) {
+    console.log('\nUnavailable official sources (kept visible for maintenance):');
+    for (const item of unavailable) {
+      console.log(`  - ${item.id} (${item.country}): ${item.error}`);
+    }
+  }
+
   console.log(`\nWritten to data/oversize/${weekLabel}/findings.json`);
 }
 
 main().catch((err) => {
-  // Isolated failures inside fetchSourceFindings never reach here - if we
-  // get here, something unexpected broke (e.g. disk write failure). Exit
-  // non-zero so the GitHub Action surfaces it, but note that any content
-  // already published earlier is entirely unaffected by this script failing.
   console.error('Daily oversize monitor failed:', err);
   process.exitCode = 1;
 });
