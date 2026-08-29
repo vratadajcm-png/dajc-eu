@@ -60,10 +60,13 @@ function explicitDurationDays(text) {
 }
 
 export function checkLongRoadClosure(candidate, { minDaysExclusive = 30 } = {}) {
-  if (candidate?.type !== 'road_closure') return { ok: true };
+  const text = `${candidate?.title || ''} ${candidate?.summary || candidate?.whatChanged || ''} ${candidate?.impact || ''}`;
+  const looksLikeClosure =
+    candidate?.type === 'road_closure' ||
+    /road closure|motorway closure|full closure|closed to traffic|vollsperrung|voll gesperrt|sperrung der (?:straße|strasse|autobahn|bundesstraße)|uzav[ií]rka|uz[aá]vierka|fermeture (?:totale|de la route|de l'autoroute)|chiusura (?:totale|stradale|autostradale)|cierre (?:total|de carretera|de autopista)|închidere (?:totală|drum|autostradă)/i.test(text);
+  if (!looksLikeClosure) return { ok: true };
 
   const structured = durationFromStructuredDates(candidate);
-  const text = `${candidate.title || ''} ${candidate.summary || ''}`;
   const inferred = structured ?? explicitDurationDays(text);
 
   if (inferred == null) {
