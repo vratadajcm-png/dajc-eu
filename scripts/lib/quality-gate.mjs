@@ -38,7 +38,7 @@ function isValidUrl(value) {
  * @param {{ frontmatter: object, body: string, developments: object[],
  *   weekStart?: Date, weekEnd?: Date }} args
  */
-export function runQualityGate({ frontmatter, body, developments, europeRoundup, weekStart, weekEnd }) {
+export function runQualityGate({ frontmatter, body, developments, europeRoundup, weekStart, weekEnd, requiredSourceUrls = [] }) {
   const errors = [];
   const roundupItems = Array.isArray(europeRoundup) ? europeRoundup : [];
 
@@ -156,6 +156,14 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
     for (const source of frontmatter?.sources || []) {
       if (!usedSourceUrls.has(source.url)) {
         errors.push(`frontmatter lists source "${source.url}" which is not cited by any report in the article body`);
+      }
+    }
+
+    for (const requiredUrl of requiredSourceUrls) {
+      if (requiredUrl && !usedSourceUrls.has(requiredUrl)) {
+        errors.push(
+          `critical verified development omitted from publication: required source "${requiredUrl}" is absent from both lead reports and Rest of Europe`
+        );
       }
     }
   }
