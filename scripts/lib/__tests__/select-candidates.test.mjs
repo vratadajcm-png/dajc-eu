@@ -34,6 +34,29 @@ describe('selectCandidates', () => {
     expect(selected.some((x) => /stale/.test(x.sourceUrl))).toBe(false);
   });
 
+  it('reserves a same-week critical item even after its status becomes active', () => {
+    const critical = finding({
+      status: 'active',
+      firstSeenAt: '2026-08-27T08:00:00Z',
+      title: 'Nationwide private exceptional-transport escort rules',
+      summary: 'A new rule changes private escorts for exceptional transports.',
+      sourceUrl: 'https://example.test/critical-active',
+    });
+    const noise = Array.from({ length: 40 }, (_, i) =>
+      finding({
+        type: 'bridge_restriction',
+        title: `Current bridge report ${i}`,
+        summary: 'Current 2026 freight infrastructure information.',
+        sourceName: `Noise ${i}`,
+        sourceUrl: `https://example.test/noise-${i}`,
+      })
+    );
+    const selected = selectCandidates([...noise, critical], {
+      discoveryWindowStart: new Date('2026-08-24T00:00:00Z'),
+    });
+    expect(selected.some((item) => item.sourceUrl === critical.sourceUrl)).toBe(true);
+  });
+
   it('prioritises exceptional-transport and escort changes', () => {
     const generic = finding({
       type: 'infrastructure',
