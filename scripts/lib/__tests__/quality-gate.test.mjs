@@ -205,6 +205,28 @@ describe('runQualityGate - other requirements', () => {
     expect(gate.errors.some((e) => /not cited by any report/.test(e))).toBe(true);
   });
 
+  it('rejects a short or unverifiable closure even when synthesis did not label it road_closure', () => {
+    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
+    developments[4] = {
+      ...developments[4],
+      title: 'B192 full closure after storm damage',
+      whatChanged: 'The road remains fully closed while crews remove damaged trees.',
+      impact: 'Traffic must divert.',
+      isInfrastructure: true,
+      validFrom: '',
+      validTo: '',
+    };
+    const gate = runQualityGate({
+      frontmatter: makeFrontmatter(developments),
+      body: LONG_BODY,
+      developments,
+      weekStart,
+      weekEnd,
+    });
+    expect(gate.ok).toBe(false);
+    expect(gate.errors.some((e) => /no verifiable planned duration longer than 30 days/.test(e))).toBe(true);
+  });
+
   it('rejects publication when a required critical source is omitted', () => {
     const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
     const gate = runQualityGate({
