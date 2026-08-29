@@ -65,13 +65,14 @@ describe('resolveDrivingBanFindings - annual-calendar maintenance', () => {
     expect(new Set(flaggedCountries)).toEqual(new Set(['DE', 'PL', 'IT', 'SI', 'AT']));
   });
 
-  it('still resolves standing-rule entries for a far-future year', () => {
+  it('keeps non-evergreen special/seasonal standing rules while suppressing evergreen Sunday baselines', () => {
     const countries = findings.map((f) => f.country);
-    expect(countries).toContain('Czechia');
-    expect(countries).toContain('Slovakia');
-    expect(countries).toContain('France');
-    expect(countries).toContain('Slovenia');
-    expect(countries).toContain('Switzerland');
+    expect(countries).toContain('Czechia'); // special-vehicle seasonal rule
+    expect(countries).toContain('France');  // exceptional-transport weekend rule
+    expect(countries).toContain('Hungary'); // summer restriction
+    expect(countries).not.toContain('Slovakia');
+    expect(countries).not.toContain('Slovenia');
+    expect(countries).not.toContain('Switzerland');
   });
 });
 
