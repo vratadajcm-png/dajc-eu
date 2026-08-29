@@ -41,9 +41,3 @@ jobs:
 
       - name: Exercise live official-source monitor
         run: npm run oversize:monitor
-
-      - name: Live weekly article dry run (validation branch only)
-        if: github.head_ref == 'fix/weekly-publish-and-html-sources'
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: npm run oversize:publish -- --dry-run
