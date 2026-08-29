@@ -36,6 +36,7 @@ import { checkOpenAiKeyPreflight } from './lib/preflight.mjs';
 import { formatNextPublicationLabel } from './lib/next-publication.mjs';
 import { resolveDrivingBanFindings } from './lib/driving-ban-calendar.mjs';
 import { crossValidateDevelopments } from './lib/cross-validate.mjs';
+import { ensureOfficialCalendarLeadFloor } from './lib/lead-floor.mjs';
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -211,6 +212,15 @@ async function main() {
   article.developments = kept;
   const roundupValidation = crossValidateDevelopments(article.europeRoundup || [], verified);
   article.europeRoundup = roundupValidation.kept;
+
+  const leadFloor = ensureOfficialCalendarLeadFloor(article, verified);
+  article = leadFloor.article;
+  if (leadFloor.added > 0 || leadFloor.promoted > 0) {
+    console.log(
+      `Official-calendar lead floor: added ${leadFloor.added}, promoted ${leadFloor.promoted}; lead reports now ${article.developments.length}.`
+    );
+  }
+
   const totalDropped = droppedCount + roundupValidation.droppedCount;
   if (totalDropped > 0) {
     console.warn(
