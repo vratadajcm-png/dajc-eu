@@ -12,11 +12,11 @@ describe('resolveDrivingBanFindings - W35 2026', () => {
     expect(maintenanceErrors).toEqual([]);
   });
 
-  it('produces exactly the 10 required countries/reports for W35', () => {
-    expect(findings).toHaveLength(10);
+  it('produces the authoritative W35 restrictions without depending on news volume', () => {
+    expect(findings).toHaveLength(14);
     const countries = findings.map((f) => f.country).sort();
     expect(countries).toEqual(
-      ['Austria', 'Austria', 'Czechia', 'France', 'Germany', 'Hungary', 'Italy', 'Poland', 'Slovakia', 'Switzerland'].sort()
+      ['Austria', 'Austria', 'Czechia', 'Czechia', 'France', 'France', 'Germany', 'Hungary', 'Italy', 'Poland', 'Slovakia', 'Slovenia', 'Slovenia', 'Switzerland'].sort()
     );
   });
 
@@ -60,15 +60,67 @@ describe('resolveDrivingBanFindings - annual-calendar maintenance', () => {
     year: 2031,
   });
 
-  it('reports a maintenance error for every annual-calendar entry (Germany, Poland, Czechia, Italy, Austria corridor)', () => {
+  it('reports a maintenance error for every year-scoped annual calendar', () => {
     const flaggedCountries = maintenanceErrors.map((m) => m.match(/^\[([A-Z]+)\//)[1]);
-    expect(new Set(flaggedCountries)).toEqual(new Set(['DE', 'PL', 'CZ', 'IT', 'AT']));
+    expect(new Set(flaggedCountries)).toEqual(new Set(['DE', 'PL', 'IT', 'SI', 'AT']));
   });
 
-  it('still resolves standing-rule entries for a far-future year (Slovakia, France, Hungary, Austria general ban, Switzerland)', () => {
+  it('still resolves standing-rule entries for a far-future year', () => {
     const countries = findings.map((f) => f.country);
+    expect(countries).toContain('Czechia');
     expect(countries).toContain('Slovakia');
     expect(countries).toContain('France');
+    expect(countries).toContain('Slovenia');
     expect(countries).toContain('Switzerland');
+  });
+});
+
+
+describe('resolveDrivingBanFindings - W36 2026', () => {
+  const weekStart = new Date('2026-08-31T00:00:00Z');
+  const weekEnd = new Date('2026-09-06T00:00:00Z');
+  const { findings, maintenanceErrors } = resolveDrivingBanFindings({
+    weekStart,
+    weekEnd,
+    year: 2026,
+  });
+
+  it('has enough independently sourced calendar restrictions for a useful weekly brief', () => {
+    expect(maintenanceErrors).toEqual([]);
+    expect(findings).toHaveLength(11);
+  });
+
+  it('carries the post-1-September Slovak Sunday window from the effective Slov-Lex version', () => {
+    const slovakia = findings.find((f) => f.country === 'Slovakia');
+    expect(slovakia).toBeTruthy();
+    expect(slovakia.timeWindow).toContain('06:00-22:00');
+    expect(slovakia.sourceUrl).toContain('20260901');
+  });
+
+  it('includes the Italian 6 September restriction from Decree 325/2025', () => {
+    const italy = findings.find((f) => f.country === 'Italy');
+    expect(italy).toBeTruthy();
+    expect(italy.validFrom).toBe('2026-09-06');
+    expect(italy.timeWindow).toContain('07:00-22:00');
+  });
+
+  it('keeps Czech general-HGV and special-vehicle regimes distinct', () => {
+    const czech = findings.filter((f) => f.country === 'Czechia');
+    expect(czech).toHaveLength(2);
+    expect(new Set(czech.map((f) => f.sourceUrl)).size).toBe(2);
+    expect(czech.some((f) => /special vehicles/i.test(f.title))).toBe(true);
+  });
+
+  it('includes both the Slovenian Sunday rule and the last tourist-season Saturday restriction', () => {
+    const slovenia = findings.filter((f) => f.country === 'Slovenia');
+    expect(slovenia).toHaveLength(2);
+    expect(slovenia.some((f) => f.timeWindow.includes('08:00-22:00'))).toBe(true);
+    expect(slovenia.some((f) => f.timeWindow.includes('06:00-16:00'))).toBe(true);
+  });
+
+  it('keeps the French general HGV ban distinct from the exceptional-transport regime', () => {
+    const france = findings.filter((f) => f.country === 'France');
+    expect(france).toHaveLength(2);
+    expect(new Set(france.map((f) => f.sourceUrl)).size).toBe(2);
   });
 });
