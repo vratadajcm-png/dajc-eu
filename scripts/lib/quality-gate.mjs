@@ -10,7 +10,8 @@ import { validateDevelopmentDateRange } from './date-validation.mjs';
 const MIN_BODY_LENGTH = 400;
 const MIN_REPORTS = 10;
 const MAX_REPORTS = 12;
-const MIN_ROUNDUP_REPORTS = 1;
+const MIN_ROUNDUP_REPORTS = 3;
+const MIN_ROUNDUP_COUNTRIES = 3;
 const MIN_RECOMMENDED_ACTION_LENGTH = 10;
 
 function normalizeTitle(title) {
@@ -54,7 +55,19 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
 
   const items = developments || [];
   if (europeRoundup !== undefined && roundupItems.length < MIN_ROUNDUP_REPORTS) {
-    errors.push('Rest-of-Europe roundup is empty - at least one additional verified European development is required');
+    errors.push(
+      `Rest-of-Europe roundup has only ${roundupItems.length} report(s) - at least ${MIN_ROUNDUP_REPORTS} verified additional developments are required`
+    );
+  }
+  if (europeRoundup !== undefined) {
+    const roundupCountries = new Set(
+      roundupItems.map((item) => String(item.country || '').trim()).filter(Boolean)
+    );
+    if (roundupCountries.size < MIN_ROUNDUP_COUNTRIES) {
+      errors.push(
+        `Rest-of-Europe roundup covers only ${roundupCountries.size} countr${roundupCountries.size === 1 ? 'y' : 'ies'} - at least ${MIN_ROUNDUP_COUNTRIES} distinct countries are required`
+      );
+    }
   }
 
   if (items.length === 0) {
