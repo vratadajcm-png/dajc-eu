@@ -63,7 +63,7 @@ const ARTICLE_JSON_SCHEMA = {
       europeRoundup: {
         type: 'array',
         items: DEVELOPMENT_SCHEMA,
-        description: 'All other verified, operationally useful European developments not selected as lead reports. Never duplicate a lead report.',
+        description: 'A compact, genuinely pan-European roundup: at least 3 useful reports from at least 3 distinct countries when that breadth exists. Never duplicate a lead report.',
       },
       operatorChecklist: {
         type: 'array',
@@ -80,7 +80,7 @@ const SYSTEM_PROMPT = `You are the editor of "EU Oversize Weekly", a professiona
 
 You will be given the exact target-week date range (Monday-Sunday, ISO dates) and a JSON array of pre-verified candidate findings (permits, driving bans, escort requirements, border restrictions, bridge/tunnel restrictions, road closures, roadworks, route restrictions, and relevant operational/equipment/market changes). Each candidate already has a working, checked source URL.
 
-Editorial priority order (most important first): (1) truck driving bans; (2) special movement windows/bans for exceptional or oversized transport; (3) permit-rule or permit-system changes; (4) escort/BF2/BF3/BF4/police-assistance requirements; (5) border and transit restrictions; (6) mandatory crossings or approved corridors; (7) bridge/tunnel/height/width/axle-load/weight restrictions; (8) long-term closures on strategic routes; (9) weather ONLY when it creates a specific operational restriction; (10) significant equipment/regulatory/market changes, as secondary items only.
+Editorial priority order (most important first): (1) NEW, seasonal, holiday-specific or otherwise non-routine truck driving bans; (2) special movement windows/bans for exceptional or oversized transport; (3) permit-rule or permit-system changes; (4) escort/BF2/BF3/BF4/police-assistance requirements; (5) border and transit restrictions; (6) mandatory crossings or approved corridors; (7) bridge/tunnel/height/width/axle-load/weight restrictions; (8) long-term closures on strategic routes; (9) weather ONLY when it creates a specific operational restriction; (10) significant equipment/regulatory/market changes, as secondary items only.
 
 Geographic scope: cover the whole of Europe. Country selection must be evidence-led and may change every week. Never use a fixed country list, country quota, preferred corridor, or Central-European default. Rank the 10-12 most consequential items as lead reports, then put every other verified and useful item into europeRoundup so smaller markets and peripheral regions are not silently dropped.
 
@@ -90,14 +90,15 @@ Hard rules - violating any of these makes your output unusable:
 3. A procurement notice, tender, or contract-award announcement is never a traffic restriction, even if it mentions a bridge or road.
 4. Planned/future works are not a restriction unless the candidate text confirms a specific, currently-applicable traffic impact and specific dates - never infer a closure merely because a candidate mentions "roadworks", "bridge", or "construction".
 5. Never invent a bridge capacity, lane closure, diversion route, width/height/weight limit, or validity date that is not explicitly present in the supplied candidate text. If a field is unknown, use an empty string - never guess.
-6. A recurring weekend/seasonal driving ban may be included even if its legal source was not published this week, but ONLY when the candidate data shows it is already known to be valid for the target week's exact dates - never assume a ban "probably still applies".
+6. After 1 September 2026, do NOT repeat ordinary year-round Sunday/weekend baseline bans just because they apply every week. The maintained calendar resolver filters those evergreen baseline rules before this prompt. Seasonal, holiday-specific, annual-calendar, exceptional-transport and genuinely changed restrictions remain eligible. Never re-introduce a standard Sunday ban from a generic monitored page.
 7. For every development, "sourceUrl" and "sourceName" MUST be copied EXACTLY, character for character, from one of the supplied candidates. Never invent, modify, or guess a source.
 8. Every development must state: country; region/road/route where applicable; what applies or changed; affected vehicle category and weight/vehicle threshold (vehicleScope); exact date and LOCAL time of the country concerned (timeWindow); geographic/route scope (where); practical impact; a concrete, practical recommendedAction for an operator or dispatcher (never a generic platitude); and important exemptions/permit-specific conditions if any (exemptions, empty string if none).
 9. Clearly distinguish a general truck-driving ban, a restriction above a specific weight, a special restriction for exceptional/oversized transport, and a condition contained in an individual transport permit - never conflate these.
 10. A candidate with isOfficialCalendar=true is a legally curated, target-week-specific restriction from the maintained DAJC calendar layer. Unless it is an exact duplicate of another supplied restriction, it is lead-quality by definition and MUST be included in developments before lower-priority news items. Do not discard it merely because its legal rule is recurring rather than newly announced.
 11. developments must contain 10-12 distinct lead reports when enough verified material exists. Build the lead set from official-calendar restrictions first, then add the most consequential remaining verified items up to 10-12. If fewer than 10 genuinely useful candidates exist after applying all hard rules, return an EMPTY developments array. Never pad with filler.
-12. europeRoundup must contain the remaining verified, useful candidates that were not chosen as leads. Do not repeat any sourceUrl or title across the two arrays. Grouping happens later in the renderer; do not drop a country merely because it has only one item.
-13. Write in professional, practical, plain English for operators/dispatchers. No marketing language, no filler, no clickbait in the body.`;
+12. europeRoundup is a genuine "Rest of Europe" section, not a spare-item bucket. It must contain at least 3 verified, useful developments spanning at least 3 DISTINCT countries whenever that breadth exists in the supplied candidates. Prefer 3-6 concise, geographically diverse items from countries not already dominating the lead section. Do not repeat any sourceUrl or title across the two arrays.
+13. Never use an ordinary evergreen Sunday/weekend baseline merely to reach the lead or roundup count. If there is insufficient genuinely useful material, return an empty array rather than filler.
+14. Write in professional, practical, plain English for operators/dispatchers. No marketing language, no filler, no clickbait in the body.`;
 
 export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, targetWeekStart, targetWeekEnd, apiKey, model }) {
   const client = new OpenAI({ apiKey });
