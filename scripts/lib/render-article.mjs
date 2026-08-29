@@ -58,6 +58,28 @@ function renderDevelopmentItem(item) {
   return lines.join('\n');
 }
 
+function renderRoundupItem(item) {
+  const bits = [];
+  const range = formatDateRange(item);
+  if (item.where) bits.push(`Where: ${mdEscape(item.where)}`);
+  if (item.timeWindow) bits.push(`When: ${mdEscape(item.timeWindow)}`);
+  else if (range) bits.push(`When: ${range}`);
+
+  const lines = [
+    `### ${mdEscape(item.title)} (${mdEscape(item.country)})`,
+    '',
+    mdEscape(item.whatChanged),
+  ];
+
+  if (bits.length > 0) lines.push('', `**${bits.join(' · ')}**`);
+
+  const action = item.recommendedAction || item.impact;
+  if (action) lines.push('', `**Operator action:** ${mdEscape(action)}`);
+
+  lines.push('', `*Source: [${mdEscape(item.sourceName)}](${item.sourceUrl})*`);
+  return lines.join('\n');
+}
+
 /**
  * Assigns each development to exactly one category, in priority order.
  * A driving ban / exceptional-transport movement restriction is reported
@@ -99,10 +121,10 @@ export function renderArticleMarkdown(article, { slug, publishedAt, nextPublicat
     const parts = [
       '## Rest of Europe: verified operational roundup',
       '',
-      'These verified items did not rank among the lead reports, but may still affect route execution. Coverage is evidence-led and is not limited to a fixed list of countries.',
+      'At least ten concise verified items from at least six countries. Only operationally useful changes are included; routine evergreen Sunday bans are omitted after 1 September 2026.',
       '',
     ];
-    for (const item of roundup) parts.push(renderDevelopmentItem(item), '');
+    for (const item of roundup) parts.push(renderRoundupItem(item), '');
     sections.push(parts.join('\n').trim());
   }
 
