@@ -38,6 +38,28 @@ describe('extractHtmlFindings', () => {
     expect(findings[0].country).toBe('Germany');
   });
 
+  it('recognizes Swiss private exceptional-transport escort news', () => {
+    const astra = {
+      id: 'ch-astra',
+      country: 'CH',
+      authority: 'ASTRA',
+      name: 'ASTRA - Medienmitteilungen',
+      url: 'https://www.astra.admin.ch/de/gesetzgebung',
+      type: 'national-road-authority',
+      priority: 1,
+    };
+    const html = `
+      <article>
+        <p>19. August 2026 - Schweizweite Vorgaben für effiziente und sichere Ausnahmetransporte.</p>
+        <a href="/de/private-ausnahmetransportbegleitungen">Private Ausnahmetransportbegleitungen</a>
+      </article>
+    `;
+    const findings = extractHtmlFindings(html, astra, astra.url);
+    expect(findings).toHaveLength(1);
+    expect(findings[0].type).toBe('escort_requirement');
+    expect(findings[0].sourceUrl).toBe('https://www.astra.admin.ch/de/private-ausnahmetransportbegleitungen');
+  });
+
   it('rejects external links and irrelevant navigation', () => {
     const html = `
       <nav>
