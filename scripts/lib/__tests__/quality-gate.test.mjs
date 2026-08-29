@@ -88,8 +88,8 @@ describe('runQualityGate - report count', () => {
     expect(result.errors.some((e) => /only 9 lead report/.test(e))).toBe(true);
   });
 
-  it('allows four strong leads once the target week reaches the post-summer policy date', () => {
-    const developments = Array.from({ length: 4 }, (_, i) =>
+  it('allows three strong leads once the target week reaches the post-summer policy date', () => {
+    const developments = Array.from({ length: 3 }, (_, i) =>
       makeDevelopment(i, { validFrom: '2026-09-05', validTo: '2026-09-06' })
     );
     const countries = ['Spain', 'Romania', 'Denmark', 'Portugal', 'Croatia', 'Switzerland'];
