@@ -14,22 +14,41 @@ function item(country, n) {
 }
 
 describe('roundup breadth', () => {
-  it('requires both three reports and three countries', () => {
+  it('requires at least ten reports and six countries', () => {
     expect(roundupNeedsSupplement([item('Spain', 1), item('Romania', 2)]).needsSupplement).toBe(true);
-    expect(roundupNeedsSupplement([item('Spain', 1), item('Spain', 2), item('Spain', 3)]).needsSupplement).toBe(true);
-    expect(roundupNeedsSupplement([item('Spain', 1), item('Romania', 2), item('Denmark', 3)]).needsSupplement).toBe(false);
+
+    const tenFromFive = Array.from({ length: 10 }, (_, i) =>
+      item(['Spain', 'Romania', 'Denmark', 'Portugal', 'Croatia'][i % 5], i + 1)
+    );
+    expect(roundupNeedsSupplement(tenFromFive).needsSupplement).toBe(true);
+
+    const tenFromSix = Array.from({ length: 10 }, (_, i) =>
+      item(['Spain', 'Romania', 'Denmark', 'Portugal', 'Croatia', 'Switzerland'][i % 6], i + 20)
+    );
+    const result = roundupNeedsSupplement(tenFromSix);
+    expect(result.needsSupplement).toBe(false);
+    expect(result.reportCount).toBe(10);
+    expect(result.countryCount).toBe(6);
   });
 
-  it('adds only unused items that increase country breadth', () => {
+  it('fills country breadth first, then report depth to ten', () => {
     const existing = [item('Spain', 1), item('Romania', 2)];
     const supplement = [
       item('Spain', 3),
       item('Denmark', 4),
       item('Portugal', 5),
+      item('Croatia', 6),
+      item('Switzerland', 7),
+      item('Spain', 8),
+      item('Romania', 9),
+      item('Denmark', 10),
+      item('Portugal', 11),
+      item('Croatia', 12),
+      item('Switzerland', 13),
     ];
     const merged = mergeRoundupSupplement(existing, supplement, new Set());
-    expect(merged).toHaveLength(3);
-    expect(merged.map((x) => x.country)).toEqual(['Spain', 'Romania', 'Denmark']);
+    expect(merged).toHaveLength(10);
+    expect(new Set(merged.map((x) => x.country)).size).toBeGreaterThanOrEqual(6);
   });
 
   it('removes roundup items whose source is already used by a lead', () => {
@@ -56,6 +75,7 @@ describe('roundup breadth', () => {
     const blocked = item('Denmark', 4);
     const supplement = [blocked, item('Portugal', 5)];
     const merged = mergeRoundupSupplement(existing, supplement, new Set([blocked.sourceUrl]));
-    expect(merged.map((x) => x.country)).toEqual(['Spain', 'Romania', 'Portugal']);
+    expect(merged.some((x) => x.sourceUrl === blocked.sourceUrl)).toBe(false);
+    expect(merged.map((x) => x.country)).toContain('Portugal');
   });
 });
