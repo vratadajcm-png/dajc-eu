@@ -102,11 +102,17 @@ export const oversizeJurisdictions = [
 
 export function coverageForSources(sources = []) {
   const configuredCountries = new Set(sources.map((source) => source.country));
+  const configuredJurisdictions = new Set(
+    sources.map((source) => source.jurisdictionId).filter(Boolean)
+  );
+
   return oversizeJurisdictions.map((jurisdiction) => {
+    const direct = configuredJurisdictions.has(jurisdiction.id);
     const coveredBy = jurisdiction.sourceCountries.filter((code) => configuredCountries.has(code));
     return {
       ...jurisdiction,
-      covered: coveredBy.length > 0,
+      direct,
+      covered: direct || coveredBy.length > 0,
       coveredBy,
     };
   });
