@@ -69,6 +69,14 @@ describe('checkOperationalRelevance', () => {
     expect(result.reason).toMatch(/historical archive/);
   });
 
+  it('rejects pure toll collection revenue statistics', () => {
+    const result = checkOperationalRelevance(
+      'Toll collection reached 1.52 billion Czech crowns and grew 5 percent year-on-year.'
+    );
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/toll revenue\/statistics/);
+  });
+
   it('accepts a current exceptional-transport escort policy change', () => {
     const result = checkOperationalRelevance(
       '19 August 2026: Switzerland proposes nationwide rules for private exceptional-transport escorts.'
