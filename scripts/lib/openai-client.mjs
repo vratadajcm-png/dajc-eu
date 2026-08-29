@@ -166,6 +166,35 @@ export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, ta
   return JSON.parse(text);
 }
 
+function roundupCandidateScore(candidate) {
+  const typeScore = {
+    escort_requirement: 30,
+    police_escort: 30,
+    permit_system: 28,
+    permit_change: 26,
+    border_restriction: 24,
+    bridge_restriction: 22,
+    tunnel_restriction: 22,
+    route_restriction: 22,
+    road_closure: 20,
+    operational_change: 18,
+    driving_ban: 16,
+    roadworks: 12,
+    market: 10,
+    infrastructure: 6,
+  }[candidate.type] || 0;
+
+  const text = `${candidate.title || ''} ${candidate.summary || ''}`;
+  let score = typeScore;
+  if (/exceptional transport|oversize|abnormal load|ausnahmetransport|schwertransport|convoi exceptionnel|izvanredni prijevoz/i.test(text)) score += 30;
+  if (/escort|begleitung|pilot vehicle|doprovod|accompagnement/i.test(text)) score += 24;
+  if (/toll|vignette|m[aá]ut|road user charge|rinkliav/i.test(text)) score += 16;
+  if (/weight restriction|weight limit|7[,.]?5\s*t|s[uú]lykorl[aá]toz/i.test(text)) score += 16;
+  if ((candidate.summary || '').length >= 250) score += 6;
+  if (candidate.status === 'new') score += 4;
+  return score;
+}
+
 export async function generateRoundupSupplementWithOpenAI({
   candidates,
   targetWeekStart,
@@ -180,7 +209,11 @@ export async function generateRoundupSupplementWithOpenAI({
   const client = new OpenAI({ apiKey });
   const existing = new Set(existingCountries.filter(Boolean));
 
-  const payload = candidates.map((c) => ({
+  const rankedCandidates = [...candidates]
+    .sort((a, b) => roundupCandidateScore(b) - roundupCandidateScore(a))
+    .slice(0, 18);
+
+  const payload = rankedCandidates.map((c) => ({
     country: c.country,
     location: c.location,
     type: c.type,
