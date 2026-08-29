@@ -63,13 +63,12 @@ describe('runQualityGate - report count', () => {
     expect(result.errors.some((e) => /covers only 1 country/.test(e))).toBe(true);
   });
 
-  it('accepts a Rest-of-Europe roundup spanning at least three countries', () => {
+  it('accepts a Rest-of-Europe roundup with ten reports across six countries', () => {
     const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
-    const europeRoundup = [
-      makeDevelopment(30, { country: 'Spain' }),
-      makeDevelopment(31, { country: 'Romania' }),
-      makeDevelopment(32, { country: 'Denmark' }),
-    ];
+    const countries = ['Spain', 'Romania', 'Denmark', 'Portugal', 'Croatia', 'Switzerland'];
+    const europeRoundup = Array.from({ length: 10 }, (_, i) =>
+      makeDevelopment(30 + i, { country: countries[i % countries.length] })
+    );
     const all = [...developments, ...europeRoundup];
     const result = runQualityGate({
       frontmatter: makeFrontmatter(all),
@@ -93,11 +92,14 @@ describe('runQualityGate - report count', () => {
     const developments = Array.from({ length: 4 }, (_, i) =>
       makeDevelopment(i, { validFrom: '2026-09-05', validTo: '2026-09-06' })
     );
-    const europeRoundup = [
-      makeDevelopment(40, { country: 'Spain', validFrom: '2026-09-05', validTo: '2026-09-06' }),
-      makeDevelopment(41, { country: 'Romania', validFrom: '2026-09-05', validTo: '2026-09-06' }),
-      makeDevelopment(42, { country: 'Denmark', validFrom: '2026-09-05', validTo: '2026-09-06' }),
-    ];
+    const countries = ['Spain', 'Romania', 'Denmark', 'Portugal', 'Croatia', 'Switzerland'];
+    const europeRoundup = Array.from({ length: 10 }, (_, i) =>
+      makeDevelopment(40 + i, {
+        country: countries[i % countries.length],
+        validFrom: '2026-09-05',
+        validTo: '2026-09-06',
+      })
+    );
     const all = [...developments, ...europeRoundup];
     const gate = runQualityGate({
       frontmatter: makeFrontmatter(all),
@@ -201,6 +203,20 @@ describe('runQualityGate - other requirements', () => {
     const gate = runQualityGate({ frontmatter, body: LONG_BODY, developments, weekStart, weekEnd });
     expect(gate.ok).toBe(false);
     expect(gate.errors.some((e) => /not cited by any report/.test(e))).toBe(true);
+  });
+
+  it('rejects publication when a required critical source is omitted', () => {
+    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
+    const gate = runQualityGate({
+      frontmatter: makeFrontmatter(developments),
+      body: LONG_BODY,
+      developments,
+      weekStart,
+      weekEnd,
+      requiredSourceUrls: ['https://example.test/critical-switzerland'],
+    });
+    expect(gate.ok).toBe(false);
+    expect(gate.errors.some((e) => /critical verified development omitted/.test(e))).toBe(true);
   });
 
   it('rejects zero developments', () => {
