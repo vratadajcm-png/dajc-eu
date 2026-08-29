@@ -120,6 +120,25 @@ describe('generate-weekly-article.mjs (mock, subprocess)', () => {
   );
 
   it(
+    'refresh-existing dry run never overwrites an already-published article',
+    () => {
+      mkdirSync(ARTICLES_DIR, { recursive: true });
+      const original = '---\ntitle: "pre-existing refresh target"\n---\n\nKEEP THIS CONTENT\n';
+      writeFileSync(targetFilePath, original, 'utf-8');
+      try {
+        const result = runGenerate(['--mock', '--dry-run', '--refresh-existing', '--skip-build']);
+        expect(result.code).toBe(0);
+        expect(result.stdout).toMatch(/Refresh preview/);
+        expect(result.stdout).toMatch(/DRY RUN - ARTICLE THAT WOULD BE PUBLISHED/);
+        expect(readFileSync(targetFilePath, 'utf-8')).toBe(original);
+      } finally {
+        rmSync(targetFilePath, { force: true });
+      }
+    },
+    30_000
+  );
+
+  it(
     'refuses to overwrite an already-published article for the target week',
     () => {
       mkdirSync(ARTICLES_DIR, { recursive: true });
