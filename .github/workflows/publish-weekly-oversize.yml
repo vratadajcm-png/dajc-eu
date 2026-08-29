@@ -1,24 +1,21 @@
 name: Publish Weekly Oversize Article
 
-# Targets 12:00 Europe/Prague every Friday. GitHub Actions cron is UTC-only
-# and cannot express "12:00 in a DST-observing timezone" as a single
-# expression (Prague is UTC+1 in winter / CET and UTC+2 in summer / CEST),
-# so this workflow fires at BOTH UTC times that noon-Prague can fall on
-# (10:00 UTC covers CEST, 11:00 UTC covers CET) and the first step checks
-# the actual Europe/Prague wall-clock time, only letting the rest of the
-# job run on the correct one. The other trigger that week is a harmless
-# no-op. workflow_dispatch always runs regardless of the time check, for
-# manual/testing runs.
+# Publishes during the 08:00-13:59 Europe/Prague window every Friday.
+# GitHub Actions cron is UTC-only, so the workflow keeps the two existing
+# near-noon triggers (10:00 and 11:00 UTC) that cover CET/CEST. The first
+# step accepts either trigger, including a moderate GitHub scheduling delay,
+# as long as the job actually starts inside the local publication window.
+# The article path is week-specific and the generator refuses to overwrite
+# it, so a second accepted trigger is an idempotent no-op rather than a
+# duplicate publication. workflow_dispatch always runs regardless of the
+# time check, for manual/testing runs.
 #
 # IMPORTANT - scheduled trigger timing is best-effort, not exact: GitHub
 # documents that scheduled workflows can be delayed, sometimes by several
-# minutes, during periods of high load on GitHub's infrastructure. The
-# check-time step below only matches the exact target HOUR (12) in
-# Europe/Prague, not a wider window, to avoid double-firing on the same
-# Friday - so a delay severe enough to push the correct-season trigger past
-# 12:59 local time would cause that week's automatic publish to be skipped
-# entirely (the other, wrong-season cron already fired and no-op'd earlier
-# that day). If a Friday publish appears to have been silently skipped,
+# minutes, during periods of high load on GitHub's infrastructure. A delay
+# that pushes both triggers outside 08:00-13:59 local time still skips that
+# week's automatic publication. If a Friday publish appears to have been
+# silently skipped,
 # check the Actions run history and use workflow_dispatch to publish it
 # manually - manual runs always skip the time gate entirely, see below.
 
@@ -53,12 +50,14 @@ jobs:
             exit 0
           fi
           hour=$(TZ=Europe/Prague date +%H)
+          hour_number=$((10#$hour))
           echo "Current Europe/Prague hour: $hour"
-          if [ "$hour" = "12" ]; then
+          if [ "$hour_number" -ge 8 ] && [ "$hour_number" -le 13 ]; then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "Inside the Europe/Prague publication window (08:00-13:59)."
           else
             echo "should_run=false" >> "$GITHUB_OUTPUT"
-            echo "Not the target hour in Europe/Prague (got $hour, want 12) - this is the redundant DST-safety trigger, exiting quietly."
+            echo "Outside the Europe/Prague publication window (got $hour, require 08:00-13:59) - exiting quietly."
           fi
 
       # For workflow_dispatch, honors the `dry_run` checkbox. For the real
