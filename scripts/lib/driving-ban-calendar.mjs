@@ -34,6 +34,16 @@ export function resolveDrivingBanFindings({ weekStart, weekEnd, year }) {
         continue;
       }
 
+      if (
+        entry.suppressSundayOnlyFromWeeklyAfter &&
+        occurrence.validFrom &&
+        occurrence.validTo === occurrence.validFrom &&
+        occurrence.validFrom >= entry.suppressSundayOnlyFromWeeklyAfter
+      ) {
+        const occurrenceDay = new Date(`${occurrence.validFrom}T12:00:00Z`).getUTCDay();
+        if (occurrenceDay === 0) continue;
+      }
+
       findings.push({
         country: entry.countryName,
         region: null,
