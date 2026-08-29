@@ -1,28 +1,21 @@
 name: Publish Weekly Oversize Article
 
-# Publishes during the 08:00-13:59 Europe/Prague window every Friday.
-# GitHub Actions cron is UTC-only, so the workflow keeps the two existing
-# near-noon triggers (10:00 and 11:00 UTC) that cover CET/CEST. The first
-# step accepts either trigger, including a moderate GitHub scheduling delay,
-# as long as the job actually starts inside the local publication window.
-# The article path is week-specific and the generator refuses to overwrite
-# it, so a second accepted trigger is an idempotent no-op rather than a
-# duplicate publication. workflow_dispatch always runs regardless of the
-# time check, for manual/testing runs.
+# Friday publication is scheduled at both UTC instants that can represent
+# 12:00 Europe/Prague (10:00 UTC in CEST, 11:00 UTC in CET). The trigger gate
+# chooses the correct cron by timezone OFFSET, not by the runner's current
+# hour, so a GitHub scheduling delay of minutes or hours cannot invalidate the
+# run. The redundant DST cron exits with an explicit summary.
 #
-# IMPORTANT - scheduled trigger timing is best-effort, not exact: GitHub
-# documents that scheduled workflows can be delayed, sometimes by several
-# minutes, during periods of high load on GitHub's infrastructure. A delay
-# that pushes both triggers outside 08:00-13:59 local time still skips that
-# week's automatic publication. If a Friday publish appears to have been
-# silently skipped,
-# check the Actions run history and use workflow_dispatch to publish it
-# manually - manual runs always skip the time gate entirely, see below.
+# A Saturday 06:00 UTC catch-up trigger runs the same idempotent pipeline.
+# scripts/check-weekly-publication.mjs checks the week-specific target file
+# before npm install/OpenAI work; if Friday already published, Saturday is a
+# cheap, clearly reported no-op.
 
 on:
   schedule:
-    - cron: '0 10 * * 5'
-    - cron: '0 11 * * 5'
+    - cron: '0 10 * * 5' # Friday 12:00 CEST
+    - cron: '0 11 * * 5' # Friday 12:00 CET
+    - cron: '0 6 * * 6'  # Saturday catch-up if Friday did not publish
   workflow_dispatch:
     inputs:
       dry_run:
@@ -41,28 +34,57 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Check Europe/Prague local time
-        id: check-time
+      - name: Resolve scheduled trigger
+        id: trigger
+        shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          event="${{ github.event_name }}"
+          schedule="${{ github.event.schedule }}"
+
+          if [ "$event" = "workflow_dispatch" ]; then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
-            echo "Manual run (workflow_dispatch) - skipping the time gate."
+            echo "role=manual" >> "$GITHUB_OUTPUT"
+            echo "Manual run - publication pipeline enabled."
             exit 0
           fi
-          hour=$(TZ=Europe/Prague date +%H)
-          hour_number=$((10#$hour))
-          echo "Current Europe/Prague hour: $hour"
-          if [ "$hour_number" -ge 8 ] && [ "$hour_number" -le 13 ]; then
+
+          if [ "$schedule" = "0 6 * * 6" ]; then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
-            echo "Inside the Europe/Prague publication window (08:00-13:59)."
-          else
-            echo "should_run=false" >> "$GITHUB_OUTPUT"
-            echo "Outside the Europe/Prague publication window (got $hour, require 08:00-13:59) - exiting quietly."
+            echo "role=catch-up" >> "$GITHUB_OUTPUT"
+            echo "Saturday catch-up trigger - publication pipeline enabled if the target article is still missing."
+            exit 0
           fi
 
-      # For workflow_dispatch, honors the `dry_run` checkbox. For the real
-      # Friday `schedule` trigger, always resolves to false.
+          offset=$(TZ=Europe/Prague date +%z)
+          echo "Europe/Prague UTC offset at execution: $offset"
+          echo "Scheduled cron identity: $schedule"
+
+          if { [ "$offset" = "+0200" ] && [ "$schedule" = "0 10 * * 5" ]; } || { [ "$offset" = "+0100" ] && [ "$schedule" = "0 11 * * 5" ]; }; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "role=friday-primary" >> "$GITHUB_OUTPUT"
+            echo "Correct CET/CEST Friday trigger selected. Runner delay does not matter."
+          else
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "role=friday-redundant" >> "$GITHUB_OUTPUT"
+            echo "Redundant DST-safety Friday trigger - no publication work required."
+            {
+              echo "### EU Oversize Weekly - redundant Friday trigger"
+              echo ""
+              echo "This is the alternate CET/CEST cron. It was intentionally ignored based on the Prague UTC offset, not the runner clock hour."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Checkout
+        if: steps.trigger.outputs.should_run == 'true'
+        uses: actions/checkout@v4
+
+      - name: Check whether target week is already published
+        if: steps.trigger.outputs.should_run == 'true'
+        id: publish-needed
+        run: node scripts/check-weekly-publication.mjs
+
       - name: Determine dry-run mode
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         id: dry-run-mode
         run: |
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
@@ -71,65 +93,57 @@ jobs:
             echo "dry_run=false" >> "$GITHUB_OUTPUT"
           fi
 
-      # Fails fast, before checkout/install/data-refresh spend any time or
-      # bandwidth, if OPENAI_API_KEY is missing - a real run without it is a
-      # configuration error (see generate-weekly-article.mjs's own preflight
-      # for the same check, kept as defense in depth for direct/local
-      # invocations that bypass this workflow). Never echoes the value.
       - name: Pre-flight - verify OPENAI_API_KEY is configured
-        if: steps.check-time.outputs.should_run == 'true'
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           if [ -z "$OPENAI_API_KEY" ]; then
-            echo "::error::OPENAI_API_KEY repository secret is not set (Settings -> Secrets and variables -> Actions -> New repository secret). Failing before any work is done - see docs/NEWS_AUTOMATION.md#github-secrets."
+            echo "::error::OPENAI_API_KEY repository secret is not set (Settings -> Secrets and variables -> Actions -> New repository secret)."
             {
               echo "### EU Oversize Weekly - pre-flight failed"
               echo ""
-              echo "\`OPENAI_API_KEY\` is not configured. No data was refreshed, no article was generated, nothing was committed."
+              echo "`OPENAI_API_KEY` is not configured. Nothing was generated or published."
             } >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
           echo "Pre-flight OK: OPENAI_API_KEY is configured (value not printed)."
 
-      - name: Checkout
-        if: steps.check-time.outputs.should_run == 'true'
-        uses: actions/checkout@v4
-
       - name: Setup Node
-        if: steps.check-time.outputs.should_run == 'true'
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
       - name: Install dependencies
-        if: steps.check-time.outputs.should_run == 'true'
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         run: npm ci
 
       - name: Final data refresh
-        if: steps.check-time.outputs.should_run == 'true'
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         run: npm run oversize:monitor
 
-      - name: Generate weekly article (official driving-ban calendars, verification, quality gate, and build check all happen inside this script)
-        if: steps.check-time.outputs.should_run == 'true'
+      - name: Generate weekly article
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run oversize:publish -- ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }}
 
-      - name: Commit new article and refreshed data (explicit publish gate - only if something was actually written)
-        # Skipped entirely for dry runs as a second, belt-and-suspenders
-        # guard - the script itself never leaves a dry-run file on disk
-        # (see generate-weekly-article.mjs's --dry-run handling), so this
-        # `if` is defensive, not load-bearing. Also implicitly skipped if
-        # the previous step failed (its `if` has no failure()/always(), so
-        # GitHub Actions ANDs it with success()) - a hard preflight/quality-
-        # gate/build failure never reaches this step.
-        #
-        # The actual publish/data-only decision lives in
-        # scripts/publish-gate-commit.mjs (decidePublishCommit in
-        # scripts/lib/publish-gate.mjs, unit tested) rather than here, so a
-        # data/oversize-only refresh can never again be committed with a
-        # "content: publish..." message - see docs/NEWS_AUTOMATION.md.
-        if: steps.check-time.outputs.should_run == 'true' && steps.dry-run-mode.outputs.dry_run != 'true'
+      - name: Commit new article and refreshed data
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true'
         run: node scripts/publish-gate-commit.mjs
+
+      - name: Publication outcome
+        if: always()
+        run: |
+          echo "Trigger role: ${{ steps.trigger.outputs.role || 'unknown' }}"
+          if [ "${{ steps.trigger.outputs.should_run }}" != "true" ]; then
+            echo "Outcome: intentional redundant-trigger no-op."
+          elif [ "${{ steps.publish-needed.outputs.needed }}" = "false" ]; then
+            echo "Outcome: target article already exists; idempotent no-op."
+          elif [ "${{ job.status }}" = "success" ]; then
+            echo "Outcome: publication/dry-run pipeline completed successfully."
+          else
+            echo "Outcome: publication pipeline failed; inspect the failed step above."
+          fi
