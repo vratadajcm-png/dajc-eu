@@ -20,6 +20,16 @@ describe('critical weekly coverage', () => {
     expect(isCriticalWeeklyCandidate(swiss)).toBe(true);
   });
 
+  it('keeps a same-week item critical after status ages to active', () => {
+    const start = new Date('2026-08-24T00:00:00Z');
+    const active = {
+      ...swiss,
+      status: 'active',
+      firstSeenAt: '2026-08-26T08:00:00Z',
+    };
+    expect(isCriticalWeeklyCandidate(active, { discoveryWindowStart: start })).toBe(true);
+  });
+
   it('does not treat routine official-calendar baselines as critical', () => {
     expect(isCriticalWeeklyCandidate({ ...swiss, isOfficialCalendar: true })).toBe(false);
   });
