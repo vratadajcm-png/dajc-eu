@@ -9,8 +9,11 @@ import { validateDevelopmentDateRange } from './date-validation.mjs';
 
 const MIN_BODY_LENGTH = 400;
 const MIN_REPORTS = 10;
+const MIN_REPORTS_POST_SUMMER = 3;
+const POST_SUMMER_POLICY_DATE = new Date('2026-09-01T00:00:00Z');
 const MAX_REPORTS = 12;
-const MIN_ROUNDUP_REPORTS = 1;
+const MIN_ROUNDUP_REPORTS = 10;
+const MIN_ROUNDUP_COUNTRIES = 6;
 const MIN_RECOMMENDED_ACTION_LENGTH = 10;
 
 function normalizeTitle(title) {
@@ -35,7 +38,7 @@ function isValidUrl(value) {
  * @param {{ frontmatter: object, body: string, developments: object[],
  *   weekStart?: Date, weekEnd?: Date }} args
  */
-export function runQualityGate({ frontmatter, body, developments, europeRoundup, weekStart, weekEnd }) {
+export function runQualityGate({ frontmatter, body, developments, europeRoundup, weekStart, weekEnd, requiredSourceUrls = [] }) {
   const errors = [];
   const roundupItems = Array.isArray(europeRoundup) ? europeRoundup : [];
 
@@ -53,16 +56,31 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
   }
 
   const items = developments || [];
+  const minReports =
+    weekEnd && weekEnd >= POST_SUMMER_POLICY_DATE ? MIN_REPORTS_POST_SUMMER : MIN_REPORTS;
+
   if (europeRoundup !== undefined && roundupItems.length < MIN_ROUNDUP_REPORTS) {
-    errors.push('Rest-of-Europe roundup is empty - at least one additional verified European development is required');
+    errors.push(
+      `Rest-of-Europe roundup has only ${roundupItems.length} report(s) - at least ${MIN_ROUNDUP_REPORTS} verified additional developments are required`
+    );
+  }
+  if (europeRoundup !== undefined) {
+    const roundupCountries = new Set(
+      roundupItems.map((item) => String(item.country || '').trim()).filter(Boolean)
+    );
+    if (roundupCountries.size < MIN_ROUNDUP_COUNTRIES) {
+      errors.push(
+        `Rest-of-Europe roundup covers only ${roundupCountries.size} countr${roundupCountries.size === 1 ? 'y' : 'ies'} - at least ${MIN_ROUNDUP_COUNTRIES} distinct countries are required`
+      );
+    }
   }
 
   if (items.length === 0) {
     errors.push('article has zero developments - nothing significant to report');
   } else {
-    if (items.length < MIN_REPORTS) {
+    if (items.length < minReports) {
       errors.push(
-        `article has only ${items.length} report(s) - a live weekly publication requires at least ${MIN_REPORTS} distinct, verified, genuinely useful reports. If fewer than ${MIN_REPORTS} are available, this is expected: do not publish, this is not an error.`
+        `article has only ${items.length} lead report(s) - this edition requires at least ${minReports} distinct, verified, genuinely useful lead reports. Never pad with evergreen Sunday bans or filler.`
       );
     }
     if (items.length > MAX_REPORTS) {
@@ -138,6 +156,14 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
     for (const source of frontmatter?.sources || []) {
       if (!usedSourceUrls.has(source.url)) {
         errors.push(`frontmatter lists source "${source.url}" which is not cited by any report in the article body`);
+      }
+    }
+
+    for (const requiredUrl of requiredSourceUrls) {
+      if (requiredUrl && !usedSourceUrls.has(requiredUrl)) {
+        errors.push(
+          `critical verified development omitted from publication: required source "${requiredUrl}" is absent from both lead reports and Rest of Europe`
+        );
       }
     }
   }

@@ -47,10 +47,10 @@ function runGenerate(args, envOverrides = {}) {
   }
 }
 
-function syntheticCandidate(n, type) {
+function syntheticCandidate(n, type, country = 'Testland') {
   return {
     id: `integration-test-${n}`,
-    country: 'Testland',
+    country,
     region: null,
     location: 'Test road',
     type,
@@ -82,15 +82,21 @@ beforeAll(() => {
       {
         week: thisWeek,
         updatedAt: now.toISOString(),
-        findings: [
-          syntheticCandidate(1, 'permit_change'),
-          syntheticCandidate(2, 'permit_system'),
-          syntheticCandidate(3, 'escort_requirement'),
-          syntheticCandidate(4, 'border_restriction'),
-          syntheticCandidate(5, 'bridge_restriction'),
-          syntheticCandidate(6, 'tunnel_restriction'),
-          syntheticCandidate(7, 'permit_change'),
-        ],
+        findings: Array.from({ length: 24 }, (_, i) => {
+          const types = [
+            'permit_change', 'permit_system', 'escort_requirement',
+            'border_restriction', 'bridge_restriction', 'tunnel_restriction',
+          ];
+          const countries = [
+            'Spain', 'Romania', 'Denmark', 'Portugal',
+            'Croatia', 'Switzerland', 'Belgium', 'Lithuania',
+          ];
+          return syntheticCandidate(
+            i + 1,
+            types[i % types.length],
+            countries[i % countries.length]
+          );
+        }),
       },
       null,
       2
@@ -115,6 +121,25 @@ describe('generate-weekly-article.mjs (mock, subprocess)', () => {
       expect(existsSync(targetFilePath)).toBe(false);
       const leftoverDryRunFiles = readdirSync(ARTICLES_DIR).filter((f) => f.startsWith(`_dry-run-${slug}`));
       expect(leftoverDryRunFiles).toEqual([]);
+    },
+    30_000
+  );
+
+  it(
+    'refresh-existing dry run never overwrites an already-published article',
+    () => {
+      mkdirSync(ARTICLES_DIR, { recursive: true });
+      const original = '---\ntitle: "pre-existing refresh target"\n---\n\nKEEP THIS CONTENT\n';
+      writeFileSync(targetFilePath, original, 'utf-8');
+      try {
+        const result = runGenerate(['--mock', '--dry-run', '--refresh-existing', '--skip-build']);
+        expect(result.code).toBe(0);
+        expect(result.stdout).toMatch(/Refresh preview/);
+        expect(result.stdout).toMatch(/DRY RUN - ARTICLE THAT WOULD BE PUBLISHED/);
+        expect(readFileSync(targetFilePath, 'utf-8')).toBe(original);
+      } finally {
+        rmSync(targetFilePath, { force: true });
+      }
     },
     30_000
   );

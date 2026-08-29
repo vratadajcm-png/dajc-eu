@@ -186,7 +186,7 @@ function toFinding({ source, title, summary, sourceUrl }) {
   const text = `${title} ${summary || ''}`;
   const type = classify(text) || 'infrastructure';
   return {
-    country: COUNTRY_NAMES[source.country] || source.country,
+    country: source.jurisdictionName || COUNTRY_NAMES[source.country] || source.country,
     region: null,
     location: guessLocation(text, source.authority),
     type,
@@ -315,7 +315,7 @@ async function parseFeed(raw, source, feedUrl, parser) {
     }));
 }
 
-async function enrichHtmlFindings(findings, source, listingUrl) {
+async function enrichDetailFindings(findings, source, listingUrl) {
   const enriched = [...findings];
   const limit = Math.min(MAX_HTML_DETAILS_PER_SOURCE, enriched.length);
   let nextIndex = 0;
@@ -360,6 +360,20 @@ async function enrichHtmlFindings(findings, source, listingUrl) {
   return enriched;
 }
 
+function dedupeFindingsByUrl(findings) {
+  const byUrl = new Map();
+  for (const finding of findings) {
+    if (!finding?.sourceUrl) continue;
+    const previous = byUrl.get(finding.sourceUrl);
+    // Prefer the richer detail-page version when the same URL was discovered
+    // through both RSS and official HTML.
+    if (!previous || (finding.summary || '').length > (previous.summary || '').length) {
+      byUrl.set(finding.sourceUrl, finding);
+    }
+  }
+  return [...byUrl.values()];
+}
+
 function htmlCandidates(source) {
   const configured = Array.isArray(source.htmlUrls) ? source.htmlUrls : [];
   return [...new Set([...configured, source.url].filter(Boolean))];
@@ -378,10 +392,16 @@ function htmlCandidates(source) {
 export async function fetchSourceFindings(source, { now = new Date().toISOString() } = {}) {
   void now;
   const parser = new Parser({ timeout: FETCH_TIMEOUT_MS });
+  const collected = [];
+  const methods = new Set();
+  const endpoints = [];
   let readableFeed = null;
+  let anyOfficialHtmlReachable = false;
   let lastError = null;
 
-  // Known feeds are cheapest and most structured, so try them first.
+  // Feed is one discovery channel, not a substitute for checking the
+  // authority's web news/traffic pages. We intentionally continue into the
+  // HTML scan even when RSS returned useful findings.
   if (source.feedUrl) {
     const fetched = await fetchTextWithRetry(
       source.feedUrl,
@@ -391,8 +411,10 @@ export async function fetchSourceFindings(source, { now = new Date().toISOString
       try {
         const findings = await parseFeed(fetched.text, source, fetched.finalUrl, parser);
         readableFeed = fetched.finalUrl;
+        methods.add('feed');
+        endpoints.push(fetched.finalUrl);
         if (findings.length > 0) {
-          return { source: source.id, status: 'ok', method: 'feed', sourceUrlUsed: fetched.finalUrl, findings };
+          collected.push(...await enrichDetailFindings(findings, source, fetched.finalUrl));
         }
       } catch (err) {
         lastError = `feed parse failed: ${err?.message || err}`;
@@ -402,8 +424,7 @@ export async function fetchSourceFindings(source, { now = new Date().toISOString
     }
   }
 
-  // No useful feed result: inspect the official HTML page. This is the key
-  // fallback for authorities that publish only web pages.
+  // Always inspect official HTML as an independent discovery channel.
   for (const pageUrl of htmlCandidates(source)) {
     const fetched = await fetchTextWithRetry(
       pageUrl,
@@ -414,22 +435,20 @@ export async function fetchSourceFindings(source, { now = new Date().toISOString
       continue;
     }
 
+    anyOfficialHtmlReachable = true;
+    methods.add('html');
+    endpoints.push(fetched.finalUrl);
+
     const htmlFindings = extractHtmlFindings(fetched.text, source, fetched.finalUrl);
     if (htmlFindings.length > 0) {
-      const enrichedFindings = await enrichHtmlFindings(htmlFindings, source, fetched.finalUrl);
-      return {
-        source: source.id,
-        status: 'ok',
-        method: 'html',
-        sourceUrlUsed: fetched.finalUrl,
-        findings: enrichedFindings,
-      };
+      collected.push(...await enrichDetailFindings(htmlFindings, source, fetched.finalUrl));
     }
 
-    // Some sites advertise a non-standard feed only from <link rel=alternate>.
-    // Try discovered official feeds before concluding that the page simply
-    // contains no operationally relevant item today.
+    // Also inspect any feed advertised by the HTML page, even when another
+    // configured feed already worked. Official sites often expose different
+    // streams for press releases vs traffic notices.
     for (const discoveredFeed of discoverFeedLinks(fetched.text, fetched.finalUrl)) {
+      if (discoveredFeed === readableFeed || discoveredFeed === source.feedUrl) continue;
       const feedFetch = await fetchTextWithRetry(
         discoveredFeed,
         'application/rss+xml, application/atom+xml, application/xml, text/xml, */*'
@@ -437,26 +456,39 @@ export async function fetchSourceFindings(source, { now = new Date().toISOString
       if (!feedFetch.ok) continue;
       try {
         const findings = await parseFeed(feedFetch.text, source, feedFetch.finalUrl, parser);
-        if (findings.length > 0) {
-          return { source: source.id, status: 'ok', method: 'feed', sourceUrlUsed: feedFetch.finalUrl, findings };
-        }
         readableFeed = feedFetch.finalUrl;
+        methods.add('feed');
+        endpoints.push(feedFetch.finalUrl);
+        if (findings.length > 0) {
+          collected.push(...await enrichDetailFindings(findings, source, feedFetch.finalUrl));
+        }
       } catch {
-        // keep trying other discovered feeds / pages
+        // Keep the successful HTML result; one malformed advertised feed must
+        // never hide the web-news channel.
       }
     }
-
-    // The official HTML itself was reachable and checked even if no relevant
-    // link was found. Report this as a successful source check, not as a fake
-    // "no feed reachable" failure.
-    return { source: source.id, status: 'ok', method: 'html', sourceUrlUsed: fetched.finalUrl, findings: [] };
   }
 
-  if (readableFeed) {
-    return { source: source.id, status: 'ok', method: 'feed', sourceUrlUsed: readableFeed, findings: [] };
+  const findings = dedupeFindingsByUrl(collected);
+  if (methods.size > 0 || anyOfficialHtmlReachable || readableFeed) {
+    const method = methods.has('feed') && methods.has('html')
+      ? 'hybrid'
+      : methods.has('feed') ? 'feed' : 'html';
+    return {
+      source: source.id,
+      status: 'ok',
+      method,
+      sourceUrlUsed: [...new Set(endpoints)][0] || source.url,
+      findings,
+    };
   }
 
-  return { source: source.id, status: 'unavailable', findings: [], error: lastError || 'no official source endpoint reachable' };
+  return {
+    source: source.id,
+    status: 'unavailable',
+    findings: [],
+    error: lastError || 'no official source endpoint reachable',
+  };
 }
 
 export { FINDING_TYPES };

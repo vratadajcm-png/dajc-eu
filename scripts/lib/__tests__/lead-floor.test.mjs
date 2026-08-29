@@ -35,6 +35,7 @@ describe('ensureOfficialCalendarLeadFloor', () => {
         title: 'Other useful report',
         sourceUrl: 'https://other.example/report',
         sourceName: 'Other source',
+        recommendedAction: 'Check the route-specific restriction before dispatch.',
       }],
     };
 

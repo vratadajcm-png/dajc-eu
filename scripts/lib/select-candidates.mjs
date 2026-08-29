@@ -4,6 +4,10 @@
 // This is the "diff/dedupe before sending to AI" step from the cost-control
 // requirement; it never decides what's TRUE, only what's worth checking.
 
+import { checkOperationalRelevance } from './relevance-filter.mjs';
+import { checkLongRoadClosure } from './closure-duration.mjs';
+import { isCriticalWeeklyCandidate } from './critical-floor.mjs';
+
 const SPECIFIC_TYPES = new Set([
   'permit_change', 'permit_system', 'driving_ban', 'escort_requirement',
   'police_escort', 'border_restriction', 'bridge_restriction',
@@ -13,15 +17,30 @@ const SPECIFIC_TYPES = new Set([
 const MAX_PER_SOURCE = 4;
 const MAX_TOTAL = 32;
 
-export function selectCandidates(findings) {
-  const active = findings.filter((f) => f.status !== 'expired' && f.status !== 'superseded');
+export function selectCandidates(findings, { discoveryWindowStart } = {}) {
+  const active = findings.filter((f) => {
+    if (f.status === 'expired' || f.status === 'superseded') return false;
+    const text = `${f.title || ''} ${f.summary || ''}`;
+    if (!checkOperationalRelevance(text).ok) return false;
+    return checkLongRoadClosure(f).ok;
+  });
 
-  const scored = active.map((f) => {
+  const critical = active.filter((finding) =>
+    isCriticalWeeklyCandidate(finding, { discoveryWindowStart })
+  );
+  const criticalUrls = new Set(critical.map((finding) => finding.sourceUrl).filter(Boolean));
+  const ordinary = active.filter((finding) => !criticalUrls.has(finding.sourceUrl));
+
+  const scored = ordinary.map((f) => {
     let score = 0;
     if (f.status === 'new') score += 3;
     else if (f.status === 'updated') score += 2;
     else score += 1;
     if (SPECIFIC_TYPES.has(f.type)) score += 3;
+    const text = `${f.title || ''} ${f.summary || ''}`;
+    if (/exceptional transport|oversize|abnormal load|ausnahmetransport|schwertransport|convoi exceptionnel|izvanredni prijevoz/i.test(text)) score += 6;
+    if (/escort|begleitung|pilot vehicle|doprovod|accompagnement/i.test(text)) score += 5;
+    if (/toll|vignette|road user charge|via toll/i.test(text)) score += 3;
     if (f.summary && f.summary.length > 40) score += 1;
     return { finding: f, score };
   });
@@ -29,14 +48,14 @@ export function selectCandidates(findings) {
   scored.sort((a, b) => b.score - a.score);
 
   const perSourceCount = new Map();
-  const selected = [];
+  const selected = [...critical];
   for (const { finding } of scored) {
     const sourceKey = finding.sourceName;
     const count = perSourceCount.get(sourceKey) || 0;
     if (count >= MAX_PER_SOURCE) continue;
     perSourceCount.set(sourceKey, count + 1);
     selected.push(finding);
-    if (selected.length >= MAX_TOTAL) break;
+    if (selected.length >= MAX_TOTAL + critical.length) break;
   }
 
   return selected;

@@ -219,6 +219,18 @@ collisions, theft reports, procurement/tender notices, and unconfirmed
 planned/future works (see `NON_RESTRICTION_PATTERNS` in
 `relevance-filter.mjs` for the exact patterns and reasons).
 
+## Editorial policy from 1 September 2026
+
+The following rules are hard publication requirements, not prompt-only guidance:
+
+- **Rest of Europe must contain at least 10 concise verified reports from at least 6 distinct countries.**
+- The roundup is deliberately short-form: each item states the country, the operational change, where/when it matters, the practical operator action, and the official source.
+- Ordinary year-round Sunday/weekend driving-ban baselines are not repeated after 1 September 2026. Seasonal, holiday-specific, exceptional-transport and genuinely changed restrictions remain eligible.
+- A road/motorway closure is publishable only when the official evidence proves a **planned duration longer than 30 days**. A 30-day closure, a shorter closure, or an undated/"until further notice" closure with no provable duration is excluded.
+- RSS/Atom is never treated as complete coverage. Every configured authority is scanned through the feed **and** its official web/HTML news/traffic pages; results are merged and deduplicated.
+- Fresh verified high-signal changes directly affecting exceptional/oversized transport (permits, escort/private-escort rules, police escort, border restrictions, weight/width/height/axle limits, relevant regulatory procedures) are **required coverage**. A quality gate blocks publication if any such critical verified source is omitted from both lead reports and Rest of Europe.
+- `config/oversize-jurisdictions/index.mjs` is the mandatory geographic coverage universe. It includes every country and territory approved for DAJC coverage, including alternative MPZ aliases and dependent/overseas territories. CI fails if any registry item loses its configured source mapping.
+
 ## Source configuration
 
 `config/oversize-sources/index.mjs` exports `oversizeSources`, an array of:
@@ -237,16 +249,7 @@ planned/future works (see `NON_RESTRICTION_PATTERNS` in
 }
 ```
 
-This is a **curated pan-European discovery set** (currently 43 configured
-official sources). RSS/Atom remains preferred when a verified `feedUrl`
-exists, but RSS is no longer required. If a feed yields nothing useful or
-is unavailable, `scripts/lib/fetch-source.mjs` fetches the authority's
-official HTML page, extracts operationally relevant same-domain links, and
-continues through the same relevance/classification pipeline. Optional
-`htmlUrls` can point at a better official traffic/news listing than the
-homepage (for example Autobahn GmbH's `Verkehrsmeldungen`). External-domain
-links are rejected by the HTML adapter, so this fallback does not silently
-turn into an unofficial aggregation layer.
+This is the official-source discovery layer for the mandatory DAJC geographic coverage registry. RSS/Atom is optional and is never considered complete on its own. For every configured authority, `fetch-source.mjs` checks both the feed (when available) and the authority's official HTML/news/traffic pages, enriches candidate links from their detail pages, merges the channels and deduplicates by source URL. External-domain links are rejected by the HTML adapter, so web discovery does not silently turn into an unofficial aggregation layer.
 
 ### How to add a new source
 
@@ -259,11 +262,7 @@ turn into an unofficial aggregation layer.
    rules. Do not solve coverage gaps by adding unofficial aggregators when an
    official source exists.
 
-**No Slovak (SK) source is configured yet.** A related prior audit found
-the obvious candidate (NDS / `ndsas.sk`) unreliable - its feed's `pubDate`
-tracks the CMS's `dateModified`, not the true publish date, so years-old
-press releases can appear "fresh". Don't add it back without
-independently re-checking that specific problem first.
+Slovakia is covered through Slovenská správa ciest' official press-release page. The previously rejected NDS RSS feed remains intentionally unused because its CMS date handling was not trusted.
 
 ## Official driving-ban calendar layer
 

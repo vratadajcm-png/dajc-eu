@@ -29,8 +29,34 @@ export async function generateArticleMock({ candidates, weekRangeLabel }) {
     sourceUrl: c.sourceUrl,
     sourceName: c.sourceName,
   });
-  const developments = candidates.slice(0, MAX_MOCK_DEVELOPMENTS).map(mapCandidate);
-  const europeRoundup = candidates.slice(MAX_MOCK_DEVELOPMENTS).map(mapCandidate);
+  // Mirror the live editorial contract: reserve at least ten Rest-of-Europe
+  // items across at least six countries when the fixture provides enough data.
+  const reservedRoundup = [];
+  const reservedUrls = new Set();
+  const reservedCountries = new Set();
+
+  for (let i = candidates.length - 1; i >= 0 && reservedCountries.size < 6; i -= 1) {
+    const candidate = candidates[i];
+    const country = String(candidate.country || '').trim();
+    if (!country || reservedCountries.has(country)) continue;
+    reservedCountries.add(country);
+    reservedUrls.add(candidate.sourceUrl);
+    reservedRoundup.unshift(candidate);
+  }
+
+  for (let i = candidates.length - 1; i >= 0 && reservedRoundup.length < 10; i -= 1) {
+    const candidate = candidates[i];
+    if (!candidate?.sourceUrl || reservedUrls.has(candidate.sourceUrl)) continue;
+    reservedUrls.add(candidate.sourceUrl);
+    reservedRoundup.unshift(candidate);
+  }
+
+  const leadPool = candidates.filter((candidate) => !reservedUrls.has(candidate.sourceUrl));
+  const developments = leadPool.slice(0, MAX_MOCK_DEVELOPMENTS).map(mapCandidate);
+  const usedLeadUrls = new Set(developments.map((d) => d.sourceUrl));
+  const europeRoundup = reservedRoundup
+    .filter((candidate) => !usedLeadUrls.has(candidate.sourceUrl))
+    .map(mapCandidate);
 
   return {
     seoTitle: `EU Oversize Weekly: Key Transport Restrictions and Permit Changes for ${weekRangeLabel} (MOCK)`,

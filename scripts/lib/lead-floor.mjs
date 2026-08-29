@@ -66,20 +66,10 @@ export function ensureOfficialCalendarLeadFloor(
     (item) => item.recommendedAction && item.recommendedAction.trim().length >= 10
   );
 
-  // If that leaves no roundup, use one remaining verified official-calendar
-  // restriction that is not already a lead. This preserves the editorial
-  // requirement for a real Rest-of-Europe item without inventing filler.
-  if (europeRoundup.length === 0) {
-    const remainingOfficial = verifiedCandidates.find(
-      (candidate) =>
-        candidate.isOfficialCalendar &&
-        candidate.sourceUrl &&
-        !usedLeadUrls.has(candidate.sourceUrl)
-    );
-    if (remainingOfficial) {
-      europeRoundup.push(developmentFromOfficialCandidate(remainingOfficial));
-    }
-  }
+  // Do not synthesize a one-country "Rest of Europe" fallback. Breadth is a
+  // hard quality requirement now; if the model cannot supply at least three
+  // useful countries, quality-gate.mjs must block publication rather than
+  // disguising one spare item as a European roundup.
 
   return {
     article: { ...article, developments, europeRoundup },
