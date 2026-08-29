@@ -7,6 +7,7 @@
 import { checkOperationalRelevance } from './relevance-filter.mjs';
 import { checkLongRoadClosure } from './closure-duration.mjs';
 import { isCriticalWeeklyCandidate } from './critical-floor.mjs';
+import { checkTransportDomainRelevance } from './transport-domain.mjs';
 
 const SPECIFIC_TYPES = new Set([
   'permit_change', 'permit_system', 'driving_ban', 'escort_requirement',
@@ -22,6 +23,7 @@ export function selectCandidates(findings, { discoveryWindowStart } = {}) {
     if (f.status === 'expired' || f.status === 'superseded') return false;
     const text = `${f.title || ''} ${f.summary || ''}`;
     if (!checkOperationalRelevance(text).ok) return false;
+    if (!checkTransportDomainRelevance(f).ok) return false;
     return checkLongRoadClosure(f).ok;
   });
 
