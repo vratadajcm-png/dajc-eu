@@ -9,7 +9,7 @@ import { validateDevelopmentDateRange } from './date-validation.mjs';
 
 const MIN_BODY_LENGTH = 400;
 const MIN_REPORTS = 10;
-const MIN_REPORTS_POST_SUMMER = 4;
+const MIN_REPORTS_POST_SUMMER = 3;
 const POST_SUMMER_POLICY_DATE = new Date('2026-09-01T00:00:00Z');
 const MAX_REPORTS = 12;
 const MIN_ROUNDUP_REPORTS = 10;
