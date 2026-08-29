@@ -51,6 +51,31 @@ describe('checkOperationalRelevance', () => {
     expect(result.reason).toMatch(/international-driving-permit/);
   });
 
+  it('rejects generic driver-licence accessibility guidance', () => {
+    const result = checkOperationalRelevance('Accesibilidad en el permiso conducir. Medidas para facilitar la obtención del permiso de conducir.');
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/driver-licensing/);
+  });
+
+  it('rejects a generic laws/rules/permits landing page', () => {
+    const result = checkOperationalRelevance('Wetten, regels en vergunningen Rijkswaterstaat');
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/generic authority/);
+  });
+
+  it('rejects a stale archived restriction that only references 2024', () => {
+    const result = checkOperationalRelevance('7.5t weight restriction introduced on 2 April 2024 on route 801.');
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/historical archive/);
+  });
+
+  it('accepts a current exceptional-transport escort policy change', () => {
+    const result = checkOperationalRelevance(
+      '19 August 2026: Switzerland proposes nationwide rules for private exceptional-transport escorts.'
+    );
+    expect(result.ok).toBe(true);
+  });
+
   it('accepts a genuine, currently-applicable driving ban', () => {
     const result = checkOperationalRelevance(
       'Nationwide weekend driving ban for goods vehicles above 7.5 tonnes applies this Saturday and Sunday.'
