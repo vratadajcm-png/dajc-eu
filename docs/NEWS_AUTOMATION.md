@@ -370,20 +370,18 @@ Vercel's standard Astro defaults.
 
 ## Weekly synthesis (Friday pipeline)
 
-Publishes automatically **every Friday at 12:00 Europe/Prague**, straight
+Publishes automatically **every Friday between 08:00 and 13:59 Europe/Prague**, straight
 to `src/content/news/eu-oversize/` on `main` - no manual Actions run
-required. Because GitHub Actions cron is UTC-only and can't express a
-single "12:00 in a DST-observing timezone" expression, the workflow's
-`schedule` trigger fires at **both** UTC times noon-Prague can fall on
-(`10:00 UTC` for CEST, `11:00 UTC` for CET); a `Check Europe/Prague local
-time` step gates the rest of the job on the actual wall-clock hour being
-12, so only the correct one of the two runs does anything - the other
-exits as a harmless no-op. `workflow_dispatch` (with an optional `dry_run`
-checkbox) is always available for a manual dry-run or emergency
-publication, and always skips the time gate. See
+required. The workflow's two existing near-noon UTC triggers cover CET and
+CEST, while a `Check Europe/Prague local time` step accepts a scheduled run
+whenever it actually starts from 08:00 through 13:59 local time. This wider
+window tolerates moderate GitHub Actions scheduling delays. Both triggers
+may be accepted, but the week-specific article path and no-overwrite guard
+make the second run an idempotent no-op. `workflow_dispatch` (with an
+optional `dry_run` checkbox) is always available for a manual dry-run or
+emergency publication, and always skips the time gate. See
 `.github/workflows/publish-weekly-oversize.yml` for the exact cron
-expressions and gating logic - this design was already in place and is
-unchanged by this pass.
+expressions and gating logic.
 
 A successful scheduled run pushes the new article commit straight to
 `main`, which the existing Vercel Git integration deploys automatically -
