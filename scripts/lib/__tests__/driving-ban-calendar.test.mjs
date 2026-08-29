@@ -95,10 +95,10 @@ describe('resolveDrivingBanFindings - W36 2026', () => {
     expect(countries).not.toContain('Switzerland');
   });
 
-  it('keeps seasonal, exceptional-transport and annual-calendar restrictions', () => {
+  it('keeps seasonal and exceptional-transport restrictions but drops routine Sunday-only calendar entries', () => {
     expect(findings.some((f) => f.country === 'Czechia' && /special vehicles/i.test(f.title))).toBe(true);
     expect(findings.some((f) => f.country === 'France' && /exceptional-transport/i.test(f.title))).toBe(true);
-    expect(findings.some((f) => f.country === 'Italy' && f.validFrom === '2026-09-06')).toBe(true);
+    expect(findings.some((f) => f.country === 'Italy')).toBe(false);
     expect(findings.some((f) => f.country === 'Slovenia' && f.timeWindow.includes('06:00-16:00'))).toBe(true);
   });
 
