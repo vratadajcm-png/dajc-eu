@@ -375,6 +375,46 @@ export const oversizeSources = [
     type: 'national-road-authority',
     priority: 3,
   },
+  // Direct web coverage for approved territories/dependencies. These are
+  // deliberately HTML-first official government/road pages; where no useful
+  // local road authority exists, the jurisdiction registry still retains the
+  // administering-country fallback as a second line of coverage.
+  { id: 'gi-gov-traffic', country: 'UK', jurisdictionId: 'GI', jurisdictionName: 'Gibraltar', authority: 'HM Government of Gibraltar', name: 'Gibraltar Government - Transport and Traffic', url: 'https://www.gibraltar.gov.gi/', type: 'ministry', priority: 3 },
+  { id: 'gg-roadworks', country: 'UK', jurisdictionId: 'GG', jurisdictionName: 'Guernsey', authority: 'States of Guernsey Traffic and Highway Services', name: 'Guernsey road closures and delays', url: 'https://roadworks.gov.gg/trafficreport/', htmlUrls: ['https://roadworks.gov.gg/trafficreport/'], type: 'traffic-portal', priority: 2 },
+  { id: 'je-roadclosures', country: 'UK', jurisdictionId: 'JE', jurisdictionName: 'Jersey', authority: 'Government of Jersey', name: 'Jersey road closures and delays', url: 'https://www.gov.je/travel/roads/roadclosures/pages/index.aspx', htmlUrls: ['https://www.gov.je/travel/roads/roadclosures/pages/index.aspx'], type: 'traffic-portal', priority: 2 },
+  { id: 'im-highways', country: 'UK', jurisdictionId: 'IM', jurisdictionName: 'Isle of Man', authority: 'Isle of Man Department of Infrastructure', name: 'Isle of Man Highway Services', url: 'https://www.gov.im/about-the-government/departments/infrastructure/highway-services/', type: 'national-road-authority', priority: 2 },
+  { id: 'alderney-gov', country: 'UK', jurisdictionId: 'ALDERNEY', jurisdictionName: 'Alderney', authority: 'States of Alderney', name: 'States of Alderney', url: 'https://alderney.gov.gg/', type: 'ministry', priority: 3 },
+  { id: 'sba-admin', country: 'CY', jurisdictionId: 'AKROTIRI-DHEKELIA', jurisdictionName: 'Akrotiri and Dhekelia', authority: 'Sovereign Base Areas Administration', name: 'Sovereign Base Areas Administration', url: 'https://www.sbaadministration.org/', type: 'ministry', priority: 3 },
+  { id: 'ax-gov', country: 'FI', jurisdictionId: 'AX', jurisdictionName: 'Åland', authority: 'Ålands landskapsregering', name: 'Åland Government', url: 'https://www.regeringen.ax/', type: 'ministry', priority: 3 },
+  { id: 'gl-gov', country: 'DK', jurisdictionId: 'GL', jurisdictionName: 'Greenland', authority: 'Naalakkersuisut', name: 'Government of Greenland', url: 'https://naalakkersuisut.gl/', type: 'ministry', priority: 3 },
+  { id: 'va-state', country: 'IT', jurisdictionId: 'VA', jurisdictionName: 'Vatican City', authority: 'Governatorato dello Stato della Citta del Vaticano', name: 'Vatican City State', url: 'https://www.vaticanstate.va/', type: 'ministry', priority: 3 },
+
+  { id: 'azores-gov', country: 'PT', jurisdictionId: 'PT-AZORES', jurisdictionName: 'Azores', authority: 'Governo dos Acores', name: 'Azores Government', url: 'https://portal.azores.gov.pt/', type: 'ministry', priority: 3 },
+  { id: 'madeira-gov', country: 'PT', jurisdictionId: 'PT-MADEIRA', jurisdictionName: 'Madeira', authority: 'Governo Regional da Madeira', name: 'Madeira Regional Government', url: 'https://www.madeira.gov.pt/', type: 'ministry', priority: 3 },
+  { id: 'canary-gov', country: 'ES', jurisdictionId: 'ES-CANARY', jurisdictionName: 'Canary Islands', authority: 'Gobierno de Canarias', name: 'Canary Islands Government', url: 'https://www.gobiernodecanarias.org/', type: 'ministry', priority: 3 },
+  { id: 'ceuta-gov', country: 'ES', jurisdictionId: 'ES-CEUTA', jurisdictionName: 'Ceuta', authority: 'Ciudad Autonoma de Ceuta', name: 'Ceuta Government', url: 'https://www.ceuta.es/ceuta/', type: 'ministry', priority: 3 },
+  { id: 'melilla-gov', country: 'ES', jurisdictionId: 'ES-MELILLA', jurisdictionName: 'Melilla', authority: 'Ciudad Autonoma de Melilla', name: 'Melilla Government', url: 'https://www.melilla.es/', type: 'ministry', priority: 3 },
+
+  { id: 'gp-prefecture', country: 'FR', jurisdictionId: 'GP', jurisdictionName: 'Guadeloupe', authority: 'Prefecture de Guadeloupe', name: 'Guadeloupe Prefecture', url: 'https://www.guadeloupe.gouv.fr/', type: 'ministry', priority: 3 },
+  { id: 'mq-prefecture', country: 'FR', jurisdictionId: 'MQ', jurisdictionName: 'Martinique', authority: 'Prefecture de la Martinique', name: 'Martinique Prefecture', url: 'https://www.martinique.gouv.fr/', type: 'ministry', priority: 3 },
+  { id: 'gf-prefecture', country: 'FR', jurisdictionId: 'GF', jurisdictionName: 'French Guiana', authority: 'Prefecture de la Guyane', name: 'French Guiana Prefecture', url: 'https://www.guyane.gouv.fr/', type: 'ministry', priority: 3 },
+  { id: 're-prefecture', country: 'FR', jurisdictionId: 'RE', jurisdictionName: 'Reunion', authority: 'Prefecture de La Reunion', name: 'Reunion Prefecture', url: 'https://www.reunion.gouv.fr/', type: 'ministry', priority: 3 },
+  { id: 'yt-prefecture', country: 'FR', jurisdictionId: 'YT', jurisdictionName: 'Mayotte', authority: 'Prefecture de Mayotte', name: 'Mayotte Prefecture', url: 'https://www.mayotte.gouv.fr/', type: 'ministry', priority: 3 },
+  { id: 'mf-bl-prefecture', country: 'FR', jurisdictionId: 'MF', jurisdictionName: 'Saint-Martin', authority: 'Prefecture Saint-Barthelemy et Saint-Martin', name: 'Saint-Martin / Saint-Barthelemy Prefecture', url: 'https://www.saint-barth-saint-martin.gouv.fr/', type: 'ministry', priority: 3 },
+  { id: 'bl-prefecture', country: 'FR', jurisdictionId: 'BL', jurisdictionName: 'Saint-Barthelemy', authority: 'Prefecture Saint-Barthelemy et Saint-Martin', name: 'Saint-Barthelemy / Saint-Martin Prefecture', url: 'https://www.saint-barth-saint-martin.gouv.fr/', type: 'ministry', priority: 3 },
+  { id: 'pm-prefecture', country: 'FR', jurisdictionId: 'PM', jurisdictionName: 'Saint-Pierre-et-Miquelon', authority: 'Prefecture de Saint-Pierre-et-Miquelon', name: 'Saint-Pierre-et-Miquelon Prefecture', url: 'https://www.saint-pierre-et-miquelon.gouv.fr/', type: 'ministry', priority: 3 },
+  { id: 'nc-gov', country: 'FR', jurisdictionId: 'NC', jurisdictionName: 'New Caledonia', authority: 'Gouvernement de la Nouvelle-Caledonie', name: 'New Caledonia Government', url: 'https://gouv.nc/', type: 'ministry', priority: 3 },
+  { id: 'pf-gov', country: 'FR', jurisdictionId: 'PF', jurisdictionName: 'French Polynesia', authority: 'Presidence de la Polynesie francaise', name: 'French Polynesia Government', url: 'https://www.presidence.pf/', type: 'ministry', priority: 3 },
+  { id: 'wf-prefecture', country: 'FR', jurisdictionId: 'WF', jurisdictionName: 'Wallis and Futuna', authority: 'Administration superieure des iles Wallis et Futuna', name: 'Wallis and Futuna Government', url: 'https://www.wallis-et-futuna.gouv.fr/', type: 'ministry', priority: 3 },
+  { id: 'tf-taaf', country: 'FR', jurisdictionId: 'TF', jurisdictionName: 'French Southern and Antarctic Lands', authority: 'TAAF', name: 'French Southern and Antarctic Lands', url: 'https://taaf.fr/', type: 'ministry', priority: 3 },
+
+  { id: 'aw-gov', country: 'NL', jurisdictionId: 'AW', jurisdictionName: 'Aruba', authority: 'Gobierno di Aruba', name: 'Government of Aruba', url: 'https://www.gobierno.aw/', type: 'ministry', priority: 3 },
+  { id: 'cw-gov', country: 'NL', jurisdictionId: 'CW', jurisdictionName: 'Curacao', authority: 'Gobiernu di Korsou', name: 'Government of Curacao', url: 'https://gobiernu.cw/', type: 'ministry', priority: 3 },
+  { id: 'sx-gov', country: 'NL', jurisdictionId: 'SX', jurisdictionName: 'Sint Maarten', authority: 'Government of Sint Maarten', name: 'Government of Sint Maarten', url: 'https://www.sintmaartengov.org/', type: 'ministry', priority: 3 },
+  { id: 'bq-bonaire', country: 'NL', jurisdictionId: 'BQ-BO', jurisdictionName: 'Bonaire', authority: 'Openbaar Lichaam Bonaire', name: 'Bonaire Government', url: 'https://bonairegov.com/', type: 'ministry', priority: 3 },
+  { id: 'bq-saba', country: 'NL', jurisdictionId: 'BQ-SA', jurisdictionName: 'Saba', authority: 'Public Entity Saba', name: 'Saba Government', url: 'https://www.sabagov.com/', type: 'ministry', priority: 3 },
+  { id: 'bq-statia', country: 'NL', jurisdictionId: 'BQ-SE', jurisdictionName: 'Sint Eustatius', authority: 'Public Entity Sint Eustatius', name: 'Sint Eustatius Government', url: 'https://www.statiagovernment.com/', type: 'ministry', priority: 3 },
+
 ];
 
 export function getSourceById(id) {
