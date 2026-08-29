@@ -2,11 +2,11 @@
 //
 // This is a starting/curated set, not exhaustive pan-European coverage - see
 // docs/NEWS_AUTOMATION.md "How to add a new source" for how to extend it.
-// `feedUrl` is set only where a working RSS/Atom feed is already known; other
-// sources are attempted via generic feed-URL guessing at monitor runtime
-// (see scripts/lib/fetch-source.mjs) and simply produce zero findings until
-// a feed is confirmed or a dedicated adapter is added - the monitor never
-// crashes on a source it can't read, it just skips and logs it.
+// `feedUrl` is set only where a working RSS/Atom feed is already known. Every
+// source is also eligible for official-HTML ingestion through its `url`; use
+// optional `htmlUrls` when a dedicated official traffic/news listing is more
+// useful than the homepage. scripts/lib/fetch-source.mjs keeps RSS preferred,
+// then falls back to HTML without using unofficial aggregators.
 //
 // @typedef {'ministry'|'national-road-authority'|'regional-road-authority'|
 //   'police'|'abnormal-load-permit-authority'|'bridge-tunnel-operator'|
@@ -19,6 +19,7 @@
 // @property {string} name
 // @property {string} url - homepage/reference URL
 // @property {string} [feedUrl] - known working RSS/Atom feed URL, if any
+// @property {string[]} [htmlUrls] - preferred official HTML listing pages, if any
 // @property {SourceType} type
 // @property {1|2|3} priority
 
@@ -181,6 +182,7 @@ export const oversizeSources = [
     authority: 'Autobahn GmbH des Bundes',
     name: 'Autobahn GmbH - Aktuelles',
     url: 'https://www.autobahn.de/aktuelles/aktuell',
+    htmlUrls: ['https://www.autobahn.de/betrieb-verkehr/verkehrsmeldungen'],
     type: 'national-road-authority',
     priority: 1,
   },
@@ -249,8 +251,8 @@ export const oversizeSources = [
   },
   // Additional national authorities completing the pan-European discovery
   // surface. Entries without a confirmed feedUrl are intentionally retained:
-  // fetch-source.mjs may discover a standard feed, otherwise it logs the gap
-  // instead of pretending the country was checked successfully.
+  // fetch-source.mjs reads their official HTML and records a visible
+  // UNAVAILABLE state only when no official endpoint can be reached.
   { id: 'ro-cnair', country: 'RO', authority: 'CNAIR', name: 'Romanian National Road Infrastructure Administration', url: 'https://www.cnadnr.ro', type: 'national-road-authority', priority: 1 },
   { id: 'dk-vejdirektoratet', country: 'DK', authority: 'Vejdirektoratet', name: 'Danish Road Directorate', url: 'https://www.vejdirektoratet.dk', type: 'national-road-authority', priority: 1 },
   { id: 'tr-kgm', country: 'TR', authority: 'Karayollari Genel Mudurlugu', name: 'Turkish General Directorate of Highways', url: 'https://www.kgm.gov.tr', type: 'national-road-authority', priority: 1 },
