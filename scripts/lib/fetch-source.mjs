@@ -186,7 +186,7 @@ function toFinding({ source, title, summary, sourceUrl }) {
   const text = `${title} ${summary || ''}`;
   const type = classify(text) || 'infrastructure';
   return {
-    country: COUNTRY_NAMES[source.country] || source.country,
+    country: source.jurisdictionName || COUNTRY_NAMES[source.country] || source.country,
     region: null,
     location: guessLocation(text, source.authority),
     type,
