@@ -1,5 +1,5 @@
-export const MIN_ROUNDUP_REPORTS = 3;
-export const MIN_ROUNDUP_COUNTRIES = 3;
+export const MIN_ROUNDUP_REPORTS = 10;
+export const MIN_ROUNDUP_COUNTRIES = 6;
 
 export function roundupCountrySet(items = []) {
   return new Set(items.map((item) => String(item.country || '').trim()).filter(Boolean));
@@ -12,6 +12,7 @@ export function roundupNeedsSupplement(items = []) {
     reportCount: items.length,
     countryCount: countries.size,
     neededCountries: Math.max(0, MIN_ROUNDUP_COUNTRIES - countries.size),
+    neededReports: Math.max(0, MIN_ROUNDUP_REPORTS - items.length),
     countries,
   };
 }
@@ -24,9 +25,7 @@ export function mergeRoundupSupplement(existing = [], supplement = [], usedSourc
   ]);
   const countries = roundupCountrySet(existing);
 
-  // First use candidates that add a new country. This is what makes the
-  // supplement a breadth repair rather than a way to add more reports from
-  // the same already-covered market.
+  // Pass 1: maximise geographic breadth until six distinct countries exist.
   for (const item of supplement) {
     if (!item?.sourceUrl || seenUrls.has(item.sourceUrl)) continue;
     const country = String(item.country || '').trim();
@@ -34,7 +33,18 @@ export function mergeRoundupSupplement(existing = [], supplement = [], usedSourc
     merged.push(item);
     seenUrls.add(item.sourceUrl);
     countries.add(country);
-    if (merged.length >= MIN_ROUNDUP_REPORTS && countries.size >= MIN_ROUNDUP_COUNTRIES) break;
+    if (countries.size >= MIN_ROUNDUP_COUNTRIES) break;
+  }
+
+  // Pass 2: once breadth exists, fill the roundup to ten concise reports.
+  for (const item of supplement) {
+    if (merged.length >= MIN_ROUNDUP_REPORTS) break;
+    if (!item?.sourceUrl || seenUrls.has(item.sourceUrl)) continue;
+    const country = String(item.country || '').trim();
+    if (!country) continue;
+    merged.push(item);
+    seenUrls.add(item.sourceUrl);
+    countries.add(country);
   }
 
   return merged;
