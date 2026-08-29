@@ -9,7 +9,7 @@ top of it.
 ## Architecture overview
 
 ```
-config/oversize-sources/index.mjs   registry of European sources to monitor (RSS)
+config/oversize-sources/index.mjs   registry of European official sources (RSS/HTML)
 config/driving-ban-calendars/       maintained official driving-ban/exceptional-
   index.mjs                        transport calendar layer (not RSS-dependent)
 data/oversize/<ISO week>/           raw findings gathered during that week
@@ -20,7 +20,7 @@ scripts/
   publish-gate-commit.mjs           friday: explicit "did we publish?" commit gate
   lib/
     findings.mjs                    finding shape, dedup key, status transitions
-    fetch-source.mjs                per-source fetch + relevance + classification
+    fetch-source.mjs                RSS + official-HTML fetch, relevance + classification
     relevance-filter.mjs            shared "is this an operational restriction" gate
     select-candidates.mjs           pre-selection before verification/AI (cost control)
     driving-ban-calendar.mjs        resolves config/driving-ban-calendars for a target week
@@ -39,7 +39,7 @@ src/content/news/platform/          published (and draft template) articles
 src/content.config.ts               Astro content collection schema
 .github/workflows/
   daily-oversize-monitor.yml
-  publish-weekly-oversize.yml
+  publish-weekly-oversize.yml       Friday noon + Saturday catch-up, idempotent
 ```
 
 The homepage renders `News` before `Integration ecosystem`, so current
@@ -231,32 +231,33 @@ planned/future works (see `NON_RESTRICTION_PATTERNS` in
   name: 'Statens vegvesen - Nyheter',
   url: 'https://www.vegvesen.no',
   feedUrl: 'https://www.vegvesen.no/rss',  // optional, set only when confirmed working
+  htmlUrls: ['https://.../traffic'],        // optional preferred official HTML listings
   type: 'national-road-authority',   // see SourceType in the file for the full list
   priority: 1,                        // 1 = high, 3 = supplementary
 }
 ```
 
-This is a **curated starting set** (~23 sources), not exhaustive
-pan-European coverage - the brief's full country list is a much larger
-undertaking. Sources with a confirmed `feedUrl` produce real findings
-today; sources without one are attempted via generic guesses
-(`<url>/feed`, `<url>/rss`) at runtime and simply produce zero findings
-until a working feed is found or a dedicated HTML-scraping adapter is
-built for them (out of scope for this pass - `scripts/lib/fetch-source.mjs`
-only knows how to read RSS/Atom).
+This is a **curated pan-European discovery set** (currently 43 configured
+official sources). RSS/Atom remains preferred when a verified `feedUrl`
+exists, but RSS is no longer required. If a feed yields nothing useful or
+is unavailable, `scripts/lib/fetch-source.mjs` fetches the authority's
+official HTML page, extracts operationally relevant same-domain links, and
+continues through the same relevance/classification pipeline. Optional
+`htmlUrls` can point at a better official traffic/news listing than the
+homepage (for example Autobahn GmbH's `Verkehrsmeldungen`). External-domain
+links are rejected by the HTML adapter, so this fallback does not silently
+turn into an unofficial aggregation layer.
 
 ### How to add a new source
 
-1. Confirm a real RSS/Atom feed exists (`curl -I <candidate-url>`,
-   check for `application/rss+xml` or `application/atom+xml`, or look for
-   a `<link rel="alternate">` tag on the homepage).
-2. Add an entry to `config/oversize-sources/index.mjs` with the verified
-   `feedUrl`.
-3. Run `npm run oversize:monitor` locally and confirm the new source
-   shows up as `OK` with a sensible item count.
-4. If the source is noisy (like the police aggregators above), consider
-   whether `GENERAL_TRANSPORT_CONTEXT` / `EXCLUSION_PATTERNS` in
-   `scripts/lib/fetch-source.mjs` need adjusting.
+1. Add the authority's official `url` to `config/oversize-sources/index.mjs`.
+2. If a verified RSS/Atom feed exists, add `feedUrl`; if a dedicated official
+   traffic/news listing is better than the homepage, add it to `htmlUrls`.
+3. Run `npm run oversize:monitor` and confirm the source reports `via feed`
+   or `via html` rather than `UNAVAILABLE`, with a sensible item count.
+4. If the source is noisy, tighten the source URL and/or the shared relevance
+   rules. Do not solve coverage gaps by adding unofficial aggregators when an
+   official source exists.
 
 **No Slovak (SK) source is configured yet.** A related prior audit found
 the obvious candidate (NDS / `ndsas.sk`) unreliable - its feed's `pubDate`
@@ -370,18 +371,20 @@ Vercel's standard Astro defaults.
 
 ## Weekly synthesis (Friday pipeline)
 
-Publishes automatically **every Friday between 08:00 and 13:59 Europe/Prague**, straight
-to `src/content/news/eu-oversize/` on `main` - no manual Actions run
-required. The workflow's two existing near-noon UTC triggers cover CET and
-CEST, while a `Check Europe/Prague local time` step accepts a scheduled run
-whenever it actually starts from 08:00 through 13:59 local time. This wider
-window tolerates moderate GitHub Actions scheduling delays. Both triggers
-may be accepted, but the week-specific article path and no-overwrite guard
-make the second run an idempotent no-op. `workflow_dispatch` (with an
-optional `dry_run` checkbox) is always available for a manual dry-run or
-emergency publication, and always skips the time gate. See
-`.github/workflows/publish-weekly-oversize.yml` for the exact cron
-expressions and gating logic.
+The primary publication target is **Friday at 12:00 Europe/Prague**. GitHub
+Actions still needs two UTC cron expressions for CET/CEST, but the workflow
+no longer checks the runner's current hour. Instead it selects the correct
+Friday cron from the **Prague UTC offset and the cron identity**. Therefore
+a GitHub delay that starts the runner at 23:00 still executes the intended
+Friday publication instead of silently becoming a green no-op.
+
+A separate **Saturday 06:00 UTC catch-up** trigger runs the same pipeline.
+Before dependency installation or any OpenAI work,
+`scripts/check-weekly-publication.mjs` checks the week-specific target
+article. If Friday already published it, the catch-up/duplicate run exits as
+an explicitly reported idempotent no-op; if the article is missing, it
+retries the real publication flow. `workflow_dispatch` remains available
+for manual dry-runs or emergency publication.
 
 A successful scheduled run pushes the new article commit straight to
 `main`, which the existing Vercel Git integration deploys automatically -
@@ -392,8 +395,8 @@ commit always proceeds to a normal build+deploy).
 
 `scripts/generate-weekly-article.mjs` (`npm run oversize:publish`):
 
-1. Reads the **current** ISO week's RSS-derived findings (gathered all
-   week), and resolves the **official driving-ban calendar layer** for the
+1. Reads the **current** ISO week's monitor-derived findings (RSS and
+   official HTML, gathered all week), and resolves the **official driving-ban calendar layer** for the
    **upcoming** week (`resolveDrivingBanFindings()` - see above). A missing
    annual calendar for the required year is a hard failure here, before any
    OpenAI cost is spent.
