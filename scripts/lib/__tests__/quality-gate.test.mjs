@@ -86,7 +86,26 @@ describe('runQualityGate - report count', () => {
     const developments = Array.from({ length: 9 }, (_, i) => makeDevelopment(i));
     const result = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
     expect(result.ok).toBe(false);
-    expect(result.errors.some((e) => /only 9 report/.test(e))).toBe(true);
+    expect(result.errors.some((e) => /only 9 lead report/.test(e))).toBe(true);
+  });
+
+  it('allows four strong leads once the target week reaches the post-summer policy date', () => {
+    const developments = Array.from({ length: 4 }, (_, i) => makeDevelopment(i));
+    const europeRoundup = [
+      makeDevelopment(40, { country: 'Spain' }),
+      makeDevelopment(41, { country: 'Romania' }),
+      makeDevelopment(42, { country: 'Denmark' }),
+    ];
+    const all = [...developments, ...europeRoundup];
+    const gate = runQualityGate({
+      frontmatter: makeFrontmatter(all),
+      body: LONG_BODY,
+      developments,
+      europeRoundup,
+      weekStart: new Date('2026-08-31T00:00:00Z'),
+      weekEnd: new Date('2026-09-06T00:00:00Z'),
+    });
+    expect(gate.ok).toBe(true);
   });
 
   it('blocks publication with more than 12 reports', () => {
