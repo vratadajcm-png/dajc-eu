@@ -5,6 +5,7 @@
 // requirement; it never decides what's TRUE, only what's worth checking.
 
 import { checkOperationalRelevance } from './relevance-filter.mjs';
+import { checkLongRoadClosure } from './closure-duration.mjs';
 
 const SPECIFIC_TYPES = new Set([
   'permit_change', 'permit_system', 'driving_ban', 'escort_requirement',
@@ -19,7 +20,8 @@ export function selectCandidates(findings) {
   const active = findings.filter((f) => {
     if (f.status === 'expired' || f.status === 'superseded') return false;
     const text = `${f.title || ''} ${f.summary || ''}`;
-    return checkOperationalRelevance(text).ok;
+    if (!checkOperationalRelevance(text).ok) return false;
+    return checkLongRoadClosure(f).ok;
   });
 
   const scored = active.map((f) => {
