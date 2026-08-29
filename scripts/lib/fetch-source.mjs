@@ -39,7 +39,7 @@ const COUNTRY_NAMES = {
 const CLASSIFICATION_RULES = [
   { type: 'driving_ban', pattern: /driving ban|weekend ban|holiday ban|seasonal ban|fahrverbot|lkw-fahrverbot|interdiction de circuler|restriction de circulation|zakaz jazd|zákaz jízd|restricții de circulație|restricciones de circulación/i },
   { type: 'police_escort', pattern: /police escort|polizeieskorte|doprovod policie/i },
-  { type: 'escort_requirement', pattern: /escort vehicle|pilot vehicle|begleitfahrzeug|BF[- ]?escort|véhicule pilote|vehículo piloto/i },
+  { type: 'escort_requirement', pattern: /escort vehicle|pilot vehicle|begleitfahrzeug|ausnahmetransportbegleit|transportbegleit|BF[- ]?escort|véhicule pilote|accompagnement.{0,40}convoi exceptionnel|accompagnateur.{0,40}convoi exceptionnel|vehículo piloto|acompañamiento.{0,40}transporte especial/i },
   { type: 'border_restriction', pattern: /border crossing|border restriction|grenzübergang|hraniční přechod|frontier crossing|poste frontière/i },
   { type: 'bridge_restriction', pattern: /\bbridge\b|brücke|brucke|\bviaduct\b|\bmost\b|pont|ponte/i },
   { type: 'tunnel_restriction', pattern: /\btunnel\b|\btunel\b|galleria/i },
@@ -61,7 +61,7 @@ function classify(text) {
 }
 
 const GENERAL_TRANSPORT_CONTEXT =
-  /oversize|abnormal load|heavy transport|wide load|special transport|convoi exceptionnel|großraum|schwertransport|trasporto eccezionale|transporte especial|agabaritic|\bHGV\b|\blorry\b|\btruck\b|\bfreight\b|\bcargo\b|heavy vehicle|weight limit|height limit|axle load|\btoll\b|motorway|highway|autobahn|autoroute|autostrada|autopista|reconstruction|construction works/i;
+  /oversize|abnormal load|heavy transport|wide load|special transport|convoi exceptionnel|ausnahmetransport|ausnahmefahr|großraum|schwertransport|trasporto eccezionale|transporte especial|agabaritic|\bHGV\b|\blorry\b|\btruck\b|\bfreight\b|\bcargo\b|heavy vehicle|weight limit|height limit|axle load|\btoll\b|motorway|highway|autobahn|autoroute|autostrada|autopista|reconstruction|construction works/i;
 
 function isRelevant(text, matchedType, source) {
   if (!checkOperationalRelevance(text).ok) return false;
