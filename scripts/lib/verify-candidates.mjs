@@ -23,6 +23,7 @@
 
 import { checkOperationalRelevance } from './relevance-filter.mjs';
 import { validateDevelopmentDateRange } from './date-validation.mjs';
+import { checkLongRoadClosure } from './closure-duration.mjs';
 
 const VERIFY_TIMEOUT_MS = 8_000;
 const CONCURRENCY = 6;
@@ -65,6 +66,9 @@ async function verifyOne(candidate, { weekStart, weekEnd } = {}) {
   const text = `${candidate.title || ''} ${candidate.summary || ''}`;
   const relevance = checkOperationalRelevance(text);
   if (!relevance.ok) return { ok: false, reason: relevance.reason };
+
+  const closureCheck = checkLongRoadClosure(candidate);
+  if (!closureCheck.ok) return { ok: false, reason: closureCheck.reason };
 
   if (weekStart && weekEnd) {
     const dateCheck = validateDevelopmentDateRange(
