@@ -9,6 +9,8 @@ import { validateDevelopmentDateRange } from './date-validation.mjs';
 
 const MIN_BODY_LENGTH = 400;
 const MIN_REPORTS = 10;
+const MIN_REPORTS_POST_SUMMER = 4;
+const POST_SUMMER_POLICY_DATE = new Date('2026-09-01T00:00:00Z');
 const MAX_REPORTS = 12;
 const MIN_ROUNDUP_REPORTS = 3;
 const MIN_ROUNDUP_COUNTRIES = 3;
@@ -54,6 +56,9 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
   }
 
   const items = developments || [];
+  const minReports =
+    weekEnd && weekEnd >= POST_SUMMER_POLICY_DATE ? MIN_REPORTS_POST_SUMMER : MIN_REPORTS;
+
   if (europeRoundup !== undefined && roundupItems.length < MIN_ROUNDUP_REPORTS) {
     errors.push(
       `Rest-of-Europe roundup has only ${roundupItems.length} report(s) - at least ${MIN_ROUNDUP_REPORTS} verified additional developments are required`
@@ -73,9 +78,9 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
   if (items.length === 0) {
     errors.push('article has zero developments - nothing significant to report');
   } else {
-    if (items.length < MIN_REPORTS) {
+    if (items.length < minReports) {
       errors.push(
-        `article has only ${items.length} report(s) - a live weekly publication requires at least ${MIN_REPORTS} distinct, verified, genuinely useful reports. If fewer than ${MIN_REPORTS} are available, this is expected: do not publish, this is not an error.`
+        `article has only ${items.length} lead report(s) - this edition requires at least ${minReports} distinct, verified, genuinely useful lead reports. Never pad with evergreen Sunday bans or filler.`
       );
     }
     if (items.length > MAX_REPORTS) {
