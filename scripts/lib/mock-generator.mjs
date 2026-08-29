@@ -29,8 +29,31 @@ export async function generateArticleMock({ candidates, weekRangeLabel }) {
     sourceUrl: c.sourceUrl,
     sourceName: c.sourceName,
   });
-  const developments = candidates.slice(0, MAX_MOCK_DEVELOPMENTS).map(mapCandidate);
-  const europeRoundup = candidates.slice(MAX_MOCK_DEVELOPMENTS).map(mapCandidate);
+  // Reserve up to three distinct countries for the Rest-of-Europe section
+  // before filling the lead list. This mirrors the live editorial contract
+  // that a "Rest of Europe" section must actually be geographically broad.
+  const reservedRoundup = [];
+  const reservedUrls = new Set();
+  const reservedCountries = new Set();
+
+  for (let i = candidates.length - 1; i >= 0 && reservedCountries.size < 3; i -= 1) {
+    const candidate = candidates[i];
+    const country = String(candidate.country || '').trim();
+    if (!country || reservedCountries.has(country)) continue;
+    reservedCountries.add(country);
+    reservedUrls.add(candidate.sourceUrl);
+    reservedRoundup.unshift(candidate);
+  }
+
+  const leadPool = candidates.filter((c) => !reservedUrls.has(c.sourceUrl));
+  const developments = leadPool.slice(0, MAX_MOCK_DEVELOPMENTS).map(mapCandidate);
+  const usedLeadUrls = new Set(developments.map((d) => d.sourceUrl));
+  const europeRoundup = [
+    ...reservedRoundup,
+    ...leadPool.slice(MAX_MOCK_DEVELOPMENTS),
+  ]
+    .filter((c) => !usedLeadUrls.has(c.sourceUrl))
+    .map(mapCandidate);
 
   return {
     seoTitle: `EU Oversize Weekly: Key Transport Restrictions and Permit Changes for ${weekRangeLabel} (MOCK)`,
