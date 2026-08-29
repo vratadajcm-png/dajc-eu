@@ -29,6 +29,15 @@ import { checkTransportDomainRelevance } from './transport-domain.mjs';
 const VERIFY_TIMEOUT_MS = 8_000;
 const CONCURRENCY = 6;
 
+function isDocumentLikeSourceUrl(url) {
+  try {
+    const pathname = new URL(url).pathname.toLowerCase();
+    return !/\.(?:jpe?g|png|gif|webp|svg|avif|bmp|ico)(?:$|\/)/i.test(pathname);
+  } catch {
+    return false;
+  }
+}
+
 async function checkReachable(url) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), VERIFY_TIMEOUT_MS);
@@ -80,6 +89,10 @@ async function verifyOne(candidate, { weekStart, weekEnd } = {}) {
       { weekStart, weekEnd }
     );
     if (!dateCheck.ok) return { ok: false, reason: dateCheck.reason };
+  }
+
+  if (!isDocumentLikeSourceUrl(candidate.sourceUrl)) {
+    return { ok: false, reason: 'source URL points to an image/asset rather than an official article or document' };
   }
 
   const reachable = await checkReachable(candidate.sourceUrl);
