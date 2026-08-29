@@ -47,7 +47,8 @@ function parseArgs(argv) {
   const mock = argv.includes('--mock') || process.env.OVERSIZE_MOCK === '1';
   const skipBuild = argv.includes('--skip-build');
   const dryRun = argv.includes('--dry-run') || process.env.OVERSIZE_DRY_RUN === '1';
-  return { mock, skipBuild, dryRun };
+  const refreshExisting = argv.includes('--refresh-existing');
+  return { mock, skipBuild, dryRun, refreshExisting };
 }
 
 async function appendSummary(markdown) {
@@ -78,7 +79,11 @@ async function fail(reason) {
 }
 
 async function main() {
-  const { mock, skipBuild, dryRun } = parseArgs(process.argv.slice(2));
+  const { mock, skipBuild, dryRun, refreshExisting } = parseArgs(process.argv.slice(2));
+  if (refreshExisting && !dryRun) {
+    await fail('--refresh-existing is allowed only together with --dry-run; it must never overwrite a published article directly.');
+    return;
+  }
 
   // Preflight, before any network/data work: a missing key on a real run is
   // a configuration error, not something worth spending verification time
@@ -118,16 +123,15 @@ async function main() {
 
   const slug = `eu-oversize-weekly-${nextWeekLabel.toLowerCase()}`;
   const filePath = path.join(ARTICLES_DIR, `${slug}.md`);
-  if (existsSync(filePath)) {
-    // This check applies in BOTH modes. In dry-run mode we still write to a
-    // separate throwaway path below (never `filePath` itself) - but if the
-    // real article already exists there is nothing meaningful left to dry-
-    // run either, so we abort the same way in both modes for consistency.
+  if (existsSync(filePath) && !refreshExisting) {
     await abort(
       `${path.relative(ROOT, filePath)} already exists - refusing to overwrite a previously published article. ` +
-        'Delete it manually first if you really want to regenerate this week\'s article.'
+        'Use --dry-run --refresh-existing for a safe editorial refresh preview; the real file will still never be written.'
     );
     return;
+  }
+  if (existsSync(filePath) && refreshExisting) {
+    console.log(`Refresh preview: ${path.relative(ROOT, filePath)} already exists; generating only to a throwaway dry-run path.`);
   }
   // Dry runs never write to the real target path, even transiently - a
   // separate, uniquely-named throwaway file is used for the build check
