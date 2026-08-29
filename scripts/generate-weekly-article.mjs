@@ -28,7 +28,7 @@ import { loadWeekFindings } from './lib/store.mjs';
 import { isoWeekLabel, isoWeekRangeLabel, isoWeekStart, isoWeekEnd } from './lib/week.mjs';
 import { selectCandidates } from './lib/select-candidates.mjs';
 import { verifyCandidates } from './lib/verify-candidates.mjs';
-import { generateArticleWithOpenAI } from './lib/openai-client.mjs';
+import { generateArticleWithOpenAI, generateRoundupSupplementWithOpenAI } from './lib/openai-client.mjs';
 import { generateArticleMock } from './lib/mock-generator.mjs';
 import { renderArticleMarkdown, toFrontmatterYaml } from './lib/render-article.mjs';
 import { runQualityGate } from './lib/quality-gate.mjs';
@@ -37,6 +37,7 @@ import { formatNextPublicationLabel } from './lib/next-publication.mjs';
 import { resolveDrivingBanFindings } from './lib/driving-ban-calendar.mjs';
 import { crossValidateDevelopments } from './lib/cross-validate.mjs';
 import { ensureOfficialCalendarLeadFloor } from './lib/lead-floor.mjs';
+import { mergeRoundupSupplement, roundupNeedsSupplement } from './lib/roundup-breadth.mjs';
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -223,6 +224,46 @@ async function main() {
     console.log(
       `Official-calendar lead floor: added ${leadFloor.added}, promoted ${leadFloor.promoted}; lead reports now ${article.developments.length}.`
     );
+  }
+
+  if (!mock) {
+    const breadth = roundupNeedsSupplement(article.europeRoundup);
+    if (breadth.needsSupplement) {
+      const usedSourceUrls = new Set(
+        [...article.developments, ...article.europeRoundup]
+          .map((item) => item.sourceUrl)
+          .filter(Boolean)
+      );
+      const remainingVerified = verified.filter(
+        (candidate) => candidate.sourceUrl && !usedSourceUrls.has(candidate.sourceUrl)
+      );
+
+      console.log(
+        `Rest-of-Europe breadth repair needed: ${breadth.reportCount} report(s), ${breadth.countryCount} countr${breadth.countryCount === 1 ? 'y' : 'ies'}; requesting ${breadth.neededCountries || 1} additional distinct country candidate(s).`
+      );
+
+      try {
+        const supplement = await generateRoundupSupplementWithOpenAI({
+          candidates: remainingVerified,
+          targetWeekStart: targetWeekStartIso,
+          targetWeekEnd: targetWeekEndIso,
+          apiKey,
+          existingCountries: [...breadth.countries],
+          neededCountries: Math.max(1, breadth.neededCountries),
+        });
+        const supplementValidation = crossValidateDevelopments(supplement, remainingVerified);
+        article.europeRoundup = mergeRoundupSupplement(
+          article.europeRoundup,
+          supplementValidation.kept,
+          new Set(article.developments.map((item) => item.sourceUrl).filter(Boolean))
+        );
+        console.log(
+          `Rest-of-Europe supplement: ${supplementValidation.kept.length} cross-validated candidate(s); roundup now has ${article.europeRoundup.length} report(s) across ${roundupNeedsSupplement(article.europeRoundup).countryCount} countries.`
+        );
+      } catch (err) {
+        console.warn(`Rest-of-Europe supplement failed: ${err.message || err}. Quality gate will decide whether publication can continue.`);
+      }
+    }
   }
 
   const totalDropped = droppedCount + roundupValidation.droppedCount;
