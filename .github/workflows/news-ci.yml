@@ -43,7 +43,9 @@ jobs:
         run: npm run oversize:monitor
 
       - name: Editorial refresh dry run
-        if: github.head_ref == 'fix/editorial-september-roundup'
+        # Live AI validation is intentionally manual-only. Running it on every
+        # pull_request commit caused overlapping jobs to exhaust model TPM.
+        if: github.event_name == 'workflow_dispatch'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run oversize:publish -- --dry-run --refresh-existing
