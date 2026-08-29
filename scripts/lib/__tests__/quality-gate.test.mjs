@@ -90,11 +90,13 @@ describe('runQualityGate - report count', () => {
   });
 
   it('allows four strong leads once the target week reaches the post-summer policy date', () => {
-    const developments = Array.from({ length: 4 }, (_, i) => makeDevelopment(i));
+    const developments = Array.from({ length: 4 }, (_, i) =>
+      makeDevelopment(i, { validFrom: '2026-09-05', validTo: '2026-09-06' })
+    );
     const europeRoundup = [
-      makeDevelopment(40, { country: 'Spain' }),
-      makeDevelopment(41, { country: 'Romania' }),
-      makeDevelopment(42, { country: 'Denmark' }),
+      makeDevelopment(40, { country: 'Spain', validFrom: '2026-09-05', validTo: '2026-09-06' }),
+      makeDevelopment(41, { country: 'Romania', validFrom: '2026-09-05', validTo: '2026-09-06' }),
+      makeDevelopment(42, { country: 'Denmark', validFrom: '2026-09-05', validTo: '2026-09-06' }),
     ];
     const all = [...developments, ...europeRoundup];
     const gate = runQualityGate({
