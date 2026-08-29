@@ -1,6 +1,6 @@
 // Pre-selection pass, run BEFORE the (network-cost) verification step and
 // BEFORE the (token-cost) OpenAI call - keeps both cheap by narrowing ~150+
-// raw findings down to a bounded set of genuinely promising candidates.
+// raw findings down to a bounded set of genuinely promising candidates. The official calendar layer is added separately and is never counted against this cap.
 // This is the "diff/dedupe before sending to AI" step from the cost-control
 // requirement; it never decides what's TRUE, only what's worth checking.
 
@@ -10,8 +10,8 @@ const SPECIFIC_TYPES = new Set([
   'tunnel_restriction', 'route_restriction', 'road_closure', 'roadworks',
 ]);
 
-const MAX_PER_SOURCE = 6;
-const MAX_TOTAL = 60;
+const MAX_PER_SOURCE = 4;
+const MAX_TOTAL = 32;
 
 export function selectCandidates(findings) {
   const active = findings.filter((f) => f.status !== 'expired' && f.status !== 'superseded');
