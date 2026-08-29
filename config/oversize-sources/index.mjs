@@ -215,6 +215,8 @@ export const oversizeSources = [
     url: 'https://www.astra.admin.ch/de/medienmitteilungen-zentrale',
     htmlUrls: [
       'https://www.astra.admin.ch/de/medienmitteilungen-zentrale',
+      'https://www.astra.admin.ch/de/gesetzgebung',
+      'https://www.astra.admin.ch/de/private-ausnahmetransportbegleitungen',
       'https://www.astra.admin.ch/astra/de/home/themen/nationalstrassen/baustellen/medienmitteilungen.html',
     ],
     type: 'national-road-authority',
