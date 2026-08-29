@@ -1,144 +1,128 @@
-// Wraps the OpenAI Chat Completions structured-output call used to
-// synthesize the Friday EU Oversize Weekly article from verified findings.
-//
-// The model is only ever given already-verified candidate findings (see
-// generate-weekly-article.mjs) and is required to attach a `sourceUrl` to
-// every development it reports. The caller cross-validates every returned
-// `sourceUrl` against the input set (scripts/lib/cross-validate.mjs) and
-// drops anything that doesn't match, and quality-gate.mjs independently
-// re-validates every date, count, and duplicate - this file does not decide
-// what's trustworthy on its own, it only asks the model to select, group
-// and phrase what was already verified, under an explicit set of hard rules.
+// OpenAI synthesis layer for DAJC European Oversize & Special Transport Intelligence.
+// Input candidates have already passed source verification. The model may only
+// select, structure and phrase those candidates; source URLs are cross-validated
+// again after generation before publication.
 
 import OpenAI from 'openai';
 
-// Reviewed against OpenAI's lineup at the time this script was written.
-// Override via OPENAI_MODEL if a newer/cheaper model is preferred - check
-// what's current before relying on the default.
 const DEFAULT_MODEL = 'gpt-4o';
 
 const DEVELOPMENT_SCHEMA = {
   type: 'object',
   properties: {
     country: { type: 'string' },
-    title: { type: 'string', description: 'Short factual headline for this development' },
-    whatChanged: { type: 'string', description: 'What applies or what changed - the substantive restriction, in professional English' },
-    where: { type: 'string', description: 'Region, road, route, or corridor this applies to' },
-    vehicleScope: { type: 'string', description: 'Affected vehicle category and the applicable weight/vehicle threshold. Empty string if not known.' },
-    timeWindow: { type: 'string', description: 'Exact date(s) and LOCAL time of the country concerned. Empty string if not known.' },
-    validFrom: { type: 'string', description: 'ISO date (YYYY-MM-DD) or empty string if unknown' },
-    validTo: { type: 'string', description: 'ISO date (YYYY-MM-DD) or empty string if unknown' },
-    impact: { type: 'string', description: 'Practical impact on heavy/oversized transport operations' },
-    recommendedAction: { type: 'string', description: 'Concrete, practical action for an operator or dispatcher - never a generic platitude' },
-    exemptions: { type: 'string', description: 'Important exemptions or permit-specific conditions. Empty string if none apply.' },
+    title: { type: 'string' },
+    whatChanged: { type: 'string' },
+    where: { type: 'string' },
+    vehicleScope: { type: 'string' },
+    timeWindow: { type: 'string' },
+    validFrom: { type: 'string' },
+    validTo: { type: 'string' },
+    impact: { type: 'string' },
+    recommendedAction: { type: 'string' },
+    exemptions: { type: 'string' },
     isDrivingBan: { type: 'boolean' },
     isInfrastructure: { type: 'boolean' },
-    sourceUrl: { type: 'string', description: 'Must be copied EXACTLY from the supplied candidate - never invented' },
-    sourceName: { type: 'string', description: 'Must be copied EXACTLY from the supplied candidate - never invented' },
+    sourceUrl: { type: 'string', description: 'Copy EXACTLY from a supplied candidate.' },
+    sourceName: { type: 'string', description: 'Copy EXACTLY from a supplied candidate.' },
   },
-  required: ['country', 'title', 'whatChanged', 'where', 'vehicleScope', 'timeWindow', 'validFrom', 'validTo', 'impact', 'recommendedAction', 'exemptions', 'isDrivingBan', 'isInfrastructure', 'sourceUrl', 'sourceName'],
+  required: ['country','title','whatChanged','where','vehicleScope','timeWindow','validFrom','validTo','impact','recommendedAction','exemptions','isDrivingBan','isInfrastructure','sourceUrl','sourceName'],
   additionalProperties: false,
 };
 
 const ARTICLE_JSON_SCHEMA = {
-  name: 'eu_oversize_weekly_article',
+  name: 'dajc_european_oversize_intelligence',
   strict: true,
   schema: {
     type: 'object',
     properties: {
-      seoTitle: {
-        type: 'string',
-        description: 'Attention-grabbing but accurate headline. May use restrained tabloid-style urgency; must never exaggerate geographic scope or claim something false.',
-      },
-      metaDescription: {
-        type: 'string',
-        description: 'One or two sentence SEO meta description naming the verified driving-ban / exceptional-transport restriction coverage and the exact target date range.',
-      },
-      intro: { type: 'string', description: 'Short intro naming what matters most for the coming week, written for a European (not single-corridor) audience' },
+      seoTitle: { type: 'string' },
+      metaDescription: { type: 'string' },
+      intro: { type: 'string' },
       developments: {
         type: 'array',
         items: DEVELOPMENT_SCHEMA,
-        description: 'The 10-12 most consequential lead reports, selected by operational impact without country quotas.',
+        description: 'Normally 20-30 substantive lead developments when enough verified material exists. Never pad.',
       },
       europeRoundup: {
         type: 'array',
         items: DEVELOPMENT_SCHEMA,
-        description: 'All other verified, operationally useful European developments not selected as lead reports. Never duplicate a lead report.',
+        description: 'Normally 10-20 additional useful short updates from the wider European scan when enough material exists. Never duplicate leads.',
       },
-      operatorChecklist: {
-        type: 'array',
-        items: { type: 'string' },
-        description: 'Short, practical checklist items for an operator/dispatcher preparing for the target week (e.g. "Check the individual exceptional-transport permit for country-specific conditions.")',
-      },
+      operatorChecklist: { type: 'array', items: { type: 'string' } },
     },
-    required: ['seoTitle', 'metaDescription', 'intro', 'developments', 'europeRoundup', 'operatorChecklist'],
+    required: ['seoTitle','metaDescription','intro','developments','europeRoundup','operatorChecklist'],
     additionalProperties: false,
   },
 };
 
-const SYSTEM_PROMPT = `You are the editor of "EU Oversize Weekly", a professional operational briefing for European heavy, oversized and special road transport operators, drivers and dispatchers. It is NOT a general traffic-news feed - never summarize every item you are given just because it exists.
+const SYSTEM_PROMPT = `You are the editor of DAJC European Oversize & Special Transport Intelligence for DAJC.eu.
 
-You will be given the exact target-week date range (Monday-Sunday, ISO dates) and a JSON array of pre-verified candidate findings (permits, driving bans, escort requirements, border restrictions, bridge/tunnel restrictions, road closures, roadworks, route restrictions, and relevant operational/equipment/market changes). Each candidate already has a working, checked source URL.
+This is a professional, change-driven Europe-wide intelligence report for people planning and executing heavy, abnormal, oversized and special road transport. It is NOT a generic trucking-news site and NOT a calendar of unchanged recurring restrictions.
 
-Editorial priority order (most important first): (1) truck driving bans; (2) special movement windows/bans for exceptional or oversized transport; (3) permit-rule or permit-system changes; (4) escort/BF2/BF3/BF4/police-assistance requirements; (5) border and transit restrictions; (6) mandatory crossings or approved corridors; (7) bridge/tunnel/height/width/axle-load/weight restrictions; (8) long-term closures on strategic routes; (9) weather ONLY when it creates a specific operational restriction; (10) significant equipment/regulatory/market changes, as secondary items only.
+GEOGRAPHIC PRINCIPLE
+The upstream DAJC monitor is intended to scan the complete DAJC European coverage area, including smaller countries, territories and relevant jurisdictions. Never favour EU, Schengen, DACH, Western Europe or major transit markets merely because they publish more English-language material. Selection is evidence-led and operational-impact-led.
 
-Geographic scope: cover the whole of Europe. Country selection must be evidence-led and may change every week. Never use a fixed country list, country quota, preferred corridor, or Central-European default. Rank the 10-12 most consequential items as lead reports, then put every other verified and useful item into europeRoundup so smaller markets and peripheral regions are not silently dropped.
+EDITORIAL SCOPE
+Relevant subjects include abnormal/oversize permits; heavy-transport weight and axle rules; exceptional restrictions; escort/private escort/police escort requirements; route authorisations; bridges/tunnels and structural restrictions; dimensions and axle loads; borders/customs/non-EU transit; long-term special-transport-relevant roadworks; ports/ferries/RoRo/project cargo; weather restrictions; wind/heat/snow limits; permit digitalisation; tolling; abnormal-load portals; routing systems; e-CMR; tachograph/enforcement; ADR where relevant; heavy-haul tractors; low-loaders/modular trailers/SPMTs; cranes; escort technology; telematics/routing APIs; AI tools; manufacturers; material acquisitions/insolvencies/capacity shifts; and major energy/industrial/infrastructure projects that generate abnormal-load demand.
 
-Hard rules - violating any of these makes your output unusable:
-1. The target week is the ONLY window that matters. Exclude any development whose validTo date is before the target week starts. Exclude any development whose validFrom date is after the target week ends.
-2. Never turn an isolated traffic accident, a stuck/broken-down vehicle, a theft report, or a routine police incident into an "ongoing restriction" - these are one-off events, not operational rules, even if a candidate mentions a road name.
-3. A procurement notice, tender, or contract-award announcement is never a traffic restriction, even if it mentions a bridge or road.
-4. Planned/future works are not a restriction unless the candidate text confirms a specific, currently-applicable traffic impact and specific dates - never infer a closure merely because a candidate mentions "roadworks", "bridge", or "construction".
-5. Never invent a bridge capacity, lane closure, diversion route, width/height/weight limit, or validity date that is not explicitly present in the supplied candidate text. If a field is unknown, use an empty string - never guess.
-6. A recurring weekend/seasonal driving ban may be included even if its legal source was not published this week, but ONLY when the candidate data shows it is already known to be valid for the target week's exact dates - never assume a ban "probably still applies".
-7. For every development, "sourceUrl" and "sourceName" MUST be copied EXACTLY, character for character, from one of the supplied candidates. Never invent, modify, or guess a source.
-8. Every development must state: country; region/road/route where applicable; what applies or changed; affected vehicle category and weight/vehicle threshold (vehicleScope); exact date and LOCAL time of the country concerned (timeWindow); geographic/route scope (where); practical impact; a concrete, practical recommendedAction for an operator or dispatcher (never a generic platitude); and important exemptions/permit-specific conditions if any (exemptions, empty string if none).
-9. Clearly distinguish a general truck-driving ban, a restriction above a specific weight, a special restriction for exceptional/oversized transport, and a condition contained in an individual transport permit - never conflate these.
-10. A candidate with isOfficialCalendar=true is a legally curated, target-week-specific restriction from the maintained DAJC calendar layer. Unless it is an exact duplicate of another supplied restriction, it is lead-quality by definition and MUST be included in developments before lower-priority news items. Do not discard it merely because its legal rule is recurring rather than newly announced.
-11. developments must contain 10-12 distinct lead reports when enough verified material exists. Build the lead set from official-calendar restrictions first, then add the most consequential remaining verified items up to 10-12. If fewer than 10 genuinely useful candidates exist after applying all hard rules, return an EMPTY developments array. Never pad with filler.
-12. europeRoundup must contain the remaining verified, useful candidates that were not chosen as leads. Do not repeat any sourceUrl or title across the two arrays. Grouping happens later in the renderer; do not drop a country merely because it has only one item.
-13. Write in professional, practical, plain English for operators/dispatchers. No marketing language, no filler, no clickbait in the body.`;
+DRIVING-BAN FILTER — CRITICAL
+DO NOT publish an ordinary recurring year-round Sunday driving ban when nothing has changed. A permanent Sunday prohibition must not be repeated every week merely because it falls inside the target week.
+Include driving-ban information only when it is materially newsworthy for the edition: a new or changed prohibition; public-holiday prohibition; seasonal/summer/winter restriction; exceptional/emergency/weather-related restriction; temporary regional restriction; changed time window or affected vehicle/weight class; new/cancelled/suspended exemption; newly announced enforcement measure; or a specific consequence for abnormal/oversize transport. A recurring Sunday ban may be mentioned only when needed to explain a material interaction with a holiday, seasonal rule, permit condition or other new operational constraint.
+
+INFRASTRUCTURE FILTER
+Do not repeat unchanged long-term restrictions every week. Re-report them only when newly announced, beginning, changed, extended, ending, materially worsening/improving, when the diversion or authorised abnormal-load route changes, or when a weight/width/height/axle condition changes. Ordinary short roadworks should normally be excluded unless their effect on special transport is critical. As a general editorial threshold, ordinary closures should normally last more than about 30 days unless they affect an important abnormal-load corridor or have exceptional dimensional/weight consequences.
+
+VERIFICATION / NON-INFERENCE RULES
+1. Use only supplied verified candidates. Never invent a development, route, limit, date, exemption or source.
+2. sourceUrl and sourceName MUST be copied EXACTLY from a supplied candidate.
+3. Never infer that a general HGV restriction applies to abnormal transport. State permit-specific uncertainty when applicability is not confirmed.
+4. Never infer that a general exemption applies to abnormal transport.
+5. Exclude isolated accidents, broken-down vehicles, theft reports and routine incidents.
+6. Procurement/tender notices are not traffic restrictions.
+7. Planned works are not restrictions unless a concrete operational effect and dates are confirmed.
+8. Use exact dates and local times where supplied. Distinguish publication date from effective date.
+9. Every published item must answer: Why does this matter to someone planning or executing heavy, abnormal, oversized or special transport in Europe? If there is no meaningful answer, exclude it.
+10. Do not repeat unchanged information merely because it appeared in an official annual calendar.
+
+SELECTION
+Rank findings by operational impact, relevance to abnormal/heavy transport, urgency, geographic reach, magnitude, evidence quality, novelty, and effect on routing, permits, timing, cost or feasibility.
+Normally select 20-30 distinct substantive lead reports when enough verified high-value material exists. If fewer genuinely worthwhile candidates exist, publish fewer rather than padding. If an unusually active week has more than 30 genuinely major items, select the strongest for leads and place additional useful findings in the roundup.
+
+AROUND EUROPE
+Place additional verified useful developments in europeRoundup. Target roughly 10-20 short updates when sufficient material exists, preferably covering at least six different countries/territories. Do not manufacture geographic balance and never use unchanged Sunday bans as filler. Prefer a meaningful finding from a smaller/less-covered jurisdiction over a marginal story from an already dominant major market.
+
+STYLE
+Write practical professional English. Each lead must contain concrete What changed / Where / When / Impact / Action information through the structured fields. No marketing filler and no clickbait body copy.`;
 
 export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, targetWeekStart, targetWeekEnd, apiKey, model }) {
   const client = new OpenAI({ apiKey });
-
-  const userPayload = {
-    targetWeekStart,
-    targetWeekEnd,
-    weekRangeLabel,
-    candidates: candidates.map((c) => ({
-      country: c.country,
-      location: c.location,
-      type: c.type,
-      title: c.title,
-      summary: c.summary,
-      validFrom: c.validFrom,
-      validTo: c.validTo,
-      vehicleScope: c.vehicleScope || '',
-      timeWindow: c.timeWindow || '',
-      routeScope: c.routeScope || c.location || '',
-      impact: c.impact || '',
-      recommendedAction: c.recommendedAction || '',
-      exemptions: c.exemptions || '',
-      isDrivingBan: Boolean(c.isDrivingBan || c.type === 'driving_ban'),
-      isInfrastructure: Boolean(c.isInfrastructure || /bridge|tunnel|road_closure|roadworks|route_restriction|infrastructure/.test(c.type || '')),
-      isOfficialCalendar: Boolean(c.isOfficialCalendar),
-      sourceUrl: c.sourceUrl,
-      sourceName: c.sourceName,
-    })),
-  };
+  const mapped = candidates.map((c) => ({
+    country: c.country,
+    location: c.location,
+    type: c.type,
+    title: c.title,
+    summary: c.summary,
+    validFrom: c.validFrom,
+    validTo: c.validTo,
+    vehicleScope: c.vehicleScope || '',
+    timeWindow: c.timeWindow || '',
+    routeScope: c.routeScope || c.location || '',
+    impact: c.impact || '',
+    recommendedAction: c.recommendedAction || '',
+    exemptions: c.exemptions || '',
+    isDrivingBan: Boolean(c.isDrivingBan || c.type === 'driving_ban'),
+    isInfrastructure: Boolean(c.isInfrastructure || /bridge|tunnel|road_closure|roadworks|route_restriction|infrastructure/.test(c.type || '')),
+    isOfficialCalendar: Boolean(c.isOfficialCalendar),
+    sourceUrl: c.sourceUrl,
+    sourceName: c.sourceName,
+  }));
 
   const response = await client.chat.completions.create({
     model: model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
-      {
-        role: 'user',
-        content:
-          `Target publication window: ${targetWeekStart} to ${targetWeekEnd} (${weekRangeLabel}). ` +
-          `Any development outside this exact date range must be excluded.\n\n` +
-          `Verified candidate findings (JSON):\n${JSON.stringify(userPayload.candidates, null, 2)}`,
-      },
+      { role: 'user', content: `Target publication window: ${targetWeekStart} to ${targetWeekEnd} (${weekRangeLabel}). Select only operationally relevant verified material. Do not repeat unchanged year-round Sunday bans.\n\nVerified candidates (JSON):\n${JSON.stringify(mapped, null, 2)}` },
     ],
     response_format: { type: 'json_schema', json_schema: ARTICLE_JSON_SCHEMA },
   });
