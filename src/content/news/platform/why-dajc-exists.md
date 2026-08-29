@@ -1,6 +1,6 @@
 ---
 title: "Why DAJC Exists: From Real Transport Operations to a Connected European Platform"
-description: "Why DAJC is being built from real heavy and oversized transport operations - and why better coordination, connected information and practical transport intelligence matter."
+description: "Why DAJC is being built from real heavy and oversized transport operations - around one D-ID, connected coordination and carefully validated transport intelligence."
 slug: "why-dajc-exists"
 category: "platform"
 publishedAt: 2026-08-18
@@ -23,28 +23,48 @@ DAJC was created from this operational reality.
 
 The idea is simple: heavy and oversized transport should not have to rely on disconnected information and fragmented coordination.
 
-DAJC is being developed as a connected digital environment for European heavy and oversized transport - bringing together the people, information, documents and services that are needed to plan and execute a transport.
+## One transport order. One D-ID.
+
+DAJC is being built around one canonical transport order identified by one D-ID.
+
+The D-ID is intended to connect the people and operational objects that belong to the same transport: the shipper, carrier, driver, dispatcher, escort and other authorised participants, together with cargo, vehicle configuration, routes, permits, documents, e-CMR/POD, execution events, costs and relevant transport intelligence.
+
+That does not mean every participant should see everything. The platform is designed so that access follows the participant's role and the information they are actually authorised to use.
 
 The goal is not to create another freight marketplace or another layer between the customer and the transport company.
 
 The goal is better coordination.
 
-A transport should remain understandable from planning through execution and delivery, with the relevant participants able to work with the information they actually need.
+A transport should remain understandable from planning through execution and delivery, while approved information remains controlled and changes can be traced instead of silently replacing the agreed state.
 
-DAJC is being built gradually.
+## Built in stages, not presented as finished before it is ready
 
-Rather than presenting unfinished ideas as finished products, the platform is being developed step by step around real operational needs. New capabilities, data connections and integrations are added only when they are technically and operationally ready.
+DAJC is being developed gradually around real operational needs.
 
-The same principle applies to the DAJC Integration Ecosystem. Services, data providers and infrastructure connections will be described according to their real status, and individual providers will only be publicly identified when their public listing has been appropriately confirmed.
+The production DAJC Platform and the public DAJC Platform Demo have different purposes. The demo shows the intended end-to-end product experience with fictitious local data and disconnected integrations. It is not a production system, does not use live provider data and does not replace the production platform's server-side security, authorisation, audit and operational gates.
 
-DAJC is also expanding its focus on transport intelligence.
+The same rule applies to DAJC Tacho, the driver-side technical project being developed alongside the wider DAJC ecosystem. Tachograph connectivity, live data, working-time support and future navigation-related capabilities are validated step by step. Technical prototypes and physical device testing are not presented as production-ready functionality until the relevant acceptance gates are closed.
 
-European heavy transport depends heavily on changing road conditions, permit rules, driving restrictions, escort requirements and infrastructure limitations. Making this information easier to monitor and use is an important part of the broader DAJC direction.
+This separation matters. A useful demo can show where DAJC is going without creating the impression that every workflow, data source or integration is already live.
 
-This is also why DAJC is launching the EU Oversize Weekly - a regular overview of important changes affecting heavy and oversized road transport across Europe.
+## Integrations must reflect their real status
+
+DAJC is being designed around provider-neutral integration contracts, but every real connector has its own technical, commercial, licensing, privacy and customer-authorisation conditions.
+
+Rights or technical capabilities confirmed for one provider are not automatically assumed for another.
+
+The DAJC Integration Ecosystem therefore describes services and data connections according to their real status. A provider listing is not, by itself, a claim of partnership or endorsement, and production connectivity is only activated when the relevant evidence and gates allow it.
+
+## Transport intelligence is part of the same operational picture
+
+European heavy transport depends heavily on changing road conditions, permit rules, driving restrictions, escort requirements and infrastructure limitations.
+
+Making this information easier to monitor, verify and connect to real transport planning is an important part of the broader DAJC direction.
+
+That is also why DAJC publishes EU Oversize Weekly: a regular intelligence briefing focused on operationally relevant changes affecting heavy and oversized road transport across Europe.
 
 DAJC is still evolving.
 
 But the direction remains the same:
 
-**connect the transport, the participants and the information around one operational workflow - and make heavy and oversized transport across Europe easier to coordinate.**
+**one transport order, one D-ID, with the authorised participants, documents, operational state and relevant transport intelligence connected around the same European transport workflow.**

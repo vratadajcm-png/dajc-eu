@@ -7,7 +7,9 @@ import { getCollection } from 'astro:content';
 const euOversize = await getCollection('eu-oversize', ({ data }) => data.status === 'published');
 const platform = await getCollection('platform', ({ data }) => data.status === 'published');
 
-const latestNews = [...euOversize, ...platform]
+const featuredStory = platform.find((entry) => entry.data.slug === 'why-dajc-exists');
+
+const latestNews = [...euOversize, ...platform.filter((entry) => entry.data.slug !== 'why-dajc-exists')]
   .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf())
   .slice(0, 3);
 
@@ -33,11 +35,90 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
     <p class="sub">The escort vehicle has already set off. DAJC will follow soon.</p>
   </main>
 
+  {featuredStory && (
+    <section class="story-feature" aria-labelledby="story-feature-heading">
+      <div class="story-feature__inner">
+        <p class="story-feature__eyebrow">The DAJC story</p>
+        <h2 id="story-feature-heading">
+          <a href={`/news/platform/${featuredStory.data.slug}`}>{featuredStory.data.title}</a>
+        </h2>
+        <p class="story-feature__desc">{featuredStory.data.description}</p>
+        <a class="story-feature__link" href={`/news/platform/${featuredStory.data.slug}`}>
+          Read why DAJC exists &rarr;
+        </a>
+      </div>
+    </section>
+  )}
+
   <NewsSection items={latestNews} showEuOversizeLaunchNotice={!hasPublishedEuOversize} />
   <IntegrationEcosystemSection providers={activeProviders} />
 </BaseLayout>
 
 <style>
+  .story-feature {
+    position: relative;
+    z-index: 2;
+    padding: 0 1.5rem 4rem;
+  }
+
+  .story-feature__inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: clamp(1.6rem, 4vw, 2.4rem);
+    border: 1px solid var(--dajc-orange);
+    border-radius: 6px;
+    background:
+      linear-gradient(135deg, rgba(239, 125, 0, 0.1), rgba(0, 38, 92, 0.22) 45%),
+      rgba(0, 20, 52, 0.46);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.16);
+  }
+
+  .story-feature__eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    margin: 0 0 0.8rem;
+  }
+
+  .story-feature h2 {
+    margin: 0 0 1rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.35rem, 3vw, 2rem);
+    line-height: 1.2;
+  }
+
+  .story-feature h2 a {
+    color: var(--dajc-white);
+    text-decoration: none;
+  }
+
+  .story-feature h2 a:hover {
+    color: var(--dajc-orange);
+  }
+
+  .story-feature__desc {
+    max-width: 72ch;
+    margin: 0 0 1.2rem;
+    color: var(--dajc-muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .story-feature__link {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    text-decoration: none;
+  }
+
+  .story-feature__link:hover {
+    text-decoration: underline;
+  }
+
   .route-inline {
     display: block;
     width: min(100%, 560px);
