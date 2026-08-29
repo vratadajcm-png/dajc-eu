@@ -12,6 +12,7 @@
 import Parser from 'rss-parser';
 import { FINDING_TYPES } from './findings.mjs';
 import { checkOperationalRelevance } from './relevance-filter.mjs';
+import { checkTransportDomainRelevance } from './transport-domain.mjs';
 
 const FETCH_TIMEOUT_MS = 12_000;
 const FETCH_RETRIES = 2;
@@ -62,8 +63,14 @@ function classify(text) {
 const GENERAL_TRANSPORT_CONTEXT =
   /oversize|abnormal load|heavy transport|wide load|special transport|convoi exceptionnel|großraum|schwertransport|trasporto eccezionale|transporte especial|agabaritic|\bHGV\b|\blorry\b|\btruck\b|\bfreight\b|\bcargo\b|heavy vehicle|weight limit|height limit|axle load|\btoll\b|motorway|highway|autobahn|autoroute|autostrada|autopista|reconstruction|construction works/i;
 
-function isRelevant(text, matchedType) {
+function isRelevant(text, matchedType, source) {
   if (!checkOperationalRelevance(text).ok) return false;
+  const candidate = {
+    type: matchedType || 'infrastructure',
+    title: text,
+    sourceName: source?.name || '',
+  };
+  if (!checkTransportDomainRelevance(candidate).ok) return false;
   if (matchedType) return true;
   return GENERAL_TRANSPORT_CONTEXT.test(text);
 }
@@ -232,6 +239,12 @@ export function extractHtmlFindings(html, source, pageUrl = source.url) {
     // feeds, but not for arbitrary website navigation/content links.
     const matchedType = classify(text);
     if (!matchedType || !checkOperationalRelevance(text).ok) continue;
+    if (!checkTransportDomainRelevance({
+      type: matchedType,
+      title,
+      summary: context,
+      sourceName: source.name,
+    }).ok) continue;
 
     // Avoid generic account/navigation anchors inheriting a restriction word
     // from a larger container. Operational titles normally carry either a
@@ -305,7 +318,7 @@ async function parseFeed(raw, source, feedUrl, parser) {
   return items
     .filter((item) => {
       const text = `${item.title || ''} ${item.contentSnippet || item.summary || ''}`;
-      return isRelevant(text, classify(text));
+      return isRelevant(text, classify(text), source);
     })
     .map((item) => toFinding({
       source,
