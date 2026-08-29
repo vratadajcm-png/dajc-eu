@@ -59,6 +59,28 @@ export function ensureOfficialCalendarLeadFloor(
     promoted += 1;
   }
 
+  // Remove non-actionable roundup noise before the hard quality gate. This
+  // does not lower the gate: it prevents a model-selected weak item from
+  // blocking an otherwise valid edition.
+  europeRoundup = europeRoundup.filter(
+    (item) => item.recommendedAction && item.recommendedAction.trim().length >= 10
+  );
+
+  // If that leaves no roundup, use one remaining verified official-calendar
+  // restriction that is not already a lead. This preserves the editorial
+  // requirement for a real Rest-of-Europe item without inventing filler.
+  if (europeRoundup.length === 0) {
+    const remainingOfficial = verifiedCandidates.find(
+      (candidate) =>
+        candidate.isOfficialCalendar &&
+        candidate.sourceUrl &&
+        !usedLeadUrls.has(candidate.sourceUrl)
+    );
+    if (remainingOfficial) {
+      europeRoundup.push(developmentFromOfficialCandidate(remainingOfficial));
+    }
+  }
+
   return {
     article: { ...article, developments, europeRoundup },
     added,
