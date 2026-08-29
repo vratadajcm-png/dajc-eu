@@ -39,3 +39,22 @@ export function mergeRoundupSupplement(existing = [], supplement = [], usedSourc
 
   return merged;
 }
+
+export function sanitizeRoundup(items = [], leadItems = [], { suppressEvergreenSunday = false } = {}) {
+  const leadUrls = new Set(leadItems.map((item) => item.sourceUrl).filter(Boolean));
+  const seenUrls = new Set();
+
+  return items.filter((item) => {
+    if (!item?.sourceUrl || leadUrls.has(item.sourceUrl) || seenUrls.has(item.sourceUrl)) return false;
+
+    if (suppressEvergreenSunday) {
+      const text = `${item.title || ''} ${item.whatChanged || ''}`;
+      const looksEvergreen =
+        /(?:routine|standard|standing|general|year[- ]round|regular).{0,40}(?:sunday|weekend)|(?:sunday|weekend).{0,40}(?:routine|standard|standing|general|year[- ]round|regular)/i.test(text);
+      if (looksEvergreen && item.isDrivingBan) return false;
+    }
+
+    seenUrls.add(item.sourceUrl);
+    return true;
+  });
+}
