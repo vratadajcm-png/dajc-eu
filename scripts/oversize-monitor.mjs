@@ -33,9 +33,30 @@ async function main() {
   const unavailable = [];
   const allCandidates = [];
 
-  for (const source of oversizeSources) {
-    process.stdout.write(`[${source.id}] (${source.country}) ... `);
-    const result = await fetchSourceFindings(source, { now: nowIso });
+  // A bounded worker pool keeps the pan-European scan fast without hammering
+  // authorities. Sequential fetching makes a handful of 12s timeouts add
+  // minutes to every daily/Friday run; six concurrent sources keeps that
+  // failure mode bounded while remaining polite.
+  const results = new Array(oversizeSources.length);
+  let nextIndex = 0;
+
+  async function worker() {
+    while (true) {
+      const index = nextIndex;
+      nextIndex += 1;
+      if (index >= oversizeSources.length) return;
+      const source = oversizeSources[index];
+      results[index] = await fetchSourceFindings(source, { now: nowIso });
+    }
+  }
+
+  await Promise.all(
+    Array.from({ length: Math.min(6, oversizeSources.length) }, () => worker())
+  );
+
+  for (let i = 0; i < oversizeSources.length; i += 1) {
+    const source = oversizeSources[i];
+    const result = results[i];
 
     if (result.status === 'ok') {
       if (result.method === 'feed') sourcesFeed += 1;
@@ -43,12 +64,12 @@ async function main() {
 
       const via = result.method || 'official source';
       const used = result.sourceUrlUsed || source.url;
-      console.log(`OK - ${result.findings.length} item(s) via ${via} from ${used}`);
+      console.log(`[${source.id}] (${source.country}) OK - ${result.findings.length} item(s) via ${via} from ${used}`);
       allCandidates.push(...result.findings);
     } else {
       sourcesUnavailable += 1;
       unavailable.push({ id: source.id, country: source.country, error: result.error || 'unreachable' });
-      console.log(`UNAVAILABLE - ${result.error || 'no official endpoint reachable'}`);
+      console.log(`[${source.id}] (${source.country}) UNAVAILABLE - ${result.error || 'no official endpoint reachable'}`);
     }
   }
 
