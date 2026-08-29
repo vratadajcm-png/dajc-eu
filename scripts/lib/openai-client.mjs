@@ -40,6 +40,23 @@ const DEVELOPMENT_SCHEMA = {
   additionalProperties: false,
 };
 
+const ROUNDUP_SUPPLEMENT_SCHEMA = {
+  name: 'eu_oversize_weekly_roundup_supplement',
+  strict: true,
+  schema: {
+    type: 'object',
+    properties: {
+      items: {
+        type: 'array',
+        items: DEVELOPMENT_SCHEMA,
+        description: 'Additional verified Rest-of-Europe items from distinct countries, using only supplied candidates.',
+      },
+    },
+    required: ['items'],
+    additionalProperties: false,
+  },
+};
+
 const ARTICLE_JSON_SCHEMA = {
   name: 'eu_oversize_weekly_article',
   strict: true,
@@ -147,4 +164,61 @@ export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, ta
   const text = response.choices?.[0]?.message?.content;
   if (!text) throw new Error('OpenAI response contained no content');
   return JSON.parse(text);
+}
+
+export async function generateRoundupSupplementWithOpenAI({
+  candidates,
+  targetWeekStart,
+  targetWeekEnd,
+  apiKey,
+  existingCountries = [],
+  neededCountries = 1,
+  model,
+}) {
+  if (!candidates.length || neededCountries <= 0) return [];
+
+  const client = new OpenAI({ apiKey });
+  const existing = new Set(existingCountries.filter(Boolean));
+
+  const payload = candidates.map((c) => ({
+    country: c.country,
+    location: c.location,
+    type: c.type,
+    title: c.title,
+    summary: c.summary,
+    validFrom: c.validFrom,
+    validTo: c.validTo,
+    vehicleScope: c.vehicleScope || '',
+    timeWindow: c.timeWindow || '',
+    routeScope: c.routeScope || c.location || '',
+    impact: c.impact || '',
+    recommendedAction: c.recommendedAction || '',
+    exemptions: c.exemptions || '',
+    isDrivingBan: Boolean(c.isDrivingBan || c.type === 'driving_ban'),
+    isInfrastructure: Boolean(c.isInfrastructure || /bridge|tunnel|road_closure|roadworks|route_restriction|infrastructure/.test(c.type || '')),
+    sourceUrl: c.sourceUrl,
+    sourceName: c.sourceName,
+  }));
+
+  const response = await client.chat.completions.create({
+    model: model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
+    messages: [
+      {
+        role: 'system',
+        content:
+          'You are filling only the Rest of Europe section of EU Oversize Weekly. Select only genuinely useful, operationally actionable heavy/oversized-road-transport developments from the supplied verified candidates. Use distinct countries not already represented whenever possible. Never use generic driver-licence guidance, stale routine content, one-off crashes/crime, procurement, or filler. Every sourceUrl/sourceName must be copied EXACTLY from a supplied candidate. If there are not enough useful candidates, return fewer items rather than inventing anything.',
+      },
+      {
+        role: 'user',
+        content:
+          `Target week: ${targetWeekStart} to ${targetWeekEnd}. Existing roundup countries: ${[...existing].join(', ') || 'none'}. Need at least ${neededCountries} additional distinct countr${neededCountries === 1 ? 'y' : 'ies'}. Return 1-5 concise items, prioritising countries not in the existing set.\n\nVerified unused candidates:\n${JSON.stringify(payload, null, 2)}`,
+      },
+    ],
+    response_format: { type: 'json_schema', json_schema: ROUNDUP_SUPPLEMENT_SCHEMA },
+  });
+
+  const text = response.choices?.[0]?.message?.content;
+  if (!text) return [];
+  const parsed = JSON.parse(text);
+  return Array.isArray(parsed.items) ? parsed.items : [];
 }
