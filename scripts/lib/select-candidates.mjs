@@ -6,6 +6,7 @@
 
 import { checkOperationalRelevance } from './relevance-filter.mjs';
 import { checkLongRoadClosure } from './closure-duration.mjs';
+import { isCriticalWeeklyCandidate } from './critical-floor.mjs';
 
 const SPECIFIC_TYPES = new Set([
   'permit_change', 'permit_system', 'driving_ban', 'escort_requirement',
@@ -16,7 +17,7 @@ const SPECIFIC_TYPES = new Set([
 const MAX_PER_SOURCE = 4;
 const MAX_TOTAL = 32;
 
-export function selectCandidates(findings) {
+export function selectCandidates(findings, { discoveryWindowStart } = {}) {
   const active = findings.filter((f) => {
     if (f.status === 'expired' || f.status === 'superseded') return false;
     const text = `${f.title || ''} ${f.summary || ''}`;
@@ -24,7 +25,13 @@ export function selectCandidates(findings) {
     return checkLongRoadClosure(f).ok;
   });
 
-  const scored = active.map((f) => {
+  const critical = active.filter((finding) =>
+    isCriticalWeeklyCandidate(finding, { discoveryWindowStart })
+  );
+  const criticalUrls = new Set(critical.map((finding) => finding.sourceUrl).filter(Boolean));
+  const ordinary = active.filter((finding) => !criticalUrls.has(finding.sourceUrl));
+
+  const scored = ordinary.map((f) => {
     let score = 0;
     if (f.status === 'new') score += 3;
     else if (f.status === 'updated') score += 2;
@@ -41,14 +48,14 @@ export function selectCandidates(findings) {
   scored.sort((a, b) => b.score - a.score);
 
   const perSourceCount = new Map();
-  const selected = [];
+  const selected = [...critical];
   for (const { finding } of scored) {
     const sourceKey = finding.sourceName;
     const count = perSourceCount.get(sourceKey) || 0;
     if (count >= MAX_PER_SOURCE) continue;
     perSourceCount.set(sourceKey, count + 1);
     selected.push(finding);
-    if (selected.length >= MAX_TOTAL) break;
+    if (selected.length >= MAX_TOTAL + critical.length) break;
   }
 
   return selected;
