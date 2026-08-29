@@ -103,7 +103,7 @@ function sameOfficialHost(candidateUrl, sourceUrl) {
   try {
     const a = normalizedHost(new URL(candidateUrl).hostname);
     const b = normalizedHost(new URL(sourceUrl).hostname);
-    return a === b || a.endsWith(`.\${b}`) || b.endsWith(`.\${a}`);
+    return a === b || a.endsWith(`.${b}`) || b.endsWith(`.${a}`);
   } catch {
     return false;
   }
