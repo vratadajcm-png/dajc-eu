@@ -12,6 +12,12 @@ name: Publish Weekly Oversize Article
 # cheap, clearly reported no-op.
 
 on:
+  # One-time recovery hook used for the W36 catch-up after PR #5. The push
+  # handler below is removed again after the article is committed.
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-weekly-oversize.yml'
   schedule:
     - cron: '0 10 * * 5' # Friday 12:00 CEST
     - cron: '0 11 * * 5' # Friday 12:00 CET
@@ -45,6 +51,13 @@ jobs:
             echo "should_run=true" >> "$GITHUB_OUTPUT"
             echo "role=manual" >> "$GITHUB_OUTPUT"
             echo "Manual run - publication pipeline enabled."
+            exit 0
+          fi
+
+          if [ "$event" = "push" ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "role=w36-recovery" >> "$GITHUB_OUTPUT"
+            echo "One-time W36 recovery push - publication pipeline enabled."
             exit 0
           fi
 
