@@ -37,6 +37,7 @@ import { formatNextPublicationLabel } from './lib/next-publication.mjs';
 import { resolveDrivingBanFindings } from './lib/driving-ban-calendar.mjs';
 import { crossValidateDevelopments } from './lib/cross-validate.mjs';
 import { ensureOfficialCalendarLeadFloor } from './lib/lead-floor.mjs';
+import { ensureCriticalCoverage } from './lib/critical-floor.mjs';
 import { mergeRoundupSupplement, roundupNeedsSupplement, sanitizeRoundup } from './lib/roundup-breadth.mjs';
 
 const execFileAsync = promisify(execFile);
@@ -221,6 +222,14 @@ async function main() {
   const leadFloor = ensureOfficialCalendarLeadFloor(article, verified);
   article = leadFloor.article;
 
+  const criticalFloor = ensureCriticalCoverage(article, verified);
+  article = criticalFloor.article;
+  if (criticalFloor.critical.length > 0) {
+    console.log(
+      `Critical-news floor: ${criticalFloor.critical.length} required verified change(s); added ${criticalFloor.addedToLeads} to leads and ${criticalFloor.addedToRoundup} to Rest of Europe.`
+    );
+  }
+
   article.europeRoundup = sanitizeRoundup(
     article.europeRoundup,
     article.developments,
@@ -298,6 +307,7 @@ async function main() {
     europeRoundup: article.europeRoundup,
     weekStart: targetWeekStart,
     weekEnd: targetWeekEnd,
+    requiredSourceUrls: criticalFloor.critical.map((item) => item.sourceUrl),
   });
   if (!gate.ok) {
     console.error('Quality gate FAILED:');
