@@ -174,7 +174,7 @@ async function main() {
     return;
   }
 
-  const preSelected = [...calendarFindings, ...selectCandidates(monitoredFindings)];
+  const preSelected = [...calendarFindings, ...selectCandidates(monitoredFindings, { discoveryWindowStart: isoWeekStart(now) })];
   console.log(`Pre-selected for verification: ${preSelected.length} (${calendarFindings.length} from the official calendar, always included)`);
   if (preSelected.length === 0) {
     await abort('no candidates passed pre-selection');
