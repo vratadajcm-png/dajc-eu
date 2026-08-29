@@ -50,6 +50,10 @@ export const NON_RESTRICTION_PATTERNS = [
     reason: 'generic authority/navigation page, not a specific operational development',
     pattern: /wetten,? regels en vergunningen|laws,? rules and permits|datenschutzerkl[aä]rung|newsletter baustellenmeldungen|^autobahnbr[uü]cken\b|^baustellenkarte\b/i,
   },
+  {
+    reason: 'toll revenue/statistics report, not an operational toll-rule change',
+    pattern: /toll collection.{0,80}(?:billion|million|grew|growth|year[- ]on[- ]year|revenue)|(?:billion|million).{0,80}toll(?:s| collection)|mýtného.{0,80}(?:miliard|milion)|výběr mýta.{0,80}(?:miliard|milion)/i,
+  },
 ];
 
 /**
