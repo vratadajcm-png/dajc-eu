@@ -71,6 +71,7 @@ export const drivingBanCalendars = [
     country: 'DE',
     countryName: 'Germany',
     kind: 'annual-calendar',
+    suppressFromWeeklyAfter: '2026-09-01', // evergreen baseline; weekly only before September 2026
     validYear: 2026,
     sourceUrl:
       'https://www.balm.bund.de/DE/Themen/RechtsentwicklungRechtsvorschriften/Rechtsvorschriften/Strassenverkehrsrecht/LKW-Fahrverbote/LKW-Fahrverbote.html',
@@ -176,6 +177,7 @@ export const drivingBanCalendars = [
     country: 'CZ',
     countryName: 'Czechia',
     kind: 'standing-rule',
+    suppressFromWeeklyAfter: '2026-09-01', // evergreen baseline; weekly only before September 2026
     sourceUrl: 'https://md.gov.cz/Dokumenty/Silnicni-doprava/Vyjimky-ze-zakazu-jizdy-%28povoleni%29',
     sourceName: 'Ministerstvo dopravy CR - Vyjimky ze zakazu jizdy',
     legalBasis: 'Section 43(1) of Act No. 361/2000 Coll. - Sunday/rest-day and summer Friday/Saturday restrictions',
@@ -279,6 +281,7 @@ export const drivingBanCalendars = [
     country: 'SK',
     countryName: 'Slovakia',
     kind: 'standing-rule',
+    suppressFromWeeklyAfter: '2026-09-01', // evergreen baseline; weekly only before September 2026
     sourceUrl: 'https://static.slov-lex.sk/static/SK/ZZ/2009/8/20260901.html',
     sourceName: 'Slov-Lex - Act No. 8/2009 Coll., Section 39',
     legalBasis: 'Section 39 of Act No. 8/2009 Coll. on Road Traffic',
@@ -409,6 +412,7 @@ export const drivingBanCalendars = [
     country: 'FR',
     countryName: 'France',
     kind: 'standing-rule',
+    suppressFromWeeklyAfter: '2026-09-01', // evergreen baseline; weekly only before September 2026
     sourceUrl: 'https://www3.bison-fute.gouv.fr/IMG/pdf/BisonFute_Brochure_vehicules_lourds_FR_2025.pdf',
     sourceName: 'Bison Fute - Vehicules lourds, interdictions generales',
     legalBasis: 'Article 1 of the Order of 16 April 2021 - permanent general goods-vehicle restriction',
@@ -519,6 +523,7 @@ export const drivingBanCalendars = [
     country: 'SI',
     countryName: 'Slovenia',
     kind: 'standing-rule',
+    suppressFromWeeklyAfter: '2026-09-01', // evergreen baseline; weekly only before September 2026
     sourceUrl: 'https://www.promet.si/en/general-limitations',
     sourceName: 'Promet.si - Limitation of cargo traffic in Slovenia',
     legalBasis: 'Order on the Limiting of Traffic on Roads in the Republic of Slovenia',
@@ -593,6 +598,7 @@ export const drivingBanCalendars = [
     country: 'AT',
     countryName: 'Austria',
     kind: 'standing-rule',
+    suppressFromWeeklyAfter: '2026-09-01', // evergreen baseline; weekly only before September 2026
     sourceUrl: 'https://www.wko.at/transport/fahrverbote',
     sourceName: 'WKO - Fahrverbote in Oesterreich',
     legalBasis: 'Austrian nationwide weekend driving ban',
@@ -667,6 +673,7 @@ export const drivingBanCalendars = [
     country: 'CH',
     countryName: 'Switzerland',
     kind: 'standing-rule',
+    suppressFromWeeklyAfter: '2026-09-01', // evergreen baseline; weekly only before September 2026
     sourceUrl: 'https://www.astra.admin.ch/de/sonntags-und-nachtfahrten',
     sourceName: 'ASTRA - Sonntags- und Nachtfahrverbot',
     legalBasis: 'Standing Sunday and night driving ban',
