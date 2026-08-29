@@ -121,6 +121,37 @@ function resolveLink(href, baseUrl) {
   }
 }
 
+function enclosingHtmlContext(html, start, end) {
+  // Prefer a semantic/list container so one neighbouring link cannot make an
+  // unrelated anchor look transport-relevant. This specifically prevents
+  // navigation items such as "Careers" from inheriting words like "closure"
+  // from the next anchor in the page.
+  for (const tag of ['article', 'li', 'tr', 'p', 'section', 'div']) {
+    const openRe = new RegExp(`<${tag}\\b[^>]*>`, 'gi');
+    let openMatch;
+    let openIndex = -1;
+    while ((openMatch = openRe.exec(html)) && openMatch.index < start) {
+      openIndex = openMatch.index;
+    }
+    if (openIndex < 0) continue;
+
+    const closeBefore = html.lastIndexOf(`</${tag}>`, start);
+    if (closeBefore > openIndex) continue;
+
+    const closeIndex = html.indexOf(`</${tag}>`, end);
+    if (closeIndex < 0) continue;
+
+    const sliceEnd = closeIndex + tag.length + 3;
+    if (sliceEnd - openIndex > 3_000) continue;
+    return stripHtml(html.slice(openIndex, sliceEnd));
+  }
+
+  // No useful enclosing block: fall back to the anchor text only. Do not
+  // use an arbitrary surrounding byte window because sibling links can
+  // contaminate classification.
+  return stripHtml(html.slice(start, end));
+}
+
 function toFinding({ source, title, summary, sourceUrl }) {
   const text = `${title} ${summary || ''}`;
   const type = classify(text) || 'infrastructure';
@@ -162,14 +193,15 @@ export function extractHtmlFindings(html, source, pageUrl = source.url) {
     const title = stripHtml(match[4] || '');
     if (title.length < 8 || title.length > 280) continue;
 
-    // A small surrounding slice often carries route codes, restriction type,
-    // dates or a short teaser even when the anchor itself is terse.
-    const before = Math.max(0, match.index - 450);
-    const after = Math.min(html.length, anchorRe.lastIndex + 450);
-    const context = stripHtml(html.slice(before, after));
+    const context = enclosingHtmlContext(html, match.index, anchorRe.lastIndex);
     const text = `${title} ${context}`;
+
+    // HTML is less structured than RSS, so use a stricter ingestion rule:
+    // require a specific operational restriction/change classification.
+    // Generic "infrastructure" fallback remains available for structured
+    // feeds, but not for arbitrary website navigation/content links.
     const matchedType = classify(text);
-    if (!isRelevant(text, matchedType)) continue;
+    if (!matchedType || !checkOperationalRelevance(text).ok) continue;
 
     seen.add(sourceUrl);
     findings.push(toFinding({
