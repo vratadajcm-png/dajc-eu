@@ -1,0 +1,1166 @@
+{
+  "week": "2026-W35",
+  "checkedAt": "2026-08-29T12:08:24.279Z",
+  "jurisdictions": [
+    {
+      "code": "AL",
+      "name": "Albania",
+      "sourceScope": "AL",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "al-arrsh"
+      ],
+      "reachableSources": [
+        "al-arrsh"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "AD",
+      "name": "Andorra",
+      "sourceScope": "AD",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [],
+      "reachableSources": [],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "AM",
+      "name": "Armenia",
+      "sourceScope": "AM",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [],
+      "reachableSources": [],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "AT",
+      "name": "Austria",
+      "sourceScope": "AT",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [
+        "at-asfinag"
+      ],
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "at-asfinag",
+          "error": "HTTP 403"
+        }
+      ],
+      "candidateFindings": 0
+    },
+    {
+      "code": "AZ",
+      "name": "Azerbaijan",
+      "sourceScope": "AZ",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [],
+      "reachableSources": [],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "BY",
+      "name": "Belarus",
+      "sourceScope": "BY",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "by-belavtodor"
+      ],
+      "reachableSources": [
+        "by-belavtodor"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "BE",
+      "name": "Belgium",
+      "sourceScope": "BE",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "be-viapass"
+      ],
+      "reachableSources": [
+        "be-viapass"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "BA",
+      "name": "Bosnia and Herzegovina",
+      "sourceScope": "BA",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "ba-jpdcfbih"
+      ],
+      "reachableSources": [
+        "ba-jpdcfbih"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "BG",
+      "name": "Bulgaria",
+      "sourceScope": "BG",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [
+        "bg-api"
+      ],
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "bg-api",
+          "error": "fetch failed"
+        }
+      ],
+      "candidateFindings": 0
+    },
+    {
+      "code": "HR",
+      "name": "Croatia",
+      "sourceScope": "HR",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "hr-hrvatske-ceste"
+      ],
+      "reachableSources": [
+        "hr-hrvatske-ceste"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 7
+    },
+    {
+      "code": "CY",
+      "name": "Cyprus",
+      "sourceScope": "CY",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [
+        "cy-public-works"
+      ],
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "cy-public-works",
+          "error": "fetch failed"
+        }
+      ],
+      "candidateFindings": 0
+    },
+    {
+      "code": "CZ",
+      "name": "Czechia",
+      "sourceScope": "CZ",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "cz-czechtoll"
+      ],
+      "reachableSources": [
+        "cz-czechtoll"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 7
+    },
+    {
+      "code": "DK",
+      "name": "Denmark",
+      "sourceScope": "DK",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "dk-vejdirektoratet"
+      ],
+      "reachableSources": [
+        "dk-vejdirektoratet"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "EE",
+      "name": "Estonia",
+      "sourceScope": "EE",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "ee-transpordiamet"
+      ],
+      "reachableSources": [
+        "ee-transpordiamet"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "FI",
+      "name": "Finland",
+      "sourceScope": "FI",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "fi-vayla"
+      ],
+      "reachableSources": [
+        "fi-vayla"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "FR",
+      "name": "France",
+      "sourceScope": "FR",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "fr-bison-fute"
+      ],
+      "reachableSources": [
+        "fr-bison-fute"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "GE",
+      "name": "Georgia",
+      "sourceScope": "GE",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [],
+      "reachableSources": [],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "DE",
+      "name": "Germany",
+      "sourceScope": "DE",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "de-polizei-blaulicht",
+        "de-autobahn"
+      ],
+      "reachableSources": [
+        "de-polizei-blaulicht",
+        "de-autobahn"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 8
+    },
+    {
+      "code": "GR",
+      "name": "Greece",
+      "sourceScope": "GR",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "gr-yme"
+      ],
+      "reachableSources": [
+        "gr-yme"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "HU",
+      "name": "Hungary",
+      "sourceScope": "HU",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "hu-kozut"
+      ],
+      "reachableSources": [
+        "hu-kozut"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 20
+    },
+    {
+      "code": "IS",
+      "name": "Iceland",
+      "sourceScope": "IS",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "is-vegagerdin"
+      ],
+      "reachableSources": [
+        "is-vegagerdin"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "IE",
+      "name": "Ireland",
+      "sourceScope": "IE",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "ie-tii"
+      ],
+      "reachableSources": [
+        "ie-tii"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "IT",
+      "name": "Italy",
+      "sourceScope": "IT",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [
+        "it-anas"
+      ],
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "it-anas",
+          "error": "fetch failed"
+        }
+      ],
+      "candidateFindings": 0
+    },
+    {
+      "code": "KZ",
+      "name": "Kazakhstan (European transport scope)",
+      "sourceScope": "KZ",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [],
+      "reachableSources": [],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "XK",
+      "name": "Kosovo",
+      "sourceScope": "XK",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "xk-kosovopolice"
+      ],
+      "reachableSources": [
+        "xk-kosovopolice"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "LV",
+      "name": "Latvia",
+      "sourceScope": "LV",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "lv-lvceli"
+      ],
+      "reachableSources": [
+        "lv-lvceli"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "LI",
+      "name": "Liechtenstein",
+      "sourceScope": "LI",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [],
+      "reachableSources": [],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "LT",
+      "name": "Lithuania",
+      "sourceScope": "LT",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "lt-vialietuva"
+      ],
+      "reachableSources": [
+        "lt-vialietuva"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 2
+    },
+    {
+      "code": "LU",
+      "name": "Luxembourg",
+      "sourceScope": "LU",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "lu-pch"
+      ],
+      "reachableSources": [
+        "lu-pch"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "MT",
+      "name": "Malta",
+      "sourceScope": "MT",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "mt-transport"
+      ],
+      "reachableSources": [
+        "mt-transport"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "MD",
+      "name": "Moldova",
+      "sourceScope": "MD",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [
+        "md-drumuri"
+      ],
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "md-drumuri",
+          "error": "fetch failed"
+        }
+      ],
+      "candidateFindings": 0
+    },
+    {
+      "code": "MC",
+      "name": "Monaco",
+      "sourceScope": "MC",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "mc-gouv"
+      ],
+      "reachableSources": [
+        "mc-gouv"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 6
+    },
+    {
+      "code": "ME",
+      "name": "Montenegro",
+      "sourceScope": "ME",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "me-monteput"
+      ],
+      "reachableSources": [
+        "me-monteput"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 5
+    },
+    {
+      "code": "NL",
+      "name": "Netherlands",
+      "sourceScope": "NL",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "nl-rijkswaterstaat"
+      ],
+      "reachableSources": [
+        "nl-rijkswaterstaat"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 3
+    },
+    {
+      "code": "MK",
+      "name": "North Macedonia",
+      "sourceScope": "MK",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "mk-roads"
+      ],
+      "reachableSources": [
+        "mk-roads"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "NO",
+      "name": "Norway",
+      "sourceScope": "NO",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "no-vegvesen"
+      ],
+      "reachableSources": [
+        "no-vegvesen"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "PL",
+      "name": "Poland",
+      "sourceScope": "PL",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "pl-policja"
+      ],
+      "reachableSources": [
+        "pl-policja"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "PT",
+      "name": "Portugal",
+      "sourceScope": "PT",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "pt-ip"
+      ],
+      "reachableSources": [
+        "pt-ip"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "RO",
+      "name": "Romania",
+      "sourceScope": "RO",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [
+        "ro-cnair"
+      ],
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "ro-cnair",
+          "error": "fetch failed"
+        }
+      ],
+      "candidateFindings": 0
+    },
+    {
+      "code": "RU",
+      "name": "Russia (European transport scope)",
+      "sourceScope": "RU",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [],
+      "reachableSources": [],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "SM",
+      "name": "San Marino",
+      "sourceScope": "SM",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [],
+      "reachableSources": [],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "RS",
+      "name": "Serbia",
+      "sourceScope": "RS",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "rs-putevi"
+      ],
+      "reachableSources": [
+        "rs-putevi"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "SK",
+      "name": "Slovakia",
+      "sourceScope": "SK",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [],
+      "reachableSources": [],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "SI",
+      "name": "Slovenia",
+      "sourceScope": "SI",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "si-dars"
+      ],
+      "reachableSources": [
+        "si-dars"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "ES",
+      "name": "Spain",
+      "sourceScope": "ES",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "es-dgt"
+      ],
+      "reachableSources": [
+        "es-dgt"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 19
+    },
+    {
+      "code": "SE",
+      "name": "Sweden",
+      "sourceScope": "SE",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "se-trafikverket"
+      ],
+      "reachableSources": [
+        "se-trafikverket"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "CH",
+      "name": "Switzerland",
+      "sourceScope": "CH",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "ch-astra"
+      ],
+      "reachableSources": [
+        "ch-astra"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 8
+    },
+    {
+      "code": "TR",
+      "name": "Türkiye (European transport scope)",
+      "sourceScope": "TR",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "tr-kgm"
+      ],
+      "reachableSources": [
+        "tr-kgm"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "UA",
+      "name": "Ukraine",
+      "sourceScope": "UA",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "ua-restoration"
+      ],
+      "reachableSources": [
+        "ua-restoration"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "UK",
+      "name": "United Kingdom",
+      "sourceScope": "UK",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "reachableSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "VA",
+      "name": "Vatican City",
+      "sourceScope": "VA",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [],
+      "reachableSources": [],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "AX",
+      "name": "Åland Islands",
+      "sourceScope": "FI",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "fi-vayla"
+      ],
+      "reachableSources": [
+        "fi-vayla"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "FO",
+      "name": "Faroe Islands",
+      "sourceScope": "DK",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "dk-vejdirektoratet"
+      ],
+      "reachableSources": [
+        "dk-vejdirektoratet"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "GI",
+      "name": "Gibraltar",
+      "sourceScope": "UK",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "reachableSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "GG",
+      "name": "Guernsey",
+      "sourceScope": "UK",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "reachableSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "JE",
+      "name": "Jersey",
+      "sourceScope": "UK",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "reachableSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "IM",
+      "name": "Isle of Man",
+      "sourceScope": "UK",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "reachableSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "SJ",
+      "name": "Svalbard and Jan Mayen",
+      "sourceScope": "NO",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "no-vegvesen"
+      ],
+      "reachableSources": [
+        "no-vegvesen"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "GL",
+      "name": "Greenland (European jurisdiction link)",
+      "sourceScope": "DK",
+      "status": "checked-no-material-development-found",
+      "configuredSources": [
+        "dk-vejdirektoratet"
+      ],
+      "reachableSources": [
+        "dk-vejdirektoratet"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "SBA",
+      "name": "Akrotiri and Dhekelia",
+      "sourceScope": "CY",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [
+        "cy-public-works"
+      ],
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "cy-public-works",
+          "error": "fetch failed"
+        }
+      ],
+      "candidateFindings": 0
+    },
+    {
+      "code": "NCY",
+      "name": "Northern Cyprus",
+      "sourceScope": "CY",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [
+        "cy-public-works"
+      ],
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "cy-public-works",
+          "error": "fetch failed"
+        }
+      ],
+      "candidateFindings": 0
+    },
+    {
+      "code": "CEU",
+      "name": "Ceuta",
+      "sourceScope": "ES",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "es-dgt"
+      ],
+      "reachableSources": [
+        "es-dgt"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 19
+    },
+    {
+      "code": "MLL",
+      "name": "Melilla",
+      "sourceScope": "ES",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "es-dgt"
+      ],
+      "reachableSources": [
+        "es-dgt"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 19
+    },
+    {
+      "code": "AZO",
+      "name": "Azores",
+      "sourceScope": "PT",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "pt-ip"
+      ],
+      "reachableSources": [
+        "pt-ip"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "MAD",
+      "name": "Madeira",
+      "sourceScope": "PT",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "pt-ip"
+      ],
+      "reachableSources": [
+        "pt-ip"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "CAN",
+      "name": "Canary Islands",
+      "sourceScope": "ES",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "es-dgt"
+      ],
+      "reachableSources": [
+        "es-dgt"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 19
+    },
+    {
+      "code": "ENG",
+      "name": "England",
+      "sourceScope": "UK",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "reachableSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "SCT",
+      "name": "Scotland",
+      "sourceScope": "UK",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "reachableSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "WLS",
+      "name": "Wales",
+      "sourceScope": "UK",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "reachableSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "NIR",
+      "name": "Northern Ireland",
+      "sourceScope": "UK",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "reachableSources": [
+        "uk-govuk-dft",
+        "uk-npcc"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "FBIH",
+      "name": "Federation of Bosnia and Herzegovina",
+      "sourceScope": "BA",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "ba-jpdcfbih"
+      ],
+      "reachableSources": [
+        "ba-jpdcfbih"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "RSBA",
+      "name": "Republika Srpska",
+      "sourceScope": "BA",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "ba-jpdcfbih"
+      ],
+      "reachableSources": [
+        "ba-jpdcfbih"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "AB",
+      "name": "Abkhazia",
+      "sourceScope": "GE",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [],
+      "reachableSources": [],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "SO",
+      "name": "South Ossetia",
+      "sourceScope": "GE",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [],
+      "reachableSources": [],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    },
+    {
+      "code": "TRN",
+      "name": "Transnistria",
+      "sourceScope": "MD",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [
+        "md-drumuri"
+      ],
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "md-drumuri",
+          "error": "fetch failed"
+        }
+      ],
+      "candidateFindings": 0
+    },
+    {
+      "code": "GAG",
+      "name": "Gagauzia",
+      "sourceScope": "MD",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [
+        "md-drumuri"
+      ],
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "md-drumuri",
+          "error": "fetch failed"
+        }
+      ],
+      "candidateFindings": 0
+    },
+    {
+      "code": "CAT",
+      "name": "Catalonia",
+      "sourceScope": "ES",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "es-dgt"
+      ],
+      "reachableSources": [
+        "es-dgt"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 19
+    },
+    {
+      "code": "BAS",
+      "name": "Basque Country",
+      "sourceScope": "ES",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "es-dgt"
+      ],
+      "reachableSources": [
+        "es-dgt"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 19
+    },
+    {
+      "code": "GAL",
+      "name": "Galicia",
+      "sourceScope": "ES",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "es-dgt"
+      ],
+      "reachableSources": [
+        "es-dgt"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 19
+    },
+    {
+      "code": "FLA",
+      "name": "Flanders",
+      "sourceScope": "BE",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "be-viapass"
+      ],
+      "reachableSources": [
+        "be-viapass"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "WAL",
+      "name": "Wallonia",
+      "sourceScope": "BE",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "be-viapass"
+      ],
+      "reachableSources": [
+        "be-viapass"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "BRU",
+      "name": "Brussels-Capital Region",
+      "sourceScope": "BE",
+      "status": "checked-major-or-short-update-candidates-found",
+      "configuredSources": [
+        "be-viapass"
+      ],
+      "reachableSources": [
+        "be-viapass"
+      ],
+      "unavailableSources": [],
+      "candidateFindings": 1
+    },
+    {
+      "code": "RSM",
+      "name": "Republic of San Marino road jurisdiction",
+      "sourceScope": "SM",
+      "status": "checked-source-availability-limited",
+      "configuredSources": [],
+      "reachableSources": [],
+      "unavailableSources": [],
+      "candidateFindings": 0
+    }
+  ]
+}
