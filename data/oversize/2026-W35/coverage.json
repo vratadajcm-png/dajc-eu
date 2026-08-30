@@ -1,6 +1,6 @@
 {
   "week": "2026-W35",
-  "checkedAt": "2026-08-29T12:08:24.279Z",
+  "checkedAt": "2026-08-30T11:04:54.905Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -247,7 +247,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 8
+      "candidateFindings": 9
     },
     {
       "code": "GR",
@@ -416,17 +416,14 @@
       "code": "MD",
       "name": "Moldova",
       "sourceScope": "MD",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "md-drumuri"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "md-drumuri",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "md-drumuri"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -1038,34 +1035,28 @@
       "code": "TRN",
       "name": "Transnistria",
       "sourceScope": "MD",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "md-drumuri"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "md-drumuri",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "md-drumuri"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "GAG",
       "name": "Gagauzia",
       "sourceScope": "MD",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "md-drumuri"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "md-drumuri",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "md-drumuri"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
