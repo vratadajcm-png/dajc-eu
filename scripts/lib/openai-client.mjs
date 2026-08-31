@@ -31,6 +31,18 @@ const DEVELOPMENT_SCHEMA = {
 };
 
 
+
+const LEAD_SUPPLEMENT_SCHEMA = {
+  name: 'dajc_lead_supplement',
+  strict: true,
+  schema: {
+    type: 'object',
+    properties: { items: { type: 'array', items: DEVELOPMENT_SCHEMA } },
+    required: ['items'],
+    additionalProperties: false,
+  },
+};
+
 const ROUNDUP_SUPPLEMENT_SCHEMA = {
   name: 'dajc_europe_roundup_supplement',
   strict: true,
@@ -189,6 +201,35 @@ export async function generateRoundupSupplementWithOpenAI({
       { role:'user', content:`Target week ${targetWeekStart} to ${targetWeekEnd}. Existing countries: ${existingCountries.join(', ') || 'none'}. Need at least ${neededCountries} additional jurisdictions and ${neededReports} additional reports. Return up to 16 items.\n\nVerified unused candidates:\n${JSON.stringify(payload)}` },
     ],
     response_format:{ type:'json_schema', json_schema:ROUNDUP_SUPPLEMENT_SCHEMA },
+  });
+  const text = response.choices?.[0]?.message?.content;
+  if (!text) return [];
+  const parsed = JSON.parse(text);
+  return Array.isArray(parsed.items) ? parsed.items : [];
+}
+
+export async function generateLeadSupplementWithOpenAI({
+  candidates, targetWeekStart, targetWeekEnd, apiKey, neededReports = 0, model,
+}) {
+  if (!candidates.length || neededReports <= 0) return [];
+  const client = new OpenAI({ apiKey });
+  const payload = candidates.slice(0, 36).map((c) => ({
+    country:c.country, location:c.location, type:c.type, title:c.title,
+    summary:String(c.summary || '').slice(0,1000), validFrom:c.validFrom, validTo:c.validTo,
+    vehicleScope:c.vehicleScope || '', timeWindow:c.timeWindow || '',
+    routeScope:c.routeScope || c.location || '', impact:c.impact || '',
+    recommendedAction:c.recommendedAction || '', exemptions:c.exemptions || '',
+    isDrivingBan:Boolean(c.isDrivingBan || c.type === 'driving_ban'),
+    isInfrastructure:Boolean(c.isInfrastructure || /bridge|tunnel|road_closure|roadworks|route_restriction|infrastructure/.test(c.type || '')),
+    sourceUrl:c.sourceUrl, sourceName:c.sourceName,
+  }));
+  const response = await client.chat.completions.create({
+    model: model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
+    messages: [
+      { role:'system', content:'Select additional LEAD reports for DAJC European Oversize & Special Transport Intelligence only from supplied verified unused candidates. Each must be substantive and operationally relevant to heavy, abnormal, oversized or special road transport. Never use routine Sunday bans, generic administration, statistics, accidents/crime, procurement, short or undated road closures, or filler. Copy sourceUrl/sourceName EXACTLY.' },
+      { role:'user', content:`Target week ${targetWeekStart} to ${targetWeekEnd}. Need up to ${neededReports} additional substantive lead reports to reach the 20-report minimum. Return fewer if genuine material is insufficient.\n\nVerified unused candidates:\n${JSON.stringify(payload)}` },
+    ],
+    response_format:{ type:'json_schema', json_schema:LEAD_SUPPLEMENT_SCHEMA },
   });
   const text = response.choices?.[0]?.message?.content;
   if (!text) return [];
