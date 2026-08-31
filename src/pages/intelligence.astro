@@ -1,66 +1,43 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import IntelligencePreferencePreview from '../components/IntelligencePreferencePreview.astro';
-import { dajcEuropeCoverage } from '../../config/europe-coverage.mjs';
-
-const jurisdictions = dajcEuropeCoverage
-  .map(([code, name]) => ({ code, name }))
-  .sort((a, b) => a.name.localeCompare(b.name, 'en'));
 ---
 <BaseLayout
   title="DAJC Intelligence - European Heavy Transport Operational Intelligence"
-  description="DAJC Intelligence is being built for vehicle-aware European heavy-transport restrictions, change detection, alerts and operational history."
+  description="DAJC Intelligence is an operational intelligence layer being developed for European heavy and oversized transport."
 >
   <main class="product-page">
     <p class="eyebrow">DAJC Intelligence</p>
-    <h1>Know what changed before it becomes a transport problem.</h1>
+    <h1>Operational intelligence for European heavy transport.</h1>
     <p class="lead">
-      EU Oversize Weekly and the basic Driving Bans Calendar stay public. DAJC Intelligence adds the operational layer:
-      saved scope, relevance, change detection, alerts and history.
+      DAJC Intelligence is being developed alongside DAJC's public operational resources to help transport professionals work with relevant changes across Europe.
     </p>
 
-    <div class="status">Early product build · no payment is collected on this page.</div>
+    <div class="status">In active development · details may change as the product improves.</div>
 
-    <section class="capabilities" aria-labelledby="capabilities-title">
-      <h2 id="capabilities-title">What the paid layer is being built for</h2>
+    <section class="principles" aria-labelledby="principles-title">
+      <h2 id="principles-title">What stays constant</h2>
       <div class="grid">
-        <article><h3>Saved operating scope</h3><p>Jurisdictions, corridors and operating profiles you use repeatedly.</p></article>
-        <article><h3>Vehicle-aware relevance</h3><p>Filter noise using vehicle and transport characteristics instead of country-only alerts.</p></article>
-        <article><h3>Change detection</h3><p>Surface what was added, changed, extended, cancelled or newly relevant.</p></article>
-        <article><h3>Immediate alerts</h3><p>Operational notifications instead of waiting for the next weekly briefing.</p></article>
-        <article><h3>History & evidence</h3><p>See how a maintained rule changed and retain source/provenance context.</p></article>
-        <article><h3>Calendar & integrations</h3><p>Advanced feeds and future dispatch/TMS/API hooks with controlled entitlements.</p></article>
+        <article><h3>Operational focus</h3><p>Designed around real European heavy and oversized transport operations.</p></article>
+        <article><h3>European scope</h3><p>Built with cross-border transport and differing national requirements in mind.</p></article>
+        <article><h3>Relevant information</h3><p>The goal is to make important operational changes easier to identify and use.</p></article>
       </div>
     </section>
 
-    <IntelligencePreferencePreview jurisdictions={jurisdictions} />
-
-    <section class="free-vs-paid" aria-labelledby="model-title">
-      <h2 id="model-title">Free remains useful</h2>
-      <div class="columns">
-        <div><strong>DAJC.eu Free</strong><p>EU Oversize Weekly, Platform Updates, basic Driving Bans Calendar, demo and public Integration Ecosystem.</p></div>
-        <div><strong>DAJC Intelligence</strong><p>Personalisation, change detection, alerts, history and advanced operational feeds. Standalone price has not been announced yet.</p></div>
-      </div>
+    <section class="public-resources" aria-labelledby="public-title">
+      <h2 id="public-title">Public resources remain available</h2>
+      <p>DAJC.eu continues to provide public news and operational resources while Intelligence is developed.</p>
+      <div class="links"><a href="/news">DAJC News</a><a href="/driving-bans">Driving Bans</a></div>
     </section>
 
     <section class="cta">
-      <p class="eyebrow">Early access</p>
-      <h2>Want to use Intelligence as it is built?</h2>
-      <p>Tell us which countries, corridors and restriction changes matter to your operation.</p>
-      <a href="mailto:team@dajc.eu?subject=DAJC%20Intelligence%20Early%20Access">Request early access</a>
+      <p class="eyebrow">Stay in touch</p>
+      <h2>Interested in DAJC Intelligence?</h2>
+      <p>Contact DAJC if you would like to follow its development or discuss your operational needs.</p>
+      <a href="mailto:team@dajc.eu?subject=DAJC%20Intelligence%20Interest">Contact DAJC</a>
     </section>
   </main>
 </BaseLayout>
 
 <style>
-  .product-page{position:relative;z-index:2;max-width:1040px;margin:0 auto;padding:8vh 1.5rem 9vh;text-align:center}
-  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--dajc-orange);margin:0 0 1rem}
-  h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2rem,5vw,3.5rem);line-height:1.05;max-width:18ch;margin:0 auto 1rem}
-  .lead{max-width:68ch;margin:0 auto;color:var(--dajc-muted);font-size:17px;line-height:1.75}
-  .status{display:inline-block;margin:1.5rem auto 3rem;padding:.55rem .85rem;border:1px solid var(--dajc-line);border-radius:999px;color:var(--dajc-muted);font-family:'IBM Plex Mono',monospace;font-size:11px}
-  section{margin-top:4rem}.capabilities h2,.free-vs-paid h2,.cta h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.4rem,3vw,2rem)}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;text-align:left}.grid article,.columns>div{padding:1.3rem;border:1px solid var(--dajc-line);border-radius:12px;background:rgba(0,38,92,.16)}.grid h3{margin:0 0 .5rem;font-family:'Space Grotesk',sans-serif}.grid p,.columns p,.cta p{color:var(--dajc-muted);line-height:1.65;margin:.2rem 0}
-  .columns{display:grid;grid-template-columns:1fr 1fr;gap:1rem;text-align:left}.columns strong{color:var(--dajc-orange);font-family:'Space Grotesk',sans-serif}
-  .cta{padding:2rem;border:1px solid var(--dajc-orange);border-radius:16px;background:linear-gradient(135deg,rgba(255,159,0,.08),rgba(0,38,92,.2))}.cta a{display:inline-flex;min-height:44px;align-items:center;justify-content:center;margin-top:1rem;padding:0 1rem;border-radius:8px;background:var(--dajc-orange);color:var(--dajc-dark);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
-  @media(max-width:760px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:520px){.grid,.columns{grid-template-columns:1fr}.product-page{padding-left:1rem;padding-right:1rem}}
+  .product-page{position:relative;z-index:2;max-width:1040px;margin:0 auto;padding:8vh 1.5rem 9vh;text-align:center}.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--dajc-orange);margin:0 0 1rem}h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2rem,5vw,3.5rem);line-height:1.05;max-width:18ch;margin:0 auto 1rem}.lead{max-width:68ch;margin:0 auto;color:var(--dajc-muted);font-size:17px;line-height:1.75}.status{display:inline-block;margin:1.5rem auto 3rem;padding:.55rem .85rem;border:1px solid var(--dajc-line);border-radius:999px;color:var(--dajc-muted);font-family:'IBM Plex Mono',monospace;font-size:11px}section{margin-top:4rem}.principles h2,.public-resources h2,.cta h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.4rem,3vw,2rem)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;text-align:left}.grid article{padding:1.3rem;border:1px solid var(--dajc-line);border-radius:12px;background:rgba(0,38,92,.16)}.grid h3{margin:0 0 .5rem;font-family:'Space Grotesk',sans-serif}.grid p,.public-resources p,.cta p{color:var(--dajc-muted);line-height:1.65;margin:.2rem 0}.public-resources{padding:1.5rem;border:1px solid var(--dajc-line);border-radius:14px}.links{display:flex;justify-content:center;gap:.8rem;flex-wrap:wrap;margin-top:1rem}.links a,.cta a{display:inline-flex;min-height:44px;align-items:center;justify-content:center;padding:0 1rem;border:1px solid var(--dajc-orange);border-radius:8px;color:var(--dajc-orange);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}.cta{padding:2rem;border:1px solid var(--dajc-orange);border-radius:16px;background:linear-gradient(135deg,rgba(255,159,0,.08),rgba(0,38,92,.2))}.cta a{margin-top:1rem;background:var(--dajc-orange);color:var(--dajc-dark)}@media(max-width:760px){.grid{grid-template-columns:1fr}}@media(max-width:520px){.product-page{padding-left:1rem;padding-right:1rem}}
 </style>
