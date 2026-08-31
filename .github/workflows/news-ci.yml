@@ -43,9 +43,3 @@ jobs:
 
       - name: Exercise live official-source monitor
         run: npm run oversize:monitor
-
-      - name: One-time live preview validation
-        if: github.head_ref == 'fix/weekly-policy-strict-10x6'
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: npm run oversize:publish -- --preview --dry-run
