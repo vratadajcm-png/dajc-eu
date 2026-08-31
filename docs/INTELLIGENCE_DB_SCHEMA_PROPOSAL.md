@@ -25,6 +25,13 @@ Therefore the proposed Intelligence model uses:
 
 Current evidence still represents a single canonical `profiles.org_id` organization binding per authenticated user. If the Platform later introduces a multi-organization membership authority, Intelligence must migrate to that canonical authority rather than inventing its own abstraction.
 
+Verified implementation evidence used for this design:
+- `HaulBoard/supabase/migrations/20260709120001_core_tables.sql` — `organizations`, `profiles`, `profiles.org_id`;
+- `HaulBoard/supabase/migrations/20260709120008_rls_helper_functions.sql` — `current_org_id()` and role/access helpers;
+- `HaulBoard/supabase/migrations/20260709120009_rls_organizations_profiles_invitations.sql` — organization/profile RLS;
+- `HaulBoard/supabase/migrations/20260719071500_lock_profiles_sensitive_columns.sql` — sensitive profile columns, including `org_id`, cannot be freely client-mutated;
+- `HaulBoard/lib/auth/require-profile.ts` — canonical server actor context `{ userId, orgId, role, canDrive }`.
+
 ## Design goals
 
 - explicit organization/user ownership;
