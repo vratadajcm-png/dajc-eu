@@ -188,3 +188,5 @@ The persistence design layer can be considered architecture-ready when:
 - master/status documentation matches the actual implementation and blockers.
 
 Architecture-ready does not mean production-persistence-ready. Production remains blocked until the migration gate above is explicitly satisfied.
+
+QA evidence for the current application implementation before documentation-only follow-up commits: Application CI run `33397042445` completed successfully for code head `85e327f` (install, Astro/TypeScript typecheck, unit/integration tests and Astro build), and Vercel for that same code head completed successfully. Documentation-only commits do not weaken the migration gate above.
