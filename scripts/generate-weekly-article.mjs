@@ -39,6 +39,7 @@ import { crossValidateDevelopments } from './lib/cross-validate.mjs';
 import { ensureOfficialCalendarLeadFloor } from './lib/lead-floor.mjs';
 import { ensureCriticalCoverage } from './lib/critical-floor.mjs';
 import { mergeRoundupSupplement, roundupNeedsSupplement, sanitizeRoundup } from './lib/roundup-breadth.mjs';
+import { filterGeneratedItems } from './lib/generated-item-filter.mjs';
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -218,9 +219,20 @@ async function main() {
   }
 
   const { kept, droppedCount } = crossValidateDevelopments(article.developments, verified);
-  article.developments = kept;
+  const initialLeadFilter = filterGeneratedItems(kept, { weekStart: targetWeekStart, weekEnd: targetWeekEnd });
+  article.developments = initialLeadFilter.kept;
+
   const roundupValidation = crossValidateDevelopments(article.europeRoundup || [], verified);
-  article.europeRoundup = roundupValidation.kept;
+  const initialRoundupFilter = filterGeneratedItems(roundupValidation.kept, {
+    weekStart: targetWeekStart,
+    weekEnd: targetWeekEnd,
+    usedSourceUrls: new Set(article.developments.map((item) => item.sourceUrl).filter(Boolean)),
+  });
+  article.europeRoundup = initialRoundupFilter.kept;
+
+  for (const dropped of [...initialLeadFilter.dropped, ...initialRoundupFilter.dropped]) {
+    console.log(`  [AI item removed] "${dropped.item?.title || 'untitled'}": ${dropped.reason}`);
+  }
 
   const leadFloor = ensureOfficialCalendarLeadFloor(article, verified);
   article = leadFloor.article;
@@ -240,35 +252,41 @@ async function main() {
 
 
   if (!mock && article.developments.length < 20) {
-    const usedSourceUrls = new Set(
-      [...article.developments, ...article.europeRoundup]
-        .map((item) => item.sourceUrl)
-        .filter(Boolean)
-    );
-    const remainingVerified = verified.filter(
-      (candidate) => candidate.sourceUrl && !usedSourceUrls.has(candidate.sourceUrl)
-    );
-    const neededLeads = 20 - article.developments.length;
-    console.log(`Lead repair needed: ${article.developments.length}/20; requesting up to ${neededLeads} additional substantive verified lead(s).`);
-    try {
-      const supplement = await generateLeadSupplementWithOpenAI({
-        candidates: remainingVerified,
-        targetWeekStart: targetWeekStartIso,
-        targetWeekEnd: targetWeekEndIso,
-        apiKey,
-        neededReports: neededLeads,
-      });
-      const supplementValidation = crossValidateDevelopments(supplement, remainingVerified);
-      const seen = new Set(article.developments.map((item) => item.sourceUrl).filter(Boolean));
-      for (const item of supplementValidation.kept) {
-        if (article.developments.length >= 20) break;
-        if (!item.sourceUrl || seen.has(item.sourceUrl)) continue;
-        article.developments.push(item);
-        seen.add(item.sourceUrl);
+    for (let attempt = 1; attempt <= 2 && article.developments.length < 20; attempt += 1) {
+      const usedSourceUrls = new Set(
+        [...article.developments, ...article.europeRoundup]
+          .map((item) => item.sourceUrl)
+          .filter(Boolean)
+      );
+      const remainingVerified = verified.filter(
+        (candidate) => candidate.sourceUrl && !usedSourceUrls.has(candidate.sourceUrl)
+      );
+      const neededLeads = 20 - article.developments.length;
+      if (remainingVerified.length === 0) break;
+      console.log(`Lead repair attempt ${attempt}: ${article.developments.length}/20; requesting up to ${neededLeads} additional substantive verified lead(s).`);
+      try {
+        const supplement = await generateLeadSupplementWithOpenAI({
+          candidates: remainingVerified,
+          targetWeekStart: targetWeekStartIso,
+          targetWeekEnd: targetWeekEndIso,
+          apiKey,
+          neededReports: neededLeads,
+        });
+        const supplementValidation = crossValidateDevelopments(supplement, remainingVerified);
+        const supplementFilter = filterGeneratedItems(supplementValidation.kept, {
+          weekStart: targetWeekStart,
+          weekEnd: targetWeekEnd,
+          usedSourceUrls: new Set([...article.developments, ...article.europeRoundup].map((x) => x.sourceUrl).filter(Boolean)),
+        });
+        for (const dropped of supplementFilter.dropped) {
+          console.log(`  [lead supplement removed] "${dropped.item?.title || 'untitled'}": ${dropped.reason}`);
+        }
+        article.developments.push(...supplementFilter.kept.slice(0, neededLeads));
+        console.log(`Lead supplement kept ${supplementFilter.kept.length}; leads now ${article.developments.length}.`);
+      } catch (err) {
+        console.warn(`Lead supplement failed: ${err.message || err}. Quality gate will decide whether publication can continue.`);
+        break;
       }
-      console.log(`Lead supplement: ${supplementValidation.kept.length} cross-validated candidate(s); leads now ${article.developments.length}.`);
-    } catch (err) {
-      console.warn(`Lead supplement failed: ${err.message || err}. Quality gate will decide whether publication can continue.`);
     }
   }
 
@@ -284,8 +302,9 @@ async function main() {
   }
 
   if (!mock) {
-    const breadth = roundupNeedsSupplement(article.europeRoundup);
-    if (breadth.needsSupplement) {
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      const breadth = roundupNeedsSupplement(article.europeRoundup);
+      if (!breadth.needsSupplement) break;
       const usedSourceUrls = new Set(
         [...article.developments, ...article.europeRoundup]
           .map((item) => item.sourceUrl)
@@ -310,16 +329,25 @@ async function main() {
           neededReports: Math.max(0, breadth.neededReports),
         });
         const supplementValidation = crossValidateDevelopments(supplement, remainingVerified);
+        const supplementFilter = filterGeneratedItems(supplementValidation.kept, {
+          weekStart: targetWeekStart,
+          weekEnd: targetWeekEnd,
+          usedSourceUrls: new Set([...article.developments, ...article.europeRoundup].map((x) => x.sourceUrl).filter(Boolean)),
+        });
+        for (const dropped of supplementFilter.dropped) {
+          console.log(`  [roundup supplement removed] "${dropped.item?.title || 'untitled'}": ${dropped.reason}`);
+        }
         article.europeRoundup = mergeRoundupSupplement(
           article.europeRoundup,
-          supplementValidation.kept,
+          supplementFilter.kept,
           new Set(article.developments.map((item) => item.sourceUrl).filter(Boolean))
         );
         console.log(
-          `Rest-of-Europe supplement: ${supplementValidation.kept.length} cross-validated candidate(s); roundup now has ${article.europeRoundup.length} report(s) across ${roundupNeedsSupplement(article.europeRoundup).countryCount} countries.`
+          `Rest-of-Europe supplement kept ${supplementFilter.kept.length}; roundup now has ${article.europeRoundup.length} report(s) across ${roundupNeedsSupplement(article.europeRoundup).countryCount} countries.`
         );
       } catch (err) {
         console.warn(`Rest-of-Europe supplement failed: ${err.message || err}. Quality gate will decide whether publication can continue.`);
+        break;
       }
     }
   }
