@@ -76,6 +76,11 @@ export function detectIntelligenceChanges(args: {
   previous: IntelligenceSnapshotItem[];
   current: IntelligenceSnapshotItem[];
   observedAt: string;
+  /**
+   * Only a source adapter that has positively established a complete snapshot may set this true.
+   * This prevents a source outage, partial response or parser failure from generating mass cancellations.
+   */
+  currentSnapshotComplete?: boolean;
 }): IntelligenceHistoryEntry[] {
   const observedAt = z.string().datetime().parse(args.observedAt);
   const previous = args.previous.map((item) => intelligenceSnapshotItemSchema.parse(item));
@@ -132,24 +137,26 @@ export function detectIntelligenceChanges(args: {
     });
   }
 
-  for (const prior of previous) {
-    if (currentByKey.has(prior.key)) continue;
-    history.push({
-      change: {
-        id: changeId(prior.key, observedAt, 'cancelled'),
-        jurisdiction: prior.jurisdiction,
-        topic: prior.topic,
-        changeType: 'cancelled',
-        materiality: prior.materiality,
-        effectiveFrom: prior.effectiveFrom,
-        effectiveTo: prior.effectiveTo,
-        sourceUrl: prior.sourceUrl,
-        sourceLabel: prior.sourceLabel,
-        observedAt,
-        summary: prior.summary,
-      },
-      previousFingerprint: fingerprintSnapshotItem(prior),
-    });
+  if (args.currentSnapshotComplete === true) {
+    for (const prior of previous) {
+      if (currentByKey.has(prior.key)) continue;
+      history.push({
+        change: {
+          id: changeId(prior.key, observedAt, 'cancelled'),
+          jurisdiction: prior.jurisdiction,
+          topic: prior.topic,
+          changeType: 'cancelled',
+          materiality: prior.materiality,
+          effectiveFrom: prior.effectiveFrom,
+          effectiveTo: prior.effectiveTo,
+          sourceUrl: prior.sourceUrl,
+          sourceLabel: prior.sourceLabel,
+          observedAt,
+          summary: prior.summary,
+        },
+        previousFingerprint: fingerprintSnapshotItem(prior),
+      });
+    }
   }
 
   return history.map((entry) => intelligenceHistoryEntrySchema.parse(entry));
