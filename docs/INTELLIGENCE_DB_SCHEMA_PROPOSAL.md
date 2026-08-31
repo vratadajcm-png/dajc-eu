@@ -4,6 +4,27 @@ Status: design-only M1 artifact. **Do not apply as a production migration.**
 
 Authority: `DAJCPLAN003FULL.md` §7.12 + R4/R7, and `docs/INTELLIGENCE_PERSISTENCE_SECURITY_CONTRACT.md`.
 
+## Canonical DAJC identity mapping — verified 2026-08-31
+
+Intelligence must reuse the existing DAJC Platform authentication and organization model from `vratadajcm-png/HaulBoard`; it must not create a second account, organization or membership authority on dajc.eu.
+
+Verified current canonical model:
+- `organizations.id` is the organization primary key;
+- `profiles.id` references `auth.users(id)` and is the authenticated DAJC user identity;
+- `profiles.org_id` references `organizations.id` and is the user's canonical organization binding;
+- current RLS helper `current_org_id()` resolves `profiles.org_id` for `auth.uid()`;
+- current `requireProfile()` server actor context returns `{ userId, orgId, role, canDrive }` from the authenticated user/profile;
+- later profile hardening explicitly prevents normal authenticated clients from updating sensitive identity/authorization columns such as `org_id`, `role` and platform-admin state.
+
+Therefore the proposed Intelligence model uses:
+- `organization_id` → canonical `organizations.id`;
+- `user_id` → canonical `profiles.id` / `auth.users.id`;
+- user/org ownership resolved from the existing authenticated actor context, never from client-supplied authority fields;
+- existing `current_org_id()` semantics as the starting RLS tenant boundary where suitable, with user-private rows additionally requiring `user_id = auth.uid()`;
+- no standalone `intelligence_users`, `intelligence_organizations` or duplicate membership tables.
+
+Current evidence still represents a single canonical `profiles.org_id` organization binding per authenticated user. If the Platform later introduces a multi-organization membership authority, Intelligence must migrate to that canonical authority rather than inventing its own abstraction.
+
 ## Design goals
 
 - explicit organization/user ownership;
@@ -22,8 +43,8 @@ Authority: `DAJCPLAN003FULL.md` §7.12 + R4/R7, and `docs/INTELLIGENCE_PERSISTEN
 Purpose: saved jurisdictions/corridors/vehicle profile/alert mode per user.
 
 Suggested columns:
-- `organization_id uuid not null`
-- `user_id uuid not null`
+- `organization_id uuid not null references organizations(id)`
+- `user_id uuid not null references profiles(id)`
 - `preferences jsonb not null`
 - `revision bigint not null default 0`
 - `created_at timestamptz not null`
@@ -34,8 +55,10 @@ Suggested key: `(organization_id, user_id)`.
 Required checks:
 - preferences validated server-side and against a bounded JSON schema;
 - revision increment is compare-and-swap / optimistic concurrency;
-- user membership in `organization_id` is resolved server-side;
-- no arbitrary organization ID accepted from client as authority.
+- authenticated ownership is resolved from the canonical DAJC actor context (`auth.uid()` + profile/org binding);
+- `organization_id` must equal the actor's canonical `profiles.org_id` / `current_org_id()` result;
+- `user_id` must equal `auth.uid()` for user-private preference access;
+- no arbitrary organization/user ID accepted from client as authority.
 
 ### `intelligence_source_scopes`
 
@@ -46,7 +69,7 @@ Suggested columns:
 - `source_id text not null`
 - `policy_version text not null`
 - `storage_scope text not null` (`public-shared`, `tenant-private`, `provider-customer-bound`)
-- `organization_id uuid null`
+- `organization_id uuid null references organizations(id)`
 - `customer_binding_id text null`
 - `storage_decision text not null`
 - `history_decision text not null`
@@ -137,8 +160,8 @@ Purpose: durable notification queue.
 
 Suggested columns:
 - `id uuid primary key`
-- `organization_id uuid not null`
-- `user_id uuid not null`
+- `organization_id uuid not null references organizations(id)`
+- `user_id uuid not null references profiles(id)`
 - `change_id text not null`
 - `channel text not null`
 - `dedupe_key text not null unique`
@@ -158,8 +181,8 @@ Purpose: sanitized delivery audit.
 Suggested columns:
 - `id uuid primary key`
 - `outbox_id uuid not null`
-- `organization_id uuid not null`
-- `user_id uuid not null`
+- `organization_id uuid not null references organizations(id)`
+- `user_id uuid not null references profiles(id)`
 - `channel text not null`
 - `provider_reference text null`
 - `attempt_number integer not null`
@@ -174,12 +197,13 @@ Full message body copies are not a default requirement and should not be persist
 ### Preferences
 
 Authenticated user may read/write only when:
-1. session user maps to `user_id`;
-2. session user currently belongs to `organization_id`;
-3. server capability permits Intelligence preferences;
-4. mutation passes revision check.
+1. `user_id = auth.uid()`;
+2. `organization_id = current_org_id()`;
+3. the canonical profile still exists and belongs to that organization;
+4. server capability permits Intelligence preferences;
+5. mutation passes revision check.
 
-Organization membership alone must not permit user A1 to overwrite user A2 preferences.
+Organization membership alone must not permit user A1 to overwrite user A2 preferences. Ordinary client updates must never mutate the canonical `profiles.org_id` merely to reach different Intelligence rows.
 
 ### Public-shared source state
 
@@ -189,15 +213,15 @@ Browser access should occur through explicit server projections. Service process
 
 ### Tenant/private source state
 
-Rows under a tenant/customer-bound `scope_id` are visible only to that organization through approved server projections. Direct browser write is denied.
+Rows under a tenant/customer-bound `scope_id` are visible only to the canonical `current_org_id()` organization through approved server projections. Direct browser write is denied.
 
 Provider-customer-bound scope also requires the active customer/mandate binding recorded in the source policy; organization membership cannot invent provider consent.
 
 ### Outbox / delivery
 
-End users may see a sanitized notification/history projection for themselves, but cannot claim, lease or mutate delivery worker state.
+End users may see a sanitized notification/history projection for themselves when both `organization_id = current_org_id()` and `user_id = auth.uid()`, but cannot claim, lease or mutate delivery worker state.
 
-Delivery worker role receives the minimum outbox projection required for send + result update and cannot browse arbitrary tenant source/history data.
+Delivery worker role receives the minimum outbox projection required for send + result update and cannot browse arbitrary tenant source/history data. It must not be exposed to browser/client code.
 
 ## Atomic processing transaction
 
@@ -220,7 +244,8 @@ Delivery occurs in a separate worker transaction and never inside source fetch/c
 
 - org A versus org B preference read/write denial;
 - user A1 versus A2 preference mutation denial;
-- stale membership denial;
+- stale/missing canonical profile denial;
+- attempted client manipulation of `organization_id` / `profiles.org_id` does not broaden access;
 - guessed source scope ID denial;
 - tenant-bound source/history cross-org denial;
 - provider-customer-bound scope without active binding denial;
@@ -236,10 +261,10 @@ Delivery occurs in a separate worker transaction and never inside source fetch/c
 ## Migration readiness checklist
 
 This proposal may become an actual migration only after:
-- R4 ownership/projection model is compatible with the chosen DAJC identity helpers;
+- R4 ownership/projection model remains compatible with the verified canonical `profiles.id/auth.uid()` + `profiles.org_id/organizations.id` identity boundary;
 - R7 supplies approved retention policy binding(s);
-- exact Supabase helper functions/current organization-membership model are audited instead of guessed;
-- SQL policies are tested against a dedicated non-production environment with real auth users;
+- exact production helper/function versions are re-read immediately before SQL implementation rather than copied from a stale snapshot;
+- SQL policies are tested against a dedicated non-production environment with real auth users from at least two organizations and two users in one organization;
 - rollback/forward-fix is documented;
 - schema types are regenerated and Application CI/security tests are green;
 - production application receives explicit gate approval.
