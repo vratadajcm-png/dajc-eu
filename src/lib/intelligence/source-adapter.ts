@@ -3,6 +3,10 @@ import {
   intelligenceSnapshotItemSchema,
   type IntelligenceSnapshotItem,
 } from './change-detection';
+import {
+  intelligenceSourceRightsSchema,
+  type IntelligenceSourceRights,
+} from './persistence-contract';
 
 export const intelligenceSourceSnapshotSchema = z.object({
   sourceId: z.string().min(1).max(120),
@@ -27,7 +31,18 @@ export type IntelligenceSourceSnapshot = z.infer<typeof intelligenceSourceSnapsh
 
 export interface IntelligenceSourceAdapter {
   readonly sourceId: string;
+  readonly rights: IntelligenceSourceRights;
   fetchSnapshot(): Promise<IntelligenceSourceSnapshot>;
+}
+
+export function validateAdapterRights(
+  adapter: Pick<IntelligenceSourceAdapter, 'sourceId' | 'rights'>,
+): IntelligenceSourceRights {
+  const rights = intelligenceSourceRightsSchema.parse(adapter.rights);
+  if (rights.sourceId !== adapter.sourceId) {
+    throw new Error(`Adapter rights sourceId mismatch: ${adapter.sourceId} != ${rights.sourceId}`);
+  }
+  return rights;
 }
 
 export function validateSourceSnapshot(
