@@ -1,6 +1,7 @@
 import { drivingBanCalendars } from '../../../config/driving-ban-calendars/index.mjs';
 import type { IntelligenceSourceAdapter, IntelligenceSourceSnapshot } from './source-adapter';
 import type { IntelligenceSnapshotItem } from './change-detection';
+import { dajcMaintainedDrivingBansRights } from './persistence-contract';
 
 const DAY = 86_400_000;
 
@@ -151,6 +152,7 @@ export function resolveDrivingBanRegistrySnapshot(args: {
 
 export class DrivingBansRegistryAdapter implements IntelligenceSourceAdapter {
   readonly sourceId = 'dajc-driving-bans-registry';
+  readonly rights = dajcMaintainedDrivingBansRights;
 
   constructor(
     private readonly from: string,
