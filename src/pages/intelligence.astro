@@ -1,5 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import IntelligencePreferencePreview from '../components/IntelligencePreferencePreview.astro';
+import { dajcEuropeCoverage } from '../../config/europe-coverage.mjs';
+
+const jurisdictions = dajcEuropeCoverage
+  .map(([code, name]) => ({ code, name }))
+  .sort((a, b) => a.name.localeCompare(b.name, 'en'));
 ---
 <BaseLayout
   title="DAJC Intelligence - European Heavy Transport Operational Intelligence"
@@ -26,6 +32,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <article><h3>Calendar & integrations</h3><p>Advanced feeds and future dispatch/TMS/API hooks with controlled entitlements.</p></article>
       </div>
     </section>
+
+    <IntelligencePreferencePreview jurisdictions={jurisdictions} />
 
     <section class="free-vs-paid" aria-labelledby="model-title">
       <h2 id="model-title">Free remains useful</h2>
