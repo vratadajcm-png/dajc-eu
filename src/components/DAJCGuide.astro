@@ -1,0 +1,311 @@
+---
+---
+<div class="dajc-guide" data-dajc-guide>
+  <button
+    class="dajc-guide__trigger"
+    type="button"
+    aria-expanded="false"
+    aria-controls="dajc-guide-panel"
+  >
+    <span class="dajc-guide__dot" aria-hidden="true"></span>
+    Ask DAJC
+  </button>
+
+  <section class="dajc-guide__panel" id="dajc-guide-panel" aria-label="DAJC Guide" hidden>
+    <div class="dajc-guide__header">
+      <div>
+        <p class="dajc-guide__eyebrow">DAJC Guide</p>
+        <h2>How can we help?</h2>
+      </div>
+      <button class="dajc-guide__close" type="button" aria-label="Close DAJC Guide">×</button>
+    </div>
+
+    <p class="dajc-guide__intro">
+      Quick answers about the public DAJC website. Information here is intentionally limited to stable,
+      currently published information and may evolve as DAJC develops.
+    </p>
+
+    <div class="dajc-guide__questions" role="list" aria-label="Common questions">
+      <button type="button" data-guide-question="what-is-dajc">What is DAJC?</button>
+      <button type="button" data-guide-question="who-for">Who is DAJC for?</button>
+      <button type="button" data-guide-question="driving-bans">Where can I find driving bans?</button>
+      <button type="button" data-guide-question="news">Where are DAJC transport updates?</button>
+      <button type="button" data-guide-question="integrations">I provide data or services. Where do I go?</button>
+      <button type="button" data-guide-question="pricing">Where can I find current commercial information?</button>
+    </div>
+
+    <div class="dajc-guide__answer" data-guide-answer aria-live="polite">
+      <p>Select a question above. If you need something else, contact DAJC directly.</p>
+    </div>
+
+    <div class="dajc-guide__actions">
+      <a href="mailto:team@dajc.eu?subject=Question%20from%20DAJC.eu">Contact DAJC</a>
+      <a href="/partners">Integration Ecosystem</a>
+    </div>
+
+    <p class="dajc-guide__privacy">
+      DAJC Guide does not send your questions to a chatbot, store a conversation or access DAJC Platform,
+      D-ID, customer or partner data.
+    </p>
+  </section>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-dajc-guide]');
+  const trigger = root?.querySelector<HTMLButtonElement>('.dajc-guide__trigger');
+  const panel = root?.querySelector<HTMLElement>('.dajc-guide__panel');
+  const close = root?.querySelector<HTMLButtonElement>('.dajc-guide__close');
+  const answer = root?.querySelector<HTMLElement>('[data-guide-answer]');
+
+  const answers: Record<string, string> = {
+    'what-is-dajc':
+      'DAJC is being developed as a European coordination environment for heavy and oversized road transport, connecting operational information, transport workflows and relevant services in one place.',
+    'who-for':
+      'DAJC is focused on organisations and professionals involved in heavy and oversized transport, including transport companies, shippers and specialist service providers.',
+    'driving-bans':
+      'Open the Driving Bans section for DAJC\'s public maintained overview and calendar. Always check the current official rule or permit conditions before operating a transport.',
+    'news':
+      'Open News for DAJC European transport intelligence, operational updates and DAJC Platform developments that are ready to be communicated publicly.',
+    'integrations':
+      'Integration requests are handled separately from DAJC Guide. Open the Integration Ecosystem page to submit an integration-interest request for your company, product, data or service.',
+    'pricing':
+      'Commercial terms are still being prepared as DAJC develops. Only information currently published on DAJC.eu should be treated as public commercial information; contact DAJC if you need clarification.'
+  };
+
+  const setOpen = (open: boolean) => {
+    if (!trigger || !panel) return;
+    trigger.setAttribute('aria-expanded', String(open));
+    panel.hidden = !open;
+    if (open) close?.focus();
+  };
+
+  trigger?.addEventListener('click', () => setOpen(trigger.getAttribute('aria-expanded') !== 'true'));
+  close?.addEventListener('click', () => {
+    setOpen(false);
+    trigger?.focus();
+  });
+
+  root?.querySelectorAll<HTMLButtonElement>('[data-guide-question]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const key = button.dataset.guideQuestion ?? '';
+      if (!answer || !answers[key]) return;
+      answer.textContent = answers[key];
+      root.querySelectorAll('[data-guide-question]').forEach((item) => item.removeAttribute('aria-current'));
+      button.setAttribute('aria-current', 'true');
+    });
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && panel && !panel.hidden) {
+      setOpen(false);
+      trigger?.focus();
+    }
+  });
+</script>
+
+<style>
+  .dajc-guide {
+    position: fixed;
+    right: 1.2rem;
+    bottom: 1.2rem;
+    z-index: 50;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .dajc-guide__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 46px;
+    padding: 0 1rem;
+    border: 1px solid rgba(255, 159, 0, 0.65);
+    border-radius: 999px;
+    background: rgba(6, 26, 51, 0.96);
+    color: var(--dajc-white);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .dajc-guide__trigger:hover,
+  .dajc-guide__trigger:focus-visible {
+    border-color: var(--dajc-orange);
+    color: var(--dajc-orange);
+  }
+
+  .dajc-guide__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--dajc-orange);
+    box-shadow: 0 0 0 4px rgba(255, 159, 0, 0.12);
+  }
+
+  .dajc-guide__panel {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 0.75rem);
+    width: min(380px, calc(100vw - 2rem));
+    max-height: min(640px, calc(100vh - 6rem));
+    overflow: auto;
+    padding: 1.25rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 14px;
+    background: rgba(6, 26, 51, 0.985);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  }
+
+  .dajc-guide__panel[hidden] {
+    display: none;
+  }
+
+  .dajc-guide__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .dajc-guide__eyebrow {
+    margin: 0 0 0.35rem;
+    color: var(--dajc-orange);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .dajc-guide h2 {
+    margin: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.25rem;
+  }
+
+  .dajc-guide__close {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border: 1px solid var(--dajc-line);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--dajc-muted);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .dajc-guide__close:hover,
+  .dajc-guide__close:focus-visible {
+    color: var(--dajc-white);
+    border-color: var(--dajc-orange);
+  }
+
+  .dajc-guide__intro {
+    margin: 0.9rem 0 1rem;
+    color: var(--dajc-muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .dajc-guide__questions {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .dajc-guide__questions button {
+    width: 100%;
+    padding: 0.72rem 0.8rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 7px;
+    background: rgba(0, 38, 92, 0.2);
+    color: var(--dajc-white);
+    text-align: left;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .dajc-guide__questions button:hover,
+  .dajc-guide__questions button:focus-visible,
+  .dajc-guide__questions button[aria-current='true'] {
+    border-color: rgba(255, 159, 0, 0.7);
+    background: rgba(255, 159, 0, 0.07);
+  }
+
+  .dajc-guide__answer {
+    min-height: 92px;
+    margin-top: 0.9rem;
+    padding: 0.9rem;
+    border-left: 2px solid var(--dajc-orange);
+    background: rgba(0, 38, 92, 0.14);
+    color: var(--dajc-muted);
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  .dajc-guide__answer p {
+    margin: 0;
+  }
+
+  .dajc-guide__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem;
+    margin-top: 0.9rem;
+  }
+
+  .dajc-guide__actions a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0.55rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 7px;
+    color: var(--dajc-white);
+    text-align: center;
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .dajc-guide__actions a:first-child {
+    border-color: var(--dajc-orange);
+    color: var(--dajc-orange);
+  }
+
+  .dajc-guide__privacy {
+    margin: 0.9rem 0 0;
+    color: var(--dajc-muted);
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 520px) {
+    .dajc-guide {
+      right: 0.8rem;
+      bottom: 0.8rem;
+    }
+
+    .dajc-guide__panel {
+      width: calc(100vw - 1.6rem);
+      max-height: calc(100vh - 5.5rem);
+    }
+
+    .dajc-guide__actions {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dajc-guide__trigger,
+    .dajc-guide__panel {
+      scroll-behavior: auto;
+    }
+  }
+</style>
