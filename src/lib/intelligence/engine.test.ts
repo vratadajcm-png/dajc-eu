@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { IntelligenceAlertRecipient } from './alerts';
 import { runIntelligenceCycle } from './engine';
+import type { IntelligenceSourceRights } from './persistence-contract';
 import type { IntelligenceSourceAdapter, IntelligenceSourceSnapshot } from './source-adapter';
 import { InMemoryIntelligenceStateStore } from './store';
 
@@ -16,9 +17,25 @@ const recipient: IntelligenceAlertRecipient = {
   channels: ['in-app'],
 };
 
+function rights(sourceId: string): IntelligenceSourceRights {
+  return {
+    sourceId,
+    policyVersion: 'test-v1',
+    storageScope: 'public-shared',
+    storage: 'allowed',
+    history: 'allowed',
+    derivedIntelligence: 'allowed',
+    redistribution: 'unknown',
+    attributionRequired: false,
+    evidenceReference: 'test fixture',
+    purpose: 'unit test',
+  };
+}
+
 function adapter(snapshot: IntelligenceSourceSnapshot): IntelligenceSourceAdapter {
   return {
     sourceId: snapshot.sourceId,
+    rights: rights(snapshot.sourceId),
     async fetchSnapshot() {
       return snapshot;
     },
@@ -105,11 +122,25 @@ describe('DAJC Intelligence cycle', () => {
     const store = new InMemoryIntelligenceStateStore();
     const mismatched: IntelligenceSourceAdapter = {
       sourceId: 'expected-source',
+      rights: rights('expected-source'),
       async fetchSnapshot() {
         return baseSnapshot;
       },
     };
     await expect(runIntelligenceCycle({ adapter: mismatched, store, recipients: [] }))
       .rejects.toThrow('Adapter sourceId mismatch');
+  });
+
+  it('rejects adapter rights bound to another source identity', async () => {
+    const store = new InMemoryIntelligenceStateStore();
+    const mismatchedRights: IntelligenceSourceAdapter = {
+      sourceId: 'authority-de',
+      rights: rights('other-source'),
+      async fetchSnapshot() {
+        return baseSnapshot;
+      },
+    };
+    await expect(runIntelligenceCycle({ adapter: mismatchedRights, store, recipients: [] }))
+      .rejects.toThrow('Adapter rights sourceId mismatch');
   });
 });
