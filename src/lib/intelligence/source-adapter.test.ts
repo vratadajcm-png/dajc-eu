@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { IntelligenceSourceRights } from './persistence-contract';
 import {
   mayCommerciallyRedistribute,
   validateSourceSnapshot,
@@ -27,6 +28,21 @@ const snapshot: IntelligenceSourceSnapshot = {
   warnings: [],
 };
 
+function rights(redistribution: IntelligenceSourceRights['redistribution']): IntelligenceSourceRights {
+  return {
+    sourceId: snapshot.sourceId,
+    policyVersion: 'test-v1',
+    storageScope: 'public-shared',
+    storage: 'allowed',
+    history: 'allowed',
+    derivedIntelligence: 'allowed',
+    redistribution,
+    attributionRequired: true,
+    evidenceReference: 'test evidence',
+    purpose: 'unit test',
+  };
+}
+
 describe('DAJC Intelligence source adapter boundary', () => {
   it('adds canonical source provenance to normalized items', () => {
     const items = withSnapshotProvenance(snapshot);
@@ -34,15 +50,37 @@ describe('DAJC Intelligence source adapter boundary', () => {
     expect(items[0].sourceUrl).toBe('https://example.com/source');
   });
 
-  it('fails closed for commercial redistribution when rights are unknown', () => {
-    expect(mayCommerciallyRedistribute(snapshot)).toBe(false);
+  it('fails closed for commercial redistribution when snapshot provenance is unknown', () => {
+    expect(mayCommerciallyRedistribute({ snapshot, rights: rights('allowed') })).toBe(false);
   });
 
-  it('allows commercial redistribution only when explicitly declared', () => {
-    expect(mayCommerciallyRedistribute({
+  it('fails closed when provenance allows redistribution but evidence-backed rights do not', () => {
+    const distributableSnapshot = {
       ...snapshot,
-      provenance: { ...snapshot.provenance, distributionPolicy: 'redistribution-allowed' },
+      provenance: { ...snapshot.provenance, distributionPolicy: 'redistribution-allowed' as const },
+    };
+    expect(mayCommerciallyRedistribute({ snapshot: distributableSnapshot, rights: rights('unknown') })).toBe(false);
+    expect(mayCommerciallyRedistribute({ snapshot: distributableSnapshot, rights: rights('denied') })).toBe(false);
+  });
+
+  it('allows commercial redistribution only when provenance and rights both explicitly allow it', () => {
+    expect(mayCommerciallyRedistribute({
+      snapshot: {
+        ...snapshot,
+        provenance: { ...snapshot.provenance, distributionPolicy: 'redistribution-allowed' },
+      },
+      rights: rights('allowed'),
     })).toBe(true);
+  });
+
+  it('fails closed when rights belong to another source', () => {
+    expect(mayCommerciallyRedistribute({
+      snapshot: {
+        ...snapshot,
+        provenance: { ...snapshot.provenance, distributionPolicy: 'redistribution-allowed' },
+      },
+      rights: { ...rights('allowed'), sourceId: 'other-source' },
+    })).toBe(false);
   });
 
   it('rejects item-level source URL conflicting with adapter provenance', () => {
