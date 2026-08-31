@@ -98,9 +98,6 @@ const statusTone = statusLabel === 'Integration in progress' ? 'progress' : stat
   }
 
   .provider-card__status {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     letter-spacing: 0.04em;
@@ -108,7 +105,15 @@ const statusTone = statusLabel === 'Integration in progress' ? 'progress' : stat
     margin: 0 0 0.7rem;
   }
 
-  .provider-card__status::before {
+  .provider-card__status--progress,
+  .provider-card__status--discussion {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .provider-card__status--progress::before,
+  .provider-card__status--discussion::before {
     content: '';
     flex: 0 0 auto;
     width: 0.45rem;

@@ -7,7 +7,9 @@ collaborationArea: "Weather data"
 website: "https://www.meteosource.com/"
 status: "active"
 order: 10
-publicStatusLabel: "Integration in progress"
+relationshipStatus: "integration_discussions"
+integrationStatus: "planned"
+publicStatusLabel: "Weather data integration planned"
 logo: "/assets/providers/meteosource.svg"
 logoApproved: true
 descriptionApproved: true
