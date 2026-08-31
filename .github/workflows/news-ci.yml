@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - 'config/oversize-sources/**'
+      - 'config/europe-coverage.mjs'
       - 'config/driving-ban-calendars/**'
       - 'scripts/**'
       - '.github/workflows/*oversize*.yml'
       - '.github/workflows/news-ci.yml'
       - 'docs/NEWS_AUTOMATION.md'
+      - 'docs/DAJC_WEEKLY_INTELLIGENCE_SPEC.md'
       - 'package.json'
       - 'package-lock.json'
   workflow_dispatch: {}
