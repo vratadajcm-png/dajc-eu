@@ -38,6 +38,7 @@ function reconcileSnapshot(
 /**
  * One provider-neutral DAJC Intelligence processing cycle.
  * No adapter may bypass identity/rights validation or provenance, and no delivery side effect occurs here.
+ * Durable stores must commit snapshot + history + outbox atomically.
  */
 export async function runIntelligenceCycle(args: {
   adapter: IntelligenceSourceAdapter;
@@ -60,8 +61,6 @@ export async function runIntelligenceCycle(args: {
     currentSnapshotComplete: snapshot.complete,
   });
 
-  await args.store.appendHistory(detected);
-
   const candidates = buildAlertCandidates({
     changes: detected.map((entry) => entry.change),
     recipients: args.recipients,
@@ -78,11 +77,13 @@ export async function runIntelligenceCycle(args: {
     .filter(({ delivered }) => !delivered)
     .map(({ candidate }) => candidate);
 
-  await args.store.enqueueAlerts(queuedAlerts);
-  await args.store.replaceSnapshot(
-    snapshot.sourceId,
-    reconcileSnapshot(previous, current, snapshot.complete),
-  );
+  const reconciledSnapshot = reconcileSnapshot(previous, current, snapshot.complete);
+  await args.store.commitCycle({
+    sourceId: snapshot.sourceId,
+    snapshot: reconciledSnapshot,
+    historyEntries: detected,
+    alertCandidates: queuedAlerts,
+  });
 
   return {
     sourceId: snapshot.sourceId,
