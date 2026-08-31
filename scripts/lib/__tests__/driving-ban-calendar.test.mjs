@@ -65,13 +65,14 @@ describe('resolveDrivingBanFindings - annual-calendar maintenance', () => {
     expect(new Set(flaggedCountries)).toEqual(new Set(['DE', 'PL', 'IT', 'SI', 'AT']));
   });
 
-  it('still resolves standing-rule entries for a far-future year', () => {
+  it('keeps non-evergreen special/seasonal standing rules while suppressing evergreen Sunday baselines', () => {
     const countries = findings.map((f) => f.country);
-    expect(countries).toContain('Czechia');
-    expect(countries).toContain('Slovakia');
-    expect(countries).toContain('France');
-    expect(countries).toContain('Slovenia');
-    expect(countries).toContain('Switzerland');
+    expect(countries).toContain('Czechia'); // special-vehicle seasonal rule
+    expect(countries).toContain('France');  // exceptional-transport weekend rule
+    expect(countries).toContain('Hungary'); // summer restriction
+    expect(countries).not.toContain('Slovakia');
+    expect(countries).not.toContain('Slovenia');
+    expect(countries).not.toContain('Switzerland');
   });
 });
 
@@ -85,42 +86,25 @@ describe('resolveDrivingBanFindings - W36 2026', () => {
     year: 2026,
   });
 
-  it('has enough independently sourced calendar restrictions for a useful weekly brief', () => {
+  it('suppresses evergreen Sunday/weekend baselines after 1 September', () => {
     expect(maintenanceErrors).toEqual([]);
-    expect(findings).toHaveLength(11);
+    const countries = findings.map((f) => f.country);
+    expect(countries).not.toContain('Germany');
+    expect(countries).not.toContain('Slovakia');
+    expect(countries).not.toContain('Austria');
+    expect(countries).not.toContain('Switzerland');
   });
 
-  it('carries the post-1-September Slovak Sunday window from the effective Slov-Lex version', () => {
-    const slovakia = findings.find((f) => f.country === 'Slovakia');
-    expect(slovakia).toBeTruthy();
-    expect(slovakia.timeWindow).toContain('06:00-22:00');
-    expect(slovakia.sourceUrl).toContain('20260901');
+  it('keeps seasonal and exceptional-transport restrictions but drops routine Sunday-only calendar entries', () => {
+    expect(findings.some((f) => f.country === 'Czechia' && /special vehicles/i.test(f.title))).toBe(true);
+    expect(findings.some((f) => f.country === 'France' && /exceptional-transport/i.test(f.title))).toBe(true);
+    expect(findings.some((f) => f.country === 'Italy')).toBe(false);
+    expect(findings.some((f) => f.country === 'Slovenia' && f.timeWindow.includes('06:00-16:00'))).toBe(true);
   });
 
-  it('includes the Italian 6 September restriction from Decree 325/2025', () => {
-    const italy = findings.find((f) => f.country === 'Italy');
-    expect(italy).toBeTruthy();
-    expect(italy.validFrom).toBe('2026-09-06');
-    expect(italy.timeWindow).toContain('07:00-22:00');
-  });
-
-  it('keeps Czech general-HGV and special-vehicle regimes distinct', () => {
-    const czech = findings.filter((f) => f.country === 'Czechia');
-    expect(czech).toHaveLength(2);
-    expect(new Set(czech.map((f) => f.sourceUrl)).size).toBe(2);
-    expect(czech.some((f) => /special vehicles/i.test(f.title))).toBe(true);
-  });
-
-  it('includes both the Slovenian Sunday rule and the last tourist-season Saturday restriction', () => {
-    const slovenia = findings.filter((f) => f.country === 'Slovenia');
-    expect(slovenia).toHaveLength(2);
-    expect(slovenia.some((f) => f.timeWindow.includes('08:00-22:00'))).toBe(true);
-    expect(slovenia.some((f) => f.timeWindow.includes('06:00-16:00'))).toBe(true);
-  });
-
-  it('keeps the French general HGV ban distinct from the exceptional-transport regime', () => {
-    const france = findings.filter((f) => f.country === 'France');
-    expect(france).toHaveLength(2);
-    expect(new Set(france.map((f) => f.sourceUrl)).size).toBe(2);
+  it('does not repeat standard Czech, French or Slovenian evergreen weekend rules', () => {
+    expect(findings.some((f) => /Standard Sunday driving ban/i.test(f.title))).toBe(false);
+    expect(findings.some((f) => /General HGV weekend driving ban/i.test(f.title))).toBe(false);
+    expect(findings.some((f) => /Sunday HGV driving restriction/i.test(f.title))).toBe(false);
   });
 });
