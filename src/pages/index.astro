@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import NewsSection from '../components/NewsSection.astro';
 import IntegrationEcosystemSection from '../components/IntegrationEcosystemSection.astro';
+import IntelligenceTeaser from '../components/IntelligenceTeaser.astro';
 import { getCollection } from 'astro:content';
 
 const euOversize = await getCollection('eu-oversize', ({ data }) => data.status === 'published');
@@ -23,10 +24,14 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
   title="DAJC - EUROPEAN HEAVY & OVERSIZE TRANSPORT PLATFORM"
   description="DAJC is building the coordination layer for heavy and oversized freight transport across Europe."
 >
-  <main>
+  <main id="platform">
     <p class="eyebrow">EUROPEAN HEAVY &amp; OVERSIZE TRANSPORT PLATFORM</p>
     <h1>DAJC is building the coordination layer for heavy and oversized freight transport across Europe.</h1>
     <p class="desc">DAJC is a pan-European platform for managing heavy and oversized transport. It connects all participants, documents, permits, routes and shipment progress in one digital environment. Using AI and specialized applications, it simplifies planning, communication and transport execution without commissions.</p>
+    <div class="hero-actions">
+      <a class="hero-action hero-action--primary" href="/intelligence">Explore DAJC Intelligence</a>
+      <a class="hero-action" href="/pricing">View pricing</a>
+    </div>
     <svg class="route-inline" viewBox="0 0 640 64" aria-hidden="true">
       <path class="route-path-ghost" d="M0 38 C 50 12, 110 52, 160 28 C 210 10, 270 54, 320 34 C 370 12, 430 56, 480 24 C 530 8, 590 52, 640 30" />
       <path class="route-path-active" d="M0 38 C 50 12, 110 52, 160 28 C 210 10, 270 54, 320 34 C 370 12, 430 56, 480 24 C 530 8, 590 52, 640 30" />
@@ -50,6 +55,7 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
     </section>
   )}
 
+  <IntelligenceTeaser />
   <NewsSection items={latestNews} showEuOversizeLaunchNotice={!hasPublishedEuOversize} />
   <IntegrationEcosystemSection providers={activeProviders} />
 </BaseLayout>
@@ -213,6 +219,40 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
     color: var(--dajc-muted);
     max-width: 56ch;
     margin: 0 0 1.6rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.7rem;
+    margin: 0 0 1.8rem;
+  }
+
+  .hero-action {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+    border: 1px solid var(--dajc-orange);
+    border-radius: 8px;
+    color: var(--dajc-orange);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .hero-action--primary {
+    background: var(--dajc-orange);
+    color: var(--dajc-dark);
+  }
+
+  .hero-action:hover,
+  .hero-action:focus-visible {
+    transform: translateY(-1px);
   }
 
   p.sub {

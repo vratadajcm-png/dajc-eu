@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="DAJC Intelligence - European Heavy Transport Operational Intelligence"
+  description="DAJC Intelligence is an operational intelligence layer being developed for European heavy and oversized transport."
+>
+  <main class="product-page">
+    <p class="eyebrow">DAJC Intelligence</p>
+    <h1>Operational intelligence for European heavy transport.</h1>
+    <p class="lead">
+      DAJC Intelligence is being developed alongside DAJC's public operational resources to help transport professionals work with relevant changes across Europe.
+    </p>
+
+    <div class="status">In active development · details may change as the product improves.</div>
+
+    <section class="principles" aria-labelledby="principles-title">
+      <h2 id="principles-title">What stays constant</h2>
+      <div class="grid">
+        <article><h3>Operational focus</h3><p>Designed around real European heavy and oversized transport operations.</p></article>
+        <article><h3>European scope</h3><p>Built with cross-border transport and differing national requirements in mind.</p></article>
+        <article><h3>Relevant information</h3><p>The goal is to make important operational changes easier to identify and use.</p></article>
+      </div>
+    </section>
+
+    <section class="public-resources" aria-labelledby="public-title">
+      <h2 id="public-title">Public resources remain available</h2>
+      <p>DAJC.eu continues to provide public news and operational resources while Intelligence is developed.</p>
+      <div class="links"><a href="/news">DAJC News</a><a href="/driving-bans">Driving Bans</a></div>
+    </section>
+
+    <section class="cta">
+      <p class="eyebrow">Stay in touch</p>
+      <h2>Interested in DAJC Intelligence?</h2>
+      <p>Contact DAJC if you would like to follow its development or discuss your operational needs.</p>
+      <a href="mailto:team@dajc.eu?subject=DAJC%20Intelligence%20Interest">Contact DAJC</a>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .product-page{position:relative;z-index:2;max-width:1040px;margin:0 auto;padding:8vh 1.5rem 9vh;text-align:center}.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--dajc-orange);margin:0 0 1rem}h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2rem,5vw,3.5rem);line-height:1.05;max-width:18ch;margin:0 auto 1rem}.lead{max-width:68ch;margin:0 auto;color:var(--dajc-muted);font-size:17px;line-height:1.75}.status{display:inline-block;margin:1.5rem auto 3rem;padding:.55rem .85rem;border:1px solid var(--dajc-line);border-radius:999px;color:var(--dajc-muted);font-family:'IBM Plex Mono',monospace;font-size:11px}section{margin-top:4rem}.principles h2,.public-resources h2,.cta h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.4rem,3vw,2rem)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;text-align:left}.grid article{padding:1.3rem;border:1px solid var(--dajc-line);border-radius:12px;background:rgba(0,38,92,.16)}.grid h3{margin:0 0 .5rem;font-family:'Space Grotesk',sans-serif}.grid p,.public-resources p,.cta p{color:var(--dajc-muted);line-height:1.65;margin:.2rem 0}.public-resources{padding:1.5rem;border:1px solid var(--dajc-line);border-radius:14px}.links{display:flex;justify-content:center;gap:.8rem;flex-wrap:wrap;margin-top:1rem}.links a,.cta a{display:inline-flex;min-height:44px;align-items:center;justify-content:center;padding:0 1rem;border:1px solid var(--dajc-orange);border-radius:8px;color:var(--dajc-orange);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}.cta{padding:2rem;border:1px solid var(--dajc-orange);border-radius:16px;background:linear-gradient(135deg,rgba(255,159,0,.08),rgba(0,38,92,.2))}.cta a{margin-top:1rem;background:var(--dajc-orange);color:var(--dajc-dark)}@media(max-width:760px){.grid{grid-template-columns:1fr}}@media(max-width:520px){.product-page{padding-left:1rem;padding-right:1rem}}
+</style>

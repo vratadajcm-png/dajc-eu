@@ -45,6 +45,107 @@ const providers = (await getCollection('providers', ({ data }) => data.status ==
       </section>
     )}
 
+    <section class="ecosystem-apply" aria-labelledby="ecosystem-apply-heading">
+      <p class="ecosystem-apply__eyebrow">For manufacturers, data providers &amp; service providers</p>
+      <h2 id="ecosystem-apply-heading">Want to connect with DAJC?</h2>
+      <p class="ecosystem-apply__intro">
+        If your company provides vehicles, trailers, technical data, telematics, permits, infrastructure,
+        parking, weather, ports, ferry, customs, payments or another service relevant to European heavy and
+        oversized transport, tell us what you would like to connect.
+      </p>
+      <p class="ecosystem-apply__note">
+        This is an integration-interest request, not an application for paid placement. Submitting it does not
+        create a partnership, endorsement or production integration. DAJC reviews each request individually,
+        including technical fit, customer value, security, licensing and data rights.
+      </p>
+
+      <form class="ecosystem-form" id="ecosystem-interest-form">
+        <div class="ecosystem-form__grid">
+          <label>
+            <span>Company *</span>
+            <input name="company" autocomplete="organization" required />
+          </label>
+
+          <label>
+            <span>Company website</span>
+            <input name="website" type="url" inputmode="url" placeholder="https://" />
+          </label>
+
+          <label>
+            <span>Your name *</span>
+            <input name="name" autocomplete="name" required />
+          </label>
+
+          <label>
+            <span>Work email *</span>
+            <input name="email" type="email" autocomplete="email" required />
+          </label>
+
+          <label>
+            <span>Your role</span>
+            <input name="role" autocomplete="organization-title" />
+          </label>
+
+          <label>
+            <span>Integration area *</span>
+            <select name="area" required>
+              <option value="" selected disabled>Select an area</option>
+              {PROVIDER_CATEGORIES.map((area) => <option value={area}>{area}</option>)}
+              <option value="Other">Other</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Technical access</span>
+            <select name="technicalAccess">
+              <option value="Not specified">Not specified</option>
+              <option value="Public API/documentation available">Public API / documentation available</option>
+              <option value="Partner or developer API available">Partner / developer API available</option>
+              <option value="Data feed available">Data feed available</option>
+              <option value="Sandbox/test environment available">Sandbox / test environment available</option>
+              <option value="No API yet — discuss integration options">No API yet — discuss integration options</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Preferred next step</span>
+            <select name="nextStep">
+              <option value="Technical introduction">Technical introduction</option>
+              <option value="API/documentation review">API / documentation review</option>
+              <option value="Sandbox/test integration">Sandbox / test integration</option>
+              <option value="Commercial discussion">Commercial discussion</option>
+              <option value="Data/licensing discussion">Data / licensing discussion</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="ecosystem-form__wide">
+          <span>What would you like to connect with DAJC? *</span>
+          <textarea
+            name="proposal"
+            rows="6"
+            required
+            placeholder="Describe your product, data or service, the integration you have in mind, geographic coverage and anything DAJC should know before contacting you."
+          ></textarea>
+        </label>
+
+        <label class="ecosystem-form__check">
+          <input name="contactConsent" type="checkbox" required />
+          <span>I agree that DAJC may use the information above to contact me about this integration request. *</span>
+        </label>
+
+        <button type="submit" class="ecosystem-form__submit">Prepare integration request</button>
+        <p class="ecosystem-form__privacy">
+          This form does not submit data to a DAJC database. It prepares an email in your email application so
+          you can review and send the request yourself.
+        </p>
+        <p class="ecosystem-form__fallback">
+          Prefer email? Write directly to <a href="mailto:miroslav@dajc.eu">miroslav@dajc.eu</a>.
+        </p>
+      </form>
+    </section>
+
     <p class="partners-page__independence">Product decisions, rankings and recommendations remain independent.</p>
 
     <div class="partners-page__disclaimer">
@@ -58,6 +159,43 @@ const providers = (await getCollection('providers', ({ data }) => data.status ==
   </main>
 </BaseLayout>
 
+<script>
+  const form = document.querySelector<HTMLFormElement>('#ecosystem-interest-form');
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    if (!form.reportValidity()) return;
+
+    const data = new FormData(form);
+    const value = (key: string) => String(data.get(key) ?? '').trim();
+
+    const company = value('company');
+    const subject = `DAJC Integration Ecosystem — ${company}`;
+    const body = [
+      'DAJC Integration Ecosystem — Integration Interest',
+      '',
+      `Company: ${company}`,
+      `Website: ${value('website') || 'Not provided'}`,
+      `Contact: ${value('name')}`,
+      `Work email: ${value('email')}`,
+      `Role: ${value('role') || 'Not provided'}`,
+      `Integration area: ${value('area')}`,
+      `Technical access: ${value('technicalAccess')}`,
+      `Preferred next step: ${value('nextStep')}`,
+      '',
+      'Integration proposal:',
+      value('proposal'),
+      '',
+      'Contact consent: Yes — submitted through the DAJC Integration Ecosystem form.',
+      '',
+      'Note: This request does not create a partnership, endorsement or production integration.'
+    ].join('\n');
+
+    window.location.href = `mailto:miroslav@dajc.eu?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
+</script>
+
 <style>
   .partners-page {
     position: relative;
@@ -67,7 +205,8 @@ const providers = (await getCollection('providers', ({ data }) => data.status ==
     padding: 8vh 1.5rem 8vh;
   }
 
-  .eyebrow {
+  .eyebrow,
+  .ecosystem-apply__eyebrow {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px;
     letter-spacing: 0.2em;
@@ -145,6 +284,135 @@ const providers = (await getCollection('providers', ({ data }) => data.status ==
     gap: 1.2rem;
   }
 
+  .ecosystem-apply {
+    margin: 4rem 0 3rem;
+    padding: clamp(1.4rem, 4vw, 2.4rem);
+    border: 1px solid var(--dajc-line);
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(0, 38, 92, 0.34), rgba(0, 38, 92, 0.14));
+  }
+
+  .ecosystem-apply__eyebrow {
+    margin-bottom: 0.8rem;
+  }
+
+  .ecosystem-apply__intro,
+  .ecosystem-apply__note {
+    max-width: 65ch;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    color: var(--dajc-muted);
+    line-height: 1.7;
+  }
+
+  .ecosystem-apply__intro {
+    font-size: 15px;
+    margin-top: 0;
+    margin-bottom: 0.8rem;
+  }
+
+  .ecosystem-apply__note {
+    font-size: 13px;
+    margin-top: 0;
+    margin-bottom: 1.8rem;
+  }
+
+  .ecosystem-form__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .ecosystem-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    color: var(--dajc-white);
+    font-size: 13px;
+  }
+
+  .ecosystem-form input,
+  .ecosystem-form select,
+  .ecosystem-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--dajc-line);
+    border-radius: 4px;
+    background: rgba(1, 14, 34, 0.72);
+    color: var(--dajc-white);
+    font: inherit;
+    font-size: 14px;
+    padding: 0.75rem 0.8rem;
+    outline: none;
+  }
+
+  .ecosystem-form input:focus,
+  .ecosystem-form select:focus,
+  .ecosystem-form textarea:focus {
+    border-color: var(--dajc-orange);
+  }
+
+  .ecosystem-form textarea {
+    resize: vertical;
+    min-height: 130px;
+  }
+
+  .ecosystem-form__wide {
+    margin-top: 1rem;
+  }
+
+  .ecosystem-form__check {
+    flex-direction: row !important;
+    align-items: flex-start;
+    gap: 0.7rem !important;
+    margin-top: 1rem;
+    line-height: 1.5;
+    color: var(--dajc-muted) !important;
+  }
+
+  .ecosystem-form__check input {
+    width: auto;
+    margin-top: 0.15rem;
+    accent-color: var(--dajc-orange);
+  }
+
+  .ecosystem-form__submit {
+    display: block;
+    width: 100%;
+    margin-top: 1.2rem;
+    border: 0;
+    border-radius: 4px;
+    padding: 0.9rem 1rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #07111f;
+    background: var(--dajc-orange);
+    cursor: pointer;
+  }
+
+  .ecosystem-form__submit:hover {
+    filter: brightness(1.06);
+  }
+
+  .ecosystem-form__privacy,
+  .ecosystem-form__fallback {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--dajc-muted);
+    text-align: center;
+    margin: 0.8rem auto 0;
+  }
+
+  .ecosystem-form__fallback {
+    margin-top: 0.3rem;
+  }
+
+  .ecosystem-form__fallback a {
+    color: var(--dajc-white);
+  }
+
   .partners-page__independence {
     font-size: 13px;
     line-height: 1.6;
@@ -171,6 +439,12 @@ const providers = (await getCollection('providers', ({ data }) => data.status ==
     margin-bottom: 0;
   }
 
+  @media (max-width: 660px) {
+    .ecosystem-form__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
   @media (max-width: 560px) {
     .partners-page {
       padding: 6vh 1.2rem 6vh;
@@ -183,6 +457,10 @@ const providers = (await getCollection('providers', ({ data }) => data.status ==
     .integration-areas,
     .providers {
       margin-bottom: 2.4rem;
+    }
+
+    .ecosystem-apply {
+      margin-top: 3rem;
     }
   }
 </style>

@@ -1,0 +1,157 @@
+---
+interface Jurisdiction {
+  code: string;
+  name: string;
+}
+
+interface Props {
+  jurisdictions: Jurisdiction[];
+}
+
+const { jurisdictions } = Astro.props;
+---
+<section class="preference-preview" aria-labelledby="preference-preview-title">
+  <div class="preview-head">
+    <div>
+      <p class="preview-eyebrow">M1 preference preview</p>
+      <h2 id="preference-preview-title">Configure what should matter to you.</h2>
+      <p>This preview stores settings only in this browser. It does not create an account, send alerts or activate billing.</p>
+    </div>
+    <button type="button" id="intelligence-preview-reset">Reset</button>
+  </div>
+
+  <div class="preview-grid">
+    <fieldset>
+      <legend>Jurisdictions</legend>
+      <input id="intelligence-country-search" class="search" type="search" placeholder="Search country or code" />
+      <div class="jurisdictions" id="intelligence-jurisdictions">
+        {jurisdictions.map((item) => (
+          <label data-search={`${item.name} ${item.code}`.toLowerCase()}>
+            <input type="checkbox" name="jurisdiction" value={item.code} />
+            <span><strong>{item.name}</strong><small>{item.code}</small></span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Vehicle profile</legend>
+      <div class="vehicle-grid">
+        <label>Gross weight (kg)<input type="number" min="1" max="250000" step="100" id="intel-weight" /></label>
+        <label>Width (mm)<input type="number" min="1" max="20000" step="10" id="intel-width" /></label>
+        <label>Height (mm)<input type="number" min="1" max="20000" step="10" id="intel-height" /></label>
+        <label>Length (mm)<input type="number" min="1" max="100000" step="10" id="intel-length" /></label>
+        <label>Axles<input type="number" min="1" max="40" step="1" id="intel-axles" /></label>
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="intel-adr" /> ADR</label>
+        <label><input type="checkbox" id="intel-exceptional" /> Exceptional / special transport</label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Alert topics</legend>
+      <div class="topics">
+        <label><input type="checkbox" name="intel-topic" value="driving-ban" checked /> Driving bans</label>
+        <label><input type="checkbox" name="intel-topic" value="permit" /> Permits</label>
+        <label><input type="checkbox" name="intel-topic" value="route-restriction" /> Route restrictions</label>
+        <label><input type="checkbox" name="intel-topic" value="border" /> Borders</label>
+        <label><input type="checkbox" name="intel-topic" value="escort" /> Escorts</label>
+        <label><input type="checkbox" name="intel-topic" value="weather" /> Weather</label>
+        <label><input type="checkbox" name="intel-topic" value="regulatory" /> Regulatory</label>
+      </div>
+      <label class="mode">Alert mode
+        <select id="intel-mode">
+          <option value="material-only">Material changes only</option>
+          <option value="all-relevant">All relevant changes</option>
+          <option value="off">Off</option>
+        </select>
+      </label>
+    </fieldset>
+  </div>
+
+  <div class="preview-summary" aria-live="polite">
+    <strong>Local preview saved.</strong>
+    <span id="intelligence-preview-summary">No jurisdictions selected · material changes only.</span>
+  </div>
+</section>
+
+<script is:inline>
+  const STORAGE_KEY = 'dajc-intelligence-preferences-preview-v1';
+  const q = (selector) => document.querySelector(selector);
+  const qa = (selector) => Array.from(document.querySelectorAll(selector));
+
+  const numericValue = (selector) => {
+    const value = Number(q(selector)?.value || '');
+    return Number.isFinite(value) && value > 0 ? value : undefined;
+  };
+
+  const readState = () => ({
+    jurisdictions: qa('input[name="jurisdiction"]:checked').map((el) => el.value),
+    corridors: [],
+    vehicleProfile: {
+      grossWeightKg: numericValue('#intel-weight'),
+      widthMm: numericValue('#intel-width'),
+      heightMm: numericValue('#intel-height'),
+      lengthMm: numericValue('#intel-length'),
+      axleCount: numericValue('#intel-axles'),
+      adr: Boolean(q('#intel-adr')?.checked),
+      exceptionalTransport: Boolean(q('#intel-exceptional')?.checked),
+    },
+    alertTopics: qa('input[name="intel-topic"]:checked').map((el) => el.value),
+    alertMode: q('#intel-mode')?.value || 'material-only',
+  });
+
+  const updateSummary = (state) => {
+    const scope = state.jurisdictions.length === 0
+      ? 'No jurisdictions selected'
+      : `${state.jurisdictions.length} jurisdiction${state.jurisdictions.length === 1 ? '' : 's'} selected`;
+    const mode = state.alertMode === 'material-only'
+      ? 'material changes only'
+      : state.alertMode === 'all-relevant' ? 'all relevant changes' : 'alerts off';
+    q('#intelligence-preview-summary').textContent = `${scope} · ${mode}.`;
+  };
+
+  const persist = () => {
+    const state = readState();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    updateSummary(state);
+  };
+
+  const apply = (state) => {
+    qa('input[name="jurisdiction"]').forEach((el) => { el.checked = state.jurisdictions?.includes(el.value) || false; });
+    const profile = state.vehicleProfile || {};
+    [['#intel-weight','grossWeightKg'],['#intel-width','widthMm'],['#intel-height','heightMm'],['#intel-length','lengthMm'],['#intel-axles','axleCount']]
+      .forEach(([selector, key]) => { q(selector).value = profile[key] ?? ''; });
+    q('#intel-adr').checked = Boolean(profile.adr);
+    q('#intel-exceptional').checked = Boolean(profile.exceptionalTransport);
+    qa('input[name="intel-topic"]').forEach((el) => { el.checked = state.alertTopics?.includes(el.value) || false; });
+    q('#intel-mode').value = state.alertMode || 'material-only';
+    updateSummary(readState());
+  };
+
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) apply(JSON.parse(stored));
+    else updateSummary(readState());
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
+    updateSummary(readState());
+  }
+
+  qa('.preference-preview input, .preference-preview select').forEach((el) => el.addEventListener('change', persist));
+  q('#intelligence-country-search')?.addEventListener('input', (event) => {
+    const needle = event.currentTarget.value.trim().toLowerCase();
+    qa('#intelligence-jurisdictions label').forEach((label) => {
+      label.hidden = needle.length > 0 && !label.dataset.search.includes(needle);
+    });
+  });
+  q('#intelligence-preview-reset')?.addEventListener('click', () => {
+    localStorage.removeItem(STORAGE_KEY);
+    apply({ jurisdictions: [], vehicleProfile: {}, alertTopics: ['driving-ban'], alertMode: 'material-only' });
+  });
+</script>
+
+<style>
+  .preference-preview{margin-top:4rem;padding:1.5rem;border:1px solid var(--dajc-line);border-radius:16px;background:rgba(0,38,92,.14);text-align:left}.preview-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}.preview-head h2{font-family:'Space Grotesk',sans-serif;margin:.15rem 0 .45rem}.preview-head p:not(.preview-eyebrow){color:var(--dajc-muted);line-height:1.6;max-width:70ch}.preview-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dajc-orange);margin:0}.preview-head button{border:1px solid var(--dajc-line);border-radius:8px;background:transparent;color:var(--dajc-white);padding:.6rem .8rem;cursor:pointer}.preview-grid{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:1rem;margin-top:1.2rem}.preview-grid fieldset{min-width:0;border:1px solid var(--dajc-line);border-radius:12px;padding:1rem}.preview-grid legend{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);padding:0 .35rem}.search,.vehicle-grid input,.mode select{width:100%;box-sizing:border-box;border:1px solid var(--dajc-line);border-radius:8px;background:rgba(0,0,0,.18);color:var(--dajc-white);padding:.65rem}.jurisdictions{max-height:260px;overflow:auto;margin-top:.6rem}.jurisdictions label{display:flex;gap:.55rem;align-items:flex-start;padding:.45rem;border-radius:6px}.jurisdictions label:hover{background:rgba(255,255,255,.03)}.jurisdictions span,.jurisdictions strong,.jurisdictions small{display:block}.jurisdictions small{color:var(--dajc-muted);font-family:'IBM Plex Mono',monospace}.vehicle-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}.vehicle-grid label,.mode{font-size:12px;color:var(--dajc-muted)}.vehicle-grid input,.mode select{margin-top:.3rem}.toggles,.topics{display:grid;gap:.55rem;margin-top:.8rem;color:var(--dajc-white);font-size:13px}.mode{display:block;margin-top:1rem}.preview-summary{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:1rem;padding:.8rem 1rem;border-left:3px solid var(--dajc-orange);background:rgba(255,159,0,.05);color:var(--dajc-muted)}.preview-summary strong{color:var(--dajc-white)}@media(max-width:850px){.preview-grid{grid-template-columns:1fr 1fr}.preview-grid fieldset:first-child{grid-column:1/-1}}@media(max-width:560px){.preview-head{display:block}.preview-head button{margin-top:.5rem}.preview-grid{grid-template-columns:1fr}.preview-grid fieldset:first-child{grid-column:auto}.vehicle-grid{grid-template-columns:1fr}}
+</style>
