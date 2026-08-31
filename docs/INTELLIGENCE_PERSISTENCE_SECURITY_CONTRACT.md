@@ -96,6 +96,8 @@ Required behavior:
 - no cross-tenant recipient lookup;
 - entitlement may suppress delivery but cannot broaden data access.
 
+The M1 code may implement/test this state machine with delivery adapters disabled by default. A state machine is not approval to connect a real email, push or webhook provider.
+
 ### 5. Delivery attempts / audit
 
 Proposed logical object: `intelligence_delivery_attempts`.
