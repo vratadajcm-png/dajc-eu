@@ -43,6 +43,21 @@ describe('critical weekly coverage', () => {
     })).toBe(false);
   });
 
+  it('consolidates related critical sources into one report with additional sources', () => {
+    const second = {
+      ...swiss,
+      title: 'Nationwide private exceptional-transport escort consultation',
+      sourceUrl: 'https://example.test/ch-2',
+    };
+    const result = ensureCriticalCoverage(
+      { developments: [], europeRoundup: [] },
+      [swiss, second]
+    );
+    expect(result.critical).toHaveLength(2);
+    expect(result.article.developments).toHaveLength(1);
+    expect(result.article.developments[0].additionalSources.map((x) => x.url)).toContain(second.sourceUrl);
+  });
+
   it('inserts an omitted critical item into the article', () => {
     const result = ensureCriticalCoverage(
       { developments: [], europeRoundup: [] },
