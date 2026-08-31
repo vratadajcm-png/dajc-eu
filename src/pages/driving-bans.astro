@@ -5,28 +5,45 @@ import { dajcEuropeCoverage, dajcCoverageMpz } from '../../config/europe-coverag
 const requestedCodes = new Set([
   'AT','AL','AD','AM','AZ','BE','BG','BA','BY','CY','CZ','DE','DK','ES','EE','FR','FI','LI','UK','GE','GR','HU','HR','CH','IT','IE','IS','LU','LT','LV','MT','MC','MD','ME','NO','NL','MK','PT','PL','RO','XK','RU','SE','SK','SI','RS','TR','UA','VA','KZ','FO','AX','GI','GG','JE','IM','ALDERNEY','SBA','SVALBARD','JANMAYEN','GL','AZO','MAD','CAN','CEU','MLL','GP','MQ','GF','RE','YT','MF','BL','PM','NC','PF','WF','CLIPPERTON','TF','AW','CW','SX','BQ-BO','BQ-SA','BQ-SE'
 ]);
+
 const jurisdictions = dajcEuropeCoverage
   .filter(([code]) => requestedCodes.has(code))
-  .map(([code, name]) => ({ code, name, mpz: (dajcCoverageMpz as Record<string,string[]>)[code]?.join(' / ') || '—' }));
+  .map(([code, name]) => ({
+    code,
+    name,
+    registrationCode: (dajcCoverageMpz as Record<string,string[]>)[code]?.join(' / ') || '—'
+  }));
 ---
-<BaseLayout title="European HGV Driving Bans Calendar - DAJC" description="Choose the European jurisdictions and HGV restriction types you need, then download or subscribe to a DAJC calendar feed.">
+<BaseLayout
+  title="European HGV Driving Bans Calendar - DAJC"
+  description="Choose European jurisdictions and HGV restriction types, then download or subscribe to the DAJC driving-bans calendar."
+>
   <main class="ban-page">
     <p class="eyebrow">DAJC operational tools</p>
     <h1>European HGV Driving Bans Calendar</h1>
-    <p class="intro">Choose the jurisdictions you operate in and add the relevant driving-ban dates to Apple Calendar, Outlook, Google Calendar or any calendar that supports iCalendar (.ics).</p>
+    <p class="intro">Choose the jurisdictions you operate in and add the relevant driving-ban dates to Apple Calendar, Outlook, Google Calendar or any calendar application that supports iCalendar (.ics).</p>
 
     <section class="panel" aria-labelledby="filters-title">
       <div class="panel-head">
-        <div><h2 id="filters-title">1. Choose jurisdictions</h2><p>MPZ aliases are shown next to the DAJC jurisdiction name.</p></div>
-        <div class="bulk"><button type="button" id="select-all">Select all</button><button type="button" id="clear-all">Clear</button></div>
+        <div>
+          <h2 id="filters-title">1. Choose jurisdictions</h2>
+          <p>International vehicle registration codes are shown next to each DAJC jurisdiction.</p>
+        </div>
+        <div class="bulk">
+          <button type="button" id="select-all">Select all</button>
+          <button type="button" id="clear-all">Clear</button>
+        </div>
       </div>
-      <label class="search-label" for="country-search">Search country or MPZ</label>
+      <label class="search-label" for="country-search">Search by country, territory or registration code</label>
       <input id="country-search" type="search" placeholder="Germany, D, Austria, A…" />
       <div class="country-grid" id="country-grid">
         {jurisdictions.map((item) => (
-          <label class="country" data-search={`${item.name} ${item.mpz} ${item.code}`.toLowerCase()}>
+          <label class="country" data-search={`${item.name} ${item.registrationCode} ${item.code}`.toLowerCase()}>
             <input type="checkbox" name="country" value={item.code} />
-            <span><strong>{item.name}</strong><small>MPZ {item.mpz}</small></span>
+            <span>
+              <strong>{item.name}</strong>
+              <small>Registration code {item.registrationCode}</small>
+            </span>
           </label>
         ))}
       </div>
@@ -36,28 +53,28 @@ const jurisdictions = dajcEuropeCoverage
       <h2 id="type-title">2. Choose restriction type</h2>
       <div class="type-row">
         <label><input type="radio" name="type" value="all" checked /> All maintained HGV restrictions</label>
-        <label><input type="radio" name="type" value="general" /> General HGV / weekend / holiday</label>
-        <label><input type="radio" name="type" value="exceptional" /> Exceptional / special transport</label>
+        <label><input type="radio" name="type" value="general" /> General HGV / weekend / public-holiday restrictions</label>
+        <label><input type="radio" name="type" value="exceptional" /> Exceptional / special transport restrictions</label>
       </div>
-      <p class="note">Vehicle weight thresholds, road scope, direction and exceptions remain in each calendar event. A selected country does not imply that every vehicle above 3.5 t is restricted there.</p>
+      <p class="note">Vehicle weight thresholds, road scope, direction and exemptions remain available inside each calendar event. Selecting a jurisdiction does not mean that every vehicle above 3.5 t is restricted there.</p>
     </section>
 
     <section class="panel action-panel" aria-labelledby="calendar-title">
-      <h2 id="calendar-title">3. Add to your calendar</h2>
+      <h2 id="calendar-title">3. Add the restrictions to your calendar</h2>
       <p id="selection-summary" class="summary">Select at least one jurisdiction.</p>
       <div class="actions">
-        <a id="download-link" class="action primary is-disabled" aria-disabled="true">Download Sep–Oct 2026 .ics</a>
-        <a id="subscribe-link" class="action is-disabled" aria-disabled="true">Subscribe to live calendar</a>
+        <a id="download-link" class="action primary is-disabled" aria-disabled="true">Download September–October 2026 .ics</a>
+        <a id="subscribe-link" class="action is-disabled" aria-disabled="true">Subscribe to the live calendar</a>
       </div>
       <div class="feed-box">
-        <label for="feed-url">Live calendar URL for Google Calendar / other calendar apps</label>
-        <input id="feed-url" readonly value="Select jurisdictions to generate your live feed URL" />
+        <label for="feed-url">Live calendar URL for Google Calendar and other calendar applications</label>
+        <input id="feed-url" readonly value="Select jurisdictions to generate your live calendar URL" />
       </div>
-      <p class="note"><strong>Apple Calendar / Outlook:</strong> use “Subscribe to live calendar”. <strong>Google Calendar:</strong> copy the generated URL and use “Add calendar → From URL”. Subscription clients decide their own refresh interval; DAJC publishes a 12-hour refresh hint.</p>
+      <p class="note"><strong>Apple Calendar / Outlook:</strong> use “Subscribe to the live calendar”. <strong>Google Calendar:</strong> copy the generated URL and use “Add calendar → From URL”. Calendar applications determine their own refresh interval; DAJC publishes a recommended 12-hour refresh interval.</p>
     </section>
 
     <section class="warning">
-      <strong>Planning information — verify before departure.</strong> Calendar entries are generated from DAJC's maintained driving-ban registry. Road signs, police orders, live restrictions, ADR rules, local access restrictions and conditions in exceptional-transport permits can override or add to calendar information.
+      <strong>Planning information — always verify before departure.</strong> Calendar entries are generated from DAJC's maintained driving-ban registry. Road signs, police orders, live traffic restrictions, ADR requirements, local access restrictions and conditions attached to exceptional-transport permits can override or add to the calendar information.
     </section>
   </main>
 </BaseLayout>
@@ -74,33 +91,58 @@ const jurisdictions = dajcEuropeCoverage
   function update() {
     const selected = boxes.filter((b) => b.checked).map((b) => b.value);
     const type = typeRadios.find((r) => r.checked)?.value || 'all';
-    summary.textContent = selected.length ? `${selected.length} jurisdiction${selected.length === 1 ? '' : 's'} selected.` : 'Select at least one jurisdiction.';
+
+    summary.textContent = selected.length
+      ? `${selected.length} jurisdiction${selected.length === 1 ? '' : 's'} selected.`
+      : 'Select at least one jurisdiction.';
+
     if (!selected.length) {
-      download.removeAttribute('href'); subscribe.removeAttribute('href');
-      download.classList.add('is-disabled'); subscribe.classList.add('is-disabled');
-      download.setAttribute('aria-disabled','true'); subscribe.setAttribute('aria-disabled','true');
-      feed.value = 'Select jurisdictions to generate your live feed URL';
+      download.removeAttribute('href');
+      subscribe.removeAttribute('href');
+      download.classList.add('is-disabled');
+      subscribe.classList.add('is-disabled');
+      download.setAttribute('aria-disabled', 'true');
+      subscribe.setAttribute('aria-disabled', 'true');
+      feed.value = 'Select jurisdictions to generate your live calendar URL';
       return;
     }
+
     const countries = encodeURIComponent(selected.join(','));
     const fixed = `/api/driving-bans.ics?countries=${countries}&type=${type}&from=2026-09-01&to=2026-10-31`;
     const rolling = `/api/driving-bans.ics?countries=${countries}&type=${type}&rolling=1`;
     const absolute = `${window.location.origin}${rolling}`;
+
     download.href = fixed;
     subscribe.href = absolute.replace(/^https:/, 'webcal:');
-    download.classList.remove('is-disabled'); subscribe.classList.remove('is-disabled');
-    download.removeAttribute('aria-disabled'); subscribe.removeAttribute('aria-disabled');
+    download.classList.remove('is-disabled');
+    subscribe.classList.remove('is-disabled');
+    download.removeAttribute('aria-disabled');
+    subscribe.removeAttribute('aria-disabled');
     feed.value = absolute;
   }
 
-  boxes.forEach((b) => b.addEventListener('change', update));
-  typeRadios.forEach((r) => r.addEventListener('change', update));
-  document.querySelector('#select-all')?.addEventListener('click', () => { boxes.forEach((b) => { if (!b.closest<HTMLElement>('.country')?.hidden) b.checked = true; }); update(); });
-  document.querySelector('#clear-all')?.addEventListener('click', () => { boxes.forEach((b) => b.checked = false); update(); });
-  search.addEventListener('input', () => {
-    const q = search.value.trim().toLowerCase();
-    document.querySelectorAll<HTMLElement>('.country').forEach((row) => row.hidden = !!q && !(row.dataset.search || '').includes(q));
+  boxes.forEach((box) => box.addEventListener('change', update));
+  typeRadios.forEach((radio) => radio.addEventListener('change', update));
+
+  document.querySelector('#select-all')?.addEventListener('click', () => {
+    boxes.forEach((box) => {
+      if (!box.closest<HTMLElement>('.country')?.hidden) box.checked = true;
+    });
+    update();
   });
+
+  document.querySelector('#clear-all')?.addEventListener('click', () => {
+    boxes.forEach((box) => box.checked = false);
+    update();
+  });
+
+  search.addEventListener('input', () => {
+    const query = search.value.trim().toLowerCase();
+    document.querySelectorAll<HTMLElement>('.country').forEach((row) => {
+      row.hidden = !!query && !(row.dataset.search || '').includes(query);
+    });
+  });
+
   feed.addEventListener('focus', () => feed.select());
   update();
 </script>
