@@ -44,8 +44,18 @@ describe('DAJC Intelligence change detection', () => {
     expect(history[0].change.changeType).toBe('extended');
   });
 
-  it('detects disappearance as cancelled', () => {
+  it('suppresses cancellations when the current snapshot is not confirmed complete', () => {
     const history = detectIntelligenceChanges({ previous: [base], current: [], observedAt });
+    expect(history).toEqual([]);
+  });
+
+  it('detects disappearance as cancelled only for a confirmed complete snapshot', () => {
+    const history = detectIntelligenceChanges({
+      previous: [base],
+      current: [],
+      observedAt,
+      currentSnapshotComplete: true,
+    });
     expect(history[0].change.changeType).toBe('cancelled');
     expect(history[0].currentFingerprint).toBeUndefined();
   });
