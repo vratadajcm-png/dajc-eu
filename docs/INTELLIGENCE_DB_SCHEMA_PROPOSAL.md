@@ -179,6 +179,8 @@ Suggested columns:
 - `last_error_code text null`
 - timestamps
 
+The current M1 application implementation already models these states plus bounded exponential retry, lease expiry recovery and dead-letter behavior. All concrete production delivery adapters remain disabled; the state machine is architecture/testing only until the persistence/privacy/security gate is closed.
+
 Do not store provider credentials or authorization headers.
 
 ### `intelligence_delivery_attempts`
