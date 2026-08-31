@@ -18,10 +18,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
 const PARENT_SOURCE = {
-  ENG: 'UK', SCT: 'UK', WLS: 'UK', NIR: 'UK', GG: 'UK', JE: 'UK', IM: 'UK', GI: 'UK',
-  AX: 'FI', FO: 'DK', GL: 'DK', SJ: 'NO', SBA: 'CY', NCY: 'CY',
+  ENG: 'UK', SCT: 'UK', WLS: 'UK', NIR: 'UK', GG: 'UK', JE: 'UK', IM: 'UK', GI: 'UK', ALDERNEY: 'UK',
+  AX: 'FI', FO: 'DK', GL: 'DK', SVALBARD: 'NO', JANMAYEN: 'NO', SBA: 'CY', NCY: 'CY',
   CEU: 'ES', MLL: 'ES', CAN: 'ES', CAT: 'ES', BAS: 'ES', GAL: 'ES',
   AZO: 'PT', MAD: 'PT', FLA: 'BE', WAL: 'BE', BRU: 'BE',
+  GP: 'FR', MQ: 'FR', GF: 'FR', RE: 'FR', YT: 'FR', MF: 'FR', BL: 'FR', PM: 'FR',
+  NC: 'FR', PF: 'FR', WF: 'FR', CLIPPERTON: 'FR', TF: 'FR',
+  AW: 'NL', CW: 'NL', SX: 'NL', 'BQ-BO': 'NL', 'BQ-SA': 'NL', 'BQ-SE': 'NL',
   FBIH: 'BA', RSBA: 'BA', TRN: 'MD', GAG: 'MD', AB: 'GE', SO: 'GE', RSM: 'SM',
 };
 
@@ -40,6 +43,7 @@ async function main() {
 
   let sourcesFeed = 0;
   let sourcesHtml = 0;
+  let sourcesHybrid = 0;
   let sourcesUnavailable = 0;
   const unavailable = [];
   const allCandidates = [];
@@ -66,6 +70,7 @@ async function main() {
 
     if (result.status === 'ok') {
       if (result.method === 'feed') sourcesFeed += 1;
+      else if (result.method === 'hybrid') sourcesHybrid += 1;
       else sourcesHtml += 1;
       const via = result.method || 'official source';
       const used = result.sourceUrlUsed || source.url;
@@ -85,18 +90,21 @@ async function main() {
   for (const finding of merged.values()) statusCounts[finding.status] += 1;
   await saveWeekFindings(weekLabel, merged);
 
-  const findingsByCountry = new Map();
+  const findingsByScope = new Map();
   for (const finding of merged.values()) {
-    const code = oversizeSources.find((s) => s.name === finding.sourceName || s.authority === finding.sourceName)?.country;
-    if (code) findingsByCountry.set(code, (findingsByCountry.get(code) || 0) + 1);
+    const source = oversizeSources.find((s) => s.name === finding.sourceName || s.authority === finding.sourceName);
+    const scope = source?.jurisdictionId || source?.country;
+    if (scope) findingsByScope.set(scope, (findingsByScope.get(scope) || 0) + 1);
   }
 
   const coverage = dajcEuropeCoverage.map(([code, name]) => {
     const effectiveCode = PARENT_SOURCE[code] || code;
-    const relevant = sourceResults.filter(({ source }) => source.country === effectiveCode);
+    const direct = sourceResults.filter(({ source }) => source.jurisdictionId === code);
+    const inherited = sourceResults.filter(({ source }) => !source.jurisdictionId && source.country === effectiveCode);
+    const relevant = direct.length > 0 ? direct : inherited;
     const ok = relevant.filter(({ result }) => result.status === 'ok');
     const unavailableForJurisdiction = relevant.filter(({ result }) => result.status !== 'ok');
-    const findingCount = findingsByCountry.get(effectiveCode) || 0;
+    const findingCount = findingsByScope.get(code) || (direct.length === 0 ? (findingsByScope.get(effectiveCode) || 0) : 0);
 
     let status;
     if (ok.length > 0 && findingCount > 0) status = 'checked-major-or-short-update-candidates-found';
@@ -128,7 +136,8 @@ async function main() {
   console.log(`sources checked: ${oversizeSources.length}`);
   console.log(`jurisdictions audited: ${coverage.length}`);
   console.log(`sources read via RSS/Atom: ${sourcesFeed}`);
-  console.log(`sources read via official HTML: ${sourcesHtml}`);
+  console.log(`sources read via official HTML only: ${sourcesHtml}`);
+  console.log(`sources read via RSS/Atom + official HTML: ${sourcesHybrid}`);
   console.log(`sources unavailable: ${sourcesUnavailable}`);
   console.log(`findings before this run: ${beforeCount}`);
   console.log(`findings after this run: ${merged.size}`);
