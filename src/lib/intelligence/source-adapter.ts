@@ -70,6 +70,13 @@ export function withSnapshotProvenance(
   }));
 }
 
-export function mayCommerciallyRedistribute(snapshot: IntelligenceSourceSnapshot): boolean {
-  return validateSourceSnapshot(snapshot).provenance.distributionPolicy === 'redistribution-allowed';
+export function mayCommerciallyRedistribute(args: {
+  snapshot: IntelligenceSourceSnapshot;
+  rights: IntelligenceSourceRights;
+}): boolean {
+  const snapshot = validateSourceSnapshot(args.snapshot);
+  const rights = intelligenceSourceRightsSchema.parse(args.rights);
+  if (rights.sourceId !== snapshot.sourceId) return false;
+  return snapshot.provenance.distributionPolicy === 'redistribution-allowed'
+    && rights.redistribution === 'allowed';
 }
