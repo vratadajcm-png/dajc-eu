@@ -62,6 +62,16 @@ export function criticalWeeklyCandidates(verifiedCandidates = [], options = {}) 
   return verifiedCandidates.filter((candidate) => isCriticalWeeklyCandidate(candidate, options));
 }
 
+function criticalTopicKey(candidate) {
+  const text = `${candidate.title || ''} ${candidate.summary || ''}`.toLowerCase();
+  if (/escort|begleit|pilot vehicle|accompagnement|doprovod/.test(text)) return 'escort';
+  if (/permit|bewilligung|genehmigung|authori[sz]ation|povolen/.test(text)) return 'permit';
+  if (/weight|height|width|axle|dimension|s[uú]ly|hmotnost|výšk|šíř/.test(text)) return 'limits';
+  if (/border|customs|transit|grenz|hrani/.test(text)) return 'border';
+  if (/toll|maut|péage|pedaggio|peaje|m[aý]to/.test(text)) return 'toll';
+  return 'other';
+}
+
 export function ensureCriticalCoverage(
   article,
   verifiedCandidates,
@@ -69,17 +79,40 @@ export function ensureCriticalCoverage(
 ) {
   const developments = [...(article.developments || [])];
   const europeRoundup = [...(article.europeRoundup || [])];
-  const used = new Set(
-    [...developments, ...europeRoundup].map((item) => item.sourceUrl).filter(Boolean)
-  );
-
   const critical = criticalWeeklyCandidates(verifiedCandidates, { discoveryWindowStart });
+
+  const groups = new Map();
+  for (const candidate of critical) {
+    const key = `${candidate.country || ''}::${criticalTopicKey(candidate)}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(candidate);
+  }
+
   let addedToLeads = 0;
   let addedToRoundup = 0;
 
-  for (const candidate of critical) {
-    if (used.has(candidate.sourceUrl)) continue;
-    const item = developmentFromCandidate(candidate);
+  for (const group of groups.values()) {
+    const urls = new Set(group.map((c) => c.sourceUrl).filter(Boolean));
+    let existingItem = [...developments, ...europeRoundup].find((item) => urls.has(item.sourceUrl));
+
+    if (existingItem) {
+      const extras = group
+        .filter((c) => c.sourceUrl && c.sourceUrl !== existingItem.sourceUrl)
+        .map((c) => ({ name: c.sourceName || c.title, url: c.sourceUrl }));
+      const existingExtraUrls = new Set((existingItem.additionalSources || []).map((x) => x.url));
+      existingItem.additionalSources = [
+        ...(existingItem.additionalSources || []),
+        ...extras.filter((x) => !existingExtraUrls.has(x.url)),
+      ];
+      continue;
+    }
+
+    const primary = group[0];
+    const item = developmentFromCandidate(primary);
+    item.additionalSources = group.slice(1).map((c) => ({
+      name: c.sourceName || c.title,
+      url: c.sourceUrl,
+    }));
 
     if (developments.length < maxLeads) {
       developments.push(item);
@@ -88,7 +121,6 @@ export function ensureCriticalCoverage(
       europeRoundup.push(item);
       addedToRoundup += 1;
     }
-    used.add(candidate.sourceUrl);
   }
 
   return {
@@ -98,3 +130,4 @@ export function ensureCriticalCoverage(
     addedToRoundup,
   };
 }
+
