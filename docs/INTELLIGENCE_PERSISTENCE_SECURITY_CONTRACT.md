@@ -8,6 +8,19 @@ This contract defines the security, privacy, tenancy, data-rights and transactio
 
 It is subordinate to `DAJCPLAN003FULL.md`, especially R4, R6, R7, §7.12, the Transport Data Fabric rules and the universal Definition-of-Done standard. It does not change the canonical DAJC Platform execution pointer.
 
+## Canonical identity authority
+
+DAJC Intelligence reuses DAJC Platform identity and organization authority. It must not create a parallel account/tenant system on dajc.eu.
+
+Verified current Platform model:
+- authenticated user identity: `auth.uid()` / `profiles.id`;
+- organization identity: `organizations.id`;
+- user organization binding: `profiles.org_id`;
+- current tenant helper: `current_org_id()`;
+- current server actor context: `requireProfile()` → `{ userId, orgId, role, canDrive }`.
+
+Intelligence user-owned rows must bind to the canonical `userId` + `orgId` pair resolved server-side. Client-provided identity fields are data to validate, never authorization authority. Sensitive Platform profile fields including `org_id` are already protected from ordinary authenticated-client mutation and Intelligence must preserve that boundary.
+
 ## Non-negotiable boundaries
 
 1. Browser state is never an authorization source. Authenticated persistence must resolve organization and user identity server-side.
@@ -27,10 +40,10 @@ It is subordinate to `DAJCPLAN003FULL.md`, especially R4, R6, R7, §7.12, the Tr
 
 Proposed logical object: `intelligence_preferences`
 
-Required identity: `organization_id`, `user_id`.
+Required identity: canonical DAJC `organization_id`, `user_id`.
 
 Required behavior:
-- server-resolved actor identity;
+- server-resolved actor identity from the DAJC Platform auth/profile model;
 - RLS / equivalent tenant + user isolation;
 - optimistic revision control;
 - schema validation before write;
@@ -72,12 +85,12 @@ Required behavior:
 
 Proposed logical object: `intelligence_alert_outbox`.
 
-Required identity: `organization_id`, `user_id`, change/event reference, channel and dedupe key.
+Required identity: canonical DAJC `organization_id`, `user_id`, change/event reference, channel and dedupe key.
 
 Required behavior:
 - enqueued only from authorized scoped preferences;
 - unique dedupe key for idempotency;
-- explicit states such as pending / leased / delivered / failed / suppressed;
+- explicit states pending / leased / delivered / failed / suppressed / dead-letter;
 - bounded retry and dead-letter/failure handling;
 - no network send in the same unprotected code path that computes relevance;
 - no cross-tenant recipient lookup;
@@ -112,7 +125,7 @@ Minimum negative tests before any production migration can be activated:
 - user A1 cannot mutate user A2 private preferences merely because both are in organization A;
 - tenant-bound source snapshot/history cannot be read by another tenant;
 - guessing IDs/dedupe keys does not bypass access;
-- stale/removed organization membership loses access;
+- stale/removed canonical profile/organization membership loses access;
 - service processing roles cannot be used by browser/client code;
 - delivery worker can read only the outbox projection required for delivery, not arbitrary tenant data;
 - billing/entitlement changes do not modify RLS visibility.
@@ -130,7 +143,7 @@ Every source adapter must supply a current policy describing at least:
 
 `unknown` is not permission. For production durable persistence it is treated as denied until evidence is updated.
 
-The maintained DAJC Driving Bans registry is the first M1 adapter and is treated as a DAJC-maintained public-source dataset for the current implementation. This does not generalize rights to any external provider.
+The maintained DAJC Driving Bans registry is the first M1 adapter and is treated as a DAJC-maintained public-source dataset for the current implementation. This does not generalize rights to any external provider and does not by itself establish commercial redistribution rights.
 
 ## Retention / deletion gate
 
@@ -150,7 +163,7 @@ Until these decisions are approved, schema/migration design may be prepared but 
 
 A future DB migration is allowed only after all of the following are true:
 - this contract is reflected in the schema design;
-- organization/user ownership paths are explicit;
+- organization/user ownership paths reuse the current canonical DAJC Platform identity authority;
 - RLS policies and negative A-vs-B tests are written;
 - source scope/rights fields cannot be omitted or default to permissive values;
 - atomic processing/outbox transaction behavior is specified;
@@ -166,5 +179,6 @@ M1 persistence design can be considered architecture-ready when:
 - the in-memory test store models tenant/user isolation, idempotency and transaction semantics sufficiently to verify business logic;
 - at least the maintained Driving Bans adapter passes end-to-end source → snapshot → history → relevance → outbox tests;
 - a DB schema/RLS proposal exists without applying a production migration;
+- canonical DAJC Platform identity/RLS helpers have been audited and reflected in the proposal;
 - Application CI and Vercel are green;
 - master/status documentation matches the actual implementation and blockers.
