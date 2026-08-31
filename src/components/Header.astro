@@ -1,8 +1,14 @@
 ---
 ---
 <header class="mark">
-  <img src="/assets/dajc-icon-mono-white.png" alt="" />
-  <span>DAJC</span>
+  <a class="brand" href="/" aria-label="DAJC home">
+    <img src="/assets/dajc-icon-mono-white.png" alt="" />
+    <span>DAJC</span>
+  </a>
+  <nav aria-label="Primary navigation">
+    <a href="/news">News</a>
+    <a href="/driving-bans">Driving bans calendar</a>
+  </nav>
 </header>
 
 <style>
@@ -11,8 +17,16 @@
     z-index: 2;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    justify-content: space-between;
+    gap: 1rem;
     padding: 2.2rem 2.4rem 0;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
   }
 
   header.mark img {
@@ -29,9 +43,36 @@
     color: var(--dajc-white);
   }
 
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  nav a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--dajc-muted);
+    text-decoration: none;
+  }
+
+  nav a:hover,
+  nav a:focus-visible {
+    color: var(--dajc-orange);
+  }
+
   @media (max-width: 560px) {
     header.mark {
       padding: 1.6rem 1.4rem 0;
+      align-items: flex-start;
+    }
+
+    nav {
+      gap: 0.65rem;
+      flex-direction: column;
+      align-items: flex-end;
     }
   }
 </style>
