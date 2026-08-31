@@ -76,7 +76,7 @@ const { jurisdictions } = Astro.props;
   </div>
 </section>
 
-<script>
+<script is:inline>
   const STORAGE_KEY = 'dajc-intelligence-preferences-preview-v1';
   const q = (selector) => document.querySelector(selector);
   const qa = (selector) => Array.from(document.querySelectorAll(selector));
