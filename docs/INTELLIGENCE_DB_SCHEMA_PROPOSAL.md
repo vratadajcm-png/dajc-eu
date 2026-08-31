@@ -267,7 +267,9 @@ Delivery occurs in a separate worker transaction and never inside source fetch/c
 
 ## Migration readiness checklist
 
-This proposal may become an actual migration only after:
+This proposal remains non-executable. No SQL from this document may be applied merely because M1 application tests are green.
+
+It may become an actual migration only after:
 - R4 ownership/projection model remains compatible with the verified canonical `profiles.id/auth.uid()` + `profiles.org_id/organizations.id` identity boundary;
 - R7 supplies approved retention policy binding(s);
 - exact production helper/function versions are re-read immediately before SQL implementation rather than copied from a stale snapshot;
