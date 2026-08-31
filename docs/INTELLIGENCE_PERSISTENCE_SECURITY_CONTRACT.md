@@ -176,11 +176,15 @@ A future DB migration is allowed only after all of the following are true:
 
 ## M1 exit criteria for persistence design
 
-M1 persistence design can be considered architecture-ready when:
-- the application contracts compile and are covered by tests;
-- the in-memory test store models tenant/user isolation, idempotency and transaction semantics sufficiently to verify business logic;
-- at least the maintained Driving Bans adapter passes end-to-end source → snapshot → history → relevance → outbox tests;
+The persistence design layer can be considered architecture-ready when:
+- application contracts compile and are covered by tests;
+- in-memory test state models tenant/user isolation, idempotency and atomic cycle semantics sufficiently to verify business logic;
+- the maintained Driving Bans adapter passes end-to-end source → snapshot → history → relevance → outbox tests;
+- source rights and commercial redistribution are fail-closed and evidence-bound;
+- delivery lifecycle has lease/retry/suppression/dead-letter semantics while production adapters remain disabled;
 - a DB schema/RLS proposal exists without applying a production migration;
 - canonical DAJC Platform identity/RLS helpers have been audited and reflected in the proposal;
 - Application CI and Vercel are green;
 - master/status documentation matches the actual implementation and blockers.
+
+Architecture-ready does not mean production-persistence-ready. Production remains blocked until the migration gate above is explicitly satisfied.
