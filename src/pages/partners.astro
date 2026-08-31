@@ -7,6 +7,11 @@ import { getCollection } from 'astro:content';
 const providers = (await getCollection('providers', ({ data }) => data.status === 'active')).sort(
   (a, b) => a.data.order - b.data.order
 );
+
+const providerGroups = PROVIDER_CATEGORIES.map((category) => ({
+  category,
+  providers: providers.filter((provider) => provider.data.category === category),
+})).filter((group) => group.providers.length > 0);
 ---
 <BaseLayout
   title="DAJC Integration Ecosystem"
@@ -37,9 +42,18 @@ const providers = (await getCollection('providers', ({ data }) => data.status ==
     {providers.length > 0 && (
       <section class="providers" aria-labelledby="providers-heading">
         <h2 id="providers-heading">Integration providers</h2>
-        <div class="providers__grid">
-          {providers.map((provider) => (
-            <ProviderCard provider={provider} />
+        <div class="providers__groups">
+          {providerGroups.map((group) => (
+            <section class="providers__group" aria-label={group.category}>
+              <p
+                class="providers__category"
+              >
+                {group.category}
+              </p>
+              <div class="providers__grid">
+                {group.providers.map((provider) => <ProviderCard provider={provider} />)}
+              </div>
+            </section>
           ))}
         </div>
       </section>
@@ -149,11 +163,7 @@ const providers = (await getCollection('providers', ({ data }) => data.status ==
     <p class="partners-page__independence">Product decisions, rankings and recommendations remain independent.</p>
 
     <div class="partners-page__disclaimer">
-      <p>
-        Third-party names, logos and trademarks will only be displayed where their use has been appropriately
-        approved. Any future listing will describe the actual integration or technical relationship and will
-        not imply endorsement, certification or partnership beyond what is expressly stated.
-      </p>
+      <p>Integration status reflects current technical work or discussions. Listing does not imply partnership, endorsement or certification.</p>
       <p>All trademarks remain the property of their respective owners.</p>
     </div>
   </main>
@@ -278,10 +288,29 @@ const providers = (await getCollection('providers', ({ data }) => data.status ==
     margin-bottom: 3rem;
   }
 
+  .providers__groups,
   .providers__grid {
     display: flex;
     flex-direction: column;
+  }
+
+  .providers__groups {
+    gap: 2.2rem;
+  }
+
+  .providers__grid {
     gap: 1.2rem;
+  }
+
+  .providers__category {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    line-height: 1.5;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+    margin: 0 0 0.9rem;
   }
 
   .ecosystem-apply {

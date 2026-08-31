@@ -16,6 +16,7 @@ const { data } = provider;
 const showLogo = data.status === 'active' && data.logoApproved === true && Boolean(data.logo);
 const showDescription = data.descriptionApproved === true;
 const statusLabel = data.publicStatusLabel ?? formatStatusLabel(data.relationshipStatus, data.integrationStatus);
+const statusTone = statusLabel === 'Integration in progress' ? 'progress' : statusLabel === 'In discussion' ? 'discussion' : undefined;
 ---
 <article class="provider-card" id={`provider-${data.slug}`}>
   {showLogo && (
@@ -26,7 +27,11 @@ const statusLabel = data.publicStatusLabel ?? formatStatusLabel(data.relationshi
   <div class="provider-card__body">
     <p class="provider-card__category">{data.category}</p>
     <h3 class="provider-card__name">{data.name}</h3>
-    {statusLabel && <p class="provider-card__status">{statusLabel}</p>}
+    {statusLabel && (
+      <p class={`provider-card__status${statusTone ? ` provider-card__status--${statusTone}` : ''}`}>
+        {statusLabel}
+      </p>
+    )}
     {showDescription && data.shortDescription && (
       <p class="provider-card__desc">{data.shortDescription}</p>
     )}
@@ -93,11 +98,31 @@ const statusLabel = data.publicStatusLabel ?? formatStatusLabel(data.relationshi
   }
 
   .provider-card__status {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     letter-spacing: 0.04em;
     color: var(--dajc-muted);
     margin: 0 0 0.7rem;
+  }
+
+  .provider-card__status::before {
+    content: '';
+    flex: 0 0 auto;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .provider-card__status--progress {
+    color: var(--dajc-orange);
+  }
+
+  .provider-card__status--discussion {
+    color: #9fb2cc;
   }
 
   .provider-card__desc {
