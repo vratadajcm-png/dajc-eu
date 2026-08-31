@@ -279,3 +279,5 @@ It may become an actual migration only after:
 - rollback/forward-fix is documented;
 - schema types are regenerated and Application CI/security tests are green;
 - production application receives explicit gate approval.
+
+Current application QA evidence before documentation-only follow-up commits: Application CI run `33397042445` succeeded on code head `85e327f` and Vercel succeeded for the same code head. This validates the application contracts/state machine only; it does not authorize or validate a database migration.
