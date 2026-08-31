@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - 'config/oversize-sources/**'
+      - 'config/europe-coverage.mjs'
       - 'config/driving-ban-calendars/**'
       - 'scripts/**'
       - '.github/workflows/*oversize*.yml'
       - '.github/workflows/news-ci.yml'
       - 'docs/NEWS_AUTOMATION.md'
+      - 'docs/DAJC_WEEKLY_INTELLIGENCE_SPEC.md'
       - 'package.json'
       - 'package-lock.json'
   workflow_dispatch: {}
@@ -41,3 +43,9 @@ jobs:
 
       - name: Exercise live official-source monitor
         run: npm run oversize:monitor
+
+      - name: One-time live preview validation
+        if: github.head_ref == 'fix/weekly-policy-strict-10x6'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: npm run oversize:publish -- --preview --dry-run

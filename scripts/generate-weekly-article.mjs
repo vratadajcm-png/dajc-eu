@@ -28,7 +28,7 @@ import { loadWeekFindings } from './lib/store.mjs';
 import { isoWeekLabel, isoWeekRangeLabel, isoWeekStart, isoWeekEnd } from './lib/week.mjs';
 import { selectCandidates } from './lib/select-candidates.mjs';
 import { verifyCandidates } from './lib/verify-candidates.mjs';
-import { generateArticleWithOpenAI } from './lib/openai-client.mjs';
+import { generateArticleWithOpenAI, generateLeadSupplementWithOpenAI, generateRoundupSupplementWithOpenAI } from './lib/openai-client.mjs';
 import { generateArticleMock } from './lib/mock-generator.mjs';
 import { renderArticleMarkdown, toFrontmatterYaml } from './lib/render-article.mjs';
 import { runQualityGate } from './lib/quality-gate.mjs';
@@ -37,6 +37,9 @@ import { formatNextPublicationLabel } from './lib/next-publication.mjs';
 import { resolveDrivingBanFindings } from './lib/driving-ban-calendar.mjs';
 import { crossValidateDevelopments } from './lib/cross-validate.mjs';
 import { ensureOfficialCalendarLeadFloor } from './lib/lead-floor.mjs';
+import { ensureCriticalCoverage } from './lib/critical-floor.mjs';
+import { mergeRoundupSupplement, roundupNeedsSupplement, sanitizeRoundup } from './lib/roundup-breadth.mjs';
+import { filterGeneratedItems } from './lib/generated-item-filter.mjs';
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -47,7 +50,9 @@ function parseArgs(argv) {
   const mock = argv.includes('--mock') || process.env.OVERSIZE_MOCK === '1';
   const skipBuild = argv.includes('--skip-build');
   const dryRun = argv.includes('--dry-run') || process.env.OVERSIZE_DRY_RUN === '1';
-  return { mock, skipBuild, dryRun };
+  const refreshExisting = argv.includes('--refresh-existing');
+  const preview = argv.includes('--preview');
+  return { mock, skipBuild, dryRun, refreshExisting, preview };
 }
 
 async function appendSummary(markdown) {
@@ -78,7 +83,11 @@ async function fail(reason) {
 }
 
 async function main() {
-  const { mock, skipBuild, dryRun } = parseArgs(process.argv.slice(2));
+  const { mock, skipBuild, dryRun, refreshExisting, preview } = parseArgs(process.argv.slice(2));
+  if (refreshExisting && !dryRun) {
+    await fail('--refresh-existing is allowed only together with --dry-run; it must never overwrite a published article directly.');
+    return;
+  }
 
   // Preflight, before any network/data work: a missing key on a real run is
   // a configuration error, not something worth spending verification time
@@ -109,25 +118,26 @@ async function main() {
 
   console.log(`EU Oversize Weekly generator - ${now.toISOString()}`);
   console.log(`Reading findings from ISO week: ${thisWeek}`);
-  console.log(`Publishing for upcoming week: ${nextWeekLabel} (${weekRangeLabel})`);
+  console.log(`${preview ? 'Publishing PREVIEW for' : 'Publishing for upcoming week'}: ${nextWeekLabel} (${weekRangeLabel})`);
   console.log(mock ? 'Mode: MOCK (no OpenAI call, no cost)' : 'Mode: LIVE (calls OpenAI API)');
   if (dryRun) {
     console.log('DRY RUN: will generate, validate and build the article, then discard it - nothing will be committed.');
   }
   console.log('');
 
-  const slug = `eu-oversize-weekly-${nextWeekLabel.toLowerCase()}`;
+  const slug = preview
+    ? `eu-oversize-weekly-preview-${nextWeekLabel.toLowerCase()}`
+    : `eu-oversize-weekly-${nextWeekLabel.toLowerCase()}`;
   const filePath = path.join(ARTICLES_DIR, `${slug}.md`);
-  if (existsSync(filePath)) {
-    // This check applies in BOTH modes. In dry-run mode we still write to a
-    // separate throwaway path below (never `filePath` itself) - but if the
-    // real article already exists there is nothing meaningful left to dry-
-    // run either, so we abort the same way in both modes for consistency.
+  if (existsSync(filePath) && !refreshExisting) {
     await abort(
       `${path.relative(ROOT, filePath)} already exists - refusing to overwrite a previously published article. ` +
-        'Delete it manually first if you really want to regenerate this week\'s article.'
+        'Use --dry-run --refresh-existing for a safe editorial refresh preview; the real file will still never be written.'
     );
     return;
+  }
+  if (existsSync(filePath) && refreshExisting) {
+    console.log(`Refresh preview: ${path.relative(ROOT, filePath)} already exists; generating only to a throwaway dry-run path.`);
   }
   // Dry runs never write to the real target path, even transiently - a
   // separate, uniquely-named throwaway file is used for the build check
@@ -168,7 +178,7 @@ async function main() {
     return;
   }
 
-  const preSelected = [...calendarFindings, ...selectCandidates(monitoredFindings)];
+  const preSelected = [...calendarFindings, ...selectCandidates(monitoredFindings, { discoveryWindowStart: isoWeekStart(now) })];
   console.log(`Pre-selected for verification: ${preSelected.length} (${calendarFindings.length} from the official calendar, always included)`);
   if (preSelected.length === 0) {
     await abort('no candidates passed pre-selection');
@@ -209,16 +219,137 @@ async function main() {
   }
 
   const { kept, droppedCount } = crossValidateDevelopments(article.developments, verified);
-  article.developments = kept;
+  const initialLeadFilter = filterGeneratedItems(kept, { weekStart: targetWeekStart, weekEnd: targetWeekEnd });
+  article.developments = initialLeadFilter.kept;
+
   const roundupValidation = crossValidateDevelopments(article.europeRoundup || [], verified);
-  article.europeRoundup = roundupValidation.kept;
+  const initialRoundupFilter = filterGeneratedItems(roundupValidation.kept, {
+    weekStart: targetWeekStart,
+    weekEnd: targetWeekEnd,
+    usedSourceUrls: new Set(article.developments.map((item) => item.sourceUrl).filter(Boolean)),
+  });
+  article.europeRoundup = initialRoundupFilter.kept;
+
+  for (const dropped of [...initialLeadFilter.dropped, ...initialRoundupFilter.dropped]) {
+    console.log(`  [AI item removed] "${dropped.item?.title || 'untitled'}": ${dropped.reason}`);
+  }
 
   const leadFloor = ensureOfficialCalendarLeadFloor(article, verified);
   article = leadFloor.article;
+
+  const criticalFloor = ensureCriticalCoverage(article, verified, {
+    discoveryWindowStart: isoWeekStart(now),
+  });
+  article = criticalFloor.article;
+  if (criticalFloor.critical.length > 0) {
+    console.log(
+      `Critical-news floor: ${criticalFloor.critical.length} required verified change(s); added ${criticalFloor.addedToLeads} to leads and ${criticalFloor.addedToRoundup} to Rest of Europe.`
+    );
+    for (const item of criticalFloor.critical) {
+      console.log(`  [required] ${item.country}: ${item.title} -> ${item.sourceUrl}`);
+    }
+  }
+
+
+  if (!mock && article.developments.length < 20) {
+    for (let attempt = 1; attempt <= 2 && article.developments.length < 20; attempt += 1) {
+      const usedSourceUrls = new Set(
+        [...article.developments, ...article.europeRoundup]
+          .map((item) => item.sourceUrl)
+          .filter(Boolean)
+      );
+      const remainingVerified = verified.filter(
+        (candidate) => candidate.sourceUrl && !usedSourceUrls.has(candidate.sourceUrl)
+      );
+      const neededLeads = 20 - article.developments.length;
+      if (remainingVerified.length === 0) break;
+      console.log(`Lead repair attempt ${attempt}: ${article.developments.length}/20; requesting up to ${neededLeads} additional substantive verified lead(s).`);
+      try {
+        const supplement = await generateLeadSupplementWithOpenAI({
+          candidates: remainingVerified,
+          targetWeekStart: targetWeekStartIso,
+          targetWeekEnd: targetWeekEndIso,
+          apiKey,
+          neededReports: neededLeads,
+        });
+        const supplementValidation = crossValidateDevelopments(supplement, remainingVerified);
+        const supplementFilter = filterGeneratedItems(supplementValidation.kept, {
+          weekStart: targetWeekStart,
+          weekEnd: targetWeekEnd,
+          usedSourceUrls: new Set([...article.developments, ...article.europeRoundup].map((x) => x.sourceUrl).filter(Boolean)),
+        });
+        for (const dropped of supplementFilter.dropped) {
+          console.log(`  [lead supplement removed] "${dropped.item?.title || 'untitled'}": ${dropped.reason}`);
+        }
+        article.developments.push(...supplementFilter.kept.slice(0, neededLeads));
+        console.log(`Lead supplement kept ${supplementFilter.kept.length}; leads now ${article.developments.length}.`);
+      } catch (err) {
+        console.warn(`Lead supplement failed: ${err.message || err}. Quality gate will decide whether publication can continue.`);
+        break;
+      }
+    }
+  }
+
+  article.europeRoundup = sanitizeRoundup(
+    article.europeRoundup,
+    article.developments,
+    { suppressEvergreenSunday: targetWeekEnd >= new Date('2026-09-01T00:00:00Z') }
+  );
   if (leadFloor.added > 0 || leadFloor.promoted > 0) {
     console.log(
       `Official-calendar lead floor: added ${leadFloor.added}, promoted ${leadFloor.promoted}; lead reports now ${article.developments.length}.`
     );
+  }
+
+  if (!mock) {
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      const breadth = roundupNeedsSupplement(article.europeRoundup);
+      if (!breadth.needsSupplement) break;
+      const usedSourceUrls = new Set(
+        [...article.developments, ...article.europeRoundup]
+          .map((item) => item.sourceUrl)
+          .filter(Boolean)
+      );
+      const remainingVerified = verified.filter(
+        (candidate) => candidate.sourceUrl && !usedSourceUrls.has(candidate.sourceUrl)
+      );
+
+      console.log(
+        `Rest-of-Europe repair needed: ${breadth.reportCount}/10 report(s), ${breadth.countryCount}/6 countries; requesting at least ${breadth.neededReports} more report(s) and ${breadth.neededCountries} more distinct country/countries.`
+      );
+
+      try {
+        const supplement = await generateRoundupSupplementWithOpenAI({
+          candidates: remainingVerified,
+          targetWeekStart: targetWeekStartIso,
+          targetWeekEnd: targetWeekEndIso,
+          apiKey,
+          existingCountries: [...breadth.countries],
+          neededCountries: Math.max(0, breadth.neededCountries),
+          neededReports: Math.max(0, breadth.neededReports),
+        });
+        const supplementValidation = crossValidateDevelopments(supplement, remainingVerified);
+        const supplementFilter = filterGeneratedItems(supplementValidation.kept, {
+          weekStart: targetWeekStart,
+          weekEnd: targetWeekEnd,
+          usedSourceUrls: new Set([...article.developments, ...article.europeRoundup].map((x) => x.sourceUrl).filter(Boolean)),
+        });
+        for (const dropped of supplementFilter.dropped) {
+          console.log(`  [roundup supplement removed] "${dropped.item?.title || 'untitled'}": ${dropped.reason}`);
+        }
+        article.europeRoundup = mergeRoundupSupplement(
+          article.europeRoundup,
+          supplementFilter.kept,
+          new Set(article.developments.map((item) => item.sourceUrl).filter(Boolean))
+        );
+        console.log(
+          `Rest-of-Europe supplement kept ${supplementFilter.kept.length}; roundup now has ${article.europeRoundup.length} report(s) across ${roundupNeedsSupplement(article.europeRoundup).countryCount} countries.`
+        );
+      } catch (err) {
+        console.warn(`Rest-of-Europe supplement failed: ${err.message || err}. Quality gate will decide whether publication can continue.`);
+        break;
+      }
+    }
   }
 
   const totalDropped = droppedCount + roundupValidation.droppedCount;
@@ -234,6 +365,12 @@ async function main() {
     return;
   }
 
+  if (preview) {
+    article.seoTitle = `Preview: ${article.seoTitle}`;
+    article.metaDescription = `Preview of the DAJC Friday European Oversize & Special Transport Intelligence format. ${article.metaDescription}`;
+    article.intro = `PREVIEW EDITION — published early to demonstrate the production Friday format. Friday's final edition will be rebuilt from the complete week's monitoring.\n\n${article.intro}`;
+  }
+
   const publishedAt = now.toISOString().slice(0, 10);
   const nextPublicationLabel = formatNextPublicationLabel(now);
   const { frontmatter, body } = renderArticleMarkdown(article, { slug, publishedAt, nextPublicationLabel });
@@ -246,6 +383,7 @@ async function main() {
     europeRoundup: article.europeRoundup,
     weekStart: targetWeekStart,
     weekEnd: targetWeekEnd,
+    requiredSourceUrls: criticalFloor.critical.map((item) => item.sourceUrl),
   });
   if (!gate.ok) {
     console.error('Quality gate FAILED:');
@@ -310,7 +448,7 @@ async function main() {
   console.log(`Title: ${frontmatter.title}`);
   console.log(`Sources cited: ${frontmatter.sources.length}`);
   console.log('\nSuggested commit message:');
-  console.log(`  content: publish EU Oversize Weekly ${nextWeekLabel}`);
+  console.log(`  content: publish ${preview ? 'preview ' : ''}EU Oversize Weekly ${nextWeekLabel}`);
   await appendSummary(
     [
       '### EU Oversize Weekly article generated',

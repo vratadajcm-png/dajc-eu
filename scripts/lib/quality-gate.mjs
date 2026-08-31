@@ -3,9 +3,14 @@
 
 import { articleFrontmatterSchema } from './article-schema.mjs';
 import { validateDevelopmentDateRange } from './date-validation.mjs';
+import { checkLongRoadClosure } from './closure-duration.mjs';
+import { checkTransportDomainRelevance } from './transport-domain.mjs';
 
 const MIN_BODY_LENGTH = 400;
+const MIN_REPORTS = 20;
 const MAX_REPORTS = 30;
+const MIN_ROUNDUP_REPORTS = 10;
+const MIN_ROUNDUP_COUNTRIES = 6;
 const MAX_ROUNDUP_REPORTS = 20;
 const MIN_RECOMMENDED_ACTION_LENGTH = 10;
 
@@ -27,7 +32,7 @@ function isValidUrl(value) {
   }
 }
 
-export function runQualityGate({ frontmatter, body, developments, europeRoundup, weekStart, weekEnd }) {
+export function runQualityGate({ frontmatter, body, developments, europeRoundup, weekStart, weekEnd, requiredSourceUrls = [] }) {
   const errors = [];
   const items = Array.isArray(developments) ? developments : [];
   const roundupItems = Array.isArray(europeRoundup) ? europeRoundup : [];
@@ -45,11 +50,18 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
     errors.push(`article body is suspiciously short (${body.trim().length} chars, minimum ${MIN_BODY_LENGTH})`);
   }
 
-  if (items.length === 0) {
-    errors.push('article has zero lead developments - nothing significant to report');
+  if (items.length < MIN_REPORTS) {
+    errors.push(`article has only ${items.length} lead reports - DAJC Weekly requires at least ${MIN_REPORTS} substantive verified lead topics; never pad with routine or irrelevant material`);
   }
   if (items.length > MAX_REPORTS) {
     errors.push(`article has ${items.length} lead reports - maximum is ${MAX_REPORTS}; move additional useful verified items to Around Europe`);
+  }
+  if (roundupItems.length < MIN_ROUNDUP_REPORTS) {
+    errors.push(`Rest of Europe has only ${roundupItems.length} reports - minimum is ${MIN_ROUNDUP_REPORTS}`);
+  }
+  const roundupCountries = new Set(roundupItems.map((item) => String(item.country || '').trim()).filter(Boolean));
+  if (roundupCountries.size < MIN_ROUNDUP_COUNTRIES) {
+    errors.push(`Rest of Europe covers only ${roundupCountries.size} countries/jurisdictions - minimum is ${MIN_ROUNDUP_COUNTRIES}`);
   }
   if (roundupItems.length > MAX_ROUNDUP_REPORTS) {
     errors.push(`Around Europe has ${roundupItems.length} reports - maximum is ${MAX_ROUNDUP_REPORTS}; retain only the strongest additional updates`);
@@ -73,6 +85,12 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
     if (!item.recommendedAction || item.recommendedAction.trim().length < MIN_RECOMMENDED_ACTION_LENGTH) {
       errors.push(`${label} has no meaningful recommendedAction for an operator/dispatcher`);
     }
+
+    const domain = checkTransportDomainRelevance(item);
+    if (!domain.ok) errors.push(`${label}: ${domain.reason}`);
+
+    const closureCheck = checkLongRoadClosure(item);
+    if (!closureCheck.ok) errors.push(`${label}: ${closureCheck.reason}`);
 
     if (weekStart && weekEnd) {
       const dateCheck = validateDevelopmentDateRange(
@@ -110,6 +128,12 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
   for (const source of frontmatter?.sources || []) {
     if (!usedSourceUrls.has(source.url)) {
       errors.push(`frontmatter lists source "${source.url}" which is not cited by any report in the article body`);
+    }
+  }
+
+  for (const requiredUrl of requiredSourceUrls) {
+    if (requiredUrl && !usedSourceUrls.has(requiredUrl)) {
+      errors.push(`critical verified development omitted from publication: required source "${requiredUrl}"`);
     }
   }
 

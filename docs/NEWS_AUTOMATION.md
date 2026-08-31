@@ -1,5 +1,7 @@
 # News automation
 
+> Canonical editorial rules: `docs/DAJC_WEEKLY_INTELLIGENCE_SPEC.md`. This file contains implementation notes only; if wording conflicts, the canonical spec wins.
+
 How the `/news` system on dajc.eu works: the content model, the daily EU
 Oversize monitor, the Friday publication pipeline, and how to author a
 DAJC Platform Update. The site itself is a static Astro build (see the
@@ -54,12 +56,7 @@ dispatchers - not a general traffic-news feed, and it must never summarize
 every item a source happens to publish. All content is written in
 professional English.
 
-- **10-12 lead reports plus a Rest-of-Europe roundup**, enforced by
-  `scripts/lib/quality-gate.mjs`. The lead reports are the most consequential
-  items by operational impact. Every other verified, useful item belongs in
-  the Europe-wide roundup. A title or source may appear only once across the
-  complete edition. If fewer than 10 verified lead-quality reports are
-  available, the run does not publish; it never pads the edition with filler.
+- **20-30 lead reports plus Rest of Europe**, enforced by `scripts/lib/quality-gate.mjs`. The hard minimum is **20 substantive lead topics**. Rest of Europe has a hard minimum of **10 concise reports spanning at least 6 distinct jurisdictions**. Titles and source URLs must be disjoint across the complete edition. The pipeline never pads either section with routine or irrelevant filler.
 - **Editorial priority order** (most important first, see the system prompt
   in `scripts/lib/openai-client.mjs`): truck driving bans; special movement
   windows/bans for exceptional or oversized transport; permit-rule/system
@@ -69,12 +66,7 @@ professional English.
   strategic routes; weather only when it creates a specific operational
   restriction; significant equipment/regulatory/market changes as secondary
   items.
-- **Whole-of-Europe scope without a fixed country list.** Countries are
-  selected from verified evidence and may change every week. There are no
-  quotas, preferred states, or habitual corridors. Romania, Lithuania,
-  Turkey, Spain, the United Kingdom, Denmark and every other covered European
-  market compete on the same operational-significance criteria. A specific
-  route is named only when an official restriction actually affects it.
+- **Complete canonical DAJC coverage scope.** Every cycle checks `config/europe-coverage.mjs`, including the explicitly approved countries, territories and MPZ aliases plus retained transport-relevant sub-jurisdictions. Article selection remains evidence-led, but absence from the article must mean "checked — no material development found", never "not searched".
 - **Every report states**: country; region/road/route where applicable;
   what applies or changed; affected vehicle category and weight/vehicle
   threshold (`vehicleScope`); exact date and **local time of the country
@@ -86,11 +78,7 @@ professional English.
   special restriction for exceptional/oversized transport, and a condition
   in an individual transport permit are always kept distinct - never
   conflated into one description.
-- **Recurring weekend/seasonal driving bans** remain relevant even when no
-  news source re-published them this week, but only when they are known to
-  be valid for the target week's exact dates - see "Official driving-ban
-  calendar layer" below, which exists specifically because RSS monitoring
-  alone cannot guarantee this.
+- **From 1 September 2026, unchanged year-round Sunday/weekend bans are not repeated.** Seasonal, holiday-specific, exceptional-transport and materially changed restrictions remain eligible through the maintained official calendar layer.
 
 ## Content model
 
@@ -219,6 +207,18 @@ collisions, theft reports, procurement/tender notices, and unconfirmed
 planned/future works (see `NON_RESTRICTION_PATTERNS` in
 `relevance-filter.mjs` for the exact patterns and reasons).
 
+## Editorial policy from 1 September 2026
+
+The following rules are hard publication requirements, not prompt-only guidance:
+
+- **Rest of Europe must contain at least 10 concise verified reports from at least 6 distinct countries.**
+- The roundup is deliberately short-form: each item states the country, the operational change, where/when it matters, the practical operator action, and the official source.
+- Ordinary year-round Sunday/weekend driving-ban baselines are not repeated after 1 September 2026. Seasonal, holiday-specific, exceptional-transport and genuinely changed restrictions remain eligible.
+- A road/motorway closure is publishable only when the official evidence proves a **planned duration longer than 30 days**. A 30-day closure, a shorter closure, or an undated/"until further notice" closure with no provable duration is excluded. There is no corridor-based exception to this threshold.
+- RSS/Atom is never treated as complete coverage. Every configured authority is scanned through the feed **and** its official web/HTML news/traffic pages; results are merged and deduplicated.
+- Fresh verified high-signal changes directly affecting exceptional/oversized transport (permits, escort/private-escort rules, police escort, border restrictions, weight/width/height/axle limits, relevant regulatory procedures) are **required coverage**. A quality gate blocks publication if any such critical verified source is omitted from both lead reports and Rest of Europe.
+- `config/europe-coverage.mjs` is the single mandatory geographic coverage universe. It includes every country and territory approved for DAJC coverage, including alternative MPZ aliases and dependent/overseas territories. CI fails if any registry item loses its configured source mapping.
+
 ## Source configuration
 
 `config/oversize-sources/index.mjs` exports `oversizeSources`, an array of:
@@ -237,16 +237,7 @@ planned/future works (see `NON_RESTRICTION_PATTERNS` in
 }
 ```
 
-This is a **curated pan-European discovery set** (currently 43 configured
-official sources). RSS/Atom remains preferred when a verified `feedUrl`
-exists, but RSS is no longer required. If a feed yields nothing useful or
-is unavailable, `scripts/lib/fetch-source.mjs` fetches the authority's
-official HTML page, extracts operationally relevant same-domain links, and
-continues through the same relevance/classification pipeline. Optional
-`htmlUrls` can point at a better official traffic/news listing than the
-homepage (for example Autobahn GmbH's `Verkehrsmeldungen`). External-domain
-links are rejected by the HTML adapter, so this fallback does not silently
-turn into an unofficial aggregation layer.
+This is the official-source discovery layer for the mandatory DAJC geographic coverage registry. RSS/Atom is optional and is never considered complete on its own. For every configured authority, `fetch-source.mjs` checks both the feed (when available) and the authority's official HTML/news/traffic pages, enriches candidate links from their detail pages, merges the channels and deduplicates by source URL. External-domain links are rejected by the HTML adapter, so web discovery does not silently turn into an unofficial aggregation layer.
 
 ### How to add a new source
 
@@ -259,11 +250,7 @@ turn into an unofficial aggregation layer.
    rules. Do not solve coverage gaps by adding unofficial aggregators when an
    official source exists.
 
-**No Slovak (SK) source is configured yet.** A related prior audit found
-the obvious candidate (NDS / `ndsas.sk`) unreliable - its feed's `pubDate`
-tracks the CMS's `dateModified`, not the true publish date, so years-old
-press releases can appear "fresh". Don't add it back without
-independently re-checking that specific problem first.
+Slovakia is covered through Slovenská správa ciest' official press-release page. The previously rejected NDS RSS feed remains intentionally unused because its CMS date handling was not trusted.
 
 ## Official driving-ban calendar layer
 
