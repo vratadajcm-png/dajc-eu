@@ -47,15 +47,15 @@ function runGenerate(args, envOverrides = {}) {
   }
 }
 
-function syntheticCandidate(n, type) {
+function syntheticCandidate(n, type, country = 'Testland') {
   return {
     id: `integration-test-${n}`,
-    country: 'Testland',
+    country,
     region: null,
     location: 'Test road',
     type,
     title: `Synthetic candidate ${n} for integration testing`,
-    summary: 'Synthetic candidate for integration testing only - not a real transport restriction.',
+    summary: 'Synthetic exceptional transport road permit and heavy-haul route change for integration testing.',
     validFrom: null,
     validTo: null,
     impact: null,
@@ -82,15 +82,11 @@ beforeAll(() => {
       {
         week: thisWeek,
         updatedAt: now.toISOString(),
-        findings: [
-          syntheticCandidate(1, 'permit_change'),
-          syntheticCandidate(2, 'permit_system'),
-          syntheticCandidate(3, 'escort_requirement'),
-          syntheticCandidate(4, 'border_restriction'),
-          syntheticCandidate(5, 'bridge_restriction'),
-          syntheticCandidate(6, 'tunnel_restriction'),
-          syntheticCandidate(7, 'permit_change'),
-        ],
+        findings: Array.from({ length: 40 }, (_, i) => {
+          const types = ['permit_change','permit_system','escort_requirement','border_restriction','bridge_restriction','tunnel_restriction','route_restriction','toll_change'];
+          const countries = ['Spain','Romania','Denmark','Portugal','Croatia','Switzerland','Belgium','Lithuania'];
+          return syntheticCandidate(i + 1, types[i % types.length], countries[i % countries.length]);
+        }),
       },
       null,
       2
@@ -103,6 +99,7 @@ afterAll(() => {
   if (preexistingFindings) writeFileSync(findingsPath, preexistingFindings, 'utf-8');
   else rmSync(findingsPath, { force: true });
   rmSync(targetFilePath, { force: true }); // safety net only - no test should leave this behind
+  rmSync(path.join(ARTICLES_DIR, `eu-oversize-weekly-preview-${nextWeekLabel.toLowerCase()}.md`), { force: true });
 });
 
 describe('generate-weekly-article.mjs (mock, subprocess)', () => {
@@ -115,6 +112,23 @@ describe('generate-weekly-article.mjs (mock, subprocess)', () => {
       expect(existsSync(targetFilePath)).toBe(false);
       const leftoverDryRunFiles = readdirSync(ARTICLES_DIR).filter((f) => f.startsWith(`_dry-run-${slug}`));
       expect(leftoverDryRunFiles).toEqual([]);
+    },
+    30_000
+  );
+
+  it(
+    'can publish a separate preview without consuming the Friday final slug',
+    () => {
+      const previewPath = path.join(ARTICLES_DIR, `eu-oversize-weekly-preview-${nextWeekLabel.toLowerCase()}.md`);
+      try {
+        const result = runGenerate(['--mock', '--preview', '--skip-build']);
+        expect(result.code).toBe(0);
+        expect(existsSync(previewPath)).toBe(true);
+        expect(existsSync(targetFilePath)).toBe(false);
+        expect(readFileSync(previewPath, 'utf-8')).toMatch(/PREVIEW EDITION/);
+      } finally {
+        rmSync(previewPath, { force: true });
+      }
     },
     30_000
   );
