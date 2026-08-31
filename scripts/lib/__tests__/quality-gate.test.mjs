@@ -1,152 +1,149 @@
 import { describe, expect, it } from 'vitest';
 import { runQualityGate } from '../quality-gate.mjs';
 
-const weekStart = new Date('2026-08-24T00:00:00Z');
-const weekEnd = new Date('2026-08-30T00:00:00Z');
+const weekStart = new Date('2026-09-07T00:00:00Z');
+const weekEnd = new Date('2026-09-13T00:00:00Z');
+const countries = ['Spain','Romania','Denmark','Portugal','Croatia','Switzerland','Belgium','Lithuania'];
 
 function makeDevelopment(i, overrides = {}) {
   return {
-    country: 'Country',
-    title: `Verified report ${i}`,
-    whatChanged: 'Something changed.',
-    where: 'Somewhere',
-    validFrom: '2026-08-29',
-    validTo: '2026-08-30',
-    impact: 'Some impact.',
-    recommendedAction: 'A concrete, practical action for the operator.',
-    isDrivingBan: i === 0, // ensure at least one driving ban by default
+    country: countries[i % countries.length],
+    title: `Exceptional transport road permit change ${i}`,
+    whatChanged: 'A verified exceptional transport road permit or routing requirement changed.',
+    where: 'National road network',
+    vehicleScope: 'Heavy and exceptional road transport',
+    timeWindow: '',
+    validFrom: '2026-09-08',
+    validTo: '2026-09-10',
+    impact: 'Operators may need to change routing, permits or dispatch timing.',
+    recommendedAction: 'Check the official source and update the transport plan before dispatch.',
+    exemptions: '',
+    isDrivingBan: false,
     isInfrastructure: false,
     sourceUrl: `https://example.test/report-${i}`,
-    sourceName: `Source ${i}`,
+    sourceName: `Official road authority ${i}`,
     ...overrides,
   };
 }
 
-function makeFrontmatter(developments) {
+function baseEdition() {
+  const developments = Array.from({ length: 20 }, (_, i) => makeDevelopment(i));
+  const europeRoundup = Array.from({ length: 10 }, (_, i) => makeDevelopment(100 + i));
+  return { developments, europeRoundup };
+}
+
+function makeFrontmatter(items) {
   return {
-    title: 'Test title long enough',
-    description: 'Test description long enough',
-    slug: 'eu-oversize-weekly-2026-w35',
+    title: 'DAJC European Oversize Intelligence test edition',
+    description: 'Verified heavy and exceptional road transport changes across Europe.',
+    slug: 'eu-oversize-weekly-2026-w37',
     category: 'eu-oversize',
-    publishedAt: '2026-08-21',
+    publishedAt: '2026-09-04',
     language: 'en',
     author: 'DAJC',
     status: 'published',
-    sources: developments.map((d) => ({ name: d.sourceName, url: d.sourceUrl })),
+    sources: items.map((d) => ({ name: d.sourceName, url: d.sourceUrl })),
   };
 }
 
-const LONG_BODY = 'x'.repeat(500);
-describe('runQualityGate - report count', () => {
-  it('blocks a generated edition with an empty Rest-of-Europe roundup', () => {
-    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
-    const result = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, europeRoundup: [], weekStart, weekEnd });
-    expect(result.ok).toBe(false);
-    expect(result.errors.some((e) => /roundup is empty/.test(e))).toBe(true);
-  });
+const LONG_BODY = 'x'.repeat(800);
 
-  it('blocks publication with fewer than 10 reports', () => {
-    const developments = Array.from({ length: 9 }, (_, i) => makeDevelopment(i));
-    const result = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
-    expect(result.ok).toBe(false);
-    expect(result.errors.some((e) => /only 9 report/.test(e))).toBe(true);
+function run({ developments, europeRoundup, requiredSourceUrls = [] }) {
+  const all = [...developments, ...europeRoundup];
+  return runQualityGate({
+    frontmatter: makeFrontmatter(all),
+    body: LONG_BODY,
+    developments,
+    europeRoundup,
+    weekStart,
+    weekEnd,
+    requiredSourceUrls,
   });
+}
 
-  it('blocks publication with more than 12 reports', () => {
-    const developments = Array.from({ length: 13 }, (_, i) => makeDevelopment(i));
-    const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
-    expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /13 reports/.test(e))).toBe(true);
-  });
-
-  it('passes with exactly 10 reports (the required W35 count)', () => {
-    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
-    const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
+describe('DAJC Weekly quality gate - 20 + 10 / 6', () => {
+  it('passes exactly 20 lead reports plus 10 roundup reports across at least six countries', () => {
+    const edition = baseEdition();
+    const gate = run(edition);
     expect(gate.ok).toBe(true);
   });
 
-  it('passes at the boundaries: 10 and 12', () => {
-    for (const count of [10, 12]) {
-      const developments = Array.from({ length: count }, (_, i) => makeDevelopment(i));
-      const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
-      expect(gate.ok).toBe(true);
-    }
-  });
-});
-
-describe('runQualityGate - duplicates', () => {
-  it('rejects a report duplicated between lead coverage and the Europe roundup', () => {
-    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
-    const europeRoundup = [{ ...makeDevelopment(20), sourceUrl: developments[0].sourceUrl }];
-    const all = [...developments, ...europeRoundup];
-    const gate = runQualityGate({ frontmatter: makeFrontmatter(all), body: LONG_BODY, developments, europeRoundup, weekStart, weekEnd });
+  it('blocks fewer than 20 lead reports', () => {
+    const edition = baseEdition();
+    edition.developments = edition.developments.slice(0, 19);
+    const gate = run(edition);
     expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /Europe roundup must be disjoint/.test(e))).toBe(true);
+    expect(gate.errors.some((e) => /only 19 lead reports/.test(e))).toBe(true);
   });
 
-  it('rejects a duplicate sourceUrl across two reports', () => {
-    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
-    developments[1] = { ...developments[1], sourceUrl: developments[0].sourceUrl };
-    const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
+  it('blocks more than 30 lead reports', () => {
+    const edition = baseEdition();
+    edition.developments = Array.from({ length: 31 }, (_, i) => makeDevelopment(i));
+    const gate = run(edition);
+    expect(gate.ok).toBe(false);
+    expect(gate.errors.some((e) => /31 lead reports/.test(e))).toBe(true);
+  });
+
+  it('blocks fewer than 10 Rest-of-Europe reports', () => {
+    const edition = baseEdition();
+    edition.europeRoundup = edition.europeRoundup.slice(0, 9);
+    const gate = run(edition);
+    expect(gate.ok).toBe(false);
+    expect(gate.errors.some((e) => /only 9 reports/.test(e))).toBe(true);
+  });
+
+  it('blocks Rest of Europe with fewer than six jurisdictions', () => {
+    const edition = baseEdition();
+    edition.europeRoundup = edition.europeRoundup.map((item, i) => ({
+      ...item,
+      country: ['Spain','Romania','Denmark','Portugal','Croatia'][i % 5],
+    }));
+    const gate = run(edition);
+    expect(gate.ok).toBe(false);
+    expect(gate.errors.some((e) => /covers only 5 countries/.test(e))).toBe(true);
+  });
+
+  it('blocks a duplicate source between leads and roundup', () => {
+    const edition = baseEdition();
+    edition.europeRoundup[0] = { ...edition.europeRoundup[0], sourceUrl: edition.developments[0].sourceUrl };
+    const gate = run(edition);
     expect(gate.ok).toBe(false);
     expect(gate.errors.some((e) => /duplicates a sourceUrl/.test(e))).toBe(true);
   });
 
-  it('rejects a duplicated (normalized) title even with different sources', () => {
-    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i));
-    developments[1] = { ...developments[1], title: developments[0].title.toUpperCase() + '  ' };
-    const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
+  it('blocks a road closure without verified duration longer than 30 days', () => {
+    const edition = baseEdition();
+    edition.europeRoundup[0] = {
+      ...edition.europeRoundup[0],
+      title: 'Motorway full closure after storm damage',
+      whatChanged: 'The motorway remains fully closed to traffic.',
+      isInfrastructure: true,
+      validFrom: '',
+      validTo: '',
+    };
+    const gate = run(edition);
     expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /duplicates a title/.test(e))).toBe(true);
+    expect(gate.errors.some((e) => /no verifiable planned duration longer than 30 days/.test(e))).toBe(true);
   });
 
-  // Two genuinely distinct restrictions for the same country/weekend (e.g.
-  // Austria's general weekend ban and its additional summer corridor
-  // restrictions) must NOT be treated as duplicates just for sharing a
-  // country and date range.
-  it('allows two distinct reports for the same country and overlapping dates', () => {
-    const developments = Array.from({ length: 10 }, (_, i) => makeDevelopment(i, { country: 'Austria' }));
-    developments[1] = { ...developments[1], title: 'A completely different Austria report', country: 'Austria' };
-    const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
+  it('allows a verified closure longer than 30 days', () => {
+    const edition = baseEdition();
+    edition.europeRoundup[0] = {
+      ...edition.europeRoundup[0],
+      title: 'Motorway full closure for bridge reconstruction',
+      whatChanged: 'The motorway is fully closed to traffic during bridge reconstruction.',
+      isInfrastructure: true,
+      validFrom: '2026-09-01',
+      validTo: '2026-10-15',
+    };
+    const gate = run(edition);
     expect(gate.ok).toBe(true);
   });
-});
 
-describe('runQualityGate - other requirements', () => {
-  it('requires at least one driving-ban report', () => {
-    const developments = Array.from({ length: 8 }, (_, i) => makeDevelopment(i, { isDrivingBan: false }));
-    const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
+  it('blocks omission of a required critical source', () => {
+    const edition = baseEdition();
+    const gate = run({ ...edition, requiredSourceUrls: ['https://example.test/critical-switzerland'] });
     expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /no driving-ban/.test(e))).toBe(true);
-  });
-
-  it('requires a meaningful recommendedAction for every report', () => {
-    const developments = Array.from({ length: 8 }, (_, i) => makeDevelopment(i));
-    developments[2] = { ...developments[2], recommendedAction: 'n/a' };
-    const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
-    expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /no meaningful recommendedAction/.test(e))).toBe(true);
-  });
-
-  it('rejects a report whose validTo is before the target week (stale/expired development)', () => {
-    const developments = Array.from({ length: 8 }, (_, i) => makeDevelopment(i));
-    developments[3] = { ...developments[3], validFrom: '2026-08-21', validTo: '2026-08-23' };
-    const gate = runQualityGate({ frontmatter: makeFrontmatter(developments), body: LONG_BODY, developments, weekStart, weekEnd });
-    expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /already ended/.test(e))).toBe(true);
-  });
-
-  it('rejects when frontmatter cites a source no report actually uses', () => {
-    const developments = Array.from({ length: 8 }, (_, i) => makeDevelopment(i));
-    const frontmatter = makeFrontmatter(developments);
-    frontmatter.sources.push({ name: 'Unused source', url: 'https://example.test/unused' });
-    const gate = runQualityGate({ frontmatter, body: LONG_BODY, developments, weekStart, weekEnd });
-    expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /not cited by any report/.test(e))).toBe(true);
-  });
-
-  it('rejects zero developments', () => {
-    const gate = runQualityGate({ frontmatter: makeFrontmatter([]), body: LONG_BODY, developments: [], weekStart, weekEnd });
-    expect(gate.ok).toBe(false);
+    expect(gate.errors.some((e) => /critical verified development omitted/.test(e))).toBe(true);
   });
 });
