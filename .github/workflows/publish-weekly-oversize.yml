@@ -4,12 +4,13 @@ name: Publish Weekly Oversize Article
 # 12:00 Europe/Prague (10:00 UTC in CEST, 11:00 UTC in CET). The trigger gate
 # chooses the correct cron by timezone OFFSET, not by the runner's current
 # hour, so a GitHub scheduling delay of minutes or hours cannot invalidate the
-# run. The redundant DST cron exits with an explicit summary.
+# run. A Saturday catch-up remains idempotent.
 #
-# A Saturday 06:00 UTC catch-up trigger runs the same idempotent pipeline.
-# scripts/check-weekly-publication.mjs checks the week-specific target file
-# before npm install/OpenAI work; if Friday already published, Saturday is a
-# cheap, clearly reported no-op.
+# TEMPORARY 2026-08-31 preview hook: the merge commit for PR #7 triggers one
+# preview publication so DAJC can inspect Friday's exact format today. The
+# preview uses a separate slug and therefore cannot consume Friday's final W37
+# slug. The bot's preview commit does not match the merge-message gate, so this
+# cannot loop.
 
 on:
   schedule:
@@ -19,9 +20,15 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run: generate, verify and build the article (using the real OpenAI API if configured) but do not commit, push, or change published content.'
+        description: 'Dry run: generate, verify and build the article but do not commit/push.'
         type: boolean
         default: false
+      preview:
+        description: 'Publish a separate preview article using Friday quality gates; never consumes the final weekly slug.'
+        type: boolean
+        default: false
+  push:
+    branches: [main]
 
 permissions:
   contents: write
@@ -40,14 +47,32 @@ jobs:
         run: |
           event="${{ github.event_name }}"
           schedule="${{ github.event.schedule }}"
+          message="${{ github.event.head_commit.message }}"
+
+          if [ "$event" = "push" ]; then
+            if [[ "$message" == *"Unify DAJC Weekly at 20 leads + 10-by-6 Europe roundup"* ]]; then
+              echo "should_run=true" >> "$GITHUB_OUTPUT"
+              echo "role=one-time-preview" >> "$GITHUB_OUTPUT"
+              echo "preview=true" >> "$GITHUB_OUTPUT"
+              echo "PR #7 merge detected - publishing one-time W37 preview."
+            else
+              echo "should_run=false" >> "$GITHUB_OUTPUT"
+              echo "role=ordinary-push" >> "$GITHUB_OUTPUT"
+              echo "preview=false" >> "$GITHUB_OUTPUT"
+              echo "Ordinary main push - weekly publication not requested."
+            fi
+            exit 0
+          fi
 
           if [ "$event" = "workflow_dispatch" ]; then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
             echo "role=manual" >> "$GITHUB_OUTPUT"
+            echo "preview=${{ github.event.inputs.preview == 'true' && 'true' || 'false' }}" >> "$GITHUB_OUTPUT"
             echo "Manual run - publication pipeline enabled."
             exit 0
           fi
 
+          echo "preview=false" >> "$GITHUB_OUTPUT"
           if [ "$schedule" = "0 6 * * 6" ]; then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
             echo "role=catch-up" >> "$GITHUB_OUTPUT"
@@ -67,11 +92,6 @@ jobs:
             echo "should_run=false" >> "$GITHUB_OUTPUT"
             echo "role=friday-redundant" >> "$GITHUB_OUTPUT"
             echo "Redundant DST-safety Friday trigger - no publication work required."
-            {
-              echo "### EU Oversize Weekly - redundant Friday trigger"
-              echo ""
-              echo "This is the alternate CET/CEST cron. It was intentionally ignored based on the Prague UTC offset, not the runner clock hour."
-            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Checkout
@@ -99,12 +119,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           if [ -z "$OPENAI_API_KEY" ]; then
-            echo "::error::OPENAI_API_KEY repository secret is not set (Settings -> Secrets and variables -> Actions -> New repository secret)."
-            {
-              echo "### EU Oversize Weekly - pre-flight failed"
-              echo ""
-              echo "`OPENAI_API_KEY` is not configured. Nothing was generated or published."
-            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::OPENAI_API_KEY repository secret is not set."
             exit 1
           fi
           echo "Pre-flight OK: OPENAI_API_KEY is configured (value not printed)."
@@ -128,7 +143,7 @@ jobs:
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: npm run oversize:publish -- ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }}
+        run: npm run oversize:publish -- ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }} ${{ steps.trigger.outputs.preview == 'true' && '--preview' || '' }}
 
       - name: Commit new article and refreshed data
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true'
@@ -138,8 +153,9 @@ jobs:
         if: always()
         run: |
           echo "Trigger role: ${{ steps.trigger.outputs.role || 'unknown' }}"
+          echo "Preview: ${{ steps.trigger.outputs.preview || 'false' }}"
           if [ "${{ steps.trigger.outputs.should_run }}" != "true" ]; then
-            echo "Outcome: intentional redundant-trigger no-op."
+            echo "Outcome: intentional no-op."
           elif [ "${{ steps.publish-needed.outputs.needed }}" = "false" ]; then
             echo "Outcome: target article already exists; idempotent no-op."
           elif [ "${{ job.status }}" = "success" ]; then
