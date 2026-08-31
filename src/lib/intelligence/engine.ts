@@ -9,6 +9,7 @@ import {
   type IntelligenceSnapshotItem,
 } from './change-detection';
 import {
+  validateAdapterRights,
   validateSourceSnapshot,
   withSnapshotProvenance,
   type IntelligenceSourceAdapter,
@@ -36,13 +37,14 @@ function reconcileSnapshot(
 
 /**
  * One provider-neutral DAJC Intelligence processing cycle.
- * No adapter may bypass validation/provenance, and no delivery side effect occurs here.
+ * No adapter may bypass identity/rights validation or provenance, and no delivery side effect occurs here.
  */
 export async function runIntelligenceCycle(args: {
   adapter: IntelligenceSourceAdapter;
   store: IntelligenceStateStore;
   recipients: IntelligenceAlertRecipient[];
 }): Promise<IntelligenceCycleResult> {
+  validateAdapterRights(args.adapter);
   const rawSnapshot = await args.adapter.fetchSnapshot();
   const snapshot = validateSourceSnapshot(rawSnapshot);
   if (snapshot.sourceId !== args.adapter.sourceId) {
