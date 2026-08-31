@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Pricing - DAJC"
+  description="DAJC pricing: public tools stay useful, the DAJC Platform Oversize plan is 59 EUR per organisation per month, and enterprise API access is individually scoped."
+>
+  <main class="pricing-page">
+    <p class="eyebrow">DAJC pricing</p>
+    <h1>Simple subscription. No transport commission.</h1>
+    <p class="lead">The public information layer remains useful. Paid value comes from operational intelligence, connected workflow and controlled integrations.</p>
+
+    <section class="cards" aria-label="DAJC pricing options">
+      <article>
+        <p class="tier">DAJC.eu Free</p>
+        <h2>€0</h2>
+        <p>Public EU Oversize Weekly, Platform Updates, basic Driving Bans Calendar, demo and Integration Ecosystem.</p>
+        <a href="/driving-bans">Open free tools</a>
+      </article>
+      <article class="featured">
+        <p class="tier">DAJC Platform · Oversize</p>
+        <h2>€59 <small>/ organisation / month</small></h2>
+        <p>Carrier, crane and escort organisations. Annual payment is 20% lower. No transaction commission. DAJC Intelligence is included once production-ready.</p>
+        <p class="note">Shippers remain free under the approved Oversize pricing model.</p>
+        <a href="mailto:team@dajc.eu?subject=DAJC%20Platform%20Early%20Access">Request early access</a>
+      </article>
+      <article>
+        <p class="tier">DAJC Intelligence</p>
+        <h2>Standalone price TBD</h2>
+        <p>Personalised restrictions, change detection, alerts, history and advanced feeds. Standalone willingness-to-pay testing comes before a public price.</p>
+        <a href="/intelligence">Explore Intelligence</a>
+      </article>
+      <article>
+        <p class="tier">DAJC Data API / Enterprise</p>
+        <h2>Custom</h2>
+        <p>Approved production API scopes, quotas/SLA, SSO and enterprise controls. Sandbox access may be limited/free; production access requires explicit contract and data rights.</p>
+        <a href="mailto:team@dajc.eu?subject=DAJC%20API%20Enterprise">Discuss API / Enterprise</a>
+      </article>
+    </section>
+
+    <section class="guardrail">
+      <h2>No hidden marketplace tax</h2>
+      <p>DAJC does not fund the product through paid ranking or a commission on transport orders. Any future sponsorship must be clearly labelled and kept separate from editorial and integration status.</p>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .pricing-page{position:relative;z-index:2;max-width:1080px;margin:0 auto;padding:8vh 1.5rem 9vh;text-align:center}.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--dajc-orange);margin:0 0 1rem}h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2rem,5vw,3.3rem);line-height:1.05;margin:0 auto 1rem;max-width:18ch}.lead{max-width:65ch;margin:0 auto 3rem;color:var(--dajc-muted);font-size:17px;line-height:1.7}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;text-align:left}.cards article{padding:1.5rem;border:1px solid var(--dajc-line);border-radius:14px;background:rgba(0,38,92,.16)}.cards article.featured{border-color:var(--dajc-orange)}.tier{margin:0 0 .5rem;color:var(--dajc-orange);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.07em;text-transform:uppercase}.cards h2{margin:0 0 .8rem;font-family:'Space Grotesk',sans-serif}.cards h2 small{font-size:.8rem;color:var(--dajc-muted);font-weight:500}.cards p{color:var(--dajc-muted);line-height:1.65}.cards .note{font-size:13px}.cards a{display:inline-flex;min-height:42px;align-items:center;margin-top:.5rem;padding:0 .85rem;border:1px solid var(--dajc-orange);border-radius:8px;color:var(--dajc-orange);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase}.featured a{background:var(--dajc-orange);color:var(--dajc-dark)}.guardrail{margin-top:3rem;padding:1.5rem;border-top:1px solid var(--dajc-line)}.guardrail h2{font-family:'Space Grotesk',sans-serif}.guardrail p{max-width:65ch;margin:0 auto;color:var(--dajc-muted);line-height:1.7}@media(max-width:680px){.cards{grid-template-columns:1fr}.pricing-page{padding-left:1rem;padding-right:1rem}}
+</style>
