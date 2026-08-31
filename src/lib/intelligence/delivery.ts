@@ -57,7 +57,7 @@ export class DisabledIntelligenceDeliveryAdapter implements IntelligenceDelivery
 
   constructor(readonly channel: IntelligenceDeliveryAdapter['channel']) {}
 
-  async deliver(): Promise<IntelligenceDeliveryOutcome> {
+  async deliver(_candidate: IntelligenceAlertCandidate): Promise<IntelligenceDeliveryOutcome> {
     return { result: 'suppressed', reasonCode: 'adapter-disabled' };
   }
 }
