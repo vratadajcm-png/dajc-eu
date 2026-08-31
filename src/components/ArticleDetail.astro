@@ -50,6 +50,13 @@ const updatedLabel = data.updatedAt?.toLocaleDateString('en-GB', {
       </div>
     )}
 
+    <aside class="article__intelligence" aria-label="DAJC Intelligence">
+      <p class="article__intelligence-label">DAJC Intelligence</p>
+      <h2>Get important changes before the weekly briefing.</h2>
+      <p>Weekly articles stay public. Intelligence is being built for saved jurisdictions, change detection and operational alerts.</p>
+      <a href="/intelligence">Explore Intelligence &rarr;</a>
+    </aside>
+
     {updatedLabel && (
       <p class="article__updated">Last updated: {updatedLabel}</p>
     )}
@@ -182,6 +189,45 @@ const updatedLabel = data.updatedAt?.toLocaleDateString('en-GB', {
   .article__sources a {
     color: var(--dajc-orange);
     font-size: 14px;
+  }
+
+  .article__intelligence {
+    margin-top: 2.6rem;
+    padding: 1.4rem;
+    border: 1px solid var(--dajc-orange);
+    border-radius: 8px;
+    background: rgba(255, 159, 0, 0.05);
+  }
+
+  .article__intelligence-label {
+    margin: 0 0 0.45rem;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--dajc-orange);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .article__intelligence h2 {
+    margin: 0 0 0.55rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem;
+    color: var(--dajc-white);
+  }
+
+  .article__intelligence p {
+    margin: 0 0 0.8rem;
+    color: var(--dajc-muted);
+    line-height: 1.6;
+  }
+
+  .article__intelligence a {
+    color: var(--dajc-orange);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
   .article__updated {
