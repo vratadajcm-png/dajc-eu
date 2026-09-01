@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Privacy — DAJC"
+  description="Privacy information for the public DAJC website and DAJC Platform Demo."
+>
+  <main class="privacy">
+    <p class="eyebrow">PRIVACY</p>
+    <h1>Public sites privacy notice</h1>
+    <p class="lead">This notice covers the public DAJC website at <strong>dajc.eu</strong> and the public DAJC Platform Demo at <strong>demo.dajc.eu</strong>. It does not replace the separate production-platform privacy notice required before a live DAJC Platform launch.</p>
+
+    <section>
+      <h2>Hosting and security logs</h2>
+      <p>The public website is hosted on Vercel and the demo is hosted on Netlify. Like other hosting providers, they process standard request information needed to deliver and secure the sites, such as IP address, timestamp, requested URL, referrer and user agent, according to their own service and data-processing terms.</p>
+    </section>
+
+    <section>
+      <h2>Privacy-friendly traffic measurement</h2>
+      <p>DAJC uses privacy-oriented traffic statistics to understand whether public content is useful and how visitors move from the public website to the demo. The measurement is not used for advertising, behavioural profiling or cross-site tracking.</p>
+      <p>The first-party DAJC traffic digest records aggregated page or screen views, a browser-session start, the referring hostname, coarse country, device category and UTM campaign labels when a campaign link contains them. The collector does not read or store IP addresses in DAJC traffic aggregates, does not use tracking cookies and does not create a persistent visitor identifier.</p>
+      <p>A temporary <code>sessionStorage</code> flag is used only in the current browser tab to avoid counting every page as a new session. It disappears when the tab session ends. Browser Do Not Track (DNT) and Global Privacy Control (GPC) signals are respected by this first-party measurement.</p>
+    </section>
+
+    <section>
+      <h2>Hosting analytics</h2>
+      <p>DAJC may also use the privacy-focused analytics supplied by its hosting providers, including Vercel Web Analytics for dajc.eu and Netlify Web Analytics for demo.dajc.eu. These are kept separate from advertising platforms and are used only for operating and improving the DAJC public sites.</p>
+    </section>
+
+    <section>
+      <h2>Demo application data</h2>
+      <p>Operational data shown in the public demo is synthetic. Changes you make inside the demo remain in your browser unless the demo explicitly tells you otherwise. Traffic measurement does not send transport orders, documents, chat messages or other demo workspace content to the analytics collector.</p>
+    </section>
+
+    <section>
+      <h2>Contact</h2>
+      <p>For privacy questions about DAJC public sites, contact <a href="mailto:team@dajc.eu">team@dajc.eu</a>.</p>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .privacy {
+    position: relative;
+    z-index: 2;
+    width: min(760px, calc(100% - 3rem));
+    margin: 0 auto;
+    padding: clamp(4rem, 9vw, 7rem) 0 6rem;
+  }
+
+  .eyebrow {
+    margin: 0 0 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--dajc-orange);
+  }
+
+  h1,
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--dajc-white);
+  }
+
+  h1 {
+    margin: 0 0 1.2rem;
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+
+  h2 {
+    margin: 0 0 0.7rem;
+    font-size: 1.15rem;
+  }
+
+  .lead,
+  section p {
+    color: var(--dajc-muted);
+    line-height: 1.75;
+  }
+
+  .lead {
+    margin: 0 0 2.5rem;
+    font-size: 16px;
+  }
+
+  section {
+    padding: 1.4rem 0;
+    border-top: 1px solid var(--dajc-line);
+  }
+
+  section p {
+    margin: 0.55rem 0 0;
+    font-size: 14px;
+  }
+
+  a {
+    color: var(--dajc-orange);
+  }
+
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9em;
+  }
+</style>
