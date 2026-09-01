@@ -13,7 +13,11 @@ export default defineConfig({
   // server-side per request instead of baked into a static build. See
   // docs/PARTNER_PORTAL.md.
   output: 'static',
-  adapter: vercel(),
+  adapter: vercel({
+    webAnalytics: {
+      enabled: true,
+    },
+  }),
   integrations: [
     sitemap({
       // The Partner Portal is a private, ungated-by-default governance
