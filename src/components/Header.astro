@@ -12,6 +12,7 @@
     <a href="/partners">Integrations</a>
     <a href="/news">News</a>
     <a href="/pricing">Pricing</a>
+    <a class="demo-cta" href="https://demo.dajc.eu" target="_blank" rel="noopener noreferrer">Live Demo</a>
   </nav>
 </header>
 
@@ -67,6 +68,25 @@
   nav a:hover,
   nav a:focus-visible {
     color: var(--dajc-orange);
+  }
+
+  nav a.demo-cta {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.8rem;
+    border: 1px solid var(--dajc-orange);
+    border-radius: 7px;
+    background: var(--dajc-orange);
+    color: var(--dajc-dark);
+    font-weight: 600;
+  }
+
+  nav a.demo-cta:hover,
+  nav a.demo-cta:focus-visible {
+    color: var(--dajc-dark);
+    transform: translateY(-1px);
   }
 
   @media (max-width: 560px) {
