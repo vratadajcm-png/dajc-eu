@@ -19,6 +19,8 @@ const hasPublishedEuOversize = euOversize.length > 0;
 const activeProviders = (await getCollection('providers', ({ data }) => data.status === 'active')).sort(
   (a, b) => a.data.order - b.data.order
 );
+
+const demoUrl = import.meta.env.PUBLIC_DAJC_DEMO_URL?.trim();
 ---
 <BaseLayout
   title="DAJC - EUROPEAN HEAVY & OVERSIZE TRANSPORT PLATFORM"
@@ -29,8 +31,12 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
     <h1>DAJC is building the coordination layer for heavy and oversized freight transport across Europe.</h1>
     <p class="desc">DAJC is a pan-European platform for managing heavy and oversized transport. It connects all participants, documents, permits, routes and shipment progress in one digital environment. Using AI and specialized applications, it simplifies planning, communication and transport execution without commissions.</p>
     <div class="hero-actions">
-      <a class="hero-action hero-action--primary" href="/intelligence">Explore DAJC Intelligence</a>
-      <a class="hero-action" href="/pricing">View pricing</a>
+      {demoUrl ? (
+        <a class="hero-action hero-action--primary" href={demoUrl} target="_blank" rel="noopener noreferrer">Open public demo</a>
+      ) : (
+        <a class="hero-action hero-action--primary" href="/intelligence">Explore DAJC Intelligence</a>
+      )}
+      <a class="hero-action" href="/pricing">Access &amp; development</a>
     </div>
     <svg class="route-inline" viewBox="0 0 640 64" aria-hidden="true">
       <path class="route-path-ghost" d="M0 38 C 50 12, 110 52, 160 28 C 210 10, 270 54, 320 34 C 370 12, 430 56, 480 24 C 530 8, 590 52, 640 30" />
