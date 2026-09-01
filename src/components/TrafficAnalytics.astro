@@ -1,0 +1,73 @@
+<script is:inline>
+  (() => {
+    const allowedHosts = new Set(['dajc.eu', 'www.dajc.eu']);
+    if (!allowedHosts.has(window.location.hostname)) return;
+
+    const nav = navigator;
+    if (nav.doNotTrack === '1' || nav.globalPrivacyControl === true) return;
+
+    const endpoint = 'https://demo.dajc.eu/.netlify/functions/traffic-collect';
+    const sessionKey = 'dajc_traffic_session_v1';
+    let sessionStart = false;
+
+    try {
+      sessionStart = sessionStorage.getItem(sessionKey) !== '1';
+      if (sessionStart) sessionStorage.setItem(sessionKey, '1');
+    } catch {
+      sessionStart = true;
+    }
+
+    const sourceDomain = () => {
+      if (!document.referrer) return '';
+      try {
+        return new URL(document.referrer).hostname.toLowerCase().replace(/^www\./, '');
+      } catch {
+        return '';
+      }
+    };
+
+    const campaign = () => {
+      const params = new URLSearchParams(window.location.search);
+      return ['utm_source', 'utm_medium', 'utm_campaign']
+        .map((key) => params.get(key)?.trim())
+        .filter(Boolean)
+        .join(' / ')
+        .slice(0, 120);
+    };
+
+    const send = (event) => {
+      const payload = {
+        site: 'web',
+        event,
+        path: window.location.pathname,
+        sessionStart: event === 'pageview' ? sessionStart : false,
+        source: event === 'pageview' && sessionStart ? sourceDomain() : '',
+        campaign: event === 'pageview' && sessionStart ? campaign() : '',
+      };
+
+      fetch(endpoint, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: { 'content-type': 'text/plain;charset=UTF-8' },
+        credentials: 'omit',
+        cache: 'no-store',
+        keepalive: true,
+        referrerPolicy: 'strict-origin-when-cross-origin',
+      }).catch(() => {});
+    };
+
+    send('pageview');
+
+    document.addEventListener(
+      'click',
+      (event) => {
+        const target =
+          event.target instanceof Element ? event.target.closest('a') : null;
+        if (target?.href?.startsWith('https://demo.dajc.eu')) {
+          send('demo_click');
+        }
+      },
+      { capture: true },
+    );
+  })();
+</script>
