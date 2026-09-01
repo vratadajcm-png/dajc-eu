@@ -1,6 +1,6 @@
 {
   "week": "2026-W36",
-  "checkedAt": "2026-08-31T12:27:47.360Z",
+  "checkedAt": "2026-09-01T10:57:32.190Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -34,7 +34,7 @@
       "code": "AM",
       "name": "Armenia",
       "sourceScope": "AM",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "configuredSources": [
         "am-road-department"
       ],
@@ -42,7 +42,7 @@
         "am-road-department"
       ],
       "unavailableSources": [],
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "AT",
@@ -82,7 +82,7 @@
       "code": "BY",
       "name": "Belarus",
       "sourceScope": "BY",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "configuredSources": [
         "by-belavtodor"
       ],
@@ -90,7 +90,7 @@
         "by-belavtodor"
       ],
       "unavailableSources": [],
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "BE",
@@ -172,7 +172,7 @@
       "code": "CZ",
       "name": "Czechia",
       "sourceScope": "CZ",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "configuredSources": [
         "cz-czechtoll"
       ],
@@ -180,7 +180,7 @@
         "cz-czechtoll"
       ],
       "unavailableSources": [],
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "DK",
@@ -214,17 +214,14 @@
       "code": "FI",
       "name": "Finland",
       "sourceScope": "FI",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "fi-vayla"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "fi-vayla",
-          "error": "HTTP 403"
-        }
+      "reachableSources": [
+        "fi-vayla"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -269,7 +266,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 4
+      "candidateFindings": 10
     },
     {
       "code": "GR",
@@ -466,24 +463,21 @@
       "code": "MC",
       "name": "Monaco",
       "sourceScope": "MC",
-      "status": "checked-source-availability-limited",
+      "status": "checked-major-or-short-update-candidates-found",
       "configuredSources": [
         "mc-gouv"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "mc-gouv",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "mc-gouv"
       ],
-      "candidateFindings": 0
+      "unavailableSources": [],
+      "candidateFindings": 3
     },
     {
       "code": "ME",
       "name": "Montenegro",
       "sourceScope": "ME",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "configuredSources": [
         "me-monteput"
       ],
@@ -491,7 +485,7 @@
         "me-monteput"
       ],
       "unavailableSources": [],
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "NL",
@@ -525,17 +519,14 @@
       "code": "NO",
       "name": "Norway",
       "sourceScope": "NO",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "no-vegvesen"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "no-vegvesen",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "no-vegvesen"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -712,17 +703,14 @@
       "code": "UA",
       "name": "Ukraine",
       "sourceScope": "UA",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "ua-restoration"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "ua-restoration",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "ua-restoration"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -829,17 +817,14 @@
       "code": "IM",
       "name": "Isle of Man",
       "sourceScope": "UK",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "im-highways"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "im-highways",
-          "error": "HTTP 403"
-        }
+      "reachableSources": [
+        "im-highways"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -860,34 +845,28 @@
       "code": "SVALBARD",
       "name": "Svalbard",
       "sourceScope": "NO",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "no-vegvesen"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "no-vegvesen",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "no-vegvesen"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "JANMAYEN",
       "name": "Jan Mayen",
       "sourceScope": "NO",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "no-vegvesen"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "no-vegvesen",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "no-vegvesen"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
