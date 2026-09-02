@@ -1,5 +1,7 @@
 ---
-const enabled = process.env.DAJC_NEWS_ALERTS_ENABLED === 'true';
+import { isNewsAlertsReady } from '../lib/news-alerts';
+
+const enabled = isNewsAlertsReady();
 ---
 
 <section class="alerts-card" aria-labelledby="news-alerts-heading">
