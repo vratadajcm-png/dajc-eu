@@ -1,13 +1,13 @@
 ---
 import {
   addNewsAlertContact,
-  isNewsAlertsEnabled,
+  isNewsAlertsReady,
   readConfirmationToken,
 } from '../../../lib/news-alerts';
 
 export const prerender = false;
 
-if (!isNewsAlertsEnabled()) {
+if (!isNewsAlertsReady()) {
   return Astro.redirect('/news?alerts=error', 303);
 }
 
