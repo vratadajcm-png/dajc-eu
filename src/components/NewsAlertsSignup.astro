@@ -1,6 +1,5 @@
 ---
 const enabled = process.env.DAJC_NEWS_ALERTS_ENABLED === 'true';
-const state = Astro.url.searchParams.get('alerts');
 ---
 
 <section class="alerts-card" aria-labelledby="news-alerts-heading">
@@ -13,18 +12,18 @@ const state = Astro.url.searchParams.get('alerts');
     </p>
   </div>
 
-  {state === 'pending' && (
-    <p class="notice" role="status">Check your inbox and confirm the subscription within 24 hours.</p>
-  )}
-  {state === 'confirmed' && (
-    <p class="notice notice--success" role="status">DAJC News Alerts are confirmed for this email address.</p>
-  )}
-  {state === 'invalid' && (
-    <p class="notice notice--error" role="alert">The confirmation link is invalid or expired. Please subscribe again.</p>
-  )}
-  {state === 'error' && (
-    <p class="notice notice--error" role="alert">News Alerts could not be processed. Please try again later.</p>
-  )}
+  <p class="notice" data-alert-state="pending" role="status" hidden>
+    Check your inbox and confirm the subscription within 24 hours.
+  </p>
+  <p class="notice notice--success" data-alert-state="confirmed" role="status" hidden>
+    DAJC News Alerts are confirmed for this email address.
+  </p>
+  <p class="notice notice--error" data-alert-state="invalid" role="alert" hidden>
+    The confirmation link is invalid or expired. Please subscribe again.
+  </p>
+  <p class="notice notice--error" data-alert-state="error" role="alert" hidden>
+    News Alerts could not be processed. Please try again later.
+  </p>
 
   {enabled ? (
     <form class="alerts-form" method="POST" action="/news-alerts/subscribe">
@@ -56,6 +55,14 @@ const state = Astro.url.searchParams.get('alerts');
 
   <p class="push-note"><strong>Web Push:</strong> planned as the next alert channel after the email opt-in flow.</p>
 </section>
+
+<script>
+  const alertState = new URLSearchParams(window.location.search).get('alerts');
+  if (alertState) {
+    const notice = document.querySelector<HTMLElement>(`[data-alert-state="${alertState}"]`);
+    if (notice) notice.hidden = false;
+  }
+</script>
 
 <style>
   .alerts-card {
