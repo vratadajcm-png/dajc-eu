@@ -1,7 +1,7 @@
 ---
 import {
   createConfirmationToken,
-  isNewsAlertsEnabled,
+  isNewsAlertsReady,
   normalizeEmail,
   sendNewsAlertConfirmation,
 } from '../../lib/news-alerts';
@@ -12,7 +12,7 @@ if (Astro.request.method !== 'POST') {
   return Astro.redirect('/news', 303);
 }
 
-if (!isNewsAlertsEnabled()) {
+if (!isNewsAlertsReady()) {
   return Astro.redirect('/news?alerts=error', 303);
 }
 
