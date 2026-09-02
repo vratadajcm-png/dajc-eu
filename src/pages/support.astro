@@ -1,0 +1,374 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+export const prerender = false;
+
+const stripeEnabled = process.env.DAJC_STRIPE_ENABLED === 'true';
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const publicSiteUrl = (process.env.DAJC_PUBLIC_SITE_URL || new URL(Astro.request.url).origin).replace(/\/$/, '');
+
+let error: string | null = null;
+let paymentConfirmed = false;
+const cancelled = Astro.url.searchParams.get('cancelled') === '1';
+const sessionId = Astro.url.searchParams.get('session_id');
+
+async function verifyCheckoutSession(id: string): Promise<boolean> {
+  if (!stripeEnabled || !stripeSecretKey || !id.startsWith('cs_')) return false;
+
+  try {
+    const response = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(id)}`, {
+      headers: {
+        Authorization: `Bearer ${stripeSecretKey}`,
+      },
+    });
+
+    if (!response.ok) return false;
+    const session = await response.json() as { payment_status?: string; metadata?: Record<string, string> };
+    return session.payment_status === 'paid' && session.metadata?.purpose === 'dajc_support';
+  } catch {
+    return false;
+  }
+}
+
+if (sessionId) {
+  paymentConfirmed = await verifyCheckoutSession(sessionId);
+}
+
+if (Astro.request.method === 'POST') {
+  if (!stripeEnabled || !stripeSecretKey) {
+    error = 'Card support is not enabled yet.';
+  } else {
+    const form = await Astro.request.formData();
+    const rawAmount = String(form.get('amount') ?? '').trim().replace(',', '.');
+    const source = String(form.get('source') ?? 'support-page').slice(0, 80);
+    const amount = Number(rawAmount);
+    const cents = Math.round(amount * 100);
+
+    const valid =
+      Number.isFinite(amount) &&
+      amount >= 2 &&
+      amount <= 500 &&
+      Math.abs(amount * 100 - cents) < 0.001;
+
+    if (!valid) {
+      error = 'Choose an amount between €2 and €500, with no more than two decimal places.';
+    } else {
+      const params = new URLSearchParams();
+      params.set('mode', 'payment');
+      params.set('success_url', `${publicSiteUrl}/support?session_id={CHECKOUT_SESSION_ID}`);
+      params.set('cancel_url', `${publicSiteUrl}/support?cancelled=1`);
+      params.set('locale', 'auto');
+      params.set('submit_type', 'pay');
+      params.set('line_items[0][quantity]', '1');
+      params.set('line_items[0][price_data][currency]', 'eur');
+      params.set('line_items[0][price_data][unit_amount]', String(cents));
+      params.set('line_items[0][price_data][product_data][name]', 'Support DAJC');
+      params.set(
+        'line_items[0][price_data][product_data][description]',
+        'Voluntary support for free DAJC News and development of the DAJC project.'
+      );
+      params.set('metadata[purpose]', 'dajc_support');
+      params.set('metadata[source]', source);
+      params.set('payment_intent_data[metadata][purpose]', 'dajc_support');
+      params.set('payment_intent_data[metadata][source]', source);
+
+      try {
+        const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${stripeSecretKey}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: params,
+        });
+
+        const session = await response.json() as { url?: string; error?: { message?: string } };
+
+        if (!response.ok || !session.url) {
+          console.error('[support] Stripe Checkout Session creation failed', response.status, session.error?.message);
+          error = 'Stripe Checkout could not be started. Please try again later.';
+        } else {
+          return Astro.redirect(session.url, 303);
+        }
+      } catch (checkoutError) {
+        console.error('[support] Stripe request failed', checkoutError);
+        error = 'Stripe Checkout could not be started. Please try again later.';
+      }
+    }
+  }
+}
+---
+
+<BaseLayout
+  title="Support DAJC"
+  description="Voluntarily support free DAJC News and the continued development of the DAJC project."
+>
+  <main class="support-page">
+    <p class="eyebrow">SUPPORT DAJC</p>
+    <h1>Keep DAJC News free.</h1>
+    <p class="lead">
+      DAJC News is free to read. If our European heavy and oversized transport updates are useful to you,
+      you can voluntarily support the operation of the website and continued development of DAJC.
+    </p>
+
+    {paymentConfirmed && (
+      <div class="notice notice--success" role="status">
+        Thank you for supporting DAJC. Stripe confirmed your payment.
+      </div>
+    )}
+
+    {cancelled && (
+      <div class="notice" role="status">
+        Payment was cancelled. Nothing was charged.
+      </div>
+    )}
+
+    {error && (
+      <div class="notice notice--error" role="alert">
+        {error}
+      </div>
+    )}
+
+    <section class="support-card" aria-labelledby="card-support-heading">
+      <div>
+        <p class="label">CARD / WALLET</p>
+        <h2 id="card-support-heading">One-time support</h2>
+        <p>Secure checkout is hosted by Stripe. DAJC does not receive or store your card details.</p>
+      </div>
+
+      {stripeEnabled ? (
+        <>
+          <div class="preset-grid" aria-label="Choose support amount">
+            {[3, 5, 10, 25].map((amount) => (
+              <form method="POST">
+                <input type="hidden" name="amount" value={amount} />
+                <input type="hidden" name="source" value="support-preset" />
+                <button type="submit">€{amount}</button>
+              </form>
+            ))}
+          </div>
+
+          <form class="custom-form" method="POST">
+            <label for="custom-amount">Custom amount</label>
+            <div class="custom-row">
+              <span aria-hidden="true">€</span>
+              <input
+                id="custom-amount"
+                name="amount"
+                type="number"
+                min="2"
+                max="500"
+                step="0.01"
+                inputmode="decimal"
+                required
+                placeholder="15"
+              />
+              <input type="hidden" name="source" value="support-custom" />
+              <button type="submit">Continue to Stripe</button>
+            </div>
+          </form>
+        </>
+      ) : (
+        <p class="coming-soon">Card support is being prepared. No payment form is active yet.</p>
+      )}
+    </section>
+
+    <section class="support-card support-card--secondary" aria-labelledby="bitcoin-heading">
+      <div>
+        <p class="label">BITCOIN</p>
+        <h2 id="bitcoin-heading">Bitcoin &amp; Lightning</h2>
+        <p>
+          Bitcoin and Lightning support will be added separately. No wallet address or payment request is published until
+          the production receiving setup is approved.
+        </p>
+      </div>
+      <span class="status">PREPARING</span>
+    </section>
+
+    <p class="fineprint">
+      Support is voluntary. It is not a subscription, does not unlock content or platform features, and does not affect access
+      to DAJC News.
+    </p>
+  </main>
+</BaseLayout>
+
+<style>
+  .support-page {
+    position: relative;
+    z-index: 2;
+    width: min(820px, calc(100% - 3rem));
+    margin: 0 auto;
+    padding: clamp(4rem, 9vw, 7rem) 0 6rem;
+  }
+
+  .eyebrow,
+  .label,
+  .status {
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .eyebrow {
+    margin: 0 0 1rem;
+    font-size: 12px;
+    color: var(--dajc-orange);
+  }
+
+  h1,
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--dajc-white);
+  }
+
+  h1 {
+    margin: 0 0 1rem;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+  }
+
+  h2 {
+    margin: 0.25rem 0 0.6rem;
+    font-size: 1.35rem;
+  }
+
+  .lead,
+  .support-card p,
+  .fineprint,
+  .coming-soon {
+    color: var(--dajc-muted);
+    line-height: 1.7;
+  }
+
+  .lead {
+    max-width: 66ch;
+    margin: 0 0 2rem;
+  }
+
+  .notice {
+    margin: 0 0 1rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 8px;
+    color: var(--dajc-white);
+    background: rgba(0, 20, 52, 0.6);
+  }
+
+  .notice--success {
+    border-color: var(--dajc-orange);
+  }
+
+  .notice--error {
+    border-color: #d15b5b;
+  }
+
+  .support-card {
+    display: grid;
+    gap: 1.4rem;
+    margin-top: 1rem;
+    padding: clamp(1.4rem, 4vw, 2rem);
+    border: 1px solid var(--dajc-line);
+    border-radius: 10px;
+    background: rgba(0, 20, 52, 0.5);
+  }
+
+  .support-card--secondary {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+
+  .label,
+  .status {
+    margin: 0;
+    font-size: 10px;
+    color: var(--dajc-orange);
+  }
+
+  .preset-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.7rem;
+  }
+
+  button {
+    width: 100%;
+    min-height: 44px;
+    border: 1px solid var(--dajc-orange);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--dajc-orange);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  button:hover,
+  button:focus-visible {
+    background: var(--dajc-orange);
+    color: var(--dajc-dark);
+  }
+
+  .custom-form label {
+    display: block;
+    margin-bottom: 0.6rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--dajc-muted);
+  }
+
+  .custom-row {
+    display: grid;
+    grid-template-columns: auto minmax(90px, 140px) 1fr;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .custom-row > span {
+    color: var(--dajc-white);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  input[type='number'] {
+    min-height: 44px;
+    padding: 0 0.75rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 8px;
+    background: rgba(0, 10, 30, 0.75);
+    color: var(--dajc-white);
+    font: inherit;
+  }
+
+  .coming-soon {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    border: 1px dashed var(--dajc-line);
+    border-radius: 8px;
+  }
+
+  .fineprint {
+    margin: 1.4rem 0 0;
+    font-size: 12px;
+  }
+
+  @media (max-width: 560px) {
+    .support-page {
+      width: min(100% - 2.4rem, 820px);
+    }
+
+    .preset-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .custom-row {
+      grid-template-columns: auto 1fr;
+    }
+
+    .custom-row button {
+      grid-column: 1 / -1;
+    }
+
+    .support-card--secondary {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
