@@ -5,6 +5,7 @@ export const prerender = false;
 
 const stripeEnabled = process.env.DAJC_STRIPE_ENABLED === 'true';
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const stripeReady = stripeEnabled && Boolean(stripeSecretKey);
 const publicSiteUrl = (process.env.DAJC_PUBLIC_SITE_URL || new URL(Astro.request.url).origin).replace(/\/$/, '');
 
 let error: string | null = null;
@@ -13,7 +14,7 @@ const cancelled = Astro.url.searchParams.get('cancelled') === '1';
 const sessionId = Astro.url.searchParams.get('session_id');
 
 async function verifyCheckoutSession(id: string): Promise<boolean> {
-  if (!stripeEnabled || !stripeSecretKey || !id.startsWith('cs_')) return false;
+  if (!stripeReady || !stripeSecretKey || !id.startsWith('cs_')) return false;
 
   try {
     const response = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(id)}`, {
@@ -35,7 +36,7 @@ if (sessionId) {
 }
 
 if (Astro.request.method === 'POST') {
-  if (!stripeEnabled || !stripeSecretKey) {
+  if (!stripeReady || !stripeSecretKey) {
     error = 'Card support is not enabled yet.';
   } else {
     const form = await Astro.request.formData();
@@ -136,7 +137,7 @@ if (Astro.request.method === 'POST') {
         <p>Secure checkout is hosted by Stripe. DAJC does not receive or store your card details.</p>
       </div>
 
-      {stripeEnabled ? (
+      {stripeReady ? (
         <>
           <div class="preset-grid" aria-label="Choose support amount">
             {[3, 5, 10, 25].map((amount) => (
