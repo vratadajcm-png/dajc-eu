@@ -1,0 +1,28 @@
+---
+import {
+  addNewsAlertContact,
+  isNewsAlertsEnabled,
+  readConfirmationToken,
+} from '../../../lib/news-alerts';
+
+export const prerender = false;
+
+if (!isNewsAlertsEnabled()) {
+  return Astro.redirect('/news?alerts=error', 303);
+}
+
+const token = Astro.params.token ?? '';
+const email = readConfirmationToken(token);
+
+if (!email) {
+  return Astro.redirect('/news?alerts=invalid', 303);
+}
+
+try {
+  await addNewsAlertContact(email);
+  return Astro.redirect('/news?alerts=confirmed', 303);
+} catch (error) {
+  console.error('[news-alerts] failed to confirm contact', error);
+  return Astro.redirect('/news?alerts=error', 303);
+}
+---
