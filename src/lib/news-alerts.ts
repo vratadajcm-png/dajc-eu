@@ -8,6 +8,16 @@ export function isNewsAlertsEnabled(): boolean {
   return process.env.DAJC_NEWS_ALERTS_ENABLED === 'true';
 }
 
+export function isNewsAlertsReady(): boolean {
+  return (
+    isNewsAlertsEnabled() &&
+    process.env.DAJC_NEWS_ALERTS_EMAIL_MODE === 'live' &&
+    Boolean(process.env.RESEND_API_KEY) &&
+    Boolean(process.env.DAJC_NEWS_ALERTS_SEGMENT_ID) &&
+    Boolean(process.env.DAJC_NEWS_ALERTS_SIGNING_SECRET)
+  );
+}
+
 export function normalizeEmail(value: string): string | null {
   const email = value.trim().toLowerCase();
   if (email.length < 5 || email.length > 254) return null;
