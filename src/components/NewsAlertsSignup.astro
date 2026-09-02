@@ -1,0 +1,186 @@
+---
+const enabled = process.env.DAJC_NEWS_ALERTS_ENABLED === 'true';
+const state = Astro.url.searchParams.get('alerts');
+---
+
+<section class="alerts-card" aria-labelledby="news-alerts-heading">
+  <div class="alerts-copy">
+    <p class="eyebrow">DAJC NEWS ALERTS</p>
+    <h2 id="news-alerts-heading">Get important transport updates.</h2>
+    <p>
+      Opt in to DAJC News Alerts by email. We will send a confirmation link first; your address is not added to the
+      subscriber list until you confirm it.
+    </p>
+  </div>
+
+  {state === 'pending' && (
+    <p class="notice" role="status">Check your inbox and confirm the subscription within 24 hours.</p>
+  )}
+  {state === 'confirmed' && (
+    <p class="notice notice--success" role="status">DAJC News Alerts are confirmed for this email address.</p>
+  )}
+  {state === 'invalid' && (
+    <p class="notice notice--error" role="alert">The confirmation link is invalid or expired. Please subscribe again.</p>
+  )}
+  {state === 'error' && (
+    <p class="notice notice--error" role="alert">News Alerts could not be processed. Please try again later.</p>
+  )}
+
+  {enabled ? (
+    <form class="alerts-form" method="POST" action="/news-alerts/subscribe">
+      <label for="news-alert-email">Email address</label>
+      <div class="form-row">
+        <input
+          id="news-alert-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          maxlength="254"
+          required
+          placeholder="you@company.eu"
+        />
+        <button type="submit">Send confirmation</button>
+      </div>
+      <div class="honeypot" aria-hidden="true">
+        <label for="company-website">Company website</label>
+        <input id="company-website" name="company_website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <p class="consent">
+        By submitting, you ask DAJC to send a confirmation email for News Alerts. You can unsubscribe from future
+        alerts at any time.
+      </p>
+    </form>
+  ) : (
+    <p class="coming-soon">Email alerts are being prepared. No addresses are collected yet.</p>
+  )}
+
+  <p class="push-note"><strong>Web Push:</strong> planned as the next alert channel after the email opt-in flow.</p>
+</section>
+
+<style>
+  .alerts-card {
+    margin: 0 0 2.6rem;
+    padding: clamp(1.4rem, 4vw, 2rem);
+    border: 1px solid var(--dajc-orange);
+    border-radius: 10px;
+    background:
+      linear-gradient(135deg, rgba(239, 125, 0, 0.08), rgba(0, 38, 92, 0.16) 55%),
+      rgba(0, 20, 52, 0.48);
+  }
+
+  .eyebrow {
+    margin: 0 0 0.55rem;
+    color: var(--dajc-orange);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    margin: 0 0 0.65rem;
+    color: var(--dajc-white);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.35rem, 3vw, 1.8rem);
+  }
+
+  .alerts-copy > p:last-child,
+  .consent,
+  .push-note,
+  .coming-soon {
+    color: var(--dajc-muted);
+    line-height: 1.65;
+  }
+
+  .alerts-copy > p:last-child {
+    margin: 0 0 1.2rem;
+    max-width: 66ch;
+  }
+
+  .alerts-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--dajc-muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.7rem;
+  }
+
+  input[type='email'] {
+    min-height: 44px;
+    padding: 0 0.8rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 8px;
+    background: rgba(0, 10, 30, 0.78);
+    color: var(--dajc-white);
+    font: inherit;
+  }
+
+  button {
+    min-height: 44px;
+    padding: 0 1rem;
+    border: 1px solid var(--dajc-orange);
+    border-radius: 8px;
+    background: var(--dajc-orange);
+    color: var(--dajc-dark);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  button:hover,
+  button:focus-visible {
+    transform: translateY(-1px);
+  }
+
+  .consent,
+  .push-note,
+  .coming-soon {
+    margin: 0.7rem 0 0;
+    font-size: 12px;
+  }
+
+  .push-note {
+    margin-top: 1.2rem;
+  }
+
+  .honeypot {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .notice {
+    margin: 0 0 1rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 8px;
+    color: var(--dajc-white);
+    background: rgba(0, 20, 52, 0.7);
+    font-size: 13px;
+  }
+
+  .notice--success {
+    border-color: var(--dajc-orange);
+  }
+
+  .notice--error {
+    border-color: #d15b5b;
+  }
+
+  @media (max-width: 620px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
