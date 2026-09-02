@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { drivingBanCalendars } from '../../../config/driving-ban-calendars/index.mjs';
+import { drivingBanCalendars } from '../../../config/driving-ban-calendars/runtime.mjs';
 
 export const prerender = false;
 
@@ -46,7 +46,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     for (const rule of drivingBanCalendars as any[]) {
       if (selected.size && !selected.has(rule.country)) continue;
-      const exceptional = /exceptional|special vehicle|oversize|abnormal/i.test(`${rule.id} ${rule.legalBasis || ''} ${rule.vehicleScope || ''}`);
+      const exceptional = /exceptional|special vehicle|oversize|abnormal|schwertransport|großraum/i.test(`${rule.id} ${rule.legalBasis || ''} ${rule.vehicleScope || ''}`);
       if (type === 'general' && exceptional) continue;
       if (type === 'exceptional' && !exceptional) continue;
 
