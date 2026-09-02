@@ -1,0 +1,42 @@
+---
+import {
+  createConfirmationToken,
+  isNewsAlertsEnabled,
+  normalizeEmail,
+  sendNewsAlertConfirmation,
+} from '../../lib/news-alerts';
+
+export const prerender = false;
+
+if (Astro.request.method !== 'POST') {
+  return Astro.redirect('/news', 303);
+}
+
+if (!isNewsAlertsEnabled()) {
+  return Astro.redirect('/news?alerts=error', 303);
+}
+
+const form = await Astro.request.formData();
+const honeypot = String(form.get('company_website') ?? '').trim();
+const email = normalizeEmail(String(form.get('email') ?? ''));
+
+// Bots filling the hidden field receive the same outward response, but no email is sent.
+if (honeypot) {
+  return Astro.redirect('/news?alerts=pending', 303);
+}
+
+if (!email) {
+  return Astro.redirect('/news?alerts=error', 303);
+}
+
+try {
+  const token = createConfirmationToken(email);
+  const baseUrl = (process.env.DAJC_PUBLIC_SITE_URL || new URL(Astro.request.url).origin).replace(/\/$/, '');
+  const confirmationUrl = `${baseUrl}/news-alerts/confirm/${encodeURIComponent(token)}`;
+  await sendNewsAlertConfirmation(email, confirmationUrl);
+  return Astro.redirect('/news?alerts=pending', 303);
+} catch (error) {
+  console.error('[news-alerts] failed to send confirmation', error);
+  return Astro.redirect('/news?alerts=error', 303);
+}
+---
