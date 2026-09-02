@@ -89,7 +89,8 @@ describe('resolveDrivingBanFindings - W36 2026', () => {
   it('suppresses evergreen Sunday/weekend baselines after 1 September', () => {
     expect(maintenanceErrors).toEqual([]);
     const countries = findings.map((f) => f.country);
-    expect(countries).not.toContain('Germany');
+    expect(findings.some((f) => f.country === 'Germany' && /low-water exception/i.test(f.title))).toBe(true);
+    expect(findings.some((f) => f.country === 'Germany' && /general sunday driving ban/i.test(f.title))).toBe(false);
     expect(countries).not.toContain('Slovakia');
     expect(countries).not.toContain('Austria');
     expect(countries).not.toContain('Switzerland');
