@@ -1,6 +1,6 @@
 {
   "week": "2026-W36",
-  "checkedAt": "2026-09-01T10:57:32.190Z",
+  "checkedAt": "2026-09-02T10:25:58.205Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -266,7 +266,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 10
+      "candidateFindings": 13
     },
     {
       "code": "GR",
@@ -429,7 +429,7 @@
         "lu-pch"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "MT",
@@ -727,7 +727,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "VA",
@@ -775,14 +775,17 @@
       "code": "GI",
       "name": "Gibraltar",
       "sourceScope": "UK",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "gi-gov-traffic"
       ],
-      "reachableSources": [
-        "gi-gov-traffic"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "gi-gov-traffic",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -1270,7 +1273,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "SCT",
@@ -1286,7 +1289,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "WLS",
@@ -1302,7 +1305,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "NIR",
@@ -1318,7 +1321,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "FBIH",
