@@ -5,7 +5,7 @@
 // (see config/driving-ban-calendars/index.mjs and
 // docs/NEWS_AUTOMATION.md "Annual calendar maintenance").
 
-import { drivingBanCalendars } from '../../config/driving-ban-calendars/index.mjs';
+import { drivingBanCalendars } from '../../config/driving-ban-calendars/runtime.mjs';
 
 /**
  * @param {{ weekStart: Date, weekEnd: Date, year: number }} args
