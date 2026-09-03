@@ -1,6 +1,7 @@
-// Time-limited, officially verified exceptions that materially modify the
-// maintained baseline driving-ban rules. Keep these separate from evergreen
-// and annual-calendar rules so expiry and provenance stay explicit.
+// Time-limited, officially verified exceptions and temporary restrictions that
+// materially modify the maintained baseline driving-ban rules. Keep these
+// separate from evergreen and annual-calendar rules so expiry and provenance
+// stay explicit.
 
 function fmt(date) {
   return date.toISOString().slice(0, 10);
@@ -42,6 +43,61 @@ export const currentDrivingBanExceptions = [
             timeWindow: 'Applies during otherwise restricted Sunday/public-holiday periods through 30 September 2026; only to qualifying low-water-related replacement transports.',
             impact: 'Qualifying freight shifted from inland waterways may operate despite the normal Sunday/public-holiday restriction. In the listed Länder, qualifying oversize/heavy transports are included subject to permit conditions.',
             recommendedAction: 'Do not treat this as a general lifting of the German HGV ban. Document the direct or indirect low-water connection and confirm the applicable Land-level general order plus the individual oversize/heavy transport permit before departure.',
+          },
+        ],
+      };
+    },
+  },
+  {
+    id: 'bg-unification-day-hgv-restrictions-2026',
+    country: 'BG',
+    countryName: 'Bulgaria',
+    kind: 'temporary-restriction',
+    sourceUrl: 'https://www.bta.bg/bg/news/bulgaria/oficial-messages/1196686-api-v-pochivnite-dni-okolo-6-septemvri-v-pikovite-chasove-shte-se-ogranichava-d',
+    sourceName: 'Bulgarian Road Infrastructure Agency (API) — official message distributed by BTA, 2 September 2026',
+    legalBasis: 'Temporary API traffic-management restriction for the holiday period around Bulgaria’s Unification Day, 6 September 2026',
+    vehicleScope: 'Heavy goods vehicles over 12t, subject to the route-specific exemptions published by API.',
+    routeScope: 'AM Trakia; AM Hemus from Sofia (km 0) to the I-4 interchange/roundabout connection (km 87); AM Struma and road I-1 in Blagoevgrad district, including the Simitli (km 376) to Kresna/AM Struma (km 402) section. Direction depends on the occurrence.',
+    exemptionNotes: 'On Hemus km 0–87 and the Struma/I-1 Simitli–Kresna section, published exemptions include public passenger transport, ADR, live animals, perishable food, temperature-controlled cargo and specialised carcass-collection vehicles. On Trakia, public passenger transport is exempt; API also publishes a specific ADR exception on the Ihtiman (km 34)–Vakarel (km 23) section in the Sofia direction. Verify the current API notice before departure.',
+    lastVerified: '2026-09-03',
+    validFrom: '2026-09-04',
+    validTo: '2026-09-07',
+    resolve(weekStart, weekEnd, year) {
+      if (year !== 2026) return { occurrences: [] };
+      if (fmt(weekStart) !== '2026-08-31') return { occurrences: [] };
+      if (fmt(weekEnd) < '2026-09-04') return { occurrences: [] };
+
+      const sharedImpact = 'HGVs over 12t in the restricted direction cannot use the affected motorway/road sections during the stated peak window unless a published exemption applies.';
+      const sharedAction = 'Plan the movement outside the restriction window or verify a published exemption. For exceptional/oversize transport, also confirm that the authorised route and permit conditions remain compatible with the temporary traffic regime.';
+
+      return {
+        occurrences: [
+          {
+            title: 'Holiday-period HGV restriction >12t — outbound from Sofia',
+            whatChanged: 'API introduced a temporary peak-period restriction for HGVs over 12t around the 6 September holiday.',
+            validFrom: '2026-09-04',
+            validTo: '2026-09-04',
+            timeWindow: 'Friday 4 September 2026, 15:00–20:00 — outbound from Sofia only; HGVs over 12t travelling toward Sofia remain unrestricted by this measure.',
+            impact: sharedImpact,
+            recommendedAction: sharedAction,
+          },
+          {
+            title: 'Holiday-period HGV restriction >12t — outbound from Sofia',
+            whatChanged: 'API introduced a temporary peak-period restriction for HGVs over 12t around the 6 September holiday.',
+            validFrom: '2026-09-05',
+            validTo: '2026-09-05',
+            timeWindow: 'Saturday 5 September 2026, 09:00–14:00 — outbound from Sofia.',
+            impact: sharedImpact,
+            recommendedAction: sharedAction,
+          },
+          {
+            title: 'Holiday-period HGV restriction >12t — toward Sofia',
+            whatChanged: 'API introduced a temporary peak-period restriction for HGVs over 12t around the 6 September holiday.',
+            validFrom: '2026-09-07',
+            validTo: '2026-09-07',
+            timeWindow: 'Monday 7 September 2026, 12:00–20:00 — toward Sofia only; HGVs over 12t leaving Sofia remain unrestricted by this measure.',
+            impact: sharedImpact,
+            recommendedAction: sharedAction,
           },
         ],
       };
