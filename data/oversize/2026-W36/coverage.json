@@ -1,6 +1,6 @@
 {
   "week": "2026-W36",
-  "checkedAt": "2026-09-02T10:25:58.205Z",
+  "checkedAt": "2026-09-03T10:33:28.701Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -555,7 +555,7 @@
         "pt-ip"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "RO",
@@ -775,17 +775,14 @@
       "code": "GI",
       "name": "Gibraltar",
       "sourceScope": "UK",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "gi-gov-traffic"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "gi-gov-traffic",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "gi-gov-traffic"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -960,7 +957,7 @@
         "pt-ip"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "MAD",
@@ -974,7 +971,7 @@
         "pt-ip"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "CAN",
