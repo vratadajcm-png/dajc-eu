@@ -8,10 +8,18 @@ const providers = (await getCollection('providers', ({ data }) => data.status ==
   (a, b) => a.data.order - b.data.order
 );
 
+const categoryAnchor = (category: string) =>
+  `integration-${category
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')}`;
+
 const providerGroups = PROVIDER_CATEGORIES.map((category) => ({
   category,
+  anchor: categoryAnchor(category),
   providers: providers.filter((provider) => provider.data.category === category),
-})).filter((group) => group.providers.length > 0);
+}));
 ---
 <BaseLayout
   title="DAJC Integration Ecosystem"
@@ -34,7 +42,13 @@ const providerGroups = PROVIDER_CATEGORIES.map((category) => ({
       <h2 id="integration-areas-heading">Integration areas</h2>
       <div class="integration-areas__grid">
         {PROVIDER_CATEGORIES.map((area) => (
-          <div class="integration-areas__item">{area}</div>
+          <a
+            class="integration-areas__item"
+            href={`#${categoryAnchor(area)}`}
+            aria-label={`View ${area} integration providers`}
+          >
+            {area}
+          </a>
         ))}
       </div>
     </section>
@@ -44,15 +58,24 @@ const providerGroups = PROVIDER_CATEGORIES.map((category) => ({
         <h2 id="providers-heading">Integration providers</h2>
         <div class="providers__groups">
           {providerGroups.map((group) => (
-            <section class="providers__group" aria-label={group.category}>
+            <section
+              class="providers__group"
+              id={group.anchor}
+              aria-labelledby={`${group.anchor}-heading`}
+            >
               <p
                 class="providers__category"
+                id={`${group.anchor}-heading`}
               >
                 {group.category}
               </p>
-              <div class="providers__grid">
-                {group.providers.map((provider) => <ProviderCard provider={provider} />)}
-              </div>
+              {group.providers.length > 0 ? (
+                <div class="providers__grid">
+                  {group.providers.map((provider) => <ProviderCard provider={provider} />)}
+                </div>
+              ) : (
+                <p class="providers__empty">No publicly confirmed integration provider is listed in this area yet.</p>
+              )}
             </section>
           ))}
         </div>
@@ -274,6 +297,11 @@ const providerGroups = PROVIDER_CATEGORIES.map((category) => ({
   }
 
   .integration-areas__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 58px;
+    box-sizing: border-box;
     padding: 1rem 1.1rem;
     border: 1px solid var(--dajc-line);
     border-radius: 4px;
@@ -282,6 +310,19 @@ const providerGroups = PROVIDER_CATEGORIES.map((category) => ({
     font-size: 14px;
     font-weight: 500;
     text-align: center;
+    text-decoration: none;
+    transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+  }
+
+  .integration-areas__item:hover {
+    border-color: var(--dajc-orange);
+    background: rgba(0, 38, 92, 0.34);
+    transform: translateY(-1px);
+  }
+
+  .integration-areas__item:focus-visible {
+    outline: 2px solid var(--dajc-orange);
+    outline-offset: 3px;
   }
 
   .providers {
@@ -298,8 +339,22 @@ const providerGroups = PROVIDER_CATEGORIES.map((category) => ({
     gap: 2.2rem;
   }
 
+  .providers__group {
+    scroll-margin-top: 6rem;
+  }
+
   .providers__grid {
     gap: 1.2rem;
+  }
+
+  .providers__empty {
+    margin: 0;
+    padding: 1rem 1.1rem;
+    border: 1px dashed var(--dajc-line);
+    border-radius: 4px;
+    color: var(--dajc-muted);
+    font-size: 13px;
+    line-height: 1.6;
   }
 
   .providers__category {
