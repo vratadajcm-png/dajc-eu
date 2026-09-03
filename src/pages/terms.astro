@@ -1,0 +1,155 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Terms of Use & Voluntary Contributions — DAJC"
+  description="Terms for using the public DAJC websites and for voluntary contributions supporting the operation and development of DAJC.eu."
+>
+  <main class="terms">
+    <p class="eyebrow">TERMS</p>
+    <h1>Terms of Use &amp; Voluntary Contributions</h1>
+    <p class="lead">These terms apply to the public DAJC website at <strong>dajc.eu</strong>, the public DAJC Platform Demo at <strong>demo.dajc.eu</strong>, and any voluntary contribution option made available through DAJC.eu.</p>
+    <p class="updated">Effective: 3 September 2026</p>
+
+    <section>
+      <h2>1. Operator</h2>
+      <p><strong>DAJC.eu is founded and currently operated by Miroslav Dajč.</strong></p>
+      <p>Contact: <a href="mailto:team@dajc.eu">team@dajc.eu</a></p>
+    </section>
+
+    <section>
+      <h2>2. Project status</h2>
+      <p>DAJC is an independent project under active development, focused on digital coordination, operational information and future workflow tools for European heavy and oversized transport.</p>
+      <p>The public website and public demo may describe planned, experimental or developing functionality. Unless a page expressly states otherwise, this content does not represent a production service, contractual commitment, guaranteed feature, availability promise or offer of a regulated financial service.</p>
+    </section>
+
+    <section>
+      <h2>3. Voluntary contributions</h2>
+      <p>Visitors may be given the option to make a voluntary financial contribution to help support the ongoing development, hosting, infrastructure and other operating costs of DAJC.eu.</p>
+      <p>A voluntary contribution is <strong>not a payment for goods or services</strong>. It does not create a customer relationship, subscription, entitlement to DAJC functionality, priority access, support obligation or other contractual benefit unless this is expressly stated separately.</p>
+      <p>A contribution is also <strong>not an investment, loan, deposit, security, crowdfunding investment or purchase of ownership</strong>. Contributors receive no shares, ownership rights, voting rights, profit participation, interest, financial return or claim against DAJC by making a contribution.</p>
+      <p>Contribution amounts are chosen voluntarily by the contributor, subject to any limits shown by the payment provider. Contributions may be made by individuals or organisations. A contribution from an organisation does not create a commercial service agreement.</p>
+    </section>
+
+    <section>
+      <h2>4. Payment processing</h2>
+      <p>Payments are processed by the payment provider shown at the time of contribution. That provider may apply its own terms, verification, security controls, payment limits and privacy practices.</p>
+      <p>DAJC does not ask contributors to send payment-card credentials by email or other informal channels.</p>
+    </section>
+
+    <section>
+      <h2>5. Mistaken or duplicate contributions</h2>
+      <p>If you believe a contribution was made by mistake, duplicated or affected by a technical error, contact <a href="mailto:team@dajc.eu">team@dajc.eu</a> as soon as possible with enough information to identify the payment.</p>
+      <p>Nothing in these terms limits any refund or other right that must be provided under applicable law.</p>
+    </section>
+
+    <section>
+      <h2>6. Public information and operational use</h2>
+      <p>DAJC public content is provided for general information and project demonstration purposes. Transport rules, driving bans, permit conditions, route restrictions, traffic conditions and other operational information can change and may depend on the exact vehicle, cargo, route, permit and jurisdiction.</p>
+      <p>Before relying on information for an actual transport, users must verify the current official source, applicable permit conditions and instructions from the competent authority or other responsible provider.</p>
+    </section>
+
+    <section>
+      <h2>7. Demo environment</h2>
+      <p>The public DAJC Platform Demo is a demonstration environment. Operational data shown there is synthetic unless explicitly stated otherwise, and connected services or integrations shown in the demo may be simulated, disconnected or under development.</p>
+    </section>
+
+    <section>
+      <h2>8. Intellectual property</h2>
+      <p>Unless otherwise indicated, DAJC branding, original website content, project descriptions, interface concepts and original materials published on DAJC.eu are protected by applicable intellectual-property rules. Third-party names, trademarks, data and linked materials remain the property of their respective owners.</p>
+      <p>Publicly accessible content may be viewed and linked to for lawful purposes. These terms do not grant a right to reproduce substantial parts of DAJC content, impersonate DAJC or present DAJC materials as an official service of another organisation.</p>
+    </section>
+
+    <section>
+      <h2>9. Third-party services and links</h2>
+      <p>DAJC.eu may link to third-party websites, authorities, data providers or technology services. DAJC does not control those services and their own terms, licences, availability and privacy rules apply.</p>
+    </section>
+
+    <section>
+      <h2>10. Availability and changes</h2>
+      <p>Because DAJC is under active development, public pages, tools, demonstrations and contribution options may be changed, suspended or removed. These terms may also be updated when the project, payment methods or legal requirements change. The effective date shown above identifies the current published version.</p>
+    </section>
+
+    <section>
+      <h2>11. Privacy</h2>
+      <p>Information about processing on the public DAJC sites is described in the <a href="/privacy">Privacy Notice</a>. Payment providers may process additional information under their own privacy notices.</p>
+    </section>
+
+    <section>
+      <h2>12. Applicable law</h2>
+      <p>These terms are governed by the laws of the Czech Republic, without limiting any mandatory rights that apply to a user or contributor under applicable law.</p>
+    </section>
+
+    <section>
+      <h2>13. Contact</h2>
+      <p>Questions about these terms or voluntary contributions can be sent to <a href="mailto:team@dajc.eu">team@dajc.eu</a>.</p>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .terms {
+    position: relative;
+    z-index: 2;
+    width: min(820px, calc(100% - 3rem));
+    margin: 0 auto;
+    padding: clamp(4rem, 9vw, 7rem) 0 6rem;
+  }
+
+  .eyebrow {
+    margin: 0 0 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--dajc-orange);
+  }
+
+  h1,
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--dajc-white);
+  }
+
+  h1 {
+    margin: 0 0 1.2rem;
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+
+  h2 {
+    margin: 0 0 0.7rem;
+    font-size: 1.15rem;
+  }
+
+  .lead,
+  .updated,
+  section p {
+    color: var(--dajc-muted);
+    line-height: 1.75;
+  }
+
+  .lead {
+    margin: 0 0 0.6rem;
+    font-size: 16px;
+  }
+
+  .updated {
+    margin: 0 0 2.5rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  section {
+    padding: 1.4rem 0;
+    border-top: 1px solid var(--dajc-line);
+  }
+
+  section p {
+    margin: 0.55rem 0 0;
+    font-size: 14px;
+  }
+
+  a {
+    color: var(--dajc-orange);
+  }
+</style>
