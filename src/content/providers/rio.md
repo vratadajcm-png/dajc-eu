@@ -1,5 +1,5 @@
 ---
-name: "RIO"
+name: "RIO / MAN"
 slug: "rio"
 category: "Vehicle & Fleet Data"
 status: "active"
