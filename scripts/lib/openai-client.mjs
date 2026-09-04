@@ -16,8 +16,14 @@ const DEVELOPMENT_SCHEMA = {
     where: { type: 'string' },
     vehicleScope: { type: 'string' },
     timeWindow: { type: 'string' },
-    validFrom: { type: 'string' },
-    validTo: { type: 'string' },
+    validFrom: {
+      type: ['string', 'null'],
+      description: 'Exact YYYY-MM-DD copied from the supplied verified candidate, or null when the candidate has no exact date. Never use prose such as Ongoing, Indefinite, Immediate or Pending.',
+    },
+    validTo: {
+      type: ['string', 'null'],
+      description: 'Exact YYYY-MM-DD copied from the supplied verified candidate, or null when the candidate has no exact date. Never use prose such as Ongoing, Indefinite, Immediate or Pending.',
+    },
     impact: { type: 'string' },
     recommendedAction: { type: 'string' },
     exemptions: { type: 'string' },
@@ -29,8 +35,6 @@ const DEVELOPMENT_SCHEMA = {
   required: ['country','title','whatChanged','where','vehicleScope','timeWindow','validFrom','validTo','impact','recommendedAction','exemptions','isDrivingBan','isInfrastructure','sourceUrl','sourceName'],
   additionalProperties: false,
 };
-
-
 
 const LEAD_SUPPLEMENT_SCHEMA = {
   name: 'dajc_lead_supplement',
@@ -102,14 +106,15 @@ Do not repeat unchanged long-term restrictions every week. Re-report them only w
 VERIFICATION / NON-INFERENCE RULES
 1. Use only supplied verified candidates. Never invent a development, route, limit, date, exemption or source.
 2. sourceUrl and sourceName MUST be copied EXACTLY from a supplied candidate.
-3. Never infer that a general HGV restriction applies to abnormal transport. State permit-specific uncertainty when applicability is not confirmed.
-4. Never infer that a general exemption applies to abnormal transport.
-5. Exclude isolated accidents, broken-down vehicles, theft reports and routine incidents.
-6. Procurement/tender notices are not traffic restrictions.
-7. Planned works are not restrictions unless a concrete operational effect and dates are confirmed.
-8. Use exact dates and local times where supplied. Distinguish publication date from effective date.
-9. Every published item must answer: Why does this matter to someone planning or executing heavy, abnormal, oversized or special transport in Europe? If there is no meaningful answer, exclude it.
-10. Do not repeat unchanged information merely because it appeared in an official annual calendar.
+3. validFrom and validTo MUST be copied exactly when the candidate supplies an ISO YYYY-MM-DD date; otherwise return null. Never replace an unknown date with prose such as Ongoing, Indefinite, Immediate, Pending, a sentence, or punctuation.
+4. Never infer that a general HGV restriction applies to abnormal transport. State permit-specific uncertainty when applicability is not confirmed.
+5. Never infer that a general exemption applies to abnormal transport.
+6. Exclude isolated accidents, broken-down vehicles, theft reports and routine incidents.
+7. Procurement/tender notices are not traffic restrictions.
+8. Planned works are not restrictions unless a concrete operational effect and dates are confirmed.
+9. Use exact dates and local times where supplied. Distinguish publication date from effective date.
+10. Every published item must answer: Why does this matter to someone planning or executing heavy, abnormal, oversized or special transport in Europe? If there is no meaningful answer, exclude it.
+11. Do not repeat unchanged information merely because it appeared in an official annual calendar.
 
 SELECTION
 Rank findings by operational impact, relevance to abnormal/heavy transport, urgency, geographic reach, magnitude, evidence quality, novelty, and effect on routing, permits, timing, cost or feasibility.
@@ -121,6 +126,22 @@ Place additional verified useful developments in europeRoundup. Return at least 
 STYLE
 Write practical professional English. Each lead must contain concrete What changed / Where / When / Impact / Action information through the structured fields. No marketing filler and no clickbait body copy.`;
 
+// The model sometimes classifies a substantive verified item as roundup even
+// when the lead tier is below its hard minimum. Rebalancing presentation tiers
+// here does not weaken verification: every item still has to survive exact URL
+// cross-validation, deterministic relevance/date/closure filters and the final
+// quality gate. Any roundup slots consumed here are rebuilt later from unused
+// verified candidates by the existing roundup-repair stage.
+function rebalanceArticleTiers(article, minimumLeadCount = 20) {
+  const developments = Array.isArray(article?.developments) ? [...article.developments] : [];
+  const europeRoundup = Array.isArray(article?.europeRoundup) ? [...article.europeRoundup] : [];
+  const needed = Math.max(0, minimumLeadCount - developments.length);
+  if (needed > 0 && europeRoundup.length > 0) {
+    developments.push(...europeRoundup.splice(0, Math.min(needed, europeRoundup.length)));
+  }
+  return { ...article, developments, europeRoundup };
+}
+
 export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, targetWeekStart, targetWeekEnd, apiKey, model }) {
   const client = new OpenAI({ apiKey });
   const mapped = candidates.slice(0, 60).map((c) => ({
@@ -129,8 +150,8 @@ export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, ta
     type: c.type,
     title: c.title,
     summary: String(c.summary || '').slice(0, 1200),
-    validFrom: c.validFrom,
-    validTo: c.validTo,
+    validFrom: c.validFrom || null,
+    validTo: c.validTo || null,
     vehicleScope: c.vehicleScope || '',
     timeWindow: c.timeWindow || '',
     routeScope: c.routeScope || c.location || '',
@@ -155,7 +176,7 @@ export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, ta
 
   const text = response.choices?.[0]?.message?.content;
   if (!text) throw new Error('OpenAI response contained no content');
-  return JSON.parse(text);
+  return rebalanceArticleTiers(JSON.parse(text));
 }
 
 function roundupCandidateScore(candidate) {
@@ -186,7 +207,7 @@ export async function generateRoundupSupplementWithOpenAI({
   const ranked = [...candidates].sort((a,b)=>roundupCandidateScore(b)-roundupCandidateScore(a)).slice(0, 40);
   const payload = ranked.map((c) => ({
     country:c.country, location:c.location, type:c.type, title:c.title,
-    summary:String(c.summary || '').slice(0,900), validFrom:c.validFrom, validTo:c.validTo,
+    summary:String(c.summary || '').slice(0,900), validFrom:c.validFrom || null, validTo:c.validTo || null,
     vehicleScope:c.vehicleScope || '', timeWindow:c.timeWindow || '',
     routeScope:c.routeScope || c.location || '', impact:c.impact || '',
     recommendedAction:c.recommendedAction || '', exemptions:c.exemptions || '',
@@ -197,7 +218,7 @@ export async function generateRoundupSupplementWithOpenAI({
   const response = await client.chat.completions.create({
     model: model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
     messages: [
-      { role:'system', content:'Fill only DAJC Rest of Europe from verified unused candidates. Return concise, operationally useful heavy/oversize/special-road-transport items. First add missing distinct jurisdictions, then fill the report count. Never use routine Sunday bans, generic administration, old statistics, short/undated closures, crime, accidents, procurement or filler. Copy sourceUrl/sourceName EXACTLY from supplied candidates.' },
+      { role:'system', content:'Fill only DAJC Rest of Europe from verified unused candidates. Return concise, operationally useful heavy/oversize/special-road-transport items. First add missing distinct jurisdictions, then fill the report count. Never use routine Sunday bans, generic administration, old statistics, short/undated closures, crime, accidents, procurement or filler. Copy sourceUrl/sourceName EXACTLY from supplied candidates. Copy validFrom/validTo only when supplied as exact ISO YYYY-MM-DD dates; otherwise return null.' },
       { role:'user', content:`Target week ${targetWeekStart} to ${targetWeekEnd}. Existing countries: ${existingCountries.join(', ') || 'none'}. Need at least ${neededCountries} additional jurisdictions and ${neededReports} additional reports. Return up to 16 items.\n\nVerified unused candidates:\n${JSON.stringify(payload)}` },
     ],
     response_format:{ type:'json_schema', json_schema:ROUNDUP_SUPPLEMENT_SCHEMA },
@@ -215,7 +236,7 @@ export async function generateLeadSupplementWithOpenAI({
   const client = new OpenAI({ apiKey });
   const payload = candidates.slice(0, 36).map((c) => ({
     country:c.country, location:c.location, type:c.type, title:c.title,
-    summary:String(c.summary || '').slice(0,1000), validFrom:c.validFrom, validTo:c.validTo,
+    summary:String(c.summary || '').slice(0,1000), validFrom:c.validFrom || null, validTo:c.validTo || null,
     vehicleScope:c.vehicleScope || '', timeWindow:c.timeWindow || '',
     routeScope:c.routeScope || c.location || '', impact:c.impact || '',
     recommendedAction:c.recommendedAction || '', exemptions:c.exemptions || '',
@@ -226,7 +247,7 @@ export async function generateLeadSupplementWithOpenAI({
   const response = await client.chat.completions.create({
     model: model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
     messages: [
-      { role:'system', content:'Select additional LEAD reports for DAJC European Oversize & Special Transport Intelligence only from supplied verified unused candidates. Each must be substantive and operationally relevant to heavy, abnormal, oversized or special road transport. Never use routine Sunday bans, generic administration, statistics, accidents/crime, procurement, short or undated road closures, or filler. Copy sourceUrl/sourceName EXACTLY.' },
+      { role:'system', content:'Select additional LEAD reports for DAJC European Oversize & Special Transport Intelligence only from supplied verified unused candidates. Each must be substantive and operationally relevant to heavy, abnormal, oversized or special road transport. Never use routine Sunday bans, generic administration, statistics, accidents/crime, procurement, short or undated road closures, or filler. Copy sourceUrl/sourceName EXACTLY. Copy validFrom/validTo only when supplied as exact ISO YYYY-MM-DD dates; otherwise return null.' },
       { role:'user', content:`Target week ${targetWeekStart} to ${targetWeekEnd}. Need up to ${neededReports} additional substantive lead reports to reach the 20-report minimum. Return fewer if genuine material is insufficient.\n\nVerified unused candidates:\n${JSON.stringify(payload)}` },
     ],
     response_format:{ type:'json_schema', json_schema:LEAD_SUPPLEMENT_SCHEMA },
