@@ -36,7 +36,10 @@ permissions:
 
 concurrency:
   group: oversize-weekly-publish
-  cancel-in-progress: false
+  # During a recovery sequence we always want the newest verified publisher
+  # logic to win. The generator writes nothing until all quality gates pass, so
+  # replacing an older in-flight recovery cannot leave a partial article.
+  cancel-in-progress: true
 
 jobs:
   publish:
