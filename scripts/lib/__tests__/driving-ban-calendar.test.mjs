@@ -13,10 +13,13 @@ describe('resolveDrivingBanFindings - W35 2026', () => {
   });
 
   it('produces the authoritative W35 restrictions without depending on news volume', () => {
-    expect(findings).toHaveLength(14);
+    expect(findings).toHaveLength(18);
     const countries = findings.map((f) => f.country).sort();
     expect(countries).toEqual(
-      ['Austria', 'Austria', 'Czechia', 'Czechia', 'France', 'France', 'Germany', 'Hungary', 'Italy', 'Poland', 'Slovakia', 'Slovenia', 'Slovenia', 'Switzerland'].sort()
+      [
+        'Austria', 'Austria', 'Austria', 'Croatia', 'Czechia', 'Czechia', 'France', 'France', 'Germany',
+        'Hungary', 'Italy', 'Italy', 'Poland', 'Slovakia', 'Slovenia', 'Slovenia', 'Spain', 'Switzerland',
+      ].sort()
     );
   });
 
@@ -41,11 +44,20 @@ describe('resolveDrivingBanFindings - W35 2026', () => {
     expect(germany.routeScope.toLowerCase()).toContain('officially balm-listed');
   });
 
-  it('keeps the two Austria reports distinct (general ban vs. summer corridor restrictions)', () => {
+  it('keeps the three Austria reports distinct (general ban, summer corridors, night ban)', () => {
     const austriaReports = findings.filter((f) => f.country === 'Austria');
-    expect(austriaReports).toHaveLength(2);
-    expect(austriaReports[0].title).not.toBe(austriaReports[1].title);
-    expect(new Set(austriaReports.map((f) => f.sourceUrl)).size).toBe(2);
+    expect(austriaReports).toHaveLength(3);
+    expect(new Set(austriaReports.map((f) => f.title)).size).toBe(3);
+    expect(new Set(austriaReports.map((f) => f.sourceUrl)).size).toBe(3);
+  });
+
+  // The weekly quality gate rejects an article in which two reports share a
+  // sourceUrl (scripts/lib/quality-gate.mjs), so two calendar entries that
+  // resolve in the same week must never cite the same page - even when the
+  // same authority publishes both rules.
+  it('gives every resolved finding its own sourceUrl', () => {
+    const urls = findings.map((f) => f.sourceUrl);
+    expect(new Set(urls).size).toBe(urls.length);
   });
 });
 
@@ -62,7 +74,7 @@ describe('resolveDrivingBanFindings - annual-calendar maintenance', () => {
 
   it('reports a maintenance error for every year-scoped annual calendar', () => {
     const flaggedCountries = maintenanceErrors.map((m) => m.match(/^\[([A-Z]+)\//)[1]);
-    expect(new Set(flaggedCountries)).toEqual(new Set(['DE', 'PL', 'IT', 'SI', 'AT']));
+    expect(new Set(flaggedCountries)).toEqual(new Set(['DE', 'PL', 'IT', 'SI', 'AT', 'ES']));
   });
 
   it('keeps non-evergreen special/seasonal standing rules while suppressing evergreen Sunday baselines', () => {
@@ -98,7 +110,10 @@ describe('resolveDrivingBanFindings - W36 2026', () => {
   it('keeps seasonal and exceptional-transport restrictions but drops routine Sunday-only calendar entries', () => {
     expect(findings.some((f) => f.country === 'Czechia' && /special vehicles/i.test(f.title))).toBe(true);
     expect(findings.some((f) => f.country === 'France' && /exceptional-transport/i.test(f.title))).toBe(true);
-    expect(findings.some((f) => f.country === 'Italy')).toBe(false);
+    // The ordinary Italian calendar stays out of W36; the separate ADR
+    // class 1/7 restriction is seasonal and ends that weekend, so it stays.
+    expect(findings.some((f) => f.country === 'Italy' && !/ADR/i.test(f.title))).toBe(false);
+    expect(findings.some((f) => f.country === 'Italy' && /ADR class 1 and class 7/i.test(f.title))).toBe(true);
     expect(findings.some((f) => f.country === 'Slovenia' && f.timeWindow.includes('06:00-16:00'))).toBe(true);
   });
 
