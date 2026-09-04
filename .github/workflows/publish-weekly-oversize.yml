@@ -1,10 +1,10 @@
 name: Publish Weekly Oversize Article
 
 # Friday publication is scheduled at both UTC instants that can represent
-# 12:00 Europe/Prague (10:00 UTC in CEST, 11:00 UTC in CET). The trigger gate
-# chooses the correct cron by timezone OFFSET, not by the runner's current
-# hour, so a GitHub scheduling delay of minutes or hours cannot invalidate the
-# run. A Saturday catch-up remains idempotent.
+# 12:00 Europe/Prague (10:00 UTC in CEST, 11:00 UTC in CET). Later Friday
+# triggers are recovery checks: the publication check is idempotent, so they
+# only do real work when the target article is still missing. A Saturday
+# catch-up remains as the final safety net.
 #
 # TEMPORARY 2026-08-31 preview hook: the merge commit for PR #7 triggers one
 # preview publication so DAJC can inspect Friday's exact format today. The
@@ -14,8 +14,9 @@ name: Publish Weekly Oversize Article
 
 on:
   schedule:
-    - cron: '0 10 * * 5' # Friday 12:00 CEST
-    - cron: '0 11 * * 5' # Friday 12:00 CET
+    - cron: '0 10 * * 5' # Friday 12:00 CEST (primary in summer)
+    - cron: '0 11 * * 5' # Friday 12:00 CET; summer recovery check
+    - cron: '0 12 * * 5' # Friday last-chance recovery check
     - cron: '0 6 * * 6'  # Saturday catch-up if Friday did not publish
   workflow_dispatch:
     inputs:
@@ -50,7 +51,12 @@ jobs:
           message="${{ github.event.head_commit.message }}"
 
           if [ "$event" = "push" ]; then
-            if [[ "$message" == *"Unify DAJC Weekly at 20 leads + 10-by-6 Europe roundup"* ]]; then
+            if [[ "$message" == *"Recover missing DAJC Weekly publication 2026-09-04"* ]]; then
+              echo "should_run=true" >> "$GITHUB_OUTPUT"
+              echo "role=one-time-recovery" >> "$GITHUB_OUTPUT"
+              echo "preview=false" >> "$GITHUB_OUTPUT"
+              echo "Recovery commit detected - publishing the missing Friday weekly article."
+            elif [[ "$message" == *"Unify DAJC Weekly at 20 leads + 10-by-6 Europe roundup"* ]]; then
               echo "should_run=true" >> "$GITHUB_OUTPUT"
               echo "role=one-time-preview" >> "$GITHUB_OUTPUT"
               echo "preview=true" >> "$GITHUB_OUTPUT"
@@ -88,10 +94,18 @@ jobs:
             echo "should_run=true" >> "$GITHUB_OUTPUT"
             echo "role=friday-primary" >> "$GITHUB_OUTPUT"
             echo "Correct CET/CEST Friday trigger selected. Runner delay does not matter."
+          elif [ "$offset" = "+0200" ] && [ "$schedule" = "0 11 * * 5" ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "role=friday-recovery" >> "$GITHUB_OUTPUT"
+            echo "Summer fallback trigger - publish only if the primary run did not create the target article."
+          elif [ "$schedule" = "0 12 * * 5" ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "role=friday-last-chance" >> "$GITHUB_OUTPUT"
+            echo "Friday last-chance trigger - publish only if the target article is still missing."
           else
             echo "should_run=false" >> "$GITHUB_OUTPUT"
             echo "role=friday-redundant" >> "$GITHUB_OUTPUT"
-            echo "Redundant DST-safety Friday trigger - no publication work required."
+            echo "Early/redundant DST-safety Friday trigger - no publication work required."
           fi
 
       - name: Checkout
