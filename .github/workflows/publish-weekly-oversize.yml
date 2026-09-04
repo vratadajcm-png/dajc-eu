@@ -5,12 +5,6 @@ name: Publish Weekly Oversize Article
 # triggers are recovery checks: the publication check is idempotent, so they
 # only do real work when the target article is still missing. A Saturday
 # catch-up remains as the final safety net.
-#
-# TEMPORARY 2026-08-31 preview hook: the merge commit for PR #7 triggers one
-# preview publication so DAJC can inspect Friday's exact format today. The
-# preview uses a separate slug and therefore cannot consume Friday's final W37
-# slug. The bot's preview commit does not match the merge-message gate, so this
-# cannot loop.
 
 on:
   schedule:
@@ -28,18 +22,15 @@ on:
         description: 'Publish a separate preview article using Friday quality gates; never consumes the final weekly slug.'
         type: boolean
         default: false
-  push:
-    branches: [main]
 
 permissions:
   contents: write
 
 concurrency:
   group: oversize-weekly-publish
-  # During a recovery sequence we always want the newest verified publisher
-  # logic to win. The generator writes nothing until all quality gates pass, so
-  # replacing an older in-flight recovery cannot leave a partial article.
-  cancel-in-progress: true
+  # Let an in-flight primary publication finish. Later recovery schedules wait
+  # and then become cheap idempotent no-ops once the target article exists.
+  cancel-in-progress: false
 
 jobs:
   publish:
@@ -51,27 +42,6 @@ jobs:
         run: |
           event="${{ github.event_name }}"
           schedule="${{ github.event.schedule }}"
-          message="${{ github.event.head_commit.message }}"
-
-          if [ "$event" = "push" ]; then
-            if [[ "$message" == *"Recover missing DAJC Weekly publication 2026-09-04"* ]]; then
-              echo "should_run=true" >> "$GITHUB_OUTPUT"
-              echo "role=one-time-recovery" >> "$GITHUB_OUTPUT"
-              echo "preview=false" >> "$GITHUB_OUTPUT"
-              echo "Recovery commit detected - publishing the missing Friday weekly article."
-            elif [[ "$message" == *"Unify DAJC Weekly at 20 leads + 10-by-6 Europe roundup"* ]]; then
-              echo "should_run=true" >> "$GITHUB_OUTPUT"
-              echo "role=one-time-preview" >> "$GITHUB_OUTPUT"
-              echo "preview=true" >> "$GITHUB_OUTPUT"
-              echo "PR #7 merge detected - publishing one-time W37 preview."
-            else
-              echo "should_run=false" >> "$GITHUB_OUTPUT"
-              echo "role=ordinary-push" >> "$GITHUB_OUTPUT"
-              echo "preview=false" >> "$GITHUB_OUTPUT"
-              echo "Ordinary main push - weekly publication not requested."
-            fi
-            exit 0
-          fi
 
           if [ "$event" = "workflow_dispatch" ]; then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
