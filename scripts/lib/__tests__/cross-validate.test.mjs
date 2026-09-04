@@ -37,4 +37,38 @@ describe('crossValidateDevelopments', () => {
     expect(kept).toHaveLength(0);
     expect(droppedCount).toBe(1);
   });
+
+  it('restores authoritative verified dates instead of model placeholders', () => {
+    const candidates = [{
+      sourceUrl: 'https://example.test/date',
+      sourceName: 'Official source',
+      country: 'Testland',
+      validFrom: '2026-09-07',
+      validTo: '2026-09-13',
+    }];
+    const { kept } = crossValidateDevelopments([
+      {
+        sourceUrl: 'https://example.test/date',
+        sourceName: 'Changed by model',
+        country: 'Changed by model',
+        validFrom: 'Pending legislative process outcome.',
+        validTo: 'Ongoing',
+      },
+    ], candidates);
+
+    expect(kept[0].sourceName).toBe('Official source');
+    expect(kept[0].country).toBe('Testland');
+    expect(kept[0].validFrom).toBe('2026-09-07');
+    expect(kept[0].validTo).toBe('2026-09-13');
+  });
+
+  it('uses null dates when the verified source has no exact validity dates', () => {
+    const candidates = [{ sourceUrl: 'https://example.test/no-date' }];
+    const { kept } = crossValidateDevelopments([
+      { sourceUrl: 'https://example.test/no-date', validFrom: 'Immediate', validTo: 'Indefinite' },
+    ], candidates);
+
+    expect(kept[0].validFrom).toBeNull();
+    expect(kept[0].validTo).toBeNull();
+  });
 });
