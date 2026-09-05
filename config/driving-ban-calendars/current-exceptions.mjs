@@ -28,9 +28,6 @@ export const currentDrivingBanExceptions = [
     validTo: '2026-09-30',
     resolve(weekStart, weekEnd, year) {
       if (year !== 2026) return { occurrences: [] };
-      // Emit once when resolving the week that first intersects the current
-      // September publication period. Calendar consumers deduplicate the
-      // month-long occurrence; weekly editorial output will not repeat it.
       if (fmt(weekStart) !== '2026-08-31') return { occurrences: [] };
       if (fmt(weekEnd) < '2026-09-01') return { occurrences: [] };
       return {
@@ -98,6 +95,56 @@ export const currentDrivingBanExceptions = [
             timeWindow: 'Monday 7 September 2026, 12:00–20:00 — toward Sofia only; HGVs over 12t leaving Sofia remain unrestricted by this measure.',
             impact: sharedImpact,
             recommendedAction: sharedAction,
+          },
+        ],
+      };
+    },
+  },
+  {
+    id: 'hr-september-2026-extraordinary-transport-night-stoppages',
+    country: 'HR',
+    countryName: 'Croatia',
+    kind: 'temporary-restriction',
+    sourceUrl: 'https://www.hak.hr/en',
+    sourceName: 'Hrvatski autoklub (HAK) — Traffic Report, updated 4 September 2026',
+    legalBasis: 'Operational motorway traffic suspensions announced by HAK in connection with extraordinary transport movements',
+    vehicleScope: 'All traffic on the affected motorway sections is subject to short temporary suspensions while extraordinary transports pass; exceptional/oversize operators must account for the same windows and route controls.',
+    routeScope: 'A1 Zagreb–Split–Dubrovnik near Bisko and Lučko/Split junctions; A3 Bregana–Lipovac near Zagreb zapad/Lučko; A4 Goričan–Zagreb near Varaždin, Zagreb istok and Breznički Hum–Novi Marof, depending on date.',
+    exemptionNotes: 'These are short operational closures, generally up to 15 minutes, not a blanket HGV driving ban. Exact pass times can change with the extraordinary-transport movement; verify the live HAK traffic report immediately before departure.',
+    lastVerified: '2026-09-05',
+    validFrom: '2026-09-05',
+    validTo: '2026-09-30',
+    resolve(weekStart, weekEnd, year) {
+      if (year !== 2026) return { occurrences: [] };
+      if (fmt(weekEnd) < '2026-09-05' || fmt(weekStart) > '2026-09-30') return { occurrences: [] };
+      return {
+        occurrences: [
+          {
+            title: 'Night motorway stoppages for extraordinary transport — A1/A3',
+            whatChanged: 'HAK published new September operational windows in which motorway traffic will be stopped several times for up to 15 minutes to allow extraordinary transports to pass.',
+            validFrom: '2026-09-05',
+            validTo: '2026-09-14',
+            timeWindow: '5–14 September 2026, generally 23:00–05:00; affected points include A3 near Zagreb zapad/Lučko and A1 near Bisko/Lučko/Split. HAK also lists overlapping 9–15 September night suspensions at Bisko and Lučko.',
+            impact: 'Short but repeated motorway closures can delay HGV and exceptional-transport movements and may affect permit timing windows and convoy sequencing.',
+            recommendedAction: 'Allow contingency time, check the live HAK report before entering the affected motorway sections, and confirm that any exceptional-transport permit time window remains workable.',
+          },
+          {
+            title: 'Night motorway stoppages for extraordinary transport — A1 Bisko',
+            whatChanged: 'HAK announced repeated temporary suspensions near the Bisko junction for extraordinary-transport movements.',
+            validFrom: '2026-09-05',
+            validTo: '2026-09-30',
+            timeWindow: '5–30 September 2026, 22:00–05:00; traffic may be suspended several times for up to 15 minutes near the Bisko junction.',
+            impact: 'Potential repeated short delays on the A1 corridor; relevant to HGV transit and oversize permit timing.',
+            recommendedAction: 'Check live HAK conditions before the movement and keep timing margin in route and permit planning.',
+          },
+          {
+            title: 'Night motorway stoppages for extraordinary transport — A3/A4',
+            whatChanged: 'HAK announced additional extraordinary-transport stoppages on the Zagreb motorway network.',
+            validFrom: '2026-09-11',
+            validTo: '2026-09-18',
+            timeWindow: '11–18 September 2026, 23:00–05:00; A3 at Lučko toward Lipovac, A4 at Zagreb istok toward Goričan, and A4 between Breznički Hum and Novi Marof in both directions. Suspensions may occur multiple times for up to 15 minutes.',
+            impact: 'Night movements may be delayed and convoy schedules may need adjustment on A3/A4.',
+            recommendedAction: 'Verify HAK live status immediately before departure and coordinate permit/escort timing around the announced closures.',
           },
         ],
       };
