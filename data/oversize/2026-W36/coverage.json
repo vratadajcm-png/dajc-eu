@@ -1,6 +1,6 @@
 {
   "week": "2026-W36",
-  "checkedAt": "2026-09-05T09:50:31.599Z",
+  "checkedAt": "2026-09-06T10:07:31.848Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -262,11 +262,15 @@
         "de-autobahn"
       ],
       "reachableSources": [
-        "de-polizei-blaulicht",
-        "de-autobahn"
+        "de-polizei-blaulicht"
       ],
-      "unavailableSources": [],
-      "candidateFindings": 25
+      "unavailableSources": [
+        {
+          "id": "de-autobahn",
+          "error": "HTTP 403"
+        }
+      ],
+      "candidateFindings": 31
     },
     {
       "code": "GR",
@@ -689,28 +693,34 @@
       "code": "TR",
       "name": "Türkiye (European transport scope)",
       "sourceScope": "TR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "tr-kgm"
       ],
-      "reachableSources": [
-        "tr-kgm"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "tr-kgm",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "UA",
       "name": "Ukraine",
       "sourceScope": "UA",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "ua-restoration"
       ],
-      "reachableSources": [
-        "ua-restoration"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "ua-restoration",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
