@@ -22,6 +22,10 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
           <button class="button secondary" id="copy-lnurl" type="button" data-lnurl={lnurl}>Copy LNURL</button>
         </div>
         <p class="status" id="copy-status" aria-live="polite"></p>
+        <details class="manual">
+          <summary>Show LNURL for manual copy</summary>
+          <code>{lnurl}</code>
+        </details>
       </div>
       <div class="qr-wrap">
         <img src="/assets/dajc-lightning-lnurl.svg" alt="QR code for the DAJC.eu Lightning LNURL" width="320" height="320" />
@@ -32,7 +36,7 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
     <section class="details">
       <h2>About voluntary contributions</h2>
       <p>Contributions support DAJC.eu only. They are not payments for goods or services and do not provide ownership, financial return, priority access or other contractual benefits.</p>
-      <p>Payments are processed through the Lightning infrastructure configured for DAJC.eu. Provider-specific limits, security controls and terms may apply.</p>
+      <p>Lightning contributions are processed through the Anycoin.cz infrastructure configured for DAJC.eu. Anycoin-specific limits, security controls and terms may apply.</p>
       <p>See the <a href="/terms">Terms of Use &amp; Voluntary Contributions</a> and <a href="/privacy">Privacy Notice</a>.</p>
     </section>
   </main>
@@ -48,7 +52,7 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
       await navigator.clipboard.writeText(value);
       if (status) status.textContent = 'LNURL copied.';
     } catch {
-      if (status) status.textContent = 'Copy failed. Select and copy the LNURL manually.';
+      if (status) status.textContent = 'Copy failed. Open “Show LNURL for manual copy” below.';
     }
   });
 </script>
@@ -95,18 +99,45 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
   .actions { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.4rem; }
   .button {
     appearance: none;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid var(--dajc-orange);
+    border-radius: 8px;
     padding: 0.85rem 1rem;
     font: 500 13px 'IBM Plex Mono', monospace;
     text-decoration: none;
     cursor: pointer;
   }
-  .primary { background: var(--dajc-orange); color: var(--dajc-navy); }
+  .primary { background: var(--dajc-orange); color: var(--dajc-dark); }
   .secondary { background: transparent; color: var(--dajc-orange); }
   .button:hover,
-  .button:focus-visible { filter: brightness(1.08); }
+  .button:focus-visible { transform: translateY(-1px); }
 
   .status { min-height: 1.4em; margin-top: 0.7rem; font: 12px 'IBM Plex Mono', monospace; }
+
+  .manual {
+    margin-top: 0.4rem;
+    color: var(--dajc-muted);
+    font: 12px 'IBM Plex Mono', monospace;
+  }
+
+  .manual summary {
+    cursor: pointer;
+    color: var(--dajc-orange);
+  }
+
+  .manual code {
+    display: block;
+    margin-top: 0.8rem;
+    padding: 0.9rem;
+    border: 1px solid var(--dajc-line);
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--dajc-white);
+    overflow-wrap: anywhere;
+    user-select: all;
+  }
 
   .qr-wrap { text-align: center; }
   .qr-wrap img { display: block; width: min(100%, 320px); height: auto; margin: 0 auto; background: white; padding: 0.75rem; }
@@ -117,7 +148,10 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
   .details a { color: var(--dajc-orange); }
 
   @media (max-width: 760px) {
-    .card { grid-template-columns: 1fr; }
+    .support { width: min(100% - 2rem, 1040px); padding-top: 3rem; }
+    .card { grid-template-columns: 1fr; padding: 1.2rem; }
     .qr-wrap { order: -1; }
+    .actions { flex-direction: column; }
+    .button { width: 100%; }
   }
 </style>
