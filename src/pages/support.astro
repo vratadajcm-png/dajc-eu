@@ -17,11 +17,25 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
         <p class="method">BITCOIN · LIGHTNING</p>
         <h2>Pay with Lightning</h2>
         <p>Choose the amount in your Lightning wallet. Contributions are voluntary and do not create a subscription, service entitlement or investment relationship.</p>
+
         <div class="actions">
-          <a class="button primary" href={`lightning:${lnurl}`}>Open Lightning wallet</a>
+          <button class="button primary" id="share-lnurl" type="button" data-lnurl={lnurl}>Share to wallet</button>
           <button class="button secondary" id="copy-lnurl" type="button" data-lnurl={lnurl}>Copy LNURL</button>
+          <a class="button tertiary" href={`lightning:${lnurl}`}>Try opening wallet</a>
         </div>
+
         <p class="status" id="copy-status" aria-live="polite"></p>
+
+        <div class="howto" aria-label="How to pay with Lightning">
+          <strong>On mobile:</strong>
+          <ol>
+            <li>Tap <strong>Share to wallet</strong> and choose your Lightning wallet if it appears.</li>
+            <li>If it does not, tap <strong>Copy LNURL</strong>.</li>
+            <li>Open your Lightning wallet manually, choose Send/Pay and paste the LNURL there.</li>
+          </ol>
+          <p>Do not paste the LNURL into the browser address bar — browsers treat it as a search term.</p>
+        </div>
+
         <details class="manual">
           <summary>Show LNURL for manual copy</summary>
           <code>{lnurl}</code>
@@ -43,16 +57,46 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
 </BaseLayout>
 
 <script>
-  const button = document.querySelector('#copy-lnurl');
-  const status = document.querySelector('#copy-status');
+  const copyButton = document.querySelector<HTMLButtonElement>('#copy-lnurl');
+  const shareButton = document.querySelector<HTMLButtonElement>('#share-lnurl');
+  const status = document.querySelector<HTMLElement>('#copy-status');
 
-  button?.addEventListener('click', async () => {
-    const value = button.getAttribute('data-lnurl') ?? '';
+  const setStatus = (message: string) => {
+    if (status) status.textContent = message;
+  };
+
+  copyButton?.addEventListener('click', async () => {
+    const value = copyButton.dataset.lnurl ?? '';
     try {
       await navigator.clipboard.writeText(value);
-      if (status) status.textContent = 'LNURL copied.';
+      setStatus('LNURL copied. Now open your Lightning wallet and paste it into Send/Pay.');
     } catch {
-      if (status) status.textContent = 'Copy failed. Open “Show LNURL for manual copy” below.';
+      setStatus('Copy failed. Open “Show LNURL for manual copy” below.');
+    }
+  });
+
+  shareButton?.addEventListener('click', async () => {
+    const value = shareButton.dataset.lnurl ?? '';
+
+    if (!navigator.share) {
+      try {
+        await navigator.clipboard.writeText(value);
+        setStatus('Sharing is not supported here. LNURL was copied instead — open your Lightning wallet and paste it into Send/Pay.');
+      } catch {
+        setStatus('Sharing is not supported here. Use “Show LNURL for manual copy” below.');
+      }
+      return;
+    }
+
+    try {
+      await navigator.share({
+        title: 'Support DAJC.eu with Lightning',
+        text: value,
+      });
+      setStatus('LNURL shared. Choose a Lightning wallet if available.');
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      setStatus('Could not open the share sheet. Use Copy LNURL instead.');
     }
   });
 </script>
@@ -83,7 +127,8 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
 
   .lead,
   .card p,
-  .details p { color: var(--dajc-muted); line-height: 1.75; }
+  .details p,
+  .howto { color: var(--dajc-muted); line-height: 1.75; }
   .lead { max-width: 760px; margin: 0 0 2.5rem; }
 
   .card {
@@ -112,13 +157,26 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
   }
   .primary { background: var(--dajc-orange); color: var(--dajc-dark); }
   .secondary { background: transparent; color: var(--dajc-orange); }
+  .tertiary { border-color: var(--dajc-line); background: transparent; color: var(--dajc-muted); }
   .button:hover,
   .button:focus-visible { transform: translateY(-1px); }
 
-  .status { min-height: 1.4em; margin-top: 0.7rem; font: 12px 'IBM Plex Mono', monospace; }
+  .status { min-height: 1.4em; margin-top: 0.8rem; font: 12px 'IBM Plex Mono', monospace; }
+
+  .howto {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-left: 2px solid var(--dajc-orange);
+    background: rgba(0, 38, 92, 0.16);
+    font-size: 13px;
+  }
+
+  .howto strong { color: var(--dajc-white); }
+  .howto ol { margin: 0.55rem 0 0.55rem 1.2rem; padding: 0; }
+  .howto p { margin: 0; font-size: 12px; }
 
   .manual {
-    margin-top: 0.4rem;
+    margin-top: 0.9rem;
     color: var(--dajc-muted);
     font: 12px 'IBM Plex Mono', monospace;
   }
