@@ -2,10 +2,11 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuhkcmn4wfkz7c3svsexgcnrvykk2cfsxvkngdfjvvknjcmzx5knzde3x5ergepsvejkgdg2espjg';
+const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
 ---
 <BaseLayout
   title="Support DAJC.eu — Bitcoin & Lightning"
-  description="Support the independent operation and development of DAJC.eu with a voluntary Bitcoin Lightning contribution."
+  description="Support the independent operation and development of DAJC.eu with a voluntary Bitcoin or Lightning contribution."
 >
   <main class="support">
     <p class="eyebrow">SUPPORT DAJC.EU</p>
@@ -30,15 +31,6 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
           <strong>Important:</strong> the copied LNURL is not a web address. Do not paste it into Chrome, Safari or another browser. Paste it only into the Send/Pay field of a Lightning wallet.
         </div>
 
-        <div class="howto" aria-label="How to pay with Lightning">
-          <strong>On mobile:</strong>
-          <ol>
-            <li>Use <strong>Open Lightning wallet</strong> if it works on your phone.</li>
-            <li>Otherwise tap <strong>Share to wallet</strong> and choose your Lightning wallet.</li>
-            <li>As a fallback, tap <strong>Copy for Lightning wallet</strong>, open the wallet manually and paste it into Send/Pay.</li>
-          </ol>
-        </div>
-
         <details class="manual">
           <summary>Show LNURL for wallet-only manual copy</summary>
           <code>{lnurl}</code>
@@ -50,10 +42,40 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
       </div>
     </section>
 
+    <section class="card onchain-card">
+      <div class="copy">
+        <p class="method">BITCOIN · ON-CHAIN</p>
+        <h2>Send Bitcoin on-chain</h2>
+        <p>Use this permanent Bitcoin address for a standard on-chain BTC transfer from a compatible wallet or exchange.</p>
+
+        <div class="address-box" aria-label="DAJC.eu Bitcoin address">
+          <code>{btcAddress}</code>
+        </div>
+
+        <div class="actions">
+          <a class="button primary" href={`bitcoin:${btcAddress}`}>Open Bitcoin wallet</a>
+          <button class="button secondary" id="copy-btc" type="button" data-address={btcAddress}>Copy BTC address</button>
+        </div>
+
+        <p class="status" id="btc-status" aria-live="polite"></p>
+
+        <div class="warning warning--strong" role="note">
+          <strong>Minimum deposit: 0.0001 BTC.</strong> Anycoin states that a smaller amount will not be credited and may be lost. Always verify the full address before sending.
+        </div>
+
+        <div class="onchain-meta">
+          <span>Network: Bitcoin</span>
+          <span>Address validity: Permanent</span>
+          <span>Anycoin deposit fee: Free</span>
+          <span>Estimated crediting: about 4 confirmations</span>
+        </div>
+      </div>
+    </section>
+
     <section class="details">
       <h2>About voluntary contributions</h2>
       <p>Contributions support DAJC.eu only. They are not payments for goods or services and do not provide ownership, financial return, priority access or other contractual benefits.</p>
-      <p>Lightning contributions are processed through the Anycoin.cz infrastructure configured for DAJC.eu. Anycoin-specific limits, security controls and terms may apply.</p>
+      <p>Bitcoin and Lightning contributions are processed through the Anycoin.cz infrastructure configured for DAJC.eu. Anycoin-specific limits, security controls and terms may apply.</p>
       <p>See the <a href="/terms">Terms of Use &amp; Voluntary Contributions</a> and <a href="/privacy">Privacy Notice</a>.</p>
     </section>
   </main>
@@ -62,7 +84,9 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
 <script>
   const copyButton = document.querySelector<HTMLButtonElement>('#copy-lnurl');
   const shareButton = document.querySelector<HTMLButtonElement>('#share-lnurl');
+  const copyBtcButton = document.querySelector<HTMLButtonElement>('#copy-btc');
   const status = document.querySelector<HTMLElement>('#copy-status');
+  const btcStatus = document.querySelector<HTMLElement>('#btc-status');
 
   const setStatus = (message: string) => {
     if (status) status.textContent = message;
@@ -102,6 +126,16 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
       setStatus('Could not open the share sheet. Use “Copy for Lightning wallet” instead.');
     }
   });
+
+  copyBtcButton?.addEventListener('click', async () => {
+    const value = copyBtcButton.dataset.address ?? '';
+    try {
+      await navigator.clipboard.writeText(value);
+      if (btcStatus) btcStatus.textContent = 'Bitcoin address copied. Verify it in your wallet before sending.';
+    } catch {
+      if (btcStatus) btcStatus.textContent = 'Copy failed. Select the Bitcoin address above and copy it manually.';
+    }
+  });
 </script>
 
 <style>
@@ -131,7 +165,6 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
   .lead,
   .card p,
   .details p,
-  .howto,
   .warning { color: var(--dajc-muted); line-height: 1.75; }
   .lead { max-width: 760px; margin: 0 0 2.5rem; }
 
@@ -143,6 +176,11 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
     padding: clamp(1.5rem, 5vw, 3rem);
     border: 1px solid var(--dajc-line);
     background: rgba(255,255,255,0.03);
+  }
+
+  .onchain-card {
+    grid-template-columns: 1fr;
+    margin-top: 1.25rem;
   }
 
   .actions { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.4rem; }
@@ -167,19 +205,15 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
 
   .status { min-height: 1.4em; margin-top: 0.8rem; font: 12px 'IBM Plex Mono', monospace; }
 
-  .warning,
-  .howto {
+  .warning {
     margin-top: 1rem;
     padding: 1rem;
+    border-left: 2px solid var(--dajc-orange);
     background: rgba(0, 38, 92, 0.16);
     font-size: 13px;
   }
 
-  .warning { border-left: 2px solid var(--dajc-orange); }
-  .howto { border-left: 2px solid var(--dajc-line); }
-  .warning strong,
-  .howto strong { color: var(--dajc-white); }
-  .howto ol { margin: 0.55rem 0 0 1.2rem; padding: 0; }
+  .warning--strong strong { color: var(--dajc-white); }
 
   .manual {
     margin-top: 0.9rem;
@@ -192,7 +226,8 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
     color: var(--dajc-orange);
   }
 
-  .manual code {
+  .manual code,
+  .address-box code {
     display: block;
     margin-top: 0.8rem;
     padding: 0.9rem;
@@ -201,6 +236,21 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
     color: var(--dajc-white);
     overflow-wrap: anywhere;
     user-select: all;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .address-box {
+    max-width: 760px;
+    margin-top: 1.25rem;
+  }
+
+  .onchain-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem 1rem;
+    margin-top: 1rem;
+    color: var(--dajc-muted);
+    font: 11px/1.6 'IBM Plex Mono', monospace;
   }
 
   .qr-wrap { text-align: center; }
@@ -217,5 +267,6 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
     .qr-wrap { order: -1; }
     .actions { flex-direction: column; }
     .button { width: 100%; }
+    .onchain-meta { grid-template-columns: 1fr; }
   }
 </style>
