@@ -119,10 +119,11 @@ restrictionPreview.sort((a, b) =>
       <div class="country-grid" id="country-grid">
         {jurisdictions.map((item) => (
           <label class="country" data-search={`${item.name} ${item.registrationCode} ${item.code}`.toLowerCase()}>
-            <input type="checkbox" name="country" value={item.code} />
+            <input type="checkbox" name="country" value={item.code} data-maintained={drivingBanCalendars.some((rule) => rule.country === item.code) ? 'true' : 'false'} />
             <span>
               <strong>{item.name}</strong>
               <small>Registration code {item.registrationCode}</small>
+              <small>{drivingBanCalendars.some((rule) => rule.country === item.code) ? 'Partial maintained coverage' : 'Coverage unavailable — verify official sources'}</small>
             </span>
           </label>
         ))}
@@ -177,7 +178,7 @@ restrictionPreview.sort((a, b) =>
           </article>
         ))}
       </div>
-      <p id="restriction-empty" class="news-empty" hidden>No maintained restrictions match the current selection.</p>
+      <p id="restriction-empty" class="news-empty" hidden>No maintained entries match this selection. This does not mean that there are no restrictions. Verify official sources before departure.</p>
     </section>
 
     <section class="panel action-panel" aria-labelledby="calendar-title">
@@ -262,6 +263,19 @@ restrictionPreview.sort((a, b) =>
       ? `${visibleRestrictions} restriction${visibleRestrictions === 1 ? '' : 's'} match the current selection.`
       : `${visibleRestrictions} upcoming maintained restriction${visibleRestrictions === 1 ? '' : 's'}.`;
     restrictionEmpty.hidden = visibleRestrictions > 0;
+
+    const unavailable = boxes.filter((box) => box.checked && (box.dataset.maintained !== 'true' || !restrictionItems.some((item) => item.dataset.country === box.value && (type === 'all' || item.dataset.type === type))));
+    if (unavailable.length || !visibleRestrictions) {
+      summary.textContent = 'Coverage is unavailable for part or all of this selection. Missing data does not mean no restrictions. Select jurisdictions with maintained entries to export.';
+      download.removeAttribute('href');
+      subscribe.removeAttribute('href');
+      download.classList.add('is-disabled');
+      subscribe.classList.add('is-disabled');
+      download.setAttribute('aria-disabled', 'true');
+      subscribe.setAttribute('aria-disabled', 'true');
+      feed.value = 'Calendar unavailable for this selection — verify official sources';
+      return;
+    }
 
     const countries = encodeURIComponent(selected.join(','));
     const fixed = `/api/driving-bans.ics?countries=${countries}&type=${type}&from=2026-09-01&to=2026-10-31`;
