@@ -1,6 +1,6 @@
 {
   "week": "2026-W37",
-  "checkedAt": "2026-09-07T11:22:16.114Z",
+  "checkedAt": "2026-09-08T10:27:09.003Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -34,18 +34,15 @@
       "code": "AM",
       "name": "Armenia",
       "sourceScope": "AM",
-      "status": "checked-source-availability-limited",
+      "status": "checked-major-or-short-update-candidates-found",
       "configuredSources": [
         "am-road-department"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "am-road-department",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "am-road-department"
       ],
-      "candidateFindings": 0
+      "unavailableSources": [],
+      "candidateFindings": 2
     },
     {
       "code": "AT",
@@ -245,14 +242,17 @@
       "code": "GE",
       "name": "Georgia",
       "sourceScope": "GE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "ge-roads"
       ],
-      "reachableSources": [
-        "ge-roads"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "ge-roads",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -265,15 +265,11 @@
         "de-autobahn"
       ],
       "reachableSources": [
-        "de-polizei-blaulicht"
+        "de-polizei-blaulicht",
+        "de-autobahn"
       ],
-      "unavailableSources": [
-        {
-          "id": "de-autobahn",
-          "error": "HTTP 403"
-        }
-      ],
-      "candidateFindings": 4
+      "unavailableSources": [],
+      "candidateFindings": 9
     },
     {
       "code": "GR",
@@ -293,17 +289,14 @@
       "code": "HU",
       "name": "Hungary",
       "sourceScope": "HU",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "hu-kozut"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "hu-kozut",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "hu-kozut"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -737,7 +730,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 4
     },
     {
       "code": "VA",
@@ -1280,7 +1273,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 4
     },
     {
       "code": "SCT",
@@ -1296,7 +1289,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 4
     },
     {
       "code": "WLS",
@@ -1312,7 +1305,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 4
     },
     {
       "code": "NIR",
@@ -1328,7 +1321,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 4
     },
     {
       "code": "FBIH",
@@ -1362,28 +1355,34 @@
       "code": "AB",
       "name": "Abkhazia",
       "sourceScope": "GE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "ge-roads"
       ],
-      "reachableSources": [
-        "ge-roads"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "ge-roads",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "SO",
       "name": "South Ossetia",
       "sourceScope": "GE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "ge-roads"
       ],
-      "reachableSources": [
-        "ge-roads"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "ge-roads",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
