@@ -32,6 +32,7 @@
       <button type="button" data-guide-question="news">Where are DAJC transport updates?</button>
       <button type="button" data-guide-question="integrations">I provide data or services. Where do I go?</button>
       <button type="button" data-guide-question="pricing">Where can I find current commercial information?</button>
+      <button type="button" data-guide-question="support">How can I support DAJC.eu?</button>
     </div>
 
     <div class="dajc-guide__answer" data-guide-answer aria-live="polite">
@@ -41,6 +42,7 @@
     <div class="dajc-guide__actions">
       <a href="mailto:team@dajc.eu?subject=Question%20from%20DAJC.eu">Contact DAJC</a>
       <a href="/partners">Integration Ecosystem</a>
+      <a href="/support">Support DAJC.eu</a>
     </div>
 
     <p class="dajc-guide__privacy">
@@ -69,7 +71,9 @@
     'integrations':
       'Integration requests are handled separately from DAJC Guide. Open the Integration Ecosystem page to submit an integration-interest request for your company, product, data or service.',
     'pricing':
-      'Commercial terms are still being prepared as DAJC develops. Only information currently published on DAJC.eu should be treated as public commercial information; contact DAJC if you need clarification.'
+      'Commercial terms are still being prepared as DAJC develops. Only information currently published on DAJC.eu should be treated as public commercial information; contact DAJC if you need clarification.',
+    'support':
+      'Open the Support page to make a voluntary Bitcoin Lightning contribution to DAJC.eu. Contributions help cover hosting, infrastructure, research and continued development of the public website and do not create a subscription, service entitlement or investment relationship.'
   };
 
   const setOpen = (open: boolean) => {
@@ -252,7 +256,7 @@
 
   .dajc-guide__actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.55rem;
     margin-top: 0.9rem;
   }
@@ -274,7 +278,8 @@
     text-transform: uppercase;
   }
 
-  .dajc-guide__actions a:first-child {
+  .dajc-guide__actions a:first-child,
+  .dajc-guide__actions a:last-child {
     border-color: var(--dajc-orange);
     color: var(--dajc-orange);
   }
