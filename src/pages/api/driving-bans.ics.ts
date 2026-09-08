@@ -9,6 +9,20 @@ const icsDate = (value: string) => value.replaceAll('-', '');
 const nextDate = (value: string) => iso(new Date(Date.parse(`${value}T00:00:00Z`) + DAY));
 const esc = (value = '') => value.replaceAll('\\', '\\\\').replaceAll('\n', '\\n').replaceAll(',', '\\,').replaceAll(';', '\\;');
 
+// iCalendar folds at 75 UTF-8 octets without splitting a code point.
+const foldLine = (line: string) => {
+  let output = '';
+  let bytes = 0;
+  const encoder = new TextEncoder();
+  for (const character of line) {
+    const size = encoder.encode(character).length;
+    if (bytes + size > 75) { output += '\r\n '; bytes = 1; }
+    output += character;
+    bytes += size;
+  }
+  return output;
+};
+
 function mondayOnOrBefore(date: Date) {
   const d = new Date(date);
   const day = d.getUTCDay();
@@ -136,7 +150,7 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   lines.push('END:VCALENDAR');
-  const body = lines.filter(Boolean).join('\r\n') + '\r\n';
+  const body = lines.filter(Boolean).map(foldLine).join('\r\n') + '\r\n';
 
   return new Response(body, {
     headers: {

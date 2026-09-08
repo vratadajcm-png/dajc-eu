@@ -20,5 +20,6 @@ describe('driving-ban feed coverage boundary', () => {
     expect(body).toContain('SUMMARY:DAJC — partial coverage / verify restrictions');
     expect(body).toContain('Germany');
     expect(body).toContain('END:VCALENDAR');
+    expect(body.split('\r\n').every((line) => new TextEncoder().encode(line).length <= 75)).toBe(true);
   });
 });
