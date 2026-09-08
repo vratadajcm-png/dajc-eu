@@ -20,24 +20,27 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
 
         <div class="actions">
           <button class="button primary" id="share-lnurl" type="button" data-lnurl={lnurl}>Share to wallet</button>
-          <button class="button secondary" id="copy-lnurl" type="button" data-lnurl={lnurl}>Copy LNURL</button>
-          <a class="button tertiary" href={`lightning:${lnurl}`}>Try opening wallet</a>
+          <button class="button secondary" id="copy-lnurl" type="button" data-lnurl={lnurl}>Copy for Lightning wallet</button>
+          <a class="button tertiary" href={`lightning:${lnurl}`}>Open Lightning wallet</a>
         </div>
 
         <p class="status" id="copy-status" aria-live="polite"></p>
 
+        <div class="warning" role="note">
+          <strong>Important:</strong> the copied LNURL is not a web address. Do not paste it into Chrome, Safari or another browser. Paste it only into the Send/Pay field of a Lightning wallet.
+        </div>
+
         <div class="howto" aria-label="How to pay with Lightning">
           <strong>On mobile:</strong>
           <ol>
-            <li>Tap <strong>Share to wallet</strong> and choose your Lightning wallet if it appears.</li>
-            <li>If it does not, tap <strong>Copy LNURL</strong>.</li>
-            <li>Open your Lightning wallet manually, choose Send/Pay and paste the LNURL there.</li>
+            <li>Use <strong>Open Lightning wallet</strong> if it works on your phone.</li>
+            <li>Otherwise tap <strong>Share to wallet</strong> and choose your Lightning wallet.</li>
+            <li>As a fallback, tap <strong>Copy for Lightning wallet</strong>, open the wallet manually and paste it into Send/Pay.</li>
           </ol>
-          <p>Do not paste the LNURL into the browser address bar — browsers treat it as a search term.</p>
         </div>
 
         <details class="manual">
-          <summary>Show LNURL for manual copy</summary>
+          <summary>Show LNURL for wallet-only manual copy</summary>
           <code>{lnurl}</code>
         </details>
       </div>
@@ -69,9 +72,9 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
     const value = copyButton.dataset.lnurl ?? '';
     try {
       await navigator.clipboard.writeText(value);
-      setStatus('LNURL copied. Now open your Lightning wallet and paste it into Send/Pay.');
+      setStatus('Copied for a Lightning wallet. Do not paste it into a browser — paste it into Send/Pay inside your wallet.');
     } catch {
-      setStatus('Copy failed. Open “Show LNURL for manual copy” below.');
+      setStatus('Copy failed. Open “Show LNURL for wallet-only manual copy” below.');
     }
   });
 
@@ -81,9 +84,9 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
     if (!navigator.share) {
       try {
         await navigator.clipboard.writeText(value);
-        setStatus('Sharing is not supported here. LNURL was copied instead — open your Lightning wallet and paste it into Send/Pay.');
+        setStatus('Sharing is not supported here. LNURL was copied for your Lightning wallet instead.');
       } catch {
-        setStatus('Sharing is not supported here. Use “Show LNURL for manual copy” below.');
+        setStatus('Sharing is not supported here. Use the manual LNURL below in a Lightning wallet.');
       }
       return;
     }
@@ -96,7 +99,7 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
       setStatus('LNURL shared. Choose a Lightning wallet if available.');
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return;
-      setStatus('Could not open the share sheet. Use Copy LNURL instead.');
+      setStatus('Could not open the share sheet. Use “Copy for Lightning wallet” instead.');
     }
   });
 </script>
@@ -128,7 +131,8 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
   .lead,
   .card p,
   .details p,
-  .howto { color: var(--dajc-muted); line-height: 1.75; }
+  .howto,
+  .warning { color: var(--dajc-muted); line-height: 1.75; }
   .lead { max-width: 760px; margin: 0 0 2.5rem; }
 
   .card {
@@ -163,17 +167,19 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
 
   .status { min-height: 1.4em; margin-top: 0.8rem; font: 12px 'IBM Plex Mono', monospace; }
 
+  .warning,
   .howto {
     margin-top: 1rem;
     padding: 1rem;
-    border-left: 2px solid var(--dajc-orange);
     background: rgba(0, 38, 92, 0.16);
     font-size: 13px;
   }
 
+  .warning { border-left: 2px solid var(--dajc-orange); }
+  .howto { border-left: 2px solid var(--dajc-line); }
+  .warning strong,
   .howto strong { color: var(--dajc-white); }
-  .howto ol { margin: 0.55rem 0 0.55rem 1.2rem; padding: 0; }
-  .howto p { margin: 0; font-size: 12px; }
+  .howto ol { margin: 0.55rem 0 0 1.2rem; padding: 0; }
 
   .manual {
     margin-top: 0.9rem;
