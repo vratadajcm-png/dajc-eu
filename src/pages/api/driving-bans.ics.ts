@@ -29,6 +29,19 @@ export const GET: APIRoute = async ({ request }) => {
   const type = url.searchParams.get('type') || 'all';
   const rolling = url.searchParams.get('rolling') === '1';
 
+  const fail = (message: string, status = 422) => new Response(message, {
+    status,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' },
+  });
+  if (!['all', 'general', 'exceptional'].includes(type)) return fail('Unknown restriction type.', 400);
+  const matchesType = (rule: any) => {
+    const exceptional = /exceptional|special vehicle|oversize|abnormal|schwertransport|großraum/i.test(`${rule.id} ${rule.legalBasis || ''} ${rule.vehicleScope || ''}`);
+    return type === 'all' || (type === 'exceptional' ? exceptional : !exceptional);
+  };
+  const available = new Set((drivingBanCalendars as any[]).filter(matchesType).map((rule) => rule.country));
+  const unsupported = [...selected].filter((country) => !available.has(country));
+  if (unsupported.length) return fail(`Coverage unavailable for ${unsupported.join(', ')} and the selected restriction type. Missing data does not mean no restrictions. Verify official sources before departure.`);
+
   const now = new Date();
   const from = rolling
     ? new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
@@ -36,6 +49,10 @@ export const GET: APIRoute = async ({ request }) => {
   const to = rolling
     ? addMonths(from, 13)
     : new Date(`${url.searchParams.get('to') || '2026-10-31'}T23:59:59Z`);
+
+  if (!Number.isFinite(from.getTime()) || !Number.isFinite(to.getTime()) || to < from || to.getTime() - from.getTime() > 400 * DAY) {
+    return fail('Invalid date range. Select at most 400 days.', 400);
+  }
 
   const events: any[] = [];
   const seen = new Set<string>();
@@ -51,7 +68,9 @@ export const GET: APIRoute = async ({ request }) => {
       if (type === 'exceptional' && !exceptional) continue;
 
       let resolved: any;
-      try { resolved = rule.resolve(week, weekEnd, year); } catch { continue; }
+      try { resolved = rule.resolve(week, weekEnd, year); } catch {
+        return fail('Calendar generation failed. Coverage cannot be verified; retry later.', 503);
+      }
       for (const occurrence of resolved?.occurrences || []) {
         if (!occurrence.validFrom || !occurrence.validTo) continue;
         if (occurrence.validTo < iso(from) || occurrence.validFrom > iso(to)) continue;
@@ -65,13 +84,29 @@ export const GET: APIRoute = async ({ request }) => {
 
   events.sort((a, b) => a.occurrence.validFrom.localeCompare(b.occurrence.validFrom) || a.rule.country.localeCompare(b.rule.country));
 
+  if (!events.length) return fail('No maintained entries are available for this selection and period. This is not confirmation that there are no restrictions. Verify official sources before departure.');
+
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
   const lines = [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//DAJC//European HGV Driving Bans//EN',
     'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:DAJC European HGV Driving Bans',
-    'X-WR-CALDESC:Planning information. Verify restrictions and permits before departure.',
+    'X-WR-CALDESC:Partial maintained coverage only. Missing dates do not mean no restrictions. Verify official sources and permits before departure.',
     'REFRESH-INTERVAL;VALUE=DURATION:PT12H', 'X-PUBLISHED-TTL:PT12H'
   ];
+
+  // Ordinary events remain useful, but an all-period visible warning also
+  // survives calendar clients that hide calendar-level descriptions.
+  lines.push(
+    'BEGIN:VEVENT',
+    `UID:coverage-warning-${[...selected].sort().join('-') || 'all'}-${type}@dajc.eu`,
+    `DTSTAMP:${stamp}`,
+    `DTSTART;VALUE=DATE:${icsDate(iso(from))}`,
+    `DTEND;VALUE=DATE:${icsDate(nextDate(iso(to)))}`,
+    'SUMMARY:DAJC — partial coverage / verify restrictions',
+    'DESCRIPTION:Only maintained entries are included. Countries and dates without entries are not verified restriction-free. Check current official sources and permit conditions before departure.',
+    'TRANSP:TRANSPARENT',
+    'END:VEVENT'
+  );
 
   for (const { rule, occurrence } of events) {
     const description = [
