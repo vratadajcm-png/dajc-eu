@@ -58,28 +58,54 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
   <IntelligenceTeaser />
   <NewsSection items={latestNews} showEuOversizeLaunchNotice={!hasPublishedEuOversize} />
   <IntegrationEcosystemSection providers={activeProviders} />
+
+  <section class="support-teaser" aria-labelledby="support-heading">
+    <div class="support-teaser__inner">
+      <div>
+        <p class="support-teaser__eyebrow">SUPPORT DAJC.EU</p>
+        <h2 id="support-heading">Help keep DAJC.eu independent and moving forward.</h2>
+        <p>Voluntary contributions help cover hosting, infrastructure, research and continued development of the public DAJC.eu website.</p>
+      </div>
+      <a class="support-teaser__action" href="/support">Support with Bitcoin / Lightning &rarr;</a>
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
-  .story-feature {
+  .story-feature,
+  .support-teaser {
     position: relative;
     z-index: 2;
     padding: 0 1.5rem 4rem;
   }
 
-  .story-feature__inner {
+  .story-feature__inner,
+  .support-teaser__inner {
     max-width: 960px;
     margin: 0 auto;
     padding: clamp(1.6rem, 4vw, 2.4rem);
-    border: 1px solid var(--dajc-orange);
     border-radius: 6px;
+  }
+
+  .story-feature__inner {
+    border: 1px solid var(--dajc-orange);
     background:
       linear-gradient(135deg, rgba(239, 125, 0, 0.1), rgba(0, 38, 92, 0.22) 45%),
       rgba(0, 20, 52, 0.46);
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.16);
   }
 
-  .story-feature__eyebrow {
+  .support-teaser__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    align-items: center;
+    border: 1px solid var(--dajc-line);
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .story-feature__eyebrow,
+  .support-teaser__eyebrow {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px;
     letter-spacing: 0.2em;
@@ -88,11 +114,13 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
     margin: 0 0 0.8rem;
   }
 
-  .story-feature h2 {
+  .story-feature h2,
+  .support-teaser h2 {
     margin: 0 0 1rem;
     font-family: 'Space Grotesk', sans-serif;
     font-size: clamp(1.35rem, 3vw, 2rem);
     line-height: 1.2;
+    color: var(--dajc-white);
   }
 
   .story-feature h2 a {
@@ -104,7 +132,8 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
     color: var(--dajc-orange);
   }
 
-  .story-feature__desc {
+  .story-feature__desc,
+  .support-teaser p {
     max-width: 72ch;
     margin: 0 0 1.2rem;
     color: var(--dajc-muted);
@@ -112,7 +141,8 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
     line-height: 1.7;
   }
 
-  .story-feature__link {
+  .story-feature__link,
+  .support-teaser__action {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px;
     letter-spacing: 0.06em;
@@ -121,7 +151,20 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
     text-decoration: none;
   }
 
-  .story-feature__link:hover {
+  .support-teaser__action {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--dajc-orange);
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+
+  .story-feature__link:hover,
+  .support-teaser__action:hover,
+  .support-teaser__action:focus-visible {
     text-decoration: underline;
   }
 
@@ -261,5 +304,17 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
     color: var(--dajc-muted);
     max-width: 44ch;
     margin: 0;
+  }
+
+  @media (max-width: 760px) {
+    .support-teaser__inner {
+      grid-template-columns: 1fr;
+    }
+
+    .support-teaser__action {
+      width: 100%;
+      white-space: normal;
+      text-align: center;
+    }
   }
 </style>
