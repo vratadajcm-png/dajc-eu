@@ -1,6 +1,6 @@
 {
   "week": "2026-W37",
-  "checkedAt": "2026-09-08T10:27:09.003Z",
+  "checkedAt": "2026-09-09T10:37:46.925Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -34,14 +34,17 @@
       "code": "AM",
       "name": "Armenia",
       "sourceScope": "AM",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "am-road-department"
       ],
-      "reachableSources": [
-        "am-road-department"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "am-road-department",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 2
     },
     {
@@ -269,7 +272,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 9
+      "candidateFindings": 12
     },
     {
       "code": "GR",
@@ -432,7 +435,7 @@
         "lu-pch"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "MT",
@@ -730,7 +733,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 4
+      "candidateFindings": 5
     },
     {
       "code": "VA",
@@ -1273,7 +1276,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 4
+      "candidateFindings": 5
     },
     {
       "code": "SCT",
@@ -1289,7 +1292,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 4
+      "candidateFindings": 5
     },
     {
       "code": "WLS",
@@ -1305,7 +1308,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 4
+      "candidateFindings": 5
     },
     {
       "code": "NIR",
@@ -1321,7 +1324,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 4
+      "candidateFindings": 5
     },
     {
       "code": "FBIH",
