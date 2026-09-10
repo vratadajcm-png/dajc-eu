@@ -6,90 +6,85 @@ const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuh
 const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
 ---
 <BaseLayout
-  title="Support DAJC.eu — Card, Bitcoin & Lightning"
-  description="Support the independent operation and development of DAJC.eu with a voluntary contribution by card, Bitcoin or Lightning."
+  title="Support DAJC.eu — Card, Lightning & Bitcoin"
+  description="Support the independent operation and development of DAJC.eu with a voluntary contribution by card, Lightning or Bitcoin."
 >
   <main class="support">
     <p class="eyebrow">SUPPORT DAJC.EU</p>
     <h1>Support independent heavy &amp; oversized transport information</h1>
     <p class="lead">DAJC.eu is an independent project. Voluntary contributions help cover hosting, infrastructure, research and continued development of the public website.</p>
 
-    <section class="card revolut-card">
-      <div class="copy">
+    <section class="method-grid" aria-label="Contribution methods">
+      <article class="method-card">
         <p class="method">CARD · REVOLUT</p>
-        <h2>Support DAJC.eu with a card</h2>
-        <p>Choose your own contribution amount in EUR and complete the payment securely through Revolut checkout. Contributions are voluntary and do not create a subscription, service entitlement or investment relationship.</p>
+        <h2>Card</h2>
+        <p>Choose your own amount in EUR and continue to Revolut secure checkout.</p>
+        <a class="button primary" href={revolutPaymentLink} target="_blank" rel="noopener noreferrer">Support with card</a>
+      </article>
 
-        <div class="actions">
-          <a class="button primary" href={revolutPaymentLink} target="_blank" rel="noopener noreferrer">Support DAJC.eu</a>
+      <details class="method-card payment-details">
+        <summary>
+          <span>
+            <span class="method">BITCOIN · LIGHTNING</span>
+            <strong>Lightning</strong>
+            <small>Fast Bitcoin payment via Lightning Network</small>
+          </span>
+          <span class="summary-action">Open</span>
+        </summary>
+        <div class="detail-content lightning-layout">
+          <div>
+            <p>Choose the amount in your Lightning wallet. Contributions are voluntary and do not create a subscription, service entitlement or investment relationship.</p>
+            <div class="actions">
+              <button class="button primary" id="share-lnurl" type="button" data-lnurl={lnurl}>Share to wallet</button>
+              <button class="button secondary" id="copy-lnurl" type="button" data-lnurl={lnurl}>Copy for Lightning wallet</button>
+              <a class="button tertiary" href={`lightning:${lnurl}`}>Open Lightning wallet</a>
+            </div>
+            <p class="status" id="copy-status" aria-live="polite"></p>
+            <div class="warning" role="note">
+              <strong>Important:</strong> the copied LNURL is not a web address. Paste it only into the Send/Pay field of a Lightning wallet.
+            </div>
+            <details class="manual">
+              <summary>Show LNURL for manual copy</summary>
+              <code>{lnurl}</code>
+            </details>
+          </div>
+          <div class="qr-wrap">
+            <img src="/assets/dajc-lightning-lnurl.svg" alt="QR code for the DAJC.eu Lightning LNURL" width="320" height="320" />
+            <p>Scan with a Lightning wallet</p>
+          </div>
         </div>
+      </details>
 
-        <div class="payment-meta">
-          <span>Currency: EUR</span>
-          <span>Amount: You choose</span>
-          <span>Processor: Revolut</span>
-          <span>Checkout: Secure external page</span>
+      <details class="method-card payment-details">
+        <summary>
+          <span>
+            <span class="method">BITCOIN · ON-CHAIN</span>
+            <strong>Bitcoin on-chain</strong>
+            <small>Standard Bitcoin transfer to the DAJC.eu address</small>
+          </span>
+          <span class="summary-action">Open</span>
+        </summary>
+        <div class="detail-content">
+          <p>Use this permanent Bitcoin address for a standard on-chain BTC transfer from a compatible wallet or exchange.</p>
+          <div class="address-box" aria-label="DAJC.eu Bitcoin address">
+            <code>{btcAddress}</code>
+          </div>
+          <div class="actions">
+            <a class="button primary" href={`bitcoin:${btcAddress}`}>Open Bitcoin wallet</a>
+            <button class="button secondary" id="copy-btc" type="button" data-address={btcAddress}>Copy BTC address</button>
+          </div>
+          <p class="status" id="btc-status" aria-live="polite"></p>
+          <div class="warning warning--strong" role="note">
+            <strong>Minimum deposit: 0.0001 BTC.</strong> Anycoin states that a smaller amount will not be credited and may be lost. Always verify the full address before sending.
+          </div>
+          <div class="payment-meta">
+            <span>Network: Bitcoin</span>
+            <span>Address validity: Permanent</span>
+            <span>Anycoin deposit fee: Free</span>
+            <span>Estimated crediting: about 4 confirmations</span>
+          </div>
         </div>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="copy">
-        <p class="method">BITCOIN · LIGHTNING</p>
-        <h2>Pay with Lightning</h2>
-        <p>Choose the amount in your Lightning wallet. Contributions are voluntary and do not create a subscription, service entitlement or investment relationship.</p>
-
-        <div class="actions">
-          <button class="button primary" id="share-lnurl" type="button" data-lnurl={lnurl}>Share to wallet</button>
-          <button class="button secondary" id="copy-lnurl" type="button" data-lnurl={lnurl}>Copy for Lightning wallet</button>
-          <a class="button tertiary" href={`lightning:${lnurl}`}>Open Lightning wallet</a>
-        </div>
-
-        <p class="status" id="copy-status" aria-live="polite"></p>
-
-        <div class="warning" role="note">
-          <strong>Important:</strong> the copied LNURL is not a web address. Do not paste it into Chrome, Safari or another browser. Paste it only into the Send/Pay field of a Lightning wallet.
-        </div>
-
-        <details class="manual">
-          <summary>Show LNURL for wallet-only manual copy</summary>
-          <code>{lnurl}</code>
-        </details>
-      </div>
-      <div class="qr-wrap">
-        <img src="/assets/dajc-lightning-lnurl.svg" alt="QR code for the DAJC.eu Lightning LNURL" width="320" height="320" />
-        <p>Scan with a Lightning wallet</p>
-      </div>
-    </section>
-
-    <section class="card onchain-card">
-      <div class="copy">
-        <p class="method">BITCOIN · ON-CHAIN</p>
-        <h2>Send Bitcoin on-chain</h2>
-        <p>Use this permanent Bitcoin address for a standard on-chain BTC transfer from a compatible wallet or exchange.</p>
-
-        <div class="address-box" aria-label="DAJC.eu Bitcoin address">
-          <code>{btcAddress}</code>
-        </div>
-
-        <div class="actions">
-          <a class="button primary" href={`bitcoin:${btcAddress}`}>Open Bitcoin wallet</a>
-          <button class="button secondary" id="copy-btc" type="button" data-address={btcAddress}>Copy BTC address</button>
-        </div>
-
-        <p class="status" id="btc-status" aria-live="polite"></p>
-
-        <div class="warning warning--strong" role="note">
-          <strong>Minimum deposit: 0.0001 BTC.</strong> Anycoin states that a smaller amount will not be credited and may be lost. Always verify the full address before sending.
-        </div>
-
-        <div class="onchain-meta">
-          <span>Network: Bitcoin</span>
-          <span>Address validity: Permanent</span>
-          <span>Anycoin deposit fee: Free</span>
-          <span>Estimated crediting: about 4 confirmations</span>
-        </div>
-      </div>
+      </details>
     </section>
 
     <section class="details">
@@ -116,15 +111,14 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
     const value = copyButton.dataset.lnurl ?? '';
     try {
       await navigator.clipboard.writeText(value);
-      setStatus('Copied for a Lightning wallet. Do not paste it into a browser — paste it into Send/Pay inside your wallet.');
+      setStatus('Copied for a Lightning wallet. Paste it into Send/Pay inside your wallet.');
     } catch {
-      setStatus('Copy failed. Open “Show LNURL for wallet-only manual copy” below.');
+      setStatus('Copy failed. Open “Show LNURL for manual copy” below.');
     }
   });
 
   shareButton?.addEventListener('click', async () => {
     const value = shareButton.dataset.lnurl ?? '';
-
     if (!navigator.share) {
       try {
         await navigator.clipboard.writeText(value);
@@ -134,12 +128,8 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
       }
       return;
     }
-
     try {
-      await navigator.share({
-        title: 'Support DAJC.eu with Lightning',
-        text: value,
-      });
+      await navigator.share({ title: 'Support DAJC.eu with Lightning', text: value });
       setStatus('LNURL shared. Choose a Lightning wallet if available.');
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return;
@@ -175,7 +165,7 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
   }
 
   .eyebrow { margin: 0 0 1rem; font-size: 12px; }
-  .method { margin: 0 0 0.7rem; font-size: 11px; }
+  .method { display: block; margin: 0 0 0.65rem; font-size: 11px; }
 
   h1,
   h2 { font-family: 'Space Grotesk', sans-serif; color: var(--dajc-white); }
@@ -183,32 +173,63 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
   h2 { margin: 0 0 0.8rem; }
 
   .lead,
-  .card p,
+  .method-card p,
   .details p,
   .warning { color: var(--dajc-muted); line-height: 1.75; }
   .lead { max-width: 760px; margin: 0 0 2.5rem; }
 
-  .card {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
-    gap: clamp(2rem, 6vw, 4rem);
-    align-items: center;
-    padding: clamp(1.5rem, 5vw, 3rem);
+  .method-grid { display: grid; gap: 1rem; }
+  .method-card {
     border: 1px solid var(--dajc-line);
     background: rgba(255,255,255,0.03);
+    padding: clamp(1.25rem, 4vw, 2rem);
+    border-radius: 10px;
   }
 
-  .revolut-card,
-  .onchain-card {
-    grid-template-columns: 1fr;
-  }
+  article.method-card h2 { margin-bottom: 0.55rem; }
+  article.method-card .button { margin-top: 1rem; }
 
-  .revolut-card {
-    margin-bottom: 1.25rem;
+  .payment-details { padding: 0; overflow: hidden; }
+  .payment-details > summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    cursor: pointer;
+    padding: clamp(1.25rem, 4vw, 2rem);
   }
+  .payment-details > summary::-webkit-details-marker { display: none; }
+  .payment-details > summary strong {
+    display: block;
+    color: var(--dajc-white);
+    font: 700 clamp(1.3rem, 3vw, 1.7rem) 'Space Grotesk', sans-serif;
+  }
+  .payment-details > summary small {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--dajc-muted);
+    font: 12px/1.5 'IBM Plex Mono', monospace;
+  }
+  .summary-action {
+    flex: 0 0 auto;
+    color: var(--dajc-dark);
+    background: var(--dajc-orange);
+    border-radius: 8px;
+    padding: 0.7rem 0.9rem;
+    font: 600 12px 'IBM Plex Mono', monospace;
+  }
+  .payment-details[open] .summary-action::after { content: ' details'; }
 
-  .onchain-card {
-    margin-top: 1.25rem;
+  .detail-content {
+    padding: 0 clamp(1.25rem, 4vw, 2rem) clamp(1.25rem, 4vw, 2rem);
+    border-top: 1px solid var(--dajc-line);
+  }
+  .lightning-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+    gap: clamp(1.5rem, 5vw, 3rem);
+    align-items: center;
   }
 
   .actions { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.4rem; }
@@ -232,7 +253,6 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
   .button:focus-visible { transform: translateY(-1px); }
 
   .status { min-height: 1.4em; margin-top: 0.8rem; font: 12px 'IBM Plex Mono', monospace; }
-
   .warning {
     margin-top: 1rem;
     padding: 1rem;
@@ -240,20 +260,10 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
     background: rgba(0, 38, 92, 0.16);
     font-size: 13px;
   }
-
   .warning--strong strong { color: var(--dajc-white); }
 
-  .manual {
-    margin-top: 0.9rem;
-    color: var(--dajc-muted);
-    font: 12px 'IBM Plex Mono', monospace;
-  }
-
-  .manual summary {
-    cursor: pointer;
-    color: var(--dajc-orange);
-  }
-
+  .manual { margin-top: 0.9rem; color: var(--dajc-muted); font: 12px 'IBM Plex Mono', monospace; }
+  .manual summary { cursor: pointer; color: var(--dajc-orange); }
   .manual code,
   .address-box code {
     display: block;
@@ -267,13 +277,8 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
     font-family: 'IBM Plex Mono', monospace;
   }
 
-  .address-box {
-    max-width: 760px;
-    margin-top: 1.25rem;
-  }
-
-  .payment-meta,
-  .onchain-meta {
+  .address-box { max-width: 760px; margin-top: 1.25rem; }
+  .payment-meta {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.6rem 1rem;
@@ -292,11 +297,11 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
 
   @media (max-width: 760px) {
     .support { width: min(100% - 2rem, 1040px); padding-top: 3rem; }
-    .card { grid-template-columns: 1fr; padding: 1.2rem; }
+    .payment-details > summary { align-items: flex-start; }
+    .lightning-layout { grid-template-columns: 1fr; }
     .qr-wrap { order: -1; }
     .actions { flex-direction: column; }
     .button { width: 100%; }
-    .payment-meta,
-    .onchain-meta { grid-template-columns: 1fr; }
+    .payment-meta { grid-template-columns: 1fr; }
   }
 </style>
