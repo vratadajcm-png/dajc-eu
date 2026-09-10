@@ -706,6 +706,203 @@ export const drivingBanCalendars = [
       };
     },
   },
+
+  {
+    id: 'at-night-driving-ban',
+    country: 'AT',
+    countryName: 'Austria',
+    kind: 'standing-rule',
+    // Evergreen baseline, same editorial policy as the weekend-anchored ones.
+    // The cut-off is the Monday of the first September week rather than
+    // 1 September itself because this occurrence is Monday-anchored - the ban
+    // runs every night, so validFrom is the Monday of the week, not the weekend.
+    suppressFromWeeklyAfter: '2026-08-31',
+    // Deliberately NOT the /transport/fahrverbote hub used by
+    // at-nationwide-weekend-ban: every entry needs its own sourceUrl, because
+    // the weekly quality gate treats a shared source across two reports as a
+    // duplicate (scripts/lib/quality-gate.mjs).
+    sourceUrl: 'https://www.wko.at/transport/lkw-wochenendfahrverbot',
+    sourceName: 'WKO - Wochenend- und Nachtfahrverbot',
+    legalBasis: 'Austrian nationwide night driving ban (Nachtfahrverbot), StVO sections 42 and 45',
+    vehicleScope: 'Goods vehicles above 7.5t maximum authorised weight (hzG) - Lkw with and without trailer, and articulated vehicles',
+    routeScope: 'Nationwide Austrian road network, all roads',
+    exemptionNotes:
+      'Low-noise vehicles carrying the Austrian "L-Tafel" next to the front number plate are exempt, as are road-service and Bundesheer vehicles. The L-Tafel requires a manufacturer confirmation and must be re-verified every two years.',
+    lastVerified: '2026-08-31',
+    additionalSources: [
+      { name: 'WKO - Lkw-Fahrverbote in Oesterreich: Ueberblick', url: 'https://www.wko.at/transport/lkw-fahrverbote-oesterreich-ueberblick' },
+    ],
+    resolve(weekStart) {
+      const mondayIso = fmt(weekStart);
+      const sundayIso = fmt(addDays(weekStart, 6));
+      return {
+        occurrences: [
+          {
+            title: `Nationwide night driving ban (${humanRange(mondayIso, sundayIso)})`,
+            whatChanged:
+              'The standing nationwide night driving ban applies every night of the week to goods vehicles above 7.5t hzG, on all Austrian roads. On Sundays and public holidays the weekend ban runs straight into it with no gap.',
+            validFrom: mondayIso,
+            validTo: sundayIso,
+            timeWindow: 'Every night 22:00-05:00, all seven nights of the week',
+            impact:
+              'Affected vehicles cannot operate anywhere in Austria overnight without the "L-Tafel" low-noise exemption. During the same hours, goods vehicles above 7.5t hzG are additionally capped at 60 km/h unless signs state otherwise.',
+            recommendedAction:
+              'Confirm whether the vehicle carries a valid "L-Tafel" before planning an Austrian night leg - without it the night is unusable - and remember the 60 km/h night cap when estimating run times.',
+            additionalSources: this.additionalSources,
+          },
+        ],
+      };
+    },
+  },
+
+  {
+    id: 'hr-summer-coastal-restrictions',
+    country: 'HR',
+    countryName: 'Croatia',
+    // The season is fixed in the Naredba itself (15 June - 15 September)
+    // rather than republished as a dated list each year, so this is a
+    // standing rule and needs no per-year seeding.
+    kind: 'standing-rule',
+    sourceUrl: 'https://www.hak.hr/info/korisne-informacije/zabrane-za-teretna-vozila/',
+    sourceName: 'HAK - Naredba o ogranicenju prometa na cestama',
+    legalBasis:
+      'Naredba o ogranicenju prometa na cestama, point I - summer-season restriction on designated state roads and the Split and Zadar ferry ports (15 June - 15 September)',
+    vehicleScope:
+      'Goods vehicles with or without trailer above 7.5t maximum permitted mass, AND vehicles longer than 14 m alone or in combination - plus tractors, working machines, vehicles unable to exceed 40 km/h and driving-school vehicles. The length criterion catches combinations that the weight threshold alone would miss.',
+    routeScope:
+      'State roads D8, D9, D21, D23, D39, D66, D200, D300 and county road Z5002, plus the approaches and surfaces of the Split and Zadar state ferry ports. Motorways are NOT covered. Excluded sections: D8 from the D27 junction (Sibenik bridge) to the eastern entrance to Sibenik and from the Bilice roundabout in Solin to the Stobrec terminal junction, and D21 from Kanfanar to Pula.',
+    exemptionNotes:
+      'The Naredba exempts emergency and escorted vehicles, police and armed forces, road/utility maintenance, post and press deliveries, broadcast vehicles, drinking-water tankers, emergency materials, concrete/asphalt/motor-fuel carriers, perishable foodstuffs and live animals; anything else needs a permit from the police administration where the journey starts or enters Croatia. Separately and year-round, point III restricts vehicles above 7.5t on state road D2 between Varazdin and the Dubrava Krizovljanska border crossing on Sundays 06:00-22:00, and a permanent routing restriction (NN 20/2019) bars vehicles above 7.5t from listed road sections where a better alternative exists - an exceptional-transport permit may expressly authorise those roads.',
+    lastVerified: '2026-08-31',
+    seasonFromMonthDay: '06-15',
+    seasonToMonthDay: '09-15',
+    additionalSources: [
+      { name: 'Narodne novine 20/2019 - Pravilnik o ogranicavanju uporabe pojedinih javnih cesta', url: 'https://narodne-novine.nn.hr/clanci/sluzbeni/2019_02_20_426.html' },
+    ],
+    resolve(weekStart) {
+      const saturday = addDays(weekStart, 5);
+      const sunday = addDays(weekStart, 6);
+      if (!inSeason(saturday, this.seasonFromMonthDay, this.seasonToMonthDay)) return { occurrences: [] };
+      const saturdayIso = fmt(saturday);
+      const sundayIso = fmt(sunday);
+      return {
+        occurrences: [
+          {
+            title: `Summer coastal and Istrian weekend restrictions (${humanRange(saturdayIso, sundayIso)})`,
+            whatChanged:
+              'The summer restriction on the designated Istrian and Adriatic state roads and on the Split and Zadar ferry ports applies. It runs to 15 September, so it outlasts most other national summer regimes.',
+            validFrom: saturdayIso,
+            validTo: sundayIso,
+            timeWindow: `Saturday ${humanDate(saturdayIso)} 04:00-14:00; Sunday ${humanDate(sundayIso)} 12:00-23:00`,
+            impact:
+              'Affected vehicles cannot use the listed state roads or the two ferry-port approaches during either window. Motorways are outside the restriction, so a coastal leg can usually be rerouted rather than paused.',
+            recommendedAction:
+              'Route via the motorway network rather than the listed coastal and Istrian state roads during the windows, and check the excluded sections (Sibenik, Solin-Stobrec, Kanfanar-Pula) before assuming a detour is needed. Note the separate year-round D2 Sunday restriction if routing through Varazdin.',
+            additionalSources: this.additionalSources,
+          },
+        ],
+      };
+    },
+  },
+
+  {
+    id: 'es-dgt-2026-summer-sunday-measures',
+    country: 'ES',
+    countryName: 'Spain',
+    kind: 'annual-calendar',
+    validYear: 2026,
+    sourceUrl: 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-1255',
+    sourceName: 'BOE - Resolucion de 14 de enero de 2026, Direccion General de Trafico',
+    legalBasis:
+      'DGT Resolution of 14 January 2026, annex II - restrictions on vehicles above 7,500 kg, vehicles requiring complementary authorisation, and special vehicles',
+    vehicleScope:
+      'Vehicles and combinations above 7,500 kg MMA/MMC - and, expressly, vehicles requiring complementary authorisation and special vehicles (annex II covers paragraphs b.1.1 and b.3.1), so an abnormal-load movement is caught even where the ordinary weight test would not decide it',
+    routeScope:
+      'Route-specific. For the Sunday/public-holiday summer period: the Madrid-inbound corridors A-1, A-2, A-3, A-5, A-6, AP-6, N-6, AP-51, AP-61, N-110, N-603 and M-501, plus A-45 (Malaga - Alto Las Pedrizas), A-49 (both directions) and N-630 (El Garrobo - Camas)',
+    exemptionNotes:
+      "Annex II exempts live-animal transport, ATP perishable goods (which must fill at least half the vehicle's useful load capacity or volume), Correos universal-postal-service vehicles Monday to Friday, winter de-icing material and roadside-assistance vehicles. ADR movements have their own separate restrictions in annex V, which apply on top of annex II above 7,500 kg. Hours are per road section - always check the annex II row for the specific corridor.",
+    lastVerified: '2026-08-31',
+    seasonFrom: '2026-06-28',
+    seasonTo: '2026-09-06',
+    resolve(weekStart, _weekEnd, year) {
+      if (year !== this.validYear) {
+        return {
+          maintenanceError: `No ${year} DGT special traffic-measures resolution seeded (last seeded: the 14 January 2026 resolution for ${this.validYear}). Seed the ${year} resolution before publishing a Spain report.`,
+        };
+      }
+      const sundayIso = fmt(addDays(weekStart, 6));
+      if (sundayIso < this.seasonFrom || sundayIso > this.seasonTo) return { occurrences: [] };
+      const isFinal = sundayIso === this.seasonTo;
+      return {
+        occurrences: [
+          {
+            title: `${isFinal ? 'Final summer' : 'Summer'} Sunday traffic restrictions (${humanDate(sundayIso)})`,
+            whatChanged: isFinal
+              ? `The DGT summer period of Sunday and public-holiday restrictions ends on this date - ${humanDate(this.seasonTo)} is the last day it covers. The Madrid-inbound evening windows apply for the last time.`
+              : 'The DGT summer period restricts vehicles above 7,500 kg, vehicles needing complementary authorisation and special vehicles on the listed corridors every Sunday and public holiday, mainly in the evening return peak into Madrid.',
+            validFrom: sundayIso,
+            validTo: sundayIso,
+            timeWindow:
+              'Madrid-inbound corridors 21:00-23:00 (A-5 21:00-24:00); A-45 towards Cordoba 17:00-24:00; A-49 15:00-24:00; N-630 (El Garrobo - Camas) 10:00-14:00',
+            impact:
+              'Affected vehicles are held off the listed corridors during the applicable window. The restriction targets the evening return peak rather than the whole day, but it explicitly reaches special vehicles and complementary-authorisation movements, not just vehicles over 7,500 kg.',
+            recommendedAction:
+              'Check the annex II row for the exact corridor being used - the hours are not uniform - and plan an abnormal-load movement around the 21:00-23:00 Madrid-inbound window rather than assuming the weight threshold decides it.',
+          },
+        ],
+      };
+    },
+  },
+
+  {
+    id: 'it-adr-class-1-7-summer-ban',
+    country: 'IT',
+    countryName: 'Italy',
+    kind: 'annual-calendar',
+    validYear: 2026,
+    // The decree PDF itself, deliberately distinct from the landing page used
+    // by it-md-325-2025-calendar - see the note on at-night-driving-ban.
+    sourceUrl:
+      'https://www.mit.gov.it/nfsmitgov/files/media/normativa/2026-01/DM_325.12-12-2025%20calendario%20mezzi%20pesanti%202026.pdf',
+    sourceName: 'MIT - Decreto ministeriale n. 325 del 12 dicembre 2025 (testo)',
+    legalBasis: 'Article 12 of Ministerial Decree 325 of 12 December 2025 - transport of dangerous goods during prohibition periods',
+    vehicleScope:
+      "ANY vehicle carrying ADR class 1 (explosives) or class 7 (radioactive) goods, in any quantity, regardless of the vehicle's maximum gross mass - article 12 is expressly not a 7.5t-threshold rule",
+    routeScope: 'Nationwide, in addition to the ordinary calendar in allegato A',
+    exemptionNotes:
+      'Article 12(2) allows narrow derogations, including explosives moved for proven operational necessity - and even then the Prefettura (Ufficio Territoriale del Governo) for the area where the journey starts or enters Italy must be notified for each transport.',
+    lastVerified: '2026-08-31',
+    seasonFrom: '2026-05-23',
+    seasonTo: '2026-09-06',
+    resolve(weekStart, _weekEnd, year) {
+      if (year !== this.validYear) {
+        return {
+          maintenanceError: `No ${year} Italian dangerous-goods (article 12) period seeded (last seeded: Decree 325/2025 for ${this.validYear}).`,
+        };
+      }
+      const saturdayIso = fmt(addDays(weekStart, 5));
+      const sundayIso = fmt(addDays(weekStart, 6));
+      if (sundayIso < this.seasonFrom || saturdayIso > this.seasonTo) return { occurrences: [] };
+      const isFinal = sundayIso === this.seasonTo;
+      return {
+        occurrences: [
+          {
+            title: `${isFinal ? 'Final weekend of the ' : ''}ADR class 1 and class 7 weekend ban (${humanRange(saturdayIso, sundayIso)})`,
+            whatChanged: isFinal
+              ? `The decree's separate dangerous-goods restriction covers every Saturday and Sunday from ${humanDate(this.seasonFrom)} to ${humanDate(this.seasonTo)} - this is the last weekend it applies. It binds any quantity of ADR class 1 or class 7 goods regardless of vehicle mass.`
+              : `On top of the ordinary calendar in allegato A, the decree bans movement of ADR class 1 and class 7 goods every Saturday and Sunday from ${humanDate(this.seasonFrom)} to ${humanDate(this.seasonTo)}, in any quantity and regardless of the vehicle's mass.`,
+            validFrom: saturdayIso,
+            validTo: sundayIso,
+            timeWindow: `Saturday ${humanDate(saturdayIso)} 08:00-24:00; Sunday ${humanDate(sundayIso)} 00:00-24:00`,
+            impact:
+              'Explosives and radioactive consignments are blocked for effectively the whole weekend - a wider window than the ordinary Sunday goods-vehicle ban, and it catches light vehicles that the 7.5t calendar does not.',
+            recommendedAction:
+              'Do not plan an Italian class 1 or class 7 movement across this weekend on the assumption that the ordinary calendar applies - it is wider and mass-independent. If relying on the article 12(2) derogation, notify the relevant Prefettura for each transport.',
+          },
+        ],
+      };
+    },
+  },
 ];
 
 export function getCalendarById(id) {
