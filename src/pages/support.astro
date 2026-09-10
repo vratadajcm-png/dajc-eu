@@ -1,17 +1,37 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
+const revolutPaymentLink = 'https://checkout.revolut.com/pay/f4dadeed-6fd2-45fc-822d-51bc1c74da05';
 const lnurl = 'lnurl1dp68gurn8ghj7amhwuhxzmnevdhkjm3wvdaz7ctsdyhkc6t8dp6xu6twvuhkcmn4wfkz7c3svsexgcnrvykk2cfsxvkngdfjvvknjcmzx5knzde3x5ergepsvejkgdg2espjg';
 const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
 ---
 <BaseLayout
-  title="Support DAJC.eu — Bitcoin & Lightning"
-  description="Support the independent operation and development of DAJC.eu with a voluntary Bitcoin or Lightning contribution."
+  title="Support DAJC.eu — Card, Bitcoin & Lightning"
+  description="Support the independent operation and development of DAJC.eu with a voluntary contribution by card, Bitcoin or Lightning."
 >
   <main class="support">
     <p class="eyebrow">SUPPORT DAJC.EU</p>
     <h1>Support independent heavy &amp; oversized transport information</h1>
     <p class="lead">DAJC.eu is an independent project. Voluntary contributions help cover hosting, infrastructure, research and continued development of the public website.</p>
+
+    <section class="card revolut-card">
+      <div class="copy">
+        <p class="method">CARD · REVOLUT</p>
+        <h2>Support DAJC.eu with a card</h2>
+        <p>Choose your own contribution amount in EUR and complete the payment securely through Revolut checkout. Contributions are voluntary and do not create a subscription, service entitlement or investment relationship.</p>
+
+        <div class="actions">
+          <a class="button primary" href={revolutPaymentLink} target="_blank" rel="noopener noreferrer">Support DAJC.eu</a>
+        </div>
+
+        <div class="payment-meta">
+          <span>Currency: EUR</span>
+          <span>Amount: You choose</span>
+          <span>Processor: Revolut</span>
+          <span>Checkout: Secure external page</span>
+        </div>
+      </div>
+    </section>
 
     <section class="card">
       <div class="copy">
@@ -75,7 +95,7 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
     <section class="details">
       <h2>About voluntary contributions</h2>
       <p>Contributions support DAJC.eu only. They are not payments for goods or services and do not provide ownership, financial return, priority access or other contractual benefits.</p>
-      <p>Bitcoin and Lightning contributions are processed through the Anycoin.cz infrastructure configured for DAJC.eu. Anycoin-specific limits, security controls and terms may apply.</p>
+      <p>Card contributions are processed by Revolut. Bitcoin and Lightning contributions are processed through the Anycoin.cz infrastructure configured for DAJC.eu. Provider-specific limits, security controls, privacy notices and terms may apply.</p>
       <p>See the <a href="/terms">Terms of Use &amp; Voluntary Contributions</a> and <a href="/privacy">Privacy Notice</a>.</p>
     </section>
   </main>
@@ -178,8 +198,16 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
     background: rgba(255,255,255,0.03);
   }
 
+  .revolut-card,
   .onchain-card {
     grid-template-columns: 1fr;
+  }
+
+  .revolut-card {
+    margin-bottom: 1.25rem;
+  }
+
+  .onchain-card {
     margin-top: 1.25rem;
   }
 
@@ -244,6 +272,7 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
     margin-top: 1.25rem;
   }
 
+  .payment-meta,
   .onchain-meta {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -267,6 +296,7 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
     .qr-wrap { order: -1; }
     .actions { flex-direction: column; }
     .button { width: 100%; }
+    .payment-meta,
     .onchain-meta { grid-template-columns: 1fr; }
   }
 </style>
