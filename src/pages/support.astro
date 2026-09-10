@@ -15,11 +15,13 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
     <p class="lead">DAJC.eu is an independent project. Voluntary contributions help cover hosting, infrastructure, research and continued development of the public website.</p>
 
     <section class="method-grid" aria-label="Contribution methods">
-      <article class="method-card">
-        <p class="method">CARD · REVOLUT</p>
-        <h2>Card</h2>
-        <p>Choose your own amount in EUR and continue to Revolut secure checkout.</p>
-        <a class="button primary" href={revolutPaymentLink} target="_blank" rel="noopener noreferrer">Support with card</a>
+      <article class="method-card revolut-method">
+        <div>
+          <p class="method">CARD · REVOLUT</p>
+          <h2>Card</h2>
+          <p>Choose your own amount in EUR and continue to Revolut secure checkout.</p>
+        </div>
+        <a class="method-action" href={revolutPaymentLink} target="_blank" rel="noopener noreferrer">Open</a>
       </article>
 
       <details class="method-card payment-details">
@@ -29,7 +31,7 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
             <strong>Lightning</strong>
             <small>Fast Bitcoin payment via Lightning Network</small>
           </span>
-          <span class="summary-action">Open</span>
+          <span class="method-action summary-action">Open</span>
         </summary>
         <div class="detail-content lightning-layout">
           <div>
@@ -62,7 +64,7 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
             <strong>Bitcoin on-chain</strong>
             <small>Standard Bitcoin transfer to the DAJC.eu address</small>
           </span>
-          <span class="summary-action">Open</span>
+          <span class="method-action summary-action">Open</span>
         </summary>
         <div class="detail-content">
           <p>Use this permanent Bitcoin address for a standard on-chain BTC transfer from a compatible wallet or exchange.</p>
@@ -182,12 +184,18 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
   .method-card {
     border: 1px solid var(--dajc-line);
     background: rgba(255,255,255,0.03);
-    padding: clamp(1.25rem, 4vw, 2rem);
     border-radius: 10px;
   }
 
-  article.method-card h2 { margin-bottom: 0.55rem; }
-  article.method-card .button { margin-top: 1rem; }
+  .revolut-method {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: clamp(1.25rem, 4vw, 2rem);
+  }
+  .revolut-method h2 { margin-bottom: 0.55rem; }
+  .revolut-method p:last-child { margin-bottom: 0; }
 
   .payment-details { padding: 0; overflow: hidden; }
   .payment-details > summary {
@@ -211,13 +219,22 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
     color: var(--dajc-muted);
     font: 12px/1.5 'IBM Plex Mono', monospace;
   }
-  .summary-action {
+
+  .method-action {
     flex: 0 0 auto;
-    color: var(--dajc-dark);
-    background: var(--dajc-orange);
+    width: 92px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    border: 1px solid var(--dajc-orange);
     border-radius: 8px;
     padding: 0.7rem 0.9rem;
+    color: var(--dajc-dark);
+    background: var(--dajc-orange);
     font: 600 12px 'IBM Plex Mono', monospace;
+    text-decoration: none;
   }
   .payment-details[open] .summary-action::after { content: ' details'; }
 
@@ -250,7 +267,9 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
   .secondary { background: transparent; color: var(--dajc-orange); }
   .tertiary { border-color: var(--dajc-line); background: transparent; color: var(--dajc-muted); }
   .button:hover,
-  .button:focus-visible { transform: translateY(-1px); }
+  .button:focus-visible,
+  .method-action:hover,
+  .method-action:focus-visible { transform: translateY(-1px); }
 
   .status { min-height: 1.4em; margin-top: 0.8rem; font: 12px 'IBM Plex Mono', monospace; }
   .warning {
@@ -297,11 +316,13 @@ const btcAddress = 'bc1qc0xd7rtvzefgkeettvrrkvgzgee405nkqdcm6s';
 
   @media (max-width: 760px) {
     .support { width: min(100% - 2rem, 1040px); padding-top: 3rem; }
+    .revolut-method,
     .payment-details > summary { align-items: flex-start; }
     .lightning-layout { grid-template-columns: 1fr; }
     .qr-wrap { order: -1; }
     .actions { flex-direction: column; }
     .button { width: 100%; }
     .payment-meta { grid-template-columns: 1fr; }
+    .method-action { width: 92px; min-width: 92px; }
   }
 </style>
