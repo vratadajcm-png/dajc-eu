@@ -12,6 +12,10 @@ This is the **single editorial authority** for the automated DAJC.eu weekly Euro
 - Unreachable sources remain visible as `checked-source-availability-limited`; never silently convert them to "no change".
 - Direct local official sources are preferred. Where none is available, an explicit administering-country fallback is allowed and remains visible in the coverage audit.
 
+### Published lead order — Central Europe first
+
+Research coverage remains Europe-wide, but the published lead order is operator-first. Among substantively comparable verified items, lead with the wider Central-European transport core: **Czechia, Germany, Austria, Slovakia, Poland, Hungary, Switzerland and Slovenia**. Then place directly connected high-value transit corridors and the rest of Europe. Peripheral territories such as Madeira, Guernsey, Jersey or Monaco belong later in the article / Rest of Europe unless a genuinely critical exceptional-transport event justifies elevation. Geographic preference must never make weak material publishable or outrank a materially more important verified change.
+
 ## 2. Source discovery
 
 - RSS/Atom is **not** complete coverage and must never be the only discovery channel.
@@ -19,6 +23,7 @@ This is the **single editorial authority** for the automated DAJC.eu weekly Euro
 - Feed and web results are merged, detail pages are enriched, and results are deduplicated by official source URL.
 - Primary/official sources are required for permits, legal rules, escorts, route/weight/dimension limits and other high-impact regulatory claims whenever available.
 - Generic landing pages, image-only URLs, stale archive pages, unrelated permits/administration and non-operational statistics are excluded.
+- **Discovery date is not publication freshness.** A page first discovered this week is not a new development merely because the crawler found it now. Completed civic/school projects, old archive pages, generic infrastructure achievements and historical announcements without a current operational consequence are excluded.
 
 ## 3. Publication format — hard counts
 
@@ -34,19 +39,9 @@ The Rest-of-Europe items are deliberately short: country/jurisdiction, what chan
 
 ## 4. Critical-news floor
 
-Fresh verified high-signal changes directly affecting exceptional/oversized transport are **required coverage**, including:
-
-- permit rules or permit systems,
-- private/police escort rules,
-- exceptional-transport movement conditions,
-- border/transit restrictions,
-- weight/width/height/axle limits,
-- route authorisations,
-- directly relevant toll/digital procedures.
+Fresh verified high-signal changes directly affecting exceptional/oversized transport are **required coverage**, including permit rules or permit systems, private/police escort rules, exceptional-transport movement conditions, border/transit restrictions, weight/width/height/axle limits, route authorisations, and directly relevant toll/digital procedures.
 
 Required critical items are reserved before normal shortlist ranking. If a verified critical source is absent from both lead reports and Rest of Europe, publication is blocked.
-
-The Swiss ASTRA exceptional-transport/private-escort change identified in August 2026 is the reference incident this rule is designed to prevent from recurring.
 
 ## 5. Driving-ban rule from 1 September 2026
 
@@ -67,25 +62,18 @@ A road or motorway closure is publishable only when official evidence proves a *
 
 Other non-closure restrictions such as weight, width, height, axle, permit, escort or route-authorisation changes are evaluated on their own operational significance and are not subject to the 30-day closure threshold.
 
-## 7. Relevance and verification
+## 7. Relevance, freshness and verification
 
 Every published item must demonstrably relate to heavy, abnormal, oversized or special road transport, freight routing, relevant tolling, vehicle/route limits, escorts, borders, ports/ferries/project cargo, heavy-haul equipment, or another directly operational DAJC intelligence topic.
 
-Exclude:
-- driver-licence/auto-school administration,
-- environmental/water-law permits unrelated to transport,
-- crime/theft/accident/breakdown incidents,
-- procurement/tender noise,
-- generic authority pages,
-- toll revenue/statistics without an operational rule change,
-- stale historical archive material,
-- ordinary short roadworks/closures.
+Exclude driver-licence/auto-school administration, environmental/water-law permits unrelated to transport, crime/theft/accident/breakdown incidents, procurement/tender noise, generic authority pages, toll revenue/statistics without an operational rule change, stale historical archive material, ordinary short roadworks/closures, completed school/public-building renovations, generic completed civic projects, and infrastructure announcements whose only claimed relevance is a theoretical future logistics benefit.
 
-Every source URL is cross-validated against the verified candidate set. Every report contains a concrete operator/dispatcher action.
+Every source URL is cross-validated against the verified candidate set. Every report contains a concrete operator/dispatcher action. Unknown or undated generic infrastructure material must not be used to satisfy the lead minimum.
 
 ## 8. Publication schedule and preview
 
 - Normal final edition: Friday at **12:00 Europe/Prague**, covering the upcoming Monday–Sunday week.
+- A policy-aware run may start immediately before 12:00 so verification/generation can complete around the publication slot; the standard run and watchdog remain idempotent recovery layers.
 - Saturday catch-up runs only if the final week article is missing.
 - Final publication is idempotent; an existing final week file is not automatically overwritten.
 - A manually requested **preview** uses the same research, verification, counts, quality gates and article layout, but a separate preview slug. It never consumes or blocks Friday's final slug.
@@ -95,7 +83,7 @@ Every source URL is cross-validated against the verified candidate set. Every re
 
 1. SEO title, publication date and covered week.
 2. Standfirst / executive summary.
-3. 20–30 substantive lead reports with What changed / Where / When / Impact / Action.
+3. 20–30 substantive lead reports, ordered Central Europe first among substantively comparable items, with What changed / Where / When / Impact / Action.
 4. Rest of Europe — minimum 10 concise reports from minimum 6 jurisdictions.
 5. Critical European corridors when materially relevant.
 6. 30-day outlook when materially relevant.
@@ -107,6 +95,6 @@ Every source URL is cross-validated against the verified candidate set. Every re
 
 Every item must answer:
 
-> Why does this matter to someone planning or executing heavy, abnormal, oversized or special transport?
+> Why does this matter **now** to someone planning or executing heavy, abnormal, oversized or special transport?
 
-If there is no meaningful answer, exclude it.
+If there is no meaningful current operational answer, exclude it. A newly discovered old page is not news.
