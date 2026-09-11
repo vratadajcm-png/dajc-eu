@@ -1,0 +1,68 @@
+name: Publish Weekly Oversize - Editorial Policy
+
+# Policy-aware primary run starts just before the public 12:00 Europe/Prague slot.
+# The existing 12:00 workflow and watchdog remain idempotent recovery layers.
+on:
+  schedule:
+    - cron: '55 9 * * 5'  # 11:55 CEST
+    - cron: '55 10 * * 5' # 11:55 CET / 12:55 CEST recovery identity
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: oversize-weekly-publish
+  cancel-in-progress: false
+
+jobs:
+  publish-policy-aware:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve Prague-time trigger
+        id: gate
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          offset=$(TZ=Europe/Prague date +%z)
+          schedule="${{ github.event.schedule }}"
+          if { [ "$offset" = "+0200" ] && [ "$schedule" = "55 9 * * 5" ]; } || { [ "$offset" = "+0100" ] && [ "$schedule" = "55 10 * * 5" ]; }; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
+      - name: Check target publication
+        if: steps.gate.outputs.run == 'true'
+        id: needed
+        run: node scripts/check-weekly-publication.mjs
+      - name: Apply DAJC editorial policy
+        if: steps.gate.outputs.run == 'true' && steps.needed.outputs.needed == 'true'
+        run: node scripts/apply-weekly-editorial-policy.mjs
+      - name: Verify API key
+        if: steps.gate.outputs.run == 'true' && steps.needed.outputs.needed == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: test -n "$OPENAI_API_KEY"
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.run == 'true' && steps.needed.outputs.needed == 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        if: steps.gate.outputs.run == 'true' && steps.needed.outputs.needed == 'true'
+      - name: Final data refresh
+        if: steps.gate.outputs.run == 'true' && steps.needed.outputs.needed == 'true'
+        run: npm run oversize:monitor
+      - name: Generate policy-compliant Weekly
+        if: steps.gate.outputs.run == 'true' && steps.needed.outputs.needed == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: node scripts/run-weekly-publisher.mjs
+      - name: Publish
+        if: steps.gate.outputs.run == 'true' && steps.needed.outputs.needed == 'true'
+        run: node scripts/publish-gate-commit.mjs
