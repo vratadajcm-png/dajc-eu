@@ -1,0 +1,72 @@
+name: Emergency Weekly Oversize Publish
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/emergency-weekly-publish.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: oversize-weekly-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check whether target week is already published
+        id: publish-needed
+        run: node scripts/check-weekly-publication.mjs
+
+      - name: Pre-flight - verify OPENAI_API_KEY is configured
+        if: steps.publish-needed.outputs.needed == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::OPENAI_API_KEY repository secret is not set."
+            exit 1
+          fi
+          echo "Pre-flight OK: OPENAI_API_KEY is configured (value not printed)."
+
+      - name: Setup Node
+        if: steps.publish-needed.outputs.needed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.publish-needed.outputs.needed == 'true'
+        run: npm ci
+
+      - name: Final data refresh
+        if: steps.publish-needed.outputs.needed == 'true'
+        run: npm run oversize:monitor
+
+      - name: Generate weekly article
+        if: steps.publish-needed.outputs.needed == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: node scripts/run-weekly-publisher.mjs
+
+      - name: Commit new article and refreshed data
+        if: steps.publish-needed.outputs.needed == 'true'
+        run: node scripts/publish-gate-commit.mjs
+
+      - name: Publication outcome
+        if: always()
+        run: |
+          if [ "${{ steps.publish-needed.outputs.needed }}" = "false" ]; then
+            echo "Outcome: target article already exists; no-op."
+          elif [ "${{ job.status }}" = "success" ]; then
+            echo "Outcome: emergency publication pipeline completed successfully."
+          else
+            echo "Outcome: emergency publication pipeline failed; inspect failed step."
+          fi
