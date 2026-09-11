@@ -1,6 +1,6 @@
 {
   "week": "2026-W37",
-  "checkedAt": "2026-09-10T10:25:24.166Z",
+  "checkedAt": "2026-09-11T10:22:28.708Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -268,11 +268,15 @@
         "de-autobahn"
       ],
       "reachableSources": [
-        "de-polizei-blaulicht",
-        "de-autobahn"
+        "de-polizei-blaulicht"
       ],
-      "unavailableSources": [],
-      "candidateFindings": 18
+      "unavailableSources": [
+        {
+          "id": "de-autobahn",
+          "error": "HTTP 403"
+        }
+      ],
+      "candidateFindings": 20
     },
     {
       "code": "GR",
@@ -413,7 +417,7 @@
       "code": "LT",
       "name": "Lithuania",
       "sourceScope": "LT",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "configuredSources": [
         "lt-vialietuva"
       ],
@@ -421,7 +425,7 @@
         "lt-vialietuva"
       ],
       "unavailableSources": [],
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "LU",
@@ -477,7 +481,7 @@
         "mc-gouv"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "ME",
