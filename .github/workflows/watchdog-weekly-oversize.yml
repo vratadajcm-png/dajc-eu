@@ -1,0 +1,110 @@
+name: Watchdog Weekly Oversize Publication
+
+# Independent safety net for the Friday EU Oversize Weekly publication.
+# GitHub scheduled workflows can occasionally be delayed or skipped, so this
+# watchdog runs separately from publish-weekly-oversize.yml and only performs
+# publication work when the target week's article is still missing.
+#
+# Two UTC pairs cover Europe/Prague in both CEST and CET. The local-time gate
+# prevents the "wrong" DST pair from doing work before 12:15 Prague time.
+
+on:
+  schedule:
+    - cron: '20 10 * * 5' # 12:20 CEST / 11:20 CET
+    - cron: '40 10 * * 5' # 12:40 CEST / 11:40 CET
+    - cron: '20 11 * * 5' # 13:20 CEST / 12:20 CET
+    - cron: '40 11 * * 5' # 13:40 CEST / 12:40 CET
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: oversize-weekly-publish
+  cancel-in-progress: false
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether watchdog may run
+        id: gate
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "Manual watchdog run enabled."
+            exit 0
+          fi
+
+          local_dow=$(TZ=Europe/Prague date +%u)
+          local_hm=$(TZ=Europe/Prague date +%H%M)
+          echo "Europe/Prague local time: $(TZ=Europe/Prague date '+%Y-%m-%d %H:%M:%S %Z')"
+
+          if [ "$local_dow" = "5" ] && [ "$local_hm" -ge 1215 ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "Friday after 12:15 Prague time - watchdog enabled."
+          else
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "Outside watchdog publication window - intentional no-op."
+          fi
+
+      - name: Checkout
+        if: steps.gate.outputs.should_run == 'true'
+        uses: actions/checkout@v4
+
+      - name: Check whether target week is already published
+        if: steps.gate.outputs.should_run == 'true'
+        id: publish-needed
+        run: node scripts/check-weekly-publication.mjs
+
+      - name: Pre-flight - verify OPENAI_API_KEY is configured
+        if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::OPENAI_API_KEY repository secret is not set."
+            exit 1
+          fi
+          echo "Pre-flight OK: OPENAI_API_KEY is configured (value not printed)."
+
+      - name: Setup Node
+        if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        run: npm ci
+
+      - name: Final data refresh
+        if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        run: npm run oversize:monitor
+
+      - name: Generate weekly article
+        if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: node scripts/run-weekly-publisher.mjs
+
+      - name: Commit new article and refreshed data
+        if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        run: node scripts/publish-gate-commit.mjs
+
+      - name: Watchdog outcome
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.gate.outputs.should_run }}" != "true" ]; then
+            echo "Outcome: watchdog intentionally inactive for this trigger."
+          elif [ "${{ steps.publish-needed.outputs.needed }}" = "false" ]; then
+            echo "Outcome: target weekly article already exists; no action needed."
+          elif [ "${{ job.status }}" = "success" ]; then
+            echo "Outcome: watchdog recovered the missing weekly publication successfully."
+          else
+            echo "Outcome: watchdog recovery failed; inspect the failed step above."
+            exit 1
+          fi
