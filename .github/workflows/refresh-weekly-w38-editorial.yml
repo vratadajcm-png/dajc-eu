@@ -1,0 +1,41 @@
+name: Refresh W38 Editorial Quality
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/refresh-weekly-w38-editorial.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: oversize-weekly-publish
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply corrected editorial policy
+        run: node scripts/apply-weekly-editorial-policy.mjs
+      - name: Remove existing W38 only in workspace for atomic regeneration
+        run: rm -f src/content/news/eu-oversize/eu-oversize-weekly-2026-w38.md
+      - name: Verify API key
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: test -n "$OPENAI_API_KEY"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Refresh source monitoring
+        run: npm run oversize:monitor
+      - name: Regenerate W38 from verified candidates
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: node scripts/run-weekly-publisher.mjs
+      - name: Commit corrected W38 atomically
+        run: node scripts/publish-gate-commit.mjs
