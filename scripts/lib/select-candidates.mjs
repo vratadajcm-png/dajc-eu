@@ -3,11 +3,6 @@ import { checkLongRoadClosure } from './closure-duration.mjs';
 import { checkTransportDomainRelevance } from './transport-domain.mjs';
 import { isCriticalWeeklyCandidate } from './critical-floor.mjs';
 
-// Pre-selection pass before verification and OpenAI synthesis.
-// The weekly edition now targets a much broader Europe-wide intelligence
-// surface, so the candidate pool must be large enough to support 20-30 leads
-// plus Around Europe without favouring a handful of high-volume sources.
-
 const SPECIFIC_TYPES = new Set([
   'permit_change', 'permit_system', 'driving_ban', 'escort_requirement',
   'police_escort', 'border_restriction', 'bridge_restriction',
@@ -18,6 +13,8 @@ const SPECIFIC_TYPES = new Set([
   'equipment', 'market', 'project_cargo', 'industry_project',
 ]);
 
+const CENTRAL_EUROPE = /^(czechia|czech republic|germany|austria|slovakia|poland|hungary|switzerland|slovenia)$/i;
+const CONNECTED_CORE = /^(croatia|italy|france|belgium|netherlands|luxembourg|romania)$/i;
 const MAX_PER_SOURCE = 6;
 const MAX_TOTAL = 80;
 
@@ -47,6 +44,13 @@ export function selectCandidates(findings, { discoveryWindowStart } = {}) {
     if (f.summary && f.summary.length > 40) score += 1;
     if (f.impact) score += 1;
     if (f.recommendedAction) score += 1;
+
+    // DAJC operator-first presentation preference. This affects ranking only;
+    // all relevance, verification and quality gates still apply unchanged.
+    const country = String(f.country || '');
+    if (CENTRAL_EUROPE.test(country)) score += 12;
+    else if (CONNECTED_CORE.test(country)) score += 5;
+
     return { finding: f, score };
   });
 
