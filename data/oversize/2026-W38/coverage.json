@@ -1,6 +1,6 @@
 {
   "week": "2026-W38",
-  "checkedAt": "2026-09-14T11:32:00.501Z",
+  "checkedAt": "2026-09-15T10:52:35.887Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -214,14 +214,17 @@
       "code": "FI",
       "name": "Finland",
       "sourceScope": "FI",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "fi-vayla"
       ],
-      "reachableSources": [
-        "fi-vayla"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "fi-vayla",
+          "error": "HTTP 403"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -269,7 +272,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 14
     },
     {
       "code": "GR",
@@ -706,14 +709,17 @@
       "code": "UA",
       "name": "Ukraine",
       "sourceScope": "UA",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "ua-restoration"
       ],
-      "reachableSources": [
-        "ua-restoration"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "ua-restoration",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -744,7 +750,7 @@
         "va-state"
       ],
       "unavailableSources": [],
-      "candidateFindings": 3
+      "candidateFindings": 4
     },
     {
       "code": "AX",
@@ -814,7 +820,7 @@
         "je-roadclosures"
       ],
       "unavailableSources": [],
-      "candidateFindings": 5
+      "candidateFindings": 6
     },
     {
       "code": "IM",
@@ -1062,56 +1068,68 @@
       "code": "YT",
       "name": "Mayotte",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "yt-prefecture"
       ],
-      "reachableSources": [
-        "yt-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "yt-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "MF",
       "name": "Saint-Martin",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "mf-bl-prefecture"
       ],
-      "reachableSources": [
-        "mf-bl-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "mf-bl-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "BL",
       "name": "Saint-Barthélemy",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "bl-prefecture"
       ],
-      "reachableSources": [
-        "bl-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "bl-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "PM",
       "name": "Saint-Pierre-et-Miquelon",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "pm-prefecture"
       ],
-      "reachableSources": [
-        "pm-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "pm-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -1146,14 +1164,17 @@
       "code": "WF",
       "name": "Wallis and Futuna",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "wf-prefecture"
       ],
-      "reachableSources": [
-        "wf-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "wf-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
