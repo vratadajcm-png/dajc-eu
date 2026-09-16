@@ -1,6 +1,6 @@
 {
   "week": "2026-W38",
-  "checkedAt": "2026-09-15T10:52:35.887Z",
+  "checkedAt": "2026-09-16T10:41:56.844Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -141,14 +141,17 @@
       "code": "HR",
       "name": "Croatia",
       "sourceScope": "HR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "hr-hrvatske-ceste"
       ],
-      "reachableSources": [
-        "hr-hrvatske-ceste"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "hr-hrvatske-ceste",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 7
     },
     {
@@ -214,17 +217,14 @@
       "code": "FI",
       "name": "Finland",
       "sourceScope": "FI",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "fi-vayla"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "fi-vayla",
-          "error": "HTTP 403"
-        }
+      "reachableSources": [
+        "fi-vayla"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -653,14 +653,17 @@
       "code": "ES",
       "name": "Spain",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -709,17 +712,14 @@
       "code": "UA",
       "name": "Ukraine",
       "sourceScope": "UA",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "ua-restoration"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "ua-restoration",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "ua-restoration"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -736,7 +736,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "VA",
@@ -930,28 +930,34 @@
       "code": "CEU",
       "name": "Ceuta",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "MLL",
       "name": "Melilla",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -986,14 +992,17 @@
       "code": "CAN",
       "name": "Canary Islands",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -1306,7 +1315,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "SCT",
@@ -1322,7 +1331,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "WLS",
@@ -1338,7 +1347,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "NIR",
@@ -1354,7 +1363,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "FBIH",
@@ -1450,42 +1459,51 @@
       "code": "CAT",
       "name": "Catalonia",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "BAS",
       "name": "Basque Country",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "GAL",
       "name": "Galicia",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
