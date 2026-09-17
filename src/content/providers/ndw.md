@@ -2,7 +2,7 @@
 name: "NDW"
 slug: "ndw"
 category: "Road Intelligence"
-status: "hidden"
+status: "active"
 order: 60
 publicStatusLabel: "Integration in progress"
 logoApproved: false
