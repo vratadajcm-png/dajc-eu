@@ -2,7 +2,7 @@
 name: "ESPORG"
 slug: "esporg"
 category: "Secure Truck Parking"
-status: "active"
+status: "hidden"
 order: 110
 publicStatusLabel: "In discussion"
 logoApproved: false
