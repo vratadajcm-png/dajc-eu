@@ -4,6 +4,7 @@ description: "Why DAJC is being built from real heavy and oversized transport op
 slug: "why-dajc-exists"
 category: "platform"
 publishedAt: 2026-08-18
+updatedAt: 2026-09-17
 language: "en"
 author: "DAJC"
 status: "published"
@@ -37,6 +38,26 @@ The goal is better coordination.
 
 A transport should remain understandable from planning through execution and delivery, while approved information remains controlled and changes can be traced instead of silently replacing the agreed state.
 
+## From coordination to trusted commitment
+
+As the architecture develops, the D-ID is also being designed to preserve the commercial and legal state of a transport, not only its operational data.
+
+The current pre-pilot design includes a controlled contract-commitment state, change and cancellation handling, jurisdiction-driven legal and compliance document preparation, document versioning and integrity evidence, multi-party signing and a provider-neutral identity and trust layer.
+
+The purpose is to keep the agreed transport state, the documents that support it and later amendments connected to the same D-ID revision history. Execution still remains subject to the required funding, permit, safety and other operational gates.
+
+These capabilities are architecture and development scope. They are not a claim that every jurisdiction, legal template or trust-service connection is already production-ready.
+
+## Preparing the D-ID for eFTI
+
+DAJC has also added a formal eFTI certification-readiness programme.
+
+The design keeps the D-ID as the canonical transport record and treats eFTI as a regulated projection of the relevant D-ID revision. Only the required regulatory information should be exposed through the applicable eFTI workflow, with identity, authorisation, validation, selective disclosure and audit evidence around it.
+
+The target direction is hybrid first, with DAJC's own eFTI platform certification as the longer-term objective where the final EU rules and conformity-assessment route make it applicable.
+
+Certification-readiness is not certification. DAJC will not present itself as eFTI-certified unless and until verifiable certificate evidence exists.
+
 ## Built in stages, not presented as finished before it is ready
 
 DAJC is being developed gradually around real operational needs.
@@ -67,4 +88,4 @@ DAJC is still evolving.
 
 But the direction remains the same:
 
-**one transport order, one D-ID, with the authorised participants, documents, operational state and relevant transport intelligence connected around the same European transport workflow.**
+**one transport order, one D-ID, with the authorised participants, contractual state, documents, operational state and relevant transport intelligence connected around the same European transport workflow.**
