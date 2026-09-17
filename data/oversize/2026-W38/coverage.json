@@ -1,6 +1,6 @@
 {
   "week": "2026-W38",
-  "checkedAt": "2026-09-16T10:41:56.844Z",
+  "checkedAt": "2026-09-17T10:50:04.401Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -141,17 +141,14 @@
       "code": "HR",
       "name": "Croatia",
       "sourceScope": "HR",
-      "status": "checked-source-availability-limited",
+      "status": "checked-major-or-short-update-candidates-found",
       "configuredSources": [
         "hr-hrvatske-ceste"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "hr-hrvatske-ceste",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "hr-hrvatske-ceste"
       ],
+      "unavailableSources": [],
       "candidateFindings": 7
     },
     {
@@ -272,7 +269,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 14
+      "candidateFindings": 16
     },
     {
       "code": "GR",
@@ -421,7 +418,7 @@
         "lt-vialietuva"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 3
     },
     {
       "code": "LU",
@@ -477,7 +474,7 @@
         "mc-gouv"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "ME",
@@ -653,17 +650,14 @@
       "code": "ES",
       "name": "Spain",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -930,34 +924,28 @@
       "code": "CEU",
       "name": "Ceuta",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "MLL",
       "name": "Melilla",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -992,17 +980,14 @@
       "code": "CAN",
       "name": "Canary Islands",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -1459,51 +1444,42 @@
       "code": "CAT",
       "name": "Catalonia",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "BAS",
       "name": "Basque Country",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "GAL",
       "name": "Galicia",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
