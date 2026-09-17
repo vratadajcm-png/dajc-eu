@@ -14,6 +14,8 @@ export const PROVIDER_CATEGORIES = [
   'Infrastructure',
   'Defence & Military Mobility',
   'Customs & Transit',
+  'Digital Freight & eFTI',
+  'Identity, Trust & Signatures',
 ] as const;
 
 export type ProviderCategory = (typeof PROVIDER_CATEGORIES)[number];
