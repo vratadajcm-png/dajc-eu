@@ -2,7 +2,7 @@
 name: "DKV"
 slug: "dkv"
 category: "Payments"
-status: "active"
+status: "hidden"
 order: 130
 publicStatusLabel: "Integration in progress"
 logoApproved: false
