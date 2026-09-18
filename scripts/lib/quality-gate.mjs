@@ -14,6 +14,16 @@ const MIN_ROUNDUP_COUNTRIES = 6;
 const MAX_ROUNDUP_REPORTS = 20;
 const MIN_RECOMMENDED_ACTION_LENGTH = 10;
 
+const INTERNAL_EDITORIAL_LEAK_PATTERNS = [
+  /\bonly\s+\*?\*?\d+\s+(?:substantive\s+)?reports?\b/i,
+  /\bnormal\s+20[–-]30\s+lead\s+target\b/i,
+  /\b10[–-]15[- ]item\s+rest\s+of\s+europe\b/i,
+  /\bverified\s+candidate\s+pool\b/i,
+  /\bdoes\s+not\s+pad\s+this\s+edition\b/i,
+  /\bquality\s+gate\b/i,
+  /\binternal\s+editorial\b/i,
+];
+
 function normalizeTitle(title) {
   return String(title || '')
     .toLowerCase()
@@ -48,6 +58,15 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
     errors.push('article body is empty');
   } else if (body.trim().length < MIN_BODY_LENGTH) {
     errors.push(`article body is suspiciously short (${body.trim().length} chars, minimum ${MIN_BODY_LENGTH})`);
+  }
+
+  if (body) {
+    for (const pattern of INTERNAL_EDITORIAL_LEAK_PATTERNS) {
+      if (pattern.test(body)) {
+        errors.push('public article contains internal DAJC editorial/publishing mechanics');
+        break;
+      }
+    }
   }
 
   if (items.length < MIN_REPORTS) {
