@@ -93,6 +93,9 @@ This is a professional, change-driven Europe-wide intelligence report for people
 GEOGRAPHIC PRINCIPLE
 The upstream DAJC monitor is intended to scan the complete DAJC European coverage area, including smaller countries, territories and relevant jurisdictions. Never favour EU, Schengen, DACH, Western Europe or major transit markets merely because they publish more English-language material. Selection is evidence-led and operational-impact-led.
 
+PUBLIC OUTPUT RULE — INTERNAL EDITORIAL MECHANICS MUST NEVER APPEAR IN PUBLIC TEXT
+The reader must never see internal DAJC publishing mechanics. Do not mention candidate/report counts, target counts such as 20–30 or 10–15, editorial thresholds, quality gates, retries, verification pool size, source-pool insufficiency, padding/filler decisions, workflow behavior, or why an edition contains fewer items. These rules are internal only. Public copy should contain operational intelligence and user-facing context, not commentary about how DAJC generated or selected the article.
+
 EDITORIAL SCOPE
 Relevant subjects include abnormal/oversize permits; heavy-transport weight and axle rules; exceptional restrictions; escort/private escort/police escort requirements; route authorisations; bridges/tunnels and structural restrictions; dimensions and axle loads; borders/customs/non-EU transit; long-term special-transport-relevant roadworks; ports/ferries/RoRo/project cargo; weather restrictions; wind/heat/snow limits; permit digitalisation; tolling; abnormal-load portals; routing systems; e-CMR; tachograph/enforcement; ADR where relevant; heavy-haul tractors; low-loaders/modular trailers/SPMTs; cranes; escort technology; telematics/routing APIs; AI tools; manufacturers; material acquisitions/insolvencies/capacity shifts; and major energy/industrial/infrastructure projects that generate abnormal-load demand.
 
