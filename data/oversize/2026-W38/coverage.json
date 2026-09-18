@@ -1,6 +1,6 @@
 {
   "week": "2026-W38",
-  "checkedAt": "2026-09-17T10:50:04.401Z",
+  "checkedAt": "2026-09-18T10:11:02.629Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -269,7 +269,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 16
+      "candidateFindings": 21
     },
     {
       "code": "GR",
@@ -474,7 +474,7 @@
         "mc-gouv"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "ME",
@@ -814,7 +814,7 @@
         "je-roadclosures"
       ],
       "unavailableSources": [],
-      "candidateFindings": 6
+      "candidateFindings": 7
     },
     {
       "code": "IM",
