@@ -1,6 +1,6 @@
 ---
 title: "EU Oversize Weekly: 21–27 September 2026"
-description: "Verified operational changes for heavy, abnormal and exceptional road transport in Europe for 21–27 September 2026. No routine truck-driving bans and no filler."
+description: "Verified operational changes for heavy, abnormal and exceptional road transport in Europe for 21–27 September 2026."
 slug: "eu-oversize-weekly-2026-w39"
 category: "eu-oversize"
 publishedAt: 2026-09-18
@@ -22,7 +22,6 @@ sources:
 
 This edition covers **21–27 September 2026** and contains only changes that could be verified as operationally relevant to heavy, abnormal or exceptional road transport. Routine national or Sunday **Driving/Truck Bans are intentionally excluded** because DAJC maintains them separately.
 
-Only **9 substantive reports** met the freshness, evidence and exceptional-transport relevance threshold. DAJC therefore does **not** pad this edition to the normal 20–30 lead target, and it does not create a 10–15-item Rest of Europe section from stale, generic or weak material.
 
 ## Wider Central Europe
 
@@ -136,9 +135,6 @@ Only **9 substantive reports** met the freshness, evidence and exceptional-trans
 
 *Source: [Agentschap Wegen en Verkeer — Uitzonderlijk vervoer wegenwerken](https://wegenenverkeer.be/zakelijk/uitzonderlijk-vervoer/wegenwerken)*
 
-## Rest of Europe
-
-No additional items are published in this edition. The verified candidate pool did **not** contain enough further fresh, specific and operationally relevant heavy/oversize changes to justify a 10–15-item roundup without using stale information, generic roadworks or filler.
 
 ## Dispatcher checklist
 
@@ -150,6 +146,3 @@ No additional items are published in this edition. The verified candidate pool d
 - Re-plan Scheldelaan / Kruisschansweg movements before the 27 September phase change.
 - Confirm a legal exceptional-transport alternative around Machelen A1/E19 before dispatch.
 
-## Editorial note
-
-DAJC Weekly is change-driven. Routine Driving/Truck Bans are maintained separately and are not repeated here. A lower report count is preferable to publishing old, generic or weakly related material.
