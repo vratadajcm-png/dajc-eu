@@ -1,6 +1,6 @@
 {
   "week": "2026-W38",
-  "checkedAt": "2026-09-18T10:11:02.629Z",
+  "checkedAt": "2026-09-19T10:09:47.747Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -34,14 +34,17 @@
       "code": "AM",
       "name": "Armenia",
       "sourceScope": "AM",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "am-road-department"
       ],
-      "reachableSources": [
-        "am-road-department"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "am-road-department",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 2
     },
     {
@@ -269,7 +272,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 21
+      "candidateFindings": 26
     },
     {
       "code": "GR",
@@ -474,7 +477,7 @@
         "mc-gouv"
       ],
       "unavailableSources": [],
-      "candidateFindings": 3
+      "candidateFindings": 4
     },
     {
       "code": "ME",
@@ -994,136 +997,112 @@
       "code": "GP",
       "name": "Guadeloupe",
       "sourceScope": "FR",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "gp-prefecture"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "gp-prefecture",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "gp-prefecture"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "MQ",
       "name": "Martinique",
       "sourceScope": "FR",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "mq-prefecture"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "mq-prefecture",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "mq-prefecture"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "GF",
       "name": "French Guiana",
       "sourceScope": "FR",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "gf-prefecture"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "gf-prefecture",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "gf-prefecture"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "RE",
       "name": "Réunion",
       "sourceScope": "FR",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "re-prefecture"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "re-prefecture",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "re-prefecture"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "YT",
       "name": "Mayotte",
       "sourceScope": "FR",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "yt-prefecture"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "yt-prefecture",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "yt-prefecture"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "MF",
       "name": "Saint-Martin",
       "sourceScope": "FR",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "mf-bl-prefecture"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "mf-bl-prefecture",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "mf-bl-prefecture"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "BL",
       "name": "Saint-Barthélemy",
       "sourceScope": "FR",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "bl-prefecture"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "bl-prefecture",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "bl-prefecture"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "PM",
       "name": "Saint-Pierre-et-Miquelon",
       "sourceScope": "FR",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "pm-prefecture"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "pm-prefecture",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "pm-prefecture"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -1158,17 +1137,14 @@
       "code": "WF",
       "name": "Wallis and Futuna",
       "sourceScope": "FR",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "wf-prefecture"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "wf-prefecture",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "wf-prefecture"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
