@@ -1,6 +1,6 @@
 {
   "week": "2026-W38",
-  "checkedAt": "2026-09-19T10:09:47.747Z",
+  "checkedAt": "2026-09-20T10:28:00.828Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -34,17 +34,14 @@
       "code": "AM",
       "name": "Armenia",
       "sourceScope": "AM",
-      "status": "checked-source-availability-limited",
+      "status": "checked-major-or-short-update-candidates-found",
       "configuredSources": [
         "am-road-department"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "am-road-department",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "am-road-department"
       ],
+      "unavailableSources": [],
       "candidateFindings": 2
     },
     {
@@ -272,7 +269,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 26
+      "candidateFindings": 30
     },
     {
       "code": "GR",
@@ -292,14 +289,17 @@
       "code": "HU",
       "name": "Hungary",
       "sourceScope": "HU",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "hu-kozut"
       ],
-      "reachableSources": [
-        "hu-kozut"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "hu-kozut",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
