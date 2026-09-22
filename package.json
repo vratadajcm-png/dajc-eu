@@ -29,5 +29,13 @@
     "drizzle-kit": "^0.31.10",
     "typescript": "^5.7.3",
     "vitest": "^4.1.11"
+  },
+  "overrides": {
+    "@vercel/routing-utils": {
+      "path-to-regexp": "6.3.0"
+    },
+    "@esbuild-kit/core-utils": {
+      "esbuild": "^0.25.12"
+    }
   }
 }

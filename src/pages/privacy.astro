@@ -29,7 +29,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <section>
       <h2>Privacy-friendly traffic measurement</h2>
       <p>DAJC uses privacy-oriented traffic statistics to understand whether public content is useful and how visitors move from the public website to the demo. The measurement is not used for advertising, behavioural profiling or cross-site tracking.</p>
-      <p>The first-party DAJC traffic digest records aggregated page or screen views, a browser-session start, the referring hostname, coarse country, device category and UTM campaign labels when a campaign link contains them. The collector does not read or store IP addresses in DAJC traffic aggregates, does not use tracking cookies and does not create a persistent visitor identifier.</p>
+      <p>The first-party DAJC traffic digest records aggregated page or screen views, a browser-session start, the referring hostname, coarse country, device category and UTM campaign labels when a campaign link contains them. It also counts clicks on the Live Demo link on dajc.eu and, in the demo, how often the "Get early access" dialog is opened and its email link is clicked; what you write in an email is never recorded. Page views from search-engine crawlers are not counted, and an hourly technical check that contains no visitor data confirms that the collector is available. The collector does not read or store IP addresses in DAJC traffic aggregates, does not use tracking cookies and does not create a persistent visitor identifier.</p>
       <p>A temporary <code>sessionStorage</code> flag is used only in the current browser tab to avoid counting every page as a new session. It disappears when the tab session ends. Browser Do Not Track (DNT) and Global Privacy Control (GPC) signals are respected by this first-party measurement.</p>
     </section>
 
@@ -40,7 +40,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     <section>
       <h2>Demo application data</h2>
-      <p>Operational data shown in the public demo is synthetic. Changes you make inside the demo remain in your browser unless the demo explicitly tells you otherwise. Traffic measurement does not send transport orders, documents, chat messages or other demo workspace content to the analytics collector.</p>
+      <p>Operational data shown in the public demo is synthetic; please enter test data only. Changes you make inside the demo remain in your browser's local storage until you reset the demo, unless the demo explicitly tells you otherwise. Traffic measurement does not send transport orders, documents, chat messages or other demo workspace content to the analytics collector.</p>
     </section>
 
     <section>
