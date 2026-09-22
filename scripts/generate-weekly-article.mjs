@@ -33,7 +33,7 @@ import { generateArticleMock } from './lib/mock-generator.mjs';
 import { renderArticleMarkdown, toFrontmatterYaml } from './lib/render-article.mjs';
 import { runQualityGate } from './lib/quality-gate.mjs';
 import { checkOpenAiKeyPreflight } from './lib/preflight.mjs';
-import { formatNextPublicationLabel } from './lib/next-publication.mjs';
+import { formatNextPublicationLabel, publicationSlotFor, targetWeekDateFor } from './lib/next-publication.mjs';
 import { resolveDrivingBanFindings } from './lib/driving-ban-calendar.mjs';
 import { crossValidateDevelopments } from './lib/cross-validate.mjs';
 import { ensureOfficialCalendarLeadFloor } from './lib/lead-floor.mjs';
@@ -107,8 +107,12 @@ async function main() {
   const now = process.env.OVERSIZE_NOW ? new Date(process.env.OVERSIZE_NOW) : new Date();
   const thisWeek = isoWeekLabel(now);
 
-  const nextWeekDate = new Date(now);
-  nextWeekDate.setUTCDate(nextWeekDate.getUTCDate() + 7);
+  // The article is prepared ahead of its Friday 12:00 Europe/Prague slot
+  // (normally on Thursday) and carries that slot as `publishedAt`; the site
+  // only shows it from that instant on. The target week is the one after the
+  // publication Friday, whatever day this run happens on.
+  const publicationSlot = publicationSlotFor(now);
+  const nextWeekDate = targetWeekDateFor(publicationSlot);
   const nextWeekLabel = isoWeekLabel(nextWeekDate);
   const weekRangeLabel = isoWeekRangeLabel(nextWeekDate);
   const targetWeekStart = isoWeekStart(nextWeekDate);
@@ -119,6 +123,7 @@ async function main() {
   console.log(`EU Oversize Weekly generator - ${now.toISOString()}`);
   console.log(`Reading findings from ISO week: ${thisWeek}`);
   console.log(`${preview ? 'Publishing PREVIEW for' : 'Publishing for upcoming week'}: ${nextWeekLabel} (${weekRangeLabel})`);
+  if (!preview) console.log(`Public from: ${publicationSlot.toISOString()} (Friday 12:00 Europe/Prague)`);
   console.log(mock ? 'Mode: MOCK (no OpenAI call, no cost)' : 'Mode: LIVE (calls OpenAI API)');
   if (dryRun) {
     console.log('DRY RUN: will generate, validate and build the article, then discard it - nothing will be committed.');
@@ -371,8 +376,10 @@ async function main() {
     article.intro = `PREVIEW EDITION — published early to demonstrate the production Friday format. Friday's final edition will be rebuilt from the complete week's monitoring.\n\n${article.intro}`;
   }
 
-  const publishedAt = now.toISOString().slice(0, 10);
-  const nextPublicationLabel = formatNextPublicationLabel(now);
+  // A preview is public as soon as it is deployed; the final edition waits
+  // for its Friday slot.
+  const publishedAt = (preview ? now : publicationSlot).toISOString();
+  const nextPublicationLabel = formatNextPublicationLabel(publicationSlot);
   const { frontmatter, body } = renderArticleMarkdown(article, { slug, publishedAt, nextPublicationLabel });
 
   console.log('\nRunning quality gate...');

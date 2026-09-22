@@ -19,7 +19,7 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['src/portal/__tests__/**/*.test.ts', 'scripts/lib/__tests__/**/*.test.mjs'],
+    include: ['src/portal/__tests__/**/*.test.ts', 'src/config/__tests__/**/*.test.ts', 'scripts/lib/__tests__/**/*.test.mjs'],
     environment: 'node',
   },
 });

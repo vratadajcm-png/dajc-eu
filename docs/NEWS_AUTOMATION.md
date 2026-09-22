@@ -41,7 +41,8 @@ src/content/news/platform/          published (and draft template) articles
 src/content.config.ts               Astro content collection schema
 .github/workflows/
   daily-oversize-monitor.yml
-  publish-weekly-oversize.yml       Friday noon + Saturday catch-up, idempotent
+  publish-weekly-oversize.yml       Thursday preparation + Fri/Sat recovery, idempotent
+  watchdog-weekly-oversize.yml      Thursday evening / Friday morning safety net
 ```
 
 The homepage renders `News` before `Integration ecosystem`, so current
@@ -367,20 +368,52 @@ Vercel's standard Astro defaults.
 
 ## Weekly synthesis (Friday pipeline)
 
-The primary publication target is **Friday at 12:00 Europe/Prague**. GitHub
-Actions still needs two UTC cron expressions for CET/CEST, but the workflow
-no longer checks the runner's current hour. Instead it selects the correct
-Friday cron from the **Prague UTC offset and the cron identity**. Therefore
-a GitHub delay that starts the runner at 23:00 still executes the intended
-Friday publication instead of silently becoming a green no-op.
+The public release is **Friday at 12:00 Europe/Prague**.
 
-A separate **Saturday 06:00 UTC catch-up** trigger runs the same pipeline.
-Before dependency installation or any OpenAI work,
-`scripts/check-weekly-publication.mjs` checks the week-specific target
-article. If Friday already published it, the catch-up/duplicate run exits as
-an explicitly reported idempotent no-op; if the article is missing, it
-retries the real publication flow. `workflow_dispatch` remains available
-for manual dry-runs or emergency publication.
+### Thursday preparation, Friday 12:00 release
+
+GitHub delivers this repository's scheduled runs hours late (about four
+hours since late August 2026: Friday "10:00 UTC" crons started around
+14:00 UTC, and the W38/W39 editions only went out thanks to hand-made
+emergency workflows). Any design that needs a runner *at* 12:00 is
+therefore unreliable, and redundant crons don't help because they all share
+the same delayed scheduler.
+
+The pipeline is split instead:
+
+1. **Preparation (Thursday).** `publish-weekly-oversize.yml` runs on Thursday
+   early morning, with Thursday retries, a Friday-early retry and the
+   independent `watchdog-weekly-oversize.yml` (Thursday evening, Friday
+   early). The generator writes the article with
+   `publishedAt` = the Friday 12:00 Europe/Prague instant as a UTC timestamp
+   (e.g. `2026-09-25T10:00:00.000Z`, CET/CEST handled by
+   `publicationSlotFor()` in `scripts/lib/next-publication.mjs`). The commit
+   deploys to Vercel right away.
+2. **Release (Friday 12:00, no job involved).** The homepage, `/news` and
+   `/news/eu-oversize/<slug>` are rendered on demand (`prerender = false`)
+   and filter with `isNewsEntryPublic()` (`src/config/news.ts`): an article
+   is shown only once `publishedAt` has passed. Before that the article URL
+   returns 404. Responses are CDN-cached with
+   `s-maxage=60, stale-while-revalidate=60`, so the edition appears within
+   about two minutes of 12:00.
+
+If the quality gate rejects the edition on Thursday, the failed run notifies
+by email and there is a day left to fix it and re-run the workflow
+manually. A recovery run on Friday after 12:00 or on Saturday still uses the
+same Friday slot as `publishedAt`, which is then already in the past, so the
+article goes live as soon as it is deployed.
+
+Every trigger runs `scripts/check-weekly-publication.mjs` first (before
+dependency installation or any OpenAI work). It checks for the target
+week's article - the ISO week after the run's publication Friday - and
+turns the run into a reported idempotent no-op if it already exists.
+`workflow_dispatch` remains available for manual dry-runs, previews (public
+immediately) or emergency publication.
+
+Because the article pages are no longer prerendered, `astro.config.mjs`
+adds the EU Oversize article URLs that are public at build time to the
+sitemap; a prepared article joins the sitemap on the next deploy after its
+release.
 
 A successful scheduled run pushes the new article commit straight to
 `main`, which the existing Vercel Git integration deploys automatically -
@@ -434,8 +467,9 @@ commit always proceeds to a normal build+deploy).
    script exits non-zero - the repository is left exactly as it was found.
 
 The article's title/date range targets the week *after* the one whose
-data was read (e.g. an article generated Friday in ISO week 2026-W34
-covers 2026-W35), matching a Friday briefing about the week ahead.
+data was read (e.g. an article prepared on Thursday in ISO week 2026-W34
+and released on that Friday covers 2026-W35), matching a Friday briefing
+about the week ahead.
 
 ### Duplicate rendering (fixed)
 
@@ -599,9 +633,10 @@ gh workflow run publish-weekly-oversize.yml -f dry_run=true        # safe test, 
 
 Or from the GitHub UI: Actions tab -> select the workflow -> "Run
 workflow" (the `dry_run` checkbox is there for `publish-weekly-oversize.yml`).
-Manual runs always skip the Europe/Prague time check regardless of
-`dry_run` (see the workflow file's comments for why the schedule itself
-fires twice on Fridays) - only the commit step is gated on `dry_run`.
+A manual real publish is prepared exactly like the Thursday run: when run
+before Friday 12:00 Europe/Prague, the article stays hidden until then; when
+run later, it goes live on deploy. Only the commit step is gated on
+`dry_run`.
 
 **Recommended first real test**: run with `dry_run=true` and a real
 `OPENAI_API_KEY` configured. This exercises the entire pipeline - including

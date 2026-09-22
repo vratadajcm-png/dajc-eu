@@ -1,19 +1,24 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import ArticleDetail from '../../../components/ArticleDetail.astro';
+import { isNewsEntryPublic, NEWS_PAGE_CACHE_CONTROL } from '../../../config/news';
 
-export async function getStaticPaths() {
-  const entries = await getCollection('eu-oversize', ({ data }) => data.status === 'published');
-  return entries.map((entry) => ({
-    params: { slug: entry.data.slug },
-    props: { entry },
-  }));
+// Rendered on demand (CDN-cached) instead of prerendered: the weekly article
+// is committed ahead of its Friday 12:00 Europe/Prague slot and must appear
+// exactly then, without depending on a rebuild at that moment.
+export const prerender = false;
+
+const now = new Date();
+const entry = (await getCollection('eu-oversize', ({ data }) => isNewsEntryPublic(data, now))).find(
+  (candidate) => candidate.data.slug === Astro.params.slug
+);
+
+Astro.response.headers.set('Cache-Control', NEWS_PAGE_CACHE_CONTROL);
+if (!entry) {
+  return new Response('Not found', {
+    status: 404,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': NEWS_PAGE_CACHE_CONTROL },
+  });
 }
-
-interface Props {
-  entry: CollectionEntry<'eu-oversize'>;
-}
-
-const { entry } = Astro.props;
 ---
 <ArticleDetail entry={entry} categoryLabel="EU Oversize Weekly" />

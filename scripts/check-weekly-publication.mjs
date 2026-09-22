@@ -10,14 +10,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { isoWeekLabel } from './lib/week.mjs';
+import { publicationSlotFor, targetWeekDateFor } from './lib/next-publication.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
 function targetFor(now = new Date()) {
-  const nextWeekDate = new Date(now);
-  nextWeekDate.setUTCDate(nextWeekDate.getUTCDate() + 7);
-  const nextWeekLabel = isoWeekLabel(nextWeekDate);
+  // Same target as generate-weekly-article.mjs: the week after this run's
+  // Friday 12:00 Europe/Prague publication slot.
+  const nextWeekLabel = isoWeekLabel(targetWeekDateFor(publicationSlotFor(now)));
   const slug = `eu-oversize-weekly-${nextWeekLabel.toLowerCase()}`;
   const relativePath = path.join('src', 'content', 'news', 'eu-oversize', `${slug}.md`);
   return { nextWeekLabel, relativePath, absolutePath: path.join(ROOT, relativePath) };
