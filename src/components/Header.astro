@@ -13,6 +13,7 @@
     <a href="/news">News</a>
     <a href="/pricing">Pricing</a>
     <a href="/support">Support</a>
+    <a class="testing-cta" href="/testing">Testing 2027</a>
     <a class="demo-cta" href="https://demo.dajc.eu" target="_blank" rel="noopener">Live Demo</a>
   </nav>
 </header>
@@ -69,6 +70,24 @@
   nav a:hover,
   nav a:focus-visible {
     color: var(--dajc-orange);
+  }
+
+  nav a.testing-cta {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.8rem;
+    border: 1px solid var(--dajc-orange);
+    border-radius: 7px;
+    color: var(--dajc-orange);
+    font-weight: 600;
+  }
+
+  nav a.testing-cta:hover,
+  nav a.testing-cta:focus-visible {
+    color: var(--dajc-orange);
+    transform: translateY(-1px);
   }
 
   nav a.demo-cta {
