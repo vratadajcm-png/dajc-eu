@@ -1,4 +1,8 @@
 ---
+// Rendered per request (cached at the edge for an hour) so the list always
+// covers the next two months from today, not from the last deploy.
+export const prerender = false;
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { dajcEuropeCoverage, dajcCoverageMpz } from '../../config/europe-coverage.mjs';
 import { drivingBanCalendars, restrictionTypesOf } from '../../config/driving-ban-calendars/runtime.mjs';
@@ -16,18 +20,22 @@ const jurisdictions = dajcEuropeCoverage
   }));
 
 const DAY = 86_400_000;
-// The page is prerendered, so the window follows the build date: the
-// current month plus the next one. Entries that have already ended are
-// hidden client-side (see the script below).
-const buildDate = new Date();
-const previewFrom = new Date(Date.UTC(buildDate.getUTCFullYear(), buildDate.getUTCMonth(), 1));
-const previewTo = new Date(Date.UTC(buildDate.getUTCFullYear(), buildDate.getUTCMonth() + 2, 0, 23, 59, 59));
+// Window: today through the same day two months later (clamped to the
+// month's last day, e.g. 31 December -> 28/29 February).
+const now = new Date();
+const previewFrom = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+const lastDayOfTargetMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 3, 0)).getUTCDate();
+const previewTo = new Date(Date.UTC(
+  now.getUTCFullYear(),
+  now.getUTCMonth() + 2,
+  Math.min(now.getUTCDate(), lastDayOfTargetMonth),
+  23, 59, 59,
+));
 const isoDate = (date: Date) => date.toISOString().slice(0, 10);
-const monthLabel = (date: Date, withYear: boolean) =>
-  date.toLocaleString('en-GB', { month: 'long', timeZone: 'UTC', ...(withYear ? { year: 'numeric' } : {}) });
-const previewLabel = previewFrom.getUTCFullYear() === previewTo.getUTCFullYear()
-  ? `${monthLabel(previewFrom, false)}–${monthLabel(previewTo, true)}`
-  : `${monthLabel(previewFrom, true)}–${monthLabel(previewTo, true)}`;
+const dayLabel = (date: Date) =>
+  date.toLocaleString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const previewLabel = `the next 2 months (${dayLabel(previewFrom)} – ${dayLabel(previewTo)})`;
+const downloadLabel = 'next 2 months';
 const previewFromIso = isoDate(previewFrom);
 const previewToIso = isoDate(previewTo);
 const mondayOnOrBefore = (date: Date) => {
@@ -96,6 +104,8 @@ for (let week = mondayOnOrBefore(previewFrom); week <= previewTo; week = new Dat
     }
   }
 }
+
+Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400');
 
 restrictionPreview.sort((a, b) =>
   a.validFrom.localeCompare(b.validFrom)
@@ -194,7 +204,7 @@ restrictionPreview.sort((a, b) =>
       <h2 id="calendar-title">4. Add the restrictions to your calendar</h2>
       <p id="selection-summary" class="summary">Select at least one jurisdiction.</p>
       <div class="actions">
-        <a id="download-link" class="action primary is-disabled" aria-disabled="true" data-from={previewFromIso} data-to={previewToIso}>Download {previewLabel} .ics</a>
+        <a id="download-link" class="action primary is-disabled" aria-disabled="true" data-from={previewFromIso} data-to={previewToIso}>Download {downloadLabel} .ics</a>
         <a id="subscribe-link" class="action is-disabled" aria-disabled="true">Subscribe to the live calendar</a>
       </div>
       <div class="feed-box">
