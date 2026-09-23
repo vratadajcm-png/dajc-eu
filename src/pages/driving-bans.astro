@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { dajcEuropeCoverage, dajcCoverageMpz } from '../../config/europe-coverage.mjs';
-import { drivingBanCalendars } from '../../config/driving-ban-calendars/runtime.mjs';
+import { drivingBanCalendars, restrictionTypesOf } from '../../config/driving-ban-calendars/runtime.mjs';
 
 const requestedCodes = new Set([
   'AT','AL','AD','AM','AZ','BE','BG','BA','BY','CY','CZ','DE','DK','ES','EE','FR','FI','LI','UK','GE','GR','HU','HR','CH','IT','IE','IS','LU','LT','LV','MT','MC','MD','ME','NO','NL','MK','PT','PL','RO','XK','RU','SE','SK','SI','RS','TR','UA','VA','KZ','FO','AX','GI','GG','JE','IM','ALDERNEY','SBA','SVALBARD','JANMAYEN','GL','AZO','MAD','CAN','CEU','MLL','GP','MQ','GF','RE','YT','MF','BL','PM','NC','PF','WF','CLIPPERTON','TF','AW','CW','SX','BQ-BO','BQ-SA','BQ-SE'
@@ -16,9 +16,20 @@ const jurisdictions = dajcEuropeCoverage
   }));
 
 const DAY = 86_400_000;
-const previewFrom = new Date('2026-09-01T00:00:00Z');
-const previewTo = new Date('2026-10-31T23:59:59Z');
+// The page is prerendered, so the window follows the build date: the
+// current month plus the next one. Entries that have already ended are
+// hidden client-side (see the script below).
+const buildDate = new Date();
+const previewFrom = new Date(Date.UTC(buildDate.getUTCFullYear(), buildDate.getUTCMonth(), 1));
+const previewTo = new Date(Date.UTC(buildDate.getUTCFullYear(), buildDate.getUTCMonth() + 2, 0, 23, 59, 59));
 const isoDate = (date: Date) => date.toISOString().slice(0, 10);
+const monthLabel = (date: Date, withYear: boolean) =>
+  date.toLocaleString('en-GB', { month: 'long', timeZone: 'UTC', ...(withYear ? { year: 'numeric' } : {}) });
+const previewLabel = previewFrom.getUTCFullYear() === previewTo.getUTCFullYear()
+  ? `${monthLabel(previewFrom, false)}–${monthLabel(previewTo, true)}`
+  : `${monthLabel(previewFrom, true)}–${monthLabel(previewTo, true)}`;
+const previewFromIso = isoDate(previewFrom);
+const previewToIso = isoDate(previewTo);
 const mondayOnOrBefore = (date: Date) => {
   const result = new Date(date);
   result.setUTCDate(result.getUTCDate() - ((result.getUTCDay() + 6) % 7));
@@ -30,7 +41,7 @@ const restrictionPreview: Array<{
   key: string;
   country: string;
   countryName: string;
-  type: 'general' | 'exceptional';
+  types: string[];
   title: string;
   validFrom: string;
   validTo: string;
@@ -50,9 +61,7 @@ for (let week = mondayOnOrBefore(previewFrom); week <= previewTo; week = new Dat
   for (const rule of drivingBanCalendars as any[]) {
     if (!requestedCodes.has(rule.country)) continue;
 
-    const exceptional = /exceptional|special vehicle|oversize|abnormal|schwertransport|großraum/i.test(
-      `${rule.id} ${rule.legalBasis || ''} ${rule.vehicleScope || ''}`
-    );
+    const types = restrictionTypesOf(rule);
 
     let resolved: any;
     try {
@@ -73,7 +82,7 @@ for (let week = mondayOnOrBefore(previewFrom); week <= previewTo; week = new Dat
         key,
         country: rule.country,
         countryName: rule.countryName || rule.country,
-        type: exceptional ? 'exceptional' : 'general',
+        types,
         title: occurrence.title,
         validFrom: occurrence.validFrom,
         validTo: occurrence.validTo,
@@ -110,7 +119,7 @@ restrictionPreview.sort((a, b) =>
           <p>International vehicle registration codes are shown next to each DAJC jurisdiction.</p>
         </div>
         <div class="bulk">
-          <button type="button" id="select-all">Select all</button>
+          <button type="button" id="select-all">Select all covered</button>
           <button type="button" id="clear-all">Clear</button>
         </div>
       </div>
@@ -133,29 +142,29 @@ restrictionPreview.sort((a, b) =>
     <section class="panel" aria-labelledby="type-title">
       <h2 id="type-title">2. Choose restriction type</h2>
       <div class="type-row">
-        <label><input type="radio" name="type" value="all" checked /> All maintained HGV restrictions</label>
-        <label><input type="radio" name="type" value="general" /> General HGV / weekend / public-holiday restrictions</label>
-        <label><input type="radio" name="type" value="exceptional" /> Exceptional / special transport restrictions</label>
+        <label><input type="radio" name="type" value="all" checked /> All restrictions — HGV bans over 7.5 t plus oversize / exceptional-transport rules</label>
+        <label><input type="radio" name="type" value="general" /> Standard HGV only — without oversize-specific rules</label>
       </div>
-      <p class="note">Vehicle weight thresholds, road scope, direction and exemptions remain available inside each calendar event. Selecting a jurisdiction does not mean that every vehicle above 3.5 t is restricted there.</p>
+      <p class="note">Driving bans apply to all heavy goods vehicles, not only to oversize transport — typically above 7.5 t (Poland and Bulgaria above 12 t; Austria, Switzerland and Czechia also restrict lighter vehicles towing a trailer). Oversize and exceptional transports are bound by these general bans <em>and</em> by their own additional rules, so use “All restrictions” for them. The exact threshold, road scope, direction and exemptions are listed inside each calendar event.</p>
     </section>
 
     <section class="panel" aria-labelledby="preview-title">
       <div class="panel-head">
         <div>
           <h2 id="preview-title">3. Upcoming maintained restrictions</h2>
-          <p>Restrictions currently held in the DAJC registry for September–October 2026. Select jurisdictions or a restriction type above to filter this list.</p>
+          <p>Restrictions currently held in the DAJC registry for {previewLabel}. Select jurisdictions or a restriction type above to filter this list.</p>
         </div>
-        <p id="restriction-count" class="summary">${restrictionPreview.length} upcoming restrictions.</p>
+        <p id="restriction-count" class="summary">{restrictionPreview.length} maintained restrictions.</p>
       </div>
 
       <div id="restriction-list" class="restriction-list">
         {restrictionPreview.map((item) => (
-          <article class="restriction" data-country={item.country} data-type={item.type}>
+          <article class="restriction" data-country={item.country} data-types={item.types.join(' ')} data-valid-to={item.validTo}>
             <div class="restriction-head">
               <div>
                 <span class="restriction-country">{item.countryName}</span>
                 <h3>{item.title}</h3>
+                <span class="restriction-scope">{item.types.includes('general') ? 'All HGVs above the threshold — incl. oversize' : 'Oversize / exceptional transport only'}</span>
               </div>
               <span class="restriction-date">
                 {item.validFrom === item.validTo ? item.validFrom : `${item.validFrom} → ${item.validTo}`}
@@ -185,7 +194,7 @@ restrictionPreview.sort((a, b) =>
       <h2 id="calendar-title">4. Add the restrictions to your calendar</h2>
       <p id="selection-summary" class="summary">Select at least one jurisdiction.</p>
       <div class="actions">
-        <a id="download-link" class="action primary is-disabled" aria-disabled="true">Download September–October 2026 .ics</a>
+        <a id="download-link" class="action primary is-disabled" aria-disabled="true" data-from={previewFromIso} data-to={previewToIso}>Download {previewLabel} .ics</a>
         <a id="subscribe-link" class="action is-disabled" aria-disabled="true">Subscribe to the live calendar</a>
       </div>
       <div class="feed-box">
@@ -219,6 +228,14 @@ restrictionPreview.sort((a, b) =>
   const restrictionItems = Array.from(document.querySelectorAll<HTMLElement>('.restriction'));
   const restrictionCount = document.querySelector<HTMLElement>('#restriction-count')!;
   const restrictionEmpty = document.querySelector<HTMLElement>('#restriction-empty')!;
+  const today = new Date().toISOString().slice(0, 10);
+  const matchesType = (item: HTMLElement, type: string) => type === 'all' || (item.dataset.types || 'general').split(' ').includes(type);
+
+  // The list is prerendered at build time; drop entries that have already ended.
+  restrictionItems.forEach((item) => {
+    if ((item.dataset.validTo || '') < today) item.remove();
+  });
+  const currentItems = restrictionItems.filter((item) => item.isConnected);
 
   function update() {
     const selected = boxes.filter((b) => b.checked).map((b) => b.value);
@@ -238,9 +255,8 @@ restrictionPreview.sort((a, b) =>
       feed.value = 'Select jurisdictions to generate your live calendar URL';
 
       let visibleRestrictions = 0;
-      restrictionItems.forEach((item) => {
-        const itemType = item.dataset.type || 'general';
-        const show = type === 'all' || itemType === type;
+      currentItems.forEach((item) => {
+        const show = matchesType(item, type);
         item.hidden = !show;
         if (show) visibleRestrictions += 1;
       });
@@ -250,21 +266,16 @@ restrictionPreview.sort((a, b) =>
     }
 
     let visibleRestrictions = 0;
-    restrictionItems.forEach((item) => {
+    currentItems.forEach((item) => {
       const country = item.dataset.country || '';
-      const itemType = item.dataset.type || 'general';
-      const countryMatches = !selected.length || selected.includes(country);
-      const typeMatches = type === 'all' || itemType === type;
-      const show = countryMatches && typeMatches;
+      const show = selected.includes(country) && matchesType(item, type);
       item.hidden = !show;
       if (show) visibleRestrictions += 1;
     });
-    restrictionCount.textContent = selected.length
-      ? `${visibleRestrictions} restriction${visibleRestrictions === 1 ? '' : 's'} match the current selection.`
-      : `${visibleRestrictions} upcoming maintained restriction${visibleRestrictions === 1 ? '' : 's'}.`;
+    restrictionCount.textContent = `${visibleRestrictions} restriction${visibleRestrictions === 1 ? '' : 's'} match the current selection.`;
     restrictionEmpty.hidden = visibleRestrictions > 0;
 
-    const unavailable = boxes.filter((box) => box.checked && (box.dataset.maintained !== 'true' || !restrictionItems.some((item) => item.dataset.country === box.value && (type === 'all' || item.dataset.type === type))));
+    const unavailable = boxes.filter((box) => box.checked && (box.dataset.maintained !== 'true' || !currentItems.some((item) => item.dataset.country === box.value && matchesType(item, type))));
     if (unavailable.length || !visibleRestrictions) {
       summary.textContent = 'Coverage is unavailable for part or all of this selection. Missing data does not mean no restrictions. Select jurisdictions with maintained entries to export.';
       download.removeAttribute('href');
@@ -278,7 +289,7 @@ restrictionPreview.sort((a, b) =>
     }
 
     const countries = encodeURIComponent(selected.join(','));
-    const fixed = `/api/driving-bans.ics?countries=${countries}&type=${type}&from=2026-09-01&to=2026-10-31`;
+    const fixed = `/api/driving-bans.ics?countries=${countries}&type=${type}&from=${download.dataset.from}&to=${download.dataset.to}`;
     const rolling = `/api/driving-bans.ics?countries=${countries}&type=${type}&rolling=1`;
     const absolute = `${window.location.origin}${rolling}`;
 
@@ -295,8 +306,12 @@ restrictionPreview.sort((a, b) =>
   typeRadios.forEach((radio) => radio.addEventListener('change', update));
 
   document.querySelector('#select-all')?.addEventListener('click', () => {
+    // Only jurisdictions with current maintained entries for the chosen type:
+    // selecting uncovered ones would block the export for the whole selection.
+    const type = typeRadios.find((r) => r.checked)?.value || 'all';
     boxes.forEach((box) => {
-      if (!box.closest<HTMLElement>('.country')?.hidden) box.checked = true;
+      if (box.closest<HTMLElement>('.country')?.hidden) return;
+      box.checked = currentItems.some((item) => item.dataset.country === box.value && matchesType(item, type));
     });
     update();
   });
@@ -318,5 +333,5 @@ restrictionPreview.sort((a, b) =>
 </script>
 
 <style>
-  .ban-page{position:relative;z-index:2;max-width:1040px;margin:0 auto;padding:7vh 1.4rem 9vh}.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--dajc-orange);text-align:center;margin:0 0 1rem}h1{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);font-size:clamp(2rem,5vw,3.3rem);line-height:1.05;text-align:center;margin:0 auto 1rem;max-width:16ch}.intro{color:var(--dajc-muted);font-size:17px;line-height:1.7;text-align:center;max-width:70ch;margin:0 auto 2.5rem}.panel{border:1px solid var(--dajc-line);border-radius:16px;padding:1.4rem;margin:0 0 1rem;background:rgba(255,255,255,.025)}.panel h2{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);font-size:1.2rem;margin:0 0 .5rem}.panel p{color:var(--dajc-muted);margin:.2rem 0}.panel-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}.bulk{display:flex;gap:.5rem}.bulk button{border:1px solid var(--dajc-line);background:transparent;color:var(--dajc-white);border-radius:999px;padding:.5rem .8rem;cursor:pointer}.search-label,.feed-box label{display:block;color:var(--dajc-muted);font-size:13px;margin:1rem 0 .4rem}.search-label+input,.feed-box input{width:100%;box-sizing:border-box;border:1px solid var(--dajc-line);border-radius:8px;background:rgba(0,0,0,.18);color:var(--dajc-white);padding:.8rem;font-size:16px}.country-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;margin-top:1rem;max-height:440px;overflow:auto;padding-right:.25rem}.country{display:flex;gap:.7rem;align-items:flex-start;padding:.65rem;border:1px solid transparent;border-radius:8px;color:var(--dajc-white);cursor:pointer}.country:hover{border-color:var(--dajc-line)}.country input{margin-top:.2rem}.country span{min-width:0}.country strong,.country small{display:block}.country strong{font-size:14px}.country small{color:var(--dajc-muted);font-size:11px;margin-top:.15rem}.type-row{display:flex;flex-wrap:wrap;gap:.8rem 1.4rem;color:var(--dajc-white);margin:1rem 0}.type-row label{display:flex;align-items:center;gap:.45rem}.note{font-size:13px!important;line-height:1.6}.actions{display:flex;flex-wrap:wrap;gap:.7rem;margin:1rem 0}.action{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 1rem;border:1px solid var(--dajc-orange);border-radius:8px;color:var(--dajc-orange);text-decoration:none;font-weight:600}.action.primary{background:var(--dajc-orange);color:var(--dajc-dark)}.action.is-disabled{opacity:.35;pointer-events:none}.summary{font-family:'IBM Plex Mono',monospace;font-size:12px}.restriction-list{display:grid;gap:.8rem;margin-top:1rem;max-height:640px;overflow:auto;padding-right:.25rem}.restriction{border:1px solid var(--dajc-line);border-radius:12px;padding:1rem;background:rgba(0,0,0,.12)}.restriction[hidden]{display:none}.restriction-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;margin-bottom:.55rem}.restriction-country{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dajc-orange)}.restriction h3{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);font-size:1rem;line-height:1.35;margin:.2rem 0 0}.restriction-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dajc-muted);white-space:nowrap}.restriction p{font-size:13px!important;line-height:1.55;margin:.35rem 0!important}.restriction p strong{color:var(--dajc-white)}.restriction details{margin-top:.55rem;color:var(--dajc-muted);font-size:13px;line-height:1.55}.restriction summary{cursor:pointer;color:var(--dajc-white)}.restriction-source{display:inline-block;margin-top:.65rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dajc-orange);text-decoration:none}.restriction-source:hover{text-decoration:underline}.warning{border-left:3px solid var(--dajc-orange);padding:1rem 1.2rem;color:var(--dajc-muted);line-height:1.65;background:rgba(255,255,255,.02)}.warning strong{color:var(--dajc-white)}.intelligence-cta{margin:1.4rem 0;padding:1.5rem;border:1px solid var(--dajc-orange);border-radius:16px;background:linear-gradient(135deg,rgba(255,159,0,.08),rgba(0,38,92,.2));text-align:center}.intelligence-cta .eyebrow{margin-bottom:.5rem}.intelligence-cta h2{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);margin:0 0 .6rem}.intelligence-cta p:not(.eyebrow){max-width:62ch;margin:0 auto 1rem;color:var(--dajc-muted);line-height:1.65}.intelligence-cta a{font-family:'IBM Plex Mono',monospace;color:var(--dajc-orange);text-decoration:none;font-size:12px;text-transform:uppercase;letter-spacing:.06em}@media(max-width:760px){.country-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel-head{display:block}.bulk{margin-top:1rem}}@media(max-width:480px){.country-grid{grid-template-columns:1fr}.ban-page{padding-left:1rem;padding-right:1rem}.actions{display:grid}.action{width:100%;box-sizing:border-box}}
+  .ban-page{position:relative;z-index:2;max-width:1040px;margin:0 auto;padding:7vh 1.4rem 9vh}.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--dajc-orange);text-align:center;margin:0 0 1rem}h1{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);font-size:clamp(2rem,5vw,3.3rem);line-height:1.05;text-align:center;margin:0 auto 1rem;max-width:16ch}.intro{color:var(--dajc-muted);font-size:17px;line-height:1.7;text-align:center;max-width:70ch;margin:0 auto 2.5rem}.panel{border:1px solid var(--dajc-line);border-radius:16px;padding:1.4rem;margin:0 0 1rem;background:rgba(255,255,255,.025)}.panel h2{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);font-size:1.2rem;margin:0 0 .5rem}.panel p{color:var(--dajc-muted);margin:.2rem 0}.panel-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}.bulk{display:flex;gap:.5rem}.bulk button{border:1px solid var(--dajc-line);background:transparent;color:var(--dajc-white);border-radius:999px;padding:.5rem .8rem;cursor:pointer}.search-label,.feed-box label{display:block;color:var(--dajc-muted);font-size:13px;margin:1rem 0 .4rem}.search-label+input,.feed-box input{width:100%;box-sizing:border-box;border:1px solid var(--dajc-line);border-radius:8px;background:rgba(0,0,0,.18);color:var(--dajc-white);padding:.8rem;font-size:16px}.country-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;margin-top:1rem;max-height:440px;overflow:auto;padding-right:.25rem}.country{display:flex;gap:.7rem;align-items:flex-start;padding:.65rem;border:1px solid transparent;border-radius:8px;color:var(--dajc-white);cursor:pointer}.country:hover{border-color:var(--dajc-line)}.country input{margin-top:.2rem}.country span{min-width:0}.country strong,.country small{display:block}.country strong{font-size:14px}.country small{color:var(--dajc-muted);font-size:11px;margin-top:.15rem}.type-row{display:flex;flex-wrap:wrap;gap:.8rem 1.4rem;color:var(--dajc-white);margin:1rem 0}.type-row label{display:flex;align-items:center;gap:.45rem}.note{font-size:13px!important;line-height:1.6}.actions{display:flex;flex-wrap:wrap;gap:.7rem;margin:1rem 0}.action{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 1rem;border:1px solid var(--dajc-orange);border-radius:8px;color:var(--dajc-orange);text-decoration:none;font-weight:600}.action.primary{background:var(--dajc-orange);color:var(--dajc-dark)}.action.is-disabled{opacity:.35;pointer-events:none}.summary{font-family:'IBM Plex Mono',monospace;font-size:12px}.restriction-list{display:grid;gap:.8rem;margin-top:1rem;max-height:640px;overflow:auto;padding-right:.25rem}.restriction{border:1px solid var(--dajc-line);border-radius:12px;padding:1rem;background:rgba(0,0,0,.12)}.restriction[hidden]{display:none}.restriction-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;margin-bottom:.55rem}.restriction-country{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dajc-orange)}.restriction h3{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);font-size:1rem;line-height:1.35;margin:.2rem 0 0}.restriction-scope{display:inline-block;margin-top:.35rem;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--dajc-muted);border:1px solid var(--dajc-line);border-radius:999px;padding:.15rem .5rem}.restriction-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dajc-muted);white-space:nowrap}.restriction p{font-size:13px!important;line-height:1.55;margin:.35rem 0!important}.restriction p strong{color:var(--dajc-white)}.restriction details{margin-top:.55rem;color:var(--dajc-muted);font-size:13px;line-height:1.55}.restriction summary{cursor:pointer;color:var(--dajc-white)}.restriction-source{display:inline-block;margin-top:.65rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dajc-orange);text-decoration:none}.restriction-source:hover{text-decoration:underline}.warning{border-left:3px solid var(--dajc-orange);padding:1rem 1.2rem;color:var(--dajc-muted);line-height:1.65;background:rgba(255,255,255,.02)}.warning strong{color:var(--dajc-white)}.intelligence-cta{margin:1.4rem 0;padding:1.5rem;border:1px solid var(--dajc-orange);border-radius:16px;background:linear-gradient(135deg,rgba(255,159,0,.08),rgba(0,38,92,.2));text-align:center}.intelligence-cta .eyebrow{margin-bottom:.5rem}.intelligence-cta h2{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);margin:0 0 .6rem}.intelligence-cta p:not(.eyebrow){max-width:62ch;margin:0 auto 1rem;color:var(--dajc-muted);line-height:1.65}.intelligence-cta a{font-family:'IBM Plex Mono',monospace;color:var(--dajc-orange);text-decoration:none;font-size:12px;text-transform:uppercase;letter-spacing:.06em}@media(max-width:760px){.country-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel-head{display:block}.bulk{margin-top:1rem}}@media(max-width:480px){.country-grid{grid-template-columns:1fr}.ban-page{padding-left:1rem;padding-right:1rem}.actions{display:grid}.action{width:100%;box-sizing:border-box}}
 </style>

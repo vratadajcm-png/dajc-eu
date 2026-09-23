@@ -1,4 +1,4 @@
-import { drivingBanCalendars } from '../../../config/driving-ban-calendars/runtime.mjs';
+import { drivingBanCalendars, restrictionTypesOf } from '../../../config/driving-ban-calendars/runtime.mjs';
 import type { IntelligenceSourceAdapter, IntelligenceSourceSnapshot } from './source-adapter';
 import type { IntelligenceSnapshotItem } from './change-detection';
 import { dajcMaintainedDrivingBansRights } from './persistence-contract';
@@ -50,9 +50,7 @@ function endOfIsoDate(value: string): string {
 }
 
 function isExceptionalRule(rule: DrivingBanRule): boolean {
-  return /exceptional|special vehicle|oversize|abnormal|schwertransport|großraum/i.test(
-    `${rule.id} ${rule.legalBasis ?? ''} ${rule.vehicleScope ?? ''}`,
-  );
+  return restrictionTypesOf(rule).includes('exceptional');
 }
 
 export function resolveDrivingBanRegistrySnapshot(args: {
