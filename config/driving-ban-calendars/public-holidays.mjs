@@ -205,6 +205,43 @@ export const publicHolidayDrivingBans = [
   },
 
   {
+    id: 'sk-public-holiday-ban-2026',
+    country: 'SK',
+    countryName: 'Slovakia',
+    kind: 'annual-calendar',
+    validYear: 2026,
+    sourceUrl: 'https://static.slov-lex.sk/static/SK/ZZ/2009/8/20260901.html',
+    sourceName: 'Slov-Lex - Act No. 8/2009 Coll., Section 39 (as amended from 1 September 2026)',
+    additionalSources: [
+      { name: 'Cargo magazin - Zakaz jazdy kamionov 2026', url: 'https://www.cargomagazin.sk/nakladne-vozidla/zakaz-jazdy-kamionov/' },
+      { name: 'CESMAD Slovakia - Informacie podla krajin: Slovensko', url: 'https://www.cesmad.sk/informacie-podla-krajiny/33-informacie-podla-krajin/28-slovensko' },
+    ],
+    legalBasis: 'Section 39 of Act No. 8/2009 Coll. on Road Traffic - driving ban on days of rest (Act No. 131/2026 moved the start from 00:00 to 06:00 from 1 September 2026)',
+    vehicleScope: 'Vehicles above 7.5t; vehicles above 3.5t towing a trailer',
+    routeScope: 'Motorways, roads for motor vehicles, and Class I roads',
+    exemptionNotes:
+      'Section 39(3) statutory exemptions apply. In recent years (2020, 2025) the Police Force has also issued a general exemption for 24-26 December allowing vehicles entering Slovakia with a destination inside the country to travel 00:00-09:00 and 16:00-24:00 - check whether a 2026 exemption has been published. 17 November is a state holiday but no longer a day of rest, so no ban applies on it.',
+    lastVerified: '2026-09-23',
+    whatChanged: 'The Section 39 day-of-rest driving ban applies over the Christmas holidays.',
+    impact: 'Affected vehicles cannot use Slovak motorways, roads for motor vehicles, or Class I roads during the holiday windows.',
+    recommendedAction:
+      'Plan Slovak transit outside 06:00-22:00 on 24-26 December (and Sunday 27 December), and check for the police general exemption for traffic entering Slovakia.',
+    seededHolidays: [
+      {
+        holiday: 'Christmas',
+        holidayDate: '2026-12-24',
+        validFrom: '2026-12-24',
+        validTo: '2026-12-26',
+        timeWindow:
+          'Thursday 24, Friday 25 and Saturday 26 December 2026, each day 06:00-22:00; the regular Sunday ban follows on 27 December 06:00-22:00. Conservative planning window: the amended Section 39 names a shorter 09:00-19:00 window for the first day of a multi-day rest period, but trade sources and police practice treat all three days as ban days.',
+      },
+    ],
+    resolve(weekStart, weekEnd, year) {
+      return resolveSeededHolidays(this, weekStart, weekEnd, year);
+    },
+  },
+
+  {
     id: 'ch-public-holiday-ban-2026',
     country: 'CH',
     countryName: 'Switzerland',

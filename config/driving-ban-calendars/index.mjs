@@ -336,11 +336,17 @@ export const drivingBanCalendars = [
             whatChanged: 'The Section 39 summer Saturday and Sunday driving-ban regime applies on motorways, roads for motor vehicles, and Class I roads.',
             validFrom: saturdayIso,
             validTo: sundayIso,
-            timeWindow: `Saturday ${humanDate(saturdayIso)} 07:00-19:00; Sunday ${humanDate(sundayIso)} 00:00-22:00`,
+            // Act No. 131/2026 moved the summer Saturday window to 09:00 and
+            // the Sunday start to 06:00 from 1 September 2026.
+            timeWindow: postChange
+              ? `Saturday ${humanDate(saturdayIso)} 09:00-19:00; Sunday ${humanDate(sundayIso)} 06:00-22:00`
+              : `Saturday ${humanDate(saturdayIso)} 07:00-19:00; Sunday ${humanDate(sundayIso)} 00:00-22:00`,
             impact: 'Affected vehicles cannot use motorways, roads for motor vehicles, or Class I roads during either window.',
             recommendedAction:
               'Plan Slovak transit outside the Saturday/Sunday windows and verify the current Section 39 exemptions for the specific transport.',
-            sourceUrl: 'https://static.slov-lex.sk/static/SK/ZZ/2009/8/20260801.print.html',
+            sourceUrl: postChange
+              ? 'https://static.slov-lex.sk/static/SK/ZZ/2009/8/20260901.html'
+              : 'https://static.slov-lex.sk/static/SK/ZZ/2009/8/20260801.print.html',
           },
         ],
       };
