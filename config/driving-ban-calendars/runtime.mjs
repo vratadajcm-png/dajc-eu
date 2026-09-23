@@ -30,7 +30,16 @@ export function restrictionTypesOf(rule) {
     : ['general'];
 }
 
-/** True when the rule should be listed under the given filter ('all', 'general' or 'exceptional'). */
+/**
+ * True when the rule should be listed under the given filter.
+ * - 'all': every maintained restriction (general HGV bans plus
+ *   oversize/exceptional-transport-specific rules).
+ * - 'general': rules that bind ordinary HGVs; oversize-only rules are left out.
+ * - 'exceptional' (kept for existing feed URLs): same as 'all'. An oversize
+ *   or exceptional transport is still a heavy goods vehicle, so the general
+ *   HGV bans apply to it in addition to the oversize-specific rules.
+ */
 export function matchesRestrictionType(rule, type) {
-  return type === 'all' || restrictionTypesOf(rule).includes(type);
+  if (type === 'all' || type === 'exceptional') return true;
+  return restrictionTypesOf(rule).includes(type);
 }
