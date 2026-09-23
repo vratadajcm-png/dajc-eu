@@ -162,7 +162,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       status.dataset.state = '';
 
       const data = new FormData(form);
-      const payload = Object.fromEntries(data.entries());
+      const payload: Record<string, unknown> = Object.fromEntries(data.entries());
       payload.role = roles.map((input) => input instanceof HTMLInputElement ? input.value : '').filter(Boolean);
       payload.consent = data.get('consent') === 'on';
 
