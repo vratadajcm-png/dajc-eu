@@ -552,7 +552,7 @@ export const drivingBanCalendars = [
     vehicleScope: 'Heavy vehicles above 7.5t',
     routeScope: 'Nationwide Hungarian road network',
     exemptionNotes:
-      'Statutory exemptions and permits apply. Outside the summer season the summer relief for runs between the border and the Hungarian base/first unloading point does not apply.',
+      'Statutory exemptions and permits apply. Outside the summer season the summer relief for runs between the border and the Hungarian base/first unloading point does not apply. International transports classified EURO-3 or higher are exempt between 4 November 2026 and 1 March 2027 (WKO / Útinform).',
     lastVerified: '2026-09-23',
     seasonFromMonthDay: '07-01',
     seasonToMonthDay: '08-31',

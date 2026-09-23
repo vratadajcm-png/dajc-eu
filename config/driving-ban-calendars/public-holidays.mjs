@@ -321,7 +321,8 @@ export const publicHolidayDrivingBans = [
     legalBasis: 'Hungarian heavy-vehicle driving ban on public holidays (from 22:00 on the preceding day to 22:00 on the holiday)',
     vehicleScope: 'Heavy vehicles above 7.5t',
     routeScope: 'Nationwide Hungarian road network',
-    exemptionNotes: 'Statutory exemptions and permits apply - check the current exemption list for the specific transport.',
+    exemptionNotes:
+      'Statutory exemptions and permits apply. International transports classified EURO-3 or higher are exempt from the weekend and holiday ban between 4 November 2026 and 1 March 2027 (WKO / Útinform) - check the current exemption list for the specific transport.',
     lastVerified: '2026-09-23',
     whatChanged: 'The Hungarian holiday driving ban runs from 22:00 on the day before the holiday until 22:00 on the holiday.',
     impact: 'Heavy vehicles above 7.5t cannot operate on the Hungarian road network during the holiday window.',
@@ -382,10 +383,10 @@ export const publicHolidayDrivingBans = [
       {
         holiday: 'Christmas',
         holidayDate: '2026-12-25',
-        validFrom: '2026-12-24',
+        validFrom: '2026-12-25',
         validTo: '2026-12-26',
         timeWindow:
-          'Friday 25 and Saturday 26 December 2026 08:00-22:00; Thursday 24 December 2026 18:00-22:00 at minimum. 24 December has been a statutory day off since 2025 - verify with GITD whether it carries the full 08:00-22:00 window (and 23 December the 18:00-22:00 eve window).',
+          'Friday 25 and Saturday 26 December 2026 08:00-22:00. No ban on 24 December: although it has been a statutory day off since 2025, the Ministry of Infrastructure confirmed it is not on the regulation\'s list of restricted days.',
       },
     ],
     resolve(weekStart, weekEnd, year) {
