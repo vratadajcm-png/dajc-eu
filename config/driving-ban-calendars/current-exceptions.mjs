@@ -13,6 +13,8 @@ export const currentDrivingBanExceptions = [
     country: 'DE',
     countryName: 'Germany',
     kind: 'temporary-exception',
+    // Relief for qualifying ordinary HGVs and for oversize/heavy transport.
+    restrictionTypes: ['general', 'exceptional'],
     sourceUrl: 'https://www.berlin.de/sen/uvk/presse/weitere-meldungen/2026/artikel.1701829.php',
     sourceName: 'Berlin Senate Department for Mobility, Transport, Climate Protection and the Environment — general order of 24 August 2026',
     additionalSources: [

@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { drivingBanCalendars } from '../../../config/driving-ban-calendars/runtime.mjs';
+import { drivingBanCalendars, matchesRestrictionType } from '../../../config/driving-ban-calendars/runtime.mjs';
 
 export const prerender = false;
 
@@ -48,10 +48,7 @@ export const GET: APIRoute = async ({ request }) => {
     headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' },
   });
   if (!['all', 'general', 'exceptional'].includes(type)) return fail('Unknown restriction type.', 400);
-  const matchesType = (rule: any) => {
-    const exceptional = /exceptional|special vehicle|oversize|abnormal|schwertransport|großraum/i.test(`${rule.id} ${rule.legalBasis || ''} ${rule.vehicleScope || ''}`);
-    return type === 'all' || (type === 'exceptional' ? exceptional : !exceptional);
-  };
+  const matchesType = (rule: any) => matchesRestrictionType(rule, type);
   const available = new Set((drivingBanCalendars as any[]).filter(matchesType).map((rule) => rule.country));
   const unsupported = [...selected].filter((country) => !available.has(country));
   if (unsupported.length) return fail(`Coverage unavailable for ${unsupported.join(', ')} and the selected restriction type. Missing data does not mean no restrictions. Verify official sources before departure.`);
@@ -70,6 +67,9 @@ export const GET: APIRoute = async ({ request }) => {
 
   const events: any[] = [];
   const seen = new Set<string>();
+  // Annual calendars not yet seeded for a year in the window: surfaced as
+  // visible warning events instead of silently leaving the dates empty.
+  const unmaintained = new Map<string, { country: string; countryName: string; year: number; from: string }>();
 
   for (let week = mondayOnOrBefore(from); week <= to; week = new Date(week.getTime() + 7 * DAY)) {
     const weekEnd = new Date(week.getTime() + 6 * DAY);
@@ -77,13 +77,21 @@ export const GET: APIRoute = async ({ request }) => {
 
     for (const rule of drivingBanCalendars as any[]) {
       if (selected.size && !selected.has(rule.country)) continue;
-      const exceptional = /exceptional|special vehicle|oversize|abnormal|schwertransport|großraum/i.test(`${rule.id} ${rule.legalBasis || ''} ${rule.vehicleScope || ''}`);
-      if (type === 'general' && exceptional) continue;
-      if (type === 'exceptional' && !exceptional) continue;
+      if (!matchesType(rule)) continue;
 
       let resolved: any;
       try { resolved = rule.resolve(week, weekEnd, year); } catch {
         return fail('Calendar generation failed. Coverage cannot be verified; retry later.', 503);
+      }
+      if (resolved?.maintenanceError) {
+        const key = `${rule.country}|${year}`;
+        // Weeks are keyed by their Monday's year, so the warning starts on
+        // 1 January to also cover the days of a year-boundary week.
+        const weekFrom = iso(from) > `${year}-01-01` ? iso(from) : `${year}-01-01`;
+        const existing = unmaintained.get(key);
+        if (!existing || weekFrom < existing.from) {
+          unmaintained.set(key, { country: rule.country, countryName: rule.countryName || rule.country, year, from: weekFrom });
+        }
       }
       for (const occurrence of resolved?.occurrences || []) {
         if (!occurrence.validFrom || !occurrence.validTo) continue;
@@ -121,6 +129,21 @@ export const GET: APIRoute = async ({ request }) => {
     'TRANSP:TRANSPARENT',
     'END:VEVENT'
   );
+
+  for (const gap of [...unmaintained.values()].sort((a, b) => a.from.localeCompare(b.from) || a.country.localeCompare(b.country))) {
+    const gapTo = iso(to) < `${gap.year}-12-31` ? iso(to) : `${gap.year}-12-31`;
+    lines.push(
+      'BEGIN:VEVENT',
+      `UID:${esc(`maintenance-${gap.country}-${gap.year}-${type}@dajc.eu`)}`,
+      `DTSTAMP:${stamp}`,
+      `DTSTART;VALUE=DATE:${icsDate(gap.from)}`,
+      `DTEND;VALUE=DATE:${icsDate(nextDate(gapTo))}`,
+      `SUMMARY:${esc(`${gap.countryName} — ${gap.year} ban dates not yet maintained / verify`)}`,
+      `DESCRIPTION:${esc(`DAJC has not yet seeded every ${gap.year} ${gap.countryName} driving-ban date (annual calendars or public holidays). Dates missing from this calendar are not verified restriction-free. Check official sources before departure.`)}`,
+      'TRANSP:TRANSPARENT',
+      'END:VEVENT'
+    );
+  }
 
   for (const { rule, occurrence } of events) {
     const description = [

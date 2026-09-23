@@ -87,13 +87,18 @@ export const drivingBanCalendars = [
     // article - extend with the full BALM summer-Saturday list as more
     // dates are confirmed.
     seededSaturdays: ['2026-08-29'],
+    seasonFromMonthDay: '07-01',
+    seasonToMonthDay: '08-31',
     resolve(weekStart, _weekEnd, year) {
-      if (year !== this.validYear) {
+      const saturdayDate = addDays(weekStart, 5);
+      // Only the summer-Saturday list is year-specific; the standing Sunday
+      // ban must keep resolving outside the season in any year.
+      if (year !== this.validYear && inSeason(saturdayDate, this.seasonFromMonthDay, this.seasonToMonthDay)) {
         return {
           maintenanceError: `No ${year} BALM summer-Saturday calendar seeded (last seeded: ${this.validYear}). Add the ${year} list before publishing a Germany driving-ban report.`,
         };
       }
-      const saturday = fmt(addDays(weekStart, 5));
+      const saturday = fmt(saturdayDate);
       const sunday = fmt(addDays(weekStart, 6));
       if (!this.seededSaturdays.includes(saturday)) {
         // The Saturday list doesn't cover this week - the standing Sunday
@@ -126,7 +131,7 @@ export const drivingBanCalendars = [
             impact:
               'Heavy goods vehicles and goods-vehicle-with-trailer combinations cannot use the BALM-listed sections on Saturday, and cannot operate anywhere in Germany on Sunday.',
             recommendedAction:
-              'Check the current BALM list of affected Saturday sections before routing through Germany on 29 August; treat Sunday 30 August as a full nationwide stop for the affected categories.',
+              `Check the current BALM list of affected Saturday sections before routing through Germany on ${humanDate(saturday)}; treat Sunday ${humanDate(sunday)} as a full nationwide stop for the affected categories.`,
           },
         ],
       };
@@ -347,6 +352,8 @@ export const drivingBanCalendars = [
     country: 'IT',
     countryName: 'Italy',
     kind: 'annual-calendar',
+    // The decree binds ordinary HGVs and authorised exceptional transports.
+    restrictionTypes: ['general', 'exceptional'],
     suppressSundayOnlyFromWeeklyAfter: '2026-09-01',
     validYear: 2026,
     sourceUrl: 'https://www.mit.gov.it/normativa/decreto-ministeriale-n-325-del-12-dicembre-2025',
@@ -357,7 +364,7 @@ export const drivingBanCalendars = [
     routeScope: 'Outside built-up areas, nationwide',
     exemptionNotes:
       "The decree sets out specific exemptions and timing adjustments for vehicles arriving from abroad, port traffic, and other categories - always check the current decree text for the specific transport, including whether an existing exceptional-transport authorisation is still subject to the ban.",
-    lastVerified: '2026-08-29',
+    lastVerified: '2026-09-23',
     additionalSources: [
       {
         name: 'MIT - Mezzi pesanti, calendario 2026 dei divieti di circolazione stradale',
@@ -375,6 +382,21 @@ export const drivingBanCalendars = [
       { validFrom: '2026-09-20', validTo: '2026-09-20', timeWindow: 'Sunday 20 September 2026 07:00-22:00' },
       { validFrom: '2026-09-27', validTo: '2026-09-27', timeWindow: 'Sunday 27 September 2026 07:00-22:00' },
       { validFrom: '2026-10-04', validTo: '2026-10-04', timeWindow: 'Sunday 4 October 2026 09:00-22:00' },
+      { validFrom: '2026-10-11', validTo: '2026-10-11', timeWindow: 'Sunday 11 October 2026 09:00-22:00' },
+      { validFrom: '2026-10-18', validTo: '2026-10-18', timeWindow: 'Sunday 18 October 2026 09:00-22:00' },
+      { validFrom: '2026-10-25', validTo: '2026-10-25', timeWindow: 'Sunday 25 October 2026 09:00-22:00' },
+      { validFrom: '2026-11-01', validTo: '2026-11-01', timeWindow: 'Sunday 1 November 2026 09:00-22:00' },
+      { validFrom: '2026-11-08', validTo: '2026-11-08', timeWindow: 'Sunday 8 November 2026 09:00-22:00' },
+      { validFrom: '2026-11-15', validTo: '2026-11-15', timeWindow: 'Sunday 15 November 2026 09:00-22:00' },
+      { validFrom: '2026-11-22', validTo: '2026-11-22', timeWindow: 'Sunday 22 November 2026 09:00-22:00' },
+      { validFrom: '2026-11-29', validTo: '2026-11-29', timeWindow: 'Sunday 29 November 2026 09:00-22:00' },
+      { validFrom: '2026-12-06', validTo: '2026-12-06', timeWindow: 'Sunday 6 December 2026 09:00-22:00' },
+      { validFrom: '2026-12-08', validTo: '2026-12-08', timeWindow: 'Tuesday 8 December 2026 09:00-22:00' },
+      { validFrom: '2026-12-13', validTo: '2026-12-13', timeWindow: 'Sunday 13 December 2026 09:00-22:00' },
+      { validFrom: '2026-12-20', validTo: '2026-12-20', timeWindow: 'Sunday 20 December 2026 09:00-22:00' },
+      { validFrom: '2026-12-25', validTo: '2026-12-25', timeWindow: 'Friday 25 December 2026 09:00-22:00' },
+      { validFrom: '2026-12-26', validTo: '2026-12-26', timeWindow: 'Saturday 26 December 2026 09:00-22:00' },
+      { validFrom: '2026-12-27', validTo: '2026-12-27', timeWindow: 'Sunday 27 December 2026 09:00-22:00' },
     ],
     resolve(weekStart, weekEnd, year) {
       if (year !== this.validYear) {
@@ -385,25 +407,24 @@ export const drivingBanCalendars = [
 
       const startIso = fmt(weekStart);
       const endIso = fmt(weekEnd);
-      const match = this.seededPeriods.find((p) => p.validTo >= startIso && p.validFrom <= endIso);
-      if (!match) return { occurrences: [] };
+      // A week can hold more than one decree day (e.g. 8 and 13 December,
+      // or 25, 26 and 27 December) - return all of them.
+      const matches = this.seededPeriods.filter((p) => p.validTo >= startIso && p.validFrom <= endIso);
 
       return {
-        occurrences: [
-          {
-            title: `Ministerial Decree 325/2025 driving ban (${humanRange(match.validFrom, match.validTo)})`,
-            whatChanged:
-              'The 2026 calendar in Ministerial Decree 325/2025 restricts goods vehicles above 7.5t outside built-up areas and, under the decree, also applies to exceptional vehicles/transports even when authorised unless a specific exemption applies.',
-            validFrom: match.validFrom,
-            validTo: match.validTo,
-            timeWindow: match.timeWindow,
-            impact:
-              'Affected vehicles - including authorised exceptional transports without a specific exemption - cannot operate outside built-up areas during the listed window.',
-            recommendedAction:
-              "Do not assume an existing exceptional-transport authorisation exempts the movement; check the decree's exemptions and timing adjustments for the specific transport before departure.",
-            additionalSources: this.additionalSources,
-          },
-        ],
+        occurrences: matches.map((match) => ({
+          title: `Ministerial Decree 325/2025 driving ban (${humanRange(match.validFrom, match.validTo)})`,
+          whatChanged:
+            'The 2026 calendar in Ministerial Decree 325/2025 restricts goods vehicles above 7.5t outside built-up areas and, under the decree, also applies to exceptional vehicles/transports even when authorised unless a specific exemption applies.',
+          validFrom: match.validFrom,
+          validTo: match.validTo,
+          timeWindow: match.timeWindow,
+          impact:
+            'Affected vehicles - including authorised exceptional transports without a specific exemption - cannot operate outside built-up areas during the listed window.',
+          recommendedAction:
+            "Do not assume an existing exceptional-transport authorisation exempts the movement; check the decree's exemptions and timing adjustments for the specific transport before departure.",
+          additionalSources: this.additionalSources,
+        })),
       };
     },
   },
@@ -468,7 +489,7 @@ export const drivingBanCalendars = [
           {
             title: `Exceptional-transport weekend movement ban (${humanDate(saturdayIso)} 12:00 to ${humanDate(mondayIso)} 06:00)`,
             whatChanged:
-              'Exceptional transport (convoi exceptionnel) movement remains prohibited without the necessary departmental exemption, from Saturday midday to Monday morning (the window shifts around a public holiday - not applicable this week).',
+              'Exceptional transport (convoi exceptionnel) movement remains prohibited without the necessary departmental exemption, from Saturday midday to Monday morning. Around public holidays the window is extended (see the separate public-holiday entry).',
             validFrom: saturdayIso,
             validTo: mondayIso,
             timeWindow: `Saturday ${humanDate(saturdayIso)} 12:00 to Monday ${humanDate(mondayIso)} 06:00`,
@@ -513,6 +534,43 @@ export const drivingBanCalendars = [
             timeWindow: `Saturday ${humanDate(saturdayIso)} from 15:00; Sunday ${humanDate(sundayIso)} until 22:00`,
             impact: 'Heavy vehicles above 7.5t cannot operate on the Hungarian road network during the ban window.',
             recommendedAction: 'Check again shortly before departure for a possible temporary relaxation announced during an official heat alert.',
+          },
+        ],
+      };
+    },
+  },
+
+  {
+    id: 'hu-weekend-ban-outside-summer',
+    country: 'HU',
+    countryName: 'Hungary',
+    kind: 'standing-rule',
+    suppressFromWeeklyAfter: '2026-09-01', // evergreen baseline; weekly only before September 2026
+    sourceUrl: 'https://www.wko.at/aussenwirtschaft/ungarn-lkw-wochenendfahrverbot',
+    sourceName: 'WKO Aussenwirtschaft - Ungarn LKW-Wochenendfahrverbot',
+    legalBasis: 'Hungarian year-round weekend heavy-vehicle driving ban (winter rule outside the 1 July - 31 August summer season)',
+    vehicleScope: 'Heavy vehicles above 7.5t',
+    routeScope: 'Nationwide Hungarian road network',
+    exemptionNotes:
+      'Statutory exemptions and permits apply. Outside the summer season the summer relief for runs between the border and the Hungarian base/first unloading point does not apply.',
+    lastVerified: '2026-09-23',
+    seasonFromMonthDay: '07-01',
+    seasonToMonthDay: '08-31',
+    resolve(weekStart) {
+      const saturday = addDays(weekStart, 5);
+      if (inSeason(saturday, this.seasonFromMonthDay, this.seasonToMonthDay)) return { occurrences: [] };
+      const saturdayIso = fmt(saturday);
+      const sundayIso = fmt(addDays(weekStart, 6));
+      return {
+        occurrences: [
+          {
+            title: `Weekend driving ban for heavy vehicles (${humanRange(saturdayIso, sundayIso)})`,
+            whatChanged: 'The year-round (winter-rule) weekend driving ban for heavy vehicles above 7.5t applies nationwide.',
+            validFrom: saturdayIso,
+            validTo: sundayIso,
+            timeWindow: `Saturday ${humanDate(saturdayIso)} 22:00 to Sunday ${humanDate(sundayIso)} 22:00`,
+            impact: 'Heavy vehicles above 7.5t cannot operate on the Hungarian road network during the ban window.',
+            recommendedAction: 'Plan Hungarian transit outside Saturday 22:00 - Sunday 22:00 and check the exemption list for the specific transport.',
           },
         ],
       };

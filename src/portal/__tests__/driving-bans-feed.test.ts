@@ -22,4 +22,16 @@ describe('driving-ban feed coverage boundary', () => {
     expect(body).toContain('END:VCALENDAR');
     expect(body.split('\r\n').every((line) => new TextEncoder().encode(line).length <= 75)).toBe(true);
   });
+  it('includes Italy under the general HGV filter', async () => {
+    const response = await get('countries=IT&type=general&from=2026-10-01&to=2026-10-31');
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain('DTSTART;VALUE=DATE:20261025');
+  });
+  it('shows a visible warning instead of silently dropping unmaintained years', async () => {
+    const response = await get('countries=IT&from=2026-12-01&to=2027-01-31');
+    expect(response.status).toBe(200);
+    const body = (await response.text()).replaceAll('\r\n ', '');
+    expect(body).toContain('SUMMARY:Italy — 2027 ban dates not yet maintained / verify');
+    expect(body).toContain('DTSTART;VALUE=DATE:20270101');
+  });
 });
