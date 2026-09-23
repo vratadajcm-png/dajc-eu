@@ -12,6 +12,8 @@ export const sloveniaCurrentDrivingBanExceptions = [
     country: 'SI',
     countryName: 'Slovenia',
     kind: 'temporary-restriction',
+    // The closure halts all traffic, not only the exceptional transport.
+    restrictionTypes: ['general', 'exceptional'],
     sourceUrl: 'https://promet.si/sl/napoved-del',
     sourceName: 'PROMET.SI — current roadworks forecast, verified 7 September 2026',
     legalBasis: 'Operational motorway closure announced by Slovenia traffic information service for an extraordinary transport movement',

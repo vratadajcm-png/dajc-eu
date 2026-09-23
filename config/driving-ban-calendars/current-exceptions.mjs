@@ -13,6 +13,8 @@ export const currentDrivingBanExceptions = [
     country: 'DE',
     countryName: 'Germany',
     kind: 'temporary-exception',
+    // Relief for qualifying ordinary HGVs and for oversize/heavy transport.
+    restrictionTypes: ['general', 'exceptional'],
     sourceUrl: 'https://www.berlin.de/sen/uvk/presse/weitere-meldungen/2026/artikel.1701829.php',
     sourceName: 'Berlin Senate Department for Mobility, Transport, Climate Protection and the Environment — general order of 24 August 2026',
     additionalSources: [
@@ -105,6 +107,8 @@ export const currentDrivingBanExceptions = [
     country: 'HR',
     countryName: 'Croatia',
     kind: 'temporary-restriction',
+    // The stoppages halt all traffic, not only exceptional transports.
+    restrictionTypes: ['general', 'exceptional'],
     sourceUrl: 'https://www.hak.hr/info/stanje-na-cestama/',
     sourceName: 'Hrvatski autoklub (HAK) — Traffic Report, updated 8 September 2026 08:40',
     legalBasis: 'Operational motorway traffic suspensions announced by HAK in connection with extraordinary transport movements',

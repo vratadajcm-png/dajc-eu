@@ -22,4 +22,28 @@ describe('driving-ban feed coverage boundary', () => {
     expect(body).toContain('END:VCALENDAR');
     expect(body.split('\r\n').every((line) => new TextEncoder().encode(line).length <= 75)).toBe(true);
   });
+  it('includes Italy under the general HGV filter', async () => {
+    const response = await get('countries=IT&type=general&from=2026-10-01&to=2026-10-31');
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain('DTSTART;VALUE=DATE:20261025');
+  });
+  it('shows a visible warning instead of silently dropping unmaintained years', async () => {
+    const response = await get('countries=IT&from=2026-12-01&to=2027-01-31');
+    expect(response.status).toBe(200);
+    const body = (await response.text()).replaceAll('\r\n ', '');
+    expect(body).toContain('SUMMARY:Italy — 2027 ban dates not yet maintained / verify');
+    expect(body).toContain('DTSTART;VALUE=DATE:20270101');
+  });
+  it('keeps the general HGV bans in the exceptional-transport feed (oversize vehicles are HGVs too)', async () => {
+    const response = await get('countries=DE&type=exceptional&from=2026-10-01&to=2026-10-31');
+    expect(response.status).toBe(200);
+    const body = (await response.text()).replaceAll('\r\n ', '');
+    expect(body).toContain('Germany — General Sunday driving ban (4 October 2026)');
+    expect(body).toContain('Germany — Public-holiday driving ban — Day of German Unity');
+  });
+  it('leaves oversize-only rules out of the standard HGV feed', async () => {
+    const body = await (await get('countries=FR&type=general&from=2026-10-01&to=2026-10-31')).text();
+    expect(body).toContain('General HGV weekend driving ban');
+    expect(body).not.toContain('Exceptional-transport weekend movement ban');
+  });
 });
