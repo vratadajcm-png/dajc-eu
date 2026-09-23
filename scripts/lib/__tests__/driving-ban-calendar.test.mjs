@@ -64,7 +64,7 @@ describe('resolveDrivingBanFindings - annual-calendar maintenance', () => {
   it('reports a maintenance error for every year-scoped annual calendar', () => {
     const flaggedCountries = maintenanceErrors.map((m) => m.match(/^\[([A-Z]+)\//)[1]);
     // Annual calendars plus the year-scoped public-holiday dates.
-    expect(new Set(flaggedCountries)).toEqual(new Set(['DE', 'PL', 'IT', 'SI', 'AT', 'CZ', 'CH', 'FR', 'HU']));
+    expect(new Set(flaggedCountries)).toEqual(new Set(['DE', 'PL', 'IT', 'SI', 'AT', 'CZ', 'CH', 'FR', 'HU', 'SK']));
   });
 
   it("keeps Germany's standing Sunday ban outside the summer-Saturday season of an unseeded year", () => {
@@ -138,6 +138,7 @@ describe('driving-ban registry - public holidays and full 2026 calendars', () =>
     ['hu-public-holiday-ban-2026', '2026-10-19', '2026-10-22', 'Thursday 22 October 2026 22:00'],
     ['si-public-holiday-ban-2026', '2026-10-26', '2026-10-31', 'Saturday 31 October 2026 08:00-22:00'],
     ['fr-general-hgv-public-holiday-ban-2026', '2026-11-09', '2026-11-10', 'Tuesday 10 November 2026 22:00'],
+    ['sk-public-holiday-ban-2026', '2026-12-21', '2026-12-24', 'each day 06:00-22:00'],
   ])('%s resolves the holiday in the week of %s', (id, monday, validFrom, windowText) => {
     const { occurrences, maintenanceError } = resolveWeek(id, monday);
     expect(maintenanceError).toBeUndefined();
@@ -168,5 +169,21 @@ describe('driving-ban registry - public holidays and full 2026 calendars', () =>
     expect(restrictionTypesOf(getCalendarById('it-md-325-2025-calendar'))).toEqual(['general', 'exceptional']);
     expect(restrictionTypesOf(getCalendarById('de-summer-weekend-ban'))).toEqual(['general']);
     expect(restrictionTypesOf(getCalendarById('fr-exceptional-transport-weekend-ban'))).toEqual(['exceptional']);
+  });
+});
+
+describe('Slovakia - Section 39 as amended from 1 September 2026', () => {
+  const rule = calendarRuntime.getCalendarById('sk-section-39-weekend-ban');
+  const week = (monday) => {
+    const start = new Date(`${monday}T00:00:00Z`);
+    return rule.resolve(start, new Date(start.getTime() + 6 * 86_400_000), start.getUTCFullYear()).occurrences[0];
+  };
+
+  it('uses the amended 09:00 Saturday / 06:00 Sunday start in summer 2027', () => {
+    expect(week('2027-07-05').timeWindow).toBe('Saturday 10 July 2027 09:00-19:00; Sunday 11 July 2027 06:00-22:00');
+  });
+
+  it('keeps the pre-amendment windows for summer 2026', () => {
+    expect(week('2026-08-24').timeWindow).toBe('Saturday 29 August 2026 07:00-19:00; Sunday 30 August 2026 00:00-22:00');
   });
 });
