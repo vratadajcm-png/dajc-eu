@@ -24,6 +24,8 @@ export default defineConfig({
       // surface - it must never appear in the public sitemap regardless of
       // DAJC_PARTNER_PORTAL_ENABLED. See docs/PARTNER_PORTAL.md.
       filter: (page) => !page.includes('/partner-portal'),
+      // On-demand public pages are not discovered automatically.
+      customPages: ['https://www.dajc.eu/driving-bans'],
     }),
   ],
 });
