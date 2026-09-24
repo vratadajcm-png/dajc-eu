@@ -56,7 +56,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <h2 id="register-title">DAJC Platform Testing 2027</h2>
         <p>
           Complete the registration below. Registration details are delivered to
-          <a href="mailto:platform@dajc.eu">platform@dajc.eu</a>.
+          <a href="mailto:platform@dajc.cz">platform@dajc.cz</a>.
         </p>
         <p class="start-date"><strong>Testing starts 4 January 2027.</strong></p>
       </div>
@@ -132,7 +132,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <button type="submit">Register for DAJC Platform Testing 2027</button>
         <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
         <p class="fallback">
-          If the form is unavailable, email <a href="mailto:platform@dajc.eu?subject=DAJC%20Platform%20Testing%202027%20registration">platform@dajc.eu</a>.
+          If the form is unavailable, email <a href="mailto:platform@dajc.cz?subject=DAJC%20Platform%20Testing%202027%20registration">platform@dajc.cz</a>.
         </p>
       </form>
     </section>
@@ -183,7 +183,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         status.dataset.state = 'success';
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Registration could not be sent.';
-        status.innerHTML = `${message} Please email <a href="mailto:platform@dajc.eu?subject=DAJC%20Platform%20Testing%202027%20registration">platform@dajc.eu</a>.`;
+        status.innerHTML = `${message} Please email <a href="mailto:platform@dajc.cz?subject=DAJC%20Platform%20Testing%202027%20registration">platform@dajc.cz</a>.`;
         status.dataset.state = 'error';
       } finally {
         if (button instanceof HTMLButtonElement) {
