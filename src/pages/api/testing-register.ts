@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 
 export const prerender = false;
 
-const DESTINATION = 'platform@dajc.eu';
+const DESTINATION = 'platform@dajc.cz';
 const ALLOWED_ORIGINS = new Set([
   'https://www.dajc.eu',
   'https://dajc.eu',
@@ -200,7 +200,7 @@ export const POST: APIRoute = async ({ request }) => {
           '',
           'DAJC',
           'European Heavy & Oversized Transport Platform',
-          'platform@dajc.eu',
+          'platform@dajc.cz',
         ].join('\n'),
       });
     } catch (error) {
