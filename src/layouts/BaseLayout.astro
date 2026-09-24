@@ -17,6 +17,7 @@ const siteName = 'DAJC';
 const siteURL = 'https://www.dajc.eu/';
 const brandLogoURL = 'https://www.dajc.eu/assets/dajc-google-brand.svg';
 const isHomePage = Astro.url.pathname === '/';
+const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 
 const homeStructuredData = {
   '@context': 'https://schema.org',
@@ -59,6 +60,7 @@ const homeStructuredData = {
   <meta name="description" content={description} />
   <meta name="application-name" content={siteName} />
   <meta name="theme-color" content="#061A33" />
+  {googleSiteVerification && <meta name="google-site-verification" content={googleSiteVerification} />}
   <link rel="canonical" href={canonicalURL} />
   <link rel="icon" href="/assets/favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
