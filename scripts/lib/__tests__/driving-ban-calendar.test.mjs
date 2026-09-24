@@ -14,10 +14,10 @@ describe('resolveDrivingBanFindings - W35 2026', () => {
   });
 
   it('produces the authoritative W35 restrictions without depending on news volume', () => {
-    expect(findings).toHaveLength(14);
+    expect(findings).toHaveLength(16);
     const countries = findings.map((f) => f.country).sort();
     expect(countries).toEqual(
-      ['Austria', 'Austria', 'Czechia', 'Czechia', 'France', 'France', 'Germany', 'Hungary', 'Italy', 'Poland', 'Slovakia', 'Slovenia', 'Slovenia', 'Switzerland'].sort()
+      ['Austria', 'Austria', 'Czechia', 'Czechia', 'France', 'France', 'Germany', 'Hungary', 'Italy', 'Liechtenstein', 'Luxembourg', 'Poland', 'Slovakia', 'Slovenia', 'Slovenia', 'Switzerland'].sort()
     );
   });
 
