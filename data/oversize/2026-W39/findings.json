@@ -1,7 +1,178 @@
 {
   "week": "2026-W39",
-  "updatedAt": "2026-09-22T10:49:25.803Z",
+  "updatedAt": "2026-09-24T10:58:39.637Z",
   "findings": [
+    {
+      "id": "68da6a1bd8a19cf4",
+      "country": "Germany",
+      "region": null,
+      "location": "Presseportal (all German police forces)",
+      "type": "border_restriction",
+      "title": "POL-KN: (Gottmadingen Lkr. Konstanz) - Mit &uuml;ber drei Promille am Steuer (23.09.2026)",
+      "summary": "Alle Meldungen Folgen Keine Meldung von Polizeipräsidium Konstanz mehr verpassen. Warum muss ich meine Email-Adresse eingeben? 24.09.2026 &ndash; 12:30 Polizeipräsidium Konstanz POL-KN: (Gottmadingen Lkr. Konstanz) - Mit &uuml;ber drei Promille am Steuer (23.09.2026) Gottmadingen (ots) Am Mittwochabend ist ein 60-jähriger Autofahrer am Grenzübergang Bietingen mit über drei Promille kontrolliert worden. Gegen 19:50 Uhr kontrollierten Beamte der Bundespolizei den Mann, der mit einem Suzuki Swift unterwegs war. Dabei bemerkten die Einsatzkräfte Alkoholgeruch bei dem 60-Jährigen. Ein Atemalkoholtest ergab einen Wert von über drei Promille. Beamte des Polizeipräsidiums Konstanz übernahmen anschließend die weiteren Maßnahmen. Der 60-Jährige musste die Polizisten zur Entnahme einer Blutprobe begleiten. Zudem stellten sie seinen Führerschein sicher. Gegen den Mann wird nun wegen Trunkenheit im Straßenverkehr ermittelt. Rückfragen bitte an: Patrick Zöller Polizeipräsidium Konstanz Durchwahl: 07531 995-1012 Telefon: 07531 995-3355 E-Mail: konstanz.pressestelle@polizei.bwl.de http://www.polizei-bw.de/ Original-Content von: Polizeipr&auml;sidium Konstanz, &uuml;bermittelt durch news aktuell Alle Meldungen Folgen Keine Meldung von Polizeipräsidium Konstanz mehr verpassen. Warum muss ich meine Email-Adresse eingeben? Druckversion PDF-Version Orte in dieser Meldung Gottmadingen Baden-Württemberg Themen in dieser Meldung Promille Bundespolizei POL Führerschein Steuer Autofahrer KN Sicherheitskräfte Gesetz Justiz, Kriminalität Transport Polizei Polizei Baden-Württemberg Weitere Meldungen: Polizeipräsidium Konstanz Weitere Meldungen: Polizeipräsidium Konstanz Alle Meldungen Alle 24.09.2026 &ndash; 12:00 POL-KN: Gemeinsame Pressemitteilung der Staatsanwaltschaft Konstanz und des Polizeipr",
+      "validFrom": null,
+      "validTo": null,
+      "impact": null,
+      "recommendedAction": null,
+      "sourceName": "Presseportal - Polizeipresse (Blaulicht)",
+      "sourceUrl": "https://www.presseportal.de/blaulicht/pm/110973/6358414",
+      "confidence": "unverified",
+      "status": "new",
+      "firstSeenAt": "2026-09-24T10:57:27.996Z",
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
+    },
+    {
+      "id": "bb8dae2187aaf042",
+      "country": "Germany",
+      "region": null,
+      "location": "B33",
+      "type": "border_restriction",
+      "title": "Polizeipr&auml;sidium Konstanz",
+      "summary": "Folgen Keine Meldung von Polizeipräsidium Konstanz mehr verpassen. Warum muss ich meine Email-Adresse eingeben? Polizeipr&auml;sidium Konstanz http://www.polizei-bw.de Weblinks Homepage --> Filtern Medien: Alle Alle Bilder Dokumente Zeitraum: Alle Gestern Letzte 7 Tage Zeitraum: Gesamt Gestern Letzte 7 Tage Von Bis Zur&uuml;cksetzen 24.09.2026 &ndash; 12:30 Radolfzell POL-KN: (Radolfzell, Lkr. Konstanz) - Ladendieb versucht Mitarbeiter mit Weinflasche zu schlagen (23.09.2026) Radolfzell (ots) - Am Mittwochnachmittag hat ein 30-Jähriger in einem Einkaufsmarkt in der Markthallenstraße Lebensmittel gestohlen und anschließend versucht, einen Mitarbeiter mit einer Weinflasche zu schlagen. Gegen 15:45 Uhr nahm der Dieb eine Flasche Wein sowie einen Apfel an sich und verließ den ... mehr 24.09.2026 &ndash; 12:30 Konstanz POL-KN: (Konstanz) - Mit frisierten Mopeds unterwegs - Rollenprüfstand zeigt bis zu 125 km/h (14./23.09.2026) Konstanz (ots) - Zwei 17-Jährige sind bereits am 14. September mit technisch veränderten Mopeds auf der B33 bei Konstanz unterwegs gewesen. Eine technische Untersuchung der Fahrzeuge am Mittwoch hat nun ergeben, dass die beiden Simsons Geschwindigkeiten von bis zu 125 km/h erreichten. Am 14.09.26 gegen 09:30 Uhr ... mehr 24.09.2026 &ndash; 12:30 Gottmadingen POL-KN: (Gottmadingen / Lkr. Konstanz) - Mit über drei Promille am Steuer (23.09.2026) Gottmadingen (ots) - Am Mittwochabend ist ein 60-jähriger Autofahrer am Grenzübergang Bietingen mit über drei Promille kontrolliert worden. Gegen 19:50 Uhr kontrollierten Beamte der Bundespolizei den Mann, der mit einem Suzuki Swift unterwegs war. Dabei bemerkten die Einsatzkräfte Alkoholgeruch bei dem 60-Jährigen. Ein Atemalkoholtest ergab einen Wert von über ... mehr 24.09.2026 &ndash; 12:00 POL-KN: Gemeinsame ",
+      "validFrom": null,
+      "validTo": null,
+      "impact": null,
+      "recommendedAction": null,
+      "sourceName": "Presseportal - Polizeipresse (Blaulicht)",
+      "sourceUrl": "https://www.presseportal.de/blaulicht/nr/110973",
+      "confidence": "unverified",
+      "status": "new",
+      "firstSeenAt": "2026-09-24T10:57:27.996Z",
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
+    },
+    {
+      "id": "2df9bb72f3edb519",
+      "country": "Germany",
+      "region": null,
+      "location": "Presseportal (all German police forces)",
+      "type": "border_restriction",
+      "title": "Aktuelles aus Gottmadingen",
+      "summary": "Aktuelles aus Gottmadingen Aktuelles aus Gottmadingen Blaulicht-Meldungen aus Gottmadingen Blaulicht-Meldungen aus Gottmadingen Alle Meldungen Alle 24.09.2026 &ndash; 12:30 Polizeipräsidium Konstanz POL-KN: (Gottmadingen / Lkr. Konstanz) - Mit über drei Promille am Steuer (23.09.2026) Gottmadingen (ots) - Am Mittwochabend ist ein 60-jähriger Autofahrer am Grenzübergang Bietingen mit über drei Promille kontrolliert worden. Gegen 19:50 Uhr kontrollierten Beamte der Bundespolizei den Mann, der mit einem Suzuki Swift unterwegs war. Dabei bemerkten die Einsatzkräfte Alkoholgeruch bei dem 60-Jährigen. Ein Atemalkoholtest ergab einen Wert von über ... mehr 07.09.2026 &ndash; 15:18 Polizeipräsidium Konstanz POL-KN: (Gottmadingen, Lkr. Konstanz) E-Scooterfahrer prallt gegen Auto - 16-Jähriger verletzt (07.09.2026) Gottmadingen (ots) - Bei einem Unfall auf der Hauptstraße ist am Montagmorgen ein jugendlicher E-Scooterfahrer verletzt worden. Ein 37-Jähriger fuhr mit einem Mercedes aus der Einfahrt einer Tiefagarage bis auf den Gehweg vor und hielt dort an. Zeitgleich sah er einen auf dem Gehweg herannahenden 16-Jährigen auf ... mehr 24.08.2026 &ndash; 12:15 Polizeipräsidium Konstanz POL-KN: (Gottmadingen, Lkr. Konstanz) E-Scooterfahrer bei Unfall verletzt (23.08.2026) Gottmadingen (ots) - Ein E-Scooterfahrer hat sich bei einem Unfall am Sonntagabend auf der Gottmadinger Straße Verletzungen zugezogen. Der 18-Jährige fuhr mit einem E-Scooter hinter einem 19-jährigen Radler auf dem Radweg in Richtung Hilzingen. Nach einer Bahnunterführung bremste der 19-Jährige um nach rechts auf einen Schotterweg abzubiegen. Dies erkannte der ... mehr 12.08.2026 &ndash; 15:07 Polizeipräsidium Konstanz POL-KN: (Gottmadingen, Randegg, Lkr. Konstanz) Dritter Einbruch in wenigen Tagen - Polizei bittet u",
+      "validFrom": null,
+      "validTo": null,
+      "impact": null,
+      "recommendedAction": null,
+      "sourceName": "Presseportal - Polizeipresse (Blaulicht)",
+      "sourceUrl": "https://www.presseportal.de/regional/Gottmadingen",
+      "confidence": "unverified",
+      "status": "new",
+      "firstSeenAt": "2026-09-24T10:57:27.996Z",
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
+    },
+    {
+      "id": "8f334fb4d11e3343",
+      "country": "Germany",
+      "region": null,
+      "location": "Presseportal (all German police forces)",
+      "type": "roadworks",
+      "title": "POL-DEL: Autobahnpolizei Ahlhorn: Verkehrskontrolle auf der A 1 +++ Gef&auml;lschter F&uuml;hrerschein festgestellt",
+      "summary": "Alle Meldungen Folgen Keine Meldung von Polizeiinspektion Delmenhorst / Oldenburg - Land / Wesermarsch mehr verpassen. Warum muss ich meine Email-Adresse eingeben? 24.09.2026 &ndash; 12:20 Polizeiinspektion Delmenhorst / Oldenburg - Land / Wesermarsch POL-DEL: Autobahnpolizei Ahlhorn: Verkehrskontrolle auf der A 1 +++ Gef&auml;lschter F&uuml;hrerschein festgestellt Delmenhorst (ots) Am Dienstagmorgen, 22. September 2026, kontrollierten Beamte der Autobahnpolizei einen 32-jährigen Autofahrer auf der A 1 in Fahrtrichtung Münster. Dabei stellten die Einsatzkräfte einen gefälschten Führerschein fest. Gegen 07:15 Uhr war ein Mercedes auf dem Hauptfahrstreifen der A 1 im Bereich Harpstedt mit lediglich etwa 30 km/h unterwegs. Grund hierfür war ein geplatzter Reifen. Aufgrund der dortigen Baustellensituation stehen in diesem Bereich weder ein Seitenstreifen noch Nothaltebuchten zur Verfügung, sodass der Fahrer seine Fahrt zunächst mit deutlich reduzierter Geschwindigkeit fortsetzen musste. Aufgrund der geringen Geschwindigkeit sicherten die eingesetzten Polizeibeamten das Fahrzeug mit eingeschaltetem Blaulicht und Warnsignal nach hinten ab. Während der Absicherung kam das Fahrzeug auf der Fahrbahn zum Stillstand. In diesem Zusammenhang beobachteten die Beamten der Autobahnpolizei einen Fahrerwechsel im \"Pannenfahrzeug\". Bei der anschließenden Verkehrskontrolle zeigte der 32-Jährige Fahrer, der vor den Beamten auf den Beifahrersitz wechselte, einen griechischen Führerschein vor. Bei der Überprüfung ergaben sich Hinweise darauf, dass es sich um eine Fälschung handelt. Eine gültige Fahrerlaubnis konnte der Mann nicht nachweisen. Gegen den 32-Jährigen wurden Ermittlungsverfahren wegen Urkundenfälschung und des Fahrens ohne Fahrerlaubnis eingeleitet. Die weiteren Ermittlungen, insb",
+      "validFrom": null,
+      "validTo": null,
+      "impact": null,
+      "recommendedAction": null,
+      "sourceName": "Presseportal - Polizeipresse (Blaulicht)",
+      "sourceUrl": "https://www.presseportal.de/blaulicht/pm/68438/6358405",
+      "confidence": "unverified",
+      "status": "new",
+      "firstSeenAt": "2026-09-24T10:57:27.996Z",
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
+    },
+    {
+      "id": "76386314ed574fa6",
+      "country": "Germany",
+      "region": null,
+      "location": "Presseportal (all German police forces)",
+      "type": "infrastructure",
+      "title": "POL-LIP: Bad Salzuflen - Biemsen-Ahmsen. Betrunkener Lastwagenfahrer verursacht Unfall.",
+      "summary": "Alle Meldungen Folgen Keine Meldung von Polizei Lippe mehr verpassen. Warum muss ich meine Email-Adresse eingeben? 23.09.2026 &ndash; 12:02 Polizei Lippe POL-LIP: Bad Salzuflen - Biemsen-Ahmsen. Betrunkener Lastwagenfahrer verursacht Unfall. Lippe (ots) Am Dienstagabend (22.09.2026) kollidierte ein 51-jähriger Lastwagenfahrer aus Portugal mit seinem Schwertransport an der Kreuzung Am Zubringer und Meerbrede in Biemsen-Ahmsen mit einem wartenden Mercedes. Während der Unfallaufnahme stellten Polizeikräfte fest, dass der Fahrer alkoholisiert war. Der Fahrer des Schwertransports (DAF) fuhr mit einer etwa 4,20 Meter breiten Fahrzeugkombination aus Richtung Bundesautobahn in Richtung Bad Salzuflen über die Kreuzung. Dabei schätzte er nach ersten Erkenntnissen die Breite seines Aufliegers falsch ein und stieß mit dem Wagen eines 29-Jährigen zusammen, der verkehrsbedingt auf dem Linksabbiegestreifen wartete. Ein Atemalkoholtest bei dem Lastwagenfahrer verlief positiv. Die Polizei ordnete eine Blutprobe an und leitete ein Strafverfahren wegen Trunkenheit im Verkehr sowie Gefährdung des Straßenverkehrs ein. Der Portugiese leistete eine Sicherheitsleistung zur Sicherung des Strafverfahrens. Der 29-Jährige blieb unverletzt. Der Sachschaden wird auf etwa 2.500 Euro geschätzt. Pressekontakt: Polizei Lippe Pressestelle Yannick Thelaner Telefon: 05231 / 609-5050 Fax: 05231 / 609-5095 E-Mail: pressestelle.lippe@polizei.nrw.de https://lippe.polizei.nrw/ Original-Content von: Polizei Lippe, &uuml;bermittelt durch news aktuell Alle Meldungen Folgen Keine Meldung von Polizei Lippe mehr verpassen. Warum muss ich meine Email-Adresse eingeben? Druckversion PDF-Version Orte in dieser Meldung Lippe Nordrhein-Westfalen Themen in dieser Meldung Fahren unter Einfluss psychoaktiver Substanzen Schwer",
+      "validFrom": null,
+      "validTo": null,
+      "impact": null,
+      "recommendedAction": null,
+      "sourceName": "Presseportal - Polizeipresse (Blaulicht)",
+      "sourceUrl": "https://www.presseportal.de/blaulicht/pm/12727/6357613",
+      "confidence": "unverified",
+      "status": "new",
+      "firstSeenAt": "2026-09-23T10:37:58.658Z",
+      "lastCheckedAt": "2026-09-23T10:37:58.658Z"
+    },
+    {
+      "id": "1a83764f1561b047",
+      "country": "Germany",
+      "region": null,
+      "location": "L401",
+      "type": "road_closure",
+      "title": "Polizeidirektion Kaiserslautern",
+      "summary": "Folgen Keine Meldung von Polizeidirektion Kaiserslautern mehr verpassen. Warum muss ich meine Email-Adresse eingeben? Polizeidirektion Kaiserslautern http://www.polizei.rlp.de Weblinks Homepage Social Web PolizeiRheinlandPfalz Instagram LinkedIn WhatsApp --> Filtern Medien: Alle Alle Bilder Dokumente Zeitraum: Alle Gestern Letzte 7 Tage Zeitraum: Gesamt Gestern Letzte 7 Tage Von Bis Zur&uuml;cksetzen 23.09.2026 &ndash; 12:31 POL-PDKL: Durchfahrtverbot kontrolliert Mehlingen (Kreis Kaiserslautern) (ots) - Wegen einer laufenden Straßenbaumaßnahme ist derzeit die L401 zwischen Mehlingen und dem Bereich Eselsfürth gesperrt. Nachdem bei der Polizei mehrere Beschwerden eingingen, dass sich einige Verkehrsteilnehmer nicht an das Durchfahrtverbot halten, führte die Polizeiinspektion 1 am Dienstag eine Kontrolle durch. Dabei wurden vier Fahrer erwischt, die in den gesperrten Bereich ... mehr 23.09.2026 &ndash; 12:25 Kaiserslautern POL-PDKL: Illegale Einkäufe mit gefundener EC-Karte Kaiserslautern (ots) - Ein \"unehrlicher Finder\" war wohl in den vergangenen Tagen im Stadtteil Morlautern unterwegs. Nach Angaben einer 53-jährigen Frau verlor sie am Freitagnachmittag (18.09.) im Ortsbereich ihre EC-Karte. Obwohl sie diese sperren ließ, stellte die Dame im Nachhinein mehrere nicht autorisierte Abbuchungen von ihrem Konto fest. Ein Unbekannter hatte die Karte offenbar an sich genommen und damit diverse ... mehr 23.09.2026 &ndash; 12:15 POL-PDKL: Eine Reihe von Diebstählen Kaiserslautern/Enkenbach-Alsenborn (ots) - Eine ganze Reihe von Diebstählen an und aus Fahrzeugen ist am Dienstag bei der Polizeiinspektion 1 angezeigt worden. Ein Schwerpunkt war dabei das östliche Stadtgebiet. In der Karl-Peters-Straße stellte eine Anwohnerin am Dienstagmorgen gegen 8 Uhr fest, dass an ihrem Auto d",
+      "validFrom": null,
+      "validTo": null,
+      "impact": null,
+      "recommendedAction": null,
+      "sourceName": "Presseportal - Polizeipresse (Blaulicht)",
+      "sourceUrl": "https://www.presseportal.de/blaulicht/nr/117679",
+      "confidence": "unverified",
+      "status": "new",
+      "firstSeenAt": "2026-09-23T10:37:58.658Z",
+      "lastCheckedAt": "2026-09-23T10:37:58.658Z"
+    },
+    {
+      "id": "def9125ff0989971",
+      "country": "Germany",
+      "region": null,
+      "location": "L401",
+      "type": "road_closure",
+      "title": "POL-PDKL: Durchfahrtverbot kontrolliert",
+      "summary": "Alle Meldungen Folgen Keine Meldung von Polizeidirektion Kaiserslautern mehr verpassen. Warum muss ich meine Email-Adresse eingeben? 23.09.2026 &ndash; 12:31 Polizeidirektion Kaiserslautern POL-PDKL: Durchfahrtverbot kontrolliert Mehlingen (Kreis Kaiserslautern) (ots) Wegen einer laufenden Straßenbaumaßnahme ist derzeit die L401 zwischen Mehlingen und dem Bereich Eselsfürth gesperrt. Nachdem bei der Polizei mehrere Beschwerden eingingen, dass sich einige Verkehrsteilnehmer nicht an das Durchfahrtverbot halten, führte die Polizeiinspektion 1 am Dienstag eine Kontrolle durch. Dabei wurden vier Fahrer erwischt, die in den gesperrten Bereich einfuhren. Sie erhielten eine Verwarnung. Darüber hinaus konnten durch die sichtbare Präsenz der Beamten weitere Verstöße verhindert werden - schätzungsweise zwölf Fahrer überlegten es sich anders und nutzten die ausgeschilderte Umleitung. |cri Kontaktdaten für Presseanfragen: Polizeipräsidium Westpfalz Polizeidirektion Kaiserslautern Telefon: 0631 369-10022 E-Mail: ppwestpfalz.presse@polizei.rlp.de Internet: www.polizei.rlp.de/westpfalz Original-Content von: Polizeidirektion Kaiserslautern, &uuml;bermittelt durch news aktuell Alle Meldungen Folgen Keine Meldung von Polizeidirektion Kaiserslautern mehr verpassen. Warum muss ich meine Email-Adresse eingeben? Druckversion PDF-Version Orte in dieser Meldung Mehlingen (Kreis Kaiserslautern) Rheinland-Pfalz Themen in dieser Meldung Verkehrsteilnehmer Polizeiinspektion Bereich Polizei Polizei Rheinland-Pfalz Weitere Meldungen: Polizeidirektion Kaiserslautern Weitere Meldungen: Polizeidirektion Kaiserslautern Alle Meldungen Alle 23.09.2026 &ndash; 12:25 POL-PDKL: Illegale Einkäufe mit gefundener EC-Karte Kaiserslautern (ots) - Ein \"unehrlicher Finder\" war wohl in den vergangenen Tagen im Stadt",
+      "validFrom": null,
+      "validTo": null,
+      "impact": null,
+      "recommendedAction": null,
+      "sourceName": "Presseportal - Polizeipresse (Blaulicht)",
+      "sourceUrl": "https://www.presseportal.de/blaulicht/pm/117679/6357652",
+      "confidence": "unverified",
+      "status": "new",
+      "firstSeenAt": "2026-09-23T10:37:58.658Z",
+      "lastCheckedAt": "2026-09-23T10:37:58.658Z"
+    },
+    {
+      "id": "5cb4d077f18add95",
+      "country": "Germany",
+      "region": null,
+      "location": "B9",
+      "type": "road_closure",
+      "title": "Kreispolizeibeh&ouml;rde Kleve",
+      "summary": "Folgen Keine Meldung von Kreispolizeibehörde Kleve mehr verpassen. Warum muss ich meine Email-Adresse eingeben? Kreispolizeibeh&ouml;rde Kleve https://kleve.polizei.nrw Weblinks Homepage Social Web polizei.nrw.kle Instagram --> Filtern Medien: Alle Alle Bilder Dokumente Zeitraum: Alle Gestern Letzte 7 Tage Zeitraum: Gesamt Gestern Letzte 7 Tage Von Bis Zur&uuml;cksetzen 23.09.2026 &ndash; 12:27 Kerken POL-KLE: Erstmeldung nach Verkehrsunfall: B9 aktuell gesperrt Kerken (ots) - Aufgrund eines Verkehrsunfalls ist die Hülser Straße (B9) aktuell zwischen dem Mühlenweg und dem Stapperweg gesperrt. Ortskundige Verkehrsteilnehmer werden gebeten, den Bereich zu umfahren. Zum Unfallhergang wird zu einem späteren Zeitpunkt berichtet. (cs) Rückfragen bitte an: Kreispolizeibehörde Kleve Pressestelle Polizei Kleve Telefon: 02821 504 ... mehr 23.09.2026 &ndash; 11:51 Bedburg-Hau-Louisendorf POL-KLE: Bedburg-Hau - Verkehrsunfall beim Überholen / PKW überschlägt sich Bedburg-Hau-Louisendorf (ots) - Gegen 14:45 Uhr ereignete sich am Dienstag (22. September 2026) ein Verkehrsunfall auf der Straße Alte Bahn, bei dem sich eine Autofahrerin Verletzungen zuzog. Ein 23-Jähriger aus Bedburg-Hau war mit seinem Nissan auf der Straße Alte Bahn unterwegs in Richtung Bedburg-Hau. Etwa auf Höhe der Einmündung Doktorstraße wollte er einen ... mehr 23.09.2026 &ndash; 11:06 Kleve POL-KLE: Kleve - Einbruch in Kiosk / Tabakwaren gestohlen Kleve (ots) - Zwischen Sonntag, 20:00 Uhr, und Montag (21. September 2026), 10:55 Uhr, sind unbekannte Täter vermutlich durch ein Fenster auf \"Kippstellung\" in einen Kiosk an der Hagschen Straße eingedrungen. Sie entwendeten Tabakwaren und flüchteten anschließend unerkannt. Zeugen, die in dem Zusammenhang verdächtige Beobachtungen gemacht haben, wenden sich bitte an die",
+      "validFrom": null,
+      "validTo": null,
+      "impact": null,
+      "recommendedAction": null,
+      "sourceName": "Presseportal - Polizeipresse (Blaulicht)",
+      "sourceUrl": "https://www.presseportal.de/blaulicht/nr/65849",
+      "confidence": "unverified",
+      "status": "new",
+      "firstSeenAt": "2026-09-23T10:37:58.658Z",
+      "lastCheckedAt": "2026-09-23T10:37:58.658Z"
+    },
+    {
+      "id": "fd5d567daa12e856",
+      "country": "Germany",
+      "region": null,
+      "location": "B9",
+      "type": "road_closure",
+      "title": "POL-KLE: Erstmeldung nach Verkehrsunfall: B9 aktuell gesperrt",
+      "summary": "Alle Meldungen Folgen Keine Meldung von Kreispolizeibehörde Kleve mehr verpassen. Warum muss ich meine Email-Adresse eingeben? 23.09.2026 &ndash; 12:27 Kreispolizeibehörde Kleve POL-KLE: Erstmeldung nach Verkehrsunfall: B9 aktuell gesperrt Kerken (ots) Aufgrund eines Verkehrsunfalls ist die Hülser Straße (B9) aktuell zwischen dem Mühlenweg und dem Stapperweg gesperrt. Ortskundige Verkehrsteilnehmer werden gebeten, den Bereich zu umfahren. Zum Unfallhergang wird zu einem späteren Zeitpunkt berichtet. (cs) Rückfragen bitte an: Kreispolizeibehörde Kleve Pressestelle Polizei Kleve Telefon: 02821 504 1111 E-Mail: pressestelle.kleve@polizei.nrw.de https://kleve.polizei.nrw/ Besuchen Sie uns auch auf Facebook und Instagram: https://www.facebook.com/polizei.nrw.kle https://www.instagram.com/polizei.nrw.kle1/ Original-Content von: Kreispolizeibeh&ouml;rde Kleve, &uuml;bermittelt durch news aktuell Alle Meldungen Folgen Keine Meldung von Kreispolizeibehörde Kleve mehr verpassen. Warum muss ich meine Email-Adresse eingeben? Druckversion PDF-Version Orte in dieser Meldung Kerken Nordrhein-Westfalen Themen in dieser Meldung Verkehrsunfall Erstmeldung Verkehrsteilnehmer B9 Verkehrsunglück Polizei Polizei Nordrhein-Westfalen Weitere Meldungen: Kreispolizeibehörde Kleve Weitere Meldungen: Kreispolizeibehörde Kleve Alle Meldungen Alle 23.09.2026 &ndash; 11:51 POL-KLE: Bedburg-Hau - Verkehrsunfall beim Überholen / PKW überschlägt sich Bedburg-Hau-Louisendorf (ots) - Gegen 14:45 Uhr ereignete sich am Dienstag (22. September 2026) ein Verkehrsunfall auf der Straße Alte Bahn, bei dem sich eine Autofahrerin Verletzungen zuzog. Ein 23-Jähriger aus Bedburg-Hau war mit seinem Nissan auf der Straße Alte Bahn unterwegs in Richtung Bedburg-Hau. Etwa auf Höhe der Einmündung Doktorstraße wollte er e",
+      "validFrom": null,
+      "validTo": null,
+      "impact": null,
+      "recommendedAction": null,
+      "sourceName": "Presseportal - Polizeipresse (Blaulicht)",
+      "sourceUrl": "https://www.presseportal.de/blaulicht/pm/65849/6357648",
+      "confidence": "unverified",
+      "status": "new",
+      "firstSeenAt": "2026-09-23T10:37:58.658Z",
+      "lastCheckedAt": "2026-09-23T10:37:58.658Z"
+    },
     {
       "id": "b267e4ea83951179",
       "country": "Vatican City",
@@ -9,7 +180,7 @@
       "location": "Governatorato dello Stato della Citta del Vaticano",
       "type": "bridge_restriction",
       "title": "Serie divisionale monete 2026 - Pontificato Leone XIV",
-      "summary": "Serie divisionale monete 2026 - Pontificato Leone XIV Video 29 Luglio 2026 Visite: 18 Serie divisionale monete 2026 - Pontificato Leone XIV Video 29 Luglio 2026 Visite: 18 video Youtube Monete La nuova serie divisionale di monete vaticana, la prima del pontificato di Papa Leone XIV, si ispira direttamente allo stemma del Pontefice, riprodotto in copertina con un effetto “gesso” e reso in rilievo su un fondo avorio, mentre un blu intenso caratterizza le iscrizioni e gli elementi grafici di risalto, richiamando i colori dei due campi araldici dello stemma pontificio. Archivio Il portale istituzionale www.vaticanstate.va completamente rinnovato Da oggi è online il restyling del portale istituzionale Set 22, 2026 In Michigan, la partecipazione di una Delegazione del Governatorato all'Incontro Internazionale dei Leader dei Patrons of the Arts in the Vatican Museums Dal 17 al 20 settembre si è svolto a Saint John’s Resort di Plymouth, Michigan, negli Stati Uniti d’America, l'incontro interna... Set 21, 2026 “AI as a Catalyst”: a Roma, intelligenza artificiale, dati e comunità al centro del confronto Il 4 e 5 settembre, presso il Pontificio Collegio Filippino di Roma, si è svolto “AI as a Catalyst – Roma”, l'incontro promos... Set 14, 2026 Nei Giardini Vaticani piantumati arbusti e piante dall’Olanda Un’altra aiuola di arbusti e piante adorna da venerdì mattina, 11 settembre, i Giardini Vaticani. È un omaggio green da parte de... Set 12, 2026 Nel Palazzo Apostolico di Castel Gandolfo inaugurata la mostra “Le Litanie della Vergine di Mario Deluigi - Dialogo tra sacro e astrazione” “Le Litanie della Vergine di Mario Deluigi - Dialogo tra sacro e astrazione”: è il tema della mostra che è stata inau... Set 11, 2026",
+      "summary": "Serie divisionale monete 2026 - Pontificato Leone XIV Video 29 Luglio 2026 Visite: 133 Serie divisionale monete 2026 - Pontificato Leone XIV Video 29 Luglio 2026 Visite: 133 video Youtube Monete La nuova serie divisionale di monete vaticana, la prima del pontificato di Papa Leone XIV, si ispira direttamente allo stemma del Pontefice, riprodotto in copertina con un effetto “gesso” e reso in rilievo su un fondo avorio, mentre un blu intenso caratterizza le iscrizioni e gli elementi grafici di risalto, richiamando i colori dei due campi araldici dello stemma pontificio. Archivio Il Vaticano presenta le 2 Euro commemorative e la 5 Euro Bimetallica 2025 in versione Fondo Specchio Il Governatorato dello Stato della Città del Vaticano presenta le versioni fondo specchio delle due monete commemorative da 2 euro,... Set 23, 2026 Il portale istituzionale www.vaticanstate.va completamente rinnovato Da oggi è online il restyling del portale istituzionale Set 22, 2026 In Michigan, la partecipazione di una Delegazione del Governatorato all'Incontro Internazionale dei Leader dei Patrons of the Arts in the Vatican Museums Dal 17 al 20 settembre si è svolto a Saint John’s Resort di Plymouth, Michigan, negli Stati Uniti d’America, l'incontro interna... Set 21, 2026 “AI as a Catalyst”: a Roma, intelligenza artificiale, dati e comunità al centro del confronto Il 4 e 5 settembre, presso il Pontificio Collegio Filippino di Roma, si è svolto “AI as a Catalyst – Roma”, l'incontro promos... Set 14, 2026 Nei Giardini Vaticani piantumati arbusti e piante dall’Olanda Un’altra aiuola di arbusti e piante adorna da venerdì mattina, 11 settembre, i Giardini Vaticani. È un omaggio green da parte de... Set 12, 2026",
       "validFrom": null,
       "validTo": null,
       "impact": null,
@@ -17,9 +188,9 @@
       "sourceName": "Vatican City State",
       "sourceUrl": "https://vaticanstate.va/it/component/content/article/serie-divisionale-monete-2026-pontificato-leone-xiv.html?catid=41&amp;Itemid=312",
       "confidence": "unverified",
-      "status": "new",
+      "status": "updated",
       "firstSeenAt": "2026-09-22T10:48:20.724Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "a347f16879e4f102",
@@ -28,7 +199,7 @@
       "location": "Governatorato dello Stato della Citta del Vaticano",
       "type": "bridge_restriction",
       "title": "“AI as a Catalyst”: a Roma, intelligenza artificiale, dati e comunità al centro del confronto",
-      "summary": "“AI as a Catalyst”: a Roma, intelligenza artificiale, dati e comunità al centro del confronto Novità 14 Settembre 2026 Visite: 23 “AI as a Catalyst”: a Roma, intelligenza artificiale, dati e comunità al centro del confronto Novità 14 Settembre 2026 Visite: 23 novità “AI as a Catalyst” Pontificio Collegio Filippino Il 4 e 5 settembre, presso il Pontificio Collegio Filippino di Roma, si è svolto “AI as a Catalyst – Roma”, l'incontro promosso da MIT Critical Data per portare le comunità immigrate al centro della riflessione sulla trasformazione prodotta dall'intelligenza artificiale. Due giornate che hanno riunito rappresentanti delle istituzioni e della Chiesa, ricercatori, professionisti, mentor, studenti e membri della comunità filippina in Italia, alternando momenti di confronto ad attività laboratoriali. Al centro, non soltanto le opportunità offerte dall'IA, ma le responsabilità che ne accompagnano l'utilizzo e una domanda fondamentale: come fare in modo che l'intelligenza artificiale sia realmente al servizio delle persone e delle comunità? L'iniziativa ha visto MIT Critical Data nel ruolo di convener, l'Ambasciata delle Filippine in Italia come co-organizzatore e il coinvolgimento dell'International Migrants School come education partner. Tra i protagonisti dell'incontro Leo Anthony Celi, fondatore di MIT Critical Data, insieme al gruppo che ha progettato l'appuntamento romano. Ad accogliere i partecipanti è stato Fr. Gregory Ramon D. Gaston, Rettore del Pontificio Collegio Filippino. I lavori hanno visto inoltre gli interventi di Nathaniel G. Imperial, Ambasciatore delle Filippine presso la Repubblica Italiana, e, nella seconda giornata, di Raphael Perpetuo M. Lotilla, Ambasciatore delle Filippine presso la Santa Sede. Comunità e senso critico Uno degli elementi c",
+      "summary": "“AI as a Catalyst”: a Roma, intelligenza artificiale, dati e comunità al centro del confronto Novità 14 Settembre 2026 Visite: 150 “AI as a Catalyst”: a Roma, intelligenza artificiale, dati e comunità al centro del confronto Novità 14 Settembre 2026 Visite: 150 novità “AI as a Catalyst” Pontificio Collegio Filippino Il 4 e 5 settembre, presso il Pontificio Collegio Filippino di Roma, si è svolto “AI as a Catalyst – Roma”, l'incontro promosso da MIT Critical Data per portare le comunità immigrate al centro della riflessione sulla trasformazione prodotta dall'intelligenza artificiale. Due giornate che hanno riunito rappresentanti delle istituzioni e della Chiesa, ricercatori, professionisti, mentor, studenti e membri della comunità filippina in Italia, alternando momenti di confronto ad attività laboratoriali. Al centro, non soltanto le opportunità offerte dall'IA, ma le responsabilità che ne accompagnano l'utilizzo e una domanda fondamentale: come fare in modo che l'intelligenza artificiale sia realmente al servizio delle persone e delle comunità? L'iniziativa ha visto MIT Critical Data nel ruolo di convener, l'Ambasciata delle Filippine in Italia come co-organizzatore e il coinvolgimento dell'International Migrants School come education partner. Tra i protagonisti dell'incontro Leo Anthony Celi, fondatore di MIT Critical Data, insieme al gruppo che ha progettato l'appuntamento romano. Ad accogliere i partecipanti è stato Fr. Gregory Ramon D. Gaston, Rettore del Pontificio Collegio Filippino. I lavori hanno visto inoltre gli interventi di Nathaniel G. Imperial, Ambasciatore delle Filippine presso la Repubblica Italiana, e, nella seconda giornata, di Raphael Perpetuo M. Lotilla, Ambasciatore delle Filippine presso la Santa Sede. Comunità e senso critico Uno degli elementi",
       "validFrom": null,
       "validTo": null,
       "impact": null,
@@ -36,9 +207,9 @@
       "sourceName": "Vatican City State",
       "sourceUrl": "https://vaticanstate.va/it/component/content/article/ai-as-a-catalyst-a-roma-intelligenza-artificiale-dati-e-comunita-al-centro-del-confronto.html?catid=39&amp;Itemid=312",
       "confidence": "unverified",
-      "status": "new",
+      "status": "updated",
       "firstSeenAt": "2026-09-22T10:48:20.724Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "d0b39d618089fba2",
@@ -55,9 +226,9 @@
       "sourceName": "Vatican City State",
       "sourceUrl": "https://vaticanstate.va/it/le-direzioni/direzione-delle-ville-pontificie.html",
       "confidence": "unverified",
-      "status": "new",
+      "status": "active",
       "firstSeenAt": "2026-09-22T10:48:20.724Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "80adebc49823aed4",
@@ -74,9 +245,9 @@
       "sourceName": "Vatican City State",
       "sourceUrl": "https://vaticanstate.va/it/stato-e-governo/note-generali/inno-pontificio-e-la-sua-storia.html",
       "confidence": "unverified",
-      "status": "new",
+      "status": "active",
       "firstSeenAt": "2026-09-22T10:48:20.724Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "fc90b81f0f70c454",
@@ -171,7 +342,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "c7c56d19af93273f",
@@ -190,7 +361,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "64b057d62e4ad746",
@@ -209,7 +380,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "d7b4c187405c4240",
@@ -228,7 +399,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-23T10:37:58.658Z"
     },
     {
       "id": "e0d76b3ab2ff0e43",
@@ -494,7 +665,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "fec54fec4adf670b",
@@ -503,7 +674,7 @@
       "location": "Gouvernement de Monaco",
       "type": "bridge_restriction",
       "title": "Kaléïdo : concert événement le 3 octobre 2026",
-      "summary": "Accueil Actualités Kaléïdo : concert événement le 3 octobre 2026 Kaléïdo : concert événement le 3 octobre 2026 18 SEPTEMBRE 2026 ACTUALITÉ COMMUNIQUÉ DE PRESSE Kal&eacute;&iuml;do : la programmation jeunesse de la Direction des Affaires Culturelles revient ! La Direction des Affaires Culturelles poursuit sa nouvelle programmation culturelle KAL&Eacute;&Iuml;DO, d&eacute;di&eacute;e aux jeunes. Apr&egrave;s le succ&egrave;s de la chanteuse Styleto cet &eacute;t&eacute; au Fort Antoine, KAL&Eacute;&Iuml;DO revient avec un nouveau rendez-vous musical et investit un lieu embl&eacute;matique de la Principaut&eacute; pour un &eacute;v&eacute;nement rock imagin&eacute; comme un v&eacute;ritable festival en format intimiste. Le temps d&rsquo;une soir&eacute;e, l&rsquo;Auditorium Rainier III change de d&eacute;cor . L&rsquo;espace du Troparium accueille exceptionnellement une sc&egrave;ne &eacute;ph&eacute;m&egrave;re. Un cadre inhabituel qui entend bousculer les codes du concert et transformer ce site pour y accueillir la nouvelle vague artistique. Au programme : &Agrave; partir de 18h, retrouvez un DJ set et des foodtrucks. &Agrave; partir de 20h30 place aux concerts live de deux groupes de rock de la sc&egrave;ne musicale internationale. Avec cette nouvelle proposition, la Direction des Affaires Culturelles poursuit son ambition de proposer aux jeunes de la Principaut&eacute; de nouvelles exp&eacute;riences culturelles. Une soir&eacute;e Kal&eacute;&iuml;do &agrave; ne pas manquer . Programmation THE SOPHS En t&ecirc;te d&rsquo;affiche, The Sophs d&eacute;barquent de Californie avec un rock aussi impr&eacute;visible qu&rsquo;explosif. Men&eacute; par Ethan, le sextet brouille les pistes entre indie-rock, pop-punk, funk, blues et sonorit&eacute;s 90&rsquo;s, avec une seule r&e",
+      "summary": "Accueil Actualités Kaléïdo : concert événement le 3 octobre 2026 Kaléïdo : concert événement le 3 octobre 2026 18 SEPTEMBRE 2026 ACTUALITÉ RENFORCER L'ATTRACTIVITÉ ET LA QUALITÉ DE VIE COMMUNIQUÉ DE PRESSE Kal&eacute;&iuml;do : la programmation jeunesse de la Direction des Affaires Culturelles revient ! La Direction des Affaires Culturelles poursuit sa nouvelle programmation culturelle KAL&Eacute;&Iuml;DO, d&eacute;di&eacute;e aux jeunes. Apr&egrave;s le succ&egrave;s de la chanteuse Styleto cet &eacute;t&eacute; au Fort Antoine, KAL&Eacute;&Iuml;DO revient avec un nouveau rendez-vous musical et investit un lieu embl&eacute;matique de la Principaut&eacute; pour un &eacute;v&eacute;nement rock imagin&eacute; comme un v&eacute;ritable festival en format intimiste. Le temps d&rsquo;une soir&eacute;e, l&rsquo;Auditorium Rainier III change de d&eacute;cor . L&rsquo;espace du Troparium accueille exceptionnellement une sc&egrave;ne &eacute;ph&eacute;m&egrave;re. Un cadre inhabituel qui entend bousculer les codes du concert et transformer ce site pour y accueillir la nouvelle vague artistique. Au programme : &Agrave; partir de 18h, retrouvez un DJ set et des foodtrucks. &Agrave; partir de 20h30 place aux concerts live de deux groupes de rock de la sc&egrave;ne musicale internationale. Avec cette nouvelle proposition, la Direction des Affaires Culturelles poursuit son ambition de proposer aux jeunes de la Principaut&eacute; de nouvelles exp&eacute;riences culturelles. Une soir&eacute;e Kal&eacute;&iuml;do &agrave; ne pas manquer . Progr ammation THE SOPHS En t&ecirc;te d&rsquo;affiche, The Sophs d&eacute;barquent de Californie avec un rock aussi impr&eacute;visible qu&rsquo;explosif. Men&eacute; par Ethan, le sextet brouille les pistes entre indie-rock, pop-punk, funk, blues et ",
       "validFrom": null,
       "validTo": null,
       "impact": null,
@@ -513,7 +684,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "6c0b93d338254eb7",
@@ -532,7 +703,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "1bab54931fe738f2",
@@ -551,7 +722,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "4f303310dc2a8828",
@@ -570,7 +741,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "6195a134169cc6a7",
@@ -589,7 +760,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "8b9a411e7668d50f",
@@ -608,7 +779,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-23T10:37:58.658Z"
     },
     {
       "id": "b08b99a0d7ba3e6a",
@@ -627,7 +798,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "0aafeeeb40d860e4",
@@ -646,7 +817,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "32f15aaa88032ac1",
@@ -665,7 +836,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "f09e2e9dd8d75cfa",
@@ -684,7 +855,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "6a5ae05b88fc0999",
@@ -703,7 +874,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "79ee0bd617b81e62",
@@ -722,7 +893,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "4ce143b4869fb617",
@@ -741,7 +912,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "092146e1577b5d94",
@@ -760,7 +931,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "f93a0e519503cd46",
@@ -779,7 +950,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "b285994319696413",
@@ -798,7 +969,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "1509ad27429ea683",
@@ -817,7 +988,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "42c529f65871199a",
@@ -836,7 +1007,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "e085e0ae3f5fd6d5",
@@ -855,7 +1026,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "1137477b968105bb",
@@ -874,7 +1045,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "125616a411744338",
@@ -893,7 +1064,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "f6557262bcf12519",
@@ -912,7 +1083,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "b1a2a8cd01be39e4",
@@ -931,7 +1102,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "86666d0c487dd187",
@@ -950,7 +1121,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "1bb2d5abbe134f2a",
@@ -969,7 +1140,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "aae4888836bb8b17",
@@ -988,7 +1159,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "1899114ec9858919",
@@ -1007,7 +1178,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "214232ff1fd8d9f5",
@@ -1026,7 +1197,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "a3f1b49025fd4ca4",
@@ -1045,7 +1216,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "8d4fe6bd42233ab0",
@@ -1064,7 +1235,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "393f1751db67d66f",
@@ -1083,7 +1254,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "64299aa776bc71de",
@@ -1121,7 +1292,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "45fb212fcfdb9dea",
@@ -1140,7 +1311,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "33e36eb8e9046c6c",
@@ -1159,7 +1330,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "9769ca9694c1c0d9",
@@ -1178,7 +1349,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "5b3b3ed4cb43014b",
@@ -1197,7 +1368,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "adcf692d7e550fa9",
@@ -1216,7 +1387,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "92e26f06149c02e3",
@@ -1225,7 +1396,7 @@
       "location": "Government of Jersey",
       "type": "road_closure",
       "title": "Current road closures and delays",
-      "summary": "Summary traffic report Road closures and delays Traffic information --> Current --> Road closures Trinity - La Grande Route de St Jean - between La Rue du Becquet Vincent and La Rue des Houguettes Start date: Saturday, 24/01/26 End date: Saturday, 17/10/26 Traffic details: Road Closure All Day Promoter: GoJ Drainage Capital Works Contractor: Techno Groundworks Description: Road closed for the northern Sewer Network Upgrades project - area 8. Diversion routes posted. Delays No current major delays Starting - next 7 days Road closures No future road closures at present Delays St.Peter - La Route de Beaumont - Between Goose Green Road and L'Hermitage Gardens Start date: Thursday, 24/09/26 End date: Thursday, 24/09/26 Traffic details: Stop/Go (1 Man) After PM Peak Promoter: Jersey Telecom Contractor: Brenwal Description: Traffic will be controlled by temporary stop/go boards from 7:00pm to 10:00pm to facilitate repairs to defective ironwork. Delays may occur, please allow extra travel time. St.Lawrence - La Route de la Haule - Between Les Marais Avenue and Court Drive Start date: Sunday, 27/09/26 End date: Monday, 28/09/26 Traffic details: Stop/Go (2 Men) Between AM and PM Peaks Promoter: Private Individual Contractor: Jsy Rd Driveway Repairs Description: Traffic will be managed using stop/go boards to allow kerb and drainage works to take place. Works will be carried out all day Sunday and from 7pm on Monday until completion. Expect delays. Please allow extra travel time.",
+      "summary": "Summary traffic report Road closures and delays Traffic information --> Current --> Road closures Trinity - La Grande Route de St Jean - between La Rue du Becquet Vincent and La Rue des Houguettes Start date: Saturday, 24/01/26 End date: Saturday, 17/10/26 Traffic details: Road Closure All Day Promoter: GoJ Drainage Capital Works Contractor: Techno Groundworks Description: Road closed for the northern Sewer Network Upgrades project - area 8. Diversion routes posted. Delays St.Peter - La Route de Beaumont - Between Goose Green Road and L'Hermitage Gardens Start date: Thursday, 24/09/26 End date: Thursday, 24/09/26 Traffic details: Stop/Go (1 Man) After PM Peak Promoter: Jersey Telecom Contractor: Brenwal Description: Traffic will be controlled by temporary stop/go boards from 7:00pm to 10:00pm to facilitate repairs to defective ironwork. Delays may occur, please allow extra travel time. Starting - next 7 days Road closures No future road closures at present Delays St.Lawrence - La Route de la Haule - Between Les Marais Avenue and Court Drive Start date: Sunday, 27/09/26 End date: Monday, 28/09/26 Traffic details: Stop/Go (2 Men) Between AM and PM Peaks Promoter: Private Individual Contractor: Jsy Rd Driveway Repairs Description: Traffic will be managed using stop/go boards to allow kerb and drainage works to take place. Works will be carried out all day Sunday and from 7pm on Monday until completion. Expect delays. Please allow extra travel time. St.Peter - L`Avenue de la Reine Elizabeth II between Airport Road and La Route de Beaumont Start date: Tuesday, 29/09/26 End date: Thursday, 01/10/26 Traffic details: Stop/Go (2 Men) After PM Peak Promoter: GoJ Drainage Maintenance and Callouts Contractor: GoJ Drainage Maintenance and Callouts Description: Stop/go traffic manage",
       "validFrom": null,
       "validTo": null,
       "impact": null,
@@ -1235,7 +1406,7 @@
       "confidence": "unverified",
       "status": "updated",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "52334fd37084a027",
@@ -1254,7 +1425,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "ee25894c76b08ed3",
@@ -1273,7 +1444,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "7eb350822803e291",
@@ -1292,7 +1463,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "ab3d8c380ef74338",
@@ -1387,7 +1558,7 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-21T11:45:54.106Z",
-      "lastCheckedAt": "2026-09-22T10:48:20.724Z"
+      "lastCheckedAt": "2026-09-24T10:57:27.996Z"
     },
     {
       "id": "5a857db419778b35",

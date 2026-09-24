@@ -52,6 +52,17 @@ jobs:
         run: |
           git config user.name "dajc-bot"
           git config user.email "bot@users.noreply.github.com"
+
+          # Security boundary: this automation is allowed to change raw oversize
+          # monitoring data only. Any source-code/config/workflow change aborts
+          # the job before staging or pushing anything.
+          unexpected="$(git status --porcelain --untracked-files=all | cut -c4- | grep -Ev '^data/oversize/' || true)"
+          if [ -n "$unexpected" ]; then
+            echo "::error::Oversize monitor modified files outside data/oversize/**"
+            printf '%s\n' "$unexpected"
+            exit 1
+          fi
+
           git add data/oversize
           if git diff --cached --quiet; then
             echo "No meaningful changes to data/oversize - nothing to commit."

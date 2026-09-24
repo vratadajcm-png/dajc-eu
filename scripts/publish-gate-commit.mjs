@@ -41,6 +41,31 @@ function summary(line) {
 git(['config', 'user.name', 'dajc-bot']);
 git(['config', 'user.email', 'bot@users.noreply.github.com']);
 
+const ALLOWED_AUTOMATION_PREFIXES = [
+  'data/oversize/',
+  'src/content/news/eu-oversize/',
+];
+
+function pathFromPorcelainLine(line) {
+  const raw = line.slice(3).trim();
+  const renameTarget = raw.includes(' -> ') ? raw.split(' -> ').at(-1) : raw;
+  return renameTarget.replace(/^"|"$/g, '');
+}
+
+const workspaceStatus = git(['status', '--porcelain', '--untracked-files=all']);
+const unexpectedChanges = workspaceStatus
+  .split('\n')
+  .filter(Boolean)
+  .map(pathFromPorcelainLine)
+  .filter((path) => !ALLOWED_AUTOMATION_PREFIXES.some((prefix) => path.startsWith(prefix)));
+
+if (unexpectedChanges.length > 0) {
+  console.error('::error::Publication automation modified files outside the approved content/data paths.');
+  for (const path of unexpectedChanges) console.error(`  - ${path}`);
+  summary('### EU Oversize Weekly publish gate - BLOCKED\n\nAutomation attempted to modify files outside the approved content/data paths.');
+  process.exit(1);
+}
+
 const articleStatusOutput = git(['status', '--porcelain', '--untracked-files=all', '--', 'src/content/news/eu-oversize']);
 const articleAdded = articleStatusOutput.trim().length > 0;
 

@@ -1,0 +1,434 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="DAJC Platform Testing 2027 — Register now"
+  description="Register now to participate in DAJC Platform pre-production testing from 4 January 2027. For heavy and oversized transport professionals and companies across Europe."
+>
+  <main class="testing-page">
+    <section class="hero" aria-labelledby="testing-title">
+      <p class="eyebrow">DAJC PLATFORM TESTING · REGISTRATION OPEN</p>
+      <h1 id="testing-title">Help test the production DAJC Platform while it is being built.</h1>
+      <p class="lead">
+        Pre-production testing starts on <strong>Monday, 4 January 2027</strong>.
+        Registration is open now for relevant professionals and companies involved in heavy and oversized transport.
+      </p>
+      <div class="principles" aria-label="Testing programme principles">
+        <span>Same production product</span>
+        <span>No separate pilot edition</span>
+        <span>No Early Access edition</span>
+        <span>Registered relevant participants</span>
+      </div>
+      <a class="primary-cta" href="#register">Register for testing</a>
+    </section>
+
+    <section class="explain">
+      <div>
+        <p class="section-kicker">WHO SHOULD REGISTER</p>
+        <h2>Built with the people who actually move complex freight.</h2>
+      </div>
+      <div class="role-grid">
+        <article><h3>Carriers & fleets</h3><p>Heavy and oversized transport companies, owner-drivers and fleet operators.</p></article>
+        <article><h3>Dispatchers & drivers</h3><p>People who plan, coordinate and execute transports every day.</p></article>
+        <article><h3>Shippers & industry</h3><p>Industrial customers and logistics teams ordering complex transports.</p></article>
+        <article><h3>Specialist services</h3><p>Escort operators, permit specialists, crane companies and route professionals.</p></article>
+      </div>
+    </section>
+
+    <section class="model">
+      <p class="section-kicker">HOW IT WORKS</p>
+      <h2>One product. Real feedback. Continuous development.</h2>
+      <p>
+        Participants do not receive a simplified pilot product. They test the same DAJC Platform product
+        intended for production while it is under active development. Features, data coverage and workflows
+        may change as validation progresses. Testing participation itself is not a commercial production service.
+      </p>
+      <p>
+        Feedback will be used to validate D-ID workflows, fleet and equipment handling, DAJC AI,
+        route and restriction intelligence, permits, documents, execution workflows and other capabilities
+        relevant to heavy and oversized transport.
+      </p>
+    </section>
+
+    <section class="register" id="register" aria-labelledby="register-title">
+      <div class="register-copy">
+        <p class="section-kicker">REGISTER NOW</p>
+        <h2 id="register-title">DAJC Platform Testing 2027</h2>
+        <p>
+          Complete the registration below. Registration details are delivered to
+          <a href="mailto:platform@dajc.eu">platform@dajc.eu</a>.
+        </p>
+        <p class="start-date"><strong>Testing starts 4 January 2027.</strong></p>
+      </div>
+
+      <form id="testing-form" class="testing-form">
+        <div class="field-row">
+          <label>
+            <span>Name *</span>
+            <input name="fullName" autocomplete="name" maxlength="120" required />
+          </label>
+          <label>
+            <span>Company *</span>
+            <input name="company" autocomplete="organization" maxlength="160" required />
+          </label>
+        </div>
+
+        <div class="field-row">
+          <label>
+            <span>Business email *</span>
+            <input name="businessEmail" type="email" autocomplete="email" maxlength="254" required />
+          </label>
+          <label>
+            <span>Country *</span>
+            <input name="country" autocomplete="country-name" maxlength="120" required />
+          </label>
+        </div>
+
+        <fieldset>
+          <legend>Your role * <small>(select all that apply)</small></legend>
+          <div class="check-grid">
+            <label><input type="checkbox" name="role" value="Transport company / carrier" /> Transport company / carrier</label>
+            <label><input type="checkbox" name="role" value="Dispatcher" /> Dispatcher</label>
+            <label><input type="checkbox" name="role" value="Driver" /> Driver</label>
+            <label><input type="checkbox" name="role" value="Shipper / industrial customer" /> Shipper / industrial customer</label>
+            <label><input type="checkbox" name="role" value="Escort / pilot vehicle operator" /> Escort / pilot vehicle operator</label>
+            <label><input type="checkbox" name="role" value="Permit specialist" /> Permit specialist</label>
+            <label><input type="checkbox" name="role" value="Crane / lifting company" /> Crane / lifting company</label>
+            <label><input type="checkbox" name="role" value="Other relevant specialist" /> Other relevant specialist</label>
+          </div>
+        </fieldset>
+
+        <div class="field-row">
+          <label>
+            <span>Main operation type</span>
+            <input name="operationType" maxlength="180" placeholder="e.g. heavy haulage, machinery, wind, industrial projects" />
+          </label>
+          <label>
+            <span>Fleet / organisation size</span>
+            <input name="fleetSize" maxlength="80" placeholder="Optional" />
+          </label>
+        </div>
+
+        <label>
+          <span>What is the biggest problem in your current heavy / oversized transport workflow?</span>
+          <textarea name="biggestProblem" maxlength="2500" rows="5" placeholder="Optional — this helps DAJC prioritise real operational problems."></textarea>
+        </label>
+
+        <label class="honeypot" aria-hidden="true">
+          <span>Website</span>
+          <input name="website" tabindex="-1" autocomplete="off" />
+        </label>
+
+        <label class="consent">
+          <input type="checkbox" name="consent" required />
+          <span>
+            I have read the <a href="/privacy" target="_blank" rel="noopener">DAJC privacy notice</a>
+            and agree that the information I submit may be used to administer my DAJC Platform testing registration. *
+          </span>
+        </label>
+
+        <input type="hidden" name="source" value="dajc.eu/testing" />
+
+        <button type="submit">Register for DAJC Platform Testing 2027</button>
+        <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+        <p class="fallback">
+          If the form is unavailable, email <a href="mailto:platform@dajc.eu?subject=DAJC%20Platform%20Testing%202027%20registration">platform@dajc.eu</a>.
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const form = document.querySelector('#testing-form');
+    const status = document.querySelector('#form-status');
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!(form instanceof HTMLFormElement) || !(status instanceof HTMLElement)) return;
+
+      const roles = [...form.querySelectorAll('input[name="role"]:checked')];
+      if (roles.length === 0) {
+        status.textContent = 'Please select at least one role.';
+        status.dataset.state = 'error';
+        return;
+      }
+
+      const button = form.querySelector('button[type="submit"]');
+      if (button instanceof HTMLButtonElement) {
+        button.disabled = true;
+        button.textContent = 'Sending registration…';
+      }
+      status.textContent = '';
+      status.dataset.state = '';
+
+      const data = new FormData(form);
+      const payload: Record<string, unknown> = Object.fromEntries(data.entries());
+      payload.role = roles.map((input) => input instanceof HTMLInputElement ? input.value : '').filter(Boolean);
+      payload.consent = data.get('consent') === 'on';
+
+      try {
+        const response = await fetch('/api/testing-register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+
+        if (!response.ok || !result.ok) {
+          throw new Error(result.error || 'Registration could not be sent.');
+        }
+
+        form.reset();
+        status.textContent = 'Registration received. Thank you — DAJC Platform testing starts 4 January 2027.';
+        status.dataset.state = 'success';
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Registration could not be sent.';
+        status.innerHTML = `${message} Please email <a href="mailto:platform@dajc.eu?subject=DAJC%20Platform%20Testing%202027%20registration">platform@dajc.eu</a>.`;
+        status.dataset.state = 'error';
+      } finally {
+        if (button instanceof HTMLButtonElement) {
+          button.disabled = false;
+          button.textContent = 'Register for DAJC Platform Testing 2027';
+        }
+      }
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  .testing-page {
+    position: relative;
+    z-index: 2;
+    width: min(1120px, calc(100% - 3rem));
+    margin: 0 auto;
+    padding: clamp(3rem, 7vw, 6rem) 0 6rem;
+  }
+
+  .hero {
+    text-align: center;
+    padding: clamp(2rem, 6vw, 5rem) 0 clamp(3rem, 7vw, 6rem);
+  }
+
+  .eyebrow, .section-kicker {
+    margin: 0 0 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+  }
+
+  h1, h2, h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--dajc-white);
+  }
+
+  h1 {
+    max-width: 18ch;
+    margin: 0 auto 1.4rem;
+    font-size: clamp(2.3rem, 6vw, 4.6rem);
+    line-height: 1.02;
+  }
+
+  h2 {
+    margin: 0 0 1rem;
+    font-size: clamp(1.7rem, 4vw, 2.7rem);
+    line-height: 1.1;
+  }
+
+  h3 {
+    margin: 0 0 .55rem;
+    font-size: 1.05rem;
+  }
+
+  .lead, .model p, .register-copy p, .role-grid p {
+    color: var(--dajc-muted);
+    line-height: 1.7;
+  }
+
+  .lead {
+    max-width: 70ch;
+    margin: 0 auto 1.8rem;
+    font-size: 17px;
+  }
+
+  .principles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .6rem;
+    margin: 0 auto 1.8rem;
+  }
+
+  .principles span {
+    padding: .55rem .75rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 999px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--dajc-white);
+    background: rgba(255,255,255,.025);
+  }
+
+  .primary-cta, .testing-form button {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 8px;
+    background: var(--dajc-orange);
+    color: var(--dajc-dark);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .primary-cta { padding: 0 1.3rem; }
+
+  .explain, .model, .register {
+    border-top: 1px solid var(--dajc-line);
+    padding: clamp(3rem, 7vw, 5rem) 0;
+  }
+
+  .role-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .role-grid article {
+    padding: 1.2rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 10px;
+    background: rgba(255,255,255,.025);
+  }
+
+  .role-grid p { margin: 0; font-size: 14px; }
+
+  .model { max-width: 820px; }
+  .model p { margin: .7rem 0; }
+
+  .register {
+    display: grid;
+    grid-template-columns: minmax(0, .8fr) minmax(0, 1.35fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+
+  .register-copy {
+    position: sticky;
+    top: 2rem;
+  }
+
+  .register-copy a, .testing-form a { color: var(--dajc-orange); }
+
+  .start-date {
+    padding: 1rem;
+    border-left: 3px solid var(--dajc-orange);
+    background: rgba(239,125,0,.08);
+  }
+
+  .testing-form {
+    display: grid;
+    gap: 1.1rem;
+    padding: clamp(1.2rem, 4vw, 2rem);
+    border: 1px solid var(--dajc-line);
+    border-radius: 12px;
+    background: rgba(0,20,52,.55);
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  label, fieldset { display: grid; gap: .45rem; }
+  label > span, legend {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--dajc-white);
+  }
+
+  legend small { color: var(--dajc-muted); }
+
+  input, textarea {
+    width: 100%;
+    border: 1px solid var(--dajc-line);
+    border-radius: 7px;
+    background: rgba(0, 10, 30, .75);
+    color: var(--dajc-white);
+    padding: .8rem .85rem;
+    font: inherit;
+  }
+
+  input:focus, textarea:focus {
+    outline: 2px solid var(--dajc-orange);
+    outline-offset: 1px;
+  }
+
+  fieldset {
+    margin: 0;
+    padding: 1rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 8px;
+  }
+
+  .check-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .65rem 1rem;
+  }
+
+  .check-grid label, .consent {
+    display: flex;
+    align-items: flex-start;
+    gap: .6rem;
+    color: var(--dajc-muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .check-grid input, .consent input {
+    width: auto;
+    margin-top: .2rem;
+    accent-color: var(--dajc-orange);
+  }
+
+  .testing-form button {
+    width: 100%;
+    padding: .8rem 1rem;
+  }
+
+  .testing-form button:disabled {
+    opacity: .65;
+    cursor: wait;
+  }
+
+  .form-status, .fallback {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .form-status[data-state="success"] { color: #72d69d; }
+  .form-status[data-state="error"] { color: #ffb3a8; }
+  .fallback { color: var(--dajc-muted); }
+  .honeypot { position: absolute !important; left: -10000px !important; }
+
+  @media (max-width: 900px) {
+    .role-grid { grid-template-columns: 1fr 1fr; }
+    .register { grid-template-columns: 1fr; }
+    .register-copy { position: static; }
+  }
+
+  @media (max-width: 620px) {
+    .testing-page { width: min(100% - 2rem, 1120px); }
+    .field-row, .check-grid, .role-grid { grid-template-columns: 1fr; }
+  }
+</style>

@@ -37,7 +37,8 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
     <h1>DAJC is building the execution layer for heavy and oversized freight transport across Europe.</h1>
     <p class="desc">DAJC is a pan-European platform for managing heavy and oversized transport around one D-ID. It connects authorised participants, documents, permits, routes, contractual state and shipment progress in one digital environment. The platform is being designed to prevent avoidable operational costs and errors, remain provider-neutral and prepare for regulated digital-freight workflows such as eFTI — without presenting roadmap work as already certified or production-ready.</p>
     <div class="hero-actions">
-      <a class="hero-action hero-action--primary" href="/intelligence">Explore DAJC Intelligence</a>
+      <a class="hero-action hero-action--primary" href="/testing">Register for Testing 2027</a>
+      <a class="hero-action" href="/intelligence">Explore DAJC Intelligence</a>
       <a class="hero-action" href="/pricing">View pricing</a>
     </div>
     <svg class="route-inline" viewBox="0 0 640 64" aria-hidden="true">
@@ -47,6 +48,22 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
     </svg>
     <p class="sub">Built from real heavy-transport operations. Moving step by step toward a trusted European execution layer.</p>
   </main>
+
+  <section class="testing-recruitment" aria-labelledby="testing-recruitment-heading">
+    <div class="testing-recruitment__inner">
+      <p class="testing-recruitment__eyebrow">DAJC PLATFORM TESTING · REGISTRATION OPEN</p>
+      <h2 id="testing-recruitment-heading">Work in heavy or oversized transport? Help test DAJC from 4 January 2027.</h2>
+      <p>
+        Registration is open now for relevant professionals and companies across Europe. Registered participants
+        will test the same DAJC Platform production product while it is under active development — not a separate
+        pilot, Founding Pilot or Early Access edition.
+      </p>
+      <div class="testing-recruitment__actions">
+        <a class="testing-recruitment__primary" href="/testing">Register for testing</a>
+        <a href="/testing#register">Go directly to the form &rarr;</a>
+      </div>
+    </div>
+  </section>
 
   {featuredStory && (
     <section class="story-feature" aria-labelledby="story-feature-heading">
@@ -80,6 +97,82 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
 </BaseLayout>
 
 <style>
+  .testing-recruitment {
+    position: relative;
+    z-index: 2;
+    padding: 0 1.5rem 4rem;
+  }
+
+  .testing-recruitment__inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: clamp(1.6rem, 4vw, 2.6rem);
+    border: 1px solid var(--dajc-orange);
+    border-radius: 10px;
+    background:
+      linear-gradient(135deg, rgba(239, 125, 0, 0.14), rgba(0, 38, 92, 0.2) 55%),
+      rgba(0, 20, 52, 0.58);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  }
+
+  .testing-recruitment__eyebrow {
+    margin: 0 0 0.8rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+  }
+
+  .testing-recruitment h2 {
+    margin: 0 0 1rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.55rem, 3.5vw, 2.35rem);
+    line-height: 1.15;
+    color: var(--dajc-white);
+  }
+
+  .testing-recruitment p:not(.testing-recruitment__eyebrow) {
+    max-width: 76ch;
+    margin: 0;
+    color: var(--dajc-muted);
+    line-height: 1.75;
+  }
+
+  .testing-recruitment__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.4rem;
+  }
+
+  .testing-recruitment__actions a {
+    color: var(--dajc-orange);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .testing-recruitment__actions .testing-recruitment__primary {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+    border-radius: 8px;
+    background: var(--dajc-orange);
+    color: var(--dajc-dark);
+    font-weight: 700;
+  }
+
+  .testing-recruitment__actions a:hover,
+  .testing-recruitment__actions a:focus-visible {
+    text-decoration: underline;
+  }
+
   .story-feature,
   .support-teaser {
     position: relative;
