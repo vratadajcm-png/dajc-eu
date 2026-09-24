@@ -1,6 +1,6 @@
 {
   "week": "2026-W39",
-  "checkedAt": "2026-09-23T10:37:58.658Z",
+  "checkedAt": "2026-09-24T10:57:27.996Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -269,7 +269,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 22
+      "candidateFindings": 26
     },
     {
       "code": "GR",
@@ -994,112 +994,136 @@
       "code": "GP",
       "name": "Guadeloupe",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "gp-prefecture"
       ],
-      "reachableSources": [
-        "gp-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "gp-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "MQ",
       "name": "Martinique",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "mq-prefecture"
       ],
-      "reachableSources": [
-        "mq-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "mq-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "GF",
       "name": "French Guiana",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "gf-prefecture"
       ],
-      "reachableSources": [
-        "gf-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "gf-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "RE",
       "name": "Réunion",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "re-prefecture"
       ],
-      "reachableSources": [
-        "re-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "re-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "YT",
       "name": "Mayotte",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "yt-prefecture"
       ],
-      "reachableSources": [
-        "yt-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "yt-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "MF",
       "name": "Saint-Martin",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "mf-bl-prefecture"
       ],
-      "reachableSources": [
-        "mf-bl-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "mf-bl-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "BL",
       "name": "Saint-Barthélemy",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "bl-prefecture"
       ],
-      "reachableSources": [
-        "bl-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "bl-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "PM",
       "name": "Saint-Pierre-et-Miquelon",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "pm-prefecture"
       ],
-      "reachableSources": [
-        "pm-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "pm-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -1134,14 +1158,17 @@
       "code": "WF",
       "name": "Wallis and Futuna",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "wf-prefecture"
       ],
-      "reachableSources": [
-        "wf-prefecture"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "wf-prefecture",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
