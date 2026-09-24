@@ -21,6 +21,12 @@ function seededRule(rule) {
   };
 }
 
+const SPAIN_SOURCE = 'https://www.boe.es/eli/es/res/2026/01/14/(1)';
+const SPAIN_SOURCE_NAME = 'BOE / DGT - 2026 special traffic-regulation resolution, Annex II';
+const SPAIN_LEGAL = 'DGT 2026 Resolution, Annex II - restrictions for vehicles above 7.5t, vehicles requiring complementary circulation authorisation, and special vehicles (B.1.1 / B.3.1)';
+const SPAIN_SCOPE = 'Vehicles/combinations above 7.5t; the same Annex II calendar also applies to vehicles requiring complementary circulation authorisation and special vehicles, subject to the published exemptions.';
+const SPAIN_EXEMPTIONS = 'Use the exemptions in sections B.1.2 and B.3.2 of the DGT resolution. The road, kilometre limits, direction and date/time are decisive. Catalonia, the Basque Country and Navarre have separate competent traffic authorities and are not inferred from DGT coverage.';
+
 export const verifiedSepOct2026DrivingBans = [
   seededRule({
     id: 'at-2026-october-transit-corridor-ban',
@@ -100,7 +106,7 @@ export const verifiedSepOct2026DrivingBans = [
 
   seededRule({
     id: 'me-2026-r1-kotor-cetinje-hgv-ban', country: 'ME', countryName: 'Montenegro', restrictionTypes: ['general', 'exceptional'],
-    sourceUrl: 'https://www.gov.me/amp/clanak/obavjestenje-naredba-o-privremenoj-zabrani-saobracaja-teretnih-motornih-vozila-i-ogranicavanju-saobracaja-svih-kategorija-vozila-na-odredenim-putnim-pravcima-2',
+    sourceUrl: 'https://www.gov.me/clanak/obavjestenje-naredba-o-privremenoj-zabrani-saobracaja-teretnih-motornih-vozila-i-ogranicavanju-saobracaja-svih-kategorija-vozila-na-odredenim-putnim-pravcima-2',
     sourceName: 'Government of Montenegro / Police Directorate - 2026 temporary HGV traffic order',
     legalBasis: 'Police Directorate order under Article 130 of the Road Traffic Safety Law',
     vehicleScope: 'Goods motor vehicles with maximum authorised mass above 7.5t',
@@ -110,18 +116,44 @@ export const verifiedSepOct2026DrivingBans = [
   }),
 
   seededRule({
-    id: 'es-dgt-2026-sep-oct-selected-hgv-restrictions', country: 'ES', countryName: 'Spain', restrictionTypes: ['general', 'exceptional'],
-    sourceUrl: 'https://www.boe.es/buscar/act.php?id=BOE-A-2026-1255',
-    sourceName: 'BOE / DGT - 2026 special traffic-regulation resolution',
-    legalBasis: 'DGT 2026 traffic-regulation resolution, Annexes I-II; consolidated update published 26 June 2026',
-    vehicleScope: 'Vehicles/combinations above 7.5t on the listed DGT roads and periods; special vehicles and vehicles requiring complementary circulation authorisation are also subject where Annex II/V applies',
-    routeScope: 'Only the specifically published DGT roads/territories; separately competent traffic authorities require their own source profile',
-    exemptionNotes: 'DGT Annex II contains statutory exemptions. Do not extrapolate a listed provincial/island restriction to all of Spain.',
-    seededPeriods: [
-      { validFrom: '2026-09-24', validTo: '2026-09-24', title: 'El Hierro all-roads HGV restriction (24 September 2026)', timeWindow: 'Thursday 24 September 2026 00:00-24:00', whatChanged: 'DGT’s 2026 resolution lists a full-day restriction on all roads of El Hierro.', impact: 'Affected >7.5t vehicles are restricted on all roads of El Hierro during the published day, subject to Annex exemptions.', recommendedAction: 'Do not dispatch an affected vehicle on El Hierro during the day without verifying an applicable exemption and local updates.' },
-      { validFrom: '2026-10-12', validTo: '2026-10-12', title: 'Balearic Islands all-roads HGV restriction (12 October 2026)', timeWindow: 'Monday 12 October 2026 00:00-24:00', whatChanged: 'DGT’s 2026 resolution lists a full-day restriction on all roads of the Balearic Islands.', impact: 'Affected >7.5t vehicles are restricted on all roads of the Balearic Islands during the published day, subject to Annex exemptions.', recommendedAction: 'Plan affected freight outside the 12 October window and verify island-specific/year-round restrictions separately.' },
-      { validFrom: '2026-10-28', validTo: '2026-11-02', title: 'Tenerife all-roads HGV restriction (28 October-2 November 2026)', timeWindow: 'Wednesday 28 October 2026 00:00 to Monday 2 November 2026 24:00', whatChanged: 'DGT’s 2026 resolution lists a continuous restriction on all roads of Tenerife over the stated period.', impact: 'Affected >7.5t vehicles are restricted on all roads of Tenerife during the published period, subject to Annex exemptions.', recommendedAction: 'Treat the Tenerife period as a hard route/date constraint unless an applicable exemption is verified.' },
-      { validFrom: '2026-10-30', validTo: '2026-10-30', title: 'Madrid outbound HGV restrictions for 1 November peak (30 October 2026)', timeWindow: 'Friday 30 October 2026 16:00-22:00 on listed outbound sections', whatChanged: 'DGT Annex II restricts selected outbound Madrid corridors, including A-6/AP-6 Madrid-M40 to San Rafael and A-1 Madrid-M40 to Venturada.', impact: 'Affected >7.5t vehicles and applicable special/authorised vehicles cannot use the listed corridor sections in the restricted direction during the window.', recommendedAction: 'Validate the exact DGT Annex II road/km/direction before dispatch; do not generalise this entry to all Madrid roads.' },
-    ],
+    id: 'es-dgt-2026-oct08-annex-ii', country: 'ES', countryName: 'Spain', restrictionTypes: ['general', 'exceptional'],
+    sourceUrl: SPAIN_SOURCE, sourceName: SPAIN_SOURCE_NAME, legalBasis: SPAIN_LEGAL, vehicleScope: SPAIN_SCOPE,
+    routeScope: 'A-3 km 352 Valencia to km 292 Requena, direction outbound from Valencia.', exemptionNotes: SPAIN_EXEMPTIONS,
+    seededPeriods: [{ validFrom: '2026-10-08', validTo: '2026-10-08', title: 'DGT Annex II HGV / special-vehicle restriction - El Pilar outbound (8 October)', timeWindow: 'Thursday 8 October 2026 15:00-21:00', whatChanged: 'DGT Annex II restricts the A-3 from Valencia km 352 to Requena km 292 in the outbound direction.', impact: 'Affected >7.5t goods vehicles, vehicles requiring complementary circulation authorisation and special vehicles cannot use the listed section during the window unless an exemption applies.', recommendedAction: 'Route outside the window or verify an applicable DGT exemption before dispatch.' }],
+  }),
+
+  seededRule({
+    id: 'es-dgt-2026-oct09-annex-ii', country: 'ES', countryName: 'Spain', restrictionTypes: ['general', 'exceptional'],
+    sourceUrl: SPAIN_SOURCE, sourceName: SPAIN_SOURCE_NAME, legalBasis: SPAIN_LEGAL, vehicleScope: SPAIN_SCOPE,
+    routeScope: '9 Oct: A-6/AP-6 Madrid M-40 km 11.65-San Rafael km 61.3 outbound; AP-6/A-6 San Rafael km 61.3-Tordesillas km 182 toward A Coruña; A-1 km 11.8-50 outbound Madrid; A-2 km 18.3-38.7 outbound; R-2 km 17.1-37.5 outbound; A-3 km 13-80.4 both directions; R-3 km 7.3-29.4 outbound; A-4 km 17.3-62 outbound; R-4 km 0-52.5 outbound; A-5 km 15.6-106 both directions; R-5 km 15-30.5 outbound; N-6 km 42.5-62.5 outbound; M-501 km 4-59.5 outbound; A-62 km 113-151 toward Portugal; A-3 km 275-352 inbound Valencia; A-8 km 139.2-169 toward Santander; N-230 sections km 64.1-116.1, 119.5-120.9 and 133.6-149.2 toward France.', exemptionNotes: SPAIN_EXEMPTIONS,
+    seededPeriods: [{ validFrom: '2026-10-09', validTo: '2026-10-09', title: 'DGT Annex II HGV / special-vehicle restrictions - El Pilar outbound (9 October)', timeWindow: 'Friday 9 October 2026: mostly 16:00-22:00; A-62 15:00-23:00; A-3 Utiel-Valencia 13:00-22:00; A-8 17:00-21:00; N-230 17:00-24:00', whatChanged: 'DGT Annex II sets route-, kilometre- and direction-specific restrictions on the listed corridors for the El Pilar traffic period.', impact: 'Affected HGV/special-vehicle movements are blocked on the listed segments during each segment’s published time window unless an exemption applies.', recommendedAction: 'Match the exact planned road, kilometre interval and direction to Annex II before dispatch.' }],
+  }),
+
+  seededRule({
+    id: 'es-dgt-2026-oct10-annex-ii', country: 'ES', countryName: 'Spain', restrictionTypes: ['general', 'exceptional'],
+    sourceUrl: SPAIN_SOURCE, sourceName: SPAIN_SOURCE_NAME, legalBasis: SPAIN_LEGAL, vehicleScope: SPAIN_SCOPE,
+    routeScope: '10 Oct: A-6/AP-6 Madrid M-40 km 11.65-San Rafael km 61.3 outbound; AP-6/A-6 San Rafael km 61.3-Tordesillas km 182 toward A Coruña; A-1 km 11.8-50 outbound; A-2 km 18.3-38.7 outbound; R-2 km 17.1-37.5 outbound; A-3 km 13-80.4 both directions; R-3 km 7.3-29.4 outbound; A-4 km 17.3-62 outbound; R-4 km 0-52.5 outbound; A-5 km 15.6-106 both directions; R-5 km 15-30.5 outbound; N-6 km 42.5-62.5 outbound; M-501 km 4-59.5 outbound; A-62 km 113-151 toward Portugal; A-8 km 139.2-169 toward Santander.', exemptionNotes: SPAIN_EXEMPTIONS,
+    seededPeriods: [{ validFrom: '2026-10-10', validTo: '2026-10-10', title: 'DGT Annex II HGV / special-vehicle restrictions - El Pilar outbound (10 October)', timeWindow: 'Saturday 10 October 2026: 08:00-15:00 or 08:00-13:00 by segment; A-8 10:00-15:00', whatChanged: 'DGT Annex II continues route-specific outbound restrictions on the listed corridors for the El Pilar traffic period.', impact: 'Affected HGV/special-vehicle movements are blocked on the listed segments during each segment’s published time window unless an exemption applies.', recommendedAction: 'Match the exact planned road, kilometre interval and direction to Annex II before dispatch.' }],
+  }),
+
+  seededRule({
+    id: 'es-dgt-2026-oct12-annex-ii', country: 'ES', countryName: 'Spain', restrictionTypes: ['general', 'exceptional'],
+    sourceUrl: SPAIN_SOURCE, sourceName: SPAIN_SOURCE_NAME, legalBasis: SPAIN_LEGAL, vehicleScope: SPAIN_SCOPE,
+    routeScope: '12 Oct return restrictions: A-1 Boceguillas km 118.3-Madrid M-40 km 11.8; A-2 Almadrones km 102-Madrid km 10.8; A-3 Atalaya km 177-Madrid km 6.9 and Arganda km 25-Tarancón km 80.4; A-4 Madridejos km 122-Madrid km 6.7; A-5 Talavera km 126-Madrid km 11.8 plus Madrid M-50 km 15.6-Talavera km 126; A-6 Tordesillas km 184-Arévalo km 123, Arévalo km 123-Adanero km 110 and Las Rozas km 22.3-Madrid km 6.8; AP-6 Adanero km 110-San Rafael km 60.5; N-6 km 110-42.5; AP-51 Ávila km 104.8-Villacastín km 81.8; AP-61 Segovia km 88.55-San Rafael km 61.5; N-110 km 246-228; N-603 km 74.9-64; M-501 km 59.5-0; A-62 Tordesillas km 151-Valladolid km 125 toward Burgos; A-1/AP-1/N-1 toward Vitoria; A-8 Laredo km 169-Castro-Urdiales km 139.2 toward Bilbao; A-3 Valencia/Requena both outbound/inbound segments; N-230 listed sections toward Benabarre.', exemptionNotes: SPAIN_EXEMPTIONS,
+    seededPeriods: [{ validFrom: '2026-10-12', validTo: '2026-10-12', title: 'DGT Annex II HGV / special-vehicle return restrictions - El Pilar (12 October)', timeWindow: 'Monday 12 October 2026: mainly 16:00-22:00/24:00; A-62 15:00-23:00; A-3 Valencia outbound 09:00-21:00 and inbound 13:00-21:00; N-230 13:00-20:00', whatChanged: 'DGT Annex II sets the return-phase restrictions on the listed Madrid, northern, Valencia and N-230 corridors.', impact: 'Affected HGV/special-vehicle movements are blocked on the listed segments during each segment’s published time window unless an exemption applies.', recommendedAction: 'Match the exact planned road, kilometre interval and direction to Annex II before dispatch.' }],
+  }),
+
+  seededRule({
+    id: 'es-dgt-2026-oct30-annex-ii', country: 'ES', countryName: 'Spain', restrictionTypes: ['general', 'exceptional'],
+    sourceUrl: SPAIN_SOURCE, sourceName: SPAIN_SOURCE_NAME, legalBasis: SPAIN_LEGAL, vehicleScope: SPAIN_SCOPE,
+    routeScope: '30 Oct: A-6/AP-6 Madrid M-40 km 11.65-San Rafael km 61.3 outbound; AP-6/A-6 San Rafael km 61.3-Tordesillas km 182 toward A Coruña; A-1 km 11.8-50 outbound; A-2 km 18.3-38.7 outbound; R-2 km 17.1-37.5 outbound; A-3 km 13-80.4 both directions; R-3 km 7.3-29.4 outbound; A-4 km 17.3-62 outbound; R-4 km 0-52.5 outbound; A-5 km 15.6-106 both directions; R-5 km 15-30.5 outbound; N-6 km 42.5-62.5 outbound; M-501 km 4-59.5 outbound; A-62 km 113-151 toward Portugal; A-3 km 275-352 inbound Valencia; A-8 km 139.2-169 toward Santander.', exemptionNotes: SPAIN_EXEMPTIONS,
+    seededPeriods: [{ validFrom: '2026-10-30', validTo: '2026-10-30', title: 'DGT Annex II HGV / special-vehicle restrictions - All Saints outbound (30 October)', timeWindow: 'Friday 30 October 2026: mostly 16:00-22:00; A-62 15:00-23:00; A-3 Utiel-Valencia 15:00-22:00; A-8 17:00-21:00', whatChanged: 'DGT Annex II sets route-specific outbound restrictions on the listed corridors for the All Saints traffic period.', impact: 'Affected HGV/special-vehicle movements are blocked on the listed segments during each segment’s published time window unless an exemption applies.', recommendedAction: 'Match the exact planned road, kilometre interval and direction to Annex II before dispatch.' }],
+  }),
+
+  seededRule({
+    id: 'es-dgt-2026-oct31-annex-ii', country: 'ES', countryName: 'Spain', restrictionTypes: ['general', 'exceptional'],
+    sourceUrl: SPAIN_SOURCE, sourceName: SPAIN_SOURCE_NAME, legalBasis: SPAIN_LEGAL, vehicleScope: SPAIN_SCOPE,
+    routeScope: '31 Oct: A-6/AP-6 Madrid M-40 km 11.65-San Rafael km 61.3 outbound; AP-6/A-6 San Rafael km 61.3-Tordesillas km 182 toward A Coruña; A-1 km 11.8-50 outbound; A-2 km 18.3-38.7 outbound; R-2 km 17.1-37.5 outbound; A-3 km 13-80.4 both directions; R-3 km 7.3-29.4 outbound; A-4 km 17.3-62 outbound; R-4 km 0-52.5 outbound; A-5 km 15.6-106 both directions; R-5 km 15-30.5 outbound; N-6 km 42.5-62.5 outbound; M-501 km 4-59.5 outbound; A-62 km 113-151 toward Portugal; A-8 km 139.2-169 toward Santander.', exemptionNotes: SPAIN_EXEMPTIONS,
+    seededPeriods: [{ validFrom: '2026-10-31', validTo: '2026-10-31', title: 'DGT Annex II HGV / special-vehicle restrictions - All Saints outbound (31 October)', timeWindow: 'Saturday 31 October 2026: 08:00-15:00 or 08:00-13:00 by segment; A-8 11:00-14:00', whatChanged: 'DGT Annex II continues route-specific outbound restrictions on the listed corridors for the All Saints traffic period.', impact: 'Affected HGV/special-vehicle movements are blocked on the listed segments during each segment’s published time window unless an exemption applies.', recommendedAction: 'Match the exact planned road, kilometre interval and direction to Annex II before dispatch.' }],
   }),
 ];
