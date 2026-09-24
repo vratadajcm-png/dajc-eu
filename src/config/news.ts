@@ -53,3 +53,23 @@ export function formatEuOversizeLaunchDate(): string {
 
   return `${datePart} at ${timePart}${timeZoneName ? ` ${timeZoneName}` : ''}`;
 }
+
+/**
+ * Whether a news entry is public at `now`. EU Oversize Weekly articles are
+ * committed ahead of their Friday 12:00 Europe/Prague slot with that instant
+ * as `publishedAt`, and must stay hidden until then - see
+ * docs/NEWS_AUTOMATION.md "Thursday preparation, Friday 12:00 release".
+ */
+export function isNewsEntryPublic(
+  data: { status: 'draft' | 'published'; publishedAt: Date },
+  now: Date = new Date()
+): boolean {
+  return data.status === 'published' && data.publishedAt.getTime() <= now.getTime();
+}
+
+/**
+ * Cache headers for the on-demand news pages (homepage, /news, EU Oversize
+ * articles). Short enough that a scheduled article appears within about two
+ * minutes of its release instant, long enough that the CDN absorbs traffic.
+ */
+export const NEWS_PAGE_CACHE_CONTROL = 'public, max-age=0, s-maxage=60, stale-while-revalidate=60';

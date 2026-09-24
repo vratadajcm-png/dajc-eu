@@ -1,17 +1,31 @@
 name: Publish Weekly Oversize Article
 
-# Friday publication is scheduled at both UTC instants that can represent
-# 12:00 Europe/Prague (10:00 UTC in CEST, 11:00 UTC in CET). Later Friday
-# triggers are recovery checks: the publication check is idempotent, so they
-# only do real work when the target article is still missing. A Saturday
-# catch-up remains as the final safety net.
+# The article is PREPARED on Thursday and RELEASED on Friday at 12:00
+# Europe/Prague by the site itself: the generator writes that instant into
+# `publishedAt`, and the on-demand news pages only show an article once
+# `publishedAt` has passed (src/config/news.ts isNewsEntryPublic). Nothing has
+# to run at 12:00.
+#
+# Why: GitHub delivers scheduled runs of this repository hours late (about
+# four hours since late August 2026), which made every Friday-noon cron -
+# primary, recovery and watchdog alike - fire in the afternoon. Preparing a
+# day ahead absorbs that delay and leaves time to react when the quality gate
+# rejects an edition.
+#
+# Every trigger is idempotent (scripts/check-weekly-publication.mjs), so the
+# later ones only do work while the target article is still missing. Minutes
+# are off the top of the hour, where GitHub's scheduler is least congested.
+# Friday/Saturday recoveries publish an article whose slot is already past,
+# i.e. immediately on deploy.
 
 on:
   schedule:
-    - cron: '0 10 * * 5' # Friday 12:00 CEST (primary in summer)
-    - cron: '0 11 * * 5' # Friday 12:00 CET; summer recovery check
-    - cron: '0 12 * * 5' # Friday last-chance recovery check
-    - cron: '0 6 * * 6'  # Saturday catch-up if Friday did not publish
+    - cron: '17 3 * * 4'  # Thursday 05:17 CEST / 04:17 CET - preparation
+    - cron: '17 9 * * 4'  # Thursday retry
+    - cron: '17 15 * * 4' # Thursday retry
+    - cron: '17 3 * * 5'  # Friday early retry, still ahead of 12:00 even if delayed
+    - cron: '17 10 * * 5' # Friday recovery (published immediately)
+    - cron: '17 6 * * 6'  # Saturday catch-up
   workflow_dispatch:
     inputs:
       dry_run:
@@ -42,9 +56,9 @@ jobs:
         run: |
           event="${{ github.event_name }}"
           schedule="${{ github.event.schedule }}"
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
 
           if [ "$event" = "workflow_dispatch" ]; then
-            echo "should_run=true" >> "$GITHUB_OUTPUT"
             echo "role=manual" >> "$GITHUB_OUTPUT"
             echo "preview=${{ github.event.inputs.preview == 'true' && 'true' || 'false' }}" >> "$GITHUB_OUTPUT"
             echo "Manual run - publication pipeline enabled."
@@ -52,34 +66,17 @@ jobs:
           fi
 
           echo "preview=false" >> "$GITHUB_OUTPUT"
-          if [ "$schedule" = "0 6 * * 6" ]; then
-            echo "should_run=true" >> "$GITHUB_OUTPUT"
-            echo "role=catch-up" >> "$GITHUB_OUTPUT"
-            echo "Saturday catch-up trigger - publication pipeline enabled if the target article is still missing."
-            exit 0
-          fi
-
-          offset=$(TZ=Europe/Prague date +%z)
-          echo "Europe/Prague UTC offset at execution: $offset"
           echo "Scheduled cron identity: $schedule"
-
-          if { [ "$offset" = "+0200" ] && [ "$schedule" = "0 10 * * 5" ]; } || { [ "$offset" = "+0100" ] && [ "$schedule" = "0 11 * * 5" ]; }; then
-            echo "should_run=true" >> "$GITHUB_OUTPUT"
-            echo "role=friday-primary" >> "$GITHUB_OUTPUT"
-            echo "Correct CET/CEST Friday trigger selected. Runner delay does not matter."
-          elif [ "$offset" = "+0200" ] && [ "$schedule" = "0 11 * * 5" ]; then
-            echo "should_run=true" >> "$GITHUB_OUTPUT"
-            echo "role=friday-recovery" >> "$GITHUB_OUTPUT"
-            echo "Summer fallback trigger - publish only if the primary run did not create the target article."
-          elif [ "$schedule" = "0 12 * * 5" ]; then
-            echo "should_run=true" >> "$GITHUB_OUTPUT"
-            echo "role=friday-last-chance" >> "$GITHUB_OUTPUT"
-            echo "Friday last-chance trigger - publish only if the target article is still missing."
-          else
-            echo "should_run=false" >> "$GITHUB_OUTPUT"
-            echo "role=friday-redundant" >> "$GITHUB_OUTPUT"
-            echo "Early/redundant DST-safety Friday trigger - no publication work required."
-          fi
+          echo "Europe/Prague time at execution: $(TZ=Europe/Prague date '+%a %Y-%m-%d %H:%M %Z')"
+          case "$schedule" in
+            '17 3 * * 4') role=thursday-prepare ;;
+            *' * * 4') role=thursday-retry ;;
+            '17 3 * * 5') role=friday-early-retry ;;
+            *' * * 5') role=friday-recovery ;;
+            *) role=saturday-catch-up ;;
+          esac
+          echo "role=$role" >> "$GITHUB_OUTPUT"
+          echo "Trigger role: $role - publication work happens only if the target article is missing."
 
       - name: Checkout
         if: steps.trigger.outputs.should_run == 'true'
@@ -89,6 +86,10 @@ jobs:
         if: steps.trigger.outputs.should_run == 'true'
         id: publish-needed
         run: node scripts/check-weekly-publication.mjs
+
+      - name: Apply DAJC editorial policy
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        run: node scripts/apply-weekly-editorial-policy.mjs
 
       - name: Determine dry-run mode
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'

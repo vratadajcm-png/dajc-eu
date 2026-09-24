@@ -73,11 +73,10 @@ Every source URL is cross-validated against the verified candidate set. Every re
 ## 8. Publication schedule and preview
 
 - Normal final edition: Friday at **12:00 Europe/Prague**, covering the upcoming Monday–Sunday week.
-- A policy-aware run may start immediately before 12:00 so verification/generation can complete around the publication slot; the standard run and watchdog remain idempotent recovery layers.
-- Saturday catch-up runs only if the final week article is missing.
+- The edition is prepared on Thursday and committed with `publishedAt` set to Friday 12:00 Europe/Prague; the site shows it only from that instant. Thursday/Friday-morning retries, the watchdog and a Saturday catch-up are idempotent recovery layers that run only if the final week article is missing.
 - Final publication is idempotent; an existing final week file is not automatically overwritten.
 - A manually requested **preview** uses the same research, verification, counts, quality gates and article layout, but a separate preview slug. It never consumes or blocks Friday's final slug.
-- Friday's final edition is always rebuilt from the complete monitoring data available by Friday.
+- The final edition is built from the complete monitoring data available at Thursday preparation.
 
 ## 9. Article structure
 

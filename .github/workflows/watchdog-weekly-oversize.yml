@@ -1,19 +1,17 @@
 name: Watchdog Weekly Oversize Publication
 
-# Independent safety net for the Friday EU Oversize Weekly publication.
-# GitHub scheduled workflows can occasionally be delayed or skipped, so this
-# watchdog runs separately from publish-weekly-oversize.yml and only performs
+# Independent safety net for the EU Oversize Weekly, separate from
+# publish-weekly-oversize.yml in case one workflow's schedule is dropped.
+# The article is prepared on Thursday and released by the site at Friday
+# 12:00 Europe/Prague (see publish-weekly-oversize.yml), so the watchdog
+# checks on Thursday evening and early Friday - both leave room for GitHub's
+# multi-hour schedule delays before the release. It only performs
 # publication work when the target week's article is still missing.
-#
-# Two UTC pairs cover Europe/Prague in both CEST and CET. The local-time gate
-# prevents the "wrong" DST pair from doing work before 12:15 Prague time.
 
 on:
   schedule:
-    - cron: '20 10 * * 5' # 12:20 CEST / 11:20 CET
-    - cron: '40 10 * * 5' # 12:40 CEST / 11:40 CET
-    - cron: '20 11 * * 5' # 13:20 CEST / 12:20 CET
-    - cron: '40 11 * * 5' # 13:40 CEST / 12:40 CET
+    - cron: '47 18 * * 4' # Thursday 20:47 CEST / 19:47 CET
+    - cron: '47 4 * * 5'  # Friday 06:47 CEST / 05:47 CET
   workflow_dispatch:
 
 permissions:
@@ -31,23 +29,10 @@ jobs:
         id: gate
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "should_run=true" >> "$GITHUB_OUTPUT"
-            echo "Manual watchdog run enabled."
-            exit 0
-          fi
-
-          local_dow=$(TZ=Europe/Prague date +%u)
-          local_hm=$(TZ=Europe/Prague date +%H%M)
+          # Every trigger may run: check-weekly-publication.mjs below keeps
+          # the watchdog a no-op once the target article exists.
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
           echo "Europe/Prague local time: $(TZ=Europe/Prague date '+%Y-%m-%d %H:%M:%S %Z')"
-
-          if [ "$local_dow" = "5" ] && [ "$local_hm" -ge 1215 ]; then
-            echo "should_run=true" >> "$GITHUB_OUTPUT"
-            echo "Friday after 12:15 Prague time - watchdog enabled."
-          else
-            echo "should_run=false" >> "$GITHUB_OUTPUT"
-            echo "Outside watchdog publication window - intentional no-op."
-          fi
 
       - name: Checkout
         if: steps.gate.outputs.should_run == 'true'
@@ -57,6 +42,10 @@ jobs:
         if: steps.gate.outputs.should_run == 'true'
         id: publish-needed
         run: node scripts/check-weekly-publication.mjs
+
+      - name: Apply DAJC editorial policy
+        if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        run: node scripts/apply-weekly-editorial-policy.mjs
 
       - name: Pre-flight - verify OPENAI_API_KEY is configured
         if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'

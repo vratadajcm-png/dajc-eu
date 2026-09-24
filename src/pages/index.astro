@@ -4,8 +4,16 @@ import NewsSection from '../components/NewsSection.astro';
 import IntegrationEcosystemSection from '../components/IntegrationEcosystemSection.astro';
 import IntelligenceTeaser from '../components/IntelligenceTeaser.astro';
 import { getCollection } from 'astro:content';
+import { isNewsEntryPublic, NEWS_PAGE_CACHE_CONTROL } from '../config/news';
 
-const euOversize = await getCollection('eu-oversize', ({ data }) => data.status === 'published');
+// Rendered on demand (CDN-cached) so a prepared EU Oversize Weekly shows up
+// at its Friday 12:00 Europe/Prague slot without a rebuild - see
+// src/pages/news/eu-oversize/[slug].astro.
+export const prerender = false;
+Astro.response.headers.set('Cache-Control', NEWS_PAGE_CACHE_CONTROL);
+
+const now = new Date();
+const euOversize = await getCollection('eu-oversize', ({ data }) => isNewsEntryPublic(data, now));
 const platform = await getCollection('platform', ({ data }) => data.status === 'published');
 
 const featuredStory = platform.find((entry) => entry.data.slug === 'why-dajc-exists');
