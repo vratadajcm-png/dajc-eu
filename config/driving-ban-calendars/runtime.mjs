@@ -2,12 +2,14 @@ import { drivingBanCalendars as baseDrivingBanCalendars } from './index.mjs';
 import { currentDrivingBanExceptions } from './current-exceptions.mjs';
 import { sloveniaCurrentDrivingBanExceptions } from './slovenia-current-exceptions.mjs';
 import { publicHolidayDrivingBans } from './public-holidays.mjs';
+import { verifiedSepOct2026DrivingBans } from './verified-sep-oct-2026.mjs';
 
 export const drivingBanCalendars = [
   ...baseDrivingBanCalendars,
   ...publicHolidayDrivingBans,
   ...currentDrivingBanExceptions,
   ...sloveniaCurrentDrivingBanExceptions,
+  ...verifiedSepOct2026DrivingBans,
 ];
 
 export function getCalendarById(id) {
