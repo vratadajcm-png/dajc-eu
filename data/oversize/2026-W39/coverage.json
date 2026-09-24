@@ -1,6 +1,6 @@
 {
   "week": "2026-W39",
-  "checkedAt": "2026-09-24T10:57:27.996Z",
+  "checkedAt": "2026-09-24T18:56:58.230Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -269,7 +269,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 26
+      "candidateFindings": 30
     },
     {
       "code": "GR",
@@ -736,14 +736,17 @@
       "code": "VA",
       "name": "Vatican City",
       "sourceScope": "VA",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "va-state"
       ],
-      "reachableSources": [
-        "va-state"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "va-state",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 8
     },
     {
