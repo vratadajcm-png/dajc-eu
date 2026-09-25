@@ -93,10 +93,17 @@ export function categorizeDevelopment(item) {
 }
 
 const SECTION_TITLES = {
-  bans: 'Driving bans and exceptional-transport restrictions',
+  bans: 'Exceptional-transport movement restrictions',
   infrastructure: 'Infrastructure restrictions',
   other: 'Other operational developments',
 };
+
+export const CHECKLIST_TITLE = 'What to check before you move';
+
+// General HGV driving bans are a separate DAJC product; the weekly only
+// covers restrictions specific to exceptional transport and points here.
+export const DRIVING_BANS_NOTE =
+  '> General HGV driving bans (weekend, public-holiday, seasonal and transit bans) are listed in the [DAJC Driving Bans calendar](/driving-bans). This report covers only restrictions specific to exceptional and oversize transport.';
 
 export function renderArticleMarkdown(article, { slug, publishedAt, nextPublicationLabel }) {
   const byCategory = { bans: [], infrastructure: [], other: [] };
@@ -107,6 +114,7 @@ export function renderArticleMarkdown(article, { slug, publishedAt, nextPublicat
   const sections = [];
 
   sections.push(`## Intro\n\n${mdEscape(article.intro)}`);
+  sections.push(DRIVING_BANS_NOTE);
 
   for (const category of ['bans', 'infrastructure', 'other']) {
     const items = byCategory[category];
@@ -121,8 +129,6 @@ export function renderArticleMarkdown(article, { slug, publishedAt, nextPublicat
     const parts = [
       '## Rest of Europe: verified operational roundup',
       '',
-      'At least ten concise verified items from at least six countries. Only operationally useful changes are included; routine evergreen Sunday bans are omitted after 1 September 2026.',
-      '',
     ];
     for (const item of roundup) parts.push(renderRoundupItem(item), '');
     sections.push(parts.join('\n').trim());
@@ -136,7 +142,7 @@ export function renderArticleMarkdown(article, { slug, publishedAt, nextPublicat
         : [];
   if (checklist.length > 0) {
     sections.push(
-      ['## Operator checklist', '', ...checklist.map((c) => `- ${mdEscape(c)}`)].join('\n')
+      [`## ${CHECKLIST_TITLE}`, '', ...checklist.map((c) => `- ${mdEscape(c)}`)].join('\n')
     );
   }
 

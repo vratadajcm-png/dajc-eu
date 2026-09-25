@@ -57,7 +57,7 @@ dispatchers - not a general traffic-news feed, and it must never summarize
 every item a source happens to publish. All content is written in
 professional English.
 
-- **20-30 lead reports plus Rest of Europe**, enforced by `scripts/lib/quality-gate.mjs`. The hard minimum is **20 substantive lead topics**. Rest of Europe has a hard minimum of **10 concise reports spanning at least 6 distinct jurisdictions**. Titles and source URLs must be disjoint across the complete edition. The pipeline never pads either section with routine or irrelevant filler.
+- **Target 20-30 lead reports plus 10-20 Rest-of-Europe items; counts never block publication.** A small edition (e.g. 5 leads + 1 roundup item) is published; only an edition with no verified report is not. `scripts/lib/quality-gate.mjs` keeps the maximums (30 / 20). Below 20 leads the generator supplements with ongoing structured restrictions (see "German motorway restrictions" below). Titles and source URLs must be disjoint across the complete edition. The pipeline never pads either section with routine or irrelevant filler.
 - **Editorial priority order** (most important first, see the system prompt
   in `scripts/lib/openai-client.mjs`): truck driving bans; special movement
   windows/bans for exceptional or oversized transport; permit-rule/system
@@ -79,7 +79,7 @@ professional English.
   special restriction for exceptional/oversized transport, and a condition
   in an individual transport permit are always kept distinct - never
   conflated into one description.
-- **From 1 September 2026, unchanged year-round Sunday/weekend bans are not repeated.** Seasonal, holiday-specific, exceptional-transport and materially changed restrictions remain eligible through the maintained official calendar layer.
+- **General HGV driving bans are not part of the Weekly.** Weekend, holiday, seasonal and transit bans live in the public Driving Bans calendar (`/driving-bans`); every edition links there. Only restrictions whose title/description/vehicle scope is explicitly limited to exceptional transport are included (`scripts/lib/weekly-driving-ban-policy.mjs`, applied to calendar findings, monitored findings, model output and in the quality gate).
 
 ## Content model
 
@@ -212,9 +212,9 @@ planned/future works (see `NON_RESTRICTION_PATTERNS` in
 
 The following rules are hard publication requirements, not prompt-only guidance:
 
-- **Rest of Europe must contain at least 10 concise verified reports from at least 6 distinct countries.**
+- **Rest of Europe targets 10-20 concise verified reports from as many countries as the material allows; fewer is published.**
 - The roundup is deliberately short-form: each item states the country, the operational change, where/when it matters, the practical operator action, and the official source.
-- Ordinary year-round Sunday/weekend driving-ban baselines are not repeated after 1 September 2026. Seasonal, holiday-specific, exceptional-transport and genuinely changed restrictions remain eligible.
+- General HGV driving bans are left to the Driving Bans calendar; only exceptional-transport-specific restrictions appear in the Weekly.
 - A road/motorway closure is publishable only when the official evidence proves a **planned duration longer than 30 days**. A 30-day closure, a shorter closure, or an undated/"until further notice" closure with no provable duration is excluded. There is no corridor-based exception to this threshold.
 - RSS/Atom is never treated as complete coverage. Every configured authority is scanned through the feed **and** its official web/HTML news/traffic pages; results are merged and deduplicated.
 - Fresh verified high-signal changes directly affecting exceptional/oversized transport (permits, escort/private-escort rules, police escort, border restrictions, weight/width/height/axle limits, relevant regulatory procedures) are **required coverage**. A quality gate blocks publication if any such critical verified source is omitted from both lead reports and Rest of Europe.
@@ -252,6 +252,29 @@ This is the official-source discovery layer for the mandatory DAJC geographic co
    official source exists.
 
 Slovakia is covered through Slovenská správa ciest' official press-release page. The previously rejected NDS RSS feed remains intentionally unused because its CMS date handling was not trusted.
+
+## German motorway restrictions (Autobahn API)
+
+Long-running motorway width and weight limits are never published by the
+Autobahn GmbH as news or HTML traffic notices - only as structured roadworks
+records in the traffic API behind autobahn.de (`verkehr.autobahn.de`). The
+monitor source `de-autobahn-restrictions` (`adapter: 'autobahn-restrictions'`,
+`scripts/lib/autobahn-restrictions.mjs`) walks every motorway's roadworks
+and keeps only records that matter for heavy/oversize planning:
+
+- an explicit gross-weight limit (`zulässiges Gesamtgewicht`), or
+- a passage width of at most 3.0 m (3.25 m is an ordinary narrowed lane),
+- with a defined construction phase (single-night windows are ignored).
+
+Records of one project on one motorway are merged into one finding (most
+restrictive limit, full phase range, all affected sections). The source URL is
+the record's official details endpoint. Example: A4 Köln-Klettenberg -
+Köln-Eifeltor ("BW Eifeltor"): max. 3.25 m, 44 t, 16.07.2026-01.12.2029.
+
+**New vs ongoing.** A restriction whose current phase began before the last
+preparation run (now - 7 days) is *ongoing*. Ongoing restrictions are held in
+reserve and only offered to the lead supplement when an edition has fewer
+than 20 lead reports; new or changed phases compete as normal candidates.
 
 ## Official driving-ban calendar layer
 
@@ -424,11 +447,15 @@ commit always proceeds to a normal build+deploy).
 
 `scripts/generate-weekly-article.mjs` (`npm run oversize:publish`):
 
-1. Reads the **current** ISO week's monitor-derived findings (RSS and
-   official HTML, gathered all week), and resolves the **official driving-ban calendar layer** for the
-   **upcoming** week (`resolveDrivingBanFindings()` - see above). A missing
-   annual calendar for the required year is a hard failure here, before any
-   OpenAI cost is spent.
+1. Reads the **current** ISO week's monitor-derived findings (RSS,
+   official HTML and the Autobahn API, gathered all week), and resolves the
+   **official driving-ban calendar layer** for the **upcoming** week
+   (`resolveDrivingBanFindings()` - see above). Only calendar entries
+   specific to exceptional transport are used; general bans are left to the
+   Driving Bans calendar page. A calendar maintenance error (e.g. a missing
+   annual calendar) is therefore reported as a workflow warning and does not
+   block the Weekly. Ongoing structured restrictions are set aside as a
+   reserve for editions below 20 lead reports.
 2. `selectCandidates()` narrows the monitor findings to a bounded, scored
    subset (freshness + specific-type bonus, capped per source) - the
    cost-control step: don't verify or pay to synthesize everything.
@@ -454,9 +481,9 @@ commit always proceeds to a normal build+deploy).
    (defends against model drift/hallucination).
 6. Renders the surviving developments into frontmatter + Markdown
    (`scripts/lib/render-article.mjs`) under **mutually exclusive**
-   categories - `## Driving bans and exceptional-transport restrictions` /
+   categories - `## Exceptional-transport movement restrictions` /
    `## Infrastructure restrictions` / `## Other operational developments` -
-   followed by `## Operator checklist`, `## Sources`, and
+   followed by `## What to check before you move`, `## Sources`, and
    `## Next EU Oversize Weekly`. Each development is rendered **exactly
    once**, in exactly one category (see "Duplicate rendering" below).
 7. Runs the quality gate (below). Only on success is the file written to

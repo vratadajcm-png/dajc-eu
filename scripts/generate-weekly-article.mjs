@@ -40,6 +40,14 @@ import { ensureOfficialCalendarLeadFloor } from './lib/lead-floor.mjs';
 import { ensureCriticalCoverage } from './lib/critical-floor.mjs';
 import { mergeRoundupSupplement, roundupNeedsSupplement, sanitizeRoundup } from './lib/roundup-breadth.mjs';
 import { filterGeneratedItems } from './lib/generated-item-filter.mjs';
+import { checkWeeklyDrivingBanPolicy } from './lib/weekly-driving-ban-policy.mjs';
+import { isOngoingRestriction } from './lib/autobahn-restrictions.mjs';
+
+// An edition is complete at 20 lead reports. Below that, ongoing (unchanged)
+// structured restrictions may supplement it; the count never blocks publication.
+const LEAD_TARGET = 20;
+const ONGOING_RESTRICTION_LIMIT = 20;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -157,40 +165,62 @@ async function main() {
   const monitoredFindings = [...findingsMap.values()];
   console.log(`Monitor-derived findings on file for ${thisWeek}: ${monitoredFindings.length}`);
 
-  // Maintained official driving-ban calendar layer (config/driving-ban-calendars):
-  // Feed/HTML monitoring alone cannot reliably surface a standing/seasonal driving
-  // ban that nobody re-announced this week, so these are resolved directly
-  // against the target week's date range instead. An "annual-calendar"
-  // entry (e.g. Italy's yearly decree) that has not been re-seeded for the
-  // target year is a configuration/maintenance error, not a quiet week -
-  // fail loudly instead of silently publishing without it.
-  const { findings: calendarFindings, maintenanceErrors } = resolveDrivingBanFindings({
+  // General HGV driving bans (weekend, holiday, seasonal, transit) live in the
+  // separate public Driving Bans calendar (dajc.eu/driving-bans) and are not
+  // repeated here. From the official calendar layer only restrictions that are
+  // explicitly scoped to exceptional/oversize transport are used. A calendar
+  // maintenance error therefore concerns the Driving Bans page, not this
+  // edition, and is reported as a warning.
+  const { findings: allCalendarFindings, maintenanceErrors } = resolveDrivingBanFindings({
     weekStart: targetWeekStart,
     weekEnd: targetWeekEnd,
     year: targetWeekStart.getUTCFullYear(),
   });
-  console.log(`Official driving-ban calendar findings for ${nextWeekLabel}: ${calendarFindings.length}`);
   if (maintenanceErrors.length > 0) {
-    await fail(
-      `official driving-ban calendar needs maintenance:\n  - ${maintenanceErrors.join('\n  - ')}`
-    );
-    return;
+    console.warn(`::warning::Official driving-ban calendar needs maintenance:\n  - ${maintenanceErrors.join('\n  - ')}`);
+  }
+  const calendarFindings = allCalendarFindings.filter((f) => checkWeeklyDrivingBanPolicy(f).ok);
+  console.log(
+    `Official driving-ban calendar findings for ${nextWeekLabel}: ${allCalendarFindings.length} ` +
+      `(${calendarFindings.length} specific to exceptional transport; general bans stay in the Driving Bans calendar)`
+  );
+
+  const bansExcluded = monitoredFindings.filter((f) => !checkWeeklyDrivingBanPolicy(f).ok);
+  const weeklyFindings = monitoredFindings.filter((f) => checkWeeklyDrivingBanPolicy(f).ok);
+  if (bansExcluded.length > 0) {
+    console.log(`General driving bans left to the Driving Bans calendar: ${bansExcluded.length}`);
   }
 
-  const findings = [...calendarFindings, ...monitoredFindings];
+  // Structured motorway restrictions whose current phase began before the
+  // previous preparation run are ongoing, unchanged limits. They are held
+  // back and only used to supplement an edition below LEAD_TARGET leads.
+  const newsWindowStart = new Date(now.getTime() - 7 * DAY_MS);
+  const ongoingRestrictions = weeklyFindings.filter((f) => isOngoingRestriction(f, newsWindowStart));
+  const freshFindings = weeklyFindings.filter((f) => !isOngoingRestriction(f, newsWindowStart));
+
+  const findings = [...calendarFindings, ...freshFindings, ...ongoingRestrictions];
   if (findings.length === 0) {
-    await abort(`no findings recorded for ${thisWeek} and no official driving-ban calendar applies to ${nextWeekLabel}`);
+    await abort(`no findings recorded for ${thisWeek} for the EU Oversize Weekly`);
     return;
   }
 
-  const preSelected = [...calendarFindings, ...selectCandidates(monitoredFindings, { discoveryWindowStart: isoWeekStart(now) })];
+  const preSelected = [...calendarFindings, ...selectCandidates(freshFindings, { discoveryWindowStart: isoWeekStart(now) })];
   console.log(`Pre-selected for verification: ${preSelected.length} (${calendarFindings.length} from the official calendar, always included)`);
-  if (preSelected.length === 0) {
+  console.log(`Ongoing structured restrictions held in reserve: ${ongoingRestrictions.length}`);
+
+  // Heaviest limits first: a weight limit affects more transports than a
+  // narrowed passage.
+  const reserveCandidates = [...ongoingRestrictions]
+    .sort((a, b) => Number(b.type === 'weight_restriction') - Number(a.type === 'weight_restriction'))
+    .slice(0, ONGOING_RESTRICTION_LIMIT);
+
+  if (preSelected.length === 0 && reserveCandidates.length === 0) {
     await abort('no candidates passed pre-selection');
     return;
   }
 
   let verified;
+  let verifiedOngoing = [];
   if (mock) {
     verified = preSelected.map((f) => ({ ...f, confidence: 'verified' }));
     console.log(`Verification: skipped (mock mode) - treating all ${verified.length} pre-selected candidates as verified`);
@@ -198,10 +228,19 @@ async function main() {
     const result = await verifyCandidates(preSelected, { weekStart: targetWeekStart, weekEnd: targetWeekEnd });
     verified = result.verified;
     console.log(`Verification: ${verified.length} OK, ${result.failed.length} rejected (see reasons above)`);
+    if (reserveCandidates.length > 0) {
+      verifiedOngoing = (await verifyCandidates(reserveCandidates, { weekStart: targetWeekStart, weekEnd: targetWeekEnd })).verified;
+      console.log(`Ongoing restrictions verified for supplement use: ${verifiedOngoing.length}`);
+    }
   }
-  if (verified.length === 0) {
+  if (verified.length === 0 && verifiedOngoing.length === 0) {
     await abort('no candidates survived verification (relevance, target-week dates, and source reachability)');
     return;
+  }
+  if (verified.length === 0) {
+    // Nothing new this week: the edition is built from ongoing restrictions.
+    verified = verifiedOngoing;
+    verifiedOngoing = [];
   }
 
   console.log(`\nSynthesizing article from ${verified.length} verified candidate(s)...`);
@@ -256,19 +295,21 @@ async function main() {
   }
 
 
-  if (!mock && article.developments.length < 20) {
-    for (let attempt = 1; attempt <= 2 && article.developments.length < 20; attempt += 1) {
+  // Best effort only: below LEAD_TARGET, add further verified material -
+  // including ongoing structured restrictions - but publish whatever exists.
+  if (!mock && article.developments.length < LEAD_TARGET) {
+    for (let attempt = 1; attempt <= 2 && article.developments.length < LEAD_TARGET; attempt += 1) {
       const usedSourceUrls = new Set(
         [...article.developments, ...article.europeRoundup]
           .map((item) => item.sourceUrl)
           .filter(Boolean)
       );
-      const remainingVerified = verified.filter(
+      const remainingVerified = [...verified, ...verifiedOngoing].filter(
         (candidate) => candidate.sourceUrl && !usedSourceUrls.has(candidate.sourceUrl)
       );
-      const neededLeads = 20 - article.developments.length;
+      const neededLeads = LEAD_TARGET - article.developments.length;
       if (remainingVerified.length === 0) break;
-      console.log(`Lead repair attempt ${attempt}: ${article.developments.length}/20; requesting up to ${neededLeads} additional substantive verified lead(s).`);
+      console.log(`Lead supplement attempt ${attempt}: ${article.developments.length}/${LEAD_TARGET}; requesting up to ${neededLeads} additional substantive verified lead(s).`);
       try {
         const supplement = await generateLeadSupplementWithOpenAI({
           candidates: remainingVerified,
@@ -289,7 +330,7 @@ async function main() {
         article.developments.push(...supplementFilter.kept.slice(0, neededLeads));
         console.log(`Lead supplement kept ${supplementFilter.kept.length}; leads now ${article.developments.length}.`);
       } catch (err) {
-        console.warn(`Lead supplement failed: ${err.message || err}. Quality gate will decide whether publication can continue.`);
+        console.warn(`Lead supplement failed: ${err.message || err}. Publishing with the reports already selected.`);
         break;
       }
     }
@@ -351,7 +392,7 @@ async function main() {
           `Rest-of-Europe supplement kept ${supplementFilter.kept.length}; roundup now has ${article.europeRoundup.length} report(s) across ${roundupNeedsSupplement(article.europeRoundup).countryCount} countries.`
         );
       } catch (err) {
-        console.warn(`Rest-of-Europe supplement failed: ${err.message || err}. Quality gate will decide whether publication can continue.`);
+        console.warn(`Rest-of-Europe supplement failed: ${err.message || err}. Publishing with the roundup already selected.`);
         break;
       }
     }
@@ -365,8 +406,15 @@ async function main() {
   }
   console.log(`Lead reports after cross-validation: ${article.developments.length}`);
   console.log(`Rest-of-Europe reports after cross-validation: ${article.europeRoundup.length}`);
+  // The number of reports never blocks publication (a 5 + 1 edition is
+  // fine). Only an edition with nothing at all is not published; a
+  // roundup-only result is presented as the lead reports.
+  if (article.developments.length === 0 && article.europeRoundup.length > 0) {
+    article.developments = article.europeRoundup;
+    article.europeRoundup = [];
+  }
   if (article.developments.length === 0) {
-    await abort('no developments survived cross-validation against verified sources');
+    await abort('no reports survived cross-validation against verified sources');
     return;
   }
 

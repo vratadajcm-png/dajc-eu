@@ -72,12 +72,12 @@ const ARTICLE_JSON_SCHEMA = {
       developments: {
         type: 'array',
         items: DEVELOPMENT_SCHEMA,
-        description: '20-30 substantive verified lead developments. Minimum 20. Never pad with routine or irrelevant material.',
+        description: 'Up to 30 substantive verified lead developments (20-30 when enough genuine material exists; fewer is acceptable). Never pad with routine or irrelevant material.',
       },
       europeRoundup: {
         type: 'array',
         items: DEVELOPMENT_SCHEMA,
-        description: '10-20 concise verified Rest-of-Europe updates, spanning at least 6 distinct countries/jurisdictions. Minimum 10. Never duplicate leads.',
+        description: 'Up to 20 concise verified Rest-of-Europe updates, as geographically broad as the material allows. Fewer is acceptable. Never duplicate leads.',
       },
       operatorChecklist: { type: 'array', items: { type: 'string' } },
     },
@@ -100,8 +100,8 @@ EDITORIAL SCOPE
 Relevant subjects include abnormal/oversize permits; heavy-transport weight and axle rules; exceptional restrictions; escort/private escort/police escort requirements; route authorisations; bridges/tunnels and structural restrictions; dimensions and axle loads; borders/customs/non-EU transit; long-term special-transport-relevant roadworks; ports/ferries/RoRo/project cargo; weather restrictions; wind/heat/snow limits; permit digitalisation; tolling; abnormal-load portals; routing systems; e-CMR; tachograph/enforcement; ADR where relevant; heavy-haul tractors; low-loaders/modular trailers/SPMTs; cranes; escort technology; telematics/routing APIs; AI tools; manufacturers; material acquisitions/insolvencies/capacity shifts; and major energy/industrial/infrastructure projects that generate abnormal-load demand.
 
 DRIVING-BAN FILTER — CRITICAL
-DO NOT publish an ordinary recurring year-round Sunday driving ban when nothing has changed. A permanent Sunday prohibition must not be repeated every week merely because it falls inside the target week.
-Include driving-ban information only when it is materially newsworthy for the edition: a new or changed prohibition; public-holiday prohibition; seasonal/summer/winter restriction; exceptional/emergency/weather-related restriction; temporary regional restriction; changed time window or affected vehicle/weight class; new/cancelled/suspended exemption; newly announced enforcement measure; or a specific consequence for abnormal/oversize transport. A recurring Sunday ban may be mentioned only when needed to explain a material interaction with a holiday, seasonal rule, permit condition or other new operational constraint.
+General HGV/truck driving bans — weekend, Sunday, public-holiday, seasonal, summer and transit bans — are published separately in the DAJC Driving Bans calendar (dajc.eu/driving-bans). Do NOT include them in this report, even when they are new, seasonal or holiday-specific.
+Include a ban or movement restriction only when the supplied evidence explicitly scopes it to exceptional, oversize, abnormal or special transport (e.g. a convoi exceptionnel weekend movement ban, an exceptional-transport stoppage on a specific motorway, or new escort/permit conditions attached to a ban). Never infer that a general HGV ban is specific to exceptional transport.
 
 INFRASTRUCTURE FILTER
 Do not repeat unchanged long-term restrictions every week. Re-report them only when newly announced, beginning, changed, extended, ending, materially worsening/improving, when the diversion or authorised abnormal-load route changes, or when a weight/width/height/axle condition changes. Ordinary short roadworks should normally be excluded unless their effect on special transport is critical. Road or motorway closures are publishable ONLY when the supplied verified evidence proves a planned duration longer than 30 days. No exception: a 30-day closure, a shorter closure, or an undated closure with no provable duration must be excluded.
@@ -121,29 +121,13 @@ VERIFICATION / NON-INFERENCE RULES
 
 SELECTION
 Rank findings first by operational impact, relevance to abnormal/heavy transport, urgency, evidence quality, novelty, and effect on routing, permits, timing, cost or feasibility. Then apply DAJC's lead-order geography: wider Central Europe first among substantively comparable items, connected European corridors next, peripheral jurisdictions later. A newly discovered old page is NOT fresh news. Exclude completed civic/school projects, stale archive material, generic infrastructure achievements and any item whose only relevance is that road access might theoretically improve.
-Return 20-30 distinct substantive lead reports. Twenty is the hard editorial minimum for a publishable DAJC Weekly edition. Never satisfy the count with routine Sunday bans, generic administration, old statistics or marginal filler; if fewer than 20 genuinely worthwhile verified candidates exist, return fewer and let the downstream quality gate block publication.
+Return up to 30 distinct substantive lead reports — 20-30 when enough genuinely worthwhile verified material exists. Fewer is acceptable and the edition is still published. Never satisfy a count with general driving bans, generic administration, old statistics or marginal filler.
 
 AROUND EUROPE
-Place additional verified useful developments in europeRoundup. Return at least 10 concise short updates and cover at least 6 distinct countries/territories; 10 reports and 6 jurisdictions are hard publication minimums. Do not manufacture geographic balance and never use unchanged Sunday bans as filler. Prefer a meaningful finding from a smaller/less-covered jurisdiction over a marginal story from an already dominant major market.
+Place additional verified useful developments in europeRoundup: up to 20 concise short updates, as geographically broad as the verified material allows. Fewer is acceptable. Do not manufacture geographic balance and never use driving bans as filler. Prefer a meaningful finding from a smaller/less-covered jurisdiction over a marginal story from an already dominant major market.
 
 STYLE
 Write practical professional English. Each lead must contain concrete What changed / Where / When / Impact / Action information through the structured fields. No marketing filler and no clickbait body copy.`;
-
-// The model sometimes classifies a substantive verified item as roundup even
-// when the lead tier is below its hard minimum. Rebalancing presentation tiers
-// here does not weaken verification: every item still has to survive exact URL
-// cross-validation, deterministic relevance/date/closure filters and the final
-// quality gate. Any roundup slots consumed here are rebuilt later from unused
-// verified candidates by the existing roundup-repair stage.
-function rebalanceArticleTiers(article, minimumLeadCount = 20) {
-  const developments = Array.isArray(article?.developments) ? [...article.developments] : [];
-  const europeRoundup = Array.isArray(article?.europeRoundup) ? [...article.europeRoundup] : [];
-  const needed = Math.max(0, minimumLeadCount - developments.length);
-  if (needed > 0 && europeRoundup.length > 0) {
-    developments.push(...europeRoundup.splice(0, Math.min(needed, europeRoundup.length)));
-  }
-  return { ...article, developments, europeRoundup };
-}
 
 export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, targetWeekStart, targetWeekEnd, apiKey, model }) {
   const client = new OpenAI({ apiKey });
@@ -172,14 +156,14 @@ export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, ta
     model: model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
-      { role: 'user', content: `Target publication window: ${targetWeekStart} to ${targetWeekEnd} (${weekRangeLabel}). Select only operationally relevant verified material. Do not repeat unchanged year-round Sunday bans.\n\nVerified candidates (JSON):\n${JSON.stringify(mapped, null, 2)}` },
+      { role: 'user', content: `Target publication window: ${targetWeekStart} to ${targetWeekEnd} (${weekRangeLabel}). Select only operationally relevant verified material. Do not include general HGV driving bans; they belong to the separate Driving Bans calendar.\n\nVerified candidates (JSON):\n${JSON.stringify(mapped, null, 2)}` },
     ],
     response_format: { type: 'json_schema', json_schema: ARTICLE_JSON_SCHEMA },
   });
 
   const text = response.choices?.[0]?.message?.content;
   if (!text) throw new Error('OpenAI response contained no content');
-  return rebalanceArticleTiers(JSON.parse(text));
+  return JSON.parse(text);
 }
 
 function roundupCandidateScore(candidate) {
@@ -221,7 +205,7 @@ export async function generateRoundupSupplementWithOpenAI({
   const response = await client.chat.completions.create({
     model: model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
     messages: [
-      { role:'system', content:'Fill only DAJC Rest of Europe from verified unused candidates. Return concise, operationally useful heavy/oversize/special-road-transport items. First add missing distinct jurisdictions, then fill the report count. Never use routine Sunday bans, generic administration, old statistics, short/undated closures, crime, accidents, procurement or filler. Copy sourceUrl/sourceName EXACTLY from supplied candidates. Copy validFrom/validTo only when supplied as exact ISO YYYY-MM-DD dates; otherwise return null.' },
+      { role:'system', content:'Fill only DAJC Rest of Europe from verified unused candidates. Return concise, operationally useful heavy/oversize/special-road-transport items. First add missing distinct jurisdictions, then fill the report count. Never use general driving bans, generic administration, old statistics, short/undated closures, crime, accidents, procurement or filler. Copy sourceUrl/sourceName EXACTLY from supplied candidates. Copy validFrom/validTo only when supplied as exact ISO YYYY-MM-DD dates; otherwise return null.' },
       { role:'user', content:`Target week ${targetWeekStart} to ${targetWeekEnd}. Existing countries: ${existingCountries.join(', ') || 'none'}. Need at least ${neededCountries} additional jurisdictions and ${neededReports} additional reports. Return up to 16 items.\n\nVerified unused candidates:\n${JSON.stringify(payload)}` },
     ],
     response_format:{ type:'json_schema', json_schema:ROUNDUP_SUPPLEMENT_SCHEMA },
@@ -250,8 +234,8 @@ export async function generateLeadSupplementWithOpenAI({
   const response = await client.chat.completions.create({
     model: model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
     messages: [
-      { role:'system', content:'Select additional LEAD reports for DAJC European Oversize & Special Transport Intelligence only from supplied verified unused candidates. Each must be substantive and operationally relevant to heavy, abnormal, oversized or special road transport. Never use routine Sunday bans, generic administration, statistics, accidents/crime, procurement, short or undated road closures, or filler. Copy sourceUrl/sourceName EXACTLY. Copy validFrom/validTo only when supplied as exact ISO YYYY-MM-DD dates; otherwise return null.' },
-      { role:'user', content:`Target week ${targetWeekStart} to ${targetWeekEnd}. Need up to ${neededReports} additional substantive lead reports to reach the 20-report minimum. Return fewer if genuine material is insufficient.\n\nVerified unused candidates:\n${JSON.stringify(payload)}` },
+      { role:'system', content:'Select additional LEAD reports for DAJC European Oversize & Special Transport Intelligence only from supplied verified unused candidates. Each must be substantive and operationally relevant to heavy, abnormal, oversized or special road transport. Never use general driving bans, generic administration, statistics, accidents/crime, procurement, short or undated road closures, or filler. Copy sourceUrl/sourceName EXACTLY. Copy validFrom/validTo only when supplied as exact ISO YYYY-MM-DD dates; otherwise return null.' },
+      { role:'user', content:`Target week ${targetWeekStart} to ${targetWeekEnd}. Return up to ${neededReports} additional substantive lead reports. Return fewer if genuine material is insufficient.\n\nVerified unused candidates:\n${JSON.stringify(payload)}` },
     ],
     response_format:{ type:'json_schema', json_schema:LEAD_SUPPLEMENT_SCHEMA },
   });

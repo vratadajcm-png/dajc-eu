@@ -1,6 +1,7 @@
 import { validateDevelopmentDateRange } from './date-validation.mjs';
 import { checkLongRoadClosure } from './closure-duration.mjs';
 import { checkTransportDomainRelevance } from './transport-domain.mjs';
+import { checkWeeklyDrivingBanPolicy } from './weekly-driving-ban-policy.mjs';
 
 export function filterGeneratedItems(items = [], { weekStart, weekEnd, usedSourceUrls = new Set() } = {}) {
   const kept = [];
@@ -14,6 +15,11 @@ export function filterGeneratedItems(items = [], { weekStart, weekEnd, usedSourc
     else {
       const domain = checkTransportDomainRelevance(item);
       if (!domain.ok) reason = domain.reason;
+    }
+
+    if (!reason) {
+      const ban = checkWeeklyDrivingBanPolicy(item);
+      if (!ban.ok) reason = ban.reason;
     }
 
     if (!reason) {

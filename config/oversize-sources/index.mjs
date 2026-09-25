@@ -190,6 +190,19 @@ export const oversizeSources = [
     priority: 1,
   },
   {
+    // Structured width/weight restrictions from the Autobahn traffic API
+    // (scripts/lib/autobahn-restrictions.mjs). Long-running limits such as
+    // A4 Köln "BW Eifeltor" (3.25 m / 44 t) are never published as news.
+    id: 'de-autobahn-restrictions',
+    country: 'DE',
+    authority: 'Autobahn GmbH des Bundes',
+    name: 'Autobahn GmbH des Bundes - roadworks restrictions',
+    url: 'https://verkehr.autobahn.de/o/autobahn/',
+    adapter: 'autobahn-restrictions',
+    type: 'national-road-authority',
+    priority: 1,
+  },
+  {
     id: 'fr-bison-fute',
     country: 'FR',
     authority: 'Bison Fute',

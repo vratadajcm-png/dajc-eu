@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { oversizeSources } from '../config/oversize-sources/index.mjs';
 import { dajcEuropeCoverage } from '../config/europe-coverage.mjs';
 import { fetchSourceFindings } from './lib/fetch-source.mjs';
+import { fetchAutobahnRestrictionFindings } from './lib/autobahn-restrictions.mjs';
 import { mergeFindings, markExpired } from './lib/findings.mjs';
 import { loadWeekFindings, saveWeekFindings } from './lib/store.mjs';
 import { isoWeekLabel } from './lib/week.mjs';
@@ -57,7 +58,9 @@ async function main() {
       const index = nextIndex++;
       if (index >= oversizeSources.length) return;
       const source = oversizeSources[index];
-      results[index] = await fetchSourceFindings(source, { now: nowIso });
+      results[index] = source.adapter === 'autobahn-restrictions'
+        ? await fetchAutobahnRestrictionFindings(source)
+        : await fetchSourceFindings(source, { now: nowIso });
     }
   }
 
@@ -69,7 +72,7 @@ async function main() {
     sourceResults.push({ source, result });
 
     if (result.status === 'ok') {
-      if (result.method === 'feed') sourcesFeed += 1;
+      if (result.method === 'feed' || result.method === 'api') sourcesFeed += 1;
       else if (result.method === 'hybrid') sourcesHybrid += 1;
       else sourcesHtml += 1;
       const via = result.method || 'official source';

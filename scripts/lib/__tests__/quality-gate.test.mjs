@@ -61,19 +61,33 @@ function run({ developments, europeRoundup, requiredSourceUrls = [] }) {
   });
 }
 
-describe('DAJC Weekly quality gate - 20 + 10 / 6', () => {
+describe('DAJC Weekly quality gate', () => {
   it('passes exactly 20 lead reports plus 10 roundup reports across at least six countries', () => {
     const edition = baseEdition();
     const gate = run(edition);
     expect(gate.ok).toBe(true);
   });
 
-  it('blocks fewer than 20 lead reports', () => {
+  it('publishes a small edition: 5 lead reports plus 1 roundup report', () => {
     const edition = baseEdition();
-    edition.developments = edition.developments.slice(0, 19);
+    edition.developments = edition.developments.slice(0, 5);
+    edition.europeRoundup = edition.europeRoundup.slice(0, 1);
     const gate = run(edition);
+    expect(gate.errors).toEqual([]);
+    expect(gate.ok).toBe(true);
+  });
+
+  it('publishes lead reports without any roundup', () => {
+    const edition = baseEdition();
+    edition.developments = edition.developments.slice(0, 3);
+    edition.europeRoundup = [];
+    expect(run(edition).ok).toBe(true);
+  });
+
+  it('blocks an edition with no lead reports at all', () => {
+    const gate = run({ developments: [], europeRoundup: [] });
     expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /only 19 lead reports/.test(e))).toBe(true);
+    expect(gate.errors.some((e) => /no lead reports/.test(e))).toBe(true);
   });
 
   it('blocks more than 30 lead reports', () => {
@@ -84,23 +98,34 @@ describe('DAJC Weekly quality gate - 20 + 10 / 6', () => {
     expect(gate.errors.some((e) => /31 lead reports/.test(e))).toBe(true);
   });
 
-  it('blocks fewer than 10 Rest-of-Europe reports', () => {
+  it('publishes a roundup from a single jurisdiction', () => {
     const edition = baseEdition();
-    edition.europeRoundup = edition.europeRoundup.slice(0, 9);
-    const gate = run(edition);
-    expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /only 9 reports/.test(e))).toBe(true);
+    edition.europeRoundup = edition.europeRoundup.slice(0, 2).map((item) => ({ ...item, country: 'Spain' }));
+    expect(run(edition).ok).toBe(true);
   });
 
-  it('blocks Rest of Europe with fewer than six jurisdictions', () => {
+  it('blocks a general HGV driving ban (it belongs to the Driving Bans calendar)', () => {
     const edition = baseEdition();
-    edition.europeRoundup = edition.europeRoundup.map((item, i) => ({
-      ...item,
-      country: ['Spain','Romania','Denmark','Portugal','Croatia'][i % 5],
-    }));
+    edition.developments[0] = {
+      ...edition.developments[0],
+      title: 'Public-holiday HGV driving ban for German Unity Day',
+      whatChanged: 'Trucks over 7.5 t may not drive on 3 October.',
+      vehicleScope: 'Trucks over 7.5 t',
+      isDrivingBan: true,
+    };
     const gate = run(edition);
     expect(gate.ok).toBe(false);
-    expect(gate.errors.some((e) => /covers only 5 countries/.test(e))).toBe(true);
+    expect(gate.errors.some((e) => /Driving Bans Calendar/.test(e))).toBe(true);
+  });
+
+  it('keeps a movement ban explicitly scoped to exceptional transport', () => {
+    const edition = baseEdition();
+    edition.developments[0] = {
+      ...edition.developments[0],
+      title: 'Exceptional-transport weekend movement ban',
+      isDrivingBan: true,
+    };
+    expect(run(edition).ok).toBe(true);
   });
 
   it('blocks a duplicate source between leads and roundup', () => {

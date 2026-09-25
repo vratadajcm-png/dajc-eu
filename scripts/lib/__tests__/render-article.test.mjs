@@ -74,7 +74,7 @@ describe('renderArticleMarkdown', () => {
     expect(sourceOccurrences).toBe(2);
   });
 
-  it('puts a driving-ban development under "Driving bans and exceptional-transport restrictions" and never under "Infrastructure restrictions"', () => {
+  it('puts a driving-ban development under "Exceptional-transport movement restrictions" and never under "Infrastructure restrictions"', () => {
     const developments = [
       {
         country: 'Austria',
@@ -94,7 +94,7 @@ describe('renderArticleMarkdown', () => {
       publishedAt: '2026-08-21',
       nextPublicationLabel: null,
     });
-    expect(body).toContain('## Driving bans and exceptional-transport restrictions');
+    expect(body).toContain('## Exceptional-transport movement restrictions');
     expect(body).not.toContain('## Infrastructure restrictions');
     expect(body).not.toContain('## Main developments');
   });
@@ -117,14 +117,25 @@ describe('renderArticleMarkdown', () => {
       publishedAt: '2026-08-21',
       nextPublicationLabel: 'Friday, 28 August 2026 at 12:00 CEST',
     });
-    expect(body).toContain('## Driving bans and exceptional-transport restrictions');
-    expect(body).toContain('## Operator checklist');
+    expect(body).toContain('## Exceptional-transport movement restrictions');
+    expect(body).toContain('## What to check before you move');
+    expect(body).not.toContain('Operator checklist');
     expect(body).toContain('## Sources');
     expect(body).toContain('## Next EU Oversize Weekly');
     // Exactly one occurrence of each heading - no secondary section repeats the reports.
-    for (const heading of ['## Driving bans and exceptional-transport restrictions', '## Operator checklist', '## Sources']) {
+    for (const heading of ['## Exceptional-transport movement restrictions', '## What to check before you move', '## Sources']) {
       expect(body.split(heading).length - 1).toBe(1);
     }
+  });
+
+  it('points readers to the separate Driving Bans calendar instead of listing general bans', () => {
+    const { body } = renderArticleMarkdown(makeArticle([]), {
+      slug: 'eu-oversize-weekly-2026-w99',
+      publishedAt: '2026-08-21',
+      nextPublicationLabel: null,
+    });
+    expect(body).toContain('[DAJC Driving Bans calendar](/driving-bans)');
+    expect(body).not.toMatch(/At least ten/);
   });
 
   it('includes additionalSources in both the report and the Sources list', () => {

@@ -21,19 +21,21 @@ Research coverage remains Europe-wide, but the published lead order is operator-
 - RSS/Atom is **not** complete coverage and must never be the only discovery channel.
 - For every configured authority, the monitor checks available RSS/Atom **and** official HTML/news/traffic/legislation pages.
 - Feed and web results are merged, detail pages are enriched, and results are deduplicated by official source URL.
+- Where an authority publishes restrictions only as structured data, a dedicated adapter reads it. Germany: the Autobahn GmbH traffic API (`verkehr.autobahn.de`) supplies motorway roadworks with an explicit gross-weight limit or a passage width of at most 3.0 m (e.g. A4 Köln "BW Eifeltor", 3.25 m / 44 t), one finding per project and motorway (`scripts/lib/autobahn-restrictions.mjs`).
 - Primary/official sources are required for permits, legal rules, escorts, route/weight/dimension limits and other high-impact regulatory claims whenever available.
 - Generic landing pages, image-only URLs, stale archive pages, unrelated permits/administration and non-operational statistics are excluded.
 - **Discovery date is not publication freshness.** A page first discovered this week is not a new development merely because the crawler found it now. Completed civic/school projects, old archive pages, generic infrastructure achievements and historical announcements without a current operational consequence are excluded.
 
-## 3. Publication format — hard counts
+## 3. Publication format — counts are targets, never blockers
 
-A publishable normal weekly edition contains:
+A full weekly edition aims for:
 
-- **20–30 substantive lead reports. Minimum: 20. Maximum: 30.**
-- **Rest of Europe: 10–20 concise short updates. Minimum: 10.**
-- Rest of Europe must span **at least 6 distinct countries/territories/jurisdictions**.
+- **20–30 substantive lead reports** (maximum 30).
+- **Rest of Europe: 10–20 concise short updates** (maximum 20), as geographically broad as the verified material allows.
 
-These are hard quality gates. Never satisfy them with filler. If fewer than 20 genuine lead topics or fewer than 10 genuine roundup items / 6 jurisdictions survive verification, the run fails instead of padding the article.
+The number of reports **never blocks publication**. A week with little genuine material is still published with what exists — for example 5 lead reports and 1 Rest-of-Europe item. Only an edition with no verified report at all is not published. Never satisfy a count with filler.
+
+Below 20 lead reports, **ongoing** structured restrictions (e.g. motorway width/weight limits whose current phase began earlier and has not changed) may supplement the edition. At 20 or more lead reports, only new or changed restrictions are published.
 
 The Rest-of-Europe items are deliberately short: country/jurisdiction, what changed, where/when relevant, operator action and official source.
 
@@ -43,13 +45,11 @@ Fresh verified high-signal changes directly affecting exceptional/oversized tran
 
 Required critical items are reserved before normal shortlist ranking. If a verified critical source is absent from both lead reports and Rest of Europe, publication is blocked.
 
-## 5. Driving-ban rule from 1 September 2026
+## 5. Driving bans — separate from the Weekly
 
-Do **not** repeat unchanged year-round Sunday/weekend bans.
+General HGV/truck driving bans (Sunday, weekend, public-holiday, seasonal, summer and transit bans) are published in the separate **DAJC Driving Bans calendar** (`/driving-bans`) and are **not** repeated in the Weekly — not even when they are new, seasonal or holiday-specific. Every edition links to the calendar instead.
 
-Publish a driving-ban item only when it is new, changed, seasonal, holiday-specific, exceptional/emergency/weather-related, regionally temporary, changes times/vehicle scope/exemptions/enforcement, or has a specific abnormal/oversize consequence.
-
-A routine Sunday rule may only be mentioned when necessary to explain a material interaction with a current change.
+The Weekly includes a ban or movement restriction only when its title, description or vehicle scope explicitly limits it to exceptional, oversize, abnormal or special transport (e.g. the French convoi exceptionnel weekend movement ban, Croatian extraordinary-transport motorway stoppages). A mention of exceptional transport only in a general ban's exemption or impact notes does not qualify. Enforced by `scripts/lib/weekly-driving-ban-policy.mjs` at candidate selection, on model output and in the quality gate.
 
 ## 6. Road/motorway closure rule
 
@@ -68,7 +68,7 @@ Every published item must demonstrably relate to heavy, abnormal, oversized or s
 
 Exclude driver-licence/auto-school administration, environmental/water-law permits unrelated to transport, crime/theft/accident/breakdown incidents, procurement/tender noise, generic authority pages, toll revenue/statistics without an operational rule change, stale historical archive material, ordinary short roadworks/closures, completed school/public-building renovations, generic completed civic projects, and infrastructure announcements whose only claimed relevance is a theoretical future logistics benefit.
 
-Every source URL is cross-validated against the verified candidate set. Every report contains a concrete operator/dispatcher action. Unknown or undated generic infrastructure material must not be used to satisfy the lead minimum.
+Every source URL is cross-validated against the verified candidate set. Every report contains a concrete operator/dispatcher action. Unknown or undated generic infrastructure material must not be used to fill an edition.
 
 ## 8. Publication schedule and preview
 
@@ -82,13 +82,14 @@ Every source URL is cross-validated against the verified candidate set. Every re
 
 1. SEO title, publication date and covered week.
 2. Standfirst / executive summary.
-3. 20–30 substantive lead reports, ordered Central Europe first among substantively comparable items, with What changed / Where / When / Impact / Action.
-4. Rest of Europe — minimum 10 concise reports from minimum 6 jurisdictions.
-5. Critical European corridors when materially relevant.
-6. 30-day outlook when materially relevant.
-7. Dispatcher/operator checklist.
-8. Full source list.
-9. Next scheduled publication.
+3. Link to the DAJC Driving Bans calendar for general HGV bans.
+4. Lead reports (target 20–30), ordered Central Europe first among substantively comparable items, with What changed / Where / When / Impact / Action.
+5. Rest of Europe — concise reports (target 10–20).
+6. Critical European corridors when materially relevant.
+7. 30-day outlook when materially relevant.
+8. "What to check before you move" — practical checks for planners and dispatchers.
+9. Full source list.
+10. Next scheduled publication.
 
 ## 10. Editorial test
 

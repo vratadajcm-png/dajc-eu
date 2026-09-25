@@ -1,16 +1,16 @@
 // Pre-publish quality gate for DAJC European Oversize & Special Transport Intelligence.
 // Every check here is a hard blocker for malformed, duplicate or unverifiable output.
+// The NUMBER of reports is deliberately not a blocker: an edition with only a
+// few verified reports (e.g. 5 leads + 1 roundup item) is still published.
 
 import { articleFrontmatterSchema } from './article-schema.mjs';
 import { validateDevelopmentDateRange } from './date-validation.mjs';
 import { checkLongRoadClosure } from './closure-duration.mjs';
 import { checkTransportDomainRelevance } from './transport-domain.mjs';
+import { checkWeeklyDrivingBanPolicy } from './weekly-driving-ban-policy.mjs';
 
 const MIN_BODY_LENGTH = 400;
-const MIN_REPORTS = 20;
 const MAX_REPORTS = 30;
-const MIN_ROUNDUP_REPORTS = 10;
-const MIN_ROUNDUP_COUNTRIES = 6;
 const MAX_ROUNDUP_REPORTS = 20;
 const MIN_RECOMMENDED_ACTION_LENGTH = 10;
 
@@ -69,18 +69,11 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
     }
   }
 
-  if (items.length < MIN_REPORTS) {
-    errors.push(`article has only ${items.length} lead reports - DAJC Weekly requires at least ${MIN_REPORTS} substantive verified lead topics; never pad with routine or irrelevant material`);
+  if (items.length === 0) {
+    errors.push('article has no lead reports');
   }
   if (items.length > MAX_REPORTS) {
     errors.push(`article has ${items.length} lead reports - maximum is ${MAX_REPORTS}; move additional useful verified items to Around Europe`);
-  }
-  if (roundupItems.length < MIN_ROUNDUP_REPORTS) {
-    errors.push(`Rest of Europe has only ${roundupItems.length} reports - minimum is ${MIN_ROUNDUP_REPORTS}`);
-  }
-  const roundupCountries = new Set(roundupItems.map((item) => String(item.country || '').trim()).filter(Boolean));
-  if (roundupCountries.size < MIN_ROUNDUP_COUNTRIES) {
-    errors.push(`Rest of Europe covers only ${roundupCountries.size} countries/jurisdictions - minimum is ${MIN_ROUNDUP_COUNTRIES}`);
   }
   if (roundupItems.length > MAX_ROUNDUP_REPORTS) {
     errors.push(`Around Europe has ${roundupItems.length} reports - maximum is ${MAX_ROUNDUP_REPORTS}; retain only the strongest additional updates`);
@@ -107,6 +100,9 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
 
     const domain = checkTransportDomainRelevance(item);
     if (!domain.ok) errors.push(`${label}: ${domain.reason}`);
+
+    const banCheck = checkWeeklyDrivingBanPolicy(item);
+    if (!banCheck.ok) errors.push(`${label}: ${banCheck.reason}`);
 
     const closureCheck = checkLongRoadClosure(item);
     if (!closureCheck.ok) errors.push(`${label}: ${closureCheck.reason}`);
