@@ -3442,12 +3442,13 @@
    "verification_state": "UNVERIFIED",
    "ban_state": "UNKNOWN",
    "coverage_complete": false,
-   "last_checked": null,
+   "last_checked": "2026-09-26T16:03:00.000Z",
    "last_verified": null,
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "NL_NO_OFFICIAL_PRIMARY_NO_BAN_STATEMENT_FOUND",
+    "NL_EXCEPTIONAL_TRANSPORT_RDW_PERMIT_CONDITIONS_NOT_REVIEWED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3511,7 +3512,7 @@
      "note": ""
     }
    },
-   "notes": "No primary-source review completed in this sweep. Not a NO_BAN finding."
+   "notes": "No official primary source explicitly stating the absence of HGV calendar bans was found; under the fail-closed rule this cannot be published as NO_BAN."
   },
   "MK": {
    "verification_state": "UNVERIFIED",
@@ -3664,17 +3665,19 @@
    "notes": "No primary-source review completed in this sweep. Not a NO_BAN finding."
   },
   "RO": {
-   "verification_state": "UNVERIFIED",
+   "verification_state": "SOURCE_UNAVAILABLE",
    "ban_state": "UNKNOWN",
    "coverage_complete": false,
-   "last_checked": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-09-26T16:03:00.000Z",
    "last_verified": null,
    "source_ids": [
+    "ro-order-1249-2018",
     "ro-cnair-note"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "RO_CNAIR_HOLIDAY_ORDERS_PRIMARY_TEXT_NOT_RETRIEVED",
+    "RO_PRIMARY_ORDER_1249_132_2018_UNREACHABLE",
+    "RO_CNAIR_ADHOC_HOLIDAY_ORDERS_NOT_RETRIEVED",
     "RO_HEAT_RESTRICTIONS_CONDITION_TRIGGERED"
    ],
    "scope_checks": {
@@ -3739,7 +3742,7 @@
      "note": ""
     }
    },
-   "notes": "CNAIR publishes ad-hoc holiday/weekend restrictions under Order MT-MAI 1249/132/2018; primary texts for the span were not retrieved."
+   "notes": "A statutory >7.5 t Friday/weekend/holiday regime exists (Order 1249/132/2018) but its current text could not be retrieved; no events published until it is read."
   },
   "RU": {
    "verification_state": "UNVERIFIED",
@@ -5767,15 +5770,18 @@
    "notes": "No primary-source review completed in this sweep. Not a NO_BAN finding."
   },
   "RSBA": {
-   "verification_state": "UNVERIFIED",
+   "verification_state": "CROSSCHECKED",
    "ban_state": "UNKNOWN",
    "coverage_complete": false,
-   "last_checked": null,
+   "last_checked": "2026-09-26T16:03:00.000Z",
    "last_verified": null,
-   "source_ids": [],
+   "source_ids": [
+    "rsba-news-2026-09-14"
+   ],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "RSBA_MUP_RS_PRIMARY_ORDERS_NOT_LOCATED",
+    "RSBA_ADHOC_ORDERS_ANNOUNCED_AT_SHORT_NOTICE"
    ],
    "scope_checks": {
     "weekend": {
@@ -5839,7 +5845,7 @@
      "note": ""
     }
    },
-   "notes": "No primary-source review completed in this sweep. Not a NO_BAN finding."
+   "notes": "Secondary evidence of an ad-hoc 14 Sep 2026 MUP RS ban (>7.5 t, 12-24 h, listed transit routes). Not published as an event without the primary order."
   },
   "CAT": {
    "verification_state": "UNVERIFIED",
@@ -7124,6 +7130,26 @@
    "checked_at": "2026-09-26T15:59:00.000Z",
    "retrieval_method": "direct-retrieval",
    "findings": "Complementary-authorisation vehicles and ADR: Sundays and national/regional holidays 08-24; Wed/Thu eves of national holidays 16-24; consecutive holidays incl. Sundays: first day 08-15, last day 08-24, non-Saturday eve 16-24. City-access table only Granada, Madrid, Soria."
+  },
+  {
+   "source_id": "ro-order-1249-2018",
+   "url": "https://legislatie.just.ro/Public/DetaliiDocument/208692",
+   "authority": "Portal Legislativ (Ministry of Justice) / Order MT-MAI 1249/132/2018",
+   "role": "PRIMARY",
+   "version": "Consolidated (amended to 27 May 2022 per index)",
+   "checked_at": "2026-09-26T16:03:00.000Z",
+   "retrieval_method": "retrieval failed (HTTP 502 / connection reset)",
+   "findings": "Order establishes >7.5 t restrictions on listed motorway/E-road sectors on Fridays, Saturdays, Sundays, days before and on legal holidays. Text NOT retrievable on 26 Sep 2026 (legislatie.just.ro and cnadnr.ro failed through the network)."
+  },
+  {
+   "source_id": "rsba-news-2026-09-14",
+   "url": "https://www.nezavisne.com/novosti/drustvo/Vazne-informacije-za-vozace-Zabrane-na-vise-puteva-u-RS-ogranicenja-i-u-Banjaluci/982286",
+   "authority": "Nezavisne novine relaying MUP Republike Srpske",
+   "role": "SECONDARY",
+   "version": "11-14 Sep 2026",
+   "checked_at": "2026-09-26T16:03:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "MUP RS order: 14 Sep 2026 12:00-24:00 ban for goods vehicles >7.5 t on Rača-Bijeljina-Brčko-Šamac-Modriča-Šešlije-Johovac, Čatrnja-Gradiška, Gradiška-Klašnice-Banja Luka and motorways Banja Luka-Doboj, Gradiška-Banja Luka; >3.5 t in Banja Luka. Primary MUP RS text not located."
   }
  ],
  "rule_profiles": {
