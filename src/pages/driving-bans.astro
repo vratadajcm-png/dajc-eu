@@ -10,7 +10,7 @@ const label = (en: string, cz: string) => cs ? cz : en;
 const title = label('European HGV Driving Bans', 'Evropské zákazy jízd nákladních vozidel');
 const format = (value: string | null) => value ? new Intl.DateTimeFormat(cs ? 'cs-CZ' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Prague' }).format(new Date(value)) : label('Not completed', 'Nedokončeno');
 const count = (state: string) => view.jurisdictions.filter(j => j.ban_state === state).length;
-const eventsByCountry = new Map(view.jurisdictions.map(j => [j.jurisdiction, view.events.filter(e => e.jurisdiction === j.jurisdiction)]));
+const eventsByCountry = new Map<string, typeof view.events>(view.jurisdictions.map(j => [j.jurisdiction, view.events.filter(e => e.jurisdiction === j.jurisdiction)]));
 ---
 <BaseLayout title={title} description="Verified HGV restrictions and explicit verification status for all 104 DAJC jurisdictions. Current and next calendar month.">
   <section class="bans-page" data-window={view.window.from}>
