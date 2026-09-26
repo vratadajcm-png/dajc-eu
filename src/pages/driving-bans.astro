@@ -1,347 +1,127 @@
 ---
-// Rendered per request (cached at the edge for an hour) so the list always
-// covers the next two months from today, not from the last deploy.
-export const prerender = false;
-
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { dajcEuropeCoverage, dajcCoverageMpz } from '../../config/europe-coverage.mjs';
-import { drivingBanCalendars, restrictionTypesOf } from '../../config/driving-ban-calendars/runtime.mjs';
-
-const requestedCodes = new Set([
-  'AT','AL','AD','AM','AZ','BE','BG','BA','BY','CY','CZ','DE','DK','ES','EE','FR','FI','LI','UK','GE','GR','HU','HR','CH','IT','IE','IS','LU','LT','LV','MT','MC','MD','ME','NO','NL','MK','PT','PL','RO','XK','RU','SE','SK','SI','RS','TR','UA','VA','KZ','FO','AX','GI','GG','JE','IM','ALDERNEY','SBA','SVALBARD','JANMAYEN','GL','AZO','MAD','CAN','CEU','MLL','GP','MQ','GF','RE','YT','MF','BL','PM','NC','PF','WF','CLIPPERTON','TF','AW','CW','SX','BQ-BO','BQ-SA','BQ-SE'
-]);
-
-const jurisdictions = dajcEuropeCoverage
-  .filter(([code]) => requestedCodes.has(code))
-  .map(([code, name]) => ({
-    code,
-    name,
-    registrationCode: (dajcCoverageMpz as Record<string,string[]>)[code]?.join(' / ') || '—'
-  }));
-
-const DAY = 86_400_000;
-// Window: today through the same day two months later (clamped to the
-// month's last day, e.g. 31 December -> 28/29 February).
-const now = new Date();
-const previewFrom = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-const lastDayOfTargetMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 3, 0)).getUTCDate();
-const previewTo = new Date(Date.UTC(
-  now.getUTCFullYear(),
-  now.getUTCMonth() + 2,
-  Math.min(now.getUTCDate(), lastDayOfTargetMonth),
-  23, 59, 59,
-));
-const isoDate = (date: Date) => date.toISOString().slice(0, 10);
-const dayLabel = (date: Date) =>
-  date.toLocaleString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
-const previewLabel = `the next 2 months (${dayLabel(previewFrom)} – ${dayLabel(previewTo)})`;
-const downloadLabel = 'next 2 months';
-const previewFromIso = isoDate(previewFrom);
-const previewToIso = isoDate(previewTo);
-const mondayOnOrBefore = (date: Date) => {
-  const result = new Date(date);
-  result.setUTCDate(result.getUTCDate() - ((result.getUTCDay() + 6) % 7));
-  result.setUTCHours(0, 0, 0, 0);
-  return result;
-};
-
-const restrictionPreview: Array<{
-  key: string;
-  country: string;
-  countryName: string;
-  types: string[];
-  title: string;
-  validFrom: string;
-  validTo: string;
-  timeWindow?: string;
-  vehicleScope?: string;
-  routeScope?: string;
-  exemptionNotes?: string;
-  sourceUrl?: string;
-  sourceName?: string;
-}> = [];
-const previewSeen = new Set<string>();
-
-for (let week = mondayOnOrBefore(previewFrom); week <= previewTo; week = new Date(week.getTime() + 7 * DAY)) {
-  const weekEnd = new Date(week.getTime() + 6 * DAY);
-  const year = week.getUTCFullYear();
-
-  for (const rule of drivingBanCalendars as any[]) {
-    if (!requestedCodes.has(rule.country)) continue;
-
-    const types = restrictionTypesOf(rule);
-
-    let resolved: any;
-    try {
-      resolved = rule.resolve(week, weekEnd, year);
-    } catch {
-      continue;
-    }
-
-    for (const occurrence of resolved?.occurrences || []) {
-      if (!occurrence.validFrom || !occurrence.validTo) continue;
-      if (occurrence.validTo < isoDate(previewFrom) || occurrence.validFrom > isoDate(previewTo)) continue;
-
-      const key = `${rule.id}|${occurrence.validFrom}|${occurrence.validTo}|${occurrence.timeWindow || occurrence.title}`;
-      if (previewSeen.has(key)) continue;
-      previewSeen.add(key);
-
-      restrictionPreview.push({
-        key,
-        country: rule.country,
-        countryName: rule.countryName || rule.country,
-        types,
-        title: occurrence.title,
-        validFrom: occurrence.validFrom,
-        validTo: occurrence.validTo,
-        timeWindow: occurrence.timeWindow,
-        vehicleScope: rule.vehicleScope,
-        routeScope: rule.routeScope,
-        exemptionNotes: rule.exemptionNotes,
-        sourceUrl: rule.sourceUrl,
-        sourceName: rule.sourceName
-      });
-    }
-  }
-}
-
-Astro.response.headers.set('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400');
-
-restrictionPreview.sort((a, b) =>
-  a.validFrom.localeCompare(b.validFrom)
-  || a.countryName.localeCompare(b.countryName)
-  || a.title.localeCompare(b.title)
-);
+import { getDrivingBansSnapshot } from '../../config/driving-ban-calendars/runtime.mjs';
+export const prerender = false;
+const view = getDrivingBansSnapshot();
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('Vercel-CDN-Cache-Control', 'no-store');
+const cs = Astro.url.searchParams.get('lang') === 'cs';
+const label = (en: string, cz: string) => cs ? cz : en;
+const title = label('European HGV Driving Bans', 'Evropské zákazy jízd nákladních vozidel');
+const format = (value: string | null) => value ? new Intl.DateTimeFormat(cs ? 'cs-CZ' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Prague' }).format(new Date(value)) : label('Not completed', 'Nedokončeno');
+const count = (state: string) => view.jurisdictions.filter(j => j.ban_state === state).length;
+const eventsByCountry = new Map<string, typeof view.events>(view.jurisdictions.map(j => [j.jurisdiction, view.events.filter(e => e.jurisdiction === j.jurisdiction)]));
 ---
-<BaseLayout
-  title="European HGV Driving Bans Calendar - DAJC"
-  description="Choose European jurisdictions and HGV restriction types, then download or subscribe to the DAJC driving-bans calendar."
->
-  <main class="ban-page">
-    <p class="eyebrow">DAJC operational tools</p>
-    <h1>European HGV Driving Bans Calendar</h1>
-    <p class="intro">Choose the jurisdictions you operate in and add the relevant driving-ban dates to Apple Calendar, Outlook, Google Calendar or any calendar application that supports iCalendar (.ics).</p>
-
-    <section class="panel" aria-labelledby="filters-title">
-      <div class="panel-head">
-        <div>
-          <h2 id="filters-title">1. Choose jurisdictions</h2>
-          <p>International vehicle registration codes are shown next to each DAJC jurisdiction.</p>
+<BaseLayout title={title} description="Verified HGV restrictions and explicit verification status for all 104 DAJC jurisdictions. Current and next calendar month.">
+  <section class="bans-page" data-window={view.window.from}>
+    <header>
+      <p class="eyebrow">DAJC INTELLIGENCE</p>
+      <h1>{title}</h1>
+      <p>{label('Coverage period', 'Sledované období')}: <strong>{view.window.from} — {view.window.to}</strong></p>
+      <p>{label('Exact thresholds, local times, roads and exceptions matter. A restriction above 12 t is not a blanket restriction above 7.5 t.', 'Rozhodují přesné hmotnostní limity, místní časy, komunikace a výjimky. Zákaz nad 12 t není plošný zákaz nad 7,5 t.')}</p>
+      <a href={cs ? '/driving-bans' : '/driving-bans?lang=cs'}>{cs ? 'English' : 'Česky'}</a>
+    </header>
+    <aside class="notice" role="note">
+      <strong>{label('104 tracked jurisdictions does not mean 104 verified jurisdictions.', '104 sledovaných jurisdikcí neznamená 104 ověřených jurisdikcí.')}</strong>
+      <p>{label('Verified individual bans can be available while the full country review is incomplete. Missing events never mean unrestricted travel. “No driving bans” is shown only after a complete primary-source review of this entire period.', 'Jednotlivé zákazy mohou být ověřené, i když celková kontrola země není dokončena. Chybějící události nikdy neznamenají volný průjezd. „Bez zákazu“ se zobrazí pouze po úplném ověření celého období z primárních zdrojů.')}</p>
+      <p>{label('Scheduled full review: Thursday. Urgent changes may trigger a targeted recheck. Always confirm the current official source and your transport permit before departure.', 'Plánovaná úplná kontrola: čtvrtek. Naléhavá změna může vyvolat cílené ověření. Před jízdou vždy zkontrolujte aktuální úřední zdroj a své povolení.')}</p>
+    </aside>
+    <p class="stats">104 / 104 {label('tracked', 'sledováno')} · {count('HAS_BAN')} HAS_BAN · {count('NO_BAN')} NO_BAN · {count('UNKNOWN')} UNKNOWN · {view.jurisdictions.filter(j => j.coverage_complete).length} / 104 {label('fully verified', 'úplně ověřeno')}</p>
+    <form id="ban-filters" class="controls">
+      <label>{label('Find a jurisdiction', 'Vyhledat jurisdikci')} <input id="country-search" type="search" placeholder={label('Name or code', 'Název nebo kód')} /></label>
+      <label>{label('Restrictions', 'Omezení')} <select id="ban-type"><option value="all">{label('All HGV / exceptional', 'Všechny nákladní / nadrozměrné')}</option><option value="general">{label('General HGV', 'Běžná nákladní vozidla')}</option><option value="exceptional">{label('Exceptional, including relevant HGV bans', 'Nadměrné, včetně příslušných běžných zákazů')}</option></select></label>
+      <label><input id="include-history" type="checkbox" /> {label('Include past events within the coverage period', 'Zobrazit i uplynulé události sledovaného období')}</label>
+      <details class="selection"><summary>{label('Select jurisdictions for the calendar', 'Výběr jurisdikcí pro kalendář')}</summary>
+        <button type="button" id="select-all">{label('Select all', 'Vybrat vše')}</button> <button type="button" id="clear-all">{label('Clear selection', 'Zrušit výběr')}</button>
+        <div class="country-grid">{view.jurisdictions.map(j => <label><input type="checkbox" name="country" value={j.jurisdiction} checked /> {j.name} ({j.jurisdiction})</label>)}</div>
+      </details>
+      <p><a id="ics-link" class="calendar-link" href="/api/driving-bans.ics?rolling=1">{label('Subscribe / open ICS calendar', 'Odebírat / otevřít ICS kalendář')}</a> · <a href="/api/driving-bans.json">{label('Canonical JSON / verification evidence', 'Jednotná data JSON / doklady ověření')}</a></p>
+      <p class="small">{label('ICS contains actual verified ban events only, by default excluding events that have already ended. Empty calendars are not a NO_BAN decision. Existing calendar applications may retain earlier cached events until they refresh.', 'ICS obsahuje pouze skutečné ověřené zákazy; ve výchozím stavu nezahrnuje ukončené události. Prázdný kalendář není potvrzením „Bez zákazu“. Kalendářové aplikace mohou staré události uchovat do další obnovy.')}</p>
+    </form>
+    <div id="jurisdictions">
+      {view.jurisdictions.map(j => <details class="jurisdiction" data-code={j.jurisdiction} data-name={j.name.toLowerCase()} data-ban-state={j.ban_state} data-verification-state={j.verification_state}>
+        <summary><strong>{j.name}</strong> <span class="code">{j.jurisdiction}</span> <span class="status">{j.ban_state === 'NO_BAN' ? label('No driving bans', 'Bez zákazu') : j.ban_state === 'HAS_BAN' ? label(`${j.event_count} verified events in this period`, `${j.event_count} ověřených událostí v období`) : label('Verification pending', 'Dosud neověřeno')}</span></summary>
+        <div class="country-body">
+          <p>{label('Period', 'Období')}: {j.period.from} — {j.period.to}. <strong>{j.verification_state}</strong></p>
+          <p>{label('Last checked', 'Poslední kontrola')}: {format(j.last_checked)} · {label('Full-period verification', 'Ověření celého období')}: {format(j.last_verified)}</p>
+          {!j.coverage_complete && <p class="notice">{label('Full jurisdiction verification is incomplete. Additional restrictions may exist; do not interpret missing events as “no ban”.', 'Ověření celé jurisdikce není dokončeno. Mohou existovat další omezení; chybějící události neznamenají „Bez zákazu“.')}</p>}
+          {j.ban_state === 'NO_BAN' && <p><strong>{label('No driving bans', 'Bez zákazu')}</strong> — {j.period.from} — {j.period.to}</p>}
+          <p class="sources">{j.source_ids.map(id => { const source = view.sources.find(s => s.source_id === id); return source && <a href={source.url} target="_blank" rel="noopener noreferrer">{source.authority}</a>; })}</p>
+          <div class="events">{(eventsByCountry.get(j.jurisdiction) || []).map(e => <article class="ban-event" data-ends={e.ends_at} data-types={e.restriction_types.join(',')} data-uid={e.uid}>
+            <h3>{e.title}</h3>
+            <p><strong>{e.date} {e.start_time} — {e.end_date} {e.end_time}</strong> ({e.timezone})</p>
+            <p>{e.vehicle_scope}</p><p>{e.roads.join('; ')} · {e.regions.join('; ')} · {e.direction}</p>
+            <p><strong>{label('Exceptions', 'Výjimky')}:</strong> {e.exceptions.join(' ')}</p>
+            <p><strong>ADR:</strong> {e.adr_relevance}</p><p><strong>Exceptional / oversize:</strong> {e.exceptional_relevance}</p>
+            <p>{e.notes}</p>
+            <p class="small"><a href={e.source_url} target="_blank" rel="noopener noreferrer">{e.source_authority}</a> · {e.source_version} · {label('Rule verified', 'Pravidlo ověřeno')}: {format(e.verified_at)}</p>
+          </article>)}</div>
         </div>
-        <div class="bulk">
-          <button type="button" id="select-all">Select all covered</button>
-          <button type="button" id="clear-all">Clear</button>
-        </div>
-      </div>
-      <label class="search-label" for="country-search">Search by country, territory or registration code</label>
-      <input id="country-search" type="search" placeholder="Germany, D, Austria, A…" />
-      <div class="country-grid" id="country-grid">
-        {jurisdictions.map((item) => (
-          <label class="country" data-search={`${item.name} ${item.registrationCode} ${item.code}`.toLowerCase()}>
-            <input type="checkbox" name="country" value={item.code} data-maintained={drivingBanCalendars.some((rule) => rule.country === item.code) ? 'true' : 'false'} />
-            <span>
-              <strong>{item.name}</strong>
-              <small>Registration code {item.registrationCode}</small>
-              <small>{drivingBanCalendars.some((rule) => rule.country === item.code) ? 'Partial maintained coverage' : 'Coverage unavailable — verify official sources'}</small>
-            </span>
-          </label>
-        ))}
-      </div>
-    </section>
-
-    <section class="panel" aria-labelledby="type-title">
-      <h2 id="type-title">2. Choose restriction type</h2>
-      <div class="type-row">
-        <label><input type="radio" name="type" value="all" checked /> All restrictions — HGV bans over 7.5 t plus oversize / exceptional-transport rules</label>
-        <label><input type="radio" name="type" value="general" /> Standard HGV only — without oversize-specific rules</label>
-      </div>
-      <p class="note">Driving bans apply to all heavy goods vehicles, not only to oversize transport — typically above 7.5 t (Poland and Bulgaria above 12 t; Austria, Switzerland and Czechia also restrict lighter vehicles towing a trailer). Oversize and exceptional transports are bound by these general bans <em>and</em> by their own additional rules, so use “All restrictions” for them. The exact threshold, road scope, direction and exemptions are listed inside each calendar event.</p>
-    </section>
-
-    <section class="panel" aria-labelledby="preview-title">
-      <div class="panel-head">
-        <div>
-          <h2 id="preview-title">3. Upcoming maintained restrictions</h2>
-          <p>Restrictions currently held in the DAJC registry for {previewLabel}. Select jurisdictions or a restriction type above to filter this list.</p>
-        </div>
-        <p id="restriction-count" class="summary">{restrictionPreview.length} maintained restrictions.</p>
-      </div>
-
-      <div id="restriction-list" class="restriction-list">
-        {restrictionPreview.map((item) => (
-          <article class="restriction" data-country={item.country} data-types={item.types.join(' ')} data-valid-to={item.validTo}>
-            <div class="restriction-head">
-              <div>
-                <span class="restriction-country">{item.countryName}</span>
-                <h3>{item.title}</h3>
-                <span class="restriction-scope">{item.types.includes('general') ? 'All HGVs above the threshold — incl. oversize' : 'Oversize / exceptional transport only'}</span>
-              </div>
-              <span class="restriction-date">
-                {item.validFrom === item.validTo ? item.validFrom : `${item.validFrom} → ${item.validTo}`}
-              </span>
-            </div>
-            {item.timeWindow && <p><strong>When:</strong> {item.timeWindow}</p>}
-            {item.vehicleScope && <p><strong>Affected:</strong> {item.vehicleScope}</p>}
-            {item.routeScope && <p><strong>Where:</strong> {item.routeScope}</p>}
-            {item.exemptionNotes && (
-              <details>
-                <summary>Exceptions / conditions</summary>
-                <p>{item.exemptionNotes}</p>
-              </details>
-            )}
-            {item.sourceUrl && (
-              <a class="restriction-source" href={item.sourceUrl} target="_blank" rel="noreferrer">
-                Source{item.sourceName ? ` — ${item.sourceName}` : ''} ↗
-              </a>
-            )}
-          </article>
-        ))}
-      </div>
-      <p id="restriction-empty" class="news-empty" hidden>No maintained entries match this selection. This does not mean that there are no restrictions. Verify official sources before departure.</p>
-    </section>
-
-    <section class="panel action-panel" aria-labelledby="calendar-title">
-      <h2 id="calendar-title">4. Add the restrictions to your calendar</h2>
-      <p id="selection-summary" class="summary">Select at least one jurisdiction.</p>
-      <div class="actions">
-        <a id="download-link" class="action primary is-disabled" aria-disabled="true" data-from={previewFromIso} data-to={previewToIso}>Download {downloadLabel} .ics</a>
-        <a id="subscribe-link" class="action is-disabled" aria-disabled="true">Subscribe to the live calendar</a>
-      </div>
-      <div class="feed-box">
-        <label for="feed-url">Live calendar URL for Google Calendar and other calendar applications</label>
-        <input id="feed-url" readonly value="Select jurisdictions to generate your live calendar URL" />
-      </div>
-      <p class="note"><strong>Apple Calendar / Outlook:</strong> use “Subscribe to the live calendar”. <strong>Google Calendar:</strong> copy the generated URL and use “Add calendar → From URL”. Calendar applications determine their own refresh interval; DAJC publishes a recommended 12-hour refresh interval.</p>
-    </section>
-
-    <section class="intelligence-cta" aria-labelledby="intelligence-cta-title">
-      <p class="eyebrow">DAJC Intelligence</p>
-      <h2 id="intelligence-cta-title">Need automatic change alerts?</h2>
-      <p>Keep the basic calendar free. DAJC Intelligence is being built for saved jurisdictions, vehicle profiles, change detection, immediate alerts and history.</p>
-      <a href="/intelligence">Explore Intelligence &rarr;</a>
-    </section>
-
-    <section class="warning">
-      <strong>Planning information — always verify before departure.</strong> Calendar entries are generated from DAJC's maintained driving-ban registry. Road signs, police orders, live traffic restrictions, ADR requirements, local access restrictions and conditions attached to exceptional-transport permits can override or add to the calendar information.
-    </section>
-  </main>
+      </details>)}
+    </div>
+    <p class="small">{label('Dataset version', 'Verze dat')}: {view.dataset_version}. {label('Generated', 'Vygenerováno')}: {format(view.generated_at)}.</p>
+  </section>
 </BaseLayout>
-
 <script>
-  const boxes = Array.from(document.querySelectorAll<HTMLInputElement>('input[name="country"]'));
-  const typeRadios = Array.from(document.querySelectorAll<HTMLInputElement>('input[name="type"]'));
-  const search = document.querySelector<HTMLInputElement>('#country-search')!;
-  const summary = document.querySelector<HTMLElement>('#selection-summary')!;
-  const download = document.querySelector<HTMLAnchorElement>('#download-link')!;
-  const subscribe = document.querySelector<HTMLAnchorElement>('#subscribe-link')!;
-  const feed = document.querySelector<HTMLInputElement>('#feed-url')!;
-  const restrictionItems = Array.from(document.querySelectorAll<HTMLElement>('.restriction'));
-  const restrictionCount = document.querySelector<HTMLElement>('#restriction-count')!;
-  const restrictionEmpty = document.querySelector<HTMLElement>('#restriction-empty')!;
-  const today = new Date().toISOString().slice(0, 10);
-  const matchesType = (item: HTMLElement, type: string) => type === 'all' || (item.dataset.types || 'general').split(' ').includes(type);
-
-  // The list is prerendered at build time; drop entries that have already ended.
-  restrictionItems.forEach((item) => {
-    if ((item.dataset.validTo || '') < today) item.remove();
-  });
-  const currentItems = restrictionItems.filter((item) => item.isConnected);
-
-  function update() {
-    const selected = boxes.filter((b) => b.checked).map((b) => b.value);
-    const type = typeRadios.find((r) => r.checked)?.value || 'all';
-
-    summary.textContent = selected.length
-      ? `${selected.length} jurisdiction${selected.length === 1 ? '' : 's'} selected.`
-      : 'Select at least one jurisdiction.';
-
-    if (!selected.length) {
-      download.removeAttribute('href');
-      subscribe.removeAttribute('href');
-      download.classList.add('is-disabled');
-      subscribe.classList.add('is-disabled');
-      download.setAttribute('aria-disabled', 'true');
-      subscribe.setAttribute('aria-disabled', 'true');
-      feed.value = 'Select jurisdictions to generate your live calendar URL';
-
-      let visibleRestrictions = 0;
-      currentItems.forEach((item) => {
-        const show = matchesType(item, type);
-        item.hidden = !show;
-        if (show) visibleRestrictions += 1;
+  const init = () => {
+    const form = document.querySelector<HTMLFormElement>('#ban-filters');
+    if (!form || form.dataset.initialized) return;
+    form.dataset.initialized = 'true';
+    const boxes = [...form.querySelectorAll<HTMLInputElement>('input[name="country"]')];
+    const search = form.querySelector<HTMLInputElement>('#country-search')!;
+    const type = form.querySelector<HTMLSelectElement>('#ban-type')!;
+    const history = form.querySelector<HTMLInputElement>('#include-history')!;
+    const link = form.querySelector<HTMLAnchorElement>('#ics-link')!;
+    const update = () => {
+      const selected = boxes.filter(b => b.checked).map(b => b.value);
+      document.querySelectorAll<HTMLElement>('.jurisdiction').forEach(row => {
+        const code = row.dataset.code || '';
+        row.hidden = !selected.includes(code) || !`${row.dataset.name} ${code}`.toLowerCase().includes(search.value.toLowerCase());
       });
-      restrictionCount.textContent = `${visibleRestrictions} upcoming maintained restriction${visibleRestrictions === 1 ? '' : 's'}.`;
-      restrictionEmpty.hidden = visibleRestrictions > 0;
-      return;
-    }
-
-    let visibleRestrictions = 0;
-    currentItems.forEach((item) => {
-      const country = item.dataset.country || '';
-      const show = selected.includes(country) && matchesType(item, type);
-      item.hidden = !show;
-      if (show) visibleRestrictions += 1;
-    });
-    restrictionCount.textContent = `${visibleRestrictions} restriction${visibleRestrictions === 1 ? '' : 's'} match the current selection.`;
-    restrictionEmpty.hidden = visibleRestrictions > 0;
-
-    const unavailable = boxes.filter((box) => box.checked && (box.dataset.maintained !== 'true' || !currentItems.some((item) => item.dataset.country === box.value && matchesType(item, type))));
-    if (unavailable.length || !visibleRestrictions) {
-      summary.textContent = 'Coverage is unavailable for part or all of this selection. Missing data does not mean no restrictions. Select jurisdictions with maintained entries to export.';
-      download.removeAttribute('href');
-      subscribe.removeAttribute('href');
-      download.classList.add('is-disabled');
-      subscribe.classList.add('is-disabled');
-      download.setAttribute('aria-disabled', 'true');
-      subscribe.setAttribute('aria-disabled', 'true');
-      feed.value = 'Calendar unavailable for this selection — verify official sources';
-      return;
-    }
-
-    const countries = encodeURIComponent(selected.join(','));
-    const fixed = `/api/driving-bans.ics?countries=${countries}&type=${type}&from=${download.dataset.from}&to=${download.dataset.to}`;
-    const rolling = `/api/driving-bans.ics?countries=${countries}&type=${type}&rolling=1`;
-    const absolute = `${window.location.origin}${rolling}`;
-
-    download.href = fixed;
-    subscribe.href = absolute.replace(/^https:/, 'webcal:');
-    download.classList.remove('is-disabled');
-    subscribe.classList.remove('is-disabled');
-    download.removeAttribute('aria-disabled');
-    subscribe.removeAttribute('aria-disabled');
-    feed.value = absolute;
-  }
-
-  boxes.forEach((box) => box.addEventListener('change', update));
-  typeRadios.forEach((radio) => radio.addEventListener('change', update));
-
-  document.querySelector('#select-all')?.addEventListener('click', () => {
-    // Only jurisdictions with current maintained entries for the chosen type:
-    // selecting uncovered ones would block the export for the whole selection.
-    const type = typeRadios.find((r) => r.checked)?.value || 'all';
-    boxes.forEach((box) => {
-      if (box.closest<HTMLElement>('.country')?.hidden) return;
-      box.checked = currentItems.some((item) => item.dataset.country === box.value && matchesType(item, type));
-    });
+      document.querySelectorAll<HTMLElement>('.ban-event').forEach(e => {
+        e.hidden = (!history.checked && (e.dataset.ends || '') <= new Date().toISOString()) || (type.value === 'general' && !e.dataset.types?.split(',').includes('general'));
+      });
+      const params = new URLSearchParams({ rolling: '1', type: type.value });
+      if (selected.length && selected.length !== boxes.length) params.set('countries', selected.join(','));
+      if (history.checked) params.set('history', '1');
+      if (selected.length) { link.href = `/api/driving-bans.ics?${params}`; link.removeAttribute('aria-disabled'); }
+      else { link.removeAttribute('href'); link.setAttribute('aria-disabled', 'true'); }
+    };
+    form.addEventListener('submit', e => e.preventDefault());
+    form.addEventListener('input', update);
+    form.querySelector('#select-all')?.addEventListener('click', () => { boxes.forEach(b => b.checked = true); update(); });
+    form.querySelector('#clear-all')?.addEventListener('click', () => { boxes.forEach(b => b.checked = false); update(); });
     update();
+  };
+  init();
+  document.addEventListener('astro:page-load', init);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) return;
+    const stored = document.querySelector<HTMLElement>('[data-window]')?.dataset.window;
+    const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Prague', year: 'numeric', month: '2-digit' }).formatToParts(new Date());
+    const month = `${parts.find(p => p.type === 'year')?.value}-${parts.find(p => p.type === 'month')?.value}-01`;
+    if (stored && stored !== month) location.reload();
   });
-
-  document.querySelector('#clear-all')?.addEventListener('click', () => {
-    boxes.forEach((box) => box.checked = false);
-    update();
-  });
-
-  search.addEventListener('input', () => {
-    const query = search.value.trim().toLowerCase();
-    document.querySelectorAll<HTMLElement>('.country').forEach((row) => {
-      row.hidden = !!query && !(row.dataset.search || '').includes(query);
-    });
-  });
-
-  feed.addEventListener('focus', () => feed.select());
-  update();
 </script>
-
 <style>
-  .ban-page{position:relative;z-index:2;max-width:1040px;margin:0 auto;padding:7vh 1.4rem 9vh}.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--dajc-orange);text-align:center;margin:0 0 1rem}h1{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);font-size:clamp(2rem,5vw,3.3rem);line-height:1.05;text-align:center;margin:0 auto 1rem;max-width:16ch}.intro{color:var(--dajc-muted);font-size:17px;line-height:1.7;text-align:center;max-width:70ch;margin:0 auto 2.5rem}.panel{border:1px solid var(--dajc-line);border-radius:16px;padding:1.4rem;margin:0 0 1rem;background:rgba(255,255,255,.025)}.panel h2{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);font-size:1.2rem;margin:0 0 .5rem}.panel p{color:var(--dajc-muted);margin:.2rem 0}.panel-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}.bulk{display:flex;gap:.5rem}.bulk button{border:1px solid var(--dajc-line);background:transparent;color:var(--dajc-white);border-radius:999px;padding:.5rem .8rem;cursor:pointer}.search-label,.feed-box label{display:block;color:var(--dajc-muted);font-size:13px;margin:1rem 0 .4rem}.search-label+input,.feed-box input{width:100%;box-sizing:border-box;border:1px solid var(--dajc-line);border-radius:8px;background:rgba(0,0,0,.18);color:var(--dajc-white);padding:.8rem;font-size:16px}.country-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;margin-top:1rem;max-height:440px;overflow:auto;padding-right:.25rem}.country{display:flex;gap:.7rem;align-items:flex-start;padding:.65rem;border:1px solid transparent;border-radius:8px;color:var(--dajc-white);cursor:pointer}.country:hover{border-color:var(--dajc-line)}.country input{margin-top:.2rem}.country span{min-width:0}.country strong,.country small{display:block}.country strong{font-size:14px}.country small{color:var(--dajc-muted);font-size:11px;margin-top:.15rem}.type-row{display:flex;flex-wrap:wrap;gap:.8rem 1.4rem;color:var(--dajc-white);margin:1rem 0}.type-row label{display:flex;align-items:center;gap:.45rem}.note{font-size:13px!important;line-height:1.6}.actions{display:flex;flex-wrap:wrap;gap:.7rem;margin:1rem 0}.action{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 1rem;border:1px solid var(--dajc-orange);border-radius:8px;color:var(--dajc-orange);text-decoration:none;font-weight:600}.action.primary{background:var(--dajc-orange);color:var(--dajc-dark)}.action.is-disabled{opacity:.35;pointer-events:none}.summary{font-family:'IBM Plex Mono',monospace;font-size:12px}.restriction-list{display:grid;gap:.8rem;margin-top:1rem;max-height:640px;overflow:auto;padding-right:.25rem}.restriction{border:1px solid var(--dajc-line);border-radius:12px;padding:1rem;background:rgba(0,0,0,.12)}.restriction[hidden]{display:none}.restriction-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;margin-bottom:.55rem}.restriction-country{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dajc-orange)}.restriction h3{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);font-size:1rem;line-height:1.35;margin:.2rem 0 0}.restriction-scope{display:inline-block;margin-top:.35rem;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--dajc-muted);border:1px solid var(--dajc-line);border-radius:999px;padding:.15rem .5rem}.restriction-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dajc-muted);white-space:nowrap}.restriction p{font-size:13px!important;line-height:1.55;margin:.35rem 0!important}.restriction p strong{color:var(--dajc-white)}.restriction details{margin-top:.55rem;color:var(--dajc-muted);font-size:13px;line-height:1.55}.restriction summary{cursor:pointer;color:var(--dajc-white)}.restriction-source{display:inline-block;margin-top:.65rem;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dajc-orange);text-decoration:none}.restriction-source:hover{text-decoration:underline}.warning{border-left:3px solid var(--dajc-orange);padding:1rem 1.2rem;color:var(--dajc-muted);line-height:1.65;background:rgba(255,255,255,.02)}.warning strong{color:var(--dajc-white)}.intelligence-cta{margin:1.4rem 0;padding:1.5rem;border:1px solid var(--dajc-orange);border-radius:16px;background:linear-gradient(135deg,rgba(255,159,0,.08),rgba(0,38,92,.2));text-align:center}.intelligence-cta .eyebrow{margin-bottom:.5rem}.intelligence-cta h2{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);margin:0 0 .6rem}.intelligence-cta p:not(.eyebrow){max-width:62ch;margin:0 auto 1rem;color:var(--dajc-muted);line-height:1.65}.intelligence-cta a{font-family:'IBM Plex Mono',monospace;color:var(--dajc-orange);text-decoration:none;font-size:12px;text-transform:uppercase;letter-spacing:.06em}@media(max-width:760px){.country-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel-head{display:block}.bulk{margin-top:1rem}}@media(max-width:480px){.country-grid{grid-template-columns:1fr}.ban-page{padding-left:1rem;padding-right:1rem}.actions{display:grid}.action{width:100%;box-sizing:border-box}}
+  .bans-page { max-width: 1160px; margin: 0 auto; padding: 3rem 1.2rem; }
+  .eyebrow { font-size: .8rem; letter-spacing: .16em; font-weight: 700; }
+  h1 { font-size: clamp(2rem, 4vw, 3.3rem); line-height: 1.15; }
+  .notice { border-left: 4px solid #edb74c; background: #edb74c14; padding: 1rem 1.2rem; margin: 1.3rem 0; }
+  .controls, .jurisdiction { border: 1px solid #71809666; border-radius: 10px; padding: 1rem; margin: .9rem 0; }
+  .controls > label { display: block; margin: .65rem 0; }
+  input[type=search], select { color: inherit; background: transparent; border: 1px solid #718096; border-radius: 5px; padding: .5rem; max-width: 100%; }
+  select option { color: #111; }
+  button { padding: .45rem .8rem; margin: .5rem .2rem; border: 1px solid #718096; border-radius: 5px; }
+  summary { cursor: pointer; line-height: 1.8; }
+  .status { margin-left: .7rem; font-size: .9rem; }
+  .code, .small { font-size: .85rem; opacity: .8; }
+  .country-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(235px, 1fr)); gap: .45rem; padding: 1rem 0; }
+  .country-body { padding: .75rem .2rem; }
+  .ban-event { border-top: 1px solid #71809655; padding: .8rem 0; }
+  .ban-event h3 { font-size: 1.1rem; }
+  .sources a { display: inline-block; margin: .25rem .7rem .25rem 0; }
+  .calendar-link[aria-disabled=true] { opacity: .5; pointer-events: none; }
+  [hidden] { display: none !important; }
+  p { overflow-wrap: anywhere; }
 </style>

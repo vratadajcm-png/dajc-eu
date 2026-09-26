@@ -10,6 +10,8 @@
     "astro": "astro",
     "typecheck": "astro check",
     "test": "vitest run",
+    "lint:driving-bans": "node scripts/lint-driving-bans.mjs",
+    "driving-bans:audit": "node scripts/audit-driving-bans.mjs",
     "oversize:monitor": "node scripts/oversize-monitor.mjs",
     "oversize:publish": "node scripts/generate-weekly-article.mjs"
   },
