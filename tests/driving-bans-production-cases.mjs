@@ -158,7 +158,7 @@ export function registerProductionDrivingBanTests(test, a) {
     a.ok(v.events.every(e => projected.has(e.uid)), 'every published event is visible to the config projection');
     a.deepEqual(uids(toIcs(v, {upcoming: false})).sort(), v.events.map(e => e.uid).sort());
     const page = readFileSync(new URL('../src/pages/driving-bans.astro', import.meta.url), 'utf8');
-    a.match(page, /Ověření probíhá/); a.match(page, /Bez zákazu/);
+    a.match(page, /shown = view\.jurisdictions\.filter\(j => j\.ban_state !== 'UNKNOWN'\)/); a.match(page, /NENÍ bez zákazu/); a.match(page, /Bez zákazu/);
   });
   test('two-month window shifts automatically; reviewed span keeps verification only while it contains the window', () => {
     a.deepEqual(publicationWindow(new Date('2026-09-30T22:30:00Z')), {from: '2026-10-01', to: '2026-11-30', timezone: 'Europe/Prague'});

@@ -52,9 +52,9 @@ await check('production web identity/state/title consistency',async()=>{
   const title=body.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]||'';assert.match(title,/DAJC|zákazy/i);assert(!/Cohere|Member of Technical Staff/i.test(title),'Unrelated page title');
   const tags=[...body.matchAll(/<details\b[^>]*\bclass="jurisdiction"[^>]*>/g)].map(m=>m[0]);
   const attrs=tags.map(t=>Object.fromEntries([...t.matchAll(/(data-[\w-]+)="([^"]*)"/g)].map(m=>[m[1],m[2]])));
-  assert.equal(attrs.length,live.jurisdictions.length);assert.deepEqual(ordered(attrs.map(a=>a['data-code'])),ordered(live.jurisdictions.map(j=>j.jurisdiction)));
+  const listed=live.jurisdictions.filter(j=>j.ban_state!=='UNKNOWN');assert.equal(attrs.length,listed.length);assert.deepEqual(ordered(attrs.map(a=>a['data-code'])),ordered(listed.map(j=>j.jurisdiction)));
   for(const a of attrs){const j=live.jurisdictions.find(j=>j.jurisdiction===a['data-code']);assert.equal(a['data-ban-state'],j.ban_state);assert.equal(a['data-verification-state'],j.verification_state);}
-  assert(body.includes(live.window.from)&&body.includes(live.window.to)&&body.includes(live.dataset_version));assert(body.includes(`${live.jurisdictions.length} sledovaných jurisdikcí neznamená ${live.jurisdictions.length} ověřených jurisdikcí.`));
+  assert(body.includes(live.window.from)&&body.includes(live.window.to)&&body.includes(live.dataset_version));assert(body.includes('Země, která v přehledu chybí, NENÍ bez zákazu'));
   assert.match(metadata.cache_control||'',/no-store/);return {title,jurisdictions:attrs.length};
 });
 for(const history of [false,true]) await check(history?'history ICS vs whole-window JSON':'default ICS vs upcoming JSON',async()=>{

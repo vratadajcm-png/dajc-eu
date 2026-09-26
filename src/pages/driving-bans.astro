@@ -9,13 +9,16 @@ const cs = Astro.url.searchParams.get('lang') === 'cs';
 const label = (en: string, cz: string) => cs ? cz : en;
 const title = label('European HGV Driving Bans', 'Evropské zákazy jízd nákladních vozidel');
 const format = (value: string | null) => value ? new Intl.DateTimeFormat(cs ? 'cs-CZ' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Prague' }).format(new Date(value)) : label('Not completed', 'Nedokončeno');
-const count = (state: string) => view.jurisdictions.filter(j => j.ban_state === state).length;
+// Public listing: only jurisdictions with an official-source status (a confirmed ban or a fully verified NO_BAN).
+// UNKNOWN jurisdictions stay in the JSON/audit evidence but are not listed until an official source confirms a ban.
+const shown = view.jurisdictions.filter(j => j.ban_state !== 'UNKNOWN');
+const count = (state: string) => shown.filter(j => j.ban_state === state).length;
 const eventsByCountry = new Map<string, typeof view.events>(view.jurisdictions.map(j => [j.jurisdiction, view.events.filter(e => e.jurisdiction === j.jurisdiction)]));
 type Weight = { any_of?: Weight[]; all_of?: Weight[]; operator?: string; value?: number; unit?: string; applies_to?: string };
 const weightText = (w: Weight): string => w.any_of ? w.any_of.map(weightText).join(label(' OR ', ' NEBO ')) : w.all_of ? w.all_of.map(weightText).join(label(' AND ', ' A ')) : w.operator === 'any' ? `${w.applies_to} (${label('any mass', 'bez hmotnostní hranice')})` : `${w.applies_to} ${w.operator} ${w.unit === 'kg' ? `${(w.value ?? 0) / 1000} t` : `${w.value} ${w.unit}`}`;
 const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO_BAN' ? label('No driving bans', 'Bez zákazu') : j.ban_state === 'HAS_BAN' ? label(`${j.event_count} verified events in this period`, `${j.event_count} ověřených událostí v období`) + (j.coverage_complete ? '' : label(' · review incomplete', ' · ověření neúplné')) : label('Verification in progress', 'Ověření probíhá');
 ---
-<BaseLayout title={title} description={`Verified HGV restrictions and explicit verification status for ${view.jurisdictions.length} DAJC jurisdictions. Current and next calendar month.`}>
+<BaseLayout title={title} description="HGV driving bans confirmed by official sources for the current and next calendar month.">
   <section class="bans-page" data-window={view.window.from}>
     <header>
       <p class="eyebrow">DAJC INTELLIGENCE</p>
@@ -25,25 +28,24 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
       <a href={cs ? '/driving-bans' : '/driving-bans?lang=cs'}>{cs ? 'English' : 'Česky'}</a>
     </header>
     <aside class="notice" role="note">
-      <strong>{label(`${view.jurisdictions.length} tracked jurisdictions does not mean ${view.jurisdictions.length} verified jurisdictions.`, `${view.jurisdictions.length} sledovaných jurisdikcí neznamená ${view.jurisdictions.length} ověřených jurisdikcí.`)}</strong>
-      <p>{label('Verified individual bans can be available while the full country review is incomplete. Missing events never mean unrestricted travel. “No driving bans” is shown only after a complete primary-source review of this entire period.', 'Jednotlivé zákazy mohou být ověřené, i když celková kontrola země není dokončena. Chybějící události nikdy neznamenají volný průjezd. „Bez zákazu“ se zobrazí pouze po úplném ověření celého období z primárních zdrojů.')}</p>
-      <p>{label('Scheduled full review: Thursday. Urgent changes may trigger a targeted recheck. Always confirm the current official source and your transport permit before departure.', 'Plánovaná úplná kontrola: čtvrtek. Naléhavá změna může vyvolat cílené ověření. Před jízdou vždy zkontrolujte aktuální úřední zdroj a své povolení.')}</p>
+      <strong>{label('Only jurisdictions where an official source confirms a driving ban are listed.', 'Zobrazeny jsou pouze jurisdikce, u nichž úřední zdroj potvrzuje zákaz jízdy.')}</strong>
+      <p>{label('A country missing from this list is NOT free of restrictions: it appears here as soon as an official source confirms a ban. “No driving bans” is shown only after a complete official-source review of the whole period.', 'Země, která v přehledu chybí, NENÍ bez zákazu – zobrazí se, jakmile úřední zdroj zákaz potvrdí. „Bez zákazu“ se zobrazí pouze po úplném ověření celého období z úředních zdrojů.')}</p>
+      <p>{label('Verified individual bans can be listed while the full country review is incomplete; missing events never mean unrestricted travel. Always confirm the current official source and your transport permit before departure.', 'Jednotlivé ověřené zákazy mohou být zobrazeny, i když celková kontrola země není dokončena; chybějící události nikdy neznamenají volný průjezd. Před jízdou vždy zkontrolujte aktuální úřední zdroj a své povolení.')}</p>
     </aside>
-    <p class="stats">{view.jurisdictions.length} / {view.jurisdictions.length} {label('tracked', 'sledováno')} · {count('HAS_BAN')} HAS_BAN · {count('NO_BAN')} NO_BAN · {count('UNKNOWN')} UNKNOWN · {view.jurisdictions.filter(j => j.coverage_complete).length} / {view.jurisdictions.length} {label('fully verified', 'úplně ověřeno')}</p>
-    <details class="small"><summary>{label(`Not covered by Driving Bans (${view.scope.excluded.length} territories)`, `Mimo rozsah Driving Bans (${view.scope.excluded.length} území)`)}</summary><p>{label('No verifiable primary source on HGV driving bans exists for these overseas, remote or disputed territories. DAJC publishes no status for them; this is not a “no ban” statement.', 'Pro tato zámořská, odlehlá či sporná území neexistuje ověřitelný primární zdroj k zákazům jízd nákladních vozidel. DAJC pro ně nezveřejňuje žádný stav; nejde o tvrzení „Bez zákazu“.')}</p><p>{view.scope.excluded.map(x => `${x.name} (${x.jurisdiction})`).join(', ')}</p></details>
+    <p class="stats">{shown.length} {label('jurisdictions with an officially verified status', 'jurisdikcí s úředně ověřeným stavem')} · {count('HAS_BAN')} {label('with bans', 'se zákazem')} · {count('NO_BAN')} {label('without bans', 'bez zákazu')} · {shown.filter(j => j.coverage_complete).length} {label('fully verified', 'úplně ověřeno')}</p>
     <form id="ban-filters" class="controls">
       <label>{label('Find a jurisdiction', 'Vyhledat jurisdikci')} <input id="country-search" type="search" placeholder={label('Name or code', 'Název nebo kód')} /></label>
       <label>{label('Restrictions', 'Omezení')} <select id="ban-type"><option value="all">{label('All HGV / exceptional', 'Všechny nákladní / nadrozměrné')}</option><option value="general">{label('General HGV', 'Běžná nákladní vozidla')}</option><option value="exceptional">{label('Exceptional, including relevant HGV bans', 'Nadměrné, včetně příslušných běžných zákazů')}</option></select></label>
       <label><input id="include-history" type="checkbox" /> {label('Include past events within the coverage period', 'Zobrazit i uplynulé události sledovaného období')}</label>
       <details class="selection"><summary>{label('Select jurisdictions for the calendar', 'Výběr jurisdikcí pro kalendář')}</summary>
         <button type="button" id="select-all">{label('Select all', 'Vybrat vše')}</button> <button type="button" id="clear-all">{label('Clear selection', 'Zrušit výběr')}</button>
-        <div class="country-grid">{view.jurisdictions.map(j => <label><input type="checkbox" name="country" value={j.jurisdiction} checked /> {j.name} ({j.jurisdiction})</label>)}</div>
+        <div class="country-grid">{shown.map(j => <label><input type="checkbox" name="country" value={j.jurisdiction} checked /> {j.name} ({j.jurisdiction})</label>)}</div>
       </details>
       <p><a id="ics-link" class="calendar-link" href="/api/driving-bans.ics?rolling=1">{label('Subscribe / open ICS calendar', 'Odebírat / otevřít ICS kalendář')}</a> · <a href="/api/driving-bans.json">{label('Canonical JSON / verification evidence', 'Jednotná data JSON / doklady ověření')}</a></p>
       <p class="small">{label('ICS contains actual verified ban events only, by default excluding events that have already ended. Empty calendars are not a NO_BAN decision. Existing calendar applications may retain earlier cached events until they refresh.', 'ICS obsahuje pouze skutečné ověřené zákazy; ve výchozím stavu nezahrnuje ukončené události. Prázdný kalendář není potvrzením „Bez zákazu“. Kalendářové aplikace mohou staré události uchovat do další obnovy.')}</p>
     </form>
     <div id="jurisdictions">
-      {view.jurisdictions.map(j => <details class="jurisdiction" data-code={j.jurisdiction} data-name={j.name.toLowerCase()} data-ban-state={j.ban_state} data-verification-state={j.verification_state}>
+      {shown.map(j => <details class="jurisdiction" data-code={j.jurisdiction} data-name={j.name.toLowerCase()} data-ban-state={j.ban_state} data-verification-state={j.verification_state}>
         <summary><strong>{j.name}</strong> <span class="code">{j.jurisdiction}</span> <span class="status">{statusText(j)}</span></summary>
         <div class="country-body">
           <p>{label('Period', 'Období')}: {j.period.from} — {j.period.to}. <strong>{j.verification_state}</strong></p>

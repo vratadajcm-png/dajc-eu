@@ -12,6 +12,10 @@ The public period is the CURRENT whole calendar month plus NEXT whole calendar m
 
 `weight_threshold` records the exact legal applicability: `any_of` / `all_of` groups; numeric leaves in `kg`, `m` or `axles`; `{"operator": "any"}` for a category with no mass threshold (for example tractors in CH/LI or any trailer behind a truck in DE). Never approximate a criterion with an invented number, and never rewrite >3.5t, >12t or axle/height criteria as >7.5t.
 
+## Public listing
+
+Owner decision (26 September 2026): the public /driving-bans page lists only jurisdictions with an official-source status for the active window (HAS_BAN from a PRIMARY_VERIFIED rule, or a fully verified NO_BAN). UNKNOWN / UNVERIFIED / CROSSCHECKED / SOURCE_UNAVAILABLE jurisdictions are not listed; they remain in `/api/driving-bans.json`, the audit export and the Change Register, and appear on the page automatically once an official source confirms a ban. The page states explicitly that a missing country is NOT free of restrictions.
+
 ## Evidence and publication gates
 
 TRACKED != VERIFIED. UNKNOWN, UNVERIFIED and SOURCE_UNAVAILABLE never become NO_BAN. Whole-jurisdiction verification is separate from individual verified rules. Complete jurisdiction coverage and NO_BAN require PRIMARY_VERIFIED evidence for all 12 scope checks, the entire window, primary source IDs, verification date and an explicit reviewed NO_BAN finding where applicable. Refresh the complete period at month rollover; never roll an old NO_BAN forward.
