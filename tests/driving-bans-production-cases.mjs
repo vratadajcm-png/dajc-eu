@@ -1,6 +1,7 @@
 import {readFileSync} from 'node:fs';
-import {dajcEuropeCoverage as coverage} from '../config/europe-coverage.mjs';
-import {canonicalDrivingBans as current, drivingBanCalendars} from '../config/driving-ban-calendars/runtime.mjs';
+import {dajcEuropeCoverage} from '../config/europe-coverage.mjs';
+import {drivingBanScope as coverage, drivingBanExcludedList, drivingBanExclusions} from '../config/driving-ban-calendars/scope.mjs';
+import {canonicalDrivingBans as current, drivingBanCalendars, getDrivingBansSnapshot} from '../config/driving-ban-calendars/runtime.mjs';
 import {snapshot, toIcs, validateCanonical, validWeight, publicationWindow, SCOPE_CHECKS} from '../src/lib/driving-bans/core.mjs';
 // Regression cases against the maintained production dataset (2026-09-26 sweep).
 const SWEEP = new Date('2026-09-26T15:30:00Z');
@@ -12,10 +13,23 @@ const uids = text => [...text.replace(/\r\n[ \t]/g, '').matchAll(/^UID:(.+)$/gm)
 const TZ = {AT:'Europe/Vienna', LI:'Europe/Vaduz', LU:'Europe/Luxembourg', ME:'Europe/Podgorica', BG:'Europe/Sofia', ES:'Europe/Madrid', DE:'Europe/Berlin', FR:'Europe/Paris', IT:'Europe/Rome', CH:'Europe/Zurich', CZ:'Europe/Prague', SK:'Europe/Bratislava', PL:'Europe/Warsaw', HU:'Europe/Budapest', SI:'Europe/Ljubljana', HR:'Europe/Zagreb', PT:'Europe/Lisbon', GR:'Europe/Athens'};
 
 export function registerProductionDrivingBanTests(test, a) {
-  test('production: exactly 104 unique Coverage identities, each with a state for the active window', () => {
+  test('scope: 104 Coverage identities = 76 Driving Bans jurisdictions + 28 documented exclusions, none published', () => {
+    a.equal(dajcEuropeCoverage.length, 104);
+    a.equal(coverage.length + drivingBanExcludedList.length, 104);
+    a.equal(drivingBanExcludedList.length, 28);
+    a.ok(drivingBanExcludedList.every(x => x.reason && !/no ban/i.test(x.reason)));
+    for (const code of ['CZ', 'DE', 'AT', 'RO', 'NL', 'UK', 'CAT', 'BAS', 'AZO', 'CAN']) a.ok(coverage.some(([c]) => c === code), `${code} stays in scope`);
     const v = at();
-    a.equal(v.jurisdictions.length, 104);
-    a.equal(new Set(v.jurisdictions.map(j => j.jurisdiction)).size, 104);
+    a.ok(v.jurisdictions.every(j => !(j.jurisdiction in drivingBanExclusions)));
+    a.ok(!current.rules.some(r => r.jurisdiction in drivingBanExclusions));
+    a.ok(!Object.keys(current.jurisdiction_reviews).some(c => c in drivingBanExclusions));
+    a.throws(() => toIcs(v, {countries: ['CLIPPERTON']}), /Unknown jurisdiction/);
+    const live = getDrivingBansSnapshot(SWEEP); a.equal(live.scope.tracked, 76); a.equal(live.scope.excluded.length, 28);
+  });
+  test('production: exactly one record per Driving Bans identity, each with a state for the active window', () => {
+    const v = at();
+    a.equal(v.jurisdictions.length, 76);
+    a.equal(new Set(v.jurisdictions.map(j => j.jurisdiction)).size, 76);
     a.deepEqual(v.jurisdictions.map(j => [j.jurisdiction, j.name]), coverage);
     for (const j of v.jurisdictions) {
       a.deepEqual(j.period, {from: '2026-09-01', to: '2026-10-31'});

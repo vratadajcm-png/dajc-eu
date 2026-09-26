@@ -4,7 +4,7 @@ import {resolve,join} from 'node:path';
 import {createHash} from 'node:crypto';
 import assert from 'node:assert/strict';
 import {dajcEuropeCoverage} from '../config/europe-coverage.mjs';
-import {canonicalDrivingBans, getDrivingBansSnapshot} from '../config/driving-ban-calendars/runtime.mjs';
+import {canonicalDrivingBans, getDrivingBansSnapshot, drivingBanScope, drivingBanExcludedList} from '../config/driving-ban-calendars/runtime.mjs';
 import {hydrateCanonical,diffCanonical,toIcs,assertSweepRequest,BAN_STATES,VERIFICATION_STATES} from '../src/lib/driving-bans/core.mjs';
 const args=process.argv.slice(2);
 const option=(name,fallback)=>{const i=args.indexOf(name);if(i<0)return fallback;assert(args[i+1]&&!args[i+1].startsWith('--'),`Missing value: ${name}`);return args[i+1];};
@@ -17,11 +17,13 @@ const out=resolve(option('--output','artifacts/driving-bans'));mkdirSync(out,{re
 const count=key=>Object.fromEntries((key==='ban_state'?BAN_STATES:VERIFICATION_STATES).map(v=>[v,view.jurisdictions.filter(j=>j[key]===v).length]));
 const raw=readFileSync(new URL('../data/driving-bans/canonical.json',import.meta.url));
 const previous=option('--previous',null);
-const delta=previous?diffCanonical(hydrateCanonical(JSON.parse(readFileSync(previous,'utf8')),dajcEuropeCoverage),canonicalDrivingBans):[];
+// Older datasets may still carry reviews for identities now excluded from the Driving Bans scope.
+const inScope=data=>({...data,jurisdiction_reviews:Object.fromEntries(Object.entries(data.jurisdiction_reviews||{}).filter(([code])=>drivingBanScope.some(([c])=>c===code)))});
+const delta=previous?diffCanonical(hydrateCanonical(inScope(JSON.parse(readFileSync(previous,'utf8'))),drivingBanScope),canonicalDrivingBans):[];
 const lastSweep=view.jurisdictions.map(j=>j.last_checked).filter(Boolean).sort().at(-1)||null;
 const sweepAgeDays=lastSweep?(clock.getTime()-Date.parse(lastSweep))/86400000:Infinity;
 const byState=state=>view.jurisdictions.filter(j=>j.ban_state===state).map(j=>j.jurisdiction);
-const summary={dataset_version:view.dataset_version,reviewed_span:canonicalDrivingBans.window,active_window_reviewed:!view.jurisdictions.some(j=>j.coverage_failures.includes('ACTIVE_WINDOW_NOT_REVERIFIED')),last_sweep:lastSweep,sweep_age_days:Number.isFinite(sweepAgeDays)?Math.round(sweepAgeDays*10)/10:null,fully_verified_jurisdictions:view.jurisdictions.filter(j=>j.coverage_complete).map(j=>j.jurisdiction),has_ban:byState('HAS_BAN'),no_ban:byState('NO_BAN'),unknown:byState('UNKNOWN'),generated_at:view.generated_at,window:view.window,tracked:view.jurisdictions.length,verification_state:count('verification_state'),ban_state:count('ban_state'),fully_verified:view.jurisdictions.filter(j=>j.coverage_complete).length,individual_primary_rules:canonicalDrivingBans.rules.filter(r=>r.verification_state==='PRIMARY_VERIFIED'&&r.status==='ACTIVE').length,whole_window_events:view.events.length,upcoming_events:view.upcoming_events.length,complete:view.complete,canonical_sha256:createHash('sha256').update(raw).digest('hex'),mode,selected_jurisdictions:selected,external_source_review_performed:false,note:'Technical validation is not a semantic legal verification or a successful 104/104 full sweep.',changes:delta};
+const summary={dataset_version:view.dataset_version,reviewed_span:canonicalDrivingBans.window,active_window_reviewed:!view.jurisdictions.some(j=>j.coverage_failures.includes('ACTIVE_WINDOW_NOT_REVERIFIED')),last_sweep:lastSweep,sweep_age_days:Number.isFinite(sweepAgeDays)?Math.round(sweepAgeDays*10)/10:null,fully_verified_jurisdictions:view.jurisdictions.filter(j=>j.coverage_complete).map(j=>j.jurisdiction),has_ban:byState('HAS_BAN'),no_ban:byState('NO_BAN'),unknown:byState('UNKNOWN'),generated_at:view.generated_at,window:view.window,coverage_total:dajcEuropeCoverage.length,tracked:view.jurisdictions.length,excluded_from_scope:drivingBanExcludedList,verification_state:count('verification_state'),ban_state:count('ban_state'),fully_verified:view.jurisdictions.filter(j=>j.coverage_complete).length,individual_primary_rules:canonicalDrivingBans.rules.filter(r=>r.verification_state==='PRIMARY_VERIFIED'&&r.status==='ACTIVE').length,whole_window_events:view.events.length,upcoming_events:view.upcoming_events.length,complete:view.complete,canonical_sha256:createHash('sha256').update(raw).digest('hex'),mode,selected_jurisdictions:selected,external_source_review_performed:false,note:'Technical validation is not a semantic legal verification or a successful full sweep of the Driving Bans scope.',changes:delta};
 const save=(file,value)=>writeFileSync(join(out,file),typeof value==='string'?value:JSON.stringify(value,null,2)+'\n');
 save('summary.json',summary);save('coverage.json',view.jurisdictions);save('snapshot.json',view);save('driving-bans.ics',toIcs(view));save('driving-bans-history.ics',toIcs(view,{upcoming:false}));
 const cell=v=>'"'+String(v??'').replaceAll('"','""')+'"';

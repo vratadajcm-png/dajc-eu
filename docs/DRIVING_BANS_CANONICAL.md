@@ -4,7 +4,7 @@ Scope: dajc.eu only. This repair is NOT a claim that the 104-jurisdiction legal 
 
 ## Single runtime authority
 
-Edit `data/driving-bans/canonical.json`. Its sources, profiles, rules and jurisdiction reviews are one maintained dataset. Identity is taken, unchanged, from `config/europe-coverage.mjs` (104) and matched with Change Register Coverage. Never invent or silently merge its identities.
+Edit `data/driving-bans/canonical.json`. Its sources, profiles, rules and jurisdiction reviews are one maintained dataset. Identity is taken, unchanged, from `config/europe-coverage.mjs` (104, matched with Change Register Coverage) minus the owner-approved exclusions in `config/driving-ban-calendars/scope.mjs` (28 overseas, remote or disputed territories without a verifiable primary source; decision of 26 September 2026). Driving Bans therefore tracks 76 identities. An exclusion is NOT a NO_BAN finding: no status is published for those territories, the page lists them separately, and ICS rejects them. Re-adding one means removing it from the exclusion list and giving it a review. Never invent or silently merge identities.
 
 `config/driving-ban-calendars/canonical.mjs` hydrates explicit UNKNOWN/UNVERIFIED records for missing reviews and validates the dataset. `runtime.mjs` and `index.mjs` are compatibility exports, not independent data. Web, JSON, ICS and Intelligence consume this boundary. Retired source files are retained under `docs/driving-bans-legacy` for historical review only. `tests/fixtures` is an immutable regression fixture, never a runtime input.
 
@@ -20,7 +20,7 @@ Maintain exact weight operators, kg thresholds and vehicle categories, roads/reg
 
 ## State after the 26 September 2026 sweep (dataset 2026-09-26.r2-sweep)
 
-Reviewed span 2026-09-01..2026-11-30. 104 tracked; 12 jurisdictions fully PRIMARY_VERIFIED for all 12 scope checks (CH, CZ, DE, FR, HR, HU, IT, LI, LU, PL, SI, SK); 18 HAS_BAN (the 12 plus AT, BG, ES, GR, ME, PT with individually verified rules but incomplete jurisdiction scope); 0 NO_BAN; 86 UNKNOWN/UNVERIFIED with explicit `coverage_failures`. No NO_BAN was set because no jurisdiction had an explicit primary statement covering all 12 scope checks; absence of search results is never used.
+Reviewed span 2026-09-01..2026-11-30. After the scope decision 76 tracked (104 Coverage minus 28 exclusions); 12 jurisdictions fully PRIMARY_VERIFIED for all 12 scope checks (CH, CZ, DE, FR, HR, HU, IT, LI, LU, PL, SI, SK); 18 HAS_BAN (the 12 plus AT, BG, ES, GR, ME, PT with individually verified rules but incomplete jurisdiction scope); 0 NO_BAN; 58 UNKNOWN/UNVERIFIED with explicit `coverage_failures`. No NO_BAN was set because no jurisdiction had an explicit primary statement covering all 12 scope checks; absence of search results is never used.
 
 Corrected errors: AT 26 October holiday missing and Tyrol A12 IG-L night ban missing; LI 8 September (Maria Geburt) missing; LU France-bound 11 November added; ES held only 14 of the Annex II rows (6 September, full 8-12 October, 30 October-2 November and 27-29 November tables now encoded, GP Valencia moved per BOE-A-2026-13892, legacy rows SUPERSEDED); BG 18 and 22 September Independence Day restrictions missing. Newly encoded from primary law: DE, FR (incl. Ile-de-France), IT, CH, CZ, SK (2026: 1 Sep, 15 Sep, 28 Oct, 17 Nov are NOT days of rest), PL (>12t), HU, SI, HR, PT (Porto VCI from 15 Sep 2026, >3.5t with >=3 axles and >=1.1 m height), GR (>3.5t, ΦΕΚ Β΄ 912/2026).
 

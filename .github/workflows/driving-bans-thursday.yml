@@ -1,6 +1,6 @@
 name: Driving Bans Thursday gate
 
-# Thursday-only 104/104 technical gate for the canonical Driving Bans dataset.
+# Thursday-only full-scope technical gate for the canonical Driving Bans dataset.
 # The semantic legal re-verification is performed by the scheduled DAJC HGV
 # sweep (see docs/DRIVING_BANS_CANONICAL.md), which updates
 # data/driving-bans/canonical.json. This workflow never fetches or interprets
@@ -44,7 +44,7 @@ jobs:
       - name: Driving Bans tests
         run: npx vitest run src/lib/driving-bans
 
-      - name: Export 104/104 evidence and enforce sweep freshness
+      - name: Export full-scope evidence and enforce sweep freshness
         run: npm run driving-bans:audit -- --mode full --max-sweep-age-days 8
 
       - name: Upload Driving Bans evidence

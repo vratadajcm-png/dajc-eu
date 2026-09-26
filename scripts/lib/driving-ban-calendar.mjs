@@ -36,6 +36,6 @@ export function resolveDrivingBanFindings({ weekStart, weekEnd, year, rules = dr
     }
   }
   const warnings = [...new Set(coverageWarnings)];
-  if (warnings.length) console.warn(`Driving Bans country review incomplete (${warnings.length} reviewed-country warnings); this is NOT a NO_BAN decision. See the canonical 104-row coverage report.`);
+  if (warnings.length) console.warn(`Driving Bans country review incomplete (${warnings.length} reviewed-country warnings); this is NOT a NO_BAN decision. See the canonical Driving Bans coverage report.`);
   return { findings, maintenanceErrors, coverageWarnings: warnings, complete: !warnings.length && !maintenanceErrors.length };
 }

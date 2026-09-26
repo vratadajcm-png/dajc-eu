@@ -40,21 +40,21 @@ await check('public JSON vs canonical snapshot',async()=>{
   assert(Math.abs(Date.now()-Date.parse(live.generated_at))<180000,'Stale generated_at / cached window');
   expected=getDrivingBansSnapshot(new Date(live.generated_at));
   assert.equal(live.dataset_version,expected.dataset_version);assert.deepEqual(live.window,expected.window);
-  assert.equal(live.jurisdictions.length,104);assert.equal(new Set(live.jurisdictions.map(j=>j.jurisdiction)).size,104);
+  const tracked=expected.jurisdictions.length;assert.equal(live.jurisdictions.length,tracked);assert.equal(new Set(live.jurisdictions.map(j=>j.jurisdiction)).size,tracked);
   assert.deepEqual(live.jurisdictions.map(j=>[j.jurisdiction,j.ban_state,j.verification_state,j.coverage_complete]),expected.jurisdictions.map(j=>[j.jurisdiction,j.ban_state,j.verification_state,j.coverage_complete]));
   const projection = es => es.map(e=>[e.uid,e.starts_at,e.ends_at,e.jurisdiction,JSON.stringify(e.weight_threshold)]);
   assert.deepEqual(projection(live.events),projection(expected.events));assert.deepEqual(projection(live.upcoming_events),projection(expected.upcoming_events));assert.equal(live.complete,expected.complete);
   assert.match(metadata.cache_control||'',/no-store/);
-  return {version:live.dataset_version,window:live.window,jurisdictions:104,whole_window_events:live.events.length,upcoming_events:live.upcoming_events.length,complete:live.complete,states:Object.fromEntries(['HAS_BAN','NO_BAN','UNKNOWN'].map(s=>[s,live.jurisdictions.filter(j=>j.ban_state===s).length]))};
+  return {version:live.dataset_version,window:live.window,jurisdictions:live.jurisdictions.length,whole_window_events:live.events.length,upcoming_events:live.upcoming_events.length,complete:live.complete,states:Object.fromEntries(['HAS_BAN','NO_BAN','UNKNOWN'].map(s=>[s,live.jurisdictions.filter(j=>j.ban_state===s).length]))};
 });
 await check('production web identity/state/title consistency',async()=>{
   const {body,metadata}=await read('/driving-bans?lang=cs','live-page.html');assert(live && expected,'JSON prerequisite failed');
   const title=body.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]||'';assert.match(title,/DAJC|zákazy/i);assert(!/Cohere|Member of Technical Staff/i.test(title),'Unrelated page title');
   const tags=[...body.matchAll(/<details\b[^>]*\bclass="jurisdiction"[^>]*>/g)].map(m=>m[0]);
   const attrs=tags.map(t=>Object.fromEntries([...t.matchAll(/(data-[\w-]+)="([^"]*)"/g)].map(m=>[m[1],m[2]])));
-  assert.equal(attrs.length,104);assert.deepEqual(ordered(attrs.map(a=>a['data-code'])),ordered(live.jurisdictions.map(j=>j.jurisdiction)));
+  assert.equal(attrs.length,live.jurisdictions.length);assert.deepEqual(ordered(attrs.map(a=>a['data-code'])),ordered(live.jurisdictions.map(j=>j.jurisdiction)));
   for(const a of attrs){const j=live.jurisdictions.find(j=>j.jurisdiction===a['data-code']);assert.equal(a['data-ban-state'],j.ban_state);assert.equal(a['data-verification-state'],j.verification_state);}
-  assert(body.includes(live.window.from)&&body.includes(live.window.to)&&body.includes(live.dataset_version));assert(body.includes('104 sledovaných jurisdikcí neznamená 104 ověřených jurisdikcí.'));
+  assert(body.includes(live.window.from)&&body.includes(live.window.to)&&body.includes(live.dataset_version));assert(body.includes(`${live.jurisdictions.length} sledovaných jurisdikcí neznamená ${live.jurisdictions.length} ověřených jurisdikcí.`));
   assert.match(metadata.cache_control||'',/no-store/);return {title,jurisdictions:attrs.length};
 });
 for(const history of [false,true]) await check(history?'history ICS vs whole-window JSON':'default ICS vs upcoming JSON',async()=>{

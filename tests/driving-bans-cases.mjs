@@ -1,6 +1,6 @@
 import {readFileSync} from 'node:fs';
 import {dajcEuropeCoverage as coverage} from '../config/europe-coverage.mjs';
-import {canonicalDrivingBans as current, getDrivingBansSnapshot} from '../config/driving-ban-calendars/runtime.mjs';
+import {canonicalDrivingBans as current, getDrivingBansSnapshot, drivingBanScope} from '../config/driving-ban-calendars/runtime.mjs';
 import {hydrateCanonical, calendarRules, publicationWindow, localToUtc, isDate, validateCanonical, snapshot, expandRules, toIcs, SCOPE_CHECKS, assertSweepRequest, invalidateSources, diffCanonical} from '../src/lib/driving-bans/core.mjs';
 // Immutable historical test fixture; never imported by runtime consumers.
 const maintained = hydrateCanonical(JSON.parse(readFileSync(new URL('./fixtures/driving-bans-sep-oct-2026.json', import.meta.url), 'utf8')), coverage);
@@ -23,7 +23,7 @@ export function registerDrivingBanTests(test, a) {
     const v=render(fresh()); a.equal(v.jurisdictions.length,104); a.deepEqual(v.jurisdictions.map(j=>[j.jurisdiction,j.name]),coverage);
     a.equal(new Set(v.jurisdictions.map(j=>j.jurisdiction)).size,104); a.ok(v.jurisdictions.every(j=>j.period.from==='2026-09-01' && j.period.to==='2026-10-31'));
   });
-  test('current production dataset remains valid as independent releases evolve',()=>{a.equal(validateCanonical(current,coverage),true);const v=getDrivingBansSnapshot();a.equal(v.jurisdictions.length,104);a.deepEqual(uids(toIcs(v)).sort(),v.upcoming_events.map(e=>e.uid).sort());});
+  test('current production dataset remains valid as independent releases evolve',()=>{a.equal(validateCanonical(current,drivingBanScope),true);const v=getDrivingBansSnapshot();a.equal(v.jurisdictions.length,drivingBanScope.length);a.deepEqual(uids(toIcs(v)).sort(),v.upcoming_events.map(e=>e.uid).sort());});
   test('duplicate semantic event with a different ID is rejected',()=>{const d=fresh();const copy=structuredClone(d.rules[0]);copy.ban_id='duplicate-different-id';d.rules.push(copy);a.throws(()=>render(d),/Duplicate semantic/);});
   test('A10 origin OR versus origin AND exceptions retained',()=>{const rule=maintained.rules.find(r=>r.ban_id==='at-a10-north-september-2026');a.match(rule.exceptions.join(' '),/Origin OR/);a.match(rule.exceptions.join(' '),/Origin AND/);});
   test('duplicate jurisdiction rejected',()=>{const d=fresh();d.jurisdictions[1]=d.jurisdictions[0];a.throws(()=>validateCanonical(d,coverage));});

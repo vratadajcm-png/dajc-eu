@@ -84,8 +84,8 @@ export function hydrateCanonical(raw, identities) {
 export function validateCanonical(data, identities) {
   assert(data.schema_version === 1, 'Unsupported canonical schema');
   assert(isDate(data.window?.from) && isDate(data.window?.to) && data.window.from <= data.window.to, 'Invalid canonical window');
-  assert(identities.length === 104 && new Set(identities.map(r => r[0])).size === 104, 'Authoritative Coverage must have exactly 104 unique identities');
-  assert(data.jurisdictions.length === 104, 'Exactly 104 jurisdiction records required');
+  assert(identities.length > 0 && new Set(identities.map(r => r[0])).size === identities.length, 'Authoritative scope identities must be unique');
+  assert(data.jurisdictions.length === identities.length, 'Exactly one jurisdiction record per scope identity required');
   const expected = new Map(identities), seen = new Set();
   const sources = new Map(data.sources.map(s => [s.source_id, s]));
   assert(sources.size === data.sources.length, 'Duplicate source identity');

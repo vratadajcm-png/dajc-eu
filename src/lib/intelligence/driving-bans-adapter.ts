@@ -171,7 +171,7 @@ export class DrivingBansRegistryAdapter implements IntelligenceSourceAdapter {
     const coverage = getDrivingBansSnapshot(new Date(`${this.from}T12:00:00Z`));
     if (!coverage.complete || coverage.window.from > this.from || coverage.window.to < this.to) {
       result.complete = false;
-      result.warnings = [...(result.warnings ?? []), '104-jurisdiction primary coverage is incomplete for the requested period; missing records are not NO_BAN.'];
+      result.warnings = [...(result.warnings ?? []), 'Driving Bans primary coverage is incomplete for the requested period; missing records are not NO_BAN.'];
     }
     return result;
   }

@@ -1,10 +1,12 @@
 import raw from '../../data/driving-bans/canonical.json' with { type: 'json' };
 import { dajcEuropeCoverage } from '../europe-coverage.mjs';
+import { drivingBanScope, drivingBanExcludedList } from './scope.mjs';
 import { hydrateCanonical, validateCanonical, snapshot, calendarRules } from '../../src/lib/driving-bans/core.mjs';
-export const canonicalDrivingBans = hydrateCanonical(raw, dajcEuropeCoverage);
-validateCanonical(canonicalDrivingBans, dajcEuropeCoverage);
+export const canonicalDrivingBans = hydrateCanonical(raw, drivingBanScope);
+validateCanonical(canonicalDrivingBans, drivingBanScope);
+export { drivingBanScope, drivingBanExcludedList };
 export const drivingBanCalendars = calendarRules(canonicalDrivingBans);
-export const getDrivingBansSnapshot = (now = new Date()) => snapshot(canonicalDrivingBans, dajcEuropeCoverage, now);
+export const getDrivingBansSnapshot = (now = new Date()) => ({ ...snapshot(canonicalDrivingBans, drivingBanScope, now), scope: { coverage_total: dajcEuropeCoverage.length, tracked: drivingBanScope.length, excluded: drivingBanExcludedList } });
 export const getCalendarById = id => drivingBanCalendars.find(rule => rule.id === id);
 export const restrictionTypesOf = rule => Array.isArray(rule.restrictionTypes) ? rule.restrictionTypes : (rule.restriction_types || ['general']);
 export const matchesRestrictionType = (rule, type = 'all') => type !== 'general' || restrictionTypesOf(rule).includes('general');

@@ -15,7 +15,7 @@ type Weight = { any_of?: Weight[]; all_of?: Weight[]; operator?: string; value?:
 const weightText = (w: Weight): string => w.any_of ? w.any_of.map(weightText).join(label(' OR ', ' NEBO ')) : w.all_of ? w.all_of.map(weightText).join(label(' AND ', ' A ')) : w.operator === 'any' ? `${w.applies_to} (${label('any mass', 'bez hmotnostní hranice')})` : `${w.applies_to} ${w.operator} ${w.unit === 'kg' ? `${(w.value ?? 0) / 1000} t` : `${w.value} ${w.unit}`}`;
 const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO_BAN' ? label('No driving bans', 'Bez zákazu') : j.ban_state === 'HAS_BAN' ? label(`${j.event_count} verified events in this period`, `${j.event_count} ověřených událostí v období`) + (j.coverage_complete ? '' : label(' · review incomplete', ' · ověření neúplné')) : label('Verification in progress', 'Ověření probíhá');
 ---
-<BaseLayout title={title} description="Verified HGV restrictions and explicit verification status for all 104 DAJC jurisdictions. Current and next calendar month.">
+<BaseLayout title={title} description={`Verified HGV restrictions and explicit verification status for ${view.jurisdictions.length} DAJC jurisdictions. Current and next calendar month.`}>
   <section class="bans-page" data-window={view.window.from}>
     <header>
       <p class="eyebrow">DAJC INTELLIGENCE</p>
@@ -25,11 +25,12 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
       <a href={cs ? '/driving-bans' : '/driving-bans?lang=cs'}>{cs ? 'English' : 'Česky'}</a>
     </header>
     <aside class="notice" role="note">
-      <strong>{label('104 tracked jurisdictions does not mean 104 verified jurisdictions.', '104 sledovaných jurisdikcí neznamená 104 ověřených jurisdikcí.')}</strong>
+      <strong>{label(`${view.jurisdictions.length} tracked jurisdictions does not mean ${view.jurisdictions.length} verified jurisdictions.`, `${view.jurisdictions.length} sledovaných jurisdikcí neznamená ${view.jurisdictions.length} ověřených jurisdikcí.`)}</strong>
       <p>{label('Verified individual bans can be available while the full country review is incomplete. Missing events never mean unrestricted travel. “No driving bans” is shown only after a complete primary-source review of this entire period.', 'Jednotlivé zákazy mohou být ověřené, i když celková kontrola země není dokončena. Chybějící události nikdy neznamenají volný průjezd. „Bez zákazu“ se zobrazí pouze po úplném ověření celého období z primárních zdrojů.')}</p>
       <p>{label('Scheduled full review: Thursday. Urgent changes may trigger a targeted recheck. Always confirm the current official source and your transport permit before departure.', 'Plánovaná úplná kontrola: čtvrtek. Naléhavá změna může vyvolat cílené ověření. Před jízdou vždy zkontrolujte aktuální úřední zdroj a své povolení.')}</p>
     </aside>
-    <p class="stats">104 / 104 {label('tracked', 'sledováno')} · {count('HAS_BAN')} HAS_BAN · {count('NO_BAN')} NO_BAN · {count('UNKNOWN')} UNKNOWN · {view.jurisdictions.filter(j => j.coverage_complete).length} / 104 {label('fully verified', 'úplně ověřeno')}</p>
+    <p class="stats">{view.jurisdictions.length} / {view.jurisdictions.length} {label('tracked', 'sledováno')} · {count('HAS_BAN')} HAS_BAN · {count('NO_BAN')} NO_BAN · {count('UNKNOWN')} UNKNOWN · {view.jurisdictions.filter(j => j.coverage_complete).length} / {view.jurisdictions.length} {label('fully verified', 'úplně ověřeno')}</p>
+    <details class="small"><summary>{label(`Not covered by Driving Bans (${view.scope.excluded.length} territories)`, `Mimo rozsah Driving Bans (${view.scope.excluded.length} území)`)}</summary><p>{label('No verifiable primary source on HGV driving bans exists for these overseas, remote or disputed territories. DAJC publishes no status for them; this is not a “no ban” statement.', 'Pro tato zámořská, odlehlá či sporná území neexistuje ověřitelný primární zdroj k zákazům jízd nákladních vozidel. DAJC pro ně nezveřejňuje žádný stav; nejde o tvrzení „Bez zákazu“.')}</p><p>{view.scope.excluded.map(x => `${x.name} (${x.jurisdiction})`).join(', ')}</p></details>
     <form id="ban-filters" class="controls">
       <label>{label('Find a jurisdiction', 'Vyhledat jurisdikci')} <input id="country-search" type="search" placeholder={label('Name or code', 'Název nebo kód')} /></label>
       <label>{label('Restrictions', 'Omezení')} <select id="ban-type"><option value="all">{label('All HGV / exceptional', 'Všechny nákladní / nadrozměrné')}</option><option value="general">{label('General HGV', 'Běžná nákladní vozidla')}</option><option value="exceptional">{label('Exceptional, including relevant HGV bans', 'Nadměrné, včetně příslušných běžných zákazů')}</option></select></label>
