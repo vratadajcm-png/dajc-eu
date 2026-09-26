@@ -5,6 +5,9 @@ on:
     paths:
       - 'src/**'
       - 'config/**'
+      - 'data/driving-bans/**'
+      - 'tests/**'
+      - 'scripts/*driving-bans.mjs'
       - 'astro.config.mjs'
       - 'tsconfig.json'
       - 'package.json'
@@ -36,6 +39,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Driving Bans scoped lint
+        run: npm run lint:driving-bans
+
+      - name: Export canonical Driving Bans evidence
+        run: npm run driving-bans:audit
+
       - name: Typecheck Astro and TypeScript
         run: npm run typecheck
 
@@ -44,3 +53,12 @@ jobs:
 
       - name: Build site
         run: npm run build
+
+      - name: Upload Driving Bans evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: driving-bans-evidence-${{ github.sha }}
+          path: artifacts/driving-bans/
+          if-no-files-found: warn
+          retention-days: 14

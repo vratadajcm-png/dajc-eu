@@ -1,4 +1,4 @@
-import { drivingBanCalendars, restrictionTypesOf } from '../../../config/driving-ban-calendars/runtime.mjs';
+import { drivingBanCalendars, restrictionTypesOf, getDrivingBansSnapshot } from '../../../config/driving-ban-calendars/runtime.mjs';
 import type { IntelligenceSourceAdapter, IntelligenceSourceSnapshot } from './source-adapter';
 import type { IntelligenceSnapshotItem } from './change-detection';
 import { dajcMaintainedDrivingBansRights } from './persistence-contract';
@@ -21,6 +21,9 @@ export interface DrivingBanRule {
       whatChanged?: string;
       validFrom: string;
       validTo: string;
+      startsAt?: string;
+      endsAt?: string;
+      uid?: string;
       timeWindow?: string;
       impact?: string;
       recommendedAction?: string;
@@ -97,7 +100,7 @@ export function resolveDrivingBanRegistrySnapshot(args: {
         }
         if (occurrence.validTo < dateOnly(from) || occurrence.validFrom > dateOnly(to)) continue;
 
-        const key = `${rule.id}|${occurrence.validFrom}|${occurrence.validTo}|${occurrence.timeWindow ?? occurrence.title}`;
+        const key = occurrence.uid ?? `${rule.id}|${occurrence.validFrom}|${occurrence.validTo}|${occurrence.timeWindow ?? occurrence.title}`;
         if (seen.has(key)) continue;
         seen.add(key);
 
@@ -106,8 +109,8 @@ export function resolveDrivingBanRegistrySnapshot(args: {
           jurisdiction: rule.country,
           topic: 'driving-ban',
           materiality: 'high',
-          effectiveFrom: startOfIsoDate(occurrence.validFrom),
-          effectiveTo: endOfIsoDate(occurrence.validTo),
+          effectiveFrom: occurrence.startsAt ?? startOfIsoDate(occurrence.validFrom),
+          effectiveTo: occurrence.endsAt ?? endOfIsoDate(occurrence.validTo),
           sourceUrl: rule.sourceUrl,
           sourceLabel: rule.sourceName,
           summary: occurrence.title,
@@ -159,11 +162,17 @@ export class DrivingBansRegistryAdapter implements IntelligenceSourceAdapter {
   ) {}
 
   async fetchSnapshot(): Promise<IntelligenceSourceSnapshot> {
-    return resolveDrivingBanRegistrySnapshot({
+    const result = resolveDrivingBanRegistrySnapshot({
       rules: drivingBanCalendars as DrivingBanRule[],
       from: this.from,
       to: this.to,
       observedAt: this.observedAt,
     });
+    const coverage = getDrivingBansSnapshot(new Date(`${this.from}T12:00:00Z`));
+    if (!coverage.complete || coverage.window.from > this.from || coverage.window.to < this.to) {
+      result.complete = false;
+      result.warnings = [...(result.warnings ?? []), '104-jurisdiction primary coverage is incomplete for the requested period; missing records are not NO_BAN.'];
+    }
+    return result;
   }
 }
