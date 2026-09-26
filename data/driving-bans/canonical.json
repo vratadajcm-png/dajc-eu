@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "dataset_version": "2026-09-26.r3-scope",
+ "dataset_version": "2026-09-26.r4-es-regions",
  "window": {
   "from": "2026-09-01",
   "to": "2026-11-30"
@@ -4867,154 +4867,254 @@
    "notes": "No primary-source review completed in this sweep. Not a NO_BAN finding."
   },
   "CEU": {
-   "verification_state": "UNVERIFIED",
-   "ban_state": "UNKNOWN",
-   "coverage_complete": false,
-   "last_checked": null,
-   "last_verified": null,
-   "source_ids": [],
-   "no_ban_evidence": [],
-   "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+   "verification_state": "PRIMARY_VERIFIED",
+   "ban_state": "HAS_BAN",
+   "coverage_complete": true,
+   "last_checked": "2026-09-26T15:59:00.000Z",
+   "last_verified": "2026-09-26T15:59:00.000Z",
+   "source_ids": [
+    "es-boe",
+    "es-annex-v",
+    "es-fiestas-2026",
+    "es-amendment-jun"
    ],
+   "no_ban_evidence": [],
+   "coverage_failures": [],
    "scope_checks": {
     "weekend": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "holidays": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "holiday_eves": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "seasonal": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "summer_winter": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "regional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-fiestas-2026"
+     ],
+     "note": "Regional holidays from the 2026 BOE holiday list applied. Scope = statutory national/regional calendars. Individually signposted local restrictions are not enumerated by DAJC and must be checked on route."
     },
     "corridors": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "directional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "night": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "weight_specific": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "special_calendar": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "exceptional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     }
    },
-   "notes": "No primary-source review completed in this sweep. Not a NO_BAN finding."
+   "notes": "DGT resolution 2026 (roads under DGT surveillance). Annex II (>7,500 kg general goods) has no rows in this territory for Sep-Nov 2026; Annex V applies to complementary-authorisation and ADR vehicles. Annex I sporting-event restrictions exclude Ceuta roads. Events therefore concern exceptional transports only; ordinary >7.5 t goods vehicles have no DGT calendar restriction here in Sep-Nov 2026."
   },
   "MLL": {
-   "verification_state": "UNVERIFIED",
-   "ban_state": "UNKNOWN",
-   "coverage_complete": false,
-   "last_checked": null,
-   "last_verified": null,
-   "source_ids": [],
-   "no_ban_evidence": [],
-   "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+   "verification_state": "PRIMARY_VERIFIED",
+   "ban_state": "HAS_BAN",
+   "coverage_complete": true,
+   "last_checked": "2026-09-26T15:59:00.000Z",
+   "last_verified": "2026-09-26T15:59:00.000Z",
+   "source_ids": [
+    "es-boe",
+    "es-annex-v",
+    "es-fiestas-2026",
+    "es-amendment-jun"
    ],
+   "no_ban_evidence": [],
+   "coverage_failures": [],
    "scope_checks": {
     "weekend": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "holidays": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "holiday_eves": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "seasonal": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "summer_winter": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "regional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-fiestas-2026"
+     ],
+     "note": "Regional holidays from the 2026 BOE holiday list applied. Scope = statutory national/regional calendars. Individually signposted local restrictions are not enumerated by DAJC and must be checked on route."
     },
     "corridors": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "directional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "night": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "weight_specific": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "special_calendar": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "exceptional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     }
    },
-   "notes": "No primary-source review completed in this sweep. Not a NO_BAN finding."
+   "notes": "DGT resolution 2026 (roads under DGT surveillance). Annex II (>7,500 kg general goods) has no rows in this territory for Sep-Nov 2026; Annex V applies to complementary-authorisation and ADR vehicles. Annex I sporting-event restrictions exclude Melilla roads. Events therefore concern exceptional transports only; ordinary >7.5 t goods vehicles have no DGT calendar restriction here in Sep-Nov 2026."
   },
   "AZO": {
    "verification_state": "UNVERIFIED",
@@ -5167,79 +5267,129 @@
    "notes": "No primary-source review completed in this sweep. Not a NO_BAN finding."
   },
   "CAN": {
-   "verification_state": "UNVERIFIED",
-   "ban_state": "UNKNOWN",
-   "coverage_complete": false,
-   "last_checked": null,
-   "last_verified": null,
-   "source_ids": [],
-   "no_ban_evidence": [],
-   "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+   "verification_state": "PRIMARY_VERIFIED",
+   "ban_state": "HAS_BAN",
+   "coverage_complete": true,
+   "last_checked": "2026-09-26T15:59:00.000Z",
+   "last_verified": "2026-09-26T15:59:00.000Z",
+   "source_ids": [
+    "es-boe",
+    "es-annex-v",
+    "es-fiestas-2026",
+    "es-amendment-jun"
    ],
+   "no_ban_evidence": [],
+   "coverage_failures": [],
    "scope_checks": {
     "weekend": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "holidays": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "holiday_eves": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "seasonal": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "summer_winter": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "regional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-fiestas-2026"
+     ],
+     "note": "Regional holidays from the 2026 BOE holiday list applied. Scope = statutory national/regional calendars. Individually signposted local restrictions are not enumerated by DAJC and must be checked on route."
     },
     "corridors": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "directional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "night": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "weight_specific": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "special_calendar": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "exceptional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     }
    },
-   "notes": "No primary-source review completed in this sweep. Not a NO_BAN finding."
+   "notes": "DGT resolution 2026 (roads under DGT surveillance). Annex II (>7,500 kg general goods) has no rows in this territory for Sep-Nov 2026; Annex V applies to complementary-authorisation and ADR vehicles. Annex VIII: Teror GC-21/GC-43 event regulation 7-8 Sep for all traffic (not an HGV-specific ban). Times are local Canary time. Events therefore concern exceptional transports only; ordinary >7.5 t goods vehicles have no DGT calendar restriction here in Sep-Nov 2026."
   },
   "ENG": {
    "verification_state": "UNVERIFIED",
@@ -5693,228 +5843,393 @@
   },
   "CAT": {
    "verification_state": "UNVERIFIED",
-   "ban_state": "UNKNOWN",
+   "ban_state": "HAS_BAN",
    "coverage_complete": false,
-   "last_checked": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-09-26T15:59:00.000Z",
    "last_verified": null,
-   "source_ids": [],
+   "source_ids": [
+    "cat-isp-300-2026",
+    "cat-isp-1933-2026",
+    "cat-sct-09-general",
+    "cat-sct-10-general",
+    "cat-sct-11-general"
+   ],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "CAT_SCT_2026_RESOLUTION_NOT_REVIEWED"
+    "CAT_ISP_2853_2026_AUGUST_AMENDMENT_TEXT_NOT_RETRIEVED",
+    "CAT_EXCEPTIONAL_SUNDAY_HOLIDAY_REGIME_NOT_ENCODED_OFFICIAL_LISTING_INCONSISTENT"
    ],
    "scope_checks": {
     "weekend": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "cat-isp-300-2026",
+      "cat-isp-1933-2026",
+      "cat-sct-09-general",
+      "cat-sct-10-general",
+      "cat-sct-11-general"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "holidays": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "cat-isp-300-2026",
+      "cat-isp-1933-2026",
+      "cat-sct-09-general",
+      "cat-sct-10-general",
+      "cat-sct-11-general"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "holiday_eves": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "cat-isp-300-2026",
+      "cat-isp-1933-2026",
+      "cat-sct-09-general",
+      "cat-sct-10-general",
+      "cat-sct-11-general"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "seasonal": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "cat-isp-300-2026",
+      "cat-isp-1933-2026",
+      "cat-sct-09-general",
+      "cat-sct-10-general",
+      "cat-sct-11-general"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "summer_winter": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "cat-isp-300-2026",
+      "cat-isp-1933-2026",
+      "cat-sct-09-general",
+      "cat-sct-10-general",
+      "cat-sct-11-general"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "regional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "cat-isp-300-2026",
+      "cat-isp-1933-2026",
+      "cat-sct-09-general",
+      "cat-sct-10-general",
+      "cat-sct-11-general"
+     ],
+     "note": "Aran, Pyrenees, Costa Brava, Barcelona-access networks encoded. Permanent restrictions (C-153 Olot all HGV; N-II/N-240/N-340 >26 t) are non-calendar and listed in notes. Scope = statutory national/regional calendars. Individually signposted local restrictions are not enumerated by DAJC and must be checked on route."
     },
     "corridors": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "cat-isp-300-2026",
+      "cat-isp-1933-2026",
+      "cat-sct-09-general",
+      "cat-sct-10-general",
+      "cat-sct-11-general"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "directional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "cat-isp-300-2026",
+      "cat-isp-1933-2026",
+      "cat-sct-09-general",
+      "cat-sct-10-general",
+      "cat-sct-11-general"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "night": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "cat-isp-300-2026",
+      "cat-isp-1933-2026",
+      "cat-sct-09-general",
+      "cat-sct-10-general",
+      "cat-sct-11-general"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "weight_specific": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "cat-isp-300-2026",
+      "cat-isp-1933-2026",
+      "cat-sct-09-general",
+      "cat-sct-10-general",
+      "cat-sct-11-general"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "special_calendar": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "cat-isp-300-2026",
+      "cat-isp-1933-2026",
+      "cat-sct-09-general",
+      "cat-sct-10-general",
+      "cat-sct-11-general"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "exceptional": {
      "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "evidence_ids": [
+      "cat-isp-300-2026",
+      "cat-isp-1933-2026",
+      "cat-sct-09-general",
+      "cat-sct-10-general",
+      "cat-sct-11-general"
+     ],
+     "note": "Section 2.1 Sunday/holiday regime for special transports not encoded: the official SCT TE/VE monthly listing is internally inconsistent for 11 Oct, 1 Nov and 2 Nov."
     }
    },
-   "notes": "Catalonia (Servei Català de Trànsit) issues its own annual HGV restriction resolution; not reviewed in this sweep."
+   "notes": "Permanent: C-153 Olot km 60.9-61.9 closed to goods vehicles >7.5 t and special transports (0-24 h); N-II La Jonquera-Fornells, N-240 Lleida-Montblanc, N-340 Alcanar-L'Hospitalet and Altafulla-Vilafranca closed to goods vehicles >26 t (both directions, local-access exemptions)."
   },
   "BAS": {
-   "verification_state": "UNVERIFIED",
-   "ban_state": "UNKNOWN",
-   "coverage_complete": false,
-   "last_checked": "2026-09-26T15:25:00.000Z",
-   "last_verified": null,
-   "source_ids": [],
-   "no_ban_evidence": [],
-   "coverage_failures": [
-    "BAS_TRAFIKOA_2026_RESOLUTION_NOT_REVIEWED"
+   "verification_state": "PRIMARY_VERIFIED",
+   "ban_state": "HAS_BAN",
+   "coverage_complete": true,
+   "last_checked": "2026-09-26T15:59:00.000Z",
+   "last_verified": "2026-09-26T15:59:00.000Z",
+   "source_ids": [
+    "bas-res-2026",
+    "es-fiestas-2026"
    ],
+   "no_ban_evidence": [],
+   "coverage_failures": [],
    "scope_checks": {
     "weekend": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "bas-res-2026",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "holidays": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "bas-res-2026",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "holiday_eves": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "bas-res-2026",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "seasonal": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "bas-res-2026",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "summer_winter": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "bas-res-2026",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "regional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "bas-res-2026"
+     ],
+     "note": "Resolution applies to all CAPV public roads. Scope = statutory national/regional calendars. Individually signposted local restrictions are not enumerated by DAJC and must be checked on route."
     },
     "corridors": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "bas-res-2026",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "directional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "bas-res-2026",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "night": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "bas-res-2026",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "weight_specific": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "bas-res-2026",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "special_calendar": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "bas-res-2026",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "exceptional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "bas-res-2026",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     }
    },
-   "notes": "Basque Country (Trafikoa) issues its own annual HGV restriction resolution; not reviewed in this sweep."
+   "notes": "ADR orange-plate vehicles: Sundays/CAPV holidays 08-24 and non-Saturday eves 16-24 (section 2.1), noted but not encoded as separate events."
   },
   "GAL": {
-   "verification_state": "UNVERIFIED",
-   "ban_state": "UNKNOWN",
-   "coverage_complete": false,
-   "last_checked": "2026-09-26T15:25:00.000Z",
-   "last_verified": null,
-   "source_ids": [],
-   "no_ban_evidence": [],
-   "coverage_failures": [
-    "GAL_COVERED_BY_DGT_BUT_NOT_SEPARATELY_MAPPED"
+   "verification_state": "PRIMARY_VERIFIED",
+   "ban_state": "HAS_BAN",
+   "coverage_complete": true,
+   "last_checked": "2026-09-26T15:59:00.000Z",
+   "last_verified": "2026-09-26T15:59:00.000Z",
+   "source_ids": [
+    "es-boe",
+    "es-annex-v",
+    "es-fiestas-2026",
+    "es-amendment-jun"
    ],
+   "no_ban_evidence": [],
+   "coverage_failures": [],
    "scope_checks": {
     "weekend": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "holidays": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "holiday_eves": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "seasonal": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "summer_winter": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "regional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-fiestas-2026"
+     ],
+     "note": "Regional holidays from the 2026 BOE holiday list applied. Scope = statutory national/regional calendars. Individually signposted local restrictions are not enumerated by DAJC and must be checked on route."
     },
     "corridors": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "directional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "night": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "weight_specific": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "special_calendar": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     },
     "exceptional": {
-     "state": "UNVERIFIED",
-     "evidence_ids": [],
-     "note": ""
+     "state": "PRIMARY_VERIFIED",
+     "evidence_ids": [
+      "es-boe",
+      "es-annex-v",
+      "es-fiestas-2026"
+     ],
+     "note": "Reviewed in the primary instrument(s); no additional restriction of this type for the window."
     }
    },
-   "notes": "Galicia is within DGT competence (ES record); no separate Galicia mapping of Annex II rows performed."
+   "notes": "DGT resolution 2026 (roads under DGT surveillance). Annex II (>7,500 kg general goods) has no rows in this territory for Sep-Nov 2026; Annex V applies to complementary-authorisation and ADR vehicles. Annex VIII lists no Galician measure in Sep-Nov (Silleda N-525 >7.5 t is 21-24 Aug only). Events therefore concern exceptional transports only; ordinary >7.5 t goods vehicles have no DGT calendar restriction here in Sep-Nov 2026."
   },
   "FLA": {
    "verification_state": "UNVERIFIED",
@@ -6729,6 +7044,86 @@
    "checked_at": "2026-09-26T15:25:00.000Z",
    "retrieval_method": "search-index listing only",
    "findings": "Evidence that CNAIR issues ad-hoc >7.5t restrictions (heat/holidays); not a primary legal text."
+  },
+  {
+   "source_id": "cat-isp-300-2026",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-6095",
+   "authority": "BOE / Resolución ISP/300/2026 (Servei Català de Trànsit), DOGC 9602",
+   "role": "PRIMARY",
+   "version": "In force 19 Feb 2026; BOE posterior references: ISP/1933/2026",
+   "checked_at": "2026-09-26T15:59:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Annex A: >7,500 kg MMA/MMC calendars by network; section 2 exceptional vehicles; sections 7-9 Aran, permanent N-II/N-240/N-340 >26 t and C-153 Olot."
+  },
+  {
+   "source_id": "cat-isp-1933-2026",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-16758",
+   "authority": "BOE / Resolución ISP/1933/2026",
+   "role": "PRIMARY",
+   "version": "Effective 26 Jun 2026",
+   "checked_at": "2026-09-26T15:59:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Annex A footnote: Costa Brava summer restriction D (10-22) applies to euromodular combinations; Annex D ADR routes."
+  },
+  {
+   "source_id": "cat-sct-09-general",
+   "url": "https://transit.gencat.cat/web/.content/restriccions_circulacio/documents/09-setembre/Restriccions-09-Setembre-2026_Mercaderies-en-general.pdf",
+   "authority": "Servei Català de Trànsit - monthly official restriction listing (general goods)",
+   "role": "PRIMARY",
+   "version": "09-Setembre 2026 listing retrieved 2026-09-26",
+   "checked_at": "2026-09-26T15:59:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Day-by-day restrictions for general goods incl. euromodular combinations, derived from ISP/300/2026 as amended."
+  },
+  {
+   "source_id": "cat-sct-10-general",
+   "url": "https://transit.gencat.cat/web/.content/restriccions_circulacio/documents/10-octubre/Restriccions-10-Octubre-2026_Mercaderies-en-general.pdf",
+   "authority": "Servei Català de Trànsit - monthly official restriction listing (general goods)",
+   "role": "PRIMARY",
+   "version": "10-Octubre 2026 listing retrieved 2026-09-26",
+   "checked_at": "2026-09-26T15:59:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Day-by-day restrictions for general goods incl. euromodular combinations, derived from ISP/300/2026 as amended."
+  },
+  {
+   "source_id": "cat-sct-11-general",
+   "url": "https://transit.gencat.cat/web/.content/restriccions_circulacio/documents/11-novembre/Restriccions-11-Novembre-2026_Mercaderies-en-general.pdf",
+   "authority": "Servei Català de Trànsit - monthly official restriction listing (general goods)",
+   "role": "PRIMARY",
+   "version": "11-Novembre 2026 listing retrieved 2026-09-26",
+   "checked_at": "2026-09-26T15:59:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Day-by-day restrictions for general goods incl. euromodular combinations, derived from ISP/300/2026 as amended."
+  },
+  {
+   "source_id": "bas-res-2026",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-2625",
+   "authority": "BOE / Resolución 9 enero 2026, Dirección de Tráfico del Gobierno Vasco (BOPV 24, 5 Feb 2026)",
+   "role": "PRIMARY",
+   "version": "In force 8 working days after BOE publication; no posterior references listed",
+   "checked_at": "2026-09-26T15:59:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Annex II >7,500 kg calendars; section 4.1 complementary-authorisation vehicles Sundays/CAPV holidays 08-24 and non-Saturday eves 16-24; Annex IV exemptions."
+  },
+  {
+   "source_id": "es-fiestas-2026",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2025-21667",
+   "authority": "BOE / Resolución 17 oct 2025 (Dirección General de Trabajo) - fiestas laborales 2026",
+   "role": "PRIMARY",
+   "version": "BOE 28 Oct 2025",
+   "checked_at": "2026-09-26T15:59:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Sep-Nov 2026: 2 Sep Ceuta; 8 Sep Asturias, Extremadura; 11 Sep Cataluña; 15 Sep Cantabria; 9 Oct C. Valenciana; 12 Oct all; 2 Nov Andalucía, Aragón, Asturias, Canarias, Castilla-La Mancha, Castilla y León, Extremadura, Madrid, Navarra."
+  },
+  {
+   "source_id": "es-annex-v",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-1255",
+   "authority": "BOE / DGT Resolución 14 enero 2026, Annex V 1.º common restrictions",
+   "role": "PRIMARY",
+   "version": "BOE-A-2026-1255",
+   "checked_at": "2026-09-26T15:59:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Complementary-authorisation vehicles and ADR: Sundays and national/regional holidays 08-24; Wed/Thu eves of national holidays 16-24; consecutive holidays incl. Sundays: first day 08-15, last day 08-24, non-Saturday eve 16-24. City-access table only Granada, Madrid, Soria."
   }
  ],
  "rule_profiles": {
@@ -7893,6 +8288,270 @@
    "exceptions": [
     "Section C: road assistance, ELTA, press distribution, vehicles carrying live animals or ATP perishables (>= 10% payload), refrigerated fresh produce/table olives, fire-fighting water/fuel, utilities on emergency repair, medical oxygen, emergency vehicles, motorway concessionaires, military and other listed categories.",
     "Police directors may suspend or extend the measures locally (Article 1(3))."
+   ]
+  },
+  "cat-general": {
+   "verification_state": "PRIMARY_VERIFIED",
+   "verified_at": "2026-09-26T15:59:00.000Z",
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-11-30"
+   },
+   "status": "ACTIVE",
+   "sequence": 0,
+   "restriction_types": [
+    "general",
+    "exceptional"
+   ],
+   "supersedes": [],
+   "regions": [],
+   "adr_relevance": "ADR (orange plate) vehicles have additional Sunday/holiday restrictions in the same instrument; not encoded as separate events.",
+   "exceptional_relevance": "Also applies to exceptional/oversize vehicles within the stated category; permit conditions remain mandatory.",
+   "jurisdiction": "CAT",
+   "timezone": "Europe/Madrid",
+   "source_id": "cat-isp-300-2026",
+   "evidence_ids": [
+    "cat-isp-300-2026",
+    "cat-isp-1933-2026",
+    "cat-sct-09-general",
+    "cat-sct-10-general",
+    "cat-sct-11-general"
+   ],
+   "legal_basis": "Resolució ISP/300/2026 annex A (as amended by ISP/1933/2026)",
+   "vehicle_scope": "Goods vehicles or combinations >7,500 kg MMA/MMC.",
+   "weight_threshold": {
+    "operator": ">",
+    "value": 7500,
+    "unit": "kg",
+    "applies_to": "maximum authorised mass of goods vehicle / combination (MMA/MMC)"
+   },
+   "roads": [],
+   "direction": "Both directions",
+   "exceptions": [
+    "Annex B: permanent exemptions (foodstuffs/essential goods to shops, live animals, municipal waste rest/organic fractions, raw milk, animal feed, drinking water, post, daily press, eggs, hot food, flowers/plants, honey, animal carcasses, fermentable products, temperature-controlled medicines; roadside assistance V-24) and seasonal harvest exemptions between fields and stores.",
+    "Annex B.3 route-specific exemptions (e.g. AP-7 northbound for Alt Camp/Baix Camp/Tarragonès bases, ATP perishables >= half load on listed corridors)."
+   ]
+  },
+  "bas-general": {
+   "verification_state": "PRIMARY_VERIFIED",
+   "verified_at": "2026-09-26T15:59:00.000Z",
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-11-30"
+   },
+   "status": "ACTIVE",
+   "sequence": 0,
+   "restriction_types": [
+    "general",
+    "exceptional"
+   ],
+   "supersedes": [],
+   "regions": [],
+   "adr_relevance": "ADR (orange plate) vehicles have additional Sunday/holiday restrictions in the same instrument; not encoded as separate events.",
+   "exceptional_relevance": "Also applies to exceptional/oversize vehicles within the stated category; permit conditions remain mandatory.",
+   "jurisdiction": "BAS",
+   "timezone": "Europe/Madrid",
+   "source_id": "bas-res-2026",
+   "evidence_ids": [
+    "bas-res-2026"
+   ],
+   "legal_basis": "Basque Traffic Directorate resolution 2026, Annex II",
+   "vehicle_scope": "Vehicles or combinations >7,500 kg MMA/MMC (also ADR and complementary-authorisation vehicles outside Sundays/holidays/eves).",
+   "weight_threshold": {
+    "operator": ">",
+    "value": 7500,
+    "unit": "kg",
+    "applies_to": "maximum authorised mass of goods vehicle / combination (MMA/MMC)"
+   },
+   "roads": [],
+   "direction": "Both directions",
+   "exceptions": [
+    "Annex IV: live animals, event/fair equipment, press, post, broadcast units, mobile sales vehicles, emergency vehicles, related empty runs, V-24 roadside recovery, utility repair vehicles, de-icing salt, urgent service machinery, ATP temperature-controlled perishables and fresh fruit/vegetables."
+   ]
+  },
+  "bas-exceptional": {
+   "verification_state": "PRIMARY_VERIFIED",
+   "verified_at": "2026-09-26T15:59:00.000Z",
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-11-30"
+   },
+   "status": "ACTIVE",
+   "sequence": 0,
+   "restriction_types": [
+    "exceptional"
+   ],
+   "supersedes": [],
+   "regions": [],
+   "adr_relevance": "ADR (orange plate) vehicles have additional Sunday/holiday restrictions in the same instrument; not encoded as separate events.",
+   "exceptional_relevance": "Exceptional-transport-only restriction.",
+   "jurisdiction": "BAS",
+   "timezone": "Europe/Madrid",
+   "source_id": "bas-res-2026",
+   "evidence_ids": [
+    "bas-res-2026",
+    "es-fiestas-2026"
+   ],
+   "legal_basis": "Basque Traffic Directorate resolution 2026, section 4.1",
+   "vehicle_scope": "Vehicles requiring a complementary circulation authorisation (exceeding maximum masses or dimensions).",
+   "weight_threshold": {
+    "operator": "any",
+    "applies_to": "vehicles requiring a complementary circulation authorisation for exceeding maximum masses or dimensions (no separate mass threshold)"
+   },
+   "roads": [
+    "All public roads of the Basque Country (CAPV)"
+   ],
+   "direction": "Both directions",
+   "exceptions": [
+    "Annex IV categories and urgent service machinery under the authorisation notice conditions."
+   ]
+  },
+  "gal-dgt-exceptional": {
+   "verification_state": "PRIMARY_VERIFIED",
+   "verified_at": "2026-09-26T15:59:00.000Z",
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-11-30"
+   },
+   "status": "ACTIVE",
+   "sequence": 0,
+   "restriction_types": [
+    "exceptional"
+   ],
+   "supersedes": [],
+   "regions": [],
+   "adr_relevance": "ADR (orange plate) vehicles have additional Sunday/holiday restrictions in the same instrument; not encoded as separate events.",
+   "exceptional_relevance": "Exceptional-transport-only restriction.",
+   "jurisdiction": "GAL",
+   "timezone": "Europe/Madrid",
+   "source_id": "es-annex-v",
+   "evidence_ids": [
+    "es-annex-v",
+    "es-fiestas-2026"
+   ],
+   "legal_basis": "DGT Resolución 2026 (BOE-A-2026-1255) Annex V 1.º",
+   "vehicle_scope": "Vehicles requiring a complementary circulation authorisation (exceeding maximum masses or dimensions); ADR vehicles have the same common restrictions.",
+   "weight_threshold": {
+    "operator": "any",
+    "applies_to": "vehicles requiring a complementary circulation authorisation for exceeding maximum masses or dimensions (no separate mass threshold)"
+   },
+   "roads": [
+    "All roads under DGT surveillance in the territory"
+   ],
+   "direction": "Both directions",
+   "exceptions": [
+    "B.3.2: urgent fire/environment/road/life-saving operations with notification; special roadside-assistance vehicles; Annex V specific agricultural/crane provisions."
+   ]
+  },
+  "can-dgt-exceptional": {
+   "verification_state": "PRIMARY_VERIFIED",
+   "verified_at": "2026-09-26T15:59:00.000Z",
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-11-30"
+   },
+   "status": "ACTIVE",
+   "sequence": 0,
+   "restriction_types": [
+    "exceptional"
+   ],
+   "supersedes": [],
+   "regions": [],
+   "adr_relevance": "ADR (orange plate) vehicles have additional Sunday/holiday restrictions in the same instrument; not encoded as separate events.",
+   "exceptional_relevance": "Exceptional-transport-only restriction.",
+   "jurisdiction": "CAN",
+   "timezone": "Atlantic/Canary",
+   "source_id": "es-annex-v",
+   "evidence_ids": [
+    "es-annex-v",
+    "es-fiestas-2026"
+   ],
+   "legal_basis": "DGT Resolución 2026 (BOE-A-2026-1255) Annex V 1.º",
+   "vehicle_scope": "Vehicles requiring a complementary circulation authorisation (exceeding maximum masses or dimensions); ADR vehicles have the same common restrictions.",
+   "weight_threshold": {
+    "operator": "any",
+    "applies_to": "vehicles requiring a complementary circulation authorisation for exceeding maximum masses or dimensions (no separate mass threshold)"
+   },
+   "roads": [
+    "All roads under DGT surveillance in the territory"
+   ],
+   "direction": "Both directions",
+   "exceptions": [
+    "B.3.2: urgent fire/environment/road/life-saving operations with notification; special roadside-assistance vehicles; Annex V specific agricultural/crane provisions."
+   ]
+  },
+  "ceu-dgt-exceptional": {
+   "verification_state": "PRIMARY_VERIFIED",
+   "verified_at": "2026-09-26T15:59:00.000Z",
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-11-30"
+   },
+   "status": "ACTIVE",
+   "sequence": 0,
+   "restriction_types": [
+    "exceptional"
+   ],
+   "supersedes": [],
+   "regions": [],
+   "adr_relevance": "ADR (orange plate) vehicles have additional Sunday/holiday restrictions in the same instrument; not encoded as separate events.",
+   "exceptional_relevance": "Exceptional-transport-only restriction.",
+   "jurisdiction": "CEU",
+   "timezone": "Africa/Ceuta",
+   "source_id": "es-annex-v",
+   "evidence_ids": [
+    "es-annex-v",
+    "es-fiestas-2026"
+   ],
+   "legal_basis": "DGT Resolución 2026 (BOE-A-2026-1255) Annex V 1.º",
+   "vehicle_scope": "Vehicles requiring a complementary circulation authorisation (exceeding maximum masses or dimensions); ADR vehicles have the same common restrictions.",
+   "weight_threshold": {
+    "operator": "any",
+    "applies_to": "vehicles requiring a complementary circulation authorisation for exceeding maximum masses or dimensions (no separate mass threshold)"
+   },
+   "roads": [
+    "All roads under DGT surveillance in the territory"
+   ],
+   "direction": "Both directions",
+   "exceptions": [
+    "B.3.2: urgent fire/environment/road/life-saving operations with notification; special roadside-assistance vehicles; Annex V specific agricultural/crane provisions."
+   ]
+  },
+  "mll-dgt-exceptional": {
+   "verification_state": "PRIMARY_VERIFIED",
+   "verified_at": "2026-09-26T15:59:00.000Z",
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-11-30"
+   },
+   "status": "ACTIVE",
+   "sequence": 0,
+   "restriction_types": [
+    "exceptional"
+   ],
+   "supersedes": [],
+   "regions": [],
+   "adr_relevance": "ADR (orange plate) vehicles have additional Sunday/holiday restrictions in the same instrument; not encoded as separate events.",
+   "exceptional_relevance": "Exceptional-transport-only restriction.",
+   "jurisdiction": "MLL",
+   "timezone": "Africa/Ceuta",
+   "source_id": "es-annex-v",
+   "evidence_ids": [
+    "es-annex-v",
+    "es-fiestas-2026"
+   ],
+   "legal_basis": "DGT Resolución 2026 (BOE-A-2026-1255) Annex V 1.º",
+   "vehicle_scope": "Vehicles requiring a complementary circulation authorisation (exceeding maximum masses or dimensions); ADR vehicles have the same common restrictions.",
+   "weight_threshold": {
+    "operator": "any",
+    "applies_to": "vehicles requiring a complementary circulation authorisation for exceeding maximum masses or dimensions (no separate mass threshold)"
+   },
+   "roads": [
+    "All roads under DGT surveillance in the territory"
+   ],
+   "direction": "Both directions",
+   "exceptions": [
+    "B.3.2: urgent fire/environment/road/life-saving operations with notification; special roadside-assistance vehicles; Annex V specific agricultural/crane provisions."
    ]
   }
  },
@@ -12358,6 +13017,1359 @@
    ],
    "direction": "Return, per Chapter A2 segment",
    "legal_basis": "ΦΕΚ Β΄ 912/2026 B7(b)"
+  },
+  {
+   "ban_id": "cat-ap7-ems-evening-2026",
+   "profile": "cat-general",
+   "title": "AP-7 euromodular combination restriction (Fri/Sun/holiday evening)",
+   "valid_from": "2026-09-04",
+   "valid_to": "2026-11-29",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-04",
+      "occurrence_id": "2026-09-04"
+     },
+     {
+      "date": "2026-09-06",
+      "occurrence_id": "2026-09-06"
+     },
+     {
+      "date": "2026-09-11",
+      "occurrence_id": "2026-09-11"
+     },
+     {
+      "date": "2026-09-13",
+      "occurrence_id": "2026-09-13"
+     },
+     {
+      "date": "2026-09-18",
+      "occurrence_id": "2026-09-18"
+     },
+     {
+      "date": "2026-09-20",
+      "occurrence_id": "2026-09-20"
+     },
+     {
+      "date": "2026-09-25",
+      "occurrence_id": "2026-09-25"
+     },
+     {
+      "date": "2026-09-27",
+      "occurrence_id": "2026-09-27"
+     },
+     {
+      "date": "2026-10-02",
+      "occurrence_id": "2026-10-02"
+     },
+     {
+      "date": "2026-10-04",
+      "occurrence_id": "2026-10-04"
+     },
+     {
+      "date": "2026-10-09",
+      "occurrence_id": "2026-10-09"
+     },
+     {
+      "date": "2026-10-11",
+      "occurrence_id": "2026-10-11"
+     },
+     {
+      "date": "2026-10-16",
+      "occurrence_id": "2026-10-16"
+     },
+     {
+      "date": "2026-10-18",
+      "occurrence_id": "2026-10-18"
+     },
+     {
+      "date": "2026-10-23",
+      "occurrence_id": "2026-10-23"
+     },
+     {
+      "date": "2026-10-25",
+      "occurrence_id": "2026-10-25"
+     },
+     {
+      "date": "2026-10-30",
+      "occurrence_id": "2026-10-30"
+     },
+     {
+      "date": "2026-11-01",
+      "occurrence_id": "2026-11-01"
+     },
+     {
+      "date": "2026-11-06",
+      "occurrence_id": "2026-11-06"
+     },
+     {
+      "date": "2026-11-08",
+      "occurrence_id": "2026-11-08"
+     },
+     {
+      "date": "2026-11-13",
+      "occurrence_id": "2026-11-13"
+     },
+     {
+      "date": "2026-11-15",
+      "occurrence_id": "2026-11-15"
+     },
+     {
+      "date": "2026-11-20",
+      "occurrence_id": "2026-11-20"
+     },
+     {
+      "date": "2026-11-22",
+      "occurrence_id": "2026-11-22"
+     },
+     {
+      "date": "2026-11-27",
+      "occurrence_id": "2026-11-27"
+     },
+     {
+      "date": "2026-11-29",
+      "occurrence_id": "2026-11-29"
+     }
+    ]
+   },
+   "roads": [
+    "AP-7 km 84.5 Maçanet de la Selva - km 281 L'Hospitalet de l'Infant"
+   ],
+   "direction": "Both directions",
+   "weight_threshold": {
+    "operator": "any",
+    "applies_to": "euromodular combinations (conjunts euromodulars) only"
+   },
+   "vehicle_scope": "Euromodular combinations (EMS) only."
+  },
+  {
+   "ban_id": "cat-ap7-ems-saturday-2026",
+   "profile": "cat-general",
+   "title": "AP-7 euromodular combination restriction (Saturday morning)",
+   "valid_from": "2026-09-05",
+   "valid_to": "2026-11-28",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-05",
+      "occurrence_id": "2026-09-05"
+     },
+     {
+      "date": "2026-09-12",
+      "occurrence_id": "2026-09-12"
+     },
+     {
+      "date": "2026-09-19",
+      "occurrence_id": "2026-09-19"
+     },
+     {
+      "date": "2026-09-26",
+      "occurrence_id": "2026-09-26"
+     },
+     {
+      "date": "2026-10-03",
+      "occurrence_id": "2026-10-03"
+     },
+     {
+      "date": "2026-10-10",
+      "occurrence_id": "2026-10-10"
+     },
+     {
+      "date": "2026-10-17",
+      "occurrence_id": "2026-10-17"
+     },
+     {
+      "date": "2026-10-24",
+      "occurrence_id": "2026-10-24"
+     },
+     {
+      "date": "2026-10-31",
+      "occurrence_id": "2026-10-31"
+     },
+     {
+      "date": "2026-11-07",
+      "occurrence_id": "2026-11-07"
+     },
+     {
+      "date": "2026-11-14",
+      "occurrence_id": "2026-11-14"
+     },
+     {
+      "date": "2026-11-21",
+      "occurrence_id": "2026-11-21"
+     },
+     {
+      "date": "2026-11-28",
+      "occurrence_id": "2026-11-28"
+     }
+    ]
+   },
+   "roads": [
+    "AP-7 km 84.5 Maçanet de la Selva - km 281 L'Hospitalet de l'Infant"
+   ],
+   "direction": "Both directions",
+   "weight_threshold": {
+    "operator": "any",
+    "applies_to": "euromodular combinations (conjunts euromodulars) only"
+   },
+   "vehicle_scope": "Euromodular combinations (EMS) only."
+  },
+  {
+   "ban_id": "cat-n2-saturday-2026",
+   "profile": "cat-general",
+   "title": "N-II Montgat - Can Bartolí Saturday restriction",
+   "valid_from": "2026-09-05",
+   "valid_to": "2026-11-28",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-05",
+      "occurrence_id": "2026-09-05"
+     },
+     {
+      "date": "2026-09-12",
+      "occurrence_id": "2026-09-12"
+     },
+     {
+      "date": "2026-09-19",
+      "occurrence_id": "2026-09-19"
+     },
+     {
+      "date": "2026-09-26",
+      "occurrence_id": "2026-09-26"
+     },
+     {
+      "date": "2026-10-03",
+      "occurrence_id": "2026-10-03"
+     },
+     {
+      "date": "2026-10-10",
+      "occurrence_id": "2026-10-10"
+     },
+     {
+      "date": "2026-10-17",
+      "occurrence_id": "2026-10-17"
+     },
+     {
+      "date": "2026-10-24",
+      "occurrence_id": "2026-10-24"
+     },
+     {
+      "date": "2026-10-31",
+      "occurrence_id": "2026-10-31"
+     },
+     {
+      "date": "2026-11-07",
+      "occurrence_id": "2026-11-07"
+     },
+     {
+      "date": "2026-11-14",
+      "occurrence_id": "2026-11-14"
+     },
+     {
+      "date": "2026-11-21",
+      "occurrence_id": "2026-11-21"
+     },
+     {
+      "date": "2026-11-28",
+      "occurrence_id": "2026-11-28"
+     }
+    ]
+   },
+   "roads": [
+    "N-II km 630 Montgat - km 682.2 Rotonda Can Bartolí"
+   ],
+   "direction": "Both directions"
+  },
+  {
+   "ban_id": "cat-c35-summer-2026",
+   "profile": "cat-general",
+   "title": "Costa Brava summer restriction C-35",
+   "valid_from": "2026-09-06",
+   "valid_to": "2026-09-13",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-06",
+      "occurrence_id": "2026-09-06"
+     },
+     {
+      "date": "2026-09-11",
+      "occurrence_id": "2026-09-11"
+     },
+     {
+      "date": "2026-09-13",
+      "occurrence_id": "2026-09-13"
+     }
+    ]
+   },
+   "roads": [
+    "C-35 km 73.4 GI-512 junction - km 83.1 Maçanet/AP-7"
+   ],
+   "direction": "Both directions"
+  },
+  {
+   "ban_id": "cat-c63-summer-2026",
+   "profile": "cat-general",
+   "title": "Costa Brava summer restriction C-63",
+   "valid_from": "2026-09-06",
+   "valid_to": "2026-09-13",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-06",
+      "occurrence_id": "2026-09-06"
+     },
+     {
+      "date": "2026-09-11",
+      "occurrence_id": "2026-09-11"
+     },
+     {
+      "date": "2026-09-13",
+      "occurrence_id": "2026-09-13"
+     }
+    ]
+   },
+   "roads": [
+    "C-63 km 0 Lloret de Mar - km 13 Vidreres"
+   ],
+   "direction": "Both directions"
+  },
+  {
+   "ban_id": "cat-gi681-summer-2026",
+   "profile": "cat-general",
+   "title": "Costa Brava summer restriction GI-681",
+   "valid_from": "2026-09-06",
+   "valid_to": "2026-09-13",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-06",
+      "occurrence_id": "2026-09-06"
+     },
+     {
+      "date": "2026-09-11",
+      "occurrence_id": "2026-09-11"
+     },
+     {
+      "date": "2026-09-13",
+      "occurrence_id": "2026-09-13"
+     }
+    ]
+   },
+   "roads": [
+    "GI-681 km 0 Llagostera - km 16 Tossa de Mar"
+   ],
+   "direction": "Both directions"
+  },
+  {
+   "ban_id": "cat-gi682-summer-2026",
+   "profile": "cat-general",
+   "title": "Costa Brava summer restriction GI-682",
+   "valid_from": "2026-09-06",
+   "valid_to": "2026-09-13",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-06",
+      "occurrence_id": "2026-09-06"
+     },
+     {
+      "date": "2026-09-11",
+      "occurrence_id": "2026-09-11"
+     },
+     {
+      "date": "2026-09-13",
+      "occurrence_id": "2026-09-13"
+     }
+    ]
+   },
+   "roads": [
+    "GI-682 km 3 Barcelona limit - km 13 Lloret de Mar"
+   ],
+   "direction": "Both directions"
+  },
+  {
+   "ban_id": "cat-c35-ems-summer-2026",
+   "profile": "cat-general",
+   "title": "Costa Brava summer euromodular restriction C-35",
+   "valid_from": "2026-09-06",
+   "valid_to": "2026-09-13",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "10:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-06",
+      "occurrence_id": "2026-09-06"
+     },
+     {
+      "date": "2026-09-11",
+      "occurrence_id": "2026-09-11"
+     },
+     {
+      "date": "2026-09-13",
+      "occurrence_id": "2026-09-13"
+     }
+    ]
+   },
+   "roads": [
+    "C-35 km 73.4 - km 83.1"
+   ],
+   "direction": "Both directions",
+   "weight_threshold": {
+    "operator": "any",
+    "applies_to": "euromodular combinations (conjunts euromodulars) only"
+   },
+   "vehicle_scope": "Euromodular combinations (EMS) only."
+  },
+  {
+   "ban_id": "cat-c63-ems-summer-2026",
+   "profile": "cat-general",
+   "title": "Costa Brava summer euromodular restriction C-63",
+   "valid_from": "2026-09-06",
+   "valid_to": "2026-09-13",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "10:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-06",
+      "occurrence_id": "2026-09-06"
+     },
+     {
+      "date": "2026-09-11",
+      "occurrence_id": "2026-09-11"
+     },
+     {
+      "date": "2026-09-13",
+      "occurrence_id": "2026-09-13"
+     }
+    ]
+   },
+   "roads": [
+    "C-63 km 0 - km 13"
+   ],
+   "direction": "Both directions",
+   "weight_threshold": {
+    "operator": "any",
+    "applies_to": "euromodular combinations (conjunts euromodulars) only"
+   },
+   "vehicle_scope": "Euromodular combinations (EMS) only."
+  },
+  {
+   "ban_id": "cat-gi681-ems-summer-2026",
+   "profile": "cat-general",
+   "title": "Costa Brava summer euromodular restriction GI-681",
+   "valid_from": "2026-09-06",
+   "valid_to": "2026-09-13",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "10:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-06",
+      "occurrence_id": "2026-09-06"
+     },
+     {
+      "date": "2026-09-11",
+      "occurrence_id": "2026-09-11"
+     },
+     {
+      "date": "2026-09-13",
+      "occurrence_id": "2026-09-13"
+     }
+    ]
+   },
+   "roads": [
+    "GI-681 km 0 - km 16"
+   ],
+   "direction": "Both directions",
+   "weight_threshold": {
+    "operator": "any",
+    "applies_to": "euromodular combinations (conjunts euromodulars) only"
+   },
+   "vehicle_scope": "Euromodular combinations (EMS) only."
+  },
+  {
+   "ban_id": "cat-gi682-ems-summer-2026",
+   "profile": "cat-general",
+   "title": "Costa Brava summer euromodular restriction GI-682",
+   "valid_from": "2026-09-06",
+   "valid_to": "2026-09-13",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "10:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-06",
+      "occurrence_id": "2026-09-06"
+     },
+     {
+      "date": "2026-09-11",
+      "occurrence_id": "2026-09-11"
+     },
+     {
+      "date": "2026-09-13",
+      "occurrence_id": "2026-09-13"
+     }
+    ]
+   },
+   "roads": [
+    "GI-682 km 3 - km 13"
+   ],
+   "direction": "Both directions",
+   "weight_threshold": {
+    "operator": "any",
+    "applies_to": "euromodular combinations (conjunts euromodulars) only"
+   },
+   "vehicle_scope": "Euromodular combinations (EMS) only."
+  },
+  {
+   "ban_id": "cat-n2-sunday-2026",
+   "profile": "cat-general",
+   "title": "N-II Montgat - Can Bartolí Sunday restriction",
+   "valid_from": "2026-09-06",
+   "valid_to": "2026-11-29",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-06",
+      "occurrence_id": "2026-09-06"
+     },
+     {
+      "date": "2026-09-13",
+      "occurrence_id": "2026-09-13"
+     },
+     {
+      "date": "2026-09-20",
+      "occurrence_id": "2026-09-20"
+     },
+     {
+      "date": "2026-09-27",
+      "occurrence_id": "2026-09-27"
+     },
+     {
+      "date": "2026-10-04",
+      "occurrence_id": "2026-10-04"
+     },
+     {
+      "date": "2026-10-11",
+      "occurrence_id": "2026-10-11"
+     },
+     {
+      "date": "2026-10-18",
+      "occurrence_id": "2026-10-18"
+     },
+     {
+      "date": "2026-10-25",
+      "occurrence_id": "2026-10-25"
+     },
+     {
+      "date": "2026-11-01",
+      "occurrence_id": "2026-11-01"
+     },
+     {
+      "date": "2026-11-08",
+      "occurrence_id": "2026-11-08"
+     },
+     {
+      "date": "2026-11-15",
+      "occurrence_id": "2026-11-15"
+     },
+     {
+      "date": "2026-11-22",
+      "occurrence_id": "2026-11-22"
+     },
+     {
+      "date": "2026-11-29",
+      "occurrence_id": "2026-11-29"
+     }
+    ]
+   },
+   "roads": [
+    "N-II km 630 Montgat - km 682.2 Rotonda Can Bartolí"
+   ],
+   "direction": "Both directions"
+  },
+  {
+   "ban_id": "cat-ap7-holidays-evening-2026",
+   "profile": "cat-general",
+   "title": "AP-7 holiday/bridge restriction (evening)",
+   "valid_from": "2026-09-13",
+   "valid_to": "2026-10-12",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-13",
+      "occurrence_id": "2026-09-13"
+     },
+     {
+      "date": "2026-09-23",
+      "occurrence_id": "2026-09-23"
+     },
+     {
+      "date": "2026-09-27",
+      "occurrence_id": "2026-09-27"
+     },
+     {
+      "date": "2026-10-09",
+      "occurrence_id": "2026-10-09"
+     },
+     {
+      "date": "2026-10-12",
+      "occurrence_id": "2026-10-12"
+     }
+    ]
+   },
+   "roads": [
+    "AP-7 km 84.5 Maçanet - km 281 L'Hospitalet de l'Infant"
+   ],
+   "direction": "Both directions"
+  },
+  {
+   "ban_id": "cat-ap7-holidays-morning-2026",
+   "profile": "cat-general",
+   "title": "AP-7 holiday/bridge restriction (morning)",
+   "valid_from": "2026-09-24",
+   "valid_to": "2026-10-10",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-24",
+      "occurrence_id": "2026-09-24"
+     },
+     {
+      "date": "2026-10-10",
+      "occurrence_id": "2026-10-10"
+     }
+    ]
+   },
+   "roads": [
+    "AP-7 km 84.5 Maçanet - km 281 L'Hospitalet de l'Infant"
+   ],
+   "direction": "Both directions"
+  },
+  {
+   "ban_id": "cat-n230-pilar-out-2026",
+   "profile": "cat-general",
+   "title": "Aran access N-230 restriction (toward France)",
+   "valid_from": "2026-10-09",
+   "valid_to": "2026-10-09",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-09",
+      "occurrence_id": "2026-10-09"
+     }
+    ]
+   },
+   "roads": [
+    "N-230 km 116 El Pont de Suert - km 187 Bausen (French border)"
+   ],
+   "direction": "Toward France"
+  },
+  {
+   "ban_id": "cat-c28-pilar-out-2026",
+   "profile": "cat-general",
+   "title": "Aran access C-28 restriction (toward France)",
+   "valid_from": "2026-10-09",
+   "valid_to": "2026-10-09",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-09",
+      "occurrence_id": "2026-10-09"
+     }
+    ]
+   },
+   "roads": [
+    "C-28 km 23 Vielha e Mijaran - km 34 Salardú"
+   ],
+   "direction": "Toward France"
+  },
+  {
+   "ban_id": "cat-n230-pilar-return-2026",
+   "profile": "cat-general",
+   "title": "Aran access N-230 restriction (toward Lleida)",
+   "valid_from": "2026-10-12",
+   "valid_to": "2026-10-12",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "13:00",
+    "end_time": "20:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-12",
+      "occurrence_id": "2026-10-12"
+     }
+    ]
+   },
+   "roads": [
+    "N-230 km 116 El Pont de Suert - km 187 Bausen"
+   ],
+   "direction": "Toward Lleida"
+  },
+  {
+   "ban_id": "cat-c28-pilar-return-2026",
+   "profile": "cat-general",
+   "title": "Aran access C-28 restriction (toward Lleida)",
+   "valid_from": "2026-10-12",
+   "valid_to": "2026-10-12",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "13:00",
+    "end_time": "20:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-12",
+      "occurrence_id": "2026-10-12"
+     }
+    ]
+   },
+   "roads": [
+    "C-28 km 23 Vielha e Mijaran - km 34 Salardú"
+   ],
+   "direction": "Toward Lleida"
+  },
+  {
+   "ban_id": "cat-n145-winter-2026",
+   "profile": "cat-general",
+   "title": "Pyrenees winter Saturday restriction N-145",
+   "valid_from": "2026-11-28",
+   "valid_to": "2026-11-28",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-11-28",
+      "occurrence_id": "2026-11-28"
+     }
+    ]
+   },
+   "roads": [
+    "N-145 km 0 La Seu d'Urgell - km 10 Andorra border"
+   ],
+   "direction": "Both directions"
+  },
+  {
+   "ban_id": "cat-c14-winter-2026",
+   "profile": "cat-general",
+   "title": "Pyrenees winter Saturday restriction C-14",
+   "valid_from": "2026-11-28",
+   "valid_to": "2026-11-28",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-11-28",
+      "occurrence_id": "2026-11-28"
+     }
+    ]
+   },
+   "roads": [
+    "C-14 km 116 Ponts - km 178 Adrall"
+   ],
+   "direction": "Both directions"
+  },
+  {
+   "ban_id": "cat-n260-winter-2026",
+   "profile": "cat-general",
+   "title": "Pyrenees winter Saturday restriction N-260",
+   "valid_from": "2026-11-28",
+   "valid_to": "2026-11-28",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-11-28",
+      "occurrence_id": "2026-11-28"
+     }
+    ]
+   },
+   "roads": [
+    "N-260 km 193 Bellver de Cerdanya - km 234 Adrall"
+   ],
+   "direction": "Both directions"
+  },
+  {
+   "ban_id": "bas-summer-weekend-outbound-2026",
+   "profile": "bas-general",
+   "title": "Summer weekend restriction toward Cantabria/Burgos",
+   "valid_from": "2026-09-05",
+   "valid_to": "2026-09-06",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "11:00",
+    "end_time": "14:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-05",
+      "occurrence_id": "2026-09-05"
+     },
+     {
+      "date": "2026-09-06",
+      "occurrence_id": "2026-09-06"
+     }
+    ]
+   },
+   "roads": [
+    "A-8 km 119.5 - km 139.21 (to Cantabria)",
+    "A-1 km 352 (N-622) - km 336 Treviño (to Burgos)",
+    "A-1 km 329 Treviño - km 321 (to Burgos)"
+   ],
+   "direction": "Toward Cantabria / Burgos",
+   "legal_basis": "Annex II 1.º a) (6 Jun-6 Sep 2026)"
+  },
+  {
+   "ban_id": "bas-summer-sunday-a8-2026",
+   "profile": "bas-general",
+   "title": "Summer Sunday restriction A-8 toward Bilbao",
+   "valid_from": "2026-09-06",
+   "valid_to": "2026-09-06",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-06",
+      "occurrence_id": "2026-09-06"
+     }
+    ]
+   },
+   "roads": [
+    "A-8 km 139.21 (Cantabria) - km 119.5"
+   ],
+   "direction": "Toward Bilbao",
+   "legal_basis": "Annex II 1.º b)"
+  },
+  {
+   "ban_id": "bas-summer-sunday-a1-2026",
+   "profile": "bas-general",
+   "title": "Summer Sunday restriction A-1 toward Vitoria-Gasteiz",
+   "valid_from": "2026-09-06",
+   "valid_to": "2026-09-06",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-06",
+      "occurrence_id": "2026-09-06"
+     }
+    ]
+   },
+   "roads": [
+    "A-1 km 321 - km 329 Treviño",
+    "A-1 km 336 Treviño - km 352 (N-622)"
+   ],
+   "direction": "Toward Vitoria-Gasteiz",
+   "legal_basis": "Annex II 1.º b)"
+  },
+  {
+   "ban_id": "bas-pilar-friday-2026",
+   "profile": "bas-general",
+   "title": "El Pilar outbound restriction (Friday)",
+   "valid_from": "2026-10-09",
+   "valid_to": "2026-10-09",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-09",
+      "occurrence_id": "2026-10-09"
+     }
+    ]
+   },
+   "roads": [
+    "A-8 km 119.5 - km 139.21 (Cantabria)",
+    "N-634 km 107 - km 120.69",
+    "BI-3724 (old N-634) km 120.69 - km 128.12",
+    "BI-734 (old N-634) km 128.12 - km 136.14 (Cantabria)",
+    "AP-1 km 83.2 - km 77.2 (to Burgos)",
+    "A-1 km 352 (N-622) - km 336 Treviño (to Burgos)",
+    "A-1 km 329 Treviño - km 321 (to Burgos)",
+    "N-240 km 55.77 - km 23.08 Bizkaia (to Vitoria-Gasteiz)",
+    "N-240 km 23.08 - km 4.9 Araba (to Vitoria-Gasteiz)"
+   ],
+   "direction": "Outbound per listed segment",
+   "legal_basis": "Annex II 2.º 3"
+  },
+  {
+   "ban_id": "bas-pilar-saturday-2026",
+   "profile": "bas-general",
+   "title": "El Pilar outbound restriction (Saturday)",
+   "valid_from": "2026-10-10",
+   "valid_to": "2026-10-10",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "10:00",
+    "end_time": "15:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-10",
+      "occurrence_id": "2026-10-10"
+     }
+    ]
+   },
+   "roads": [
+    "A-8 km 119.5 - km 139.21 (Cantabria)",
+    "N-634 km 107 - km 120.69",
+    "BI-3724 (old N-634) km 120.69 - km 128.12",
+    "BI-734 (old N-634) km 128.12 - km 136.14 (Cantabria)",
+    "AP-1 km 83.2 - km 77.2 (to Burgos)",
+    "A-1 km 352 (N-622) - km 336 Treviño (to Burgos)",
+    "A-1 km 329 Treviño - km 321 (to Burgos)",
+    "N-240 km 55.77 - km 23.08 Bizkaia (to Vitoria-Gasteiz)",
+    "N-240 km 23.08 - km 4.9 Araba (to Vitoria-Gasteiz)"
+   ],
+   "direction": "Outbound per listed segment",
+   "legal_basis": "Annex II 2.º 3"
+  },
+  {
+   "ban_id": "bas-pilar-return-2026",
+   "profile": "bas-general",
+   "title": "El Pilar return restriction",
+   "valid_from": "2026-10-12",
+   "valid_to": "2026-10-12",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-12",
+      "occurrence_id": "2026-10-12"
+     }
+    ]
+   },
+   "roads": [
+    "A-8 km 139.21 (Cantabria) - km 119.5",
+    "BI-734 km 136.14 - km 128.12",
+    "BI-3724 km 128.12 - km 120.69",
+    "N-634 km 120.69 - km 107",
+    "AP-1 km 77.2 - km 83.2 (to Vitoria-Gasteiz)",
+    "A-1 km 336 Treviño - km 352 (to Vitoria-Gasteiz)",
+    "A-1 km 321 - km 329 Treviño (to Vitoria-Gasteiz)",
+    "N-240 km 23.08 - km 55.77 Bizkaia (to Bilbao)",
+    "N-240 km 4.9 - km 23.08 Araba (to Bilbao)"
+   ],
+   "direction": "Return per listed segment",
+   "legal_basis": "Annex II 2.º 5"
+  },
+  {
+   "ban_id": "bas-all-saints-return-2026",
+   "profile": "bas-general",
+   "title": "All Saints return restriction toward Bilbao",
+   "valid_from": "2026-11-01",
+   "valid_to": "2026-11-01",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-11-01",
+      "occurrence_id": "2026-11-01"
+     }
+    ]
+   },
+   "roads": [
+    "A-8 km 139.21 (Cantabria) - km 119.5",
+    "BI-734 km 136.14 - km 128.12",
+    "BI-3724 km 128.12 - km 120.69",
+    "N-634 km 120.69 - km 107"
+   ],
+   "direction": "Toward Bilbao",
+   "legal_basis": "Annex II 2.º 2"
+  },
+  {
+   "ban_id": "bas-armistice-crossborder-2026",
+   "profile": "bas-general",
+   "title": "Cross-border restriction for the French Armistice holiday",
+   "valid_from": "2026-11-10",
+   "valid_to": "2026-11-11",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "22:00",
+    "end_time": "22:00",
+    "end_day_offset": 1,
+    "dates": [
+     {
+      "date": "2026-11-10",
+      "occurrence_id": "2026-11-10"
+     }
+    ]
+   },
+   "roads": [
+    "AP-8 km 100 Amorebieta - km 0 French border",
+    "GI-20 km 15.572 Aritzeta - km 0 Errenteria",
+    "A-15 km 139.7 Navarra - km 156.56 N-I",
+    "AP-1 km 102.7 Etxabarri-Ibiña - km 146.15 Maltzaga",
+    "A-1 km 321.4 - km 329 Treviño",
+    "A-1 km 336 Treviño - km 352 N-622",
+    "N-I km 405.45 Etzegarate - km 454.47 Lasarte-Oria",
+    "GI-636 km 0 Pasaia - km 17.235 Behobia",
+    "GI-11 km 0 - km 2.523",
+    "N-121A km 68.46 Navarra - km 75.02 Behobia"
+   ],
+   "direction": "Toward France (cross-border transport only)",
+   "legal_basis": "Annex II 2.º 6 (cross-border transport only)"
+  },
+  {
+   "ban_id": "bas-exceptional-sunday",
+   "profile": "bas-exceptional",
+   "title": "Complementary-authorisation vehicles: Sunday restriction",
+   "valid_from": "2026-01-01",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "weekly",
+    "start_time": "08:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "weekdays": [
+     0
+    ]
+   }
+  },
+  {
+   "ban_id": "bas-exceptional-holiday-2026",
+   "profile": "bas-exceptional",
+   "title": "Complementary-authorisation vehicles: holiday restriction",
+   "valid_from": "2026-10-12",
+   "valid_to": "2026-10-12",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-12",
+      "occurrence_id": "2026-10-12"
+     }
+    ]
+   },
+   "notes": "12 Oct is the only CAPV holiday Sep-Nov 2026 besides the Sunday 1 Nov; its eve is a Sunday; the eve of 1 Nov is a Saturday (excluded)."
+  },
+  {
+   "ban_id": "gal-dgt-exceptional-sunday",
+   "profile": "gal-dgt-exceptional",
+   "title": "Complementary-authorisation vehicles: Sunday restriction",
+   "valid_from": "2026-01-01",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "weekly",
+    "start_time": "08:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "weekdays": [
+     0
+    ],
+    "excluded_dates": [
+     "2026-10-11"
+    ]
+   }
+  },
+  {
+   "ban_id": "gal-dgt-exceptional-consecutive-first-2026",
+   "profile": "gal-dgt-exceptional",
+   "title": "Consecutive holidays: first day (Sunday 11 Oct)",
+   "valid_from": "2026-10-11",
+   "valid_to": "2026-10-11",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "15:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-11",
+      "occurrence_id": "2026-10-11"
+     }
+    ]
+   }
+  },
+  {
+   "ban_id": "gal-dgt-exceptional-holiday-2026",
+   "profile": "gal-dgt-exceptional",
+   "title": "National holiday (12 Oct)",
+   "valid_from": "2026-10-12",
+   "valid_to": "2026-10-12",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-12",
+      "occurrence_id": "2026-10-12"
+     }
+    ]
+   }
+  },
+  {
+   "ban_id": "can-dgt-exceptional-sunday",
+   "profile": "can-dgt-exceptional",
+   "title": "Complementary-authorisation vehicles: Sunday restriction",
+   "valid_from": "2026-01-01",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "weekly",
+    "start_time": "08:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "weekdays": [
+     0
+    ],
+    "excluded_dates": [
+     "2026-10-11",
+     "2026-11-01"
+    ]
+   }
+  },
+  {
+   "ban_id": "can-dgt-exceptional-consecutive-first-2026",
+   "profile": "can-dgt-exceptional",
+   "title": "Consecutive holidays: first day (Sundays 11 Oct, 1 Nov)",
+   "valid_from": "2026-10-11",
+   "valid_to": "2026-11-01",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "15:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-11",
+      "occurrence_id": "2026-10-11"
+     },
+     {
+      "date": "2026-11-01",
+      "occurrence_id": "2026-11-01"
+     }
+    ]
+   }
+  },
+  {
+   "ban_id": "can-dgt-exceptional-holiday-2026",
+   "profile": "can-dgt-exceptional",
+   "title": "Holidays (12 Oct national, 2 Nov Canarias)",
+   "valid_from": "2026-10-12",
+   "valid_to": "2026-11-02",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-12",
+      "occurrence_id": "2026-10-12"
+     },
+     {
+      "date": "2026-11-02",
+      "occurrence_id": "2026-11-02"
+     }
+    ]
+   }
+  },
+  {
+   "ban_id": "ceu-dgt-exceptional-sunday",
+   "profile": "ceu-dgt-exceptional",
+   "title": "Complementary-authorisation vehicles: Sunday restriction",
+   "valid_from": "2026-01-01",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "weekly",
+    "start_time": "08:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "weekdays": [
+     0
+    ],
+    "excluded_dates": [
+     "2026-10-11"
+    ]
+   }
+  },
+  {
+   "ban_id": "ceu-dgt-exceptional-consecutive-first-2026",
+   "profile": "ceu-dgt-exceptional",
+   "title": "Consecutive holidays: first day (Sunday 11 Oct)",
+   "valid_from": "2026-10-11",
+   "valid_to": "2026-10-11",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "15:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-11",
+      "occurrence_id": "2026-10-11"
+     }
+    ]
+   }
+  },
+  {
+   "ban_id": "ceu-dgt-exceptional-holiday-2026",
+   "profile": "ceu-dgt-exceptional",
+   "title": "Holidays (2 Sep Día de Ceuta, 12 Oct)",
+   "valid_from": "2026-09-02",
+   "valid_to": "2026-10-12",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-09-02",
+      "occurrence_id": "2026-09-02"
+     },
+     {
+      "date": "2026-10-12",
+      "occurrence_id": "2026-10-12"
+     }
+    ]
+   }
+  },
+  {
+   "ban_id": "mll-dgt-exceptional-sunday",
+   "profile": "mll-dgt-exceptional",
+   "title": "Complementary-authorisation vehicles: Sunday restriction",
+   "valid_from": "2026-01-01",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "weekly",
+    "start_time": "08:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "weekdays": [
+     0
+    ],
+    "excluded_dates": [
+     "2026-10-11"
+    ]
+   }
+  },
+  {
+   "ban_id": "mll-dgt-exceptional-consecutive-first-2026",
+   "profile": "mll-dgt-exceptional",
+   "title": "Consecutive holidays: first day (Sunday 11 Oct)",
+   "valid_from": "2026-10-11",
+   "valid_to": "2026-10-11",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "15:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-11",
+      "occurrence_id": "2026-10-11"
+     }
+    ]
+   }
+  },
+  {
+   "ban_id": "mll-dgt-exceptional-holiday-2026",
+   "profile": "mll-dgt-exceptional",
+   "title": "National holiday (12 Oct)",
+   "valid_from": "2026-10-12",
+   "valid_to": "2026-10-12",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-12",
+      "occurrence_id": "2026-10-12"
+     }
+    ]
+   }
   }
  ]
 }

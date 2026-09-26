@@ -5,12 +5,14 @@ import {canonicalDrivingBans as current, drivingBanCalendars, getDrivingBansSnap
 import {snapshot, toIcs, validateCanonical, validWeight, publicationWindow, SCOPE_CHECKS} from '../src/lib/driving-bans/core.mjs';
 // Regression cases against the maintained production dataset (2026-09-26 sweep).
 const SWEEP = new Date('2026-09-26T15:30:00Z');
-const at = (clock = SWEEP) => snapshot(structuredClone(current), coverage, clock);
+// snapshot() never mutates its input; memoize per clock to keep the suite fast.
+const memo = new Map();
+const at = (clock = SWEEP) => { const k = clock.toISOString(); if (!memo.has(k)) memo.set(k, snapshot(current, coverage, clock)); return memo.get(k); };
 const ev = (v, id) => v.events.filter(e => e.ban_id === id);
 const one = (v, id, date) => v.events.find(e => e.ban_id === id && e.date === date);
 const hours = e => (Date.parse(e.ends_at) - Date.parse(e.starts_at)) / 3600000;
 const uids = text => [...text.replace(/\r\n[ \t]/g, '').matchAll(/^UID:(.+)$/gm)].map(m => m[1].trim());
-const TZ = {AT:'Europe/Vienna', LI:'Europe/Vaduz', LU:'Europe/Luxembourg', ME:'Europe/Podgorica', BG:'Europe/Sofia', ES:'Europe/Madrid', DE:'Europe/Berlin', FR:'Europe/Paris', IT:'Europe/Rome', CH:'Europe/Zurich', CZ:'Europe/Prague', SK:'Europe/Bratislava', PL:'Europe/Warsaw', HU:'Europe/Budapest', SI:'Europe/Ljubljana', HR:'Europe/Zagreb', PT:'Europe/Lisbon', GR:'Europe/Athens'};
+const TZ = {AT:'Europe/Vienna', LI:'Europe/Vaduz', LU:'Europe/Luxembourg', ME:'Europe/Podgorica', BG:'Europe/Sofia', ES:'Europe/Madrid', DE:'Europe/Berlin', FR:'Europe/Paris', IT:'Europe/Rome', CH:'Europe/Zurich', CZ:'Europe/Prague', SK:'Europe/Bratislava', PL:'Europe/Warsaw', HU:'Europe/Budapest', SI:'Europe/Ljubljana', HR:'Europe/Zagreb', PT:'Europe/Lisbon', GR:'Europe/Athens', CAT:'Europe/Madrid', BAS:'Europe/Madrid', GAL:'Europe/Madrid', CAN:'Atlantic/Canary', CEU:'Africa/Ceuta', MLL:'Africa/Ceuta'};
 
 export function registerProductionDrivingBanTests(test, a) {
   test('scope: 104 Coverage identities = 76 Driving Bans jurisdictions + 28 documented exclusions, none published', () => {
