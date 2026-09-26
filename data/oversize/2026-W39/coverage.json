@@ -1,6 +1,6 @@
 {
   "week": "2026-W39",
-  "checkedAt": "2026-09-25T10:58:46.072Z",
+  "checkedAt": "2026-09-26T10:39:46.464Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -269,7 +269,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 33
+      "candidateFindings": 43
     },
     {
       "code": "GR",
@@ -692,14 +692,17 @@
       "code": "TR",
       "name": "Türkiye (European transport scope)",
       "sourceScope": "TR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "tr-kgm"
       ],
-      "reachableSources": [
-        "tr-kgm"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "tr-kgm",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
