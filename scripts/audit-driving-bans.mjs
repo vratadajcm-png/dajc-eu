@@ -18,7 +18,10 @@ const count=key=>Object.fromEntries((key==='ban_state'?BAN_STATES:VERIFICATION_S
 const raw=readFileSync(new URL('../data/driving-bans/canonical.json',import.meta.url));
 const previous=option('--previous',null);
 const delta=previous?diffCanonical(hydrateCanonical(JSON.parse(readFileSync(previous,'utf8')),dajcEuropeCoverage),canonicalDrivingBans):[];
-const summary={dataset_version:view.dataset_version,generated_at:view.generated_at,window:view.window,tracked:view.jurisdictions.length,verification_state:count('verification_state'),ban_state:count('ban_state'),fully_verified:view.jurisdictions.filter(j=>j.coverage_complete).length,individual_primary_rules:canonicalDrivingBans.rules.filter(r=>r.verification_state==='PRIMARY_VERIFIED'&&r.status==='ACTIVE').length,whole_window_events:view.events.length,upcoming_events:view.upcoming_events.length,complete:view.complete,canonical_sha256:createHash('sha256').update(raw).digest('hex'),mode,selected_jurisdictions:selected,external_source_review_performed:false,note:'Technical validation is not a semantic legal verification or a successful 104/104 full sweep.',changes:delta};
+const lastSweep=view.jurisdictions.map(j=>j.last_checked).filter(Boolean).sort().at(-1)||null;
+const sweepAgeDays=lastSweep?(clock.getTime()-Date.parse(lastSweep))/86400000:Infinity;
+const byState=state=>view.jurisdictions.filter(j=>j.ban_state===state).map(j=>j.jurisdiction);
+const summary={dataset_version:view.dataset_version,reviewed_span:canonicalDrivingBans.window,active_window_reviewed:!view.jurisdictions.some(j=>j.coverage_failures.includes('ACTIVE_WINDOW_NOT_REVERIFIED')),last_sweep:lastSweep,sweep_age_days:Number.isFinite(sweepAgeDays)?Math.round(sweepAgeDays*10)/10:null,fully_verified_jurisdictions:view.jurisdictions.filter(j=>j.coverage_complete).map(j=>j.jurisdiction),has_ban:byState('HAS_BAN'),no_ban:byState('NO_BAN'),unknown:byState('UNKNOWN'),generated_at:view.generated_at,window:view.window,tracked:view.jurisdictions.length,verification_state:count('verification_state'),ban_state:count('ban_state'),fully_verified:view.jurisdictions.filter(j=>j.coverage_complete).length,individual_primary_rules:canonicalDrivingBans.rules.filter(r=>r.verification_state==='PRIMARY_VERIFIED'&&r.status==='ACTIVE').length,whole_window_events:view.events.length,upcoming_events:view.upcoming_events.length,complete:view.complete,canonical_sha256:createHash('sha256').update(raw).digest('hex'),mode,selected_jurisdictions:selected,external_source_review_performed:false,note:'Technical validation is not a semantic legal verification or a successful 104/104 full sweep.',changes:delta};
 const save=(file,value)=>writeFileSync(join(out,file),typeof value==='string'?value:JSON.stringify(value,null,2)+'\n');
 save('summary.json',summary);save('coverage.json',view.jurisdictions);save('snapshot.json',view);save('driving-bans.ics',toIcs(view));save('driving-bans-history.ics',toIcs(view,{upcoming:false}));
 const cell=v=>'"'+String(v??'').replaceAll('"','""')+'"';
@@ -27,3 +30,6 @@ const rows=view.jurisdictions.map(j=>[j.jurisdiction,j.name,j.period.from,j.peri
 save('coverage.csv','\uFEFF'+[headers,...rows].map(row=>row.map(cell).join(',')).join('\r\n')+'\r\n');
 console.log(JSON.stringify(summary,null,2));
 if(args.includes('--require-complete')&&!view.complete)process.exitCode=2;
+// Thursday gate: the reviewed span must contain the active window and the last sweep must be recent.
+const maxAge=option('--max-sweep-age-days',null);
+if(maxAge!==null&&(!summary.active_window_reviewed||!(sweepAgeDays<=Number(maxAge)))){console.error(`Driving Bans sweep is stale: active_window_reviewed=${summary.active_window_reviewed}, sweep_age_days=${summary.sweep_age_days}, limit=${maxAge}`);process.exitCode=3;}
