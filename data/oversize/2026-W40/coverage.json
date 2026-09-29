@@ -1,6 +1,6 @@
 {
   "week": "2026-W40",
-  "checkedAt": "2026-09-28T12:41:10.873Z",
+  "checkedAt": "2026-09-29T11:58:48.823Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -269,7 +269,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 5
+      "candidateFindings": 8
     },
     {
       "code": "GR",
