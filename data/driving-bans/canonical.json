@@ -122,14 +122,16 @@
         "de-rp-lowwater-oct2026",
         "de-rp-lowwater-aug2026",
         "de-berlin-brandenburg-lowwater-sep2026",
-        "trafficban-de-lowwater-oct2026"
+        "trafficban-de-lowwater-oct2026",
+        "de-rp-gst-aug2026"
       ],
       "coverage_failures": [
         "FULL_12_SCOPE_TWO_MONTH_REVIEW_INCOMPLETE",
+        "RP_GST_AND_44T_EASING_POST_SEP30_SCOPE_NOT_EXPLICITLY_RECONFIRMED",
         "NRW_SAARLAND_LOW_WATER_EXTENSION_STATUS_NOT_PRIMARY_VERIFIED",
         "OTHER_REGIONAL_EXCEPTION_AND_EXCEPTIONAL_TRANSPORT_SCOPE_NOT_FULLY_REVIEWED"
       ],
-      "notes": "Off-Thursday targeted re-verification triggered by an urgent published change to temporary low-water exemptions. Federal §30 StVO Sunday/holiday ban and selected Länder exception changes are primary-source verified; this is not a full Germany PRIMARY_VERIFIED decision."
+      "notes": "Off-Thursday targeted re-verification triggered by an urgent published change to temporary low-water exemptions. Federal §30 StVO Sunday/holiday ban and selected Länder exception changes are primary-source verified. Rheinland-Pfalz primary evidence confirms GST/<=44t easing through 30 Sep, but the 28 Sep extension to 31 Oct does not explicitly restate that GST-specific scope; therefore it remains fail-closed for October. This is not a full Germany PRIMARY_VERIFIED decision."
     }
   },
   "sources": [
@@ -394,6 +396,16 @@
       "checked_at": "2026-09-30T06:57:39.000Z",
       "retrieval_method": "secondary-content-review",
       "findings": "Cross-check reports Baden-Württemberg and Rhineland-Palatinate extended relevant exemptions through 31 October, while Berlin and Brandenburg end them after 30 September; primary post-30-September status for NRW/Saarland was not established in this targeted review."
+    },
+    {
+      "source_id": "de-rp-gst-aug2026",
+      "url": "https://lbm.rlp.de/service/presse-aktuelles/detail/wolf-weitere-erleichterungen-fuer-guetertransporte-wegen-niedrigwassers",
+      "authority": "Landesbetrieb Mobilität Rheinland-Pfalz / state transport authority",
+      "role": "PRIMARY",
+      "version": "Official notice 2026-08-14; exceptional-transport easing originally through 2026-09-30",
+      "checked_at": "2026-09-30T06:57:39.000Z",
+      "retrieval_method": "official-content-review",
+      "findings": "Rheinland-Pfalz expanded the low-water relief to Großraum- und Schwertransporte and allowed divisible cargo up to 44t in that context; the notice states the measures were initially time-limited through 30 September 2026."
     }
   ],
   "rule_profiles": {
@@ -857,7 +869,7 @@
       "exceptions": [
         "Federal §30(3) statutory exceptions include specified combined rail-road and port-road transport, listed fresh/perishable food categories, specified animal by-products, emergency recovery/towing, live bees, associated empty runs, Bundesleistungsgesetz journeys and qualifying military transport; verify exact applicability to the D-ID.",
         "Baden-Württemberg: through 31 October 2026, qualifying low-water replacement transport and necessary empty runs are exempt. The official extension includes Großraum- und Schwertransporte; the indivisibility requirement is waived when total transport weight does not exceed 44t. Separate heavy/oversize permits and route conditions remain mandatory.",
-        "Rhineland-Palatinate: through 31 October 2026, qualifying low-water/Rhine replacement transport and associated empty runs are exempt. The original state notice expressly excludes Großraum- und Schwertransporte; the 28 September extension does not state a scope expansion, so DAJC does not infer one.",
+        "Rhineland-Palatinate: qualifying low-water/Rhine replacement transport and associated empty runs are extended through 31 October 2026. A 14 August primary notice also included Großraum- und Schwertransporte and allowed divisible cargo up to 44t, but stated that easing was initially limited through 30 September. The 28 September extension does not explicitly restate the GST/44t scope, so DAJC does not infer that specific exceptional-transport easing continues into October.",
         "Berlin and Brandenburg: the official joint notice confirms the temporary low-water exception, including Großraum- und Schwertransporte, only through 30 September 2026. A post-30-September primary extension was not verified in this targeted check; do not assume continuation.",
         "North Rhine-Westphalia and Saarland: post-30-September low-water exception status was not established from a current primary source in this targeted check. Do not infer continuation or expiry solely from secondary reporting."
       ],
@@ -866,7 +878,7 @@
       ],
       "direction": "All directions subject to the federal rule unless a documented exception applies",
       "adr_relevance": "No blanket ADR exemption is inferred; check cargo-specific and route-specific requirements separately.",
-      "exceptional_relevance": "The federal Sunday/public-holiday rule is relevant to heavy/oversize goods movements in scope. Temporary Land exemptions differ: Baden-Württemberg explicitly includes Großraum-/Schwertransporte through 31 October; the original Rhineland-Palatinate exception excludes them; Berlin/Brandenburg inclusion is verified only through 30 September. Individual §29/§46 and route permits remain mandatory.",
+      "exceptional_relevance": "The federal Sunday/public-holiday rule is relevant to heavy/oversize goods movements in scope. Temporary Land exemptions differ: Baden-Württemberg explicitly includes Großraum-/Schwertransporte through 31 October and waives indivisibility up to 44t; Rheinland-Pfalz GST/44t easing is primary-verified through 30 September but not explicitly reconfirmed for October in the 28 September extension; Berlin/Brandenburg inclusion is verified only through 30 September. Individual §29/§46 and route permits remain mandatory.",
       "notes": "Federal ban is primary verified for the Sep-Oct publication window. Regional low-water exception coverage is targeted and incomplete; the Germany jurisdiction therefore remains UNVERIFIED overall.",
       "jurisdiction": "DE",
       "source_id": "de-stvo30",
@@ -876,7 +888,8 @@
         "de-rp-lowwater-oct2026",
         "de-rp-lowwater-aug2026",
         "de-berlin-brandenburg-lowwater-sep2026",
-        "trafficban-de-lowwater-oct2026"
+        "trafficban-de-lowwater-oct2026",
+        "de-rp-gst-aug2026"
       ],
       "timezone": "Europe/Berlin",
       "legal_basis": "Straßenverkehrs-Ordnung (StVO) §30(3)-(4)",
