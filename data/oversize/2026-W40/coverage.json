@@ -1,6 +1,6 @@
 {
   "week": "2026-W40",
-  "checkedAt": "2026-09-29T11:58:48.823Z",
+  "checkedAt": "2026-09-30T11:46:58.301Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -34,14 +34,17 @@
       "code": "AM",
       "name": "Armenia",
       "sourceScope": "AM",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "am-road-department"
       ],
-      "reachableSources": [
-        "am-road-department"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "am-road-department",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 2
     },
     {
@@ -269,7 +272,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 8
+      "candidateFindings": 13
     },
     {
       "code": "GR",
@@ -522,7 +525,7 @@
       "code": "NO",
       "name": "Norway",
       "sourceScope": "NO",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "configuredSources": [
         "no-vegvesen"
       ],
@@ -530,7 +533,7 @@
         "no-vegvesen"
       ],
       "unavailableSources": [],
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "PL",
@@ -730,7 +733,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 3
+      "candidateFindings": 6
     },
     {
       "code": "VA",
@@ -848,7 +851,7 @@
       "code": "SVALBARD",
       "name": "Svalbard",
       "sourceScope": "NO",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "configuredSources": [
         "no-vegvesen"
       ],
@@ -856,13 +859,13 @@
         "no-vegvesen"
       ],
       "unavailableSources": [],
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "JANMAYEN",
       "name": "Jan Mayen",
       "sourceScope": "NO",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "configuredSources": [
         "no-vegvesen"
       ],
@@ -870,7 +873,7 @@
         "no-vegvesen"
       ],
       "unavailableSources": [],
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "GL",
@@ -1300,7 +1303,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 3
+      "candidateFindings": 6
     },
     {
       "code": "SCT",
@@ -1316,7 +1319,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 3
+      "candidateFindings": 6
     },
     {
       "code": "WLS",
@@ -1332,7 +1335,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 3
+      "candidateFindings": 6
     },
     {
       "code": "NIR",
@@ -1348,7 +1351,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 3
+      "candidateFindings": 6
     },
     {
       "code": "FBIH",
