@@ -147,11 +147,35 @@ export function registerProductionDrivingBanTests(test, a) {
   test('two-month window shifts automatically; reviewed span keeps verification only while it contains the window', () => {
     a.deepEqual(publicationWindow(new Date('2026-09-30T22:30:00Z')), {from: '2026-10-01', to: '2026-11-30', timezone: 'Europe/Prague'});
     const oct = at(new Date('2026-10-01T08:00:00Z'));
-    a.ok(oct.jurisdictions.filter(j => j.coverage_complete).length >= 12);
+    a.equal(oct.jurisdictions.filter(j => j.coverage_complete).length, 11, 'DE downgraded by open Laender low-water scope (1 Oct 2026)');
     a.ok(oct.jurisdictions.every(j => !j.coverage_failures.includes('ACTIVE_WINDOW_NOT_REVERIFIED')));
     const nov = at(new Date('2026-11-01T08:00:00Z'));
     a.equal(nov.jurisdictions.filter(j => j.coverage_complete).length, 0);
     a.ok(nov.jurisdictions.every(j => j.ban_state !== 'NO_BAN' && j.coverage_failures.includes('ACTIVE_WINDOW_NOT_REVERIFIED')));
     a.ok(!nov.events.some(e => e.date > '2026-11-30'), 'no extrapolation beyond the reviewed span');
+  });
+  test('1 Oct 2026 rollover: Oct-Nov window stays verified (11 full, 0 NO_BAN), no ACTIVE_WINDOW_NOT_REVERIFIED', () => {
+    const v = at(new Date('2026-10-01T08:30:00Z'));
+    a.deepEqual(v.window, {from: '2026-10-01', to: '2026-11-30', timezone: 'Europe/Prague'});
+    a.equal(v.jurisdictions.length, 104);
+    a.equal(v.jurisdictions.filter(j => j.verification_state === 'PRIMARY_VERIFIED').length, 11);
+    a.equal(v.jurisdictions.filter(j => j.ban_state === 'NO_BAN').length, 0);
+    a.ok(v.jurisdictions.every(j => !j.coverage_failures.includes('ACTIVE_WINDOW_NOT_REVERIFIED')));
+  });
+  test('1 Oct 2026 — France: hydrocarbon derogation (NOR TRAT2625304A) is an exception, not a removed ban', () => {
+    const v = at(new Date('2026-10-01T08:30:00Z'));
+    const we = one(v, 'fr-weekend', '2026-10-03'); a.ok(we, 'weekend ban still published');
+    a.ok(we.exceptions.some(x => /TRAT2625304A/.test(x) && /12 October 2026 10:00/.test(x)));
+    a.ok(one(v, 'fr-idf-in-monday', '2026-10-05').exceptions.some(x => /TRAT2625304A/.test(x)));
+    a.ok(current.sources.some(s => s.source_id === 'fr-arrete-hydrocarbures-20260924' && s.role === 'PRIMARY'));
+    a.equal(v.jurisdictions.find(j => j.jurisdiction === 'FR').coverage_complete, true);
+  });
+  test('1 Oct 2026 — Germany: federal ban kept, Laender low-water scope keeps DE fail-closed (not fully verified)', () => {
+    const v = at(new Date('2026-10-01T08:30:00Z'));
+    const de = v.jurisdictions.find(j => j.jurisdiction === 'DE');
+    a.equal(de.ban_state, 'HAS_BAN'); a.equal(de.verification_state, 'UNVERIFIED'); a.equal(de.coverage_complete, false);
+    a.ok(de.coverage_failures.includes('SAARLAND_LOW_WATER_EXTENSION_STATUS_NOT_PRIMARY_VERIFIED'));
+    a.ok(one(v, 'de-sunday', '2026-10-04') && one(v, 'de-holiday-2026-10-03', '2026-10-03'));
+    a.ok(one(v, 'de-sunday', '2026-10-04').exceptions.some(x => /North Rhine-Westphalia/.test(x)));
   });
 }

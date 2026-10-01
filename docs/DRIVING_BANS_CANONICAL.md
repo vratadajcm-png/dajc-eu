@@ -26,6 +26,14 @@ Corrected errors: AT 26 October holiday missing and Tyrol A12 IG-L night ban mis
 
 Open items are listed per jurisdiction in `coverage_failures` (e.g. AT Laender secondary-road orders, ES Annex V exceptional/ADR events, GR permanent 2017 network decision, BG ad-hoc orders, RO CNAIR texts, CAT/BAS own resolutions, French overseas application). `regional` scope means statutory national/regional calendars; individually signposted local restrictions are not enumerated and are stated as such.
 
+## Delta of 1 October 2026 (dataset 2026-10-01.r3-fr-de-delta)
+
+Rollover to the 1 October-30 November window; the 26 September reviewed span (1 Sep-30 Nov) still contains it. Stored reviews: 11 PRIMARY_VERIFIED / 93 UNVERIFIED; 18 HAS_BAN / 0 NO_BAN / 86 UNKNOWN. In the active window BG has no verified event (its reviewed bans were 18 and 22 September), so the runtime shows 17 HAS_BAN / 87 UNKNOWN.
+
+FR: Arrêté du 24 septembre 2026 (NOR TRAT2625304A, JORF 25 September) lifts the bans of articles 1-3 of the 16 April 2021 arrêté, incl. Île-de-France, until 12 October 2026 10:00 only for >7.5t vehicles supplying hydrocarbon products to service stations and their empty return. Encoded as an exception; ban events are unchanged and FR stays fully verified.
+
+DE: temporary Länder low-water exemptions (targeted review 30 September, NRW rechecked 1 October): BW, RP and NRW through 31 October; BE/BB ended 30 September; RP GST/44t easing not restated after 30 September; Saarland only secondarily reported. Federal §30 StVO events stay published; DE is downgraded from full PRIMARY_VERIFIED with explicit `coverage_failures`.
+
 ## Thursday operation and urgent exceptions
 
 The existing DAJC Daily Intelligence automation owns the semantic review. Its HGV branch is Thursday-only, Europe/Prague; other daily DAJC topics are unchanged. Each Thursday it must read all 104 identities, determine the full two-month window, review current primary legislation/amendments and relevant secondary sources, update canonical reviews/rules with evidence, compare old/new states, run all quality gates, publish only supported changes and verify deployment. Outside Thursday only a sourced urgent recheck of one already-published jurisdiction/rule is allowed.

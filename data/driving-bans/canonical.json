@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "dataset_version": "2026-09-26.r2-sweep",
+ "dataset_version": "2026-10-01.r3-fr-de-delta",
  "window": {
   "from": "2026-09-01",
   "to": "2026-11-30"
@@ -612,17 +612,29 @@
    "notes": "Corrected in this sweep: previous data held only 14 October rows; the full Annex II tables (6 Sep, 8-12 Oct, 30 Oct-2 Nov, 27-29 Nov) are now encoded and the 14 legacy rows are SUPERSEDED."
   },
   "DE": {
-   "verification_state": "PRIMARY_VERIFIED",
+   "verification_state": "UNVERIFIED",
    "ban_state": "HAS_BAN",
-   "coverage_complete": true,
-   "last_checked": "2026-09-26T15:25:00.000Z",
-   "last_verified": "2026-09-26T15:25:00.000Z",
+   "coverage_complete": false,
+   "last_checked": "2026-10-01T08:30:00.000Z",
+   "last_verified": null,
    "source_ids": [
     "de-stvo30",
-    "de-ferienreisev"
+    "de-ferienreisev",
+    "de-bw-lowwater-oct2026",
+    "de-rp-lowwater-oct2026",
+    "de-rp-lowwater-aug2026",
+    "de-rp-gst-aug2026",
+    "de-berlin-brandenburg-lowwater-sep2026",
+    "de-nrw-lowwater-oct2026",
+    "trafficban-de-lowwater-oct2026",
+    "saarnews-sl-lowwater-oct2026"
    ],
    "no_ban_evidence": [],
-   "coverage_failures": [],
+   "coverage_failures": [
+    "RP_GST_AND_44T_EASING_POST_SEP30_SCOPE_NOT_EXPLICITLY_RECONFIRMED",
+    "SAARLAND_LOW_WATER_EXTENSION_STATUS_NOT_PRIMARY_VERIFIED",
+    "OTHER_LAENDER_LOW_WATER_EXCEPTION_AND_EXCEPTIONAL_TRANSPORT_SCOPE_NOT_FULLY_REVIEWED"
+   ],
    "scope_checks": {
     "weekend": {
      "state": "PRIMARY_VERIFIED",
@@ -661,11 +673,14 @@
      "note": "No winter calendar; summer regime ended 31 Aug."
     },
     "regional": {
-     "state": "PRIMARY_VERIFIED",
+     "state": "UNVERIFIED",
      "evidence_ids": [
-      "de-stvo30"
+      "de-stvo30",
+      "de-bw-lowwater-oct2026",
+      "de-rp-lowwater-oct2026",
+      "de-nrw-lowwater-oct2026"
      ],
-     "note": "Laender-specific holidays in §30(4) encoded. Scope = statutory national/regional calendars. Individually signposted local restrictions (municipal/road-sign bans) are not enumerated by DAJC and must be checked on route."
+     "note": "Temporary Länder low-water exemptions (Sep/Oct 2026) only partly primary-verified: BW, RP, NRW through 31 Oct and BE/BB ended 30 Sep are verified; Saarland and other Länder, and RP GST/44t scope after 30 Sep, are open."
     },
     "corridors": {
      "state": "PRIMARY_VERIFIED",
@@ -703,25 +718,29 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     },
     "exceptional": {
-     "state": "PRIMARY_VERIFIED",
+     "state": "UNVERIFIED",
      "evidence_ids": [
-      "de-stvo30"
+      "de-stvo30",
+      "de-bw-lowwater-oct2026",
+      "de-rp-lowwater-oct2026",
+      "de-nrw-lowwater-oct2026"
      ],
-     "note": "Sunday/holiday ban applies; §29(3) permits set route/time conditions individually."
+     "note": "Temporary Länder low-water exemptions (Sep/Oct 2026) only partly primary-verified: BW, RP, NRW through 31 Oct and BE/BB ended 30 Sep are verified; Saarland and other Länder, and RP GST/44t scope after 30 Sep, are open."
     }
    },
-   "notes": ""
+   "notes": "Federal §30 StVO Sunday/holiday ban remains primary verified and published. Germany is downgraded from full PRIMARY_VERIFIED because temporary Länder low-water exemptions (targeted review 30 Sep, NRW rechecked 1 Oct 2026) are not fully verified. Exemptions do not remove the ban for other traffic."
   },
   "FR": {
    "verification_state": "PRIMARY_VERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": true,
-   "last_checked": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-01T08:30:00.000Z",
    "last_verified": "2026-09-26T15:25:00.000Z",
    "source_ids": [
     "fr-arrete-2021",
     "fr-arrete-2026",
-    "fr-bison-fute"
+    "fr-bison-fute",
+    "fr-arrete-hydrocarbures-20260924"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [],
@@ -806,9 +825,10 @@
     "exceptional": {
      "state": "PRIMARY_VERIFIED",
      "evidence_ids": [
-      "fr-arrete-2021"
+      "fr-arrete-2021",
+      "fr-arrete-hydrocarbures-20260924"
      ],
-     "note": "Convois exceptionnels: additionally prohibited from Saturday/eve 12:00 to Monday/day-after 06:00 (Bison Futé; permit conditions prevail). Not encoded as separate events."
+     "note": "Convois exceptionnels: additionally prohibited from Saturday/eve 12:00 to Monday/day-after 06:00 (Bison Futé; permit conditions prevail). Not encoded as separate events. Temporary hydrocarbon-delivery derogation until 12 Oct 2026 10:00 (NOR TRAT2625304A) encoded as an exception; ban events unchanged."
     }
    },
    "notes": "Metropolitan France. Overseas departments are separate DAJC jurisdictions."
@@ -8842,6 +8862,96 @@
    "checked_at": "2026-09-26T15:25:00.000Z",
    "retrieval_method": "search-index listing only",
    "findings": "Evidence that CNAIR issues ad-hoc >7.5t restrictions (heat/holidays); not a primary legal text."
+  },
+  {
+   "source_id": "de-bw-lowwater-oct2026",
+   "url": "https://vm.baden-wuerttemberg.de/de/service/presse/pressemitteilung/pid/baden-wuerttemberg-verlaengert-erleichterungen-fuer-lkw-transporte",
+   "authority": "Ministry of Transport Baden-Württemberg",
+   "role": "PRIMARY",
+   "version": "Official notice 2026-09-28; extension through 2026-10-31",
+   "checked_at": "2026-09-30T06:57:39.000Z",
+   "retrieval_method": "official-content-review",
+   "findings": "Low-water replacement-transport exception extended through end of October; includes necessary empty runs and Großraum-/Schwertransporte. Indivisibility requirement is waived where total transport weight does not exceed 44t; separate heavy/oversize authorisations remain required."
+  },
+  {
+   "source_id": "de-rp-lowwater-oct2026",
+   "url": "https://mdi.rlp.de/service/pressemitteilungen/detail/rheinland-pfalz-verlaengert-aussetzung-des-sonn-und-feiertagsverbots-fuer-lkw-transporte",
+   "authority": "Rhineland-Palatinate Ministry of the Interior and Sport",
+   "role": "PRIMARY",
+   "version": "Official notice 2026-09-28; extension through 2026-10-31",
+   "checked_at": "2026-09-30T06:57:39.000Z",
+   "retrieval_method": "official-content-review",
+   "findings": "Low-water/Rhine replacement-transport exception and associated empty runs extended through 31 October 2026."
+  },
+  {
+   "source_id": "de-rp-lowwater-aug2026",
+   "url": "https://lbm.rlp.de/service/presse-aktuelles/detail/wolf-schaffen-kurzfristig-zusaetzliche-transportmoeglichkeiten",
+   "authority": "Landesbetrieb Mobilität Rheinland-Pfalz / state transport authority",
+   "role": "PRIMARY",
+   "version": "Official notice 2026-08-07; original exception scope through 2026-09-30",
+   "checked_at": "2026-09-30T06:57:39.000Z",
+   "retrieval_method": "official-content-review",
+   "findings": "Original low-water exception covers qualifying replacement transport and associated empty runs; Großraum- und Schwertransporte are expressly excluded. The 28 Sep extension does not state an expansion of that exceptional-transport scope, so DAJC does not infer one."
+  },
+  {
+   "source_id": "de-berlin-brandenburg-lowwater-sep2026",
+   "url": "https://viz.berlin.de/aktuelle-meldungen/berlin-und-brandenburg-erleichtern-gutertransporte-wegen-niedrigwassers/",
+   "authority": "Berlin Verkehrsinformationszentrale / official Berlin traffic information",
+   "role": "PRIMARY",
+   "version": "Joint Berlin/Brandenburg official notice; exception valid through 2026-09-30",
+   "checked_at": "2026-09-30T06:57:39.000Z",
+   "retrieval_method": "official-content-review",
+   "findings": "Low-water exceptions from Sunday/public-holiday and summer Saturday restrictions were extended through and including 30 September 2026; the scope was expanded to include Großraum- und Schwertransporte."
+  },
+  {
+   "source_id": "trafficban-de-lowwater-oct2026",
+   "url": "https://www.trafficban.com/news.3226.en.html",
+   "authority": "TrafficBan",
+   "role": "SECONDARY",
+   "version": "2026-09-29 secondary cross-check",
+   "checked_at": "2026-09-30T06:57:39.000Z",
+   "retrieval_method": "secondary-content-review",
+   "findings": "Cross-check reports Baden-Württemberg and Rhineland-Palatinate extended relevant exemptions through 31 October, while Berlin and Brandenburg end them after 30 September; primary post-30-September status for NRW/Saarland was not established in this targeted review."
+  },
+  {
+   "source_id": "de-rp-gst-aug2026",
+   "url": "https://lbm.rlp.de/service/presse-aktuelles/detail/wolf-weitere-erleichterungen-fuer-guetertransporte-wegen-niedrigwassers",
+   "authority": "Landesbetrieb Mobilität Rheinland-Pfalz / state transport authority",
+   "role": "PRIMARY",
+   "version": "Official notice 2026-08-14; exceptional-transport easing originally through 2026-09-30",
+   "checked_at": "2026-09-30T06:57:39.000Z",
+   "retrieval_method": "official-content-review",
+   "findings": "Rheinland-Pfalz expanded the low-water relief to Großraum- und Schwertransporte and allowed divisible cargo up to 44t in that context; the notice states the measures were initially time-limited through 30 September 2026."
+  },
+  {
+   "source_id": "de-nrw-lowwater-oct2026",
+   "url": "https://www.umwelt.nrw.de/themen/verkehr/strasse/strassenverkehr/gueterverkehr",
+   "authority": "Ministerium für Umwelt, Naturschutz und Verkehr Nordrhein-Westfalen",
+   "role": "PRIMARY",
+   "version": "Official notice 2026-09-28; extension through 2026-10-31",
+   "checked_at": "2026-10-01T08:30:00.000Z",
+   "retrieval_method": "official-content-review",
+   "findings": "\"Das Ministerium für Umwelt, Naturschutz und Verkehr des Landes Nordrhein-Westfalen verlängert die Ausnahmen vom Sonn- und Feiertagsfahrverbot bis zum 31. Oktober 2026.\" Low-water-related transports and associated empty runs. The notice does not state an inclusion of Großraum-/Schwertransporte; DAJC does not infer one."
+  },
+  {
+   "source_id": "saarnews-sl-lowwater-oct2026",
+   "url": "https://www.saarnews.com/feature/saarland-verlaengert-lkw-ausnahme-wegen-niedrigwasser-am-rhein/",
+   "authority": "saarnews (regional media)",
+   "role": "SECONDARY",
+   "version": "2026-09-28 secondary report",
+   "checked_at": "2026-10-01T08:30:00.000Z",
+   "retrieval_method": "secondary-content-review",
+   "findings": "Reports that Saarland issued a new low-water exception on 28 September 2026, replacing the 17 August permission, valid through 31 October 2026. Primary Saarland text was not retrieved; not treated as primary evidence."
+  },
+  {
+   "source_id": "fr-arrete-hydrocarbures-20260924",
+   "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054894720",
+   "authority": "Légifrance / Journal officiel",
+   "role": "PRIMARY",
+   "version": "Arrêté du 24 septembre 2026, NOR TRAT2625304A, JORF 25 septembre 2026",
+   "checked_at": "2026-10-01T08:30:00.000Z",
+   "retrieval_method": "official-content-review",
+   "findings": "Art. 1: the circulation bans of the arrêté of 16 April 2021 (articles 1, 2 and 3, incl. Île-de-France) for goods vehicles >7.5t are lifted, until Monday 12 October 2026 10:00, exclusively for vehicles carrying hydrocarbon products serving service stations; empty return is authorised nationwide. Art. 2: supporting documents must be on board or immediately accessible if digital."
   }
  ],
  "rule_profiles": {
@@ -9339,13 +9449,13 @@
   },
   "de-sunday": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-01T08:30:00.000Z",
    "review_window": {
     "from": "2026-09-01",
     "to": "2026-11-30"
    },
    "status": "ACTIVE",
-   "sequence": 0,
+   "sequence": 1,
    "restriction_types": [
     "general",
     "exceptional"
@@ -9353,13 +9463,19 @@
    "supersedes": [],
    "regions": [],
    "adr_relevance": "No ADR-specific rule is encoded here; check the national ADR regime separately.",
-   "exceptional_relevance": "Also applies to exceptional/oversize goods vehicles within the stated category; permit conditions remain mandatory.",
+   "exceptional_relevance": "Also applies to exceptional/oversize goods vehicles within the stated category; permit conditions remain mandatory. Temporary Land low-water exemptions differ: Baden-Württemberg explicitly includes Großraum-/Schwertransporte through 31 October and waives indivisibility up to 44t; Rheinland-Pfalz GST/44t easing is verified only through 30 September; Berlin/Brandenburg ended 30 September. Individual §29/§46 permits remain mandatory.",
    "jurisdiction": "DE",
    "timezone": "Europe/Berlin",
    "source_id": "de-stvo30",
    "evidence_ids": [
     "de-stvo30",
-    "de-ferienreisev"
+    "de-ferienreisev",
+    "de-bw-lowwater-oct2026",
+    "de-rp-lowwater-oct2026",
+    "de-rp-lowwater-aug2026",
+    "de-rp-gst-aug2026",
+    "de-berlin-brandenburg-lowwater-sep2026",
+    "de-nrw-lowwater-oct2026"
    ],
    "legal_basis": "StVO §30(3)-(4)",
    "vehicle_scope": "Trucks (Lkw) with MAM >7.5t and trailers behind trucks, for commercial goods carriage incl. related empty runs.",
@@ -9383,18 +9499,23 @@
    "direction": "Both directions",
    "exceptions": [
     "§30(3): combined rail-road transport up to 200 km and port-road transport within 150 km; fresh milk/dairy, fresh meat, fresh fish, perishable fruit/vegetables; animal by-products cat. 1/2; recovery/towing in emergencies; live bees; related empty runs; Bundesleistungsgesetz, Bundeswehr and allied forces journeys.",
-    "Further exemptions only by permit of the Land authority (§46 StVO)."
+    "Further exemptions only by permit of the Land authority (§46 StVO).",
+    "Baden-Württemberg: through 31 October 2026, qualifying low-water replacement transport and necessary empty runs are exempt. The official extension includes Großraum- und Schwertransporte; the indivisibility requirement is waived when total transport weight does not exceed 44t. Separate heavy/oversize permits and route conditions remain mandatory.",
+    "Rhineland-Palatinate: qualifying low-water/Rhine replacement transport and associated empty runs are extended through 31 October 2026. The 14 August GST/44t easing was limited to 30 September and is not explicitly restated by the 28 September extension, so DAJC does not infer it for October.",
+    "North Rhine-Westphalia: the low-water exception from the Sunday/holiday ban is extended through 31 October 2026 (official notice 28 September 2026); no Großraum-/Schwertransport inclusion is stated.",
+    "Berlin and Brandenburg: the joint low-water exception (incl. Großraum- und Schwertransporte) was confirmed only through 30 September 2026; continuation is not assumed.",
+    "Saarland: a 28 September extension through 31 October 2026 is reported by secondary sources only; primary text not yet verified — do not rely on it without the Land order."
    ]
   },
   "fr-general": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-01T08:30:00.000Z",
    "review_window": {
     "from": "2026-09-01",
     "to": "2026-11-30"
    },
    "status": "ACTIVE",
-   "sequence": 0,
+   "sequence": 1,
    "restriction_types": [
     "general",
     "exceptional"
@@ -9408,7 +9529,8 @@
    "source_id": "fr-arrete-2021",
    "evidence_ids": [
     "fr-arrete-2021",
-    "fr-arrete-2026"
+    "fr-arrete-2026",
+    "fr-arrete-hydrocarbures-20260924"
    ],
    "legal_basis": "Arrêté du 16 avril 2021, art. 1",
    "vehicle_scope": "Goods vehicles/combinations >7.5t GVW (specialised and agricultural vehicles of annex II excluded).",
@@ -9424,18 +9546,19 @@
    "direction": "Both directions",
    "exceptions": [
     "Art.4: livestock/perishables (>= half load), harvest collection, event/fair/market vehicles, press, removals of offices/factories, air freight under AWB, and other listed categories; prefectoral temporary derogations (Art.5).",
-    "Art.4 exemptions do NOT apply to the Ile-de-France Art.3 restrictions."
+    "Art.4 exemptions do NOT apply to the Ile-de-France Art.3 restrictions.",
+    "Temporary national derogation (Arrêté du 24 septembre 2026, NOR TRAT2625304A): until Monday 12 October 2026 10:00 the bans of articles 1-3 of the 16 April 2021 arrêté (incl. Île-de-France) do not apply to goods vehicles >7.5t carrying hydrocarbon products to service stations, nor to their empty return; transport documents must be on board or immediately accessible. All other traffic remains banned."
    ]
   },
   "fr-idf": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-01T08:30:00.000Z",
    "review_window": {
     "from": "2026-09-01",
     "to": "2026-11-30"
    },
    "status": "ACTIVE",
-   "sequence": 0,
+   "sequence": 1,
    "restriction_types": [
     "general",
     "exceptional"
@@ -9450,7 +9573,8 @@
    "timezone": "Europe/Paris",
    "source_id": "fr-arrete-2021",
    "evidence_ids": [
-    "fr-arrete-2021"
+    "fr-arrete-2021",
+    "fr-arrete-hydrocarbures-20260924"
    ],
    "legal_basis": "Arrêté du 16 avril 2021, art. 3",
    "vehicle_scope": "Goods vehicles/combinations >7.5t GVW (specialised and agricultural vehicles of annex II excluded).",
@@ -9470,7 +9594,8 @@
    ],
    "direction": "Both directions",
    "exceptions": [
-    "No Art.4 exemptions apply to Art.3 (no derogation)."
+    "No Art.4 exemptions apply to Art.3.",
+    "Temporary national derogation (Arrêté du 24 septembre 2026, NOR TRAT2625304A): until Monday 12 October 2026 10:00 the bans of articles 1-3 of the 16 April 2021 arrêté (incl. Île-de-France) do not apply to goods vehicles >7.5t carrying hydrocarbon products to service stations, nor to their empty return; transport documents must be on board or immediately accessible. All other traffic remains banned."
    ]
   },
   "it-calendar": {
