@@ -28,7 +28,13 @@ function localParts(ms, timezone) {
   return `${values.year}-${values.month}-${values.day}T${values.hour}:${values.minute}:${values.second}`;
 }
 /** Reject nonexistent/ambiguous local times unless the evidence specifies a fold. */
+const utcCache = new Map();
 export function localToUtc(date, time, timezone, disambiguation = 'reject') {
+  const key = `${date}|${time}|${timezone}|${disambiguation}`;
+  if (!utcCache.has(key)) utcCache.set(key, resolveLocal(date, time, timezone, disambiguation));
+  return utcCache.get(key);
+}
+function resolveLocal(date, time, timezone, disambiguation) {
   assert(isDate(date) && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(time), 'Invalid local date/time');
   assert(validTimezone(timezone), `Invalid timezone ${timezone}`);
   const target = `${date}T${time}:00`;
@@ -47,8 +53,13 @@ export function localToUtc(date, time, timezone, disambiguation = 'reject') {
 }
 const validUrl = value => { try { const u = new URL(value); return u.protocol === 'https:' && !!u.hostname && !/[\r\n]/.test(value); } catch { return false; } };
 const validInstant = value => typeof value === 'string' && /T.*Z$/.test(value) && Number.isFinite(Date.parse(value));
-const validWeight = w => w && (Array.isArray(w.any_of) ? w.any_of.length > 0 && w.any_of.every(validWeight) : ['>','>=','<','<=','='].includes(w.operator) && Number.isFinite(w.value) && w.value > 0 && w.unit === 'kg' && typeof w.applies_to === 'string');
-const includesWindow = (a, b) => isDate(a?.from) && isDate(a?.to) && a.from <= b.from && a.to >= b.to;
+/** Exact legal applicability: any_of / all_of groups; numeric leaves in kg, m or axles; `any` marks a category with no mass threshold. Never invent a number. */
+export const validWeight = w => !!w && typeof w === 'object' && (Array.isArray(w.any_of) || Array.isArray(w.all_of)
+  ? (w.any_of || w.all_of).length > 0 && (w.any_of || w.all_of).every(validWeight) && !(w.any_of && w.all_of)
+  : typeof w.applies_to === 'string' && w.applies_to.length > 0 && (w.operator === 'any'
+    ? w.value === undefined
+    : ['>','>=','<','<=','='].includes(w.operator) && Number.isFinite(w.value) && w.value > 0 && ['kg','m','axles'].includes(w.unit)));
+export const includesWindow = (a, b) => isDate(a?.from) && isDate(a?.to) && a.from <= b.from && a.to >= b.to;
 /** Missing reviews explicitly materialize as UNKNOWN/UNVERIFIED, never NO_BAN. */
 export function hydrateCanonical(raw, identities) {
   const reviews = raw.jurisdiction_reviews || {};
@@ -167,7 +178,8 @@ export function snapshot(data, identities, now = new Date()) {
   validateCanonical(data, identities);
   const window = publicationWindow(now);
   const events = expandRules(data, window);
-  const staleWindow = window.from !== data.window.from || window.to !== data.window.to;
+  // The reviewed span may exceed the active window (e.g. reviewed Sep-Nov covers Sep-Oct and, after rollover, Oct-Nov); it must fully contain it.
+  const staleWindow = !includesWindow(data.window, window);
   const jurisdictions = data.jurisdictions.map(row => {
     const rules = events.filter(e => e.jurisdiction === row.jurisdiction);
     const canKeepNoBan = !staleWindow && row.ban_state === 'NO_BAN' && row.verification_state === 'PRIMARY_VERIFIED';

@@ -11,6 +11,9 @@ const title = label('European HGV Driving Bans', 'Evropské zákazy jízd nákla
 const format = (value: string | null) => value ? new Intl.DateTimeFormat(cs ? 'cs-CZ' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Prague' }).format(new Date(value)) : label('Not completed', 'Nedokončeno');
 const count = (state: string) => view.jurisdictions.filter(j => j.ban_state === state).length;
 const eventsByCountry = new Map<string, typeof view.events>(view.jurisdictions.map(j => [j.jurisdiction, view.events.filter(e => e.jurisdiction === j.jurisdiction)]));
+type Weight = { any_of?: Weight[]; all_of?: Weight[]; operator?: string; value?: number; unit?: string; applies_to?: string };
+const weightText = (w: Weight): string => w.any_of ? w.any_of.map(weightText).join(label(' OR ', ' NEBO ')) : w.all_of ? w.all_of.map(weightText).join(label(' AND ', ' A ')) : w.operator === 'any' ? `${w.applies_to} (${label('any mass', 'bez hmotnostní hranice')})` : `${w.applies_to} ${w.operator} ${w.unit === 'kg' ? `${(w.value ?? 0) / 1000} t` : `${w.value} ${w.unit}`}`;
+const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO_BAN' ? label('No driving bans', 'Bez zákazu') : j.ban_state === 'HAS_BAN' ? label(`${j.event_count} verified events in this period`, `${j.event_count} ověřených událostí v období`) + (j.coverage_complete ? '' : label(' · review incomplete', ' · ověření neúplné')) : label('Verification in progress', 'Ověření probíhá');
 ---
 <BaseLayout title={title} description="Verified HGV restrictions and explicit verification status for all 104 DAJC jurisdictions. Current and next calendar month.">
   <section class="bans-page" data-window={view.window.from}>
@@ -40,17 +43,19 @@ const eventsByCountry = new Map<string, typeof view.events>(view.jurisdictions.m
     </form>
     <div id="jurisdictions">
       {view.jurisdictions.map(j => <details class="jurisdiction" data-code={j.jurisdiction} data-name={j.name.toLowerCase()} data-ban-state={j.ban_state} data-verification-state={j.verification_state}>
-        <summary><strong>{j.name}</strong> <span class="code">{j.jurisdiction}</span> <span class="status">{j.ban_state === 'NO_BAN' ? label('No driving bans', 'Bez zákazu') : j.ban_state === 'HAS_BAN' ? label(`${j.event_count} verified events in this period`, `${j.event_count} ověřených událostí v období`) : label('Verification pending', 'Dosud neověřeno')}</span></summary>
+        <summary><strong>{j.name}</strong> <span class="code">{j.jurisdiction}</span> <span class="status">{statusText(j)}</span></summary>
         <div class="country-body">
           <p>{label('Period', 'Období')}: {j.period.from} — {j.period.to}. <strong>{j.verification_state}</strong></p>
           <p>{label('Last checked', 'Poslední kontrola')}: {format(j.last_checked)} · {label('Full-period verification', 'Ověření celého období')}: {format(j.last_verified)}</p>
           {!j.coverage_complete && <p class="notice">{label('Full jurisdiction verification is incomplete. Additional restrictions may exist; do not interpret missing events as “no ban”.', 'Ověření celé jurisdikce není dokončeno. Mohou existovat další omezení; chybějící události neznamenají „Bez zákazu“.')}</p>}
-          {j.ban_state === 'NO_BAN' && <p><strong>{label('No driving bans', 'Bez zákazu')}</strong> — {j.period.from} — {j.period.to}</p>}
+          {j.coverage_failures.length > 0 && <p class="small">{label('Open review items', 'Otevřené body ověření')}: {j.coverage_failures.join(', ')}</p>}
+          {j.notes && <p class="small">{j.notes}</p>}
+          {j.ban_state === 'NO_BAN' && <p><strong>{label('No driving bans', 'Bez zákazu')}</strong> — {j.period.from} — {j.period.to} · {label('verified', 'ověřeno')} {format(j.last_verified)}</p>}
           <p class="sources">{j.source_ids.map(id => { const source = view.sources.find(s => s.source_id === id); return source && <a href={source.url} target="_blank" rel="noopener noreferrer">{source.authority}</a>; })}</p>
           <div class="events">{(eventsByCountry.get(j.jurisdiction) || []).map(e => <article class="ban-event" data-ends={e.ends_at} data-types={e.restriction_types.join(',')} data-uid={e.uid}>
             <h3>{e.title}</h3>
             <p><strong>{e.date} {e.start_time} — {e.end_date} {e.end_time}</strong> ({e.timezone})</p>
-            <p>{e.vehicle_scope}</p><p>{e.roads.join('; ')} · {e.regions.join('; ')} · {e.direction}</p>
+            <p>{e.vehicle_scope}</p><p><strong>{label('Applicability', 'Hmotnostní/technická kritéria')}:</strong> {weightText(e.weight_threshold)}</p><p>{e.roads.join('; ')} · {e.regions.join('; ')} · {e.direction}</p>
             <p><strong>{label('Exceptions', 'Výjimky')}:</strong> {e.exceptions.join(' ')}</p>
             <p><strong>ADR:</strong> {e.adr_relevance}</p><p><strong>Exceptional / oversize:</strong> {e.exceptional_relevance}</p>
             <p>{e.notes}</p>
