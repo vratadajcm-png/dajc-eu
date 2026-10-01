@@ -1,6 +1,6 @@
 {
   "week": "2026-W40",
-  "checkedAt": "2026-09-30T11:46:58.301Z",
+  "checkedAt": "2026-10-01T10:12:02.793Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -34,17 +34,14 @@
       "code": "AM",
       "name": "Armenia",
       "sourceScope": "AM",
-      "status": "checked-source-availability-limited",
+      "status": "checked-major-or-short-update-candidates-found",
       "configuredSources": [
         "am-road-department"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "am-road-department",
-          "error": "fetch failed"
-        }
+      "reachableSources": [
+        "am-road-department"
       ],
+      "unavailableSources": [],
       "candidateFindings": 2
     },
     {
@@ -272,7 +269,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 13
+      "candidateFindings": 20
     },
     {
       "code": "GR",
@@ -533,7 +530,7 @@
         "no-vegvesen"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "PL",
@@ -859,7 +856,7 @@
         "no-vegvesen"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "JANMAYEN",
@@ -873,7 +870,7 @@
         "no-vegvesen"
       ],
       "unavailableSources": [],
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "GL",
