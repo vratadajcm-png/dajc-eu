@@ -1,6 +1,6 @@
 {
   "week": "2026-W40",
-  "checkedAt": "2026-10-01T10:12:02.793Z",
+  "checkedAt": "2026-10-01T12:16:12.772Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -269,7 +269,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 20
+      "candidateFindings": 22
     },
     {
       "code": "GR",
@@ -650,14 +650,17 @@
       "code": "ES",
       "name": "Spain",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -924,28 +927,34 @@
       "code": "CEU",
       "name": "Ceuta",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "MLL",
       "name": "Melilla",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -980,14 +989,17 @@
       "code": "CAN",
       "name": "Canary Islands",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -1444,42 +1456,51 @@
       "code": "CAT",
       "name": "Catalonia",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "BAS",
       "name": "Basque Country",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "GAL",
       "name": "Galicia",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [
-        "es-dgt"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "es-dgt",
+          "error": "timeout"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
