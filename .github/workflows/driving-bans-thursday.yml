@@ -1,0 +1,57 @@
+name: Driving Bans Thursday gate
+
+# Thursday-only 104/104 technical gate for the canonical Driving Bans dataset.
+# The semantic legal re-verification is performed by the scheduled DAJC HGV
+# sweep (see docs/DRIVING_BANS_CANONICAL.md), which updates
+# data/driving-bans/canonical.json. This workflow never fetches or interprets
+# law; it fails when the reviewed span no longer contains the active
+# current+next calendar month, or when the last sweep is older than 8 days, so
+# a missed Thursday sweep is visible instead of silently decaying to UNKNOWN.
+
+on:
+  schedule:
+    # Thursday 09:17 UTC (10:17 CET / 11:17 CEST), after the sweep window.
+    - cron: '17 9 * * 4'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: driving-bans-thursday
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Driving Bans scoped lint
+        run: npm run lint:driving-bans
+
+      - name: Driving Bans tests
+        run: npx vitest run src/lib/driving-bans
+
+      - name: Export 104/104 evidence and enforce sweep freshness
+        run: npm run driving-bans:audit -- --mode full --max-sweep-age-days 8
+
+      - name: Upload Driving Bans evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: driving-bans-thursday-${{ github.run_id }}
+          path: artifacts/driving-bans/
+          if-no-files-found: warn
+          retention-days: 90
