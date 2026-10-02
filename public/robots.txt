@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /partner-portal/
-
-Sitemap: https://www.dajc.eu/sitemap-index.xml
