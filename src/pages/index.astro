@@ -84,6 +84,20 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
   <NewsSection items={latestNews} showEuOversizeLaunchNotice={!hasPublishedEuOversize} />
   <IntegrationEcosystemSection providers={activeProviders} />
 
+  <section class="investor-teaser" aria-labelledby="investor-heading">
+    <div class="investor-teaser__inner">
+      <div>
+        <p class="investor-teaser__eyebrow">FOR INVESTORS</p>
+        <h2 id="investor-heading">DAJC investor overview and detailed materials.</h2>
+        <p>
+          See the problem DAJC is addressing, its provider-neutral positioning, current development stage and
+          commercial direction. Detailed investor materials are available directly on request.
+        </p>
+      </div>
+      <a class="investor-teaser__action" href="/investors">Investor overview &rarr;</a>
+    </div>
+  </section>
+
   <section class="support-teaser" aria-labelledby="support-heading">
     <div class="support-teaser__inner">
       <div>
@@ -418,4 +432,86 @@ const activeProviders = (await getCollection('providers', ({ data }) => data.sta
       text-align: center;
     }
   }
+
+  .investor-teaser {
+    position: relative;
+    z-index: 2;
+    padding: 0 1.5rem 4rem;
+  }
+
+  .investor-teaser__inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: clamp(1.6rem, 4vw, 2.4rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    align-items: center;
+    border: 1px solid var(--dajc-line);
+    border-radius: 6px;
+    background:
+      linear-gradient(135deg, rgba(239, 125, 0, 0.08), rgba(0, 38, 92, 0.22) 55%),
+      rgba(255, 255, 255, 0.02);
+  }
+
+  .investor-teaser__eyebrow {
+    margin: 0 0 0.8rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dajc-orange);
+  }
+
+  .investor-teaser h2 {
+    margin: 0 0 1rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.35rem, 3vw, 2rem);
+    line-height: 1.2;
+    color: var(--dajc-white);
+  }
+
+  .investor-teaser p:not(.investor-teaser__eyebrow) {
+    max-width: 72ch;
+    margin: 0;
+    color: var(--dajc-muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .investor-teaser__action {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--dajc-orange);
+    border-radius: 8px;
+    color: var(--dajc-orange);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .investor-teaser__action:hover,
+  .investor-teaser__action:focus-visible {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 760px) {
+    .investor-teaser__inner {
+      grid-template-columns: 1fr;
+    }
+
+    .investor-teaser__action {
+      width: 100%;
+      box-sizing: border-box;
+      white-space: normal;
+      text-align: center;
+    }
+  }
+
 </style>
