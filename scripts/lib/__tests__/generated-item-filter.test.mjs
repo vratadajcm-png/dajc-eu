@@ -56,4 +56,37 @@ describe('filterGeneratedItems', () => {
     expect(result.kept).toHaveLength(0);
     expect(result.dropped[0].reason).toBe('duplicate sourceUrl');
   });
+
+  it('re-applies the full eligibility rules to the verified record behind an item', () => {
+    const now = new Date('2026-09-04T10:00:00Z');
+    const candidatesByUrl = new Map([
+      ['https://example.test/1', {
+        country: 'Switzerland',
+        title: 'Vereinfachte Bewilligung von Ausnahmetransporten',
+        summary: 'Ab dem 1. Juli 2026 werden Bewilligungen für Ausnahmetransporte vereinfacht erteilt.',
+        sourceUrl: 'https://example.test/1',
+        sourceName: 'ASTRA',
+        publishedAt: '2026-05-06',
+      }],
+    ]);
+    const result = filterGeneratedItems([item()], {
+      weekStart,
+      weekEnd,
+      candidatesByUrl,
+      eligibilityContext: { now, weekStart, weekEnd, previousEditions: new Map() },
+    });
+    expect(result.kept).toHaveLength(0);
+    expect(result.dropped[0].reason).toMatch(/older than the 14-day freshness window/);
+  });
+
+  it('drops an item whose source is not a verified candidate', () => {
+    const result = filterGeneratedItems([item({ sourceUrl: 'https://example.test/invented' })], {
+      weekStart,
+      weekEnd,
+      candidatesByUrl: new Map(),
+      eligibilityContext: { now: new Date('2026-09-04T10:00:00Z'), weekStart, weekEnd },
+    });
+    expect(result.kept).toHaveLength(0);
+    expect(result.dropped[0].reason).toBe('sourceUrl is not a verified candidate');
+  });
 });

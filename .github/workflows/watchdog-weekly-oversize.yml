@@ -43,10 +43,6 @@ jobs:
         id: publish-needed
         run: node scripts/check-weekly-publication.mjs
 
-      - name: Apply DAJC editorial policy
-        if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
-        run: node scripts/apply-weekly-editorial-policy.mjs
-
       - name: Pre-flight - verify OPENAI_API_KEY is configured
         if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
@@ -77,7 +73,7 @@ jobs:
         if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: node scripts/run-weekly-publisher.mjs
+        run: node scripts/generate-weekly-article.mjs
 
       - name: Commit new article and refreshed data
         if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'

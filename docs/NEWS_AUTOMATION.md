@@ -12,27 +12,31 @@ top of it.
 
 ```
 config/oversize-sources/index.mjs   registry of European official sources (RSS/HTML)
-config/driving-ban-calendars/       maintained official driving-ban/exceptional-
-  index.mjs                        transport calendar layer (not RSS-dependent)
 data/oversize/<ISO week>/           raw findings gathered during that week
   findings.json
 scripts/
   oversize-monitor.mjs              daily: fetch sources -> data/oversize
-  generate-weekly-article.mjs       friday: data/oversize + calendars -> content/news
-  publish-gate-commit.mjs           friday: explicit "did we publish?" commit gate
+  generate-weekly-article.mjs       thursday: data/oversize -> content/news
+  publish-gate-commit.mjs           explicit "did we publish?" commit gate
   lib/
-    findings.mjs                    finding shape, dedup key, status transitions
-    fetch-source.mjs                RSS + official-HTML fetch, relevance + classification
+    findings.mjs                    finding shape, dedup key, status, cross-week history
+    fetch-source.mjs                RSS + official-HTML fetch, classification, publication date
+    publication-date.mjs            source publication date (metadata/feed/label/text/URL)
     relevance-filter.mjs            shared "is this an operational restriction" gate
-    select-candidates.mjs           pre-selection before verification/AI (cost control)
-    driving-ban-calendar.mjs        resolves config/driving-ban-calendars for a target week
-    verify-candidates.mjs           relevance + target-week dates + source reachability
+    transport-domain.mjs            heavy/oversize-transport scope gate (+ broad ingestion check)
+    weekly-driving-ban-policy.mjs   general HGV bans are out of Weekly scope
+    weekly-eligibility.mjs          THE Weekly eligibility rules (freshness, scope, no repeats, ...)
+    previous-editions.mjs           sources already cited by earlier editions
+    select-candidates.mjs           eligibility + ranking before verification/AI
+    verify-candidates.mjs           eligibility (again) + source reachability
     date-validation.mjs             deterministic validFrom/validTo vs. target-week checks
+    critical-floor.mjs              required critical developments (coverage check only)
     openai-client.mjs               structured-output OpenAI call, hardened prompt
     mock-generator.mjs              free local stand-in for openai-client.mjs
     cross-validate.mjs              drops any development whose sourceUrl wasn't verified
+    generated-item-filter.mjs       re-applies every rule to each model-returned item
     render-article.mjs              validated JSON -> frontmatter + Markdown
-    quality-gate.mjs                pre-publish blocking checks (count, dedup, dates, ...)
+    quality-gate.mjs                pre-publish blocking checks (maximums, dedup, eligibility, ...)
     article-schema.mjs              zod schema mirroring src/content.config.ts
     publish-gate.mjs                publish-vs-data-only commit decision + week extraction
     store.mjs / week.mjs            file I/O and ISO-week helpers
@@ -57,9 +61,9 @@ dispatchers - not a general traffic-news feed, and it must never summarize
 every item a source happens to publish. All content is written in
 professional English.
 
-- **20-30 lead reports plus Rest of Europe**, enforced by `scripts/lib/quality-gate.mjs`. The hard minimum is **20 substantive lead topics**. Rest of Europe has a hard minimum of **10 concise reports spanning at least 6 distinct jurisdictions**. Titles and source URLs must be disjoint across the complete edition. The pipeline never pads either section with routine or irrelevant filler.
+- **QUALITY > COUNT.** A well-supplied week has room for up to **30 lead reports** and up to **15 Rest-of-Europe updates** (typically 20-30 / 10-15). These are capacities, never quotas: an edition contains exactly the items that pass every rule (17 + 8, 9 + 0 or 25 + 12 are all correct). There is no minimum, no country quota, no supplement/repair loop and no retry that re-rolls synthesis until a count is met. `scripts/lib/quality-gate.mjs` enforces the maximums and requires at least one lead report for an edition to exist. Titles and source URLs (including "Also see" sources) must be disjoint across the complete edition.
 - **Editorial priority order** (most important first, see the system prompt
-  in `scripts/lib/openai-client.mjs`): truck driving bans; special movement
+  in `scripts/lib/openai-client.mjs`): special movement
   windows/bans for exceptional or oversized transport; permit-rule/system
   changes; escort/BF2-BF4/police-assistance requirements; border/transit
   restrictions; mandatory crossings/approved corridors; bridge/tunnel/
@@ -79,7 +83,8 @@ professional English.
   special restriction for exceptional/oversized transport, and a condition
   in an individual transport permit are always kept distinct - never
   conflated into one description.
-- **From 1 September 2026, unchanged year-round Sunday/weekend bans are not repeated.** Seasonal, holiday-specific, exceptional-transport and materially changed restrictions remain eligible through the maintained official calendar layer.
+- **General HGV/truck driving bans are out of scope** (weekend, Sunday, holiday, seasonal, night, transit - new or recurring). They belong to the separate DAJC Driving Bans system; the Weekly never imports its calendar. Only movement restrictions explicitly scoped to exceptional/oversize transport are eligible (`scripts/lib/weekly-driving-ban-policy.mjs`).
+- **Freshness is proven by the source's own publication date**, never by discovery: published within 14 days before preparation, or validity beginning/ending in the target week. Undated material, homepages/landing/project pages, police incident reports and sources already cited by an earlier edition are excluded (`scripts/lib/weekly-eligibility.mjs`).
 
 ## Content model
 
@@ -171,7 +176,14 @@ this key:
 
 A finding never becomes multiple records just because it was re-scraped
 on Monday, Wednesday and Friday - it's one record whose `status` and
-`lastCheckedAt` evolve. `superseded` is reserved for a human/AI-identified
+`lastCheckedAt` evolve. Each ISO week has its own findings file, so the
+monitor also loads the previous six weeks as discovery history (by source
+URL): a page first seen weeks ago keeps that `firstSeenAt` and is not "new"
+again on Monday. Every finding also carries `publishedAt` /
+`publishedAtSource` - the date the official source published it (page
+`datePublished`/publication metadata, feed date, a labelled or leading date
+in the text, or a date in the URL; `scripts/lib/publication-date.mjs`), or
+`null` when there is no evidence. `superseded` is reserved for a human/AI-identified
 case where one finding fully replaces another (not yet automated - see
 Troubleshooting).
 
@@ -208,16 +220,19 @@ collisions, theft reports, procurement/tender notices, and unconfirmed
 planned/future works (see `NON_RESTRICTION_PATTERNS` in
 `relevance-filter.mjs` for the exact patterns and reasons).
 
-## Editorial policy from 1 September 2026
+## Editorial policy (canonical: DAJC_WEEKLY_INTELLIGENCE_SPEC.md)
 
-The following rules are hard publication requirements, not prompt-only guidance:
+The following rules are hard publication requirements in plain code, not prompt-only guidance:
 
-- **Rest of Europe must contain at least 10 concise verified reports from at least 6 distinct countries.**
-- The roundup is deliberately short-form: each item states the country, the operational change, where/when it matters, the practical operator action, and the official source.
-- Ordinary year-round Sunday/weekend driving-ban baselines are not repeated after 1 September 2026. Seasonal, holiday-specific, exceptional-transport and genuinely changed restrictions remain eligible.
+- **No count forcing.** Up to 30 lead reports and up to 15 Rest-of-Europe updates; no minimum, no country quota. The roundup is deliberately short-form and is omitted when nothing further qualifies.
+- **Freshness by publication date.** A candidate qualifies only if the official source published it within the last 14 days before preparation, or its verified validity begins or ends in the target week. Discovery date never counts; undated material is never published.
+- **One specific development.** Homepages, listing/landing pages, project/programme pages, FAQ and organisation pages and bare topic titles are excluded; several pages about one development are reported once.
+- **No repetition.** A source already cited by an earlier edition is excluded unless the source republished it after that edition.
+- **Heavy-transport scope.** The candidate's own text must show heavy/abnormal/oversize transport context; a generic road, tunnel or bridge mention - or the publishing authority's name - is not enough.
+- **Driving bans.** General HGV bans are out of scope (separate DAJC Driving Bans system).
 - A road/motorway closure is publishable only when the official evidence proves a **planned duration longer than 30 days**. A 30-day closure, a shorter closure, or an undated/"until further notice" closure with no provable duration is excluded. There is no corridor-based exception to this threshold.
 - RSS/Atom is never treated as complete coverage. Every configured authority is scanned through the feed **and** its official web/HTML news/traffic pages; results are merged and deduplicated.
-- Fresh verified high-signal changes directly affecting exceptional/oversized transport (permits, escort/private-escort rules, police escort, border restrictions, weight/width/height/axle limits, relevant regulatory procedures) are **required coverage**. A quality gate blocks publication if any such critical verified source is omitted from both lead reports and Rest of Europe.
+- Fresh (recently published) verified high-signal changes directly affecting exceptional/oversized transport (permits, escort/private-escort rules, police escort, border restrictions, weight/width/height/axle limits, relevant regulatory procedures) are **required coverage**. A quality gate blocks publication if such a development is omitted from both lead reports and Rest of Europe.
 - `config/europe-coverage.mjs` is the single mandatory geographic coverage universe. It includes every country and territory approved for DAJC coverage, including alternative MPZ aliases and dependent/overseas territories. CI fails if any registry item loses its configured source mapping.
 
 ## Source configuration
@@ -253,53 +268,18 @@ This is the official-source discovery layer for the mandatory DAJC geographic co
 
 Slovakia is covered through Slovenská správa ciest' official press-release page. The previously rejected NDS RSS feed remains intentionally unused because its CMS date handling was not trusted.
 
-## Official driving-ban calendar layer
+## Driving Bans are not a Weekly source
 
-Feed/HTML news monitoring alone cannot reliably surface a standing or seasonal driving
-ban that no source happened to re-announce this particular week - the ban
-is still fully in force, but invisible to `fetch-source.mjs`. This is a
-distinct data source from `config/oversize-sources` (RSS/Atom feeds):
-`config/driving-ban-calendars/index.mjs` is a small, curated registry of the
-official rules themselves, resolved by `scripts/lib/driving-ban-calendar.mjs`
-directly against the target week's date range - no news item required.
-
-Each entry records: `country`; official `sourceUrl`/`sourceName`;
-`legalBasis`; `vehicleScope` (vehicle/weight threshold); `routeScope`;
-`exemptionNotes`; `lastVerified` date; and one of two `kind`s:
-
-- **`standing-rule`** - a fixed legal rule (e.g. "every Saturday/Sunday from
-  1 July to 31 August", or a year-round nightly ban) that needs no per-year
-  maintenance. `resolve(weekStart, weekEnd)` computes that week's actual
-  dates fresh every time.
-- **`annual-calendar`** - an official body republishes a dated calendar
-  every year (Germany's BALM summer-Saturday list, Poland's summer calendar,
-  Italy's Ministerial Decree, Slovenia's tourist-season Saturday dates, and
-  Austria's summer corridor order). `validYear` records which year's dates are seeded.
-  **Resolving for any other year returns a `maintenanceError` instead of
-  silently reusing a previous year's dates** - `generate-weekly-article.mjs`
-  treats this as a hard configuration failure (non-zero exit), the same as
-  a missing `OPENAI_API_KEY`. When a new year's official calendar is
-  published (e.g. Italy's 2027 decree), add its dates to the relevant entry
-  and bump `validYear` - see `scripts/lib/__tests__/driving-ban-calendar.test.mjs`
-  for the expected behavior both before and after that update.
-
-Coverage is intentionally split by legally distinct regimes rather than by
-country count. For W35 2026 the resolver returns 14 verified calendar
-findings. For W36 (31 August-6 September) it returns 11 before any news
-monitor findings are considered, including: Czech general and Section 43(2)
-special-vehicle restrictions; Slovakia's Section 39 Sunday window effective
-from 1 September 2026; Italy's 6 September Decree 325/2025 ban; France's
-general-HGV and separate exceptional-transport regimes; Slovenia's standing
-Sunday rule and final 2026 tourist-season Saturday restriction; plus the
-applicable German, Austrian and Swiss rules. This avoids making publication
-quality depend on whether a standing ban happened to be re-announced in a
-news feed that week.
-
-`generate-weekly-article.mjs` merges `resolveDrivingBanFindings()`'s output
-with the week's monitor-derived RSS/official-HTML findings before selection; calendar findings are
-always included (never subject to `select-candidates.mjs`'s per-source cap)
-and are still re-verified like any other candidate (relevance, target-week
-dates, source reachability) before reaching the model.
+General HGV/truck driving bans are published by the separate DAJC Driving
+Bans system (`/driving-bans`, `data/driving-bans/canonical.json`,
+`config/driving-ban-calendars/`, `docs/DRIVING_BANS_CANONICAL.md`). The
+Weekly generator does not import that calendar in any form - the former
+`scripts/lib/driving-ban-calendar.mjs` bridge was removed, and
+`scripts/lib/__tests__/weekly-editorial-contract.test.mjs` fails if any
+Weekly pipeline file imports `driving-ban-calendars` again. A monitored
+restriction that explicitly concerns exceptional/oversize transport (for
+example a changed abnormal-load movement window) can still qualify through
+the normal monitor and eligibility rules.
 
 ## Daily monitoring
 
@@ -425,22 +405,19 @@ commit always proceeds to a normal build+deploy).
 `scripts/generate-weekly-article.mjs` (`npm run oversize:publish`):
 
 1. Reads the **current** ISO week's monitor-derived findings (RSS and
-   official HTML, gathered all week), and resolves the **official driving-ban calendar layer** for the
-   **upcoming** week (`resolveDrivingBanFindings()` - see above). A missing
-   annual calendar for the required year is a hard failure here, before any
-   OpenAI cost is spent.
-2. `selectCandidates()` narrows the monitor findings to a bounded, scored
-   subset (freshness + specific-type bonus, capped per source) - the
-   cost-control step: don't verify or pay to synthesize everything.
-   Calendar findings bypass this cap and are always included.
-3. `verifyCandidates()` runs three independent checks per candidate:
-   operational relevance (`checkOperationalRelevance`, rejects one-off
-   incidents/procurement notices/unconfirmed works even if the daily
-   ingestion filter already let it through), target-week date overlap
-   (`validateDevelopmentDateRange` - rejects anything whose already-known
-   `validFrom`/`validTo` cannot overlap the target week), and source
-   reachability (HEAD, falling back to GET). Every rejection is logged with
-   its specific reason.
+   official HTML, gathered all week) and the sources already cited by
+   earlier editions. No Driving Bans calendar is read.
+2. `selectCandidates()` applies the complete deterministic eligibility
+   rules (`checkWeeklyEligibility()` in `scripts/lib/weekly-eligibility.mjs`:
+   operational relevance, heavy-transport scope, >30-day closure rule,
+   driving-ban scope, specific development, source suitability,
+   publication-date freshness, target-week dates, no repetition), logs every
+   exclusion with its reason, collapses near-duplicate pages of one
+   development, then ranks the survivors (recency, specificity, Central
+   Europe first) with a per-source cap.
+3. `verifyCandidates()` re-runs the same eligibility check and verifies
+   source reachability (HEAD, falling back to GET). Every rejection is
+   logged with its specific reason.
 4. Calls OpenAI (`scripts/lib/openai-client.mjs`, structured JSON output,
    hardened system prompt - see "Hardened editorial prompt" below) to
    select, group and phrase the verified candidates into an article for the
@@ -451,10 +428,15 @@ commit always proceeds to a normal build+deploy).
 5. **Cross-validates** every `sourceUrl` the model returned against the
    actual verified set (`scripts/lib/cross-validate.mjs`) - anything that
    doesn't match exactly is dropped before it can reach the article
-   (defends against model drift/hallucination).
+   (defends against model drift/hallucination) - and re-applies every rule
+   to each item (`scripts/lib/generated-item-filter.mjs`). If a required
+   critical development was left out, one targeted call writes exactly
+   that development (`generateRequiredItemsWithOpenAI`); nothing ever asks
+   the model for "more" items to reach a count. Overflow beyond the
+   maximums (30 / 15) is left out, never moved around to fill a section.
 6. Renders the surviving developments into frontmatter + Markdown
    (`scripts/lib/render-article.mjs`) under **mutually exclusive**
-   categories - `## Driving bans and exceptional-transport restrictions` /
+   categories - `## Exceptional-transport movement restrictions` /
    `## Infrastructure restrictions` / `## Other operational developments` -
    followed by `## Operator checklist`, `## Sources`, and
    `## Next EU Oversize Weekly`. Each development is rendered **exactly
@@ -495,10 +477,11 @@ notice is never a traffic restriction; planned/future works are not a
 restriction without a confirmed traffic impact and specific dates; never
 invent a bridge capacity, closure, diversion, width/height/weight limit, or
 validity date not present in the supplied candidate text; return an empty
-`developments` array rather than padding to a target count; a recurring
-ban may be included only when the candidate data shows it is already valid
-for the target week's exact dates; and every development must include a
-concrete `recommendedAction`. The JSON schema also carries `vehicleScope`,
+`developments` array rather than padding to a target count (the prompt
+states there is NO minimum; 30 / 15 are capacities, not quotas); general HGV
+driving bans are out of scope; each candidate's `publishedAt` must show it
+is current; one report per real-world development; and every development
+must include a concrete `recommendedAction`. The JSON schema also carries `vehicleScope`,
 `timeWindow` and `exemptions` per development, and `operatorChecklist`
 (array of strings) instead of a single closing paragraph.
 
@@ -523,19 +506,23 @@ publication if:
   `sourceUrl`, a `sourceName`, a `title`, or a meaningful
   `recommendedAction` (non-empty, not a placeholder like "n/a"),
 - the article body is empty or under ~400 characters (suspiciously short),
-- **fewer than 8 or more than 12 developments** survived cross-validation -
-  the required 8-12 distinct operational reports (see "Editorial
-  specification" above),
-- **no development is a driving ban / exceptional-transport restriction** -
-  at least one is required every week,
+- **no lead report** survived (an edition needs at least one), **more than
+  30 lead reports** or **more than 15 Rest-of-Europe reports** - there is no
+  other count rule,
+- any item's verified record fails the Weekly eligibility rules (stale or
+  undated source, out of scope, generic page, general driving ban, already
+  published, police incident), or the item cites a source outside the
+  verified candidate set,
+- a required critical development is missing, or public text contains
+  internal publishing mechanics (counts, targets, quality gates),
 - **any development's `validFrom`/`validTo` doesn't overlap the target
   week** (`validateDevelopmentDateRange`, `scripts/lib/date-validation.mjs`)
   - an invalid ISO date, a reversed range, a `validTo` before the week
   starts, or a `validFrom` after the week ends, all block publication. This
   is deliberately independent of what the model was instructed to do.
-- **a duplicate `sourceUrl` or duplicate (normalized) title** across
-  developments - the same restriction must never be rendered as two
-  reports. Two genuinely distinct restrictions that happen to share a
+- **a duplicate `sourceUrl` (primary or "Also see") or duplicate
+  (normalized) title** across developments - the same restriction must
+  never be rendered as two reports. Two genuinely distinct restrictions that happen to share a
   country and weekend (e.g. Austria's general ban and its additional
   summer corridor restrictions) are *not* flagged as duplicates - only an
   exact source or title repeat is.
@@ -546,22 +533,14 @@ previously published site is completely unaffected.
 
 ### Safety: never publish a low-quality article just because cron ran
 
-Two distinct outcomes, deliberately different exit codes:
-
-- **Genuinely nothing to check yet** - no RSS findings on file *and* no
-  official driving-ban calendar applies to the target week, or nothing
-  survives pre-selection - exits **0** (success, no article; the Actions
-  run is green). This is normal, not an error: with the calendar layer
-  seeded (see above), this case is now rare in practice, since a standing
-  rule like Austria's or Switzerland's applies most weeks regardless of
-  RSS activity.
-- **Something was checked, but the result doesn't clear the editorial bar**
-  - nothing survives verification or cross-validation, or the quality gate
-  rejects the result (including having fewer than 8 or more than 12
-  reports) - exits **1**, so it shows up as a **clearly failed** GitHub
-  Actions run. This is a deliberate policy: once the pipeline has gone far
-  enough to attempt a real article, coming up short is worth a human
-  looking at the log, not a silently green "nothing happened" run.
+- **Nothing qualifies** - no findings, nothing passes the eligibility rules
+  or verification, or no lead report survives synthesis - exits **0**
+  (success, no article; the Actions run is green). This is the correct
+  outcome for a week without genuine, verified, current developments: an
+  empty week is never filled with old, generic or marginal material.
+- **Something broke** - a quality-gate violation, an OpenAI/API error or a
+  failed `astro build` - exits **1**, so it shows up as a **clearly failed**
+  GitHub Actions run worth a human looking at.
 
 Either way, the specific reason is always logged and written to
 `$GITHUB_STEP_SUMMARY`, and **no partial or broken file is ever left
@@ -773,10 +752,11 @@ Fixed by:
   ban, no duplicate source/title, and a meaningful `recommendedAction` for
   every report (see "Quality gate" above).
 - The maintained official driving-ban calendar layer
-  (`config/driving-ban-calendars`) now guarantees driving-ban coverage
-  every week regardless of RSS activity (see "Official driving-ban
-  calendar layer" above) - the corrected W35 article's 10 reports are
-  generated from this layer.
+  (`config/driving-ban-calendars`) guaranteed driving-ban coverage every
+  week regardless of RSS activity - the corrected W35 article's 10 reports
+  were generated from this layer. (Superseded: since the W41 incident below,
+  general driving bans are out of Weekly scope and the calendar is not a
+  Weekly source; the count rules above were replaced by QUALITY > COUNT.)
 - `scripts/publish-gate-commit.mjs` no longer computes its own week - it
   derives the commit message's week from the actual newly-added article's
   filename (`extractArticleWeekFromStatus`, `scripts/lib/publish-gate.mjs`),
@@ -784,6 +764,46 @@ Fixed by:
   See `scripts/lib/__tests__/publish-gate.test.mjs` for the regression test
   (findings collected in W34, article targets W35, commit message reads
   `content: publish EU Oversize Weekly 2026-W35`).
+
+## Incident: the W41 edition (2026-10-01)
+
+The W41 edition (5-11 October 2026) was published with 20 lead reports and
+10 Rest-of-Europe items, most of them filler: battery-powered wheel loaders
+in Norwegian tunnel works (twice), a new pedestrian/cycle tunnel in Estonia,
+a Monaco government press conference, the Luxembourg roads administration
+homepage, the Guernsey roadworks map, a 2023 tunnel price list, project
+pages, a Swiss announcement from 6 May 2026 rendered as raw German text,
+the same Swiss escort consultation three times (and for the fourth week
+running), and a Rest-of-Europe heading that printed the internal counting
+rule. The production log (run 36847570925) shows the mechanism:
+
+- The model itself selected 10-11 leads and **0** Rest-of-Europe items.
+- The quality gate demanded at least 20 leads, 10 Rest-of-Europe items and
+  6 countries, so two "lead repair" calls asked the model for more leads
+  "to reach the 20-report minimum", two "Rest-of-Europe repair" calls asked
+  for "at least 6 additional jurisdictions and 10 additional reports", and
+  `run-weekly-publisher.mjs` re-ran the whole generation until attempt 3
+  finally padded its way to 20 + 10.
+- "Verified" only meant reachable and matching broad regexes: findings had
+  no publication date at all, each ISO week's findings file started empty so
+  every evergreen page was "new" again on Monday, unknown dates passed date
+  validation, and the domain gate counted the publishing authority's name
+  ("... Roads Administration") as transport context.
+- The critical floor treated "first discovered this week" as fresh, flagged
+  the May 2026 announcement as required news and injected it as raw text.
+
+Fixed by: removing every minimum, repair/supplement loop, tier rebalancing
+and the retry runner (QUALITY > COUNT, maximums 30 / 15 kept); recording the
+source publication date and cross-week discovery history in the monitor;
+the deterministic eligibility rules in `scripts/lib/weekly-eligibility.mjs`
+(publication-date freshness, heavy-transport scope without the source name,
+no generic/landing/project pages, no police incident reports, no repetition
+of earlier editions), applied before verification, to every model item and
+in the quality gate; critical coverage based on publication date and written
+by the model instead of injected; removing the Driving Bans calendar import;
+removing the runtime source-patching workflow step; and the regression suite
+`scripts/lib/__tests__/weekly-eligibility.test.mjs`, which asserts that none
+of the 30 original W41 items can be published again.
 
 ## Troubleshooting
 

@@ -12,7 +12,8 @@
 import Parser from 'rss-parser';
 import { FINDING_TYPES } from './findings.mjs';
 import { checkOperationalRelevance } from './relevance-filter.mjs';
-import { checkTransportDomainRelevance } from './transport-domain.mjs';
+import { checkIngestionRoadContext } from './transport-domain.mjs';
+import { extractPublicationDate } from './publication-date.mjs';
 
 const FETCH_TIMEOUT_MS = 12_000;
 const FETCH_RETRIES = 2;
@@ -41,7 +42,9 @@ const CLASSIFICATION_RULES = [
   { type: 'police_escort', pattern: /police escort|polizeieskorte|doprovod policie/i },
   { type: 'escort_requirement', pattern: /escort vehicle|pilot vehicle|begleitfahrzeug|ausnahmetransportbegleit|transportbegleit|BF[- ]?escort|véhicule pilote|accompagnement.{0,40}convoi exceptionnel|accompagnateur.{0,40}convoi exceptionnel|vehículo piloto|acompañamiento.{0,40}transporte especial/i },
   { type: 'border_restriction', pattern: /border crossing|border restriction|grenzübergang|hraniční přechod|frontier crossing|poste frontière/i },
-  { type: 'bridge_restriction', pattern: /\bbridge\b|brücke|brucke|\bviaduct\b|\bmost\b|pont|ponte/i },
+  // Word boundaries matter: a bare "pont" also matched "Pontificio" and
+  // "ponts et chaussées" (an authority name), mislabelling unrelated pages.
+  { type: 'bridge_restriction', pattern: /\bbridge\b|brücke|brucke|\bviaduct\b|\bmost\b|\bponts?\b|\bponte\b/i },
   { type: 'tunnel_restriction', pattern: /\btunnel\b|\btunel\b|galleria/i },
   { type: 'road_closure', pattern: /road closure|closed to traffic|full closure|vollsperrung|sperrung|uzavírka|uzavierka|gesperrt|fermeture|chiusura|cierre|închidere/i },
   { type: 'roadworks', pattern: /roadworks|road works|construction works|stavební práce|baustelle|bauarbeiten|travaux|lavori|obras|lucrări/i },
@@ -65,12 +68,7 @@ const GENERAL_TRANSPORT_CONTEXT =
 
 function isRelevant(text, matchedType, source) {
   if (!checkOperationalRelevance(text).ok) return false;
-  const candidate = {
-    type: matchedType || 'infrastructure',
-    title: text,
-    sourceName: source?.name || '',
-  };
-  if (!checkTransportDomainRelevance(candidate).ok) return false;
+  if (!checkIngestionRoadContext({ title: text, sourceName: source?.name || '' }).ok) return false;
   if (matchedType) return true;
   return GENERAL_TRANSPORT_CONTEXT.test(text);
 }
@@ -106,7 +104,7 @@ function stripHtml(value = '') {
     .trim();
 }
 
-function extractDetailText(html) {
+export function extractDetailText(html) {
   const cleaned = html
     .replace(/<nav\b[^>]*>[\s\S]*?<\/nav>/gi, ' ')
     .replace(/<header\b[^>]*>[\s\S]*?<\/header>/gi, ' ')
@@ -189,11 +187,15 @@ function enclosingHtmlContext(html, start, end) {
   return stripHtml(html.slice(start, end));
 }
 
-function toFinding({ source, title, summary, sourceUrl }) {
+function countryNameFor(source) {
+  return source.jurisdictionName || COUNTRY_NAMES[source.country] || source.country;
+}
+
+function toFinding({ source, title, summary, sourceUrl, publication = null }) {
   const text = `${title} ${summary || ''}`;
   const type = classify(text) || 'infrastructure';
   return {
-    country: source.jurisdictionName || COUNTRY_NAMES[source.country] || source.country,
+    country: countryNameFor(source),
     region: null,
     location: guessLocation(text, source.authority),
     type,
@@ -203,6 +205,10 @@ function toFinding({ source, title, summary, sourceUrl }) {
     validTo: null,
     impact: null,
     recommendedAction: null,
+    // Date the official source published the item (not when DAJC found it);
+    // null when the source offers no verifiable date. See publication-date.mjs.
+    publishedAt: publication?.date ?? null,
+    publishedAtSource: publication?.source ?? null,
     sourceName: source.name,
     sourceUrl,
     confidence: 'unverified',
@@ -239,12 +245,7 @@ export function extractHtmlFindings(html, source, pageUrl = source.url) {
     // feeds, but not for arbitrary website navigation/content links.
     const matchedType = classify(text);
     if (!matchedType || !checkOperationalRelevance(text).ok) continue;
-    if (!checkTransportDomainRelevance({
-      type: matchedType,
-      title,
-      summary: context,
-      sourceName: source.name,
-    }).ok) continue;
+    if (!checkIngestionRoadContext({ title, summary: context, sourceName: source.name }).ok) continue;
 
     // Avoid generic account/navigation anchors inheriting a restriction word
     // from a larger container. Operational titles normally carry either a
@@ -259,6 +260,8 @@ export function extractHtmlFindings(html, source, pageUrl = source.url) {
       title,
       summary: context === title ? null : context,
       sourceUrl,
+      // Only the URL is known until the detail page is fetched.
+      publication: extractPublicationDate({ url: sourceUrl, country: countryNameFor(source) }),
     }));
 
     if (findings.length >= MAX_HTML_FINDINGS_PER_SOURCE) break;
@@ -320,12 +323,20 @@ async function parseFeed(raw, source, feedUrl, parser) {
       const text = `${item.title || ''} ${item.contentSnippet || item.summary || ''}`;
       return isRelevant(text, classify(text), source);
     })
-    .map((item) => toFinding({
-      source,
-      title: item.title || '(untitled)',
-      summary: item.contentSnippet || item.summary || null,
-      sourceUrl: item.link || feedUrl || source.url,
-    }));
+    .map((item) => {
+      const sourceUrl = item.link || feedUrl || source.url;
+      return toFinding({
+        source,
+        title: item.title || '(untitled)',
+        summary: item.contentSnippet || item.summary || null,
+        sourceUrl,
+        publication: extractPublicationDate({
+          feedDate: item.isoDate || item.pubDate || null,
+          url: sourceUrl,
+          country: countryNameFor(source),
+        }),
+      });
+    });
 }
 
 async function enrichDetailFindings(findings, source, listingUrl) {
@@ -356,6 +367,13 @@ async function enrichDetailFindings(findings, source, listingUrl) {
         ? detailHeading
         : finding.title;
       const combined = `${title} ${detailText}`;
+      const publication = extractPublicationDate({
+        feedDate: finding.publishedAtSource === 'feed' ? finding.publishedAt : null,
+        html: fetched.text,
+        text: detailText,
+        url: finding.sourceUrl,
+        country: finding.country,
+      });
 
       enriched[index] = {
         ...finding,
@@ -363,6 +381,8 @@ async function enrichDetailFindings(findings, source, listingUrl) {
         summary: detailText,
         type: classify(combined) || finding.type,
         location: guessLocation(combined, finding.location || source.authority),
+        publishedAt: publication?.date ?? finding.publishedAt ?? null,
+        publishedAtSource: publication?.source ?? finding.publishedAtSource ?? null,
       };
     }
   }

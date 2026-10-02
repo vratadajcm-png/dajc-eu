@@ -21,6 +21,9 @@ export function crossValidateDevelopments(developments = [], verifiedCandidates 
       // rather than accepting a model-generated prose placeholder.
       validFrom: candidate.validFrom || null,
       validTo: candidate.validTo || null,
+      // Internal provenance (not rendered): the date the official source
+      // published this item, re-checked by the quality gate.
+      publishedAt: candidate.publishedAt || null,
       additionalSources: candidate.additionalSources || item.additionalSources || [],
     });
   }

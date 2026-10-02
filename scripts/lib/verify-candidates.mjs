@@ -1,16 +1,15 @@
-// Re-verification pass for the Friday pipeline. For each pre-selected
-// candidate finding this now runs THREE independent checks before a
-// candidate is allowed anywhere near the OpenAI call:
+// Re-verification pass for the Weekly pipeline. Each pre-selected candidate
+// must pass two independent checks before it is allowed anywhere near the
+// OpenAI call:
 //
-// 1. Operational relevance (checkOperationalRelevance, relevance-filter.mjs)
-//    - rejects one-off incidents, procurement notices, unconfirmed planned
-//      works, and crime/administrative noise, even if the daily monitor's
-//      own ingestion filter already let it through (see relevance-filter.mjs
-//      for why both layers exist).
-// 2. Target-week date overlap (validateDevelopmentDateRange, date-validation.mjs)
-//    - rejects a candidate whose already-known validFrom/validTo cannot
-//      possibly overlap the week the article is actually being written for.
-// 3. Source reachability (HEAD, falling back to GET on any non-2xx HEAD).
+// 1. The complete deterministic Weekly eligibility check
+//    (weekly-eligibility.mjs): operational relevance, heavy-transport domain,
+//    the >30-day closure rule, the driving-ban scope rule, specific-development
+//    (no homepages/landing/project pages), source suitability, publication-date
+//    freshness, target-week date overlap and no repetition of earlier editions.
+//    This deliberately repeats pre-selection so verification can never be
+//    called with weaker rules.
+// 2. Source reachability (HEAD, falling back to GET on any non-2xx HEAD).
 //    Some official government sites reject or mishandle HEAD while serving a
 //    normal GET successfully; a candidate is still never published with a
 //    genuinely dead source link.
@@ -21,10 +20,7 @@
 // the class of error this file screens out. Every rejection is logged with
 // its specific reason.
 
-import { checkOperationalRelevance } from './relevance-filter.mjs';
-import { validateDevelopmentDateRange } from './date-validation.mjs';
-import { checkLongRoadClosure } from './closure-duration.mjs';
-import { checkTransportDomainRelevance } from './transport-domain.mjs';
+import { checkWeeklyEligibility } from './weekly-eligibility.mjs';
 
 const VERIFY_TIMEOUT_MS = 8_000;
 const CONCURRENCY = 6;
@@ -69,27 +65,12 @@ async function checkReachable(url) {
 
 /**
  * @param {object} candidate
- * @param {{ weekStart?: Date, weekEnd?: Date }} targetWeek
+ * @param {Parameters<typeof checkWeeklyEligibility>[1]} ctx
  * @returns {Promise<{ ok: true } | { ok: false, reason: string }>}
  */
-async function verifyOne(candidate, { weekStart, weekEnd } = {}) {
-  const text = `${candidate.title || ''} ${candidate.summary || ''}`;
-  const relevance = checkOperationalRelevance(text);
-  if (!relevance.ok) return { ok: false, reason: relevance.reason };
-
-  const domain = checkTransportDomainRelevance(candidate);
-  if (!domain.ok) return { ok: false, reason: domain.reason };
-
-  const closureCheck = checkLongRoadClosure(candidate);
-  if (!closureCheck.ok) return { ok: false, reason: closureCheck.reason };
-
-  if (weekStart && weekEnd) {
-    const dateCheck = validateDevelopmentDateRange(
-      { validFrom: candidate.validFrom, validTo: candidate.validTo },
-      { weekStart, weekEnd }
-    );
-    if (!dateCheck.ok) return { ok: false, reason: dateCheck.reason };
-  }
+async function verifyOne(candidate, ctx) {
+  const eligibility = checkWeeklyEligibility(candidate, ctx);
+  if (!eligibility.ok) return eligibility;
 
   if (!isDocumentLikeSourceUrl(candidate.sourceUrl)) {
     return { ok: false, reason: 'source URL points to an image/asset rather than an official article or document' };
@@ -103,11 +84,12 @@ async function verifyOne(candidate, { weekStart, weekEnd } = {}) {
 
 /**
  * @param {object[]} candidates - must each have a `sourceUrl`
- * @param {{ weekStart?: Date, weekEnd?: Date }} [targetWeek] - when given,
- *   candidates with a known validFrom/validTo outside this range are dropped.
+ * @param {Parameters<typeof checkWeeklyEligibility>[1]} ctx - the same
+ *   eligibility context used for pre-selection (now, target week, earlier
+ *   editions, source metadata).
  * @returns {Promise<{ verified: object[], failed: object[] }>}
  */
-export async function verifyCandidates(candidates, targetWeek = {}) {
+export async function verifyCandidates(candidates, ctx) {
   const verified = [];
   const failed = [];
   const queue = [...candidates];
@@ -116,7 +98,7 @@ export async function verifyCandidates(candidates, targetWeek = {}) {
     while (queue.length > 0) {
       const candidate = queue.shift();
       if (!candidate) return;
-      const result = await verifyOne(candidate, targetWeek);
+      const result = await verifyOne(candidate, ctx);
       if (result.ok) {
         verified.push({ ...candidate, confidence: 'verified' });
       } else {

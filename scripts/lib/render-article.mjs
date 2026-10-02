@@ -92,13 +92,16 @@ export function categorizeDevelopment(item) {
   return 'other';
 }
 
+// General HGV driving bans are not part of this product (they live in the
+// separate DAJC Driving Bans service); this section only ever holds movement
+// restrictions explicitly scoped to exceptional/oversize transport.
 const SECTION_TITLES = {
-  bans: 'Driving bans and exceptional-transport restrictions',
+  bans: 'Exceptional-transport movement restrictions',
   infrastructure: 'Infrastructure restrictions',
   other: 'Other operational developments',
 };
 
-export function renderArticleMarkdown(article, { slug, publishedAt, nextPublicationLabel }) {
+export function renderArticleMarkdown(article, { slug, publishedAt, updatedAt = null, nextPublicationLabel }) {
   const byCategory = { bans: [], infrastructure: [], other: [] };
   for (const item of article.developments) {
     byCategory[categorizeDevelopment(item)].push(item);
@@ -118,12 +121,7 @@ export function renderArticleMarkdown(article, { slug, publishedAt, nextPublicat
 
   const roundup = Array.isArray(article.europeRoundup) ? article.europeRoundup : [];
   if (roundup.length > 0) {
-    const parts = [
-      '## Rest of Europe: verified operational roundup',
-      '',
-      'At least ten concise verified items from at least six countries. Only operationally useful changes are included; routine evergreen Sunday bans are omitted after 1 September 2026.',
-      '',
-    ];
+    const parts = ['## Rest of Europe: verified operational roundup', ''];
     for (const item of roundup) parts.push(renderRoundupItem(item), '');
     sections.push(parts.join('\n').trim());
   }
@@ -164,6 +162,7 @@ export function renderArticleMarkdown(article, { slug, publishedAt, nextPublicat
     slug,
     category: 'eu-oversize',
     publishedAt,
+    ...(updatedAt ? { updatedAt } : {}),
     language: 'en',
     author: 'DAJC',
     status: 'published',
@@ -180,6 +179,7 @@ export function toFrontmatterYaml(frontmatter) {
   lines.push(`slug: ${JSON.stringify(frontmatter.slug)}`);
   lines.push(`category: ${JSON.stringify(frontmatter.category)}`);
   lines.push(`publishedAt: ${frontmatter.publishedAt}`);
+  if (frontmatter.updatedAt) lines.push(`updatedAt: ${frontmatter.updatedAt}`);
   lines.push(`language: ${JSON.stringify(frontmatter.language)}`);
   lines.push(`author: ${JSON.stringify(frontmatter.author)}`);
   lines.push(`status: ${JSON.stringify(frontmatter.status)}`);

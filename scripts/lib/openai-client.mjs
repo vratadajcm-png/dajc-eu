@@ -36,25 +36,12 @@ const DEVELOPMENT_SCHEMA = {
   additionalProperties: false,
 };
 
-const LEAD_SUPPLEMENT_SCHEMA = {
-  name: 'dajc_lead_supplement',
+const REQUIRED_ITEMS_SCHEMA = {
+  name: 'dajc_required_items',
   strict: true,
   schema: {
     type: 'object',
     properties: { items: { type: 'array', items: DEVELOPMENT_SCHEMA } },
-    required: ['items'],
-    additionalProperties: false,
-  },
-};
-
-const ROUNDUP_SUPPLEMENT_SCHEMA = {
-  name: 'dajc_europe_roundup_supplement',
-  strict: true,
-  schema: {
-    type: 'object',
-    properties: {
-      items: { type: 'array', items: DEVELOPMENT_SCHEMA },
-    },
     required: ['items'],
     additionalProperties: false,
   },
@@ -72,12 +59,12 @@ const ARTICLE_JSON_SCHEMA = {
       developments: {
         type: 'array',
         items: DEVELOPMENT_SCHEMA,
-        description: '20-30 substantive verified lead developments. Minimum 20. Never pad with routine or irrelevant material.',
+        description: 'Substantive verified lead developments, most important first. Maximum 30. There is no minimum: include only candidates that pass every editorial rule.',
       },
       europeRoundup: {
         type: 'array',
         items: DEVELOPMENT_SCHEMA,
-        description: '10-20 concise verified Rest-of-Europe updates, spanning at least 6 distinct countries/jurisdictions. Minimum 10. Never duplicate leads.',
+        description: 'Additional concise verified updates. Maximum 15. There is no minimum and no country quota: an empty array is correct when nothing further qualifies. Never duplicate leads.',
       },
       operatorChecklist: { type: 'array', items: { type: 'string' } },
     },
@@ -88,71 +75,59 @@ const ARTICLE_JSON_SCHEMA = {
 
 const SYSTEM_PROMPT = `You are the editor of DAJC European Oversize & Special Transport Intelligence for DAJC.eu.
 
-This is a professional, change-driven Europe-wide intelligence report for people planning and executing heavy, abnormal, oversized and special road transport. It is NOT a generic trucking-news site and NOT a calendar of unchanged recurring restrictions.
+This is a professional, change-driven Europe-wide weekly intelligence briefing for people planning and executing heavy, abnormal, oversized and special road transport. It is NOT a generic trucking-news site, NOT a roadworks list and NOT a calendar of recurring restrictions.
+
+QUALITY OVER COUNT — CRITICAL
+There is NO minimum number of reports. Include a candidate only when it passes every rule below. A well-supplied week can fill up to 30 lead reports and up to 15 Rest-of-Europe updates, but these are capacities, never quotas: if 6 candidates qualify, return 6; if nothing qualifies for Rest of Europe, return an empty europeRoundup; if nothing qualifies at all, return empty arrays. Never add an old, generic, marginal or weakly relevant item to make a section look fuller. Never split one development into several reports. If any item qualifies, the most important ones belong in developments (never return an empty developments array together with a non-empty europeRoundup).
 
 GEOGRAPHIC PRINCIPLE
-The upstream DAJC monitor scans the complete DAJC European coverage area, including smaller countries, territories and relevant jurisdictions. Coverage remains Europe-wide and evidence-led. For the PUBLISHED LEAD ORDER, however, DAJC is operator-first: place verified, substantive developments from the wider Central-European transport core first when available — Czechia, Germany, Austria, Slovakia, Poland, Hungary, Switzerland and Slovenia — followed by directly connected high-value transit corridors, then the rest of Europe. This ordering must never promote weak material over a materially more important verified change. Peripheral territories such as Madeira, Guernsey, Jersey, Monaco or similar jurisdictions belong later in the article/Rest of Europe unless a genuinely critical exceptional-transport event justifies elevation.
+The upstream DAJC monitor scans the complete DAJC European coverage area, including smaller countries, territories and relevant jurisdictions. Coverage remains Europe-wide and evidence-led. For the PUBLISHED LEAD ORDER, however, DAJC is operator-first: place verified, substantive developments from the wider Central-European transport core first when available — Czechia, Germany, Austria, Slovakia, Poland, Hungary, Switzerland and Slovenia — followed by directly connected high-value transit corridors, then the rest of Europe. This ordering must never promote weak material over a materially more important verified change. Peripheral territories such as Madeira, Guernsey, Jersey, Monaco or similar jurisdictions belong later in the article/Rest of Europe unless a genuinely critical exceptional-transport event justifies elevation. There is no country quota: never include an item to add a country.
 
 PUBLIC OUTPUT RULE — INTERNAL EDITORIAL MECHANICS MUST NEVER APPEAR IN PUBLIC TEXT
-The reader must never see internal DAJC publishing mechanics. Do not mention candidate/report counts, target counts such as 20–30 or 10–15, editorial thresholds, quality gates, retries, verification pool size, source-pool insufficiency, padding/filler decisions, workflow behavior, or why an edition contains fewer items. These rules are internal only. Public copy should contain operational intelligence and user-facing context, not commentary about how DAJC generated or selected the article.
+The reader must never see internal DAJC publishing mechanics. Do not mention candidate/report counts, capacities such as 30 or 15, editorial thresholds, quality gates, retries, verification pool size, source-pool insufficiency, padding/filler decisions, workflow behavior, or why an edition contains fewer items. Public copy contains operational intelligence and user-facing context only.
+
+FRESHNESS
+Each candidate carries publishedAt, the date the official source published it. Report what is new: a recent official announcement, or a dated change that begins, ends or materially changes around the target week. A newly discovered old page is NOT news. Never present an old announcement, an evergreen information page, a project description, a price list, a statistics release or a general authority page as this week's development.
 
 EDITORIAL SCOPE
-Relevant subjects include abnormal/oversize permits; heavy-transport weight and axle rules; exceptional restrictions; escort/private escort/police escort requirements; route authorisations; bridges/tunnels and structural restrictions; dimensions and axle loads; borders/customs/non-EU transit; long-term special-transport-relevant roadworks; ports/ferries/RoRo/project cargo; weather restrictions; wind/heat/snow limits; permit digitalisation; tolling; abnormal-load portals; routing systems; e-CMR; tachograph/enforcement; ADR where relevant; heavy-haul tractors; low-loaders/modular trailers/SPMTs; cranes; escort technology; telematics/routing APIs; AI tools; manufacturers; material acquisitions/insolvencies/capacity shifts; and major energy/industrial/infrastructure projects that generate abnormal-load demand.
+Relevant subjects include abnormal/oversize permits and permit systems; heavy-transport weight, axle and dimension rules; exceptional-transport movement conditions; escort/private escort/police escort requirements; route authorisations; bridges/tunnels and structural restrictions affecting heavy vehicles; borders/customs/non-EU transit for goods traffic; long-term (>30 days) closures of routes used by heavy transport; ports/ferries/RoRo/project cargo; weather-related heavy-vehicle restrictions; permit digitalisation and abnormal-load portals; truck tolling; e-CMR, tachograph and enforcement rules; ADR where relevant; heavy-haul equipment (low-loaders, modular trailers, SPMTs, cranes); and major energy/industrial/infrastructure projects only when they create concrete abnormal-load movements or restrictions.
 
-DRIVING-BAN FILTER — CRITICAL
-DO NOT publish an ordinary recurring year-round Sunday driving ban when nothing has changed. A permanent Sunday prohibition must not be repeated every week merely because it falls inside the target week.
-Include driving-ban information only when it is materially newsworthy for the edition: a new or changed prohibition; public-holiday prohibition; seasonal/summer/winter restriction; exceptional/emergency/weather-related restriction; temporary regional restriction; changed time window or affected vehicle/weight class; new/cancelled/suspended exemption; newly announced enforcement measure; or a specific consequence for abnormal/oversize transport. A recurring Sunday ban may be mentioned only when needed to explain a material interaction with a holiday, seasonal rule, permit condition or other new operational constraint.
+DRIVING BANS — OUT OF SCOPE
+General HGV/truck driving bans — weekend, Sunday, public-holiday, seasonal, summer, night, transit or holiday-traffic bans, whether new or recurring — are covered by DAJC's separate Driving Bans service and must NOT appear in this briefing. Include a movement restriction only when the official evidence explicitly scopes it to exceptional/abnormal/oversize/special transport (for example a changed movement window for abnormal loads, a convoy or escort rule, or a permit condition).
 
 INFRASTRUCTURE FILTER
-Do not repeat unchanged long-term restrictions every week. Re-report them only when newly announced, beginning, changed, extended, ending, materially worsening/improving, when the diversion or authorised abnormal-load route changes, or when a weight/width/height/axle condition changes. Ordinary short roadworks should normally be excluded unless their effect on special transport is critical. Road or motorway closures are publishable ONLY when the supplied verified evidence proves a planned duration longer than 30 days. No exception: a 30-day closure, a shorter closure, or an undated closure with no provable duration must be excluded.
+Do not repeat unchanged long-term restrictions. Report them only when newly announced, beginning, changed, extended, ending, materially worsening/improving, when the diversion or authorised abnormal-load route changes, or when a weight/width/height/axle condition changes. Ordinary short roadworks are excluded. Road or motorway closures are publishable ONLY when the supplied verified evidence proves a planned duration longer than 30 days. No exception: a 30-day closure, a shorter closure, or an undated closure with no provable duration must be excluded. A completed civic project, a pedestrian/cycling facility, construction-site equipment or a general infrastructure achievement is not heavy-transport intelligence.
 
 VERIFICATION / NON-INFERENCE RULES
 1. Use only supplied verified candidates. Never invent a development, route, limit, date, exemption or source.
-2. sourceUrl and sourceName MUST be copied EXACTLY from a supplied candidate.
+2. sourceUrl and sourceName MUST be copied EXACTLY from a supplied candidate. Use each candidate at most once.
 3. validFrom and validTo MUST be copied exactly when the candidate supplies an ISO YYYY-MM-DD date; otherwise return null. Never replace an unknown date with prose such as Ongoing, Indefinite, Immediate, Pending, a sentence, or punctuation.
 4. Never infer that a general HGV restriction applies to abnormal transport. State permit-specific uncertainty when applicability is not confirmed.
 5. Never infer that a general exemption applies to abnormal transport.
-6. Exclude isolated accidents, broken-down vehicles, theft reports and routine incidents.
+6. Exclude accidents, broken-down vehicles, single local transport movements, theft and police/crime reports.
 7. Procurement/tender notices are not traffic restrictions.
 8. Planned works are not restrictions unless a concrete operational effect and dates are confirmed.
 9. Use exact dates and local times where supplied. Distinguish publication date from effective date.
-10. Every published item must answer: Why does this matter to someone planning or executing heavy, abnormal, oversized or special transport in Europe? If there is no meaningful answer, exclude it.
-11. Do not repeat unchanged information merely because it appeared in an official annual calendar.
+10. Every published item must answer: Why does this matter NOW to someone planning or executing heavy, abnormal, oversized or special transport in Europe? If there is no meaningful current answer, exclude it.
+11. One report per real-world development: when several candidates describe the same change, report it once, using the most authoritative candidate.
+
+REQUIRED CANDIDATES
+Candidates marked "required": true are verified, recently published changes that directly govern exceptional/oversize transport. Each required development must appear exactly once (lead or Rest of Europe).
 
 SELECTION
-Rank findings first by operational impact, relevance to abnormal/heavy transport, urgency, evidence quality, novelty, and effect on routing, permits, timing, cost or feasibility. Then apply DAJC's lead-order geography: wider Central Europe first among substantively comparable items, connected European corridors next, peripheral jurisdictions later. A newly discovered old page is NOT fresh news. Exclude completed civic/school projects, stale archive material, generic infrastructure achievements and any item whose only relevance is that road access might theoretically improve.
-Return 20-30 distinct substantive lead reports. Twenty is the hard editorial minimum for a publishable DAJC Weekly edition. Never satisfy the count with routine Sunday bans, generic administration, old statistics or marginal filler; if fewer than 20 genuinely worthwhile verified candidates exist, return fewer and let the downstream quality gate block publication.
-
-AROUND EUROPE
-Place additional verified useful developments in europeRoundup. Return at least 10 concise short updates and cover at least 6 distinct countries/territories; 10 reports and 6 jurisdictions are hard publication minimums. Do not manufacture geographic balance and never use unchanged Sunday bans as filler. Prefer a meaningful finding from a smaller/less-covered jurisdiction over a marginal story from an already dominant major market.
+Rank qualifying findings first by operational impact, relevance to abnormal/heavy transport, urgency, evidence quality, novelty, and effect on routing, permits, timing, cost or feasibility. Then apply DAJC's lead-order geography: wider Central Europe first among substantively comparable items, connected European corridors next, peripheral jurisdictions later.
 
 STYLE
-Write practical professional English. Each lead must contain concrete What changed / Where / When / Impact / Action information through the structured fields. No marketing filler and no clickbait body copy.`;
+Write practical professional English. Each lead must contain concrete What changed / Where / When / Impact / Action information through the structured fields. timeWindow holds concrete dates/times from the evidence, or an empty string when the source gives none — never vague words such as Current, Ongoing, Future or Construction period. recommendedAction is a concrete operator/dispatcher step. No marketing filler and no clickbait body copy.`;
 
-// The model sometimes classifies a substantive verified item as roundup even
-// when the lead tier is below its hard minimum. Rebalancing presentation tiers
-// here does not weaken verification: every item still has to survive exact URL
-// cross-validation, deterministic relevance/date/closure filters and the final
-// quality gate. Any roundup slots consumed here are rebuilt later from unused
-// verified candidates by the existing roundup-repair stage.
-function rebalanceArticleTiers(article, minimumLeadCount = 20) {
-  const developments = Array.isArray(article?.developments) ? [...article.developments] : [];
-  const europeRoundup = Array.isArray(article?.europeRoundup) ? [...article.europeRoundup] : [];
-  const needed = Math.max(0, minimumLeadCount - developments.length);
-  if (needed > 0 && europeRoundup.length > 0) {
-    developments.push(...europeRoundup.splice(0, Math.min(needed, europeRoundup.length)));
-  }
-  return { ...article, developments, europeRoundup };
-}
-
-export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, targetWeekStart, targetWeekEnd, apiKey, model }) {
-  const client = new OpenAI({ apiKey });
-  const mapped = candidates.slice(0, 60).map((c) => ({
+function candidatePayload(c, { required = false, summaryChars = 1200 } = {}) {
+  return {
     country: c.country,
     location: c.location,
     type: c.type,
     title: c.title,
-    summary: String(c.summary || '').slice(0, 1200),
+    summary: String(c.summary || '').slice(0, summaryChars),
+    publishedAt: c.publishedAt || null,
     validFrom: c.validFrom || null,
     validTo: c.validTo || null,
     vehicleScope: c.vehicleScope || '',
@@ -163,97 +138,47 @@ export async function generateArticleWithOpenAI({ candidates, weekRangeLabel, ta
     exemptions: c.exemptions || '',
     isDrivingBan: Boolean(c.isDrivingBan || c.type === 'driving_ban'),
     isInfrastructure: Boolean(c.isInfrastructure || /bridge|tunnel|road_closure|roadworks|route_restriction|infrastructure/.test(c.type || '')),
-    isOfficialCalendar: Boolean(c.isOfficialCalendar),
+    required,
     sourceUrl: c.sourceUrl,
     sourceName: c.sourceName,
-  }));
+  };
+}
+
+export async function generateArticleWithOpenAI({
+  candidates, requiredSourceUrls = [], weekRangeLabel, targetWeekStart, targetWeekEnd, apiKey, model,
+}) {
+  const client = new OpenAI({ apiKey });
+  const required = new Set(requiredSourceUrls);
+  const mapped = candidates.slice(0, 60).map((c) => candidatePayload(c, { required: required.has(c.sourceUrl) }));
 
   const response = await client.chat.completions.create({
     model: model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
-      { role: 'user', content: `Target publication window: ${targetWeekStart} to ${targetWeekEnd} (${weekRangeLabel}). Select only operationally relevant verified material. Do not repeat unchanged year-round Sunday bans.\n\nVerified candidates (JSON):\n${JSON.stringify(mapped, null, 2)}` },
+      { role: 'user', content: `Target publication window: ${targetWeekStart} to ${targetWeekEnd} (${weekRangeLabel}). Select only verified material that passes every editorial rule; there is no minimum count. General HGV driving bans are out of scope.\n\nVerified candidates (JSON):\n${JSON.stringify(mapped, null, 2)}` },
     ],
     response_format: { type: 'json_schema', json_schema: ARTICLE_JSON_SCHEMA },
   });
 
   const text = response.choices?.[0]?.message?.content;
   if (!text) throw new Error('OpenAI response contained no content');
-  return rebalanceArticleTiers(JSON.parse(text));
+  return JSON.parse(text);
 }
 
-function roundupCandidateScore(candidate) {
-  const typeScore = {
-    escort_requirement: 40, police_escort: 40, permit_system: 36, permit_change: 34,
-    border_restriction: 32, weight_restriction: 30, axle_load_restriction: 30,
-    height_restriction: 30, width_restriction: 30, bridge_restriction: 28,
-    tunnel_restriction: 28, route_restriction: 28, toll_change: 26,
-    port_restriction: 24, ferry_restriction: 24, legislation: 24,
-    digitalisation: 22, enforcement: 20, project_cargo: 18, equipment: 16,
-    market: 12, infrastructure: 8,
-  }[candidate.type] || 0;
-  const text = `${candidate.title || ''} ${candidate.summary || ''}`;
-  let score = typeScore;
-  if (/exceptional transport|oversize|abnormal load|ausnahmetransport|schwertransport|convoi exceptionnel|trasporto eccezionale|transporte especial/i.test(text)) score += 30;
-  if (/escort|begleit|pilot vehicle|doprovod|accompagnement/i.test(text)) score += 24;
-  if (/toll|vignette|road user charge|m[aý]to|maut|péage|pedaggio|peaje/i.test(text)) score += 16;
-  if (candidate.status === 'new' || candidate.status === 'updated') score += 8;
-  return score;
-}
-
-export async function generateRoundupSupplementWithOpenAI({
-  candidates, targetWeekStart, targetWeekEnd, apiKey,
-  existingCountries = [], neededCountries = 0, neededReports = 0, model,
-}) {
-  if (!candidates.length || (neededCountries <= 0 && neededReports <= 0)) return [];
+// Writes report text for specific verified critical developments the main
+// synthesis left out (critical-floor.mjs). This is mandatory-coverage repair
+// for named items only - it never asks for "more" items to reach a count.
+export async function generateRequiredItemsWithOpenAI({ candidates, targetWeekStart, targetWeekEnd, apiKey, model }) {
+  if (!candidates?.length) return [];
   const client = new OpenAI({ apiKey });
-  const ranked = [...candidates].sort((a,b)=>roundupCandidateScore(b)-roundupCandidateScore(a)).slice(0, 40);
-  const payload = ranked.map((c) => ({
-    country:c.country, location:c.location, type:c.type, title:c.title,
-    summary:String(c.summary || '').slice(0,900), validFrom:c.validFrom || null, validTo:c.validTo || null,
-    vehicleScope:c.vehicleScope || '', timeWindow:c.timeWindow || '',
-    routeScope:c.routeScope || c.location || '', impact:c.impact || '',
-    recommendedAction:c.recommendedAction || '', exemptions:c.exemptions || '',
-    isDrivingBan:Boolean(c.isDrivingBan || c.type === 'driving_ban'),
-    isInfrastructure:Boolean(c.isInfrastructure || /bridge|tunnel|road_closure|roadworks|route_restriction|infrastructure/.test(c.type || '')),
-    sourceUrl:c.sourceUrl, sourceName:c.sourceName,
-  }));
+  const payload = candidates.map((c) => candidatePayload(c, { required: true, summaryChars: 1500 }));
   const response = await client.chat.completions.create({
     model: model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
     messages: [
-      { role:'system', content:'Fill only DAJC Rest of Europe from verified unused candidates. Return concise, operationally useful heavy/oversize/special-road-transport items. First add missing distinct jurisdictions, then fill the report count. Never use routine Sunday bans, generic administration, old statistics, short/undated closures, crime, accidents, procurement or filler. Copy sourceUrl/sourceName EXACTLY from supplied candidates. Copy validFrom/validTo only when supplied as exact ISO YYYY-MM-DD dates; otherwise return null.' },
-      { role:'user', content:`Target week ${targetWeekStart} to ${targetWeekEnd}. Existing countries: ${existingCountries.join(', ') || 'none'}. Need at least ${neededCountries} additional jurisdictions and ${neededReports} additional reports. Return up to 16 items.\n\nVerified unused candidates:\n${JSON.stringify(payload)}` },
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'user', content: `Target publication window: ${targetWeekStart} to ${targetWeekEnd}. Write exactly one report for each verified critical development below (merge candidates that describe the same change). Return nothing else.\n\nRequired verified candidates (JSON):\n${JSON.stringify(payload, null, 2)}` },
     ],
-    response_format:{ type:'json_schema', json_schema:ROUNDUP_SUPPLEMENT_SCHEMA },
-  });
-  const text = response.choices?.[0]?.message?.content;
-  if (!text) return [];
-  const parsed = JSON.parse(text);
-  return Array.isArray(parsed.items) ? parsed.items : [];
-}
-
-export async function generateLeadSupplementWithOpenAI({
-  candidates, targetWeekStart, targetWeekEnd, apiKey, neededReports = 0, model,
-}) {
-  if (!candidates.length || neededReports <= 0) return [];
-  const client = new OpenAI({ apiKey });
-  const payload = candidates.slice(0, 36).map((c) => ({
-    country:c.country, location:c.location, type:c.type, title:c.title,
-    summary:String(c.summary || '').slice(0,1000), validFrom:c.validFrom || null, validTo:c.validTo || null,
-    vehicleScope:c.vehicleScope || '', timeWindow:c.timeWindow || '',
-    routeScope:c.routeScope || c.location || '', impact:c.impact || '',
-    recommendedAction:c.recommendedAction || '', exemptions:c.exemptions || '',
-    isDrivingBan:Boolean(c.isDrivingBan || c.type === 'driving_ban'),
-    isInfrastructure:Boolean(c.isInfrastructure || /bridge|tunnel|road_closure|roadworks|route_restriction|infrastructure/.test(c.type || '')),
-    sourceUrl:c.sourceUrl, sourceName:c.sourceName,
-  }));
-  const response = await client.chat.completions.create({
-    model: model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
-    messages: [
-      { role:'system', content:'Select additional LEAD reports for DAJC European Oversize & Special Transport Intelligence only from supplied verified unused candidates. Each must be substantive and operationally relevant to heavy, abnormal, oversized or special road transport. Never use routine Sunday bans, generic administration, statistics, accidents/crime, procurement, short or undated road closures, or filler. Copy sourceUrl/sourceName EXACTLY. Copy validFrom/validTo only when supplied as exact ISO YYYY-MM-DD dates; otherwise return null.' },
-      { role:'user', content:`Target week ${targetWeekStart} to ${targetWeekEnd}. Need up to ${neededReports} additional substantive lead reports to reach the 20-report minimum. Return fewer if genuine material is insufficient.\n\nVerified unused candidates:\n${JSON.stringify(payload)}` },
-    ],
-    response_format:{ type:'json_schema', json_schema:LEAD_SUPPLEMENT_SCHEMA },
+    response_format: { type: 'json_schema', json_schema: REQUIRED_ITEMS_SCHEMA },
   });
   const text = response.choices?.[0]?.message?.content;
   if (!text) return [];

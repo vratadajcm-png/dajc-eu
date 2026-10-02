@@ -51,27 +51,64 @@ function normalizeForKey(text) {
     .replace(/^-+|-+$/g, '');
 }
 
+function contentChanged(previous, candidate) {
+  return (
+    previous.title !== candidate.title ||
+    previous.summary !== candidate.summary ||
+    previous.validTo !== candidate.validTo ||
+    previous.impact !== candidate.impact
+  );
+}
+
 /**
  * Merge a freshly-scraped candidate finding into the existing week's
  * findings map (keyed by findingKey). Mutates nothing - returns a new map.
  *
- * - Not seen before -> status "new", firstSeenAt = now.
+ * - Never seen before (this week or in `history`) -> status "new",
+ *   firstSeenAt = now.
  * - Seen before, content materially changed (title/summary/validTo) ->
  *   status "updated", firstSeenAt preserved.
  * - Seen before, content unchanged -> status stays "active" (or whatever it
  *   already was, unless it was "new"/"updated" from a previous run, which
  *   ages into "active").
  *
+ * `history` maps sourceUrl -> the finding as recorded in earlier ISO weeks.
+ * Each week has its own findings file, so without it every page would be
+ * "new" again every Monday - discovery would masquerade as freshness. The
+ * source URL is the identity across weeks (the dedup key also hashes the
+ * classified type, which can change when classification rules improve).
+ *
  * Findings not present in `candidates` at all this run are handled
  * separately by `markExpired` - this function only touches things the
  * monitor actually saw today.
  */
-export function mergeFindings(existingByKey, candidates, now = new Date().toISOString()) {
-  const merged = new Map(existingByKey);
+export function mergeFindings(existingByKey, candidates, now = new Date().toISOString(), { history = new Map() } = {}) {
+  const merged = new Map();
+  const keyByUrl = new Map();
+
+  // Entries already in this week's file keep their record, but inherit the
+  // real first-discovery time from earlier weeks.
+  for (const [key, finding] of existingByKey) {
+    const earlier = finding.sourceUrl ? history.get(finding.sourceUrl) : null;
+    if (earlier?.firstSeenAt && (!finding.firstSeenAt || earlier.firstSeenAt < finding.firstSeenAt)) {
+      merged.set(key, {
+        ...finding,
+        firstSeenAt: earlier.firstSeenAt,
+        status: finding.status === 'new' ? (contentChanged(earlier, finding) ? 'updated' : 'active') : finding.status,
+      });
+    } else {
+      merged.set(key, finding);
+    }
+    if (finding.sourceUrl) keyByUrl.set(finding.sourceUrl, key);
+  }
 
   for (const candidate of candidates) {
     const key = findingKey(candidate);
-    const previous = merged.get(key);
+    const existingKey = merged.has(key) ? key : keyByUrl.get(candidate.sourceUrl);
+    const previous = existingKey ? merged.get(existingKey) : (candidate.sourceUrl ? history.get(candidate.sourceUrl) : null);
+
+    if (existingKey && existingKey !== key) merged.delete(existingKey);
+    if (candidate.sourceUrl) keyByUrl.set(candidate.sourceUrl, key);
 
     if (!previous) {
       merged.set(key, {
@@ -83,23 +120,46 @@ export function mergeFindings(existingByKey, candidates, now = new Date().toISOS
       continue;
     }
 
-    const changed =
-      previous.title !== candidate.title ||
-      previous.summary !== candidate.summary ||
-      previous.validTo !== candidate.validTo ||
-      previous.impact !== candidate.impact;
-
     merged.set(key, {
       ...candidate,
-      status: changed ? 'updated' : previous.status === 'expired' || previous.status === 'superseded'
+      publishedAt: candidate.publishedAt ?? previous.publishedAt ?? null,
+      publishedAtSource: candidate.publishedAt ? (candidate.publishedAtSource ?? null) : (previous.publishedAtSource ?? null),
+      status: contentChanged(previous, candidate) ? 'updated' : previous.status === 'expired' || previous.status === 'superseded'
         ? 'new'
         : 'active',
-      firstSeenAt: previous.firstSeenAt,
+      firstSeenAt: previous.firstSeenAt || now,
       lastCheckedAt: now,
     });
   }
 
   return merged;
+}
+
+/**
+ * sourceUrl -> earliest recorded sighting across earlier weeks' findings
+ * (most recent record for content/publication fields, earliest firstSeenAt).
+ * @param {Iterable<object>[]} weeksNewestFirst
+ */
+export function buildFindingHistory(weeksNewestFirst = []) {
+  const history = new Map();
+  for (const findings of weeksNewestFirst) {
+    for (const finding of findings) {
+      if (!finding?.sourceUrl) continue;
+      const known = history.get(finding.sourceUrl);
+      if (!known) {
+        history.set(finding.sourceUrl, { ...finding });
+        continue;
+      }
+      if (finding.firstSeenAt && (!known.firstSeenAt || finding.firstSeenAt < known.firstSeenAt)) {
+        known.firstSeenAt = finding.firstSeenAt;
+      }
+      if (!known.publishedAt && finding.publishedAt) {
+        known.publishedAt = finding.publishedAt;
+        known.publishedAtSource = finding.publishedAtSource ?? null;
+      }
+    }
+  }
+  return history;
 }
 
 /**

@@ -27,9 +27,14 @@ export const NON_RESTRICTION_PATTERNS = [
   { reason: 'personal driver-licensing administration, not an oversize/freight operational change', pattern: /permisos? de conducir|permiso por puntos|autoescuel|centro de formaci[oó]n|canjes? de permisos|recuperaci[oó]n de permisos|driving licen[cs]e|driver licen[cs]e|f[uü]hrerausweis/i },
   { reason: 'generic authority/navigation page, not a specific operational development', pattern: /wetten,? regels en vergunningen|laws,? rules and permits|datenschutzerkl[aä]rung|newsletter baustellenmeldungen|^autobahnbr[uü]cken\b|^baustellenkarte\b/i },
   { reason: 'toll revenue/statistics report, not an operational toll-rule change', pattern: /toll collection.{0,80}(?:billion|million|grew|growth|year[- ]on[- ]year|revenue)|(?:billion|million).{0,80}toll(?:s| collection)|mýtného.{0,80}(?:miliard|milion)|výběr mýta.{0,80}(?:miliard|milion)/i },
+  { reason: 'statistics release, not an operational rule or restriction change', pattern: /\b(?:accredited )?official statistics\b|statistical release|statistik(?:bericht|en ver(?:ö|oe)ffentlicht)/i },
+  {
+    reason: 'police/crime/accident report, not a transport rule or restriction',
+    pattern: /zeugenaufruf|zeugen gesucht|hausfriedensbruch|sachbesch(?:ä|ae)digung|diebstahl|einbruch|verfolgungsfahrt|festnahme|festgenommen|haftbefehl|geldstrafe|alkoholisiert|trunkenheitsfahrt|unter alkoholeinfluss|zu schnell|geschwindigkeits(?:ü|ue)berschreitung|verkehrsunfall|unfallflucht|(?:schwer|leicht|tödlich|toedlich) verletzt|ladung (?:zu )?verlieren|ladung verloren|ladung verrutscht/i,
+  },
 ];
 
-export function checkOperationalRelevance(text) {
+export function checkOperationalRelevance(text, { now = new Date() } = {}) {
   const safeText = text || '';
   if (EXCLUSION_PATTERNS.test(safeText)) return { ok: false, reason: 'generic crime/administrative content, not transport-relevant' };
   for (const { reason, pattern } of NON_RESTRICTION_PATTERNS) {
@@ -39,7 +44,7 @@ export function checkOperationalRelevance(text) {
   // Discovery is not freshness: explicitly historical pages stay excluded even
   // when the crawler encounters them for the first time this week.
   const years = [...safeText.matchAll(/\b(20\d{2})\b/g)].map((m) => Number(m[1]));
-  const currentYear = new Date().getUTCFullYear();
+  const currentYear = now.getUTCFullYear();
   if (years.length > 0 && Math.max(...years) < currentYear) {
     return { ok: false, reason: 'historical archive item predating the current year' };
   }
