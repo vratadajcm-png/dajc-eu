@@ -14,6 +14,7 @@ import { FINDING_TYPES } from './findings.mjs';
 import { checkOperationalRelevance } from './relevance-filter.mjs';
 import { checkIngestionRoadContext } from './transport-domain.mjs';
 import { extractPublicationDate } from './publication-date.mjs';
+import { looksBinary } from './text-quality.mjs';
 
 const FETCH_TIMEOUT_MS = 12_000;
 const FETCH_RETRIES = 2;
@@ -358,6 +359,9 @@ async function enrichDetailFindings(findings, source, listingUrl) {
         'text/html, application/xhtml+xml, */*'
       );
       if (!fetched.ok) continue;
+      // A PDF or other binary document is not readable text here: keep the
+      // listing-level title/summary (and the URL date) instead of bytes.
+      if (looksBinary(fetched.text)) continue;
 
       const detailText = extractDetailText(fetched.text);
       if (detailText.length < 120 || !checkOperationalRelevance(detailText).ok) continue;

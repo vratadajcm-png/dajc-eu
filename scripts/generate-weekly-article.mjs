@@ -46,7 +46,7 @@ import { crossValidateDevelopments } from './lib/cross-validate.mjs';
 import { attachCriticalGroupSources, criticalWeeklyGroups, missingCriticalGroups } from './lib/critical-floor.mjs';
 import { filterGeneratedItems } from './lib/generated-item-filter.mjs';
 import { loadPreviousEditionSources } from './lib/previous-editions.mjs';
-import { FRESHNESS_WINDOW_DAYS } from './lib/weekly-eligibility.mjs';
+import { FRESHNESS_WINDOW_DAYS, editionFreshSince } from './lib/weekly-eligibility.mjs';
 import { oversizeSources } from '../config/oversize-sources/index.mjs';
 
 const execFileAsync = promisify(execFile);
@@ -223,15 +223,17 @@ async function main() {
     excludeSlugs: [`eu-oversize-weekly-${nextWeekLabel.toLowerCase()}`, `eu-oversize-weekly-preview-${nextWeekLabel.toLowerCase()}`],
   });
   const sourceByName = new Map(oversizeSources.map((source) => [source.name, source]));
+  const freshSince = editionFreshSince(now, publicationSlot);
   const eligibilityContext = {
     now,
+    freshSince,
     weekStart: targetWeekStart,
     weekEnd: targetWeekEnd,
     previousEditions,
     sourceMetaFor: (candidate) => sourceByName.get(candidate.sourceName) || null,
   };
   console.log(
-    `Eligibility: source publication date within ${FRESHNESS_WINDOW_DAYS} days (or validity beginning/ending in ${nextWeekLabel}), ` +
+    `Eligibility: source published on/after ${freshSince.toISOString().slice(0, 10)} (${FRESHNESS_WINDOW_DAYS} days before preparation) or validity beginning/ending in ${nextWeekLabel}, ` +
       `heavy-transport scope, no general driving bans, no generic pages, ${previousEditions.size} source URL(s) already published in earlier editions.`
   );
 

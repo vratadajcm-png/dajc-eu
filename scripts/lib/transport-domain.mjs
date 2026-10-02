@@ -15,6 +15,7 @@
 // than 30 days matters for heavy-transport routing without further wording.
 
 import { checkLongRoadClosure } from './closure-duration.mjs';
+import { looksBinary } from './text-quality.mjs';
 
 export const HEAVY_TRANSPORT_CONTEXT = new RegExp([
   // exceptional / abnormal / oversize transport
@@ -94,7 +95,7 @@ function candidateText(candidate) {
     candidate.whatChanged,
     candidate.vehicleScope,
     candidate.impact,
-  ].filter(Boolean).join(' ');
+  ].filter((part) => part && !looksBinary(part)).join(' ');
 }
 
 export function checkTransportDomainRelevance(candidate = {}) {

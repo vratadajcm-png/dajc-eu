@@ -4,6 +4,7 @@
 // again after generation before publication.
 
 import OpenAI from 'openai';
+import { readableText } from './text-quality.mjs';
 
 const DEFAULT_MODEL = 'gpt-4o';
 
@@ -126,7 +127,7 @@ function candidatePayload(c, { required = false, summaryChars = 1200 } = {}) {
     location: c.location,
     type: c.type,
     title: c.title,
-    summary: String(c.summary || '').slice(0, summaryChars),
+    summary: String(readableText(c.summary) || '').slice(0, summaryChars),
     publishedAt: c.publishedAt || null,
     validFrom: c.validFrom || null,
     validTo: c.validTo || null,

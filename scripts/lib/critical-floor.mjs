@@ -14,6 +14,7 @@
 // gate blocks publication if one is still missing.
 
 import { checkFreshness } from './weekly-eligibility.mjs';
+import { readableText } from './text-quality.mjs';
 
 const HIGH_SIGNAL_TYPES = new Set([
   'permit_change',
@@ -39,7 +40,7 @@ export function isCriticalWeeklyCandidate(candidate, ctx = {}) {
   if (!candidate?.sourceUrl || !ctx.now) return false;
   if (!checkFreshness(candidate, ctx).ok) return false;
 
-  const text = `${candidate.title || ''} ${candidate.summary || ''}`;
+  const text = `${candidate.title || ''} ${readableText(candidate.summary) || ''}`;
   return OVERSIZE_SIGNAL.test(text) && (HIGH_SIGNAL_TYPES.has(candidate.type) || REGULATORY_SIGNAL.test(text));
 }
 

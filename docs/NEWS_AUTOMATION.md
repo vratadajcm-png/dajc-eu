@@ -183,7 +183,10 @@ again on Monday. Every finding also carries `publishedAt` /
 `publishedAtSource` - the date the official source published it (page
 `datePublished`/publication metadata, feed date, a labelled or leading date
 in the text, or a date in the URL; `scripts/lib/publication-date.mjs`), or
-`null` when there is no evidence. `superseded` is reserved for a human/AI-identified
+`null` when there is no evidence. A PDF or other binary document fetched as
+a detail page is never read as text (`scripts/lib/text-quality.mjs`): the
+listing title and the URL date are kept, and binary bytes can neither match
+relevance keywords nor reach the model. `superseded` is reserved for a human/AI-identified
 case where one finding fully replaces another (not yet automated - see
 Troubleshooting).
 
@@ -225,7 +228,7 @@ planned/future works (see `NON_RESTRICTION_PATTERNS` in
 The following rules are hard publication requirements in plain code, not prompt-only guidance:
 
 - **No count forcing.** Up to 30 lead reports and up to 15 Rest-of-Europe updates; no minimum, no country quota. The roundup is deliberately short-form and is omitted when nothing further qualifies.
-- **Freshness by publication date.** A candidate qualifies only if the official source published it within the last 14 days before preparation, or its verified validity begins or ends in the target week. Discovery date never counts; undated material is never published.
+- **Freshness by publication date.** A candidate qualifies only if the official source published it within the last 14 days before preparation, or its verified validity begins or ends in the target week. Discovery date never counts; undated material is never published. The window is anchored to the edition's Thursday preparation day, so a Friday recovery or Saturday catch-up run judges freshness exactly like the Thursday run would have.
 - **One specific development.** Homepages, listing/landing pages, project/programme pages, FAQ and organisation pages and bare topic titles are excluded; several pages about one development are reported once.
 - **No repetition.** A source already cited by an earlier edition is excluded unless the source republished it after that edition.
 - **Heavy-transport scope.** The candidate's own text must show heavy/abnormal/oversize transport context; a generic road, tunnel or bridge mention - or the publishing authority's name - is not enough.

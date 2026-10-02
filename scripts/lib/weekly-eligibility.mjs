@@ -14,6 +14,7 @@ import { checkTransportDomainRelevance } from './transport-domain.mjs';
 import { checkLongRoadClosure } from './closure-duration.mjs';
 import { checkWeeklyDrivingBanPolicy } from './weekly-driving-ban-policy.mjs';
 import { isValidIsoDate, validateDevelopmentDateRange } from './date-validation.mjs';
+import { readableText } from './text-quality.mjs';
 
 /** A source item is current news only if the source published it within this window. */
 export const FRESHNESS_WINDOW_DAYS = 14;
@@ -31,11 +32,23 @@ export function freshnessWindowStart(now, days = FRESHNESS_WINDOW_DAYS) {
 }
 
 /**
+ * Start of an edition's freshness window. The window is anchored to the
+ * edition's preparation day - the Thursday before its Friday 12:00 slot - so
+ * a Friday recovery or Saturday catch-up run judges freshness exactly like
+ * the Thursday run would have; an earlier run (e.g. a preview) uses its own
+ * day.
+ */
+export function editionFreshSince(now, publicationSlot, days = FRESHNESS_WINDOW_DAYS) {
+  const preparation = new Date(Math.min(now.getTime(), new Date(publicationSlot).getTime() - DAY_MS));
+  return freshnessWindowStart(preparation, days);
+}
+
+/**
  * Freshness is proven by the source's own publication date, never by the
  * date DAJC discovered the page. A dated change that begins or ends inside
  * the target week is also current, even if it was announced earlier.
  */
-export function checkFreshness(candidate = {}, { now, weekStart, weekEnd, windowDays = FRESHNESS_WINDOW_DAYS } = {}) {
+export function checkFreshness(candidate = {}, { now, freshSince = null, weekStart, weekEnd, windowDays = FRESHNESS_WINDOW_DAYS } = {}) {
   if (!(now instanceof Date) || Number.isNaN(now.getTime())) {
     throw new Error('checkFreshness requires a valid `now`');
   }
@@ -46,7 +59,7 @@ export function checkFreshness(candidate = {}, { now, weekStart, weekEnd, window
     if (day.getTime() > now.getTime() + DAY_MS) {
       return { ok: false, reason: `publication date ${published} lies in the future - not a verifiable publication date` };
     }
-    if (day >= freshnessWindowStart(now, windowDays)) return { ok: true, basis: 'published' };
+    if (day >= (freshSince || freshnessWindowStart(now, windowDays))) return { ok: true, basis: 'published' };
   }
 
   if (weekStart && weekEnd) {
@@ -132,7 +145,7 @@ const ENFORCEMENT_CAMPAIGN =
  */
 export function checkSourceSuitability(candidate = {}, sourceMeta = null) {
   if (sourceMeta?.type !== 'police') return { ok: true };
-  const text = `${candidate.title || ''} ${candidate.summary || ''}`;
+  const text = `${candidate.title || ''} ${readableText(candidate.summary) || ''}`;
   if (ENFORCEMENT_CAMPAIGN.test(text)) return { ok: true };
   return {
     ok: false,
@@ -163,7 +176,7 @@ export function checkNotPreviouslyPublished(candidate = {}, previousEditions = n
  *   previousEditions?: Map<string, object>, sourceMetaFor?: (c: object) => object|null }} ctx
  */
 export function checkWeeklyEligibility(candidate = {}, ctx = {}) {
-  const text = `${candidate.title || ''} ${candidate.summary || ''}`;
+  const text = `${candidate.title || ''} ${readableText(candidate.summary) || ''}`;
   const checks = [
     () => checkOperationalRelevance(text, { now: ctx.now }),
     () => checkTransportDomainRelevance(candidate),

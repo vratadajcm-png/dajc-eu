@@ -7,6 +7,7 @@ import {
   checkSourceSuitability,
   checkSpecificDevelopment,
   checkWeeklyEligibility,
+  editionFreshSince,
 } from '../weekly-eligibility.mjs';
 import { loadPreviousEditionSources } from '../previous-editions.mjs';
 import { oversizeSources } from '../../../config/oversize-sources/index.mjs';
@@ -152,5 +153,27 @@ describe('checkNotPreviouslyPublished', () => {
   });
   it('allows the source again when it was republished after that edition', () => {
     expect(checkNotPreviouslyPublished({ sourceUrl: 'https://example.test/a', publishedAt: '2026-09-30' }, previous).ok).toBe(true);
+  });
+});
+
+describe('editionFreshSince', () => {
+  const slot = new Date('2026-10-02T10:00:00Z'); // Friday 12:00 Prague
+  it('anchors a late (Friday/Saturday) run to the Thursday preparation day', () => {
+    expect(editionFreshSince(new Date('2026-10-02T12:17:00Z'), slot).toISOString().slice(0, 10)).toBe('2026-09-17');
+    expect(editionFreshSince(new Date('2026-10-03T06:17:00Z'), slot).toISOString().slice(0, 10)).toBe('2026-09-17');
+  });
+  it('uses the run day itself for an earlier run', () => {
+    expect(editionFreshSince(new Date('2026-10-01T03:17:00Z'), slot).toISOString().slice(0, 10)).toBe('2026-09-17');
+    expect(editionFreshSince(new Date('2026-09-28T09:00:00Z'), slot).toISOString().slice(0, 10)).toBe('2026-09-14');
+  });
+});
+
+describe('binary documents are never content', () => {
+  it('ignores a PDF read as text when judging scope', async () => {
+    const pdfBytes = '%PDF-1.7 %��� 1 0 obj stream x��]Yo9~7 7,5 t Lkw ��';
+    const item = { ...fresh, title: 'SSC zrekonštruuje most na ceste I/65 pri Zlatých Moravciach', summary: pdfBytes, sourceUrl: 'https://www.ssc.sk/files/ts_17.09.2026_most.pdf', publishedAt: '2026-09-29' };
+    const result = checkWeeklyEligibility(item, await w41Context());
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/no demonstrated heavy\/abnormal\/oversize road-transport context/);
   });
 });
