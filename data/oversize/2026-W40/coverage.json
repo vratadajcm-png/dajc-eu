@@ -1,6 +1,6 @@
 {
   "week": "2026-W40",
-  "checkedAt": "2026-10-01T12:16:12.772Z",
+  "checkedAt": "2026-10-02T11:45:04.161Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -269,7 +269,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 22
+      "candidateFindings": 25
     },
     {
       "code": "GR",
@@ -630,7 +630,7 @@
         "sk-ssc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "SI",
@@ -650,17 +650,14 @@
       "code": "ES",
       "name": "Spain",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -927,34 +924,28 @@
       "code": "CEU",
       "name": "Ceuta",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "MLL",
       "name": "Melilla",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -989,17 +980,14 @@
       "code": "CAN",
       "name": "Canary Islands",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -1456,51 +1444,42 @@
       "code": "CAT",
       "name": "Catalonia",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "BAS",
       "name": "Basque Country",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
       "code": "GAL",
       "name": "Galicia",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "es-dgt"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "es-dgt",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "es-dgt"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
