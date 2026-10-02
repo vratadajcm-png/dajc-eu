@@ -8,7 +8,7 @@ import { validateDevelopmentDateRange } from './date-validation.mjs';
 import { checkLongRoadClosure } from './closure-duration.mjs';
 import { checkTransportDomainRelevance } from './transport-domain.mjs';
 import { checkWeeklyDrivingBanPolicy } from './weekly-driving-ban-policy.mjs';
-import { checkWeeklyEligibility } from './weekly-eligibility.mjs';
+import { checkWeeklyEligibility, OUTLOOK_DAYS } from './weekly-eligibility.mjs';
 
 /**
  * Checks one generated item. `candidate` is the verified record behind the
@@ -36,7 +36,7 @@ export function checkGeneratedItem(item, { weekStart, weekEnd, candidate = null,
   if (weekStart && weekEnd) {
     const date = validateDevelopmentDateRange(
       { validFrom: item.validFrom, validTo: item.validTo },
-      { weekStart, weekEnd }
+      { weekStart, weekEnd, outlookDays: OUTLOOK_DAYS }
     );
     if (!date.ok) return date;
   }

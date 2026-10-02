@@ -27,12 +27,20 @@ function targetFor(now = new Date()) {
 async function main() {
   const now = process.env.OVERSIZE_NOW ? new Date(process.env.OVERSIZE_NOW) : new Date();
   const target = targetFor(now);
-  const needed = !existsSync(target.absolutePath);
+  const exists = existsSync(target.absolutePath);
+  // A manual correction run regenerates the current target edition even if
+  // it exists; the generator replaces it only if the new edition passes.
+  const correction = process.env.OVERSIZE_CORRECTION === '1';
+  const needed = !exists || correction;
 
   console.log(`Target weekly article: ${target.relativePath}`);
-  console.log(needed
-    ? 'Publication needed: target article does not exist.'
-    : 'Publication not needed: target article already exists; this run is an idempotent no-op.');
+  if (exists && correction) {
+    console.log('Correction requested: the existing article will be regenerated and replaced only if the new edition passes every check.');
+  } else {
+    console.log(needed
+      ? 'Publication needed: target article does not exist.'
+      : 'Publication not needed: target article already exists; this run is an idempotent no-op.');
+  }
 
   if (process.env.GITHUB_OUTPUT) {
     await appendFile(

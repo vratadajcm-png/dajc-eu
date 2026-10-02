@@ -228,12 +228,14 @@ planned/future works (see `NON_RESTRICTION_PATTERNS` in
 The following rules are hard publication requirements in plain code, not prompt-only guidance:
 
 - **No count forcing.** Up to 30 lead reports and up to 15 Rest-of-Europe updates; no minimum, no country quota. The roundup is deliberately short-form and is omitted when nothing further qualifies.
-- **Freshness by publication date.** A candidate qualifies only if the official source published it within the last 14 days before preparation, or its verified validity begins or ends in the target week. Discovery date never counts; undated material is never published. The window is anchored to the edition's Thursday preparation day, so a Friday recovery or Saturday catch-up run judges freshness exactly like the Thursday run would have.
+- **Freshness - discovery is not news.** A candidate qualifies only if the official source published it within the last 14 days before preparation; or its explicitly stated validity takes effect or ends in the target week; or explicit start and end dates show it in force during the target week; or it takes effect within the 30-day outlook after the target week. Discovery date never counts; undated material without such evidence is never published. Effective dates are read only from explicit wording (`extractValidityPeriod`, `scripts/lib/publication-date.mjs`). The window is anchored to the edition's Thursday preparation day, so a Friday recovery or Saturday catch-up run judges freshness exactly like the Thursday run would have.
+- **Hard exclusions** (`checkEditorialExclusions`): completed projects/openings without a current restriction, pedestrian/cycling facilities, school/civic/public-space projects, PR/event items and market/financial news; plus the relevance-filter exclusions (accidents, breakdowns, crime, procurement, statistics).
 - **One specific development.** Homepages, listing/landing pages, project/programme pages, FAQ and organisation pages and bare topic titles are excluded; several pages about one development are reported once.
 - **No repetition.** A source already cited by an earlier edition is excluded unless the source republished it after that edition.
 - **Heavy-transport scope.** The candidate's own text must show heavy/abnormal/oversize transport context; a generic road, tunnel or bridge mention - or the publishing authority's name - is not enough.
 - **Driving bans.** General HGV bans are out of scope (separate DAJC Driving Bans system).
-- A road/motorway closure is publishable only when the official evidence proves a **planned duration longer than 30 days**. A 30-day closure, a shorter closure, or an undated/"until further notice" closure with no provable duration is excluded. There is no corridor-based exception to this threshold.
+- A road/motorway closure - and likewise roadworks - is publishable only when the official evidence proves a **planned duration longer than 30 days**. A 30-day closure, a shorter closure, or an undated/"until further notice" closure with no provable duration is excluded. There is no corridor-based exception to this threshold. Genuine weight/height/width/axle-load, permit, escort and abnormal-load-corridor restrictions are exempt from the duration rule and judged on operational impact.
+- **Operator-first order is deterministic** (`scripts/lib/edition-order.mjs`): importance tier first, then Czechia, Germany, Austria, Slovakia, Poland, Hungary, Switzerland, Slovenia, then connected corridors, the rest of Europe and peripheral jurisdictions. Lead reports are rendered as one list in that order.
 - RSS/Atom is never treated as complete coverage. Every configured authority is scanned through the feed **and** its official web/HTML news/traffic pages; results are merged and deduplicated.
 - Fresh (recently published) verified high-signal changes directly affecting exceptional/oversized transport (permits, escort/private-escort rules, police escort, border restrictions, weight/width/height/axle limits, relevant regulatory procedures) are **required coverage**. A quality gate blocks publication if such a development is omitted from both lead reports and Rest of Europe.
 - `config/europe-coverage.mjs` is the single mandatory geographic coverage universe. It includes every country and territory approved for DAJC coverage, including alternative MPZ aliases and dependent/overseas territories. CI fails if any registry item loses its configured source mapping.
@@ -549,6 +551,18 @@ Either way, the specific reason is always logged and written to
 `$GITHUB_STEP_SUMMARY`, and **no partial or broken file is ever left
 behind** under any of these outcomes.
 
+### Correction of a published edition (manual)
+
+`publish-weekly-oversize.yml` with the `correction` input regenerates the
+current target edition from source data (monitor -> eligibility ->
+verification -> synthesis -> post-generation filters -> quality gate ->
+build). The published file is replaced only after all of that passes,
+in one commit (`content: replace EU Oversize Weekly <week> with corrected
+edition`) and with `updatedAt` set. If the regenerated edition does not
+qualify (nothing passes the rules, gate or build failure), the published
+edition is left untouched and the run fails with `CORRECTION BLOCKED` and
+the exact reason. A `dry_run` + `correction` run previews the result.
+
 ### Never overwrites or deletes published content
 
 This is a hard invariant, true under every failure mode, not just the
@@ -563,7 +577,9 @@ common ones:
   (exit 0, logged clearly) without touching it. It never overwrites an
   existing article, so accidentally running the publish step twice in one
   week cannot silently replace or duplicate-cost-regenerate that week's
-  article.
+  article. The only exception is an explicit manual correction run (see
+  "Correction of a published edition"), which replaces the file only after
+  the regenerated edition has passed every check and the build.
 - On any failure *after* the file is written (build failure), only that
   same just-written file is deleted - never any other file.
 - `--dry-run` never writes to the real target path at all, not even

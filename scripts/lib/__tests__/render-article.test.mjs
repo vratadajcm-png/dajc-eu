@@ -94,13 +94,13 @@ describe('renderArticleMarkdown', () => {
       publishedAt: '2026-08-21',
       nextPublicationLabel: null,
     });
-    expect(body).toContain('## Exceptional-transport movement restrictions');
-    expect(body).not.toContain('## Driving bans');
+    expect(body).toContain('**Category:** Exceptional-transport movement restriction');
+    expect(body).not.toContain('Driving bans');
     expect(body).not.toContain('## Infrastructure restrictions');
     expect(body).not.toContain('## Main developments');
   });
 
-  it('renders exactly one section when all developments are driving bans, plus checklist and sources', () => {
+  it('renders all lead reports in one ordered section, plus checklist and sources', () => {
     const developments = Array.from({ length: 10 }, (_, i) => ({
       country: 'Country',
       title: `Report number ${i}`,
@@ -118,12 +118,12 @@ describe('renderArticleMarkdown', () => {
       publishedAt: '2026-08-21',
       nextPublicationLabel: 'Friday, 28 August 2026 at 12:00 CEST',
     });
-    expect(body).toContain('## Exceptional-transport movement restrictions');
+    expect(body).toContain('## Lead reports');
     expect(body).toContain('## Operator checklist');
     expect(body).toContain('## Sources');
     expect(body).toContain('## Next EU Oversize Weekly');
     // Exactly one occurrence of each heading - no secondary section repeats the reports.
-    for (const heading of ['## Exceptional-transport movement restrictions', '## Operator checklist', '## Sources']) {
+    for (const heading of ['## Lead reports', '## Operator checklist', '## Sources']) {
       expect(body.split(heading).length - 1).toBe(1);
     }
   });
@@ -191,5 +191,28 @@ describe('renderArticleMarkdown', () => {
     });
     expect(frontmatter.updatedAt).toBe('2026-10-02T15:00:00.000Z');
     expect(toFrontmatterYaml(frontmatter)).toContain('updatedAt: 2026-10-02T15:00:00.000Z');
+  });
+
+  it('keeps the pipeline order of lead reports across categories', () => {
+    const make = (country, title, isInfrastructure) => ({
+      country, title, whatChanged: 'Change.', recommendedAction: 'Act now.', isDrivingBan: false, isInfrastructure,
+      sourceUrl: `https://example.test/${title}`, sourceName: 'Source',
+    });
+    const { body } = renderArticleMarkdown(makeArticle([
+      make('Czechia', 'first', false),
+      make('Madeira', 'second', true),
+    ]), { slug: 'eu-oversize-weekly-2026-w99', publishedAt: '2026-08-21', nextPublicationLabel: null });
+    expect(body.indexOf('### first')).toBeLessThan(body.indexOf('### second'));
+  });
+
+  it('marks a change taking effect after the covered week as outlook', () => {
+    const item = {
+      country: 'Austria', title: 'Escort rule change', whatChanged: 'New escort rule.', recommendedAction: 'Prepare escorts.',
+      validFrom: '2026-10-20', sourceUrl: 'https://example.test/o', sourceName: 'Source',
+    };
+    const { body } = renderArticleMarkdown(makeArticle([item]), {
+      slug: 'eu-oversize-weekly-2026-w41', publishedAt: '2026-10-02', nextPublicationLabel: null, weekEnd: '2026-10-11',
+    });
+    expect(body).toContain('**Outlook:** takes effect 2026-10-20');
   });
 });

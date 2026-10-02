@@ -12,7 +12,7 @@
 
 import { execFileSync } from 'node:child_process';
 import { appendFileSync } from 'node:fs';
-import { decidePublishCommit, extractArticleWeekFromStatus } from './lib/publish-gate.mjs';
+import { decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement } from './lib/publish-gate.mjs';
 
 function git(args) {
   return execFileSync('git', args, { encoding: 'utf-8' });
@@ -87,7 +87,8 @@ if (articleAdded) {
   week = extraction.week;
 }
 
-const decision = decidePublishCommit({ articleAdded, dataChanged, week });
+const articleReplaced = articleAdded && isArticleReplacement(articleStatusOutput);
+const decision = decidePublishCommit({ articleAdded, articleReplaced, dataChanged, week });
 
 if (!decision.commit) {
   summary(

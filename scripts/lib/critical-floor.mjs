@@ -30,7 +30,7 @@ const HIGH_SIGNAL_TYPES = new Set([
   'driving_ban',
 ]);
 
-const OVERSIZE_SIGNAL =
+export const OVERSIZE_SIGNAL =
   /exceptional transport|exceptional vehicle|oversize|oversized|abnormal load|wide load|heavy transport|schwertransport|gro[ßs]raum|ausnahmetransport|convoi exceptionnel|transport exceptionnel|trasporto eccezionale|transporte especial|izvanredni prijevoz|agabaritic|special transport|pilot vehicle|escort vehicle|begleitfahrzeug|private escort|police escort|route permit|special permit|overweight permit|overdimension|nadrozm[eě]rn|nadmern/i;
 
 const REGULATORY_SIGNAL =

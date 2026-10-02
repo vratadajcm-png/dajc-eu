@@ -50,12 +50,25 @@ export function extractArticleWeekFromStatus(statusOutput) {
   return { ok: true, week: `${year}-W${week}`, filename: matches[0].filename };
 }
 
-export function decidePublishCommit({ articleAdded, dataChanged, week }) {
+/**
+ * Whether the article change in `git status --porcelain` output replaces an
+ * existing (tracked) file rather than adding a new one - a manual correction.
+ */
+export function isArticleReplacement(statusOutput) {
+  return (statusOutput || '')
+    .split('\n')
+    .filter((line) => ARTICLE_FILENAME_PATTERN.test(line.slice(3).trim().split(/[/\\]/).pop() || ''))
+    .some((line) => /M/.test(line.slice(0, 2)));
+}
+
+export function decidePublishCommit({ articleAdded, articleReplaced = false, dataChanged, week }) {
   if (articleAdded) {
     return {
       commit: true,
       addPaths: ['data/oversize', 'src/content/news/eu-oversize'],
-      message: `content: publish EU Oversize Weekly ${week}`,
+      message: articleReplaced
+        ? `content: replace EU Oversize Weekly ${week} with corrected edition`
+        : `content: publish EU Oversize Weekly ${week}`,
     };
   }
   if (dataChanged) {

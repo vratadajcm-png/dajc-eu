@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { decidePublishCommit, extractArticleWeekFromStatus } from '../publish-gate.mjs';
+import { decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement } from '../publish-gate.mjs';
 
 describe('decidePublishCommit', () => {
   it('produces a publish commit when a new article was added', () => {
@@ -81,5 +81,20 @@ describe('extractArticleWeekFromStatus', () => {
     const result = extractArticleWeekFromStatus('A  src/content/news/eu-oversize/eu-oversize-weekly-2026-w40.md\n');
     expect(result.ok).toBe(true);
     expect(result.week).toBe('2026-W40');
+  });
+});
+
+describe('corrected edition replacing a published article', () => {
+  it('detects a modified (replaced) article file', () => {
+    expect(isArticleReplacement(' M src/content/news/eu-oversize/eu-oversize-weekly-2026-w41.md\n')).toBe(true);
+    expect(isArticleReplacement('?? src/content/news/eu-oversize/eu-oversize-weekly-2026-w42.md\n')).toBe(false);
+  });
+
+  it('labels the commit as a replacement with the article week', () => {
+    const status = ' M src/content/news/eu-oversize/eu-oversize-weekly-2026-w41.md\n';
+    const extraction = extractArticleWeekFromStatus(status);
+    expect(extraction.week).toBe('2026-W41');
+    const decision = decidePublishCommit({ articleAdded: true, articleReplaced: isArticleReplacement(status), dataChanged: true, week: extraction.week });
+    expect(decision.message).toBe('content: replace EU Oversize Weekly 2026-W41 with corrected edition');
   });
 });

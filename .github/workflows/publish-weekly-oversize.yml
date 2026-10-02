@@ -37,7 +37,7 @@ on:
         type: boolean
         default: false
       correction:
-        description: 'Regeneration of a withdrawn edition: stamp updatedAt so readers can see the edition changed.'
+        description: 'Regenerate the current target edition from source data; replaces an existing article only if the new edition passes every gate and the build (stamps updatedAt).'
         type: boolean
         default: false
 
@@ -89,6 +89,8 @@ jobs:
       - name: Check whether target week is already published
         if: steps.trigger.outputs.should_run == 'true'
         id: publish-needed
+        env:
+          OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
         run: node scripts/check-weekly-publication.mjs
 
       - name: Determine dry-run mode

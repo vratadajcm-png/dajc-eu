@@ -3,13 +3,12 @@
 // into frontmatter + Markdown body matching src/content.config.ts's schema
 // and the structure required for EU Oversize Weekly articles.
 //
-// Categorization is mutually exclusive and each development is rendered
-// EXACTLY ONCE - see scripts/lib/__tests__/render-article.test.mjs. This
-// fixes the incident where every development was rendered under "Main
-// developments" AND AGAIN under "Driving bans next week" and/or
-// "Infrastructure watch" whenever its isDrivingBan/isInfrastructure flags
-// were set, because the old renderer treated those flags as additive
-// overlays instead of a single categorization.
+// Lead reports are rendered as ONE list, in the order the pipeline decided
+// (edition-order.mjs: importance first, then Central Europe first), so the
+// published order is exactly the deterministic, tested order. Each
+// development carries one category label and is rendered EXACTLY ONCE - see
+// scripts/lib/__tests__/render-article.test.mjs (the W35 incident rendered
+// developments twice because category flags were additive overlays).
 
 function mdEscape(text) {
   return String(text ?? '').replace(/\r\n/g, '\n').trim();
@@ -25,11 +24,19 @@ function formatDateRange(item) {
   return null;
 }
 
-function renderDevelopmentItem(item) {
+function outlookLine(item, weekEnd) {
+  return weekEnd && item.validFrom && item.validFrom > weekEnd
+    ? `**Outlook:** takes effect ${item.validFrom}, after the week covered by this edition`
+    : null;
+}
+
+function renderDevelopmentItem(item, { weekEnd = null } = {}) {
   const lines = [`### ${mdEscape(item.title)} (${mdEscape(item.country)})`, ''];
   lines.push(mdEscape(item.whatChanged));
   lines.push('');
-  const meta = [];
+  const meta = [`**Category:** ${CATEGORY_LABELS[categorizeDevelopment(item)]}`];
+  const outlook = outlookLine(item, weekEnd);
+  if (outlook) meta.push(outlook);
   if (item.where) meta.push(`**Where:** ${mdEscape(item.where)}`);
   if (item.vehicleScope) meta.push(`**Affected vehicles:** ${mdEscape(item.vehicleScope)}`);
   const range = formatDateRange(item);
@@ -58,8 +65,9 @@ function renderDevelopmentItem(item) {
   return lines.join('\n');
 }
 
-function renderRoundupItem(item) {
+function renderRoundupItem(item, { weekEnd = null } = {}) {
   const bits = [];
+  if (weekEnd && item.validFrom && item.validFrom > weekEnd) bits.push(`Outlook: takes effect ${item.validFrom}`);
   const range = formatDateRange(item);
   if (item.where) bits.push(`Where: ${mdEscape(item.where)}`);
   if (item.timeWindow) bits.push(`When: ${mdEscape(item.timeWindow)}`);
@@ -93,36 +101,29 @@ export function categorizeDevelopment(item) {
 }
 
 // General HGV driving bans are not part of this product (they live in the
-// separate DAJC Driving Bans service); this section only ever holds movement
-// restrictions explicitly scoped to exceptional/oversize transport.
-const SECTION_TITLES = {
-  bans: 'Exceptional-transport movement restrictions',
-  infrastructure: 'Infrastructure restrictions',
-  other: 'Other operational developments',
+// separate DAJC Driving Bans service); the "bans" category only ever holds
+// movement restrictions explicitly scoped to exceptional/oversize transport.
+const CATEGORY_LABELS = {
+  bans: 'Exceptional-transport movement restriction',
+  infrastructure: 'Infrastructure restriction',
+  other: 'Operational development',
 };
 
-export function renderArticleMarkdown(article, { slug, publishedAt, updatedAt = null, nextPublicationLabel }) {
-  const byCategory = { bans: [], infrastructure: [], other: [] };
-  for (const item of article.developments) {
-    byCategory[categorizeDevelopment(item)].push(item);
-  }
-
+export function renderArticleMarkdown(article, { slug, publishedAt, updatedAt = null, nextPublicationLabel, weekEnd = null }) {
   const sections = [];
 
   sections.push(`## Intro\n\n${mdEscape(article.intro)}`);
 
-  for (const category of ['bans', 'infrastructure', 'other']) {
-    const items = byCategory[category];
-    if (items.length === 0) continue;
-    const parts = [`## ${SECTION_TITLES[category]}`, ''];
-    for (const item of items) parts.push(renderDevelopmentItem(item), '');
+  if (article.developments.length > 0) {
+    const parts = ['## Lead reports', ''];
+    for (const item of article.developments) parts.push(renderDevelopmentItem(item, { weekEnd }), '');
     sections.push(parts.join('\n').trim());
   }
 
   const roundup = Array.isArray(article.europeRoundup) ? article.europeRoundup : [];
   if (roundup.length > 0) {
     const parts = ['## Rest of Europe: verified operational roundup', ''];
-    for (const item of roundup) parts.push(renderRoundupItem(item), '');
+    for (const item of roundup) parts.push(renderRoundupItem(item, { weekEnd }), '');
     sections.push(parts.join('\n').trim());
   }
 

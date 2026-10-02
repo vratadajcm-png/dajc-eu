@@ -30,10 +30,14 @@ describe('filterGeneratedItems', () => {
     expect(result.dropped[0].reason).toMatch(/invalid validFrom/);
   });
 
-  it('drops future-only developments', () => {
+  it('drops developments starting beyond the 30-day outlook', () => {
     const result = filterGeneratedItems([item({ validFrom: '2026-11-16' })], { weekStart, weekEnd });
     expect(result.kept).toHaveLength(0);
-    expect(result.dropped[0].reason).toMatch(/had not started yet/);
+    expect(result.dropped[0].reason).toMatch(/beyond the outlook/);
+  });
+
+  it('keeps a change taking effect within the 30-day outlook', () => {
+    expect(filterGeneratedItems([item({ validFrom: '2026-10-01' })], { weekStart, weekEnd }).kept).toHaveLength(1);
   });
 
   it('drops short closures', () => {

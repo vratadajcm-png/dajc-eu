@@ -13,7 +13,7 @@ import Parser from 'rss-parser';
 import { FINDING_TYPES } from './findings.mjs';
 import { checkOperationalRelevance } from './relevance-filter.mjs';
 import { checkIngestionRoadContext } from './transport-domain.mjs';
-import { extractPublicationDate } from './publication-date.mjs';
+import { extractPublicationDate, extractValidityPeriod } from './publication-date.mjs';
 import { looksBinary } from './text-quality.mjs';
 
 const FETCH_TIMEOUT_MS = 12_000;
@@ -195,6 +195,8 @@ function countryNameFor(source) {
 function toFinding({ source, title, summary, sourceUrl, publication = null }) {
   const text = `${title} ${summary || ''}`;
   const type = classify(text) || 'infrastructure';
+  // Effective dates only when the text states them explicitly.
+  const validity = extractValidityPeriod(text, { country: countryNameFor(source) });
   return {
     country: countryNameFor(source),
     region: null,
@@ -202,8 +204,8 @@ function toFinding({ source, title, summary, sourceUrl, publication = null }) {
     type,
     title,
     summary: summary ? summary.slice(0, MAX_SUMMARY_CHARS) : null,
-    validFrom: null,
-    validTo: null,
+    validFrom: validity?.validFrom ?? null,
+    validTo: validity?.validTo ?? null,
     impact: null,
     recommendedAction: null,
     // Date the official source published the item (not when DAJC found it);
@@ -378,6 +380,7 @@ async function enrichDetailFindings(findings, source, listingUrl) {
         url: finding.sourceUrl,
         country: finding.country,
       });
+      const validity = extractValidityPeriod(combined, { country: finding.country });
 
       enriched[index] = {
         ...finding,
@@ -387,6 +390,8 @@ async function enrichDetailFindings(findings, source, listingUrl) {
         location: guessLocation(combined, finding.location || source.authority),
         publishedAt: publication?.date ?? finding.publishedAt ?? null,
         publishedAtSource: publication?.source ?? finding.publishedAtSource ?? null,
+        validFrom: validity ? validity.validFrom : finding.validFrom ?? null,
+        validTo: validity ? validity.validTo : finding.validTo ?? null,
       };
     }
   }

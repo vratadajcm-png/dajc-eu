@@ -4,7 +4,7 @@
 // they concern exceptional/heavy transport, and DAJC's Central-Europe-first
 // presentation preference. Ranking never makes an ineligible item eligible.
 
-import { checkWeeklyEligibility, FRESHNESS_WINDOW_DAYS } from './weekly-eligibility.mjs';
+import { checkWeeklyEligibility, deriveValidity, FRESHNESS_WINDOW_DAYS } from './weekly-eligibility.mjs';
 import { isCriticalWeeklyCandidate } from './critical-floor.mjs';
 import { foldText } from './publication-date.mjs';
 
@@ -110,7 +110,9 @@ function score(finding, now) {
 export function selectCandidates(findings, ctx) {
   const rejected = [];
   const eligible = [];
-  for (const finding of dedupeFindingsByUrl(findings)) {
+  // Effective dates stated in the record's own text travel with the
+  // candidate from here on (to the model, cross-validation and the gate).
+  for (const finding of dedupeFindingsByUrl(findings).map(deriveValidity)) {
     if (finding.status === 'expired' || finding.status === 'superseded') {
       rejected.push({ finding, reason: `status ${finding.status}` });
       continue;

@@ -149,7 +149,7 @@ export function findDates(text, ctx = {}) {
   let coveredTo = -1;
   for (const item of found) {
     if (item.index < coveredTo) continue;
-    result.push({ iso: item.iso, index: item.index, kind: item.kind });
+    result.push({ iso: item.iso, index: item.index, end: item.index + item.length, kind: item.kind });
     coveredTo = item.index + item.length;
   }
   return result;
@@ -277,3 +277,94 @@ export function extractPublicationDate({ feedDate = null, html = '', text = '', 
     fromUrl(url, now)
   );
 }
+
+// --- Effective (validity) dates -------------------------------------------
+//
+// The date a change applies is not its publication date. These patterns read
+// only explicit wording - "from 5 October 2026", "vom 14.09. bis 20.12.2026",
+// "until 20 December 2026" - and never guess: no evidence means null.
+
+const VALIDITY_TEXT_CHARS = 2500;
+
+const RANGE_CONNECTOR =
+  /^\s*,?\s*(?:-|–|—|to|until|till|through|bis(?: zum| einschliesslich)?|au|jusqu'?au|al|hasta(?: el)?|do|az|and|und|et|y|i)\s*$/;
+
+const START_LABEL =
+  /(?:from|as of|with effect from|effective(?: from| as of)?|starting(?: on| from)?|starts on|started on|begins on|began on|commences? on|valid from|applies from|in force from|zacal[ao]?|zacne|zacina|beginnt am|begann am|ab(?: dem)?|ab sofort|seit(?: dem)?|gultig ab|a partir du|a compter du|des le|depuis le|a partire dal|in vigore dal|dal|desde el|a partir del|a partir de|platne od|plati od|obowiazuje od|vrijedi od|velja od|od|ode|(?:tritt|treten)(?: \S+)? am|in kraft am|en vigueur le|entre en vigueur le)\s*(?:the\s*)?$/;
+
+const END_LABEL =
+  /(?:until|till|up to and including|valid until|valid to|ends on|bis(?: zum| einschliesslich| voraussichtlich)?|jusqu'?au|jusqu'?a|fino al|hasta el|ate|do)\s*(?:the\s*)?$/;
+
+const PARTIAL_NUMERIC_RANGE =
+  /\b(\d{1,2})\.\s?(?:(\d{1,2})\.\s?)?(?:-|–|—|bis|do|az|au|to|until)\s*(\d{1,2})\.\s?(\d{1,2})\.\s?(20\d{2})(?!\d)/g;
+
+const PARTIAL_TEXT_RANGE = new RegExp(
+  `\\b(\\d{1,2})\\.?\\s*(${MONTH_ALTERNATION})?\\.?\\s*(?:-|–|—|bis(?: zum)?|to|until|au|al|do|az)\\s*(\\d{1,2})\\.?\\s+(${MONTH_ALTERNATION})\\.?,?\\s+(20\\d{2})\\b`,
+  'g'
+);
+
+function orderedPair(from, to) {
+  return from && to && from <= to ? { validFrom: from, validTo: to } : null;
+}
+
+function partialRanges(folded, ctx) {
+  const ranges = [];
+  PARTIAL_NUMERIC_RANGE.lastIndex = 0;
+  let m;
+  while ((m = PARTIAL_NUMERIC_RANGE.exec(folded))) {
+    const year = Number(m[5]);
+    const endMonth = Number(m[4]);
+    const startMonth = m[2] ? Number(m[2]) : endMonth;
+    const startYear = startMonth > endMonth ? year - 1 : year;
+    const pair = orderedPair(isoFromParts(startYear, startMonth, m[1]), isoFromParts(year, endMonth, m[3]));
+    if (pair) ranges.push({ ...pair, index: m.index });
+  }
+  PARTIAL_TEXT_RANGE.lastIndex = 0;
+  while ((m = PARTIAL_TEXT_RANGE.exec(folded))) {
+    const year = Number(m[5]);
+    const endMonth = monthNumber(m[4], ctx);
+    const startMonth = m[2] ? monthNumber(m[2], ctx) : endMonth;
+    if (!startMonth || !endMonth) continue;
+    const startYear = startMonth > endMonth ? year - 1 : year;
+    const pair = orderedPair(isoFromParts(startYear, startMonth, m[1]), isoFromParts(year, endMonth, m[3]));
+    if (pair) ranges.push({ ...pair, index: m.index });
+  }
+  return ranges;
+}
+
+/**
+ * Explicit validity period stated in a text.
+ * @returns {{ validFrom: string|null, validTo: string|null } | null}
+ */
+export function extractValidityPeriod(text, ctx = {}) {
+  const folded = foldText(String(text || '').slice(0, VALIDITY_TEXT_CHARS));
+  if (!folded.trim()) return null;
+  const dates = findDates(folded, ctx);
+
+  // 1. An explicit range wins: two full dates joined by a range word/dash,
+  //    or a range whose first date borrows month/year from the second.
+  const ranges = partialRanges(folded, ctx);
+  for (let i = 0; i + 1 < dates.length; i += 1) {
+    const gap = folded.slice(dates[i].end, dates[i + 1].index);
+    if (gap.length <= 24 && RANGE_CONNECTOR.test(gap)) {
+      const pair = orderedPair(dates[i].iso, dates[i + 1].iso);
+      if (pair) ranges.push({ ...pair, index: dates[i].index });
+    }
+  }
+  if (ranges.length > 0) {
+    ranges.sort((a, b) => a.index - b.index);
+    return { validFrom: ranges[0].validFrom, validTo: ranges[0].validTo };
+  }
+
+  // 2. Otherwise a labelled start and/or end date.
+  let validFrom = null;
+  let validTo = null;
+  for (const date of dates) {
+    const before = folded.slice(Math.max(0, date.index - 40), date.index);
+    if (!validFrom && START_LABEL.test(before)) validFrom = date.iso;
+    else if (!validTo && END_LABEL.test(before)) validTo = date.iso;
+  }
+  if (validFrom && validTo && validTo < validFrom) validTo = null;
+  return validFrom || validTo ? { validFrom, validTo } : null;
+}
+

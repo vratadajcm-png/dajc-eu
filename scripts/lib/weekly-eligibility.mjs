@@ -15,9 +15,13 @@ import { checkLongRoadClosure } from './closure-duration.mjs';
 import { checkWeeklyDrivingBanPolicy } from './weekly-driving-ban-policy.mjs';
 import { isValidIsoDate, validateDevelopmentDateRange } from './date-validation.mjs';
 import { readableText } from './text-quality.mjs';
+import { extractValidityPeriod, foldText } from './publication-date.mjs';
 
 /** A source item is current news only if the source published it within this window. */
 export const FRESHNESS_WINDOW_DAYS = 14;
+
+/** A dated change taking effect up to this many days after the target week is an outlook item. */
+export const OUTLOOK_DAYS = 30;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -44,37 +48,61 @@ export function editionFreshSince(now, publicationSlot, days = FRESHNESS_WINDOW_
 }
 
 /**
- * Freshness is proven by the source's own publication date, never by the
- * date DAJC discovered the page. A dated change that begins or ends inside
- * the target week is also current, even if it was announced earlier.
+ * Effective (validity) dates stated explicitly in the record's own text, used
+ * when the monitor did not record them. Never guessed: no wording, no date.
  */
-export function checkFreshness(candidate = {}, { now, freshSince = null, weekStart, weekEnd, windowDays = FRESHNESS_WINDOW_DAYS } = {}) {
+export function deriveValidity(candidate = {}) {
+  if (candidate.validFrom || candidate.validTo) return candidate;
+  const period = extractValidityPeriod(`${candidate.title || ''} ${readableText(candidate.summary) || ''}`, { country: candidate.country });
+  return period ? { ...candidate, validFrom: period.validFrom, validTo: period.validTo } : candidate;
+}
+
+/**
+ * Freshness (spec §7). DISCOVERY date (firstSeenAt) never counts. A record is
+ * current only on one of these grounds:
+ *
+ *   published    the official source published it within the edition's window
+ *   takes-effect its verified validity starts inside the target week
+ *   ends         its verified validity ends inside the target week
+ *   outlook      it takes effect within OUTLOOK_DAYS after the target week
+ *   ongoing      explicit start AND end dates show it is in force during the
+ *                target week (a time-bounded restriction with real impact)
+ *
+ * Undated material, and older material none of these grounds covers, is out.
+ * @returns {{ ok: true, basis: string, bases: string[] } | { ok: false, reason: string }}
+ */
+export function checkFreshness(candidate = {}, {
+  now, freshSince = null, weekStart, weekEnd, windowDays = FRESHNESS_WINDOW_DAYS, outlookDays = OUTLOOK_DAYS,
+} = {}) {
   if (!(now instanceof Date) || Number.isNaN(now.getTime())) {
     throw new Error('checkFreshness requires a valid `now`');
   }
   const published = isValidIsoDate(candidate.publishedAt) ? candidate.publishedAt : null;
+  const bases = [];
 
   if (published) {
     const day = utcDay(published);
     if (day.getTime() > now.getTime() + DAY_MS) {
       return { ok: false, reason: `publication date ${published} lies in the future - not a verifiable publication date` };
     }
-    if (day >= (freshSince || freshnessWindowStart(now, windowDays))) return { ok: true, basis: 'published' };
+    if (day >= (freshSince || freshnessWindowStart(now, windowDays))) bases.push('published');
   }
 
   if (weekStart && weekEnd) {
-    for (const key of ['validFrom', 'validTo']) {
-      const value = candidate[key];
-      if (!isValidIsoDate(value)) continue;
-      const day = utcDay(value);
-      if (day >= weekStart && day <= weekEnd) return { ok: true, basis: key };
-    }
+    const from = isValidIsoDate(candidate.validFrom) ? utcDay(candidate.validFrom) : null;
+    const to = isValidIsoDate(candidate.validTo) ? utcDay(candidate.validTo) : null;
+    const outlookEnd = new Date(weekEnd.getTime() + outlookDays * DAY_MS);
+    if (from && from >= weekStart && from <= weekEnd) bases.push('takes-effect');
+    if (to && to >= weekStart && to <= weekEnd) bases.push('ends');
+    if (from && from > weekEnd && from <= outlookEnd) bases.push('outlook');
+    if (from && to && from <= weekEnd && to >= weekStart && !bases.includes('takes-effect') && !bases.includes('ends')) bases.push('ongoing');
   }
 
+  if (bases.length > 0) return { ok: true, basis: bases[0], bases };
   if (published) {
     return {
       ok: false,
-      reason: `published ${published}, older than the ${windowDays}-day freshness window - a newly discovered old page is not news`,
+      reason: `published ${published}, older than the ${windowDays}-day freshness window and not taking effect, ending or in force with explicit dates in the target week - a newly discovered old page is not news`,
     };
   }
   return { ok: false, reason: 'no verifiable publication or effective date - undated material is never published' };
@@ -153,15 +181,64 @@ export function checkSourceSuitability(candidate = {}, sourceMeta = null) {
   };
 }
 
+const RESTRICTION_TERMS =
+  /restrict|limit|\bban\b|prohibit|closure|closed|detour|diversion|permit|escort|weight|height|width|axle|tonnage|\b\d+(?:[.,]\d+)?\s?t\b|beschrank|sperr|umleitung|verbot|bewilligung|genehmigung|omezen|uzav|objizd|povolen|zakaz|ogranicz|ogranicen|zabran|limitation|interdi|fermeture|deviation|limitazion|divieto|chiusura|deviazione|restricci|cierre|desvio|prohib/;
+
+// Matched on the folded (lower-case, accent-free) source title.
+const EDITORIAL_EXCLUSIONS = [
+  {
+    reason: 'completed project or opening without a current operational restriction',
+    pattern: /\b(?:completed|completion|finished|opened|opening|inaugurat\w*|handed over|put into (?:service|operation)|valmis|dokoncen\w*|otvoril\w*|odovzdan\w*|otevren\w*|fertiggestellt|abgeschlossen|eroffnet|freigegeben|inaugure\w*|mise en service|completat\w*|terminad\w*|ukoncz\w*|oddan\w*|zavrsen\w*|dovrsen\w*|pusten\w* u promet|predan\w* prometu)\b/,
+    unlessRestriction: true,
+  },
+  {
+    reason: 'pedestrian/cycling facility, not heavy-transport intelligence',
+    pattern: /pedestrian|footpath|footbridge|sidewalk|cycle (?:path|lane|way|route)|cycleway|bike (?:path|lane)|bicycle|radweg|gehweg|fussweg|fussganger|pieton|piste cyclable|voie verte|pista ciclabile|pedonal|ciclovia|carril bici|peatonal|cyklostezk|cyklotras|chodnik|sciezk\w* rowerow|biciklist|pjesack|kolesar|jalgratta|jalgtee|jalakaija|sykkelvei|cykelvag/,
+  },
+  {
+    reason: 'school/civic/public-space project, not heavy-transport intelligence',
+    pattern: /\bschool|\bschule\b|\becole\b|\bscuola\b|\bescuela\b|\bskol[ay]?\b|\bszkol|kindergarten|\bkita\b|playground|spielplatz|public space|town square|city park|stadtpark|marktplatz|namesti|town hall|rathaus|library|bibliothek|museum|\bchurch|\bkirche\b|stadium|sports hall|swimming pool/,
+  },
+  {
+    reason: 'event/PR item without an operational change',
+    pattern: /campaign|kampan|kampanj|awareness|conferen|konferen|ceremon|anniversar|jubilaum|\baward|\bprize\b|\bvisit\b|\bvisite\b|\bbesuch|navstev|exhibition|ausstellung|concert|festival|salario minimo|minimum wage|\bcoins?\b|monete|\binno\b|\bhymn/,
+    unlessRestriction: true,
+    unlessEnforcement: true,
+  },
+  {
+    reason: 'market/financial news, not an operational change',
+    pattern: /market report|market outlook|industry outlook|sales figures|quarterly results|annual results|annual report|\brevenue|\bprofit\b|turnover|\bumsatz|\bgewinn\b/,
+  },
+];
+
+/**
+ * Hard editorial exclusions (spec §7): completed projects and openings,
+ * pedestrian/cycling facilities, school/civic/public-space projects, PR and
+ * event items, market/financial news.
+ */
+export function checkEditorialExclusions(candidate = {}) {
+  const title = foldText(candidate.sourceTitle || candidate.title);
+  const text = foldText(`${candidate.title || ''} ${readableText(candidate.summary) || ''}`);
+  for (const rule of EDITORIAL_EXCLUSIONS) {
+    if (!rule.pattern.test(title)) continue;
+    if (rule.unlessRestriction && RESTRICTION_TERMS.test(text)) continue;
+    if (rule.unlessEnforcement && ENFORCEMENT_CAMPAIGN.test(text)) continue;
+    return { ok: false, reason: rule.reason };
+  }
+  return { ok: true };
+}
+
 /**
  * Unchanged information is not repeated: a source already cited by an
  * earlier edition is eligible again only if the source published it again
- * after that edition went out.
+ * after that edition went out, or if the change takes effect or ends in the
+ * target week (a reason to report it again).
  * @param {Map<string, { slug: string, publishedAt: string }>} previousEditions
  */
-export function checkNotPreviouslyPublished(candidate = {}, previousEditions = new Map()) {
+export function checkNotPreviouslyPublished(candidate = {}, previousEditions = new Map(), { freshnessBases = [] } = {}) {
   const prior = candidate.sourceUrl ? previousEditions?.get(candidate.sourceUrl) : null;
   if (!prior) return { ok: true };
+  if (freshnessBases.includes('takes-effect') || freshnessBases.includes('ends')) return { ok: true };
   const priorDay = String(prior.publishedAt || '').slice(0, 10);
   if (isValidIsoDate(candidate.publishedAt) && isValidIsoDate(priorDay) && candidate.publishedAt > priorDay) {
     return { ok: true };
@@ -172,27 +249,40 @@ export function checkNotPreviouslyPublished(candidate = {}, previousEditions = n
 /**
  * Every Weekly rule that can be decided from the monitored record itself.
  * @param {object} candidate - a finding (title/summary/sourceUrl/publishedAt/...)
- * @param {{ now: Date, weekStart?: Date, weekEnd?: Date,
+ * @param {{ now: Date, freshSince?: Date, weekStart?: Date, weekEnd?: Date,
  *   previousEditions?: Map<string, object>, sourceMetaFor?: (c: object) => object|null }} ctx
+ * @returns {{ ok: true, freshness?: string } | { ok: false, reason: string }}
  */
-export function checkWeeklyEligibility(candidate = {}, ctx = {}) {
+export function checkWeeklyEligibility(rawCandidate = {}, ctx = {}) {
+  const candidate = deriveValidity(rawCandidate);
   const text = `${candidate.title || ''} ${readableText(candidate.summary) || ''}`;
   const checks = [
     () => checkOperationalRelevance(text, { now: ctx.now }),
+    () => checkEditorialExclusions(candidate),
     () => checkTransportDomainRelevance(candidate),
     () => checkLongRoadClosure(candidate),
     () => checkWeeklyDrivingBanPolicy(candidate),
     () => checkSpecificDevelopment(candidate),
     () => checkSourceSuitability(candidate, ctx.sourceMetaFor ? ctx.sourceMetaFor(candidate) : null),
-    () => checkFreshness(candidate, ctx),
-    () => (ctx.weekStart && ctx.weekEnd
-      ? validateDevelopmentDateRange({ validFrom: candidate.validFrom, validTo: candidate.validTo }, ctx)
-      : { ok: true }),
-    () => checkNotPreviouslyPublished(candidate, ctx.previousEditions),
   ];
   for (const check of checks) {
     const result = check();
     if (!result.ok) return result;
   }
-  return { ok: true };
+
+  const freshness = checkFreshness(candidate, ctx);
+  if (!freshness.ok) return freshness;
+
+  if (ctx.weekStart && ctx.weekEnd) {
+    const dates = validateDevelopmentDateRange(
+      { validFrom: candidate.validFrom, validTo: candidate.validTo },
+      { weekStart: ctx.weekStart, weekEnd: ctx.weekEnd, outlookDays: OUTLOOK_DAYS }
+    );
+    if (!dates.ok) return dates;
+  }
+
+  const repetition = checkNotPreviouslyPublished(candidate, ctx.previousEditions, { freshnessBases: freshness.bases });
+  if (!repetition.ok) return repetition;
+
+  return { ok: true, freshness: freshness.basis };
 }

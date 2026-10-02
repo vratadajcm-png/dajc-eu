@@ -206,6 +206,44 @@ describe('generate-weekly-article.mjs (mock, subprocess)', () => {
   );
 
   it(
+    'a correction replaces an existing filler edition only with a regenerated edition that passes',
+    () => {
+      mkdirSync(ARTICLES_DIR, { recursive: true });
+      writeFileSync(targetFilePath, '---\ntitle: "old filler edition"\n---\n\nOLD FILLER\n', 'utf-8');
+      writeFindings([...Array.from({ length: 3 }, (_, i) => qualifyingFinding(i + 1)), ...fillerFindings()]);
+      try {
+        const result = runGenerate(['--mock', '--correction', '--skip-build']);
+        expect(result.code).toBe(0);
+        const content = readFileSync(targetFilePath, 'utf-8');
+        expect(content).not.toContain('OLD FILLER');
+        expect(content).toMatch(/^updatedAt: /m);
+        expect(content.match(/^### /gm)).toHaveLength(3);
+      } finally {
+        rmSync(targetFilePath, { force: true });
+      }
+    },
+    30_000
+  );
+
+  it(
+    'a correction that finds nothing qualifying leaves the published edition untouched and reports the blocker',
+    () => {
+      mkdirSync(ARTICLES_DIR, { recursive: true });
+      writeFileSync(targetFilePath, '---\ntitle: "published edition"\n---\n\nKEEP ME\n', 'utf-8');
+      writeFindings(fillerFindings());
+      try {
+        const result = runGenerate(['--mock', '--correction', '--skip-build']);
+        expect(result.code).not.toBe(0);
+        expect(result.stdout).toMatch(/CORRECTION BLOCKED/);
+        expect(readFileSync(targetFilePath, 'utf-8')).toContain('KEEP ME');
+      } finally {
+        rmSync(targetFilePath, { force: true });
+      }
+    },
+    30_000
+  );
+
+  it(
     'fails hard (non-zero exit) on a real run with no OPENAI_API_KEY, before writing anything',
     () => {
       const result = runGenerate([], { OPENAI_API_KEY: '' });

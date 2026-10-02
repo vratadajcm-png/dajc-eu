@@ -87,7 +87,7 @@ describe('W41 regression: none of the published filler may pass again', () => {
   });
 
   it('still accepts a genuine, recently published exceptional-transport change', async () => {
-    expect(checkWeeklyEligibility(fresh, await w41Context())).toEqual({ ok: true });
+    expect(checkWeeklyEligibility(fresh, await w41Context())).toEqual({ ok: true, freshness: 'published' });
   });
 });
 

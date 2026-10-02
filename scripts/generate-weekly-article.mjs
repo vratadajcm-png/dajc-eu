@@ -17,15 +17,19 @@
 // supplement/repair loop asking for "more" items, and no retry that re-rolls
 // synthesis until a count is met (docs/DAJC_WEEKLY_INTELLIGENCE_SPEC.md §3).
 //
-// Safety invariant: this script only ever ADDS a new file, and only a file
+// Safety invariant: a normal run only ever ADDS a new file, and only a file
 // that does not already exist. If anything fails at any stage - nothing
 // verified to publish, quality gate, build, or the target file already
 // existing - it exits without modifying the repository. Existing published
-// articles (this week's or any other week's) are never overwritten, touched,
-// or deleted by this script under any failure mode, including a --dry-run
-// invocation, which always deletes its own output before exiting.
+// articles are never overwritten or deleted, with exactly one deliberate,
+// manual exception: `--correction` regenerates the CURRENT target week's
+// edition from source data and replaces the existing file atomically - only
+// after the new edition has passed every gate and the site build. If the
+// regenerated edition does not qualify, the existing file is left untouched
+// and the run fails with the blocker. A --dry-run invocation never touches
+// the real file and always deletes its own output before exiting.
 
-import { writeFile, unlink, mkdir, appendFile } from 'node:fs/promises';
+import { writeFile, readFile, unlink, mkdir, appendFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -47,6 +51,7 @@ import { attachCriticalGroupSources, criticalWeeklyGroups, missingCriticalGroups
 import { filterGeneratedItems } from './lib/generated-item-filter.mjs';
 import { loadPreviousEditionSources } from './lib/previous-editions.mjs';
 import { FRESHNESS_WINDOW_DAYS, editionFreshSince } from './lib/weekly-eligibility.mjs';
+import { capSection, criticalGroupOwners, orderEditionItems } from './lib/edition-order.mjs';
 import { oversizeSources } from '../config/oversize-sources/index.mjs';
 
 const execFileAsync = promisify(execFile);
@@ -76,7 +81,18 @@ async function appendSummary(markdown) {
   }
 }
 
+// Set when a manual --correction run regenerates an existing edition.
+let correctionOfExisting = false;
+
 async function abort(reason) {
+  if (correctionOfExisting) {
+    // A correction that cannot produce a qualifying edition is a blocker,
+    // not a quiet week: the published edition stays exactly as it was.
+    console.error(`\nCORRECTION BLOCKED: ${reason}`);
+    console.error('The existing published edition was left unchanged (nothing was overwritten).');
+    await appendSummary(`### EU Oversize Weekly - correction blocked\n\n${reason}\n\nThe existing published edition was left unchanged.\n`);
+    process.exit(1);
+  }
   console.log(`\nNo article will be published: ${reason}`);
   console.log('This is expected behavior when there is not enough verified, significant data - not an error.');
   await appendSummary(`### EU Oversize Weekly - no article this run\n\n${reason}\n`);
@@ -91,32 +107,6 @@ async function fail(reason) {
   console.error(`\nConfiguration error - failing this run: ${reason}`);
   await appendSummary(`### EU Oversize Weekly - configuration error\n\n${reason}\n`);
   process.exit(1);
-}
-
-// The first report covering each critical development (by any of its URLs).
-function criticalGroupOwners(article, criticalGroups) {
-  const groupByUrl = new Map();
-  for (const group of criticalGroups) {
-    for (const candidate of group.candidates) groupByUrl.set(candidate.sourceUrl, group.key);
-  }
-  const covered = new Set();
-  const owners = new Set();
-  for (const item of [...article.developments, ...article.europeRoundup]) {
-    const key = groupByUrl.get(item.sourceUrl);
-    if (key && !covered.has(key)) {
-      covered.add(key);
-      owners.add(item);
-    }
-  }
-  return owners;
-}
-
-function capSection(items, max, isProtected) {
-  if (items.length <= max) return { kept: items, left: [] };
-  const protectedItems = items.filter(isProtected).slice(0, max);
-  const others = items.filter((item) => !isProtected(item)).slice(0, max - protectedItems.length);
-  const keep = new Set([...protectedItems, ...others]);
-  return { kept: items.filter((item) => keep.has(item)), left: items.filter((item) => !keep.has(item)) };
 }
 
 function logRejections(rejected) {
@@ -187,15 +177,21 @@ async function main() {
     ? `eu-oversize-weekly-preview-${nextWeekLabel.toLowerCase()}`
     : `eu-oversize-weekly-${nextWeekLabel.toLowerCase()}`;
   const filePath = path.join(ARTICLES_DIR, `${slug}.md`);
-  if (existsSync(filePath) && !refreshExisting) {
+  const targetExists = existsSync(filePath);
+  if (targetExists && !refreshExisting && !correction) {
     await abort(
       `${path.relative(ROOT, filePath)} already exists - refusing to overwrite a previously published article. ` +
-        'Use --dry-run --refresh-existing for a safe editorial refresh preview; the real file will still never be written.'
+        'Use --dry-run --refresh-existing for a safe editorial refresh preview, or a manual --correction run to replace it with a regenerated edition that passes every check.'
     );
     return;
   }
-  if (existsSync(filePath) && refreshExisting) {
+  correctionOfExisting = targetExists && correction;
+  if (targetExists && dryRun) {
     console.log(`Refresh preview: ${path.relative(ROOT, filePath)} already exists; generating only to a throwaway dry-run path.`);
+  } else if (correctionOfExisting) {
+    console.log(
+      `Correction: ${path.relative(ROOT, filePath)} is regenerated from source data and replaced only if the new edition passes every gate and the build; otherwise it is left unchanged.`
+    );
   }
   // Dry runs never write to the real target path, even transiently - a
   // separate, uniquely-named throwaway file is used for the build check
@@ -362,6 +358,13 @@ async function main() {
 
   article = attachCriticalGroupSources(article, criticalGroups);
 
+  // Deterministic operator-first order: importance tier first, then Central
+  // Europe before connected corridors, the rest of Europe and peripheral
+  // jurisdictions. Never a relevance bypass.
+  const orderOptions = { candidatesByUrl, criticalUrls: new Set(requiredSourceUrls) };
+  article.developments = orderEditionItems(article.developments, orderOptions);
+  article.europeRoundup = orderEditionItems(article.europeRoundup, orderOptions);
+
   console.log(`Lead reports: ${article.developments.length}`);
   console.log(`Rest-of-Europe reports: ${article.europeRoundup.length}`);
   if (article.developments.length === 0) {
@@ -378,9 +381,9 @@ async function main() {
   // A preview is public as soon as it is deployed; the final edition waits
   // for its Friday slot.
   const publishedAt = (preview ? now : publicationSlot).toISOString();
-  const updatedAt = correction ? now.toISOString() : null;
+  const updatedAt = correctionOfExisting ? now.toISOString() : null;
   const nextPublicationLabel = formatNextPublicationLabel(publicationSlot);
-  const { frontmatter, body } = renderArticleMarkdown(article, { slug, publishedAt, updatedAt, nextPublicationLabel });
+  const { frontmatter, body } = renderArticleMarkdown(article, { slug, publishedAt, updatedAt, nextPublicationLabel, weekEnd: targetWeekEndIso });
 
   console.log('\nRunning quality gate...');
   const gate = runQualityGate({
@@ -405,8 +408,10 @@ async function main() {
 
   await mkdir(ARTICLES_DIR, { recursive: true });
   const fileContent = `${toFrontmatterYaml(frontmatter)}\n\n${body}`;
+  // Kept in memory so a failed build can restore the published edition.
+  const previousContent = !dryRun && existsSync(writeTargetPath) ? await readFile(writeTargetPath, 'utf-8') : null;
   await writeFile(writeTargetPath, fileContent, 'utf-8');
-  console.log(`\nWrote ${path.relative(ROOT, writeTargetPath)}${dryRun ? ' (throwaway dry-run path)' : ''}`);
+  console.log(`\nWrote ${path.relative(ROOT, writeTargetPath)}${dryRun ? ' (throwaway dry-run path)' : previousContent !== null ? ' (replacing the previous edition)' : ''}`);
 
   if (skipBuild) {
     console.log('Skipping build check (--skip-build passed).');
@@ -421,8 +426,13 @@ async function main() {
     } catch (err) {
       console.error('Build FAILED after adding the new article - rolling back.');
       console.error(err.stdout || err.message || err);
-      await unlink(writeTargetPath).catch(() => {});
-      console.error(`Removed ${path.relative(ROOT, writeTargetPath)}. Repository restored to its prior state.`);
+      if (previousContent !== null) {
+        await writeFile(writeTargetPath, previousContent, 'utf-8');
+        console.error(`Restored the previous ${path.relative(ROOT, writeTargetPath)}. Repository restored to its prior state.`);
+      } else {
+        await unlink(writeTargetPath).catch(() => {});
+        console.error(`Removed ${path.relative(ROOT, writeTargetPath)}. Repository restored to its prior state.`);
+      }
       process.exit(1);
       return;
     }

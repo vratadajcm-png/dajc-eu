@@ -37,6 +37,10 @@ describe('quality over count', () => {
     expect(existsSync(path.join(ROOT, 'scripts', 'apply-weekly-editorial-policy.mjs'))).toBe(false);
   });
 
+  it('no one-time emergency validation step from an earlier Weekly policy remains in CI', () => {
+    expect(read('.github/workflows/news-ci.yml')).not.toMatch(/One-time|fix\/weekly-policy-strict-10x6/);
+  });
+
   it('workflows run the generator once and never patch source files at runtime', () => {
     for (const workflow of ['.github/workflows/publish-weekly-oversize.yml', '.github/workflows/watchdog-weekly-oversize.yml']) {
       const yaml = read(workflow);
