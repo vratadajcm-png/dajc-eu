@@ -1,33 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { resolveDrivingBanFindings } from '../driving-ban-calendar.mjs';
 import { hydrateCanonical, calendarRules, snapshot } from '../../../src/lib/driving-bans/core.mjs';
 import { dajcEuropeCoverage } from '../../../config/europe-coverage.mjs';
 
-// Historical fixture is explicit; retired assertions that extrapolated future
-// law, produced exception-only ban events or treated missing countries as banned
-// are replaced by the new fail-closed publication contract.
+// Canonical Driving Bans resolver regressions (historical fixture is explicit).
+// The EU Oversize Weekly no longer consumes these rules at all - see
+// weekly-driving-ban-isolation.test.mjs - but the resolver contract itself
+// stays covered here.
 const data = hydrateCanonical(JSON.parse(readFileSync(new URL('../../../tests/fixtures/driving-bans-sep-oct-2026.json', import.meta.url), 'utf8')), dajcEuropeCoverage);
 const rules = calendarRules(data);
-const week = (date, selected = rules) => {
-  const start = new Date(`${date}T00:00:00Z`);
-  return resolveDrivingBanFindings({weekStart:start, weekEnd:new Date(start.getTime()+6*86400000), year:start.getUTCFullYear(), rules:selected});
-};
 const resolve = (id, date) => {
   const start = new Date(`${date}T00:00:00Z`);
   return rules.find(r=>r.id===id).resolve(start,new Date(start.getTime()+6*86400000),start.getUTCFullYear());
 };
-
-describe('weekly-news/canonical Driving Bans boundary',()=>{
-  it('does not let incomplete country review crash unrelated news publication',()=>{expect(week('2026-09-28').maintenanceErrors).toEqual([]);});
-  it('reports incomplete primary coverage explicitly',()=>{const r=week('2026-09-28');expect(r.complete).toBe(false);expect(r.coverageWarnings.length).toBeGreaterThan(0);});
-  it('does not repeat the standalone Driving Bans reference as weekly news',()=>{expect(week('2026-09-28').findings).toEqual([]);});
-  it('does not invent historical W35 findings outside the verified window',()=>{expect(week('2026-08-24').findings).toEqual([]);});
-  it('does not extrapolate an annual calendar to an unreviewed future year',()=>{expect(week('2031-08-25').findings).toEqual([]);expect(week('2031-08-25').complete).toBe(false);});
-  it('reserves hard maintenance errors for broken resolver data',()=>{const broken={id:'broken-test',country:'AT',resolve(){throw Error('invalid rule');}};expect(week('2026-09-28',[broken]).maintenanceErrors[0]).toContain('invalid rule');});
-  it('retains legacy annual-maintenance failure semantics for explicit fixtures',()=>{const broken={id:'annual-test',country:'IT',resolve(){return{maintenanceError:'unseeded year',occurrences:[]};}};expect(week('2031-08-25',[broken]).maintenanceErrors[0]).toContain('unseeded year');});
-  it('rejects an invalid requested window',()=>{expect(()=>week('not-a-date')).toThrow();});
-});
 
 describe('canonical resolver regression coverage',()=>{
   it('keeps Germany-bound Austria October 3 as a real timed holiday restriction',()=>{const o=resolve('at-calendar-germany-oct03-2026','2026-09-28').occurrences;expect(o).toHaveLength(1);expect(o[0].validFrom).toBe('2026-10-03');expect(o[0].timeWindow).toContain('00:00');});

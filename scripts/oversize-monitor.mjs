@@ -10,12 +10,13 @@ import { fileURLToPath } from 'node:url';
 import { oversizeSources } from '../config/oversize-sources/index.mjs';
 import { dajcEuropeCoverage } from '../config/europe-coverage.mjs';
 import { fetchSourceFindings } from './lib/fetch-source.mjs';
-import { mergeFindings, markExpired } from './lib/findings.mjs';
+import { buildFindingHistory, mergeFindings, markExpired } from './lib/findings.mjs';
 import { loadWeekFindings, saveWeekFindings } from './lib/store.mjs';
 import { isoWeekLabel } from './lib/week.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
+const HISTORY_WEEKS = 6;
 
 const PARENT_SOURCE = {
   ENG: 'UK', SCT: 'UK', WLS: 'UK', NIR: 'UK', GG: 'UK', JE: 'UK', IM: 'UK', GI: 'UK', ALDERNEY: 'UK',
@@ -40,6 +41,15 @@ async function main() {
 
   const existing = await loadWeekFindings(weekLabel);
   const beforeCount = existing.size;
+
+  // Earlier weeks' findings, so a page first seen weeks ago is not "new"
+  // again just because this week's file started empty on Monday.
+  const earlierWeeks = [];
+  for (let back = 1; back <= HISTORY_WEEKS; back += 1) {
+    const label = isoWeekLabel(new Date(now.getTime() - back * 7 * 24 * 60 * 60 * 1000));
+    earlierWeeks.push([...(await loadWeekFindings(label)).values()]);
+  }
+  const history = buildFindingHistory(earlierWeeks);
 
   let sourcesFeed = 0;
   let sourcesHtml = 0;
@@ -83,7 +93,7 @@ async function main() {
     }
   }
 
-  let merged = mergeFindings(existing, allCandidates, nowIso);
+  let merged = mergeFindings(existing, allCandidates, nowIso, { history });
   merged = markExpired(merged, now);
 
   const statusCounts = { new: 0, updated: 0, active: 0, expired: 0, superseded: 0 };
@@ -146,6 +156,8 @@ async function main() {
   console.log(`active (unchanged) findings: ${statusCounts.active}`);
   console.log(`expired findings: ${statusCounts.expired}`);
   console.log(`superseded findings: ${statusCounts.superseded}`);
+  const dated = [...merged.values()].filter((f) => f.publishedAt).length;
+  console.log(`findings with a verifiable source publication date: ${dated}/${merged.size}`);
 
   if (unavailable.length > 0) {
     console.log('\nUnavailable official sources (visible for maintenance):');

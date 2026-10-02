@@ -1,13 +1,14 @@
 // Subprocess integration tests for the top-level pipeline script. These are
 // slower than the pure-function unit tests elsewhere in this directory, but
 // are the only way to genuinely exercise dry-run cleanup, overwrite
-// protection, and the OPENAI_API_KEY preflight as they actually run.
+// protection, the OPENAI_API_KEY preflight and the end-to-end editorial
+// contract (quality > count) as they actually run.
 //
 // OVERSIZE_NOW pins "now" to a fixed instant (read by
 // scripts/generate-weekly-article.mjs) so the target week - and therefore
 // the article filename these tests touch - is deterministic and never
-// collides with the real, already-published eu-oversize-weekly-2026-w35.md.
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+// collides with real, already-published content.
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -19,10 +20,7 @@ const ROOT = path.resolve(__dirname, '..', '..', '..');
 const GENERATE_SCRIPT = path.join(ROOT, 'scripts', 'generate-weekly-article.mjs');
 const ARTICLES_DIR = path.join(ROOT, 'src', 'content', 'news', 'eu-oversize');
 
-// Early August - deliberately NOT the real, already-published W35
-// (24-30 August 2026), but still inside the Slovak/Hungarian summer-ban
-// season so the official calendar layer alone contributes several
-// candidates in mock mode.
+// Late July - deliberately NOT a week with real, already-published content.
 const NOW_ISO = '2026-07-31T10:00:00Z';
 const now = new Date(NOW_ISO);
 const thisWeek = isoWeekLabel(now);
@@ -47,52 +45,60 @@ function runGenerate(args, envOverrides = {}) {
   }
 }
 
-function syntheticCandidate(n, type, country = 'Testland') {
+const COUNTRIES = ['Germany', 'Czechia', 'Austria', 'Poland', 'Slovakia', 'Hungary', 'Switzerland', 'Slovenia', 'Croatia', 'Spain'];
+const TYPES = ['permit_change', 'permit_system', 'escort_requirement', 'border_restriction', 'bridge_restriction', 'route_restriction'];
+
+// A genuine, recently published exceptional-transport development.
+function qualifyingFinding(n) {
   return {
     id: `integration-test-${n}`,
-    country,
+    country: COUNTRIES[n % COUNTRIES.length],
     region: null,
     location: 'Test road',
-    type,
-    title: `Synthetic candidate ${n} for integration testing`,
+    type: TYPES[n % TYPES.length],
+    title: `Synthetic exceptional transport permit change ref${n}`,
     summary: 'Synthetic exceptional transport road permit and heavy-haul route change for integration testing.',
     validFrom: null,
     validTo: null,
     impact: null,
     recommendedAction: null,
+    publishedAt: '2026-07-29',
+    publishedAtSource: 'jsonld',
     sourceName: `Synthetic Source ${n}`,
-    sourceUrl: `https://example.test/integration-synthetic-${n}`,
+    sourceUrl: `https://example.test/news/integration-synthetic-${n}`,
     confidence: 'unverified',
-    status: 'new',
+    status: 'active',
     firstSeenAt: now.toISOString(),
     lastCheckedAt: now.toISOString(),
   };
+}
+
+// Material that must never be published, however short the edition is.
+function fillerFindings() {
+  return [
+    { ...qualifyingFinding(900), title: 'Old exceptional transport permit simplification announced in May', publishedAt: '2026-05-06', status: 'new' },
+    { ...qualifyingFinding(901), title: 'Undated exceptional transport permit information page', publishedAt: null, publishedAtSource: null },
+    { ...qualifyingFinding(902), title: 'Tartu ja Elva vahel valmis uus jalakäijate tunnel', summary: 'Uus jalgratta- ja jalakäijate tunnel valmis.' },
+    { ...qualifyingFinding(903), title: 'Izvanredni prijevoz', sourceUrl: 'https://example.test/hr/izvanredni-prijevoz' },
+    { ...qualifyingFinding(904), title: 'Austria national holiday lorry driving ban on 26 October', summary: 'Lorries over 7.5 t may not drive on the national holiday.', type: 'driving_ban' },
+    { ...qualifyingFinding(905), title: 'Roads administration homepage with latest exceptional transport news', sourceUrl: 'https://example.test/fr.html' },
+  ];
+}
+
+function writeFindings(findings) {
+  mkdirSync(findingsDir, { recursive: true });
+  writeFileSync(findingsPath, JSON.stringify({ week: thisWeek, updatedAt: now.toISOString(), findings }, null, 2), 'utf-8');
 }
 
 let preexistingFindings = null;
 
 beforeAll(() => {
   expect(existsSync(targetFilePath)).toBe(false); // sanity: must not collide with real content
-
   if (existsSync(findingsPath)) preexistingFindings = readFileSync(findingsPath, 'utf-8');
-  mkdirSync(findingsDir, { recursive: true });
-  writeFileSync(
-    findingsPath,
-    JSON.stringify(
-      {
-        week: thisWeek,
-        updatedAt: now.toISOString(),
-        findings: Array.from({ length: 40 }, (_, i) => {
-          const types = ['permit_change','permit_system','escort_requirement','border_restriction','bridge_restriction','tunnel_restriction','route_restriction','toll_change'];
-          const countries = ['Spain','Romania','Denmark','Portugal','Croatia','Switzerland','Belgium','Lithuania'];
-          return syntheticCandidate(i + 1, types[i % types.length], countries[i % countries.length]);
-        }),
-      },
-      null,
-      2
-    ),
-    'utf-8'
-  );
+});
+
+beforeEach(() => {
+  writeFindings([...Array.from({ length: 40 }, (_, i) => qualifyingFinding(i + 1)), ...fillerFindings()]);
 });
 
 afterAll(() => {
@@ -101,6 +107,11 @@ afterAll(() => {
   rmSync(targetFilePath, { force: true }); // safety net only - no test should leave this behind
   rmSync(path.join(ARTICLES_DIR, `eu-oversize-weekly-preview-${nextWeekLabel.toLowerCase()}.md`), { force: true });
 });
+
+function dryRunArticle(stdout) {
+  const match = stdout.match(/=== DRY RUN - ARTICLE THAT WOULD BE PUBLISHED \(not committed\) ===\n([\s\S]*?)=== END OF DRY RUN ARTICLE ===/);
+  return match ? match[1] : '';
+}
 
 describe('generate-weekly-article.mjs (mock, subprocess)', () => {
   it(
@@ -112,6 +123,50 @@ describe('generate-weekly-article.mjs (mock, subprocess)', () => {
       expect(existsSync(targetFilePath)).toBe(false);
       const leftoverDryRunFiles = readdirSync(ARTICLES_DIR).filter((f) => f.startsWith(`_dry-run-${slug}`));
       expect(leftoverDryRunFiles).toEqual([]);
+    },
+    30_000
+  );
+
+  it(
+    'publishes exactly the qualifying items - 9 leads and no Rest of Europe - without padding',
+    () => {
+      writeFindings([...Array.from({ length: 9 }, (_, i) => qualifyingFinding(i + 1)), ...fillerFindings()]);
+      const result = runGenerate(['--mock', '--dry-run', '--skip-build']);
+      expect(result.code).toBe(0);
+      expect(result.stdout).toMatch(/Lead reports: 9\b/);
+      expect(result.stdout).toMatch(/Rest-of-Europe reports: 0\b/);
+      expect(result.stdout).not.toMatch(/repair|supplement|attempt \d/i);
+      const article = dryRunArticle(result.stdout);
+      expect(article.match(/^### /gm)).toHaveLength(9);
+      expect(article).not.toContain('Rest of Europe');
+      for (const filler of ['announced in May', 'Undated exceptional', 'jalakäijate', 'Izvanredni prijevoz', 'driving ban', 'homepage']) {
+        expect(article).not.toContain(filler);
+      }
+    },
+    30_000
+  );
+
+  it(
+    'caps a large week at 30 lead reports and 15 Rest-of-Europe updates',
+    () => {
+      writeFindings(Array.from({ length: 60 }, (_, i) => qualifyingFinding(i + 1)));
+      const result = runGenerate(['--mock', '--dry-run', '--skip-build']);
+      expect(result.code).toBe(0);
+      expect(result.stdout).toMatch(/Lead reports: 30\b/);
+      expect(result.stdout).toMatch(/Rest-of-Europe reports: 15\b/);
+    },
+    30_000
+  );
+
+  it(
+    'publishes nothing when only old, undated, generic or out-of-scope material exists',
+    () => {
+      writeFindings(fillerFindings());
+      const result = runGenerate(['--mock', '--dry-run', '--skip-build']);
+      expect(result.code).toBe(0);
+      expect(result.stdout).toMatch(/No article will be published/);
+      expect(result.stdout).not.toMatch(/DRY RUN - ARTICLE THAT WOULD BE PUBLISHED/);
+      expect(existsSync(targetFilePath)).toBe(false);
     },
     30_000
   );
@@ -143,6 +198,44 @@ describe('generate-weekly-article.mjs (mock, subprocess)', () => {
         expect(result.code).toBe(0);
         expect(result.stdout).toMatch(/already exists/);
         expect(readFileSync(targetFilePath, 'utf-8')).toContain('DO NOT OVERWRITE');
+      } finally {
+        rmSync(targetFilePath, { force: true });
+      }
+    },
+    30_000
+  );
+
+  it(
+    'a correction replaces an existing filler edition only with a regenerated edition that passes',
+    () => {
+      mkdirSync(ARTICLES_DIR, { recursive: true });
+      writeFileSync(targetFilePath, '---\ntitle: "old filler edition"\n---\n\nOLD FILLER\n', 'utf-8');
+      writeFindings([...Array.from({ length: 3 }, (_, i) => qualifyingFinding(i + 1)), ...fillerFindings()]);
+      try {
+        const result = runGenerate(['--mock', '--correction', '--skip-build']);
+        expect(result.code).toBe(0);
+        const content = readFileSync(targetFilePath, 'utf-8');
+        expect(content).not.toContain('OLD FILLER');
+        expect(content).toMatch(/^updatedAt: /m);
+        expect(content.match(/^### /gm)).toHaveLength(3);
+      } finally {
+        rmSync(targetFilePath, { force: true });
+      }
+    },
+    30_000
+  );
+
+  it(
+    'a correction that finds nothing qualifying leaves the published edition untouched and reports the blocker',
+    () => {
+      mkdirSync(ARTICLES_DIR, { recursive: true });
+      writeFileSync(targetFilePath, '---\ntitle: "published edition"\n---\n\nKEEP ME\n', 'utf-8');
+      writeFindings(fillerFindings());
+      try {
+        const result = runGenerate(['--mock', '--correction', '--skip-build']);
+        expect(result.code).not.toBe(0);
+        expect(result.stdout).toMatch(/CORRECTION BLOCKED/);
+        expect(readFileSync(targetFilePath, 'utf-8')).toContain('KEEP ME');
       } finally {
         rmSync(targetFilePath, { force: true });
       }

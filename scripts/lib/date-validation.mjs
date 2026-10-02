@@ -37,7 +37,13 @@ export function toUtcDate(isoDate) {
  * either side (e.g. France's Saturday-to-Monday window spills one day into
  * the following ISO week by design).
  */
-export function validateDevelopmentDateRange({ validFrom, validTo } = {}, { weekStart, weekEnd }) {
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * `outlookDays` (default 0) admits a change that takes effect up to that many
+ * days after the target week - the Weekly's 30-day outlook.
+ */
+export function validateDevelopmentDateRange({ validFrom, validTo } = {}, { weekStart, weekEnd, outlookDays = 0 }) {
   if (!weekStart || !weekEnd) {
     throw new Error('validateDevelopmentDateRange requires weekStart and weekEnd');
   }
@@ -61,10 +67,13 @@ export function validateDevelopmentDateRange({ validFrom, validTo } = {}, { week
       reason: `validTo (${to}) is before the target week starts (${weekStart.toISOString().slice(0, 10)}) - this development had already ended`,
     };
   }
-  if (from && toUtcDate(from) > weekEnd) {
+  const latestStart = new Date(weekEnd.getTime() + outlookDays * DAY_MS);
+  if (from && toUtcDate(from) > latestStart) {
     return {
       ok: false,
-      reason: `validFrom (${from}) is after the target week ends (${weekEnd.toISOString().slice(0, 10)}) - this development had not started yet`,
+      reason: outlookDays > 0
+        ? `validFrom (${from}) is more than ${outlookDays} days after the target week ends (${weekEnd.toISOString().slice(0, 10)}) - beyond the outlook`
+        : `validFrom (${from}) is after the target week ends (${weekEnd.toISOString().slice(0, 10)}) - this development had not started yet`,
     };
   }
 

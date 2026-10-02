@@ -59,4 +59,21 @@ describe('extractHtmlFindings', () => {
     const findings = extractHtmlFindings(html, source, source.url);
     expect(findings).toHaveLength(1);
   });
+
+  it('does not classify "Pontificio" or "ponts et chaussées" as a bridge restriction', () => {
+    const html = `
+      <ul>
+        <li><a href="/inno-pontificio">Inno Pontificio e la sua storia - traffico</a></li>
+      </ul>
+    `;
+    const findings = extractHtmlFindings(html, { ...source, url: 'https://www.autobahn.de/' }, 'https://www.autobahn.de/');
+    expect(findings.filter((f) => f.type === 'bridge_restriction')).toEqual([]);
+  });
+
+  it('records a publication date when the link URL carries one', () => {
+    const html = '<p><a href="/files/ts_17.09.2026_most_zlate_moravce.pdf">SSC rekonštruuje most na ceste I/65 - obmedzenie premávky</a></p>';
+    const findings = extractHtmlFindings(html, { ...source, url: 'https://www.autobahn.de/' }, 'https://www.autobahn.de/');
+    expect(findings[0].publishedAt).toBe('2026-09-17');
+    expect(findings[0].publishedAtSource).toBe('url');
+  });
 });

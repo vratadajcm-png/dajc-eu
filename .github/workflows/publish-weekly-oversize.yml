@@ -36,6 +36,10 @@ on:
         description: 'Publish a separate preview article using Friday quality gates; never consumes the final weekly slug.'
         type: boolean
         default: false
+      correction:
+        description: 'Regenerate the current target edition from source data; replaces an existing article only if the new edition passes every gate and the build (stamps updatedAt).'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -85,11 +89,9 @@ jobs:
       - name: Check whether target week is already published
         if: steps.trigger.outputs.should_run == 'true'
         id: publish-needed
+        env:
+          OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
         run: node scripts/check-weekly-publication.mjs
-
-      - name: Apply DAJC editorial policy
-        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
-        run: node scripts/apply-weekly-editorial-policy.mjs
 
       - name: Determine dry-run mode
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
@@ -131,7 +133,10 @@ jobs:
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: node scripts/run-weekly-publisher.mjs ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }} ${{ steps.trigger.outputs.preview == 'true' && '--preview' || '' }}
+        # One generation attempt. Quality > count: an edition contains exactly
+        # the items that pass every editorial rule, so there is nothing to
+        # retry for (no lead/Rest-of-Europe minimum, no padding loop).
+        run: node scripts/generate-weekly-article.mjs ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }} ${{ steps.trigger.outputs.preview == 'true' && '--preview' || '' }} ${{ github.event.inputs.correction == 'true' && '--correction' || '' }}
 
       - name: Commit new article and refreshed data
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true'

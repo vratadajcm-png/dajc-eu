@@ -1,3 +1,21 @@
+// Critical-news coverage (docs/DAJC_WEEKLY_INTELLIGENCE_SPEC.md §4).
+//
+// A verified change that directly governs exceptional/oversize transport -
+// permits, escorts, movement conditions, limits, transport-relevant border or
+// toll procedures - must not be left out of the edition. "Fresh" here means
+// the SOURCE published it recently (weekly-eligibility.mjs checkFreshness),
+// never that DAJC's crawler happened to find the page this week: the old
+// discovery-based test flagged a 6 May 2026 announcement as critical news in
+// October and forced it into the W41 edition as raw German text.
+//
+// This module only identifies critical developments and checks coverage. It
+// never writes report text itself; missing critical items are written by the
+// model (openai-client.mjs generateRequiredItemsWithOpenAI) and the quality
+// gate blocks publication if one is still missing.
+
+import { checkFreshness } from './weekly-eligibility.mjs';
+import { readableText } from './text-quality.mjs';
+
 const HIGH_SIGNAL_TYPES = new Set([
   'permit_change',
   'permit_system',
@@ -7,59 +25,23 @@ const HIGH_SIGNAL_TYPES = new Set([
   'operational_change',
   'equipment',
   'route_restriction',
+  // only reachable for movement restrictions explicitly scoped to exceptional
+  // transport: general truck bans never pass weekly-eligibility.mjs
   'driving_ban',
 ]);
 
-const OVERSIZE_SIGNAL =
-  /exceptional transport|exceptional vehicle|oversize|oversized|abnormal load|wide load|heavy transport|schwertransport|gro[ßs]raum|ausnahmetransport|convoi exceptionnel|transport exceptionnel|trasporto eccezionale|transporte especial|izvanredni prijevoz|agabaritic|special transport|pilot vehicle|escort vehicle|begleitfahrzeug|private escort|police escort|route permit|special permit|overweight permit|overdimension|weight limit|height limit|width limit|axle load/i;
+export const OVERSIZE_SIGNAL =
+  /exceptional transport|exceptional vehicle|oversize|oversized|abnormal load|wide load|heavy transport|schwertransport|gro[ßs]raum|ausnahmetransport|convoi exceptionnel|transport exceptionnel|trasporto eccezionale|transporte especial|izvanredni prijevoz|agabaritic|special transport|pilot vehicle|escort vehicle|begleitfahrzeug|private escort|police escort|route permit|special permit|overweight permit|overdimension|nadrozm[eě]rn|nadmern/i;
 
 const REGULATORY_SIGNAL =
-  /permit|authorisation|authorization|bewilligung|genehmigung|escort|begleit|pilot vehicle|new rule|new requirement|regulation|decree|law|procedure|digital system|toll system|weight restriction|height restriction|width restriction|border restriction/i;
+  /permit|authorisation|authorization|bewilligung|genehmigung|escort|begleit|pilot vehicle|new rule|new requirement|regulation|verordnung|decree|law|gesetz|procedure|digital system|toll system|weight restriction|height restriction|width restriction|border restriction/i;
 
-function developmentFromCandidate(c) {
-  return {
-    country: c.country || '',
-    title: c.title || '',
-    whatChanged: c.summary || '',
-    where: c.routeScope || c.location || '',
-    vehicleScope: c.vehicleScope || '',
-    timeWindow: c.timeWindow || '',
-    validFrom: c.validFrom || '',
-    validTo: c.validTo || '',
-    impact: c.impact || '',
-    recommendedAction:
-      c.recommendedAction ||
-      'Review the official change before planning or dispatching an affected exceptional transport.',
-    exemptions: c.exemptions || '',
-    isDrivingBan: Boolean(c.isDrivingBan || c.type === 'driving_ban'),
-    isInfrastructure: Boolean(c.isInfrastructure),
-    sourceUrl: c.sourceUrl,
-    sourceName: c.sourceName,
-    additionalSources: c.additionalSources || [],
-  };
-}
+export function isCriticalWeeklyCandidate(candidate, ctx = {}) {
+  if (!candidate?.sourceUrl || !ctx.now) return false;
+  if (!checkFreshness(candidate, ctx).ok) return false;
 
-export function isCriticalWeeklyCandidate(candidate, { discoveryWindowStart } = {}) {
-  if (!candidate || candidate.isOfficialCalendar || !candidate.sourceUrl) return false;
-
-  const firstSeen = candidate.firstSeenAt ? new Date(candidate.firstSeenAt) : null;
-  const discoveredThisWindow =
-    discoveryWindowStart &&
-    firstSeen &&
-    !Number.isNaN(firstSeen.getTime()) &&
-    firstSeen >= discoveryWindowStart;
-  const fresh = ['new', 'updated'].includes(candidate.status) || Boolean(discoveredThisWindow);
-  if (!fresh) return false;
-
-  const text = `${candidate.title || ''} ${candidate.summary || ''}`;
-  const directlyOversize = OVERSIZE_SIGNAL.test(text);
-  const regulatory = REGULATORY_SIGNAL.test(text);
-
-  return directlyOversize && (HIGH_SIGNAL_TYPES.has(candidate.type) || regulatory);
-}
-
-export function criticalWeeklyCandidates(verifiedCandidates = [], options = {}) {
-  return verifiedCandidates.filter((candidate) => isCriticalWeeklyCandidate(candidate, options));
+  const text = `${candidate.title || ''} ${readableText(candidate.summary) || ''}`;
+  return OVERSIZE_SIGNAL.test(text) && (HIGH_SIGNAL_TYPES.has(candidate.type) || REGULATORY_SIGNAL.test(text));
 }
 
 function criticalTopicKey(candidate) {
@@ -72,62 +54,61 @@ function criticalTopicKey(candidate) {
   return 'other';
 }
 
-export function ensureCriticalCoverage(
-  article,
-  verifiedCandidates,
-  { maxLeads = 30, discoveryWindowStart } = {}
-) {
-  const developments = [...(article.developments || [])];
-  const europeRoundup = [...(article.europeRoundup || [])];
-  const critical = criticalWeeklyCandidates(verifiedCandidates, { discoveryWindowStart });
-
+/**
+ * Verified critical candidates grouped per development (country + topic):
+ * several official pages about one change form one group, and the edition
+ * covers the group once.
+ * @returns {{ key: string, candidates: object[] }[]}
+ */
+export function criticalWeeklyGroups(verifiedCandidates = [], ctx = {}) {
   const groups = new Map();
-  for (const candidate of critical) {
+  for (const candidate of verifiedCandidates) {
+    if (!isCriticalWeeklyCandidate(candidate, ctx)) continue;
     const key = `${candidate.country || ''}::${criticalTopicKey(candidate)}`;
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(candidate);
   }
-
-  let addedToLeads = 0;
-  let addedToRoundup = 0;
-
-  for (const group of groups.values()) {
-    const urls = new Set(group.map((c) => c.sourceUrl).filter(Boolean));
-    let existingItem = [...developments, ...europeRoundup].find((item) => urls.has(item.sourceUrl));
-
-    if (existingItem) {
-      const extras = group
-        .filter((c) => c.sourceUrl && c.sourceUrl !== existingItem.sourceUrl)
-        .map((c) => ({ name: c.sourceName || c.title, url: c.sourceUrl }));
-      const existingExtraUrls = new Set((existingItem.additionalSources || []).map((x) => x.url));
-      existingItem.additionalSources = [
-        ...(existingItem.additionalSources || []),
-        ...extras.filter((x) => !existingExtraUrls.has(x.url)),
-      ];
-      continue;
-    }
-
-    const primary = group[0];
-    const item = developmentFromCandidate(primary);
-    item.additionalSources = group.slice(1).map((c) => ({
-      name: c.sourceName || c.title,
-      url: c.sourceUrl,
-    }));
-
-    if (developments.length < maxLeads) {
-      developments.push(item);
-      addedToLeads += 1;
-    } else {
-      europeRoundup.push(item);
-      addedToRoundup += 1;
-    }
-  }
-
-  return {
-    article: { ...article, developments, europeRoundup },
-    critical,
-    addedToLeads,
-    addedToRoundup,
-  };
+  return [...groups.entries()].map(([key, candidates]) => ({ key, candidates }));
 }
 
+function citedUrls(items = []) {
+  const urls = new Set();
+  for (const item of items) {
+    if (item?.sourceUrl) urls.add(item.sourceUrl);
+    for (const extra of item?.additionalSources || []) if (extra?.url) urls.add(extra.url);
+  }
+  return urls;
+}
+
+/** Critical groups that no lead or Rest-of-Europe item cites yet. */
+export function missingCriticalGroups(article, groups = []) {
+  const cited = citedUrls([...(article.developments || []), ...(article.europeRoundup || [])]);
+  return groups.filter((group) => !group.candidates.some((c) => cited.has(c.sourceUrl)));
+}
+
+/**
+ * Attaches the group's other official pages to the item that covers the
+ * group as "Also see" sources - but only pages that are not already a
+ * report's own primary source, so no URL is ever cited twice.
+ */
+export function attachCriticalGroupSources(article, groups = []) {
+  const developments = [...(article.developments || [])];
+  const europeRoundup = [...(article.europeRoundup || [])];
+  const items = [...developments, ...europeRoundup];
+  const primaryUrls = new Set(items.map((item) => item.sourceUrl).filter(Boolean));
+  const attached = new Set();
+
+  for (const group of groups) {
+    const groupUrls = new Set(group.candidates.map((c) => c.sourceUrl));
+    const owner = items.find((item) => groupUrls.has(item.sourceUrl));
+    if (!owner) continue;
+    const existing = new Set((owner.additionalSources || []).map((x) => x.url));
+    const extras = group.candidates
+      .filter((c) => c.sourceUrl !== owner.sourceUrl && !primaryUrls.has(c.sourceUrl) && !existing.has(c.sourceUrl) && !attached.has(c.sourceUrl))
+      .map((c) => ({ name: c.sourceName || c.title, url: c.sourceUrl }));
+    for (const extra of extras) attached.add(extra.url);
+    owner.additionalSources = [...(owner.additionalSources || []), ...extras];
+  }
+
+  return { ...article, developments, europeRoundup };
+}

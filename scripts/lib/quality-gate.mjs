@@ -1,24 +1,33 @@
 // Pre-publish quality gate for DAJC European Oversize & Special Transport Intelligence.
-// Every check here is a hard blocker for malformed, duplicate or unverifiable output.
+// Every check here is a hard blocker for malformed, duplicate, stale, out-of-scope
+// or unverifiable output.
+//
+// QUALITY > COUNT. The gate enforces maximums (30 lead reports, 15 Rest-of-Europe
+// updates) but no minimum beyond "an edition needs at least one lead report".
+// 17 + 8, 9 + 0 or 25 + 12 are all publishable when every item is genuine; a
+// short edition is never a reason to fail, and nothing in the pipeline pads
+// an edition toward the 20-30 / 10-15 range of a well-supplied week.
 
 import { articleFrontmatterSchema } from './article-schema.mjs';
-import { validateDevelopmentDateRange } from './date-validation.mjs';
-import { checkLongRoadClosure } from './closure-duration.mjs';
-import { checkTransportDomainRelevance } from './transport-domain.mjs';
+import { checkGeneratedItem } from './generated-item-filter.mjs';
 
 const MIN_BODY_LENGTH = 400;
-const MIN_REPORTS = 20;
-const MAX_REPORTS = 30;
-const MIN_ROUNDUP_REPORTS = 10;
-const MIN_ROUNDUP_COUNTRIES = 6;
-const MAX_ROUNDUP_REPORTS = 20;
-const MIN_RECOMMENDED_ACTION_LENGTH = 10;
+export const MIN_LEAD_REPORTS = 1;
+export const MAX_REPORTS = 30;
+export const MAX_ROUNDUP_REPORTS = 15;
 
+// Internal publishing mechanics must never reach public copy.
 const INTERNAL_EDITORIAL_LEAK_PATTERNS = [
   /\bonly\s+\*?\*?\d+\s+(?:substantive\s+)?reports?\b/i,
-  /\bnormal\s+20[–-]30\s+lead\s+target\b/i,
-  /\b10[–-]15[- ]item\s+rest\s+of\s+europe\b/i,
+  /\b20[–-]30\s+lead\b/i,
+  /\b10[–-]1[05][- ]item\b/i,
+  /\bat least (?:ten|10) concise\b/i,
+  /\bfrom at least (?:six|6) (?:distinct )?(?:countries|jurisdictions)\b/i,
+  /\b(?:minimum(?: of)?|at least) (?:20|twenty|10|ten) (?:substantive |lead |verified )*(?:reports|items|topics)\b/i,
   /\bverified\s+candidate\s+pool\b/i,
+  /\bcandidates?\s+(?:pool|set|list)\b/i,
+  /\bverified\s+(?:source|candidate)\s+set\b/i,
+  /\bminimum\s+(?:of\s+)?(?:six|6)\s+(?:distinct\s+)?(?:countries|jurisdictions)\b/i,
   /\bdoes\s+not\s+pad\s+this\s+edition\b/i,
   /\bquality\s+gate\b/i,
   /\binternal\s+editorial\b/i,
@@ -42,7 +51,26 @@ function isValidUrl(value) {
   }
 }
 
-export function runQualityGate({ frontmatter, body, developments, europeRoundup, weekStart, weekEnd, requiredSourceUrls = [] }) {
+/**
+ * @param {object} input
+ * @param {Map<string, object>} [input.candidatesByUrl] - verified candidates;
+ *   when given, every item must belong to one and that record must still pass
+ *   the full Weekly eligibility check (freshness, scope, no repetition, ...).
+ * @param {object} [input.eligibilityContext] - see weekly-eligibility.mjs
+ * @param {string[][]} [input.requiredSourceGroups] - critical developments;
+ *   each must be cited by at least one of its official URLs.
+ */
+export function runQualityGate({
+  frontmatter,
+  body,
+  developments,
+  europeRoundup,
+  weekStart,
+  weekEnd,
+  candidatesByUrl = null,
+  eligibilityContext = null,
+  requiredSourceGroups = [],
+}) {
   const errors = [];
   const items = Array.isArray(developments) ? developments : [];
   const roundupItems = Array.isArray(europeRoundup) ? europeRoundup : [];
@@ -69,31 +97,24 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
     }
   }
 
-  if (items.length < MIN_REPORTS) {
-    errors.push(`article has only ${items.length} lead reports - DAJC Weekly requires at least ${MIN_REPORTS} substantive verified lead topics; never pad with routine or irrelevant material`);
+  if (items.length < MIN_LEAD_REPORTS) {
+    errors.push('edition has no lead report - there is nothing verified to publish');
   }
   if (items.length > MAX_REPORTS) {
-    errors.push(`article has ${items.length} lead reports - maximum is ${MAX_REPORTS}; move additional useful verified items to Around Europe`);
-  }
-  if (roundupItems.length < MIN_ROUNDUP_REPORTS) {
-    errors.push(`Rest of Europe has only ${roundupItems.length} reports - minimum is ${MIN_ROUNDUP_REPORTS}`);
-  }
-  const roundupCountries = new Set(roundupItems.map((item) => String(item.country || '').trim()).filter(Boolean));
-  if (roundupCountries.size < MIN_ROUNDUP_COUNTRIES) {
-    errors.push(`Rest of Europe covers only ${roundupCountries.size} countries/jurisdictions - minimum is ${MIN_ROUNDUP_COUNTRIES}`);
+    errors.push(`article has ${items.length} lead reports - maximum is ${MAX_REPORTS}`);
   }
   if (roundupItems.length > MAX_ROUNDUP_REPORTS) {
-    errors.push(`Around Europe has ${roundupItems.length} reports - maximum is ${MAX_ROUNDUP_REPORTS}; retain only the strongest additional updates`);
+    errors.push(`Rest of Europe has ${roundupItems.length} reports - maximum is ${MAX_ROUNDUP_REPORTS}`);
   }
 
-  const seenSourceUrls = new Map();
+  const seenUrls = new Map();
   const seenTitles = new Map();
   const allItems = [
     ...items.map((item, i) => ({ item, label: `developments[${i}]` })),
     ...roundupItems.map((item, i) => ({ item, label: `europeRoundup[${i}]` })),
   ];
 
-  allItems.forEach(({ item, label: baseLabel }, i) => {
+  allItems.forEach(({ item, label: baseLabel }) => {
     const label = `${baseLabel} ("${item.title || 'untitled'}")`;
 
     if (!item.title) errors.push(`${baseLabel} is missing a title`);
@@ -101,58 +122,48 @@ export function runQualityGate({ frontmatter, body, developments, europeRoundup,
     else if (!isValidUrl(item.sourceUrl)) errors.push(`${label} has an invalid sourceUrl: "${item.sourceUrl}"`);
     if (!item.sourceName) errors.push(`${label} has no sourceName`);
 
-    if (!item.recommendedAction || item.recommendedAction.trim().length < MIN_RECOMMENDED_ACTION_LENGTH) {
-      errors.push(`${label} has no meaningful recommendedAction for an operator/dispatcher`);
+    if (item.sourceUrl && candidatesByUrl && !candidatesByUrl.has(item.sourceUrl)) {
+      errors.push(`${label} cites a source that is not a verified candidate`);
+    } else if (item.sourceUrl) {
+      const check = checkGeneratedItem(item, {
+        weekStart,
+        weekEnd,
+        candidate: candidatesByUrl?.get(item.sourceUrl) ?? null,
+        eligibilityContext,
+      });
+      if (!check.ok) errors.push(`${label}: ${check.reason}`);
     }
 
-    const domain = checkTransportDomainRelevance(item);
-    if (!domain.ok) errors.push(`${label}: ${domain.reason}`);
-
-    const closureCheck = checkLongRoadClosure(item);
-    if (!closureCheck.ok) errors.push(`${label}: ${closureCheck.reason}`);
-
-    if (weekStart && weekEnd) {
-      const dateCheck = validateDevelopmentDateRange(
-        { validFrom: item.validFrom, validTo: item.validTo },
-        { weekStart, weekEnd }
-      );
-      if (!dateCheck.ok) errors.push(`${label}: ${dateCheck.reason}`);
-    }
-
-    if (item.sourceUrl) {
-      if (seenSourceUrls.has(item.sourceUrl)) {
-        errors.push(`${label} duplicates a sourceUrl already used by report ${seenSourceUrls.get(item.sourceUrl)} - lead reports and Around Europe must be disjoint`);
+    // Every URL - primary or "Also see" - may be cited by one report only.
+    const urls = [item.sourceUrl, ...(item.additionalSources || []).map((x) => x?.url)].filter(Boolean);
+    for (const url of urls) {
+      if (seenUrls.has(url)) {
+        errors.push(`${label} cites "${url}", already cited by ${seenUrls.get(url)} - every development appears once`);
       } else {
-        seenSourceUrls.set(item.sourceUrl, i);
+        seenUrls.set(url, baseLabel);
       }
     }
 
     const normalized = normalizeTitle(item.title);
     if (normalized) {
       if (seenTitles.has(normalized)) {
-        errors.push(`${label} duplicates a title already used by report ${seenTitles.get(normalized)} - lead reports and Around Europe must be disjoint`);
+        errors.push(`${label} duplicates the title of ${seenTitles.get(normalized)} - every development appears once`);
       } else {
-        seenTitles.set(normalized, i);
+        seenTitles.set(normalized, baseLabel);
       }
     }
   });
 
-  const usedSourceUrls = new Set();
-  for (const item of [...items, ...roundupItems]) {
-    if (item.sourceUrl) usedSourceUrls.add(item.sourceUrl);
-    for (const extra of item.additionalSources || []) {
-      if (extra.url) usedSourceUrls.add(extra.url);
-    }
-  }
   for (const source of frontmatter?.sources || []) {
-    if (!usedSourceUrls.has(source.url)) {
+    if (!seenUrls.has(source.url)) {
       errors.push(`frontmatter lists source "${source.url}" which is not cited by any report in the article body`);
     }
   }
 
-  for (const requiredUrl of requiredSourceUrls) {
-    if (requiredUrl && !usedSourceUrls.has(requiredUrl)) {
-      errors.push(`critical verified development omitted from publication: required source "${requiredUrl}"`);
+  for (const group of requiredSourceGroups) {
+    const urls = (group || []).filter(Boolean);
+    if (urls.length > 0 && !urls.some((url) => seenUrls.has(url))) {
+      errors.push(`critical verified development omitted from publication: required source "${urls[0]}"`);
     }
   }
 

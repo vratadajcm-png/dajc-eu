@@ -59,27 +59,63 @@ function explicitDurationDays(text) {
   return null;
 }
 
+// Roadworks notices name themselves in the title; matched on the folded
+// (lower-case, accent-free) title only, so an incidental mention elsewhere
+// does not turn a permit or toll item into "roadworks".
+const ROADWORKS_TITLE =
+  /roadworks|road works|resurfacing|maintenance works|construction works|lane closure|single[- ]lane|bauarbeiten|baustelle|fahrbahnsanierung|deckenerneuerung|sanierung|travaux|renouvellement de la couche|couche de roulement|lavori|manutenzione|obras|radovi|odrzavanj|prace na|opravy|oprava|rekonstrukc|remont|przebudow|felujit|lucrari/;
+
+// Real dimension/weight/axle, permit or escort restrictions are judged on
+// their operational impact, not by the closure-duration rule (spec §6).
+const DIMENSION_OR_PERMIT_RESTRICTION = new RegExp([
+  'weight (?:limit|restriction)', 'height (?:limit|restriction)', 'width (?:limit|restriction)', 'axle[- ]?load',
+  'tonnage (?:limit|restriction)', 'gewichtsbeschrank', 'hohenbeschrank', 'breitenbeschrank', 'achslast',
+  'durchfahrtshohe', 'lichte hohe', 'omezeni (?:hmotnosti|vysky|sirky|nosnosti)', 'nosnost',
+  'ograniczenie (?:nacisku|tonazu|wysokosci|szerokosci)', 'sulykorlatoz', 'tengelyterhel',
+  'limitation de (?:tonnage|poids|hauteur|largeur)', 'limite di (?:peso|massa|altezza|larghezza)',
+  'limite de (?:peso|altura|anchura)', 'ogranicenje (?:nosivosti|osovinsk|visine|sirine)',
+  '(?:closed|banned|prohibited|gesperrt|verboten|zakazan|uzavren|zamkniet|interdit|vietat|prohibid|zabranjen|tilos)\\s+(?:for|to|fur|pro|dla|pour|per|para|za)\\s+(?:all\\s+)?(?:vehicles|fahrzeuge|lorries|lkw|trucks|hgvs?|vozidla|pojazdy|vehicules|veicoli|vehiculos|vozila)\\s+(?:over|above|uber|nad|powyzej|de plus de|oltre|de mas de|preko|iznad)\\s*\\d',
+  '(?:vehicles|fahrzeuge|lorries|lkw|trucks|hgvs?|vozidla|pojazdy|vehicules|veicoli|vehiculos|vozila)\\s+(?:over|above|uber|nad|powyzej|de plus de|oltre|de mas de|preko|iznad)\\s*\\d+(?:[.,]\\d+)?\\s?(?:t|tonnes?|tons?|tonnen)\\b[^.]{0,40}(?:closed|banned|prohibited|gesperrt|verboten|zakazan|uzavren|zamkniet|interdit|vietat|prohibid|zabranjen|tilos|nicht (?:befahrbar|passierbar))',
+  'escort (?:requirement|rule|obligation)', 'begleitpflicht', '\\bbf[34]\\b', 'police escort', 'polizeibegleit',
+  'bewilligungspflicht', 'genehmigungspflicht', 'permit (?:requirement|condition|procedure|regime)',
+  'abnormal[- ]load (?:route|corridor)', 'exceptional[- ]transport (?:route|corridor)', 'ausnahmetransport(?:route|korridor|strecke)',
+].join('|'));
+
+function fold(text) {
+  return String(text || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[ßẞ]/g, 'ss').toLowerCase();
+}
+
+/**
+ * The closure rule (spec §6): a general road/motorway closure - and likewise
+ * roadworks - is publishable only with a proven planned duration of MORE than
+ * 30 days. Exactly 30, fewer, or unknown: excluded. A genuine
+ * dimension/weight/axle, permit or escort restriction is exempt and judged on
+ * its operational impact instead.
+ */
 export function checkLongRoadClosure(candidate, { minDaysExclusive = 30 } = {}) {
   const text = `${candidate?.title || ''} ${candidate?.summary || candidate?.whatChanged || ''} ${candidate?.impact || ''}`;
   const looksLikeClosure =
     candidate?.type === 'road_closure' ||
     /road closure|motorway closure|full closure|closed to traffic|vollsperrung|voll gesperrt|sperrung der (?:straße|strasse|autobahn|bundesstraße)|uzav[ií]rka|uz[aá]vierka|fermeture (?:totale|de la route|de l'autoroute)|chiusura (?:totale|stradale|autostradale)|cierre (?:total|de carretera|de autopista)|închidere (?:totală|drum|autostradă)/i.test(text);
-  if (!looksLikeClosure) return { ok: true };
+  const looksLikeRoadworks = ROADWORKS_TITLE.test(fold(candidate?.title));
+  if (!looksLikeClosure && !looksLikeRoadworks) return { ok: true };
+  if (DIMENSION_OR_PERMIT_RESTRICTION.test(fold(text))) return { ok: true, exempt: 'dimension/weight/permit/escort restriction' };
 
+  const kind = looksLikeClosure ? 'road closure' : 'roadworks';
   const structured = durationFromStructuredDates(candidate);
   const inferred = structured ?? explicitDurationDays(text);
 
   if (inferred == null) {
     return {
       ok: false,
-      reason: `road closure has no verifiable planned duration longer than ${minDaysExclusive} days`,
+      reason: `${kind} has no verifiable planned duration longer than ${minDaysExclusive} days`,
     };
   }
 
   if (inferred <= minDaysExclusive) {
     return {
       ok: false,
-      reason: `road closure is planned for only ${Math.round(inferred * 10) / 10} days; weekly policy requires more than ${minDaysExclusive} days`,
+      reason: `${kind} is planned for only ${Math.round(inferred * 10) / 10} days; weekly policy requires more than ${minDaysExclusive} days`,
     };
   }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { renderArticleMarkdown, categorizeDevelopment } from '../render-article.mjs';
+import { renderArticleMarkdown, categorizeDevelopment, toFrontmatterYaml } from '../render-article.mjs';
 
 function makeArticle(developments, extra = {}) {
   return {
@@ -74,12 +74,12 @@ describe('renderArticleMarkdown', () => {
     expect(sourceOccurrences).toBe(2);
   });
 
-  it('puts a driving-ban development under "Driving bans and exceptional-transport restrictions" and never under "Infrastructure restrictions"', () => {
+  it('puts an exceptional-transport movement restriction under its own section and never under "Infrastructure restrictions"', () => {
     const developments = [
       {
         country: 'Austria',
-        title: 'Nationwide weekend driving ban',
-        whatChanged: 'Weekend ban applies.',
+        title: 'Abnormal-load movement window shortened',
+        whatChanged: 'Exceptional transports may no longer move on Friday afternoons.',
         where: 'Nationwide',
         impact: 'No movement allowed.',
         recommendedAction: 'Plan around it.',
@@ -94,12 +94,13 @@ describe('renderArticleMarkdown', () => {
       publishedAt: '2026-08-21',
       nextPublicationLabel: null,
     });
-    expect(body).toContain('## Driving bans and exceptional-transport restrictions');
+    expect(body).toContain('**Category:** Exceptional-transport movement restriction');
+    expect(body).not.toContain('Driving bans');
     expect(body).not.toContain('## Infrastructure restrictions');
     expect(body).not.toContain('## Main developments');
   });
 
-  it('renders exactly one section when all developments are driving bans, plus checklist and sources', () => {
+  it('renders all lead reports in one ordered section, plus checklist and sources', () => {
     const developments = Array.from({ length: 10 }, (_, i) => ({
       country: 'Country',
       title: `Report number ${i}`,
@@ -117,12 +118,12 @@ describe('renderArticleMarkdown', () => {
       publishedAt: '2026-08-21',
       nextPublicationLabel: 'Friday, 28 August 2026 at 12:00 CEST',
     });
-    expect(body).toContain('## Driving bans and exceptional-transport restrictions');
+    expect(body).toContain('## Lead reports');
     expect(body).toContain('## Operator checklist');
     expect(body).toContain('## Sources');
     expect(body).toContain('## Next EU Oversize Weekly');
     // Exactly one occurrence of each heading - no secondary section repeats the reports.
-    for (const heading of ['## Driving bans and exceptional-transport restrictions', '## Operator checklist', '## Sources']) {
+    for (const heading of ['## Lead reports', '## Operator checklist', '## Sources']) {
       expect(body.split(heading).length - 1).toBe(1);
     }
   });
@@ -151,5 +152,67 @@ describe('renderArticleMarkdown', () => {
     expect(body).toContain('[ASTRA secondary](https://example.test/ch-secondary)');
     const sourcesSection = body.split('## Sources')[1];
     expect(sourcesSection).toContain('https://example.test/ch-secondary');
+  });
+
+  // Regression (W41): the Rest-of-Europe heading carried the internal rule
+  // "At least ten concise verified items from at least six countries".
+  it('never prints counting rules in the Rest-of-Europe section', () => {
+    const roundup = {
+      country: 'Norway', title: 'Roundup report', whatChanged: 'Change.', where: 'NO', impact: 'Impact.',
+      recommendedAction: 'Act.', isDrivingBan: false, isInfrastructure: false,
+      sourceUrl: 'https://example.test/r1', sourceName: 'Roundup source',
+    };
+    const lead = { ...roundup, country: 'Czechia', title: 'Lead report', sourceUrl: 'https://example.test/l1' };
+    const { body } = renderArticleMarkdown(makeArticle([lead], { europeRoundup: [roundup] }), {
+      slug: 'eu-oversize-weekly-2026-w99', publishedAt: '2026-08-21', nextPublicationLabel: null,
+    });
+    expect(body).not.toMatch(/at least|minimum|ten concise|six countries/i);
+  });
+
+  it('omits the Rest-of-Europe section entirely when there are no roundup items', () => {
+    const lead = {
+      country: 'Czechia', title: 'Lead report', whatChanged: 'Change.', where: 'CZ', impact: 'Impact.',
+      recommendedAction: 'Act.', isDrivingBan: false, isInfrastructure: false,
+      sourceUrl: 'https://example.test/l1', sourceName: 'Lead source',
+    };
+    const { body } = renderArticleMarkdown(makeArticle([lead], { europeRoundup: [] }), {
+      slug: 'eu-oversize-weekly-2026-w99', publishedAt: '2026-08-21', nextPublicationLabel: null,
+    });
+    expect(body).not.toContain('Rest of Europe');
+  });
+
+  it('writes updatedAt into the frontmatter of a corrected edition', () => {
+    const lead = {
+      country: 'Czechia', title: 'Lead report', whatChanged: 'Change.', where: 'CZ', impact: 'Impact.',
+      recommendedAction: 'Act.', sourceUrl: 'https://example.test/l1', sourceName: 'Lead source',
+    };
+    const { frontmatter } = renderArticleMarkdown(makeArticle([lead]), {
+      slug: 'eu-oversize-weekly-2026-w41', publishedAt: '2026-10-02T10:00:00.000Z', updatedAt: '2026-10-02T15:00:00.000Z', nextPublicationLabel: null,
+    });
+    expect(frontmatter.updatedAt).toBe('2026-10-02T15:00:00.000Z');
+    expect(toFrontmatterYaml(frontmatter)).toContain('updatedAt: 2026-10-02T15:00:00.000Z');
+  });
+
+  it('keeps the pipeline order of lead reports across categories', () => {
+    const make = (country, title, isInfrastructure) => ({
+      country, title, whatChanged: 'Change.', recommendedAction: 'Act now.', isDrivingBan: false, isInfrastructure,
+      sourceUrl: `https://example.test/${title}`, sourceName: 'Source',
+    });
+    const { body } = renderArticleMarkdown(makeArticle([
+      make('Czechia', 'first', false),
+      make('Madeira', 'second', true),
+    ]), { slug: 'eu-oversize-weekly-2026-w99', publishedAt: '2026-08-21', nextPublicationLabel: null });
+    expect(body.indexOf('### first')).toBeLessThan(body.indexOf('### second'));
+  });
+
+  it('marks a change taking effect after the covered week as outlook', () => {
+    const item = {
+      country: 'Austria', title: 'Escort rule change', whatChanged: 'New escort rule.', recommendedAction: 'Prepare escorts.',
+      validFrom: '2026-10-20', sourceUrl: 'https://example.test/o', sourceName: 'Source',
+    };
+    const { body } = renderArticleMarkdown(makeArticle([item]), {
+      slug: 'eu-oversize-weekly-2026-w41', publishedAt: '2026-10-02', nextPublicationLabel: null, weekEnd: '2026-10-11',
+    });
+    expect(body).toContain('**Outlook:** takes effect 2026-10-20');
   });
 });
