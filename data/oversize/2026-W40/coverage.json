@@ -1,6 +1,6 @@
 {
   "week": "2026-W40",
-  "checkedAt": "2026-10-02T11:45:04.161Z",
+  "checkedAt": "2026-10-03T10:58:20.608Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -34,14 +34,17 @@
       "code": "AM",
       "name": "Armenia",
       "sourceScope": "AM",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "am-road-department"
       ],
-      "reachableSources": [
-        "am-road-department"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "am-road-department",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 2
     },
     {
@@ -269,7 +272,7 @@
         "de-autobahn"
       ],
       "unavailableSources": [],
-      "candidateFindings": 25
+      "candidateFindings": 26
     },
     {
       "code": "GR",
@@ -750,14 +753,17 @@
       "code": "AX",
       "name": "Åland Islands",
       "sourceScope": "FI",
-      "status": "checked-no-material-development-found",
+      "status": "checked-source-availability-limited",
       "configuredSources": [
         "ax-gov"
       ],
-      "reachableSources": [
-        "ax-gov"
+      "reachableSources": [],
+      "unavailableSources": [
+        {
+          "id": "ax-gov",
+          "error": "fetch failed"
+        }
       ],
-      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
