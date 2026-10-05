@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "dataset_version": "2026-10-01.r3-fr-de-delta",
+ "dataset_version": "2026-10-05.r1-pt-adr-targeted",
  "window": {
   "from": "2026-09-01",
   "to": "2026-11-30"
@@ -1707,15 +1707,16 @@
    "verification_state": "UNVERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": false,
-   "last_checked": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-05T06:50:56.000Z",
    "last_verified": null,
    "source_ids": [
-    "pt-dl-155a-2026"
+    "pt-dl-155a-2026",
+    "pt-portaria-281-2019-consolidated"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [
     "PT_NATIONAL_HOLIDAY_PERIOD_RESTRICTIONS_NOT_REVIEWED",
-    "PT_ADR_RESTRICTIONS_NOT_REVIEWED"
+    "PT_ADR_ART5_BRIDGE_AND_ART6_TUNNEL_RESTRICTIONS_NOT_FULLY_ENCODED"
    ],
    "scope_checks": {
     "weekend": {
@@ -1783,7 +1784,7 @@
      "note": "Not reviewed from a primary source in this sweep."
     }
    },
-   "notes": "New corridor ban from 15 Sep 2026 found and encoded; the rest of the national regime is not yet primary-reviewed."
+   "notes": "New corridor ban from 15 Sep 2026 found and encoded; the rest of the national regime is not yet primary-reviewed. Targeted 2026-10-05 repair: primary IMT consolidated Portaria review added ADR arts. 2-4 rules. Jurisdiction remains UNVERIFIED/HAS_BAN; this is not a full PT sweep."
   },
   "GR": {
    "verification_state": "UNVERIFIED",
@@ -8844,6 +8845,16 @@
    "findings": "Art.2: heavy goods vehicles (>3500 kg gross, >= 3 axles, height at first axle >= 1.1 m) banned on the Porto VCI (A1/IC1, A20/IC23, A28/IC1, A44/IC23) on working days 07:00-21:00."
   },
   {
+   "source_id": "pt-portaria-281-2019-consolidated",
+   "url": "https://www.imt-ip.pt/wp-content/uploads/IMTT/Portugues/TransportesRodoviarios/TransporteMercadoriasPerigosas/AutorizacoesEspeciaisCirculacao/Documents/Portaria%20n.%C2%BA%20281-2019.pdf",
+   "authority": "IMT / Portaria n.º 281/2019 consolidated with Portaria n.º 163/2021",
+   "role": "PRIMARY",
+   "version": "Consolidated text including Portaria n.º 163/2021, effective 2021-07-30",
+   "checked_at": "2026-10-05T06:50:56.000Z",
+   "retrieval_method": "official-IMT-consolidated-legal-text",
+   "findings": "Arts. 2-4: dangerous-goods heavy-vehicle restrictions on Sundays/national holidays, specified Fri/Sun/holiday/eve routes, and Monday 07:00-10:00 inbound approaches to Lisbon/Porto. Art. 2(2) excludes tank-vehicle holiday restrictions when the national holiday falls on Saturday or Monday."
+  },
+  {
    "source_id": "gr-fek-912b-2026",
    "url": "https://ia37rg02wpsa01.blob.core.windows.net/fek/02/2026/20260200912.pdf",
    "authority": "Εθνικό Τυπογραφείο / ΦΕΚ Β΄ 912/18.02.2026 (ΚΥΑ Δ30/Δ5α/27316)",
@@ -10132,6 +10143,45 @@
     "Section C: road assistance, ELTA, press distribution, vehicles carrying live animals or ATP perishables (>= 10% payload), refrigerated fresh produce/table olives, fire-fighting water/fuel, utilities on emergency repair, medical oxygen, emergency vehicles, motorway concessionaires, military and other listed categories.",
     "Police directors may suspend or extend the measures locally (Article 1(3))."
    ]
+  },
+  "pt-adr": {
+   "verification_state": "PRIMARY_VERIFIED",
+   "verified_at": "2026-10-05T06:50:56.000Z",
+   "review_window": {
+    "from": "2026-10-01",
+    "to": "2026-11-30"
+   },
+   "status": "ACTIVE",
+   "sequence": 0,
+   "restriction_types": [
+    "adr"
+   ],
+   "supersedes": [],
+   "regions": [
+    "Mainland Portugal"
+   ],
+   "adr_relevance": "This profile is itself specific to ADR / dangerous-goods heavy vehicles.",
+   "exceptional_relevance": "Relevant to an exceptional/oversize vehicle only when that vehicle also falls within the dangerous-goods scope. Oversize permits and any IMT special circulation authorisation remain separate requirements.",
+   "jurisdiction": "PT",
+   "timezone": "Europe/Lisbon",
+   "source_id": "pt-portaria-281-2019-consolidated",
+   "evidence_ids": [
+    "pt-portaria-281-2019-consolidated"
+   ],
+   "legal_basis": "Portaria n.º 281/2019, as amended by Portaria n.º 163/2021, arts. 1-4 and 7-9",
+   "vehicle_scope": "Heavy vehicles transporting dangerous goods in tanks or other heavy dangerous-goods vehicles required to display ADR orange panels, as specified by the individual rule.",
+   "weight_threshold": {
+    "operator": "any",
+    "applies_to": "legal heavy-vehicle dangerous-goods category in Portaria 281/2019; no separate numeric mass threshold is stated in this Portaria"
+   },
+   "roads": [],
+   "direction": "As specified by the individual rule",
+   "exceptions": [
+    "Art. 7 exceptions include dangerous goods for healthcare units, armed/militarised/police forces, qualifying airport/port and civil-protection fuel supplies, movements to/from refineries and ships, specified LNG supply and strategic reserves.",
+    "Art. 7 also provides temporary exception conditions connected to qualifying fuel-distribution strikes, civil-protection alert/contingency/calamity, and declared energy crisis.",
+    "Art. 8 allows IMT special circulation authorisations for defined indispensable/urgent cases; emergency circulation without the issued authorisation requires a prior application and written non-objection from the competent security force."
+   ],
+   "notes": "Targeted off-Thursday coverage repair. Articles 2-4 are encoded for the current Oct-Nov 2026 publication window. Permanent Ponte 25 de Abril and tunnel-specific ADR restrictions remain a separate incomplete-coverage item."
   }
  },
  "rules": [
@@ -14596,6 +14646,208 @@
    ],
    "direction": "Return, per Chapter A2 segment",
    "legal_basis": "ΦΕΚ Β΄ 912/2026 B7(b)"
+  },
+  {
+   "ban_id": "pt-adr-monday-lisbon-porto-access",
+   "profile": "pt-adr",
+   "title": "ADR heavy vehicles — Monday inbound restrictions to Lisbon and Porto",
+   "valid_from": "2026-10-01",
+   "valid_to": "2026-11-30",
+   "schedule": {
+    "kind": "weekly",
+    "start_time": "07:00",
+    "end_time": "10:00",
+    "end_day_offset": 0,
+    "weekdays": [
+     1
+    ]
+   },
+   "roads": [
+    "A1: Alverca - Lisboa",
+    "A5: ligação à CREL - Lisboa",
+    "A8: Loures - Lisboa",
+    "IC19: nó da CREL - Lisboa (Damaia)",
+    "EN6: Cascais - Lisboa",
+    "EN10: Vila Franca de Xira - Alverca",
+    "IC22: ligação A9 - Odivelas",
+    "A3: ligação ao IC24 - Porto",
+    "A4: nó com A3 - Matosinhos",
+    "A28: Ponte da Arrábida - A4",
+    "EN13: Moreira - Porto",
+    "EN209: Gondomar - Porto",
+    "EN222 (ER): Avintes - Porto",
+    "A20: Ponte do Freixo - A3"
+   ],
+   "direction": "Inbound to Lisbon or Porto, as specified in Portaria art. 4",
+   "legal_basis": "Portaria 281/2019 as amended, art. 4",
+   "vehicle_scope": "All heavy vehicles covered by Portaria art. 1: dangerous goods in tanks and other heavy dangerous-goods vehicles required to display ADR orange panels.",
+   "notes": "July/August exception in art. 4 is outside the Oct-Nov 2026 publication window. This reviewed projection is not the legal commencement/expiry of the standing rule."
+  },
+  {
+   "ban_id": "pt-adr-orange-friday-sunday-routes",
+   "profile": "pt-adr",
+   "title": "ADR orange-panel heavy vehicles — Friday/Sunday route restriction",
+   "valid_from": "2026-10-01",
+   "valid_to": "2026-11-30",
+   "schedule": {
+    "kind": "weekly",
+    "start_time": "18:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "weekdays": [
+     5,
+     0
+    ]
+   },
+   "roads": [
+    "EN 6: Lisboa - Cascais",
+    "EN 10: Infantado - Vila Franca de Xira",
+    "EN 14: Maia - Braga",
+    "IC 1: Coimbrões - Miramar",
+    "EN 209: Porto - Gondomar",
+    "EN 1: Carvalhos - Vila Nova de Gaia (Santo Ovídio)",
+    "EN 101: Braga - Vila Verde",
+    "IC 4 (EN 125): São João da Venda - Faro",
+    "EN 125: Faro - Olhão"
+   ],
+   "direction": "Both directions on the listed roads",
+   "legal_basis": "Portaria 281/2019 as amended, art. 3(1)",
+   "vehicle_scope": "Heavy dangerous-goods vehicles covered by art. 1(2) and required to display ADR orange panels.",
+   "notes": "Holiday/eve occurrences not already represented by the Friday/Sunday recurrence are encoded separately."
+  },
+  {
+   "ban_id": "pt-adr-orange-holiday-eve-oct-nov-2026",
+   "profile": "pt-adr",
+   "title": "ADR orange-panel heavy vehicles — holiday / holiday-eve route restriction",
+   "valid_from": "2026-10-05",
+   "valid_to": "2026-11-30",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "18:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-05",
+      "occurrence_id": "2026-10-05-holiday"
+     },
+     {
+      "date": "2026-10-31",
+      "occurrence_id": "2026-10-31-holiday-eve"
+     },
+     {
+      "date": "2026-11-30",
+      "occurrence_id": "2026-11-30-holiday-eve"
+     }
+    ]
+   },
+   "roads": [
+    "EN 6: Lisboa - Cascais",
+    "EN 10: Infantado - Vila Franca de Xira",
+    "EN 14: Maia - Braga",
+    "IC 1: Coimbrões - Miramar",
+    "EN 209: Porto - Gondomar",
+    "EN 1: Carvalhos - Vila Nova de Gaia (Santo Ovídio)",
+    "EN 101: Braga - Vila Verde",
+    "IC 4 (EN 125): São João da Venda - Faro",
+    "EN 125: Faro - Olhão"
+   ],
+   "direction": "Both directions on the listed roads",
+   "legal_basis": "Portaria 281/2019 as amended, art. 3(1)",
+   "vehicle_scope": "Heavy dangerous-goods vehicles covered by art. 1(2) and required to display ADR orange panels.",
+   "notes": "Oct 4 and Nov 1 are already represented by the Sunday recurrence; Nov 30 is the eve of the Dec 1 national holiday."
+  },
+  {
+   "ban_id": "pt-adr-tank-friday-routes",
+   "profile": "pt-adr",
+   "title": "ADR tank heavy vehicles — Friday route restriction",
+   "valid_from": "2026-10-01",
+   "valid_to": "2026-11-30",
+   "schedule": {
+    "kind": "weekly",
+    "start_time": "18:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "weekdays": [
+     5
+    ]
+   },
+   "roads": [
+    "EN 6: Lisboa - Cascais",
+    "EN 10: Infantado - Vila Franca de Xira",
+    "EN 14: Maia - Braga",
+    "IC 1: Coimbrões - Miramar",
+    "EN 209: Porto - Gondomar",
+    "EN 1: Carvalhos - Vila Nova de Gaia (Santo Ovídio)",
+    "EN 101: Braga - Vila Verde",
+    "IC 4 (EN 125): São João da Venda - Faro",
+    "EN 125: Faro - Olhão"
+   ],
+   "direction": "Both directions on the listed roads",
+   "legal_basis": "Portaria 281/2019 as amended, art. 3(2)",
+   "vehicle_scope": "Heavy vehicles transporting dangerous goods in tanks under art. 1(1).",
+   "notes": "Art. 3(2) applies the listed-route restriction to tank vehicles on Fridays and national-holiday eves."
+  },
+  {
+   "ban_id": "pt-adr-tank-holiday-eves-oct-nov-2026",
+   "profile": "pt-adr",
+   "title": "ADR tank heavy vehicles — holiday-eve route restriction",
+   "valid_from": "2026-10-31",
+   "valid_to": "2026-11-30",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "18:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-10-31",
+      "occurrence_id": "2026-10-31-holiday-eve"
+     },
+     {
+      "date": "2026-11-30",
+      "occurrence_id": "2026-11-30-holiday-eve"
+     }
+    ]
+   },
+   "roads": [
+    "EN 6: Lisboa - Cascais",
+    "EN 10: Infantado - Vila Franca de Xira",
+    "EN 14: Maia - Braga",
+    "IC 1: Coimbrões - Miramar",
+    "EN 209: Porto - Gondomar",
+    "EN 1: Carvalhos - Vila Nova de Gaia (Santo Ovídio)",
+    "EN 101: Braga - Vila Verde",
+    "IC 4 (EN 125): São João da Venda - Faro",
+    "EN 125: Faro - Olhão"
+   ],
+   "direction": "Both directions on the listed roads",
+   "legal_basis": "Portaria 281/2019 as amended, art. 3(2)",
+   "vehicle_scope": "Heavy vehicles transporting dangerous goods in tanks under art. 1(1).",
+   "notes": "Oct 4 is already subject to the broader Sunday all-network tank restriction under art. 2."
+  },
+  {
+   "ban_id": "pt-adr-tank-sundays",
+   "profile": "pt-adr",
+   "title": "ADR tank heavy vehicles — Sunday all-network restriction",
+   "valid_from": "2026-10-01",
+   "valid_to": "2026-11-30",
+   "schedule": {
+    "kind": "weekly",
+    "start_time": "00:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "weekdays": [
+     0
+    ]
+   },
+   "roads": [
+    "All public roads in mainland Portugal"
+   ],
+   "direction": "All directions",
+   "legal_basis": "Portaria 281/2019 as amended, art. 2",
+   "vehicle_scope": "Heavy vehicles transporting dangerous goods in tanks under art. 1(1).",
+   "notes": "Art. 2 also covers national holidays but excludes a holiday solely on the holiday basis when it falls on Saturday or Monday. In Oct-Nov 2026, 5 Oct is Monday and is therefore not added as an art. 2 holiday event; 1 Nov is Sunday and is covered by the Sunday recurrence."
   }
  ]
 }

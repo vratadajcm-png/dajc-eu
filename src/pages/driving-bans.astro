@@ -32,7 +32,7 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
     <p class="stats">104 / 104 {label('tracked', 'sledováno')} · {count('HAS_BAN')} HAS_BAN · {count('NO_BAN')} NO_BAN · {count('UNKNOWN')} UNKNOWN · {view.jurisdictions.filter(j => j.coverage_complete).length} / 104 {label('fully verified', 'úplně ověřeno')}</p>
     <form id="ban-filters" class="controls">
       <label>{label('Find a jurisdiction', 'Vyhledat jurisdikci')} <input id="country-search" type="search" placeholder={label('Name or code', 'Název nebo kód')} /></label>
-      <label>{label('Restrictions', 'Omezení')} <select id="ban-type"><option value="all">{label('All HGV / exceptional', 'Všechny nákladní / nadrozměrné')}</option><option value="general">{label('General HGV', 'Běžná nákladní vozidla')}</option><option value="exceptional">{label('Exceptional, including relevant HGV bans', 'Nadměrné, včetně příslušných běžných zákazů')}</option></select></label>
+      <label>{label('Restrictions', 'Omezení')} <select id="ban-type"><option value="all">{label('All HGV / exceptional', 'Všechny nákladní / nadrozměrné')}</option><option value="general">{label('General HGV', 'Běžná nákladní vozidla')}</option><option value="adr">ADR / dangerous goods</option><option value="exceptional">{label('Exceptional, including relevant HGV bans', 'Nadměrné, včetně příslušných běžných zákazů')}</option></select></label>
       <label><input id="include-history" type="checkbox" /> {label('Include past events within the coverage period', 'Zobrazit i uplynulé události sledovaného období')}</label>
       <details class="selection"><summary>{label('Select jurisdictions for the calendar', 'Výběr jurisdikcí pro kalendář')}</summary>
         <button type="button" id="select-all">{label('Select all', 'Vybrat vše')}</button> <button type="button" id="clear-all">{label('Clear selection', 'Zrušit výběr')}</button>
@@ -84,7 +84,9 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
         row.hidden = !selected.includes(code) || !`${row.dataset.name} ${code}`.toLowerCase().includes(search.value.toLowerCase());
       });
       document.querySelectorAll<HTMLElement>('.ban-event').forEach(e => {
-        e.hidden = (!history.checked && (e.dataset.ends || '') <= new Date().toISOString()) || (type.value === 'general' && !e.dataset.types?.split(',').includes('general'));
+        const types = e.dataset.types?.split(',') || [];
+        const typeMismatch = type.value === 'general' ? !types.includes('general') : type.value === 'adr' ? !types.includes('adr') : false;
+        e.hidden = (!history.checked && (e.dataset.ends || '') <= new Date().toISOString()) || typeMismatch;
       });
       const params = new URLSearchParams({ rolling: '1', type: type.value });
       if (selected.length && selected.length !== boxes.length) params.set('countries', selected.join(','));

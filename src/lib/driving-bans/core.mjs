@@ -113,7 +113,7 @@ export function validateCanonical(data, identities) {
     assert(/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(schedule.start_time) && /^(?:(?:[01]\d|2[0-3]):[0-5]\d|24:00)$/.test(schedule.end_time), `Invalid times ${rule.ban_id}`);
     assert(Number.isInteger(schedule.end_day_offset) && schedule.end_day_offset >= 0 && schedule.end_day_offset <= 7, 'Invalid end-day offset');
     assert((schedule.excluded_dates || []).every(isDate), 'Invalid excluded date');
-    assert(Array.isArray(rule.restriction_types) && rule.restriction_types.length > 0 && rule.restriction_types.every(t => ['general','exceptional'].includes(t)), 'Invalid restriction types');
+    assert(Array.isArray(rule.restriction_types) && rule.restriction_types.length > 0 && rule.restriction_types.every(t => ['general','exceptional','adr'].includes(t)), 'Invalid restriction types');
     if (schedule.kind === 'weekly') assert(schedule.weekdays?.length && new Set(schedule.weekdays).size === schedule.weekdays.length && schedule.weekdays.every(n => Number.isInteger(n) && n >= 0 && n <= 6), 'Invalid weekdays');
     if (schedule.kind === 'dates') assert(schedule.dates?.length && new Set(schedule.dates.map(d => d.occurrence_id)).size === schedule.dates.length && schedule.dates.every(d => isDate(d.date) && /^[a-zA-Z0-9_-]+$/.test(d.occurrence_id)), 'Invalid dated occurrences');
   }
@@ -198,10 +198,10 @@ export function foldLine(line) {
   return out;
 }
 export function toIcs(view, { countries = [], type = 'all', upcoming = true } = {}) {
-  assert(['all','general','exceptional'].includes(type), 'Invalid restriction type');
+  assert(['all','general','exceptional','adr'].includes(type), 'Invalid restriction type');
   const valid = new Set(view.jurisdictions.map(r => r.jurisdiction));
   assert(countries.every(c => valid.has(c)), 'Unknown jurisdiction');
-  const events = (upcoming ? view.upcoming_events : view.events).filter(e => (!countries.length || countries.includes(e.jurisdiction)) && (type !== 'general' || e.restriction_types.includes('general')));
+  const events = (upcoming ? view.upcoming_events : view.events).filter(e => (!countries.length || countries.includes(e.jurisdiction)) && (type === 'general' ? e.restriction_types.includes('general') : type === 'adr' ? e.restriction_types.includes('adr') : true));
   const selected = view.jurisdictions.filter(r => !countries.length || countries.includes(r.jurisdiction));
   const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DAJC//Canonical Driving Bans//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:DAJC HGV Driving Bans',`X-DAJC-WINDOW:${view.window.from}/${view.window.to}`,`X-DAJC-DATASET:${esc(view.dataset_version)}`,`X-DAJC-EVENT-SCOPE:${upcoming ? 'UPCOMING' : 'WHOLE-WINDOW'}`,`X-DAJC-COVERAGE-COMPLETE:${selected.every(r => r.coverage_complete) ? 'TRUE':'FALSE'}`,`X-DAJC-UNKNOWN:${esc(selected.filter(r => r.ban_state === 'UNKNOWN').map(r => r.jurisdiction).join(','))}`,'X-WR-CALDESC:Verified ban events only. Missing events are NOT evidence of no ban. Consult the DAJC coverage status and official sources.','REFRESH-INTERVAL;VALUE=DURATION:PT1H','X-PUBLISHED-TTL:PT1H'];
   for (const e of events) {

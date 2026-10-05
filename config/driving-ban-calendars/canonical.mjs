@@ -7,4 +7,4 @@ export const drivingBanCalendars = calendarRules(canonicalDrivingBans);
 export const getDrivingBansSnapshot = (now = new Date()) => snapshot(canonicalDrivingBans, dajcEuropeCoverage, now);
 export const getCalendarById = id => drivingBanCalendars.find(rule => rule.id === id);
 export const restrictionTypesOf = rule => Array.isArray(rule.restrictionTypes) ? rule.restrictionTypes : (rule.restriction_types || ['general']);
-export const matchesRestrictionType = (rule, type = 'all') => type !== 'general' || restrictionTypesOf(rule).includes('general');
+export const matchesRestrictionType = (rule, type = 'all') => type === 'all' || type === 'exceptional' || restrictionTypesOf(rule).includes(type);
