@@ -1,6 +1,6 @@
 {
   "week": "2026-W41",
-  "checkedAt": "2026-10-05T13:22:06.668Z",
+  "checkedAt": "2026-10-06T12:36:54.361Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -265,15 +265,11 @@
         "de-autobahn"
       ],
       "reachableSources": [
+        "de-polizei-blaulicht",
         "de-autobahn"
       ],
-      "unavailableSources": [
-        {
-          "id": "de-polizei-blaulicht",
-          "error": "HTTP 429"
-        }
-      ],
-      "candidateFindings": 2
+      "unavailableSources": [],
+      "candidateFindings": 8
     },
     {
       "code": "GR",
@@ -293,17 +289,14 @@
       "code": "HU",
       "name": "Hungary",
       "sourceScope": "HU",
-      "status": "checked-source-availability-limited",
+      "status": "checked-no-material-development-found",
       "configuredSources": [
         "hu-kozut"
       ],
-      "reachableSources": [],
-      "unavailableSources": [
-        {
-          "id": "hu-kozut",
-          "error": "timeout"
-        }
+      "reachableSources": [
+        "hu-kozut"
       ],
+      "unavailableSources": [],
       "candidateFindings": 0
     },
     {
@@ -737,7 +730,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "VA",
@@ -1307,7 +1300,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "SCT",
@@ -1323,7 +1316,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "WLS",
@@ -1339,7 +1332,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "NIR",
@@ -1355,7 +1348,7 @@
         "uk-npcc"
       ],
       "unavailableSources": [],
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "FBIH",
