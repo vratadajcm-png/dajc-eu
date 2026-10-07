@@ -1,5 +1,5 @@
-// Global request middleware. Its only job today is the DAJC Partner Portal
-// feature gate: fail closed, server-side, before any portal route handler
+// Global request middleware applies private investor response headers and the
+// DAJC Partner Portal feature gate: fail closed before any portal route handler
 // (page or API) ever runs.
 //
 // This is layer 1 of defense-in-depth. Layer 2 is that every portal route
@@ -11,6 +11,15 @@ import { defineMiddleware } from 'astro:middleware';
 import { isPartnerPortalEnabled, isPartnerPortalPath } from './portal/config/gate';
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  if (context.url.pathname === '/investor' || context.url.pathname.startsWith('/investor/')) {
+    const response = await next();
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+    response.headers.set('CDN-Cache-Control', 'no-store');
+    response.headers.set('Vercel-CDN-Cache-Control', 'no-store');
+    response.headers.set('Referrer-Policy', 'no-referrer');
+    return response;
+  }
   if (isPartnerPortalPath(context.url.pathname)) {
     if (!isPartnerPortalEnabled()) {
       return new Response('Not found', {

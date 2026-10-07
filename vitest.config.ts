@@ -9,7 +9,7 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['src/portal/__tests__/**/*.test.ts', 'src/config/__tests__/**/*.test.ts', 'scripts/lib/__tests__/**/*.test.mjs', 'src/lib/driving-bans/**/*.test.ts'],
+    include: ['src/portal/__tests__/**/*.test.ts', 'src/config/__tests__/**/*.test.ts', 'scripts/lib/__tests__/**/*.test.mjs', 'src/lib/driving-bans/**/*.test.ts', 'src/investor/__tests__/**/*.test.ts'],
     environment: 'node',
   },
 });

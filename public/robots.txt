@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /partner-portal/
+Disallow: /investor/
 
 Sitemap: https://www.dajc.eu/sitemap-index.xml

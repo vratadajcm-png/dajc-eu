@@ -1,0 +1,151 @@
+---
+export const prerender = false;
+import '../../styles/global.css';
+import {
+  ACCESS_COOKIE, ACCESS_TTL, PRIVATE_HEADERS, accessConfiguration,
+  hasAccessSession, issueAccessSession, verifyAccessCode, isSameOriginPost,
+  allowAccessAttempt, clearAccessAttempts,
+} from '../../investor/access';
+
+for (const [name, value] of Object.entries(PRIVATE_HEADERS)) Astro.response.headers.set(name, value);
+const configured = Boolean(accessConfiguration());
+let error = '';
+let authenticated = hasAccessSession(Astro.cookies.get(ACCESS_COOKIE)?.value);
+const cookieOptions = { httpOnly: true, secure: Astro.url.protocol === 'https:', sameSite: 'strict' as const, path: '/investor', maxAge: ACCESS_TTL };
+
+if (Astro.request.method === 'POST') {
+  if (!isSameOriginPost(Astro.request)) {
+    Astro.response.status = 403;
+    error = 'This request could not be verified. Please try again from this page.';
+  } else if (!configured) {
+    Astro.response.status = 503;
+  } else if (Number(Astro.request.headers.get('content-length') ?? 0) > 4096) {
+    Astro.response.status = 413;
+    error = 'The request is too large.';
+  } else {
+    let form: FormData | null = null;
+    try { form = await Astro.request.formData(); } catch { /* malformed form */ }
+    if (!form) {
+      Astro.response.status = 400;
+      error = 'Please use the access form below.';
+    } else if (form.get('action') === 'sign-out') {
+      Astro.cookies.delete(ACCESS_COOKIE, { path: '/investor' });
+      return Astro.redirect('/investor/pitch-deck', 303);
+    } else {
+      const address = Astro.clientAddress;
+      if (!allowAccessAttempt(address)) {
+        Astro.response.status = 429;
+        Astro.response.headers.set('Retry-After', '600');
+        error = 'Too many attempts. Please try again in ten minutes.';
+      } else {
+        const candidate = form.get('access_code');
+        if (typeof candidate === 'string' && verifyAccessCode(candidate)) {
+          clearAccessAttempts(address);
+          Astro.cookies.set(ACCESS_COOKIE, issueAccessSession(), cookieOptions);
+          return Astro.redirect('/investor/pitch-deck', 303);
+        }
+        Astro.response.status = 401;
+        error = 'That access code is not valid. Please check the code provided by DAJC.';
+      }
+    }
+  }
+}
+if (!configured) Astro.response.status = 503;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+    <meta name="theme-color" content="#061A33" />
+    <title>Investor documents | DAJC</title>
+    <link rel="icon" href="/assets/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <main>
+      <a class="brand" href="/" aria-label="DAJC home">
+        <img src="/assets/dajc-icon-mono-white.png" alt="" width="42" height="42" />
+        <span>DAJC</span>
+      </a>
+      <p class="eyebrow">Private investor access</p>
+      <h1>Investor documents</h1>
+      {!configured ? (
+        <section class="access-panel">
+          <p>Document access is temporarily unavailable.</p>
+          <p>Please contact <a href="mailto:team@dajc.eu">team@dajc.eu</a>.</p>
+        </section>
+      ) : authenticated ? (
+        <>
+          <p class="intro">Download the DAJC investor pitch deck.</p>
+          <p class="metadata">English · 26 slides · Updated 7 October 2026</p>
+          <div class="documents">
+            <section class="document">
+              <p class="file-type">PDF</p>
+              <h2>Investor presentation</h2>
+              <p>Ready to read and share within your investment team.</p>
+              <a class="button" href="/investor/pitch-deck/pitch-deck.pdf" download>Download PDF</a>
+            </section>
+            <section class="document">
+              <p class="file-type">POWERPOINT</p>
+              <h2>Presentation &amp; notes</h2>
+              <p>Editable slides, speaker notes and the financial scenario.</p>
+              <a class="button secondary" href="/investor/pitch-deck/pitch-deck.pptx" download>Download PowerPoint</a>
+            </section>
+          </div>
+          <div class="session-actions">
+            <a href="mailto:team@dajc.eu">Contact DAJC</a>
+            <form method="POST"><input type="hidden" name="action" value="sign-out" /><button class="text-button" type="submit">Sign out</button></form>
+          </div>
+        </>
+      ) : (
+        <section class="access-panel">
+          <p class="intro">Enter the access code provided by DAJC.</p>
+          {error && <p class="error" role="alert">{error}</p>}
+          <form method="POST">
+            <label for="access-code">Access code</label>
+            <input id="access-code" name="access_code" type="password" required maxlength="256" autocomplete="current-password" spellcheck="false" />
+            <button class="button" type="submit">Unlock documents</button>
+          </form>
+          <p class="help">Need access? Contact <a href="mailto:team@dajc.eu">team@dajc.eu</a>.</p>
+        </section>
+      )}
+      <footer><span>Confidential investment discussion</span><span>DRIVING A SAFER TOMORROW</span></footer>
+    </main>
+  </body>
+</html>
+<style>
+  main { width: min(100% - 3rem, 1080px); margin: 0 auto; padding: 3rem 0 2rem; }
+  .brand { display: inline-flex; align-items: center; gap: 1rem; color: var(--dajc-white); text-decoration: none; font: 700 2rem 'Space Grotesk', sans-serif; }
+  .eyebrow { margin: 4rem 0 1rem; color: var(--dajc-orange); font: 500 .875rem 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: .08em; }
+  h1 { margin: 0 0 1.5rem; font: 700 clamp(2.5rem, 6vw, 4.5rem)/1.1 'Space Grotesk', sans-serif; }
+  h2 { margin: 1.2rem 0 1rem; font: 500 1.6rem/1.25 'Space Grotesk', sans-serif; }
+  p { line-height: 1.6; }
+  .intro { font-size: 1.25rem; margin-top: 0; }
+  .metadata, .help { color: #abb7c8; font-size: 1rem; }
+  .documents { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+  .document, .access-panel { border: 1px solid #354962; border-top: 3px solid var(--dajc-orange); background: #0b2240; padding: 2rem; }
+  .access-panel { max-width: 540px; margin-top: 2rem; }
+  .document { display: flex; flex-direction: column; align-items: flex-start; }
+  .document p { margin-top: 0; }
+  .file-type { color: var(--dajc-orange); font: 500 .875rem 'IBM Plex Mono', monospace; }
+  a { color: var(--dajc-orange); text-underline-offset: .2em; }
+  label { display: block; margin: 1.5rem 0 .6rem; }
+  input { width: 100%; border: 1px solid #71829a; border-radius: 4px; background: var(--dajc-dark); color: var(--dajc-white); font: inherit; font-size: 1rem; padding: .85rem 1rem; }
+  .button { display: inline-flex; align-items: center; justify-content: center; margin-top: 1.5rem; min-height: 48px; padding: .8rem 1.3rem; border: 1px solid var(--dajc-orange); border-radius: 4px; background: var(--dajc-orange); color: var(--dajc-dark); font: 500 1rem 'IBM Plex Sans', sans-serif; text-decoration: none; cursor: pointer; }
+  .document .button { margin-top: auto; }
+  .document p:last-of-type { margin-bottom: 2rem; }
+  .secondary { background: transparent; color: var(--dajc-orange); }
+  :is(a, button, input):focus-visible { outline: 3px solid var(--dajc-white); outline-offset: 4px; }
+  .button:hover { filter: brightness(1.1); }
+  .error { padding: .8rem 1rem; border: 1px solid #e5a485; background: #45232a; color: #ffe0d1; }
+  .help { margin: 1.8rem 0 0; }
+  .session-actions { display: flex; gap: 1.5rem; align-items: center; justify-content: space-between; margin-top: 2rem; }
+  .text-button { color: var(--dajc-white); font: inherit; font-size: 1rem; background: transparent; border: 0; text-decoration: underline; text-underline-offset: .2em; cursor: pointer; padding: .5rem 0; }
+  footer { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: space-between; border-top: 1px solid #354962; margin-top: 5rem; padding-top: 1.5rem; font-size: .875rem; color: #abb7c8; }
+  footer span:last-child { font-family: 'IBM Plex Mono', monospace; }
+  @media (max-width: 640px) { main { width: calc(100% - 2rem); padding-top: 2rem; } .eyebrow { margin-top: 3rem; } .documents { grid-template-columns: 1fr; } .document, .access-panel { padding: 1.5rem; } .button { width: 100%; } footer { margin-top: 3rem; } }
+</style>
