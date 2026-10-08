@@ -1,6 +1,10 @@
 # DAJC European Oversize & Special Transport Intelligence — canonical production rules
 
-This is the **single editorial authority** for the automated DAJC.eu weekly European oversize/special-transport publication. Implementation notes in `NEWS_AUTOMATION.md` must conform to this document.
+This is the **single editorial authority** for the automated DAJC.eu weekly European oversize/special-transport publication. It is the only document that states the rules; `NEWS_AUTOMATION.md` describes how they are implemented and links here instead of repeating them. In code the rules live in `scripts/lib/weekly-eligibility.mjs` (deterministic checks), `scripts/lib/quality-gate.mjs` (final gate) and the model prompt in `scripts/lib/openai-client.mjs`; a rule change must update this document and those files together.
+
+## 0. Scope
+
+The Weekly covers **road freight transport with vehicles over 12 t** (EU category N3) across Europe. **Oversize, abnormal and special transport has priority**: it is searched first, ranked first, placed first in the edition (§1) and is the required-coverage floor (§4). Other developments for goods vehicles over 12 t — weight, axle and dimension limits, bridge/tunnel restrictions for trucks, long-term closures of freight routes, truck tolls, goods border crossings, ferries/RoRo, rules for HGV operators and drivers — are in scope and follow after it.
 
 ## 1. Geographic research coverage
 
@@ -14,14 +18,14 @@ This is the **single editorial authority** for the automated DAJC.eu weekly Euro
 
 ### Published lead order — Central Europe first
 
-Research coverage remains Europe-wide, but the published lead order is operator-first and **deterministic** (`scripts/lib/edition-order.mjs`): importance first (required critical development → directly exceptional/abnormal-transport change → other heavy-transport intelligence), then geography — the wider Central-European transport core in the order **Czechia, Germany, Austria, Slovakia, Poland, Hungary, Switzerland, Slovenia**, then directly connected corridors (France, Benelux, Italy, Croatia, Romania), then the rest of Europe, with peripheral jurisdictions such as Madeira, Guernsey, Jersey or Monaco last. Lead reports are published as one list in exactly this order. Geography is an ordering preference only: it never makes weak material publishable, and a critical development from a peripheral jurisdiction still leads a weaker Central-European item.
+Research coverage remains Europe-wide, but the published lead order is operator-first and **deterministic** (`scripts/lib/edition-order.mjs`): importance first (required critical development → directly exceptional/abnormal-transport change → other developments for goods vehicles over 12 t), then geography — the wider Central-European transport core in the order **Czechia, Germany, Austria, Slovakia, Poland, Hungary, Switzerland, Slovenia**, then directly connected corridors (France, Benelux, Italy, Croatia, Romania), then the rest of Europe, with peripheral jurisdictions such as Madeira, Guernsey, Jersey or Monaco last. Lead reports are published as one list in exactly this order. Geography is an ordering preference only: it never makes weak material publishable, and a critical development from a peripheral jurisdiction still leads a weaker Central-European item.
 
 ## 2. Source discovery
 
-- RSS/Atom is **not** complete coverage and must never be the only discovery channel.
-- For every configured authority, the monitor checks available RSS/Atom **and** official HTML/news/traffic/legislation pages.
-- Feed and web results are merged, detail pages are enriched, and results are deduplicated by official source URL.
-- Primary/official sources are required for permits, legal rules, escorts, route/weight/dimension limits and other high-impact regulatory claims whenever available.
+- **News is discovered by web search** (`scripts/lib/web-search.mjs`, OpenAI web search): one search per region group, Central Europe country by country first, asking for developments published in the last 7 days or taking effect within one month (§7), oversize/abnormal transport first, then goods vehicles over 12 t.
+- The search model only finds links. Every hit is fetched and the finding is built from **the page itself** (heading, text, publication date). A date the model reports is kept only when the page text shows it. Unreachable pages, PDFs, and pages whose own text shows no freight-vehicle (>12 t) or oversize context are dropped and logged.
+- The previous crawler of configured official authority pages (`config/oversize-sources`, `scripts/lib/fetch-source.mjs`) remains available with `OVERSIZE_DISCOVERY=official` (or `both`).
+- Official sources (authorities, ministries, toll operators, police) are preferred, and established transport trade media are acceptable. Primary sources are required for permits, legal rules, escorts, route/weight/dimension limits and other high-impact regulatory claims whenever available.
 - Generic landing pages, image-only URLs, stale archive pages, unrelated permits/administration and non-operational statistics are excluded.
 - **Discovery date is not publication freshness.** A page first discovered this week is not a new development merely because the crawler found it now. Completed civic/school projects, old archive pages, generic infrastructure achievements and historical announcements without a current operational consequence are excluded.
 - The monitor records, for every finding, the date the **official source published it** (`publishedAt`: page `datePublished`/publication metadata, feed date, a labelled or leading date in the text, or a date in the URL) and keeps the real first-discovery time across ISO weeks. Without such evidence the date is unknown — never "today".
@@ -67,14 +71,14 @@ Other non-closure restrictions such as weight, width, height, axle, permit, esco
 
 ## 7. Relevance, freshness and verification
 
-Every published item must demonstrably relate to heavy, abnormal, oversized or special road transport, freight routing, relevant tolling, vehicle/route limits, escorts, borders, ports/ferries/project cargo, heavy-haul equipment, or another directly operational DAJC intelligence topic.
+Every published item must demonstrably relate to road freight with vehicles over 12 t — oversize, abnormal or special transport first — freight routing, relevant tolling, vehicle/route limits, escorts, borders, ports/ferries/project cargo, heavy-haul equipment, or another directly operational DAJC intelligence topic.
 
 Exclude driver-licence/auto-school administration, environmental/water-law permits unrelated to transport, crime/theft/accident/breakdown incidents, procurement/tender noise, generic authority pages, toll revenue/statistics without an operational rule change, stale historical archive material, ordinary short roadworks/closures, completed school/public-building renovations, generic completed civic projects, and infrastructure announcements whose only claimed relevance is a theoretical future logistics benefit.
 
 Every published item must also prove that it is current:
 
-- **Freshness — discovery is not news.** The pipeline distinguishes DISCOVERY date (`firstSeenAt`, never a freshness signal), SOURCE PUBLICATION date (`publishedAt`), EFFECTIVE date (`validFrom`/`validTo`, read only from explicit wording) and TARGET-WEEK relevance. An item is current only if (a) the official source published it within the **14 days** before the edition's Thursday preparation, (b) it takes effect or ends inside the target week, (c) explicit start and end dates show it is in force during the target week, or (d) it takes effect within the **30-day outlook** after the target week. Otherwise it is excluded; undated material without such evidence is never published.
-- **Hard exclusions:** completed projects and openings without a current restriction, pedestrian/cycling facilities, school/civic/public-space projects, PR/event items, market/financial news, statistics, accidents, breakdowns, crime, procurement, generic landing/roadworks pages and anything without proven heavy/oversize/special-transport relevance. A generic mention of road, bridge, tunnel, vehicle or transport is not enough.
+- **Freshness — discovery is not news.** The pipeline distinguishes DISCOVERY date (`firstSeenAt`, never a freshness signal), SOURCE PUBLICATION date (`publishedAt`), EFFECTIVE date (`validFrom`/`validTo`, read only from explicit wording) and TARGET-WEEK relevance. An item is current only if (a) the source published it within the **7 days** before the edition's Thursday preparation (one week back), (b) it takes effect or ends inside the target week, (c) explicit start and end dates show it is in force during the target week, or (d) it takes effect within **one month (30 days) after the Thursday preparation** (outlook; `FRESHNESS_WINDOW_DAYS`, `FORWARD_HORIZON_DAYS` in `weekly-eligibility.mjs`). Otherwise it is excluded; undated material without such evidence is never published.
+- **Hard exclusions:** completed projects and openings without a current restriction, pedestrian/cycling facilities, school/civic/public-space projects, PR/event items, market/financial news, statistics, accidents, breakdowns, crime, procurement, generic landing/roadworks pages and anything without proven relevance for freight vehicles over 12 t or oversize/special transport. A generic mention of road, bridge, tunnel, vehicle or transport is not enough.
 - **One specific development:** homepages, listing/landing pages, project/programme pages, FAQ pages, organisation pages and bare topic titles are not developments.
 - **No repetition:** a source already cited by an earlier edition is not published again unless the source republished it after that edition or the change takes effect or ends in the target week.
 - **Source suitability:** police press feeds contribute only announced enforcement campaigns, never single incidents or one-off local movements.
@@ -98,7 +102,7 @@ These rules are deterministic (`scripts/lib/weekly-eligibility.mjs`) and are app
 3. Substantive lead reports (up to 30; as many as genuinely qualify) as one list in the deterministic operator-first order (§1), each with a category label and What changed / Where / When / Impact / Action; outlook items carry an explicit "takes effect" date.
 4. Rest of Europe — concise reports (up to 15; omitted when none qualify).
 5. Critical European corridors when materially relevant.
-6. 30-day outlook when materially relevant.
+6. One-month outlook when materially relevant.
 7. Dispatcher/operator checklist.
 8. Full source list.
 9. Next scheduled publication.
@@ -107,6 +111,6 @@ These rules are deterministic (`scripts/lib/weekly-eligibility.mjs`) and are app
 
 Every item must answer:
 
-> Why does this matter **now** to someone planning or executing heavy, abnormal, oversized or special transport?
+> Why does this matter **now** to someone planning or executing road freight transport with vehicles over 12 t — and above all oversize, abnormal or special transport?
 
 If there is no meaningful current operational answer, exclude it. A newly discovered old page is not news. A short edition is a correct edition; a padded edition is not.

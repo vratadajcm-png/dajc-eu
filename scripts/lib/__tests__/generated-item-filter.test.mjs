@@ -30,13 +30,13 @@ describe('filterGeneratedItems', () => {
     expect(result.dropped[0].reason).toMatch(/invalid validFrom/);
   });
 
-  it('drops developments starting beyond the 30-day outlook', () => {
+  it('drops developments starting beyond the one-month outlook', () => {
     const result = filterGeneratedItems([item({ validFrom: '2026-11-16' })], { weekStart, weekEnd });
     expect(result.kept).toHaveLength(0);
     expect(result.dropped[0].reason).toMatch(/beyond the outlook/);
   });
 
-  it('keeps a change taking effect within the 30-day outlook', () => {
+  it('keeps a change taking effect within the one-month outlook', () => {
     expect(filterGeneratedItems([item({ validFrom: '2026-10-01' })], { weekStart, weekEnd }).kept).toHaveLength(1);
   });
 
@@ -80,7 +80,7 @@ describe('filterGeneratedItems', () => {
       eligibilityContext: { now, weekStart, weekEnd, previousEditions: new Map() },
     });
     expect(result.kept).toHaveLength(0);
-    expect(result.dropped[0].reason).toMatch(/older than the 14-day freshness window/);
+    expect(result.dropped[0].reason).toMatch(/older than the 7-day freshness window/);
   });
 
   it('drops an item whose source is not a verified candidate', () => {

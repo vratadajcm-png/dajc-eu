@@ -189,7 +189,7 @@ describe('DAJC Weekly quality gate - quality over count', () => {
     const e = edition(3, 0);
     const gate = run({ ...e, candidateOverrides: { [e.developments[2].sourceUrl]: { publishedAt: '2026-05-06' } } });
     expect(gate.ok).toBe(false);
-    expect(gate.errors.some((x) => /published 2026-05-06, older than the 14-day freshness window/.test(x))).toBe(true);
+    expect(gate.errors.some((x) => /published 2026-05-06, older than the 7-day freshness window/.test(x))).toBe(true);
   });
 
   it('blocks an undated item', () => {

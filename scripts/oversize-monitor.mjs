@@ -1,7 +1,12 @@
 #!/usr/bin/env node
-// Daily DAJC Europe oversize monitor. Reads configured official sources,
-// stores findings, and writes an explicit geographic coverage audit for the
-// complete DAJC Europe matrix so missing jurisdictions remain visible.
+// Daily DAJC Europe oversize monitor. Discovers news by web search
+// (scripts/lib/web-search.mjs, default) and/or by crawling the configured
+// official sources, stores findings, and writes an explicit geographic
+// coverage audit for the complete DAJC Europe matrix so missing jurisdictions
+// remain visible.
+//
+// OVERSIZE_DISCOVERY selects the channel: "web" (default), "official"
+// (legacy crawler of config/oversize-sources) or "both".
 
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -10,6 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { oversizeSources } from '../config/oversize-sources/index.mjs';
 import { dajcEuropeCoverage } from '../config/europe-coverage.mjs';
 import { fetchSourceFindings } from './lib/fetch-source.mjs';
+import { discoverWithWebSearch, SEARCH_GROUPS } from './lib/web-search.mjs';
 import { buildFindingHistory, mergeFindings, markExpired } from './lib/findings.mjs';
 import { loadWeekFindings, saveWeekFindings } from './lib/store.mjs';
 import { isoWeekLabel } from './lib/week.mjs';
@@ -34,9 +40,21 @@ async function main() {
   const weekLabel = isoWeekLabel(now);
   const nowIso = now.toISOString();
 
+  const discovery = (process.env.OVERSIZE_DISCOVERY || 'web').trim().toLowerCase();
+  if (!['web', 'official', 'both'].includes(discovery)) {
+    throw new Error(`OVERSIZE_DISCOVERY must be "web", "official" or "both" (got "${discovery}")`);
+  }
+  const useWeb = discovery !== 'official';
+  const useOfficial = discovery !== 'web';
+  if (useWeb && !process.env.OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY is not set - web-search discovery needs it (set OVERSIZE_DISCOVERY=official to use only the official-source crawler).');
+  }
+
   console.log(`DAJC European Oversize monitor - ${nowIso}`);
   console.log(`ISO week: ${weekLabel}`);
-  console.log(`Sources configured: ${oversizeSources.length}`);
+  console.log(`Discovery: ${discovery}`);
+  if (useWeb) console.log(`Web search groups: ${SEARCH_GROUPS.length}`);
+  if (useOfficial) console.log(`Official sources configured: ${oversizeSources.length}`);
   console.log(`Coverage jurisdictions: ${dajcEuropeCoverage.length}\n`);
 
   const existing = await loadWeekFindings(weekLabel);
@@ -59,22 +77,39 @@ async function main() {
   const allCandidates = [];
   const sourceResults = [];
 
-  const results = new Array(oversizeSources.length);
+  let webGroups = [];
+  if (useWeb) {
+    const web = await discoverWithWebSearch({ apiKey: process.env.OPENAI_API_KEY, now });
+    webGroups = web.groups;
+    for (const entry of web.groups) {
+      const label = `[web:${entry.group.id}] (${entry.group.countries.join(', ')})`;
+      if (entry.status !== 'ok') {
+        console.log(`${label} UNAVAILABLE - ${entry.error}`);
+        continue;
+      }
+      console.log(`${label} OK - ${entry.hits} hit(s), ${entry.kept} verified against their own page`);
+      for (const rejected of entry.rejected) console.log(`    [dropped] ${rejected.url} - ${rejected.reason}`);
+    }
+    allCandidates.push(...web.findings);
+  }
+
+  const officialSources = useOfficial ? oversizeSources : [];
+  const results = new Array(officialSources.length);
   let nextIndex = 0;
 
   async function worker() {
     while (true) {
       const index = nextIndex++;
-      if (index >= oversizeSources.length) return;
-      const source = oversizeSources[index];
+      if (index >= officialSources.length) return;
+      const source = officialSources[index];
       results[index] = await fetchSourceFindings(source, { now: nowIso });
     }
   }
 
-  await Promise.all(Array.from({ length: Math.min(6, oversizeSources.length) }, () => worker()));
+  await Promise.all(Array.from({ length: Math.min(6, officialSources.length) }, () => worker()));
 
-  for (let i = 0; i < oversizeSources.length; i += 1) {
-    const source = oversizeSources[i];
+  for (let i = 0; i < officialSources.length; i += 1) {
+    const source = officialSources[i];
     const result = results[i];
     sourceResults.push({ source, result });
 
@@ -107,8 +142,35 @@ async function main() {
     if (scope) findingsByScope.set(scope, (findingsByScope.get(scope) || 0) + 1);
   }
 
+  const webFindingsByGroup = new Map();
+  for (const finding of merged.values()) {
+    if (finding.searchGroup) webFindingsByGroup.set(finding.searchGroup, (webFindingsByGroup.get(finding.searchGroup) || 0) + 1);
+  }
+
   const coverage = dajcEuropeCoverage.map(([code, name]) => {
     const effectiveCode = PARENT_SOURCE[code] || code;
+    if (useWeb) {
+      const entry = webGroups.find(({ group }) => group.codes.includes(code))
+        || webGroups.find(({ group }) => group.codes.includes(effectiveCode));
+      if (entry && (entry.status === 'ok' || !useOfficial)) {
+        const findingCount = webFindingsByGroup.get(entry.group.id) || 0;
+        return {
+          code,
+          name,
+          sourceScope: effectiveCode,
+          status: entry.status !== 'ok'
+            ? 'checked-source-availability-limited'
+            : findingCount > 0 ? 'checked-major-or-short-update-candidates-found' : 'checked-no-material-development-found',
+          discovery: 'web-search',
+          searchGroup: entry.group.id,
+          candidateFindings: findingCount,
+          ...(entry.status !== 'ok' ? { error: entry.error } : {}),
+        };
+      }
+      if (!useOfficial) {
+        return { code, name, sourceScope: effectiveCode, status: 'checked-source-availability-limited', discovery: 'web-search', searchGroup: null, candidateFindings: 0 };
+      }
+    }
     const direct = sourceResults.filter(({ source }) => source.jurisdictionId === code);
     const inherited = sourceResults.filter(({ source }) => !source.jurisdictionId && source.country === effectiveCode);
     const relevant = direct.length > 0 ? direct : inherited;
@@ -143,7 +205,11 @@ async function main() {
   );
 
   console.log('\n=== SUMMARY ===');
-  console.log(`sources checked: ${oversizeSources.length}`);
+  if (useWeb) {
+    console.log(`web search groups: ${webGroups.length} (${webGroups.filter((g) => g.status !== 'ok').length} unavailable)`);
+    console.log(`web findings verified against their own page: ${webGroups.reduce((n, g) => n + g.kept, 0)}`);
+  }
+  console.log(`official sources checked: ${officialSources.length}`);
   console.log(`jurisdictions audited: ${coverage.length}`);
   console.log(`sources read via RSS/Atom: ${sourcesFeed}`);
   console.log(`sources read via official HTML only: ${sourcesHtml}`);

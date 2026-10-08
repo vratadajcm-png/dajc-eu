@@ -11,15 +11,16 @@ top of it.
 ## Architecture overview
 
 ```
-config/oversize-sources/index.mjs   registry of European official sources (RSS/HTML)
+config/oversize-sources/index.mjs   registry of European official sources (legacy crawler, OVERSIZE_DISCOVERY=official)
 data/oversize/<ISO week>/           raw findings gathered during that week
   findings.json
 scripts/
-  oversize-monitor.mjs              daily: fetch sources -> data/oversize
+  oversize-monitor.mjs              daily: web search (default) / official sources -> data/oversize
   generate-weekly-article.mjs       thursday: data/oversize -> content/news
   publish-gate-commit.mjs           explicit "did we publish?" commit gate
   lib/
     findings.mjs                    finding shape, dedup key, status, cross-week history
+    web-search.mjs                  web-search discovery; every hit verified against its own page
     fetch-source.mjs                RSS + official-HTML fetch, classification, publication date
     publication-date.mjs            source publication date (metadata/feed/label/text/URL)
     relevance-filter.mjs            shared "is this an operational restriction" gate
@@ -53,38 +54,15 @@ The homepage renders `News` before `Integration ecosystem`, so current
 operational intelligence is visible before the provider directory. The
 system reuses the global DAJC styles and does not alter the hero or header.
 
-## Editorial specification
+## Editorial rules
 
-EU Oversize Weekly is a **professional operational briefing** for European
-heavy, oversized and special road transport operators, drivers and
-dispatchers - not a general traffic-news feed, and it must never summarize
-every item a source happens to publish. All content is written in
-professional English.
-
-- **QUALITY > COUNT.** A well-supplied week has room for up to **30 lead reports** and up to **15 Rest-of-Europe updates** (typically 20-30 / 10-15). These are capacities, never quotas: an edition contains exactly the items that pass every rule (17 + 8, 9 + 0 or 25 + 12 are all correct). There is no minimum, no country quota, no supplement/repair loop and no retry that re-rolls synthesis until a count is met. `scripts/lib/quality-gate.mjs` enforces the maximums and requires at least one lead report for an edition to exist. Titles and source URLs (including "Also see" sources) must be disjoint across the complete edition.
-- **Editorial priority order** (most important first, see the system prompt
-  in `scripts/lib/openai-client.mjs`): special movement
-  windows/bans for exceptional or oversized transport; permit-rule/system
-  changes; escort/BF2-BF4/police-assistance requirements; border/transit
-  restrictions; mandatory crossings/approved corridors; bridge/tunnel/
-  height/width/axle-load/weight restrictions; long-term closures on
-  strategic routes; weather only when it creates a specific operational
-  restriction; significant equipment/regulatory/market changes as secondary
-  items.
-- **Complete canonical DAJC coverage scope.** Every cycle checks `config/europe-coverage.mjs`, including the explicitly approved countries, territories and MPZ aliases plus retained transport-relevant sub-jurisdictions. Article selection remains evidence-led, but absence from the article must mean "checked — no material development found", never "not searched".
-- **Every report states**: country; region/road/route where applicable;
-  what applies or changed; affected vehicle category and weight/vehicle
-  threshold (`vehicleScope`); exact date and **local time of the country
-  concerned** (`timeWindow`); geographic/route scope (`where`); practical
-  impact; a concrete `recommendedAction` for an operator/dispatcher (never a
-  platitude); and important exemptions/permit-specific conditions
-  (`exemptions`), if any.
-- A general truck-driving ban, a restriction above a specific weight, a
-  special restriction for exceptional/oversized transport, and a condition
-  in an individual transport permit are always kept distinct - never
-  conflated into one description.
-- **General HGV/truck driving bans are out of scope** (weekend, Sunday, holiday, seasonal, night, transit - new or recurring). They belong to the separate DAJC Driving Bans system; the Weekly never imports its calendar. Only movement restrictions explicitly scoped to exceptional/oversize transport are eligible (`scripts/lib/weekly-driving-ban-policy.mjs`).
-- **Freshness is proven by the source's own publication date**, never by discovery: published within 14 days before preparation, or validity beginning/ending in the target week. Undated material, homepages/landing/project pages, police incident reports and sources already cited by an earlier edition are excluded (`scripts/lib/weekly-eligibility.mjs`).
+All editorial rules - scope (freight vehicles over 12 t, oversize/abnormal
+transport first), freshness (7 days back, one month ahead), exclusions,
+closure duration, driving-ban scope, counts and article structure - are
+stated once, in [`DAJC_WEEKLY_INTELLIGENCE_SPEC.md`](DAJC_WEEKLY_INTELLIGENCE_SPEC.md).
+They are enforced in code by `scripts/lib/weekly-eligibility.mjs` and
+`scripts/lib/quality-gate.mjs` and given to the model in
+`scripts/lib/openai-client.mjs`. This file does not repeat them.
 
 ## Content model
 
@@ -223,23 +201,6 @@ collisions, theft reports, procurement/tender notices, and unconfirmed
 planned/future works (see `NON_RESTRICTION_PATTERNS` in
 `relevance-filter.mjs` for the exact patterns and reasons).
 
-## Editorial policy (canonical: DAJC_WEEKLY_INTELLIGENCE_SPEC.md)
-
-The following rules are hard publication requirements in plain code, not prompt-only guidance:
-
-- **No count forcing.** Up to 30 lead reports and up to 15 Rest-of-Europe updates; no minimum, no country quota. The roundup is deliberately short-form and is omitted when nothing further qualifies.
-- **Freshness - discovery is not news.** A candidate qualifies only if the official source published it within the last 14 days before preparation; or its explicitly stated validity takes effect or ends in the target week; or explicit start and end dates show it in force during the target week; or it takes effect within the 30-day outlook after the target week. Discovery date never counts; undated material without such evidence is never published. Effective dates are read only from explicit wording (`extractValidityPeriod`, `scripts/lib/publication-date.mjs`). The window is anchored to the edition's Thursday preparation day, so a Friday recovery or Saturday catch-up run judges freshness exactly like the Thursday run would have.
-- **Hard exclusions** (`checkEditorialExclusions`): completed projects/openings without a current restriction, pedestrian/cycling facilities, school/civic/public-space projects, PR/event items and market/financial news; plus the relevance-filter exclusions (accidents, breakdowns, crime, procurement, statistics).
-- **One specific development.** Homepages, listing/landing pages, project/programme pages, FAQ and organisation pages and bare topic titles are excluded; several pages about one development are reported once.
-- **No repetition.** A source already cited by an earlier edition is excluded unless the source republished it after that edition.
-- **Heavy-transport scope.** The candidate's own text must show heavy/abnormal/oversize transport context; a generic road, tunnel or bridge mention - or the publishing authority's name - is not enough.
-- **Driving bans.** General HGV bans are out of scope (separate DAJC Driving Bans system).
-- A road/motorway closure - and likewise roadworks - is publishable only when the official evidence proves a **planned duration longer than 30 days**. A 30-day closure, a shorter closure, or an undated/"until further notice" closure with no provable duration is excluded. There is no corridor-based exception to this threshold. Genuine weight/height/width/axle-load, permit, escort and abnormal-load-corridor restrictions are exempt from the duration rule and judged on operational impact.
-- **Operator-first order is deterministic** (`scripts/lib/edition-order.mjs`): importance tier first, then Czechia, Germany, Austria, Slovakia, Poland, Hungary, Switzerland, Slovenia, then connected corridors, the rest of Europe and peripheral jurisdictions. Lead reports are rendered as one list in that order.
-- RSS/Atom is never treated as complete coverage. Every configured authority is scanned through the feed **and** its official web/HTML news/traffic pages; results are merged and deduplicated.
-- Fresh (recently published) verified high-signal changes directly affecting exceptional/oversized transport (permits, escort/private-escort rules, police escort, border restrictions, weight/width/height/axle limits, relevant regulatory procedures) are **required coverage**. A quality gate blocks publication if such a development is omitted from both lead reports and Rest of Europe.
-- `config/europe-coverage.mjs` is the single mandatory geographic coverage universe. It includes every country and territory approved for DAJC coverage, including alternative MPZ aliases and dependent/overseas territories. CI fails if any registry item loses its configured source mapping.
-
 ## Source configuration
 
 `config/oversize-sources/index.mjs` exports `oversizeSources`, an array of:
@@ -292,14 +253,19 @@ the normal monitor and eligibility rules.
 
 1. Computes the current ISO week (e.g. `2026-W34`).
 2. Loads `data/oversize/2026-W34/findings.json` if it exists.
-3. For every configured source, prefers a verified RSS/Atom endpoint and
-   falls back to the authority's official HTML page/listing. Relevant HTML
-   links are constrained to the same official host and enriched from their
-   detail pages; a bounded worker pool scans up to six authorities in
-   parallel. Unreachable sources are logged as `UNAVAILABLE`, never hidden
-   behind a false successful check.
-4. Classifies and relevance-filters each feed item or official-HTML detail
-   into a candidate finding.
+3. **Web search (default, `OVERSIZE_DISCOVERY=web`).** Runs one OpenAI web
+   search per region group in `SEARCH_GROUPS` (`scripts/lib/web-search.mjs`;
+   Central Europe country by country first). Every returned URL is fetched;
+   the finding's title, text and publication date come from that page, not
+   from the model. Unreachable pages, PDFs and pages without freight (>12 t)
+   or oversize context are dropped with a logged reason; a failed search is
+   logged as `UNAVAILABLE` and the jurisdictions it covers are recorded as
+   `checked-source-availability-limited`. Model: `OPENAI_SEARCH_MODEL`
+   (default `gpt-4.1`).
+4. **Official-source crawler (`OVERSIZE_DISCOVERY=official` or `both`).**
+   For every configured source, prefers a verified RSS/Atom endpoint and
+   falls back to the authority's official HTML page/listing, then classifies
+   and relevance-filters each item into a candidate finding.
 5. Merges candidates into the existing findings by dedup key
    (`mergeFindings`), then marks anything whose `validTo` has passed as
    `expired` (`markExpired`).
@@ -612,7 +578,7 @@ matches what `scripts/lib/openai-client.mjs` expects the schema to be.
 
 | Secret | Required for | Why |
 |---|---|---|
-| `OPENAI_API_KEY` | `publish-weekly-oversize.yml` | Calls the OpenAI API to synthesize the Friday article. Not needed by the daily monitor (it never calls OpenAI). |
+| `OPENAI_API_KEY` | `daily-oversize-monitor.yml`, `publish-weekly-oversize.yml`, `watchdog-weekly-oversize.yml` | Web-search discovery in the daily monitor and the final data refresh, and synthesis of the weekly article. |
 
 Set it under repository Settings -> Secrets and variables -> Actions ->
 New repository secret.

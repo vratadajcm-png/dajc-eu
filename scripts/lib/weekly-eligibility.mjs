@@ -17,11 +17,19 @@ import { isValidIsoDate, validateDevelopmentDateRange } from './date-validation.
 import { readableText } from './text-quality.mjs';
 import { extractValidityPeriod, foldText } from './publication-date.mjs';
 
-/** A source item is current news only if the source published it within this window. */
-export const FRESHNESS_WINDOW_DAYS = 14;
+/** A source item is current news only if the source published it within this window (one week back). */
+export const FRESHNESS_WINDOW_DAYS = 7;
 
-/** A dated change taking effect up to this many days after the target week is an outlook item. */
-export const OUTLOOK_DAYS = 30;
+/** How far ahead of the Thursday preparation a dated change may take effect (one month ahead). */
+export const FORWARD_HORIZON_DAYS = 30;
+
+/**
+ * Days after the target week in which a dated change still counts as an
+ * outlook item. The target week (Mon-Sun) ends 10 days after the Thursday
+ * preparation, so this keeps the horizon at FORWARD_HORIZON_DAYS from
+ * preparation.
+ */
+export const OUTLOOK_DAYS = FORWARD_HORIZON_DAYS - 10;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 

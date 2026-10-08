@@ -42,4 +42,8 @@ jobs:
         run: npm run build
 
       - name: Exercise live official-source monitor
+        # CI has no OpenAI key and must not spend on web search; the
+        # web-search path is covered by scripts/lib/__tests__/web-search.test.mjs.
+        env:
+          OVERSIZE_DISCOVERY: official
         run: npm run oversize:monitor
