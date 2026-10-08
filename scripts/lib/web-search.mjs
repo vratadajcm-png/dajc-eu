@@ -93,21 +93,43 @@ function isoDay(date) {
   return date.toISOString().slice(0, 10);
 }
 
-/** The prompt for one search group. Pure - exported for tests. */
-export function buildSearchPrompt(group, now = new Date()) {
+/**
+ * Each group is searched twice: once only for oversize/abnormal transport (the
+ * priority topic, so it is never crowded out) and once for other changes that
+ * affect goods vehicles over 12 t.
+ */
+export const SEARCH_FOCUSES = ['oversize', 'heavy'];
+
+const FOCUS_TOPICS = {
+  oversize: `ONLY oversize / abnormal / exceptional / special transport (Schwertransport, Ausnahmetransport, nadrozměrná přeprava, convoi exceptionnel, trasporto eccezionale, transporte especial ...):
+- permits and permit systems, application portals, fees
+- escort, private-escort and police-escort rules
+- movement windows and time restrictions for abnormal loads
+- approved abnormal-load routes, diversions for abnormal loads
+- bridges or tunnels newly restricted or reopened for abnormal loads`,
+  heavy: `Changes that affect goods vehicles over 12 t (not specifically oversize):
+- new or changed weight, axle-load, height or width limits; bridges or tunnels closed or restricted for trucks
+- closures or diversions of motorways and main freight routes lasting more than 30 days
+- truck tolls and road charges (new rates, new tolled sections, new systems)
+- border crossings and customs procedures for goods traffic; ferries/RoRo for trucks
+- new rules for HGV operators or drivers: tachograph, e-CMR, ADR, cabotage, announced enforcement campaigns`,
+};
+
+/** The prompt for one search group and focus. Pure - exported for tests. */
+export function buildSearchPrompt(group, now = new Date(), focus = 'oversize') {
   const since = isoDay(new Date(now.getTime() - FRESHNESS_WINDOW_DAYS * DAY_MS));
   const today = isoDay(now);
   const horizon = isoDay(new Date(now.getTime() + FORWARD_HORIZON_DAYS * DAY_MS));
-  return `Today is ${today}. Search the web for news relevant to road freight transport with vehicles over 12 tonnes in: ${group.countries.join(', ')}.
-Search in ${group.languages}.
+  return `Today is ${today}. You are researching news for a weekly briefing for road freight operators running vehicles over 12 tonnes, where oversize/abnormal transport has priority.
+Countries: ${group.countries.join(', ')}. Search in ${group.languages}.
 
-Find specific, dated developments that are EITHER published between ${since} and ${today}, OR take effect (or end) between ${today} and ${horizon}.
+TOPIC:
+${FOCUS_TOPICS[focus] || FOCUS_TOPICS.oversize}
 
-PRIORITY (search these first, list them first):
-1. Oversize / abnormal / exceptional / special transport: permits and permit systems, escort or police-escort rules, movement windows, approved abnormal-load routes, bridge or tunnel limits for such transport.
-2. Other changes for heavy goods vehicles over 12 t: weight, axle-load, height or width limits; bridges or tunnels closed or restricted for trucks; long-term (more than 30 days) closures or diversions of motorways and main freight routes; truck tolls and road charges; border crossings and customs for goods traffic; ferries/RoRo for trucks; new rules for HGV drivers or operators (tachograph, e-CMR, ADR, enforcement campaigns).
+DATES - STRICT:
+Return a page only if its visible publication date is between ${since} and ${today}, OR it announces a change that takes effect or ends between ${today} and ${horizon}. Skip every page that shows an older date and no such upcoming effective date. Search news sections and press releases of the last days, not evergreen pages.
 
-EXCLUDE: general recurring truck driving bans (Sunday, holiday, weekend, night, summer bans), accidents, single incidents, crime, short local roadworks, tenders, statistics, company/market news, homepages and listing pages.
+NEVER RETURN: general recurring truck driving bans (Sunday, holiday, weekend, night, summer bans - they are covered elsewhere), accidents, incidents, crime, short local roadworks, tenders, statistics, company/market news, service or company pages, guides, FAQs, homepages, listing pages, undated pages.
 
 Prefer official sources (road authorities, ministries, police, toll operators) and established transport trade media. Each item must link to the specific article. Copy dates exactly as shown on the page; use null when the page shows none. Return at most ${MAX_ITEMS_PER_SEARCH} items; return an empty list when nothing qualifies - never pad.`;
 }
@@ -192,6 +214,15 @@ export async function verifySearchItem(item, { fetchPage = (url) => fetchTextWit
   }
 
   const validity = extractValidityPeriod(evidence, { country });
+
+  // An old page announcing nothing upcoming is not worth recording.
+  const staleBefore = isoDay(new Date(now.getTime() - FRESHNESS_WINDOW_DAYS * DAY_MS));
+  const horizon = isoDay(new Date(now.getTime() + FORWARD_HORIZON_DAYS * DAY_MS));
+  const upcoming = [validity?.validFrom, validity?.validTo].some((d) => d && d >= isoDay(now) && d <= horizon);
+  if (publication?.date && publication.date < staleBefore && !upcoming) {
+    return { ok: false, reason: `published ${publication.date}, older than ${FRESHNESS_WINDOW_DAYS} days, nothing upcoming` };
+  }
+
   const type = FINDING_TYPES.includes(item.type) ? item.type : (classify(evidence) || 'infrastructure');
 
   return {
@@ -238,18 +269,31 @@ async function pool(items, limit, fn) {
  * Run one web search for a group.
  * @returns {Promise<{ status: 'ok', items: object[] } | { status: 'unavailable', error: string, items: [] }>}
  */
-export async function searchGroup(client, group, { now = new Date(), model } = {}) {
-  try {
-    const response = await client.responses.create({
-      model: model || process.env.OPENAI_SEARCH_MODEL || DEFAULT_SEARCH_MODEL,
-      tools: [{ type: 'web_search_preview', search_context_size: 'medium' }],
-      input: buildSearchPrompt(group, now),
-      text: { format: SEARCH_RESULT_FORMAT },
-    });
-    return { status: 'ok', items: parseSearchResponse(response.output_text) };
-  } catch (err) {
-    return { status: 'unavailable', error: err?.message || String(err), items: [] };
+export async function searchGroup(client, group, { now = new Date(), model, focuses = SEARCH_FOCUSES } = {}) {
+  const items = [];
+  const seen = new Set();
+  const errors = [];
+  for (const focus of focuses) {
+    try {
+      const response = await client.responses.create({
+        model: model || process.env.OPENAI_SEARCH_MODEL || DEFAULT_SEARCH_MODEL,
+        tools: [{ type: 'web_search_preview', search_context_size: 'high' }],
+        input: buildSearchPrompt(group, now, focus),
+        text: { format: SEARCH_RESULT_FORMAT },
+      });
+      for (const item of parseSearchResponse(response.output_text)) {
+        if (seen.has(item.url)) continue;
+        seen.add(item.url);
+        items.push(item);
+      }
+    } catch (err) {
+      errors.push(`${focus}: ${err?.message || String(err)}`);
+    }
   }
+  // One failed focus still leaves a usable search; only a total failure is
+  // reported as unavailable.
+  if (errors.length === focuses.length) return { status: 'unavailable', error: errors.join('; '), items: [] };
+  return { status: 'ok', items, ...(errors.length ? { error: errors.join('; ') } : {}) };
 }
 
 /**

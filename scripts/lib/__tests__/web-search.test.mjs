@@ -34,12 +34,16 @@ const okPage = (html) => async (url) => ({ ok: true, text: html, finalUrl: url }
 
 describe('buildSearchPrompt', () => {
   it('asks for one week back, one month ahead, >12 t scope with oversize first', () => {
-    const prompt = buildSearchPrompt(SEARCH_GROUPS[0], now);
-    expect(prompt).toContain('published between 2026-10-01 and 2026-10-08');
+    const prompt = buildSearchPrompt(SEARCH_GROUPS[0], now, 'oversize');
+    expect(prompt).toContain('between 2026-10-01 and 2026-10-08');
     expect(prompt).toContain('between 2026-10-08 and 2026-11-07');
     expect(prompt).toMatch(/vehicles over 12 tonnes/);
-    expect(prompt).toMatch(/PRIORITY[\s\S]*1\. Oversize/);
-    expect(prompt).toMatch(/EXCLUDE: general recurring truck driving bans/);
+    expect(prompt).toMatch(/ONLY oversize/);
+    expect(prompt).toMatch(/NEVER RETURN: general recurring truck driving bans/);
+  });
+
+  it('has a separate focus for other goods vehicles over 12 t', () => {
+    expect(buildSearchPrompt(SEARCH_GROUPS[0], now, 'heavy')).toMatch(/goods vehicles over 12 t/);
   });
 });
 
@@ -111,6 +115,17 @@ describe('verifySearchItem', () => {
     expect(result.finding.publishedAt).toBe('2026-10-06');
   });
 
+  it('drops an old page that announces nothing upcoming', async () => {
+    const html = page({ date: '2026-08-01', text: 'Lkw über 12 t: neue Regeln für Ausnahmetransporte und Polizeibegleitung auf der A8 wurden beschlossen. '.repeat(3) });
+    const result = await verifySearchItem(item(), { fetchPage: okPage(html), now });
+    expect(result).toEqual({ ok: false, reason: 'published 2026-08-01, older than 7 days, nothing upcoming' });
+  });
+
+  it('keeps an old page announcing a change within the next month', async () => {
+    const result = await verifySearchItem(item(), { fetchPage: okPage(page({ date: '2026-08-01' })), now });
+    expect(result.ok).toBe(true);
+  });
+
   it('drops binary documents', async () => {
     const result = await verifySearchItem(item(), { fetchPage: okPage('%PDF-1.7\u0000\u0001\u0002 binary'), now });
     expect(result.ok).toBe(false);
@@ -118,7 +133,7 @@ describe('verifySearchItem', () => {
 });
 
 describe('discoverWithWebSearch', () => {
-  it('runs one search per group, verifies hits and dedupes URLs across groups', async () => {
+  it('runs both focuses per group, verifies hits and dedupes URLs across groups', async () => {
     const groups = SEARCH_GROUPS.slice(0, 2);
     const calls = [];
     const client = {
@@ -130,7 +145,7 @@ describe('discoverWithWebSearch', () => {
       },
     };
     const { findings, groups: report } = await discoverWithWebSearch({ client, now, groups, fetchPage: okPage(page()) });
-    expect(calls).toHaveLength(2);
+    expect(calls).toHaveLength(4);
     expect(calls[0].tools[0].type).toBe('web_search_preview');
     expect(findings).toHaveLength(1);
     expect(findings[0].searchGroup).toBe(groups[0].id);
@@ -141,6 +156,6 @@ describe('discoverWithWebSearch', () => {
     const client = { responses: { create: async () => { throw new Error('rate limited'); } } };
     const { findings, groups } = await discoverWithWebSearch({ client, now, groups: SEARCH_GROUPS.slice(0, 1), fetchPage: okPage(page()) });
     expect(findings).toEqual([]);
-    expect(groups[0]).toMatchObject({ status: 'unavailable', error: 'rate limited' });
+    expect(groups[0]).toMatchObject({ status: 'unavailable', error: 'oversize: rate limited; heavy: rate limited' });
   });
 });
