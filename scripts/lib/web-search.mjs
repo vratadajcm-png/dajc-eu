@@ -159,6 +159,17 @@ function isIsoDay(value) {
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`));
 }
 
+// Control characters or U+FFFD mean the model mangled an escape (W42 shipped
+// "Stra\u00007fenwesen" for "Straßenwesen"); fall back to the host name.
+const MANGLED = /[\u0000-\u001f\u007f\ufffd]/;
+
+/** Publisher name for a finding: the model's, unless it is empty or mangled. */
+export function cleanSourceName(name, sourceUrl) {
+  const text = String(name || '').trim();
+  if (text && !MANGLED.test(text)) return text;
+  return new URL(sourceUrl).hostname.replace(/^www\./, '');
+}
+
 /** Strip tracking parameters OpenAI adds to cited links. */
 export function cleanUrl(raw) {
   const url = new URL(raw);
@@ -242,7 +253,7 @@ export async function verifySearchItem(item, { fetchPage = (url) => fetchTextWit
       recommendedAction: null,
       publishedAt: publication?.date ?? null,
       publishedAtSource: publication?.source ?? null,
-      sourceName: String(item.sourceName || new URL(sourceUrl).hostname).trim(),
+      sourceName: cleanSourceName(item.sourceName, sourceUrl),
       sourceUrl,
       discoveredVia: 'web-search',
       oversize: Boolean(item.oversize),

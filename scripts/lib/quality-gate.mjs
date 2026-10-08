@@ -60,6 +60,9 @@ function isValidUrl(value) {
  * @param {string[][]} [input.requiredSourceGroups] - critical developments;
  *   each must be cited by at least one of its official URLs.
  */
+// eslint-disable-next-line no-control-regex
+const CONTROL_CHARS = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f\ufffd]/;
+
 export function runQualityGate({
   frontmatter,
   body,
@@ -86,6 +89,13 @@ export function runQualityGate({
     errors.push('article body is empty');
   } else if (body.trim().length < MIN_BODY_LENGTH) {
     errors.push(`article body is suspiciously short (${body.trim().length} chars, minimum ${MIN_BODY_LENGTH})`);
+  }
+
+  // Control characters (W42 shipped a NUL byte inside a source name) break
+  // rendering and are never legitimate article text.
+  const textFields = [body, ...[...items, ...roundupItems].flatMap((item) => [item.title, item.sourceName, item.whatChanged])];
+  if (textFields.some((text) => typeof text === 'string' && CONTROL_CHARS.test(text))) {
+    errors.push('article contains control characters (mangled text)');
   }
 
   if (body) {

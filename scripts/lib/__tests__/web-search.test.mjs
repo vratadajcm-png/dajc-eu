@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildSearchPrompt, cleanUrl, discoverWithWebSearch, parseSearchResponse, SEARCH_GROUPS, verifySearchItem,
+  buildSearchPrompt, cleanSourceName, cleanUrl, discoverWithWebSearch, parseSearchResponse, SEARCH_GROUPS, verifySearchItem,
 } from '../web-search.mjs';
 import { dajcEuropeCoverage } from '../../../config/europe-coverage.mjs';
 
@@ -72,6 +72,16 @@ describe('parseSearchResponse', () => {
 describe('cleanUrl', () => {
   it('drops utm tracking and fragments', () => {
     expect(cleanUrl('https://a.example/x?id=3&utm_source=openai#top')).toBe('https://a.example/x?id=3');
+  });
+});
+
+describe('cleanSourceName', () => {
+  it('keeps a clean publisher name', () => {
+    expect(cleanSourceName('Landesbetrieb Straßenwesen Brandenburg', 'https://www.ls.brandenburg.de/x')).toBe('Landesbetrieb Straßenwesen Brandenburg');
+  });
+  it('falls back to the host name for a mangled or empty name', () => {
+    expect(cleanSourceName('Landesbetrieb Stra\u00007fenwesen Brandenburg', 'https://www.ls.brandenburg.de/x')).toBe('ls.brandenburg.de');
+    expect(cleanSourceName('', 'https://www.ls.brandenburg.de/x')).toBe('ls.brandenburg.de');
   });
 });
 

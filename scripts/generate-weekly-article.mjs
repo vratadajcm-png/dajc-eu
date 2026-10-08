@@ -288,6 +288,7 @@ async function main() {
     return;
   }
 
+  const generatedDevelopmentUrls = [...(article.developments || []), ...(article.europeRoundup || [])].map((item) => item.sourceUrl);
   const filterOptions = { weekStart: targetWeekStart, weekEnd: targetWeekEnd, candidatesByUrl, eligibilityContext };
   const leadValidation = crossValidateDevelopments(article.developments, verified);
   const leadFilter = filterGeneratedItems(leadValidation.kept, filterOptions);
@@ -357,6 +358,19 @@ async function main() {
   }
 
   article = attachCriticalGroupSources(article, criticalGroups);
+
+  // The model writes the checklist before the filters above run, so it can
+  // mention developments that were removed (W42 listed Ukrainian and Irish
+  // items that were not in the edition). When anything was removed, rebuild
+  // the checklist from the reports that remain.
+  const published = [...article.developments, ...article.europeRoundup];
+  const generatedUrls = [...(generatedDevelopmentUrls || [])];
+  if (generatedUrls.some((url) => !published.some((item) => item.sourceUrl === url))) {
+    article.operatorChecklist = published
+      .filter((item) => item.recommendedAction)
+      .map((item) => `${item.country}: ${item.recommendedAction}`);
+    console.log('Operator checklist rebuilt from the published reports (some generated items were removed).');
+  }
 
   // Deterministic operator-first order: importance tier first, then Central
   // Europe before connected corridors, the rest of Europe and peripheral

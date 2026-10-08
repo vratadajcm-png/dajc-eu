@@ -192,6 +192,14 @@ describe('DAJC Weekly quality gate - quality over count', () => {
     expect(gate.errors.some((x) => /published 2026-05-06, older than the 7-day freshness window/.test(x))).toBe(true);
   });
 
+  it('blocks control characters in a source name', () => {
+    const e = edition(3, 0);
+    e.developments[0] = { ...e.developments[0], sourceName: 'Landesbetrieb Stra\u00007fenwesen' };
+    const gate = run(e);
+    expect(gate.ok).toBe(false);
+    expect(gate.errors).toContain('article contains control characters (mangled text)');
+  });
+
   it('blocks an undated item', () => {
     const e = edition(2, 0);
     const gate = run({ ...e, candidateOverrides: { [e.developments[0].sourceUrl]: { publishedAt: null } } });
