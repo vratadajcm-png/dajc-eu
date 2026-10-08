@@ -183,7 +183,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         status.dataset.state = 'success';
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Registration could not be sent.';
-        status.innerHTML = `${message} Please email <a href="mailto:platform@dajc.cz?subject=DAJC%20Platform%20Testing%202027%20registration">platform@dajc.cz</a>.`;
+        const link = document.createElement('a');
+        link.href = 'mailto:platform@dajc.cz?subject=DAJC%20Platform%20Testing%202027%20registration';
+        link.textContent = 'platform@dajc.cz';
+        status.replaceChildren(`${message} Please email `, link, '.');
         status.dataset.state = 'error';
       } finally {
         if (button instanceof HTMLButtonElement) {
