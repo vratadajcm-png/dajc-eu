@@ -127,6 +127,8 @@ jobs:
 
       - name: Final data refresh
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run oversize:monitor
 
       - name: Generate weekly article
@@ -141,6 +143,26 @@ jobs:
       - name: Commit new article and refreshed data
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true'
         run: node scripts/publish-gate-commit.mjs
+
+      # A week where nothing qualifies exits the generator with success, so
+      # without this step a missing edition would stay silent. Thursday runs
+      # only warn (later retries refresh the data and try again); from the
+      # Friday-early retry on - and on manual runs - a still-missing edition
+      # fails the run so GitHub e-mails the owner before the 12:00 release.
+      - name: Alert when no edition was produced
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true'
+        shell: bash
+        run: |
+          target="${{ steps.publish-needed.outputs.target }}"
+          if [ -f "$target" ]; then
+            echo "Edition present: $target"
+            exit 0
+          fi
+          msg="No EU Oversize Weekly edition for ${{ steps.publish-needed.outputs.week }}: nothing passed the editorial rules (see the generator log above)."
+          case "${{ steps.trigger.outputs.role }}" in
+            thursday-*) echo "::warning::$msg Later retries will try again with refreshed data." ;;
+            *) echo "::error::$msg"; exit 1 ;;
+          esac
 
       - name: Publication outcome
         if: always()

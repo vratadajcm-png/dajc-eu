@@ -57,7 +57,7 @@ const CLASSIFICATION_RULES = [
   { type: 'market', pattern: /market report|fleet growth|industry outlook/i },
 ];
 
-function classify(text) {
+export function classify(text) {
   for (const rule of CLASSIFICATION_RULES) {
     if (rule.pattern.test(text)) return rule.type;
   }
@@ -76,7 +76,7 @@ function isRelevant(text, matchedType, source) {
 
 const ROUTE_CODE_PATTERN = /\b([A-Z]\d{1,3})\b/;
 
-function guessLocation(text, fallback) {
+export function guessLocation(text, fallback) {
   const match = text.match(ROUTE_CODE_PATTERN);
   return match ? match[1] : fallback;
 }
@@ -125,7 +125,7 @@ export function extractDetailText(html) {
   return text.slice(0, MAX_SUMMARY_CHARS);
 }
 
-function extractDetailHeading(html) {
+export function extractDetailHeading(html) {
   const match = html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
   const title = stripHtml(match?.[1] || '');
   return title.length >= 8 && title.length <= 280 ? title : null;
@@ -303,7 +303,7 @@ async function fetchWithTimeout(url, timeoutMs, accept) {
   }
 }
 
-async function fetchTextWithRetry(url, accept) {
+export async function fetchTextWithRetry(url, accept) {
   let lastError;
   for (let attempt = 1; attempt <= FETCH_RETRIES; attempt += 1) {
     try {

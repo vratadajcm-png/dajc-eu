@@ -1,7 +1,11 @@
 // Deterministic heavy-transport domain gate.
 //
-// The candidate's OWN content must show a connection to heavy, abnormal,
-// oversized or special road transport: a heavy/goods vehicle, an
+// Weekly scope: road freight with vehicles over 12 t (EU category N3), with
+// oversize/abnormal/special transport taking priority (ranking and order are
+// handled in select-candidates.mjs and edition-order.mjs).
+//
+// The candidate's OWN content must show a connection to that scope: a
+// heavy/goods vehicle, an
 // exceptional-transport term, a weight/dimension/axle limit, an escort or
 // transport permit, a truck toll, freight/project-cargo handling, a goods
 // border crossing or freight-operations rules. Generic words such as "road",
@@ -28,7 +32,7 @@ export const HEAVY_TRANSPORT_CONTEXT = new RegExp([
   't[uú]lm[eé]retes', 'agabaritic', 'exceptionee?le? transport', 'uitzonderlijk vervoer', 'spesialtransport',
   'specialtransport', 'dispenstransport', 'erikoiskuljetus',
   // heavy goods vehicles
-  '\\bhgvs?\\b', '\\blgvs?\\b', 'heavy goods vehicle', 'heavy vehicle', 'goods vehicle', '\\blorr(?:y|ies)\\b',
+  '\\bhgvs?\\b', '\\blgvs?\\b', '(?:category|kategori[ea]|fahrzeugklasse|klasse|cat[eé]gorie) n3', 'n3 (?:vehicles?|trucks?)', 'heavy goods vehicle', 'heavy vehicle', 'goods vehicle', '\\blorr(?:y|ies)\\b',
   '\\btrucks?\\b', '\\blkw\\b', 'lkw-', 'lastwagen', 'schwerverkehr', 'g(?:ü|ue)terverkehr', 'nutzfahrzeug', 'sattelz(?:u|ü)g',
   'autocarr', 'cami(?:ã|a)o', 'cami(?:õ|o)es', '\\bkamyon',
   'poids lourds?', 'v[ée]hicules lourds', '\\bcamion', '\\bcami[oó]n', 'mezzi pesanti', 'veicoli pesanti',
@@ -108,6 +112,6 @@ export function checkTransportDomainRelevance(candidate = {}) {
 
   return {
     ok: false,
-    reason: 'no demonstrated heavy/abnormal/oversize road-transport context (a generic road, tunnel or bridge mention is not enough)',
+    reason: 'no demonstrated heavy/abnormal/oversize road-transport context - nothing for freight vehicles over 12 t (a generic road, tunnel or bridge mention is not enough)',
   };
 }

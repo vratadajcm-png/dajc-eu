@@ -1,8 +1,8 @@
 name: Daily Oversize Monitor
 
 # Runs every morning (Europe-time, see docs/NEWS_AUTOMATION.md for the exact
-# UTC/DST reasoning) and walks config/oversize-sources, writing whatever it
-# finds to data/oversize/<ISO week>/findings.json. Never touches
+# UTC/DST reasoning), discovers news by web search (scripts/lib/web-search.mjs)
+# and writes whatever it verifies to data/oversize/<ISO week>/findings.json. Never touches
 # content/news - this only maintains the raw dataset the Friday publish
 # workflow reads from.
 #
@@ -45,7 +45,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run oversize monitor
+      - name: Pre-flight - verify OPENAI_API_KEY is configured
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::OPENAI_API_KEY repository secret is not set - web-search discovery needs it."
+            exit 1
+          fi
+          echo "Pre-flight OK: OPENAI_API_KEY is configured (value not printed)."
+
+      - name: Run oversize monitor (web search)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run oversize:monitor
 
       - name: Commit updated findings (only if meaningfully changed)
