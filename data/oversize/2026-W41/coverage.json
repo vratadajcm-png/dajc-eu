@@ -1,6 +1,6 @@
 {
   "week": "2026-W41",
-  "checkedAt": "2026-10-08T08:33:53.177Z",
+  "checkedAt": "2026-10-08T09:07:32.970Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -36,7 +36,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "at",
-      "candidateFindings": 1
+      "candidateFindings": 4
     },
     {
       "code": "AZ",
@@ -60,10 +60,10 @@
       "code": "BE",
       "name": "Belgium",
       "sourceScope": "BE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "BA",
@@ -81,7 +81,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "HR",
@@ -90,16 +90,16 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "si-hr",
-      "candidateFindings": 3
+      "candidateFindings": 7
     },
     {
       "code": "CY",
       "name": "Cyprus",
       "sourceScope": "CY",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "islands",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "CZ",
@@ -108,7 +108,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "cz",
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "DK",
@@ -126,7 +126,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "baltics",
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "FI",
@@ -141,10 +141,10 @@
       "code": "FR",
       "name": "France",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "GE",
@@ -162,7 +162,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "de",
-      "candidateFindings": 5
+      "candidateFindings": 8
     },
     {
       "code": "GR",
@@ -180,7 +180,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "hu",
-      "candidateFindings": 2
+      "candidateFindings": 5
     },
     {
       "code": "IS",
@@ -198,16 +198,16 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "IT",
       "name": "Italy",
       "sourceScope": "IT",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "it",
-      "candidateFindings": 0
+      "candidateFindings": 6
     },
     {
       "code": "KZ",
@@ -234,7 +234,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "baltics",
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "LI",
@@ -243,7 +243,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "ch-li",
-      "candidateFindings": 2
+      "candidateFindings": 4
     },
     {
       "code": "LT",
@@ -252,25 +252,25 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "baltics",
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "LU",
       "name": "Luxembourg",
       "sourceScope": "LU",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "MT",
       "name": "Malta",
       "sourceScope": "MT",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "islands",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "MD",
@@ -279,16 +279,16 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "MC",
       "name": "Monaco",
       "sourceScope": "MC",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "ME",
@@ -303,10 +303,10 @@
       "code": "NL",
       "name": "Netherlands",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "MK",
@@ -351,7 +351,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "RU",
@@ -366,10 +366,10 @@
       "code": "SM",
       "name": "San Marino",
       "sourceScope": "SM",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "it",
-      "candidateFindings": 0
+      "candidateFindings": 6
     },
     {
       "code": "RS",
@@ -384,10 +384,10 @@
       "code": "SK",
       "name": "Slovakia",
       "sourceScope": "SK",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "sk",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "SI",
@@ -396,7 +396,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "si-hr",
-      "candidateFindings": 3
+      "candidateFindings": 7
     },
     {
       "code": "ES",
@@ -423,7 +423,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "ch-li",
-      "candidateFindings": 2
+      "candidateFindings": 4
     },
     {
       "code": "TR",
@@ -450,16 +450,16 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "VA",
       "name": "Vatican City",
       "sourceScope": "VA",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "it",
-      "candidateFindings": 0
+      "candidateFindings": 6
     },
     {
       "code": "AX",
@@ -495,7 +495,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "JE",
@@ -504,7 +504,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "IM",
@@ -513,7 +513,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "ALDERNEY",
@@ -522,7 +522,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "SVALBARD",
@@ -555,19 +555,19 @@
       "code": "SBA",
       "name": "Akrotiri and Dhekelia",
       "sourceScope": "CY",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "islands",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "NCY",
       "name": "Northern Cyprus",
       "sourceScope": "CY",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "islands",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "CEU",
@@ -618,172 +618,172 @@
       "code": "GP",
       "name": "Guadeloupe",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "MQ",
       "name": "Martinique",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "GF",
       "name": "French Guiana",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "RE",
       "name": "Réunion",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "YT",
       "name": "Mayotte",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "MF",
       "name": "Saint-Martin",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "BL",
       "name": "Saint-Barthélemy",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "PM",
       "name": "Saint-Pierre-et-Miquelon",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "NC",
       "name": "New Caledonia",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "PF",
       "name": "French Polynesia",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "WF",
       "name": "Wallis and Futuna",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "CLIPPERTON",
       "name": "Clipperton",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "TF",
       "name": "French Southern and Antarctic Lands",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "AW",
       "name": "Aruba",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "CW",
       "name": "Curaçao",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "SX",
       "name": "Sint Maarten",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "BQ-BO",
       "name": "Bonaire",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "BQ-SA",
       "name": "Saba",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "BQ-SE",
       "name": "Sint Eustatius",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "ENG",
@@ -792,7 +792,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "SCT",
@@ -801,7 +801,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "WLS",
@@ -810,7 +810,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "NIR",
@@ -819,7 +819,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 4
+      "candidateFindings": 6
     },
     {
       "code": "FBIH",
@@ -864,7 +864,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "GAG",
@@ -873,7 +873,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "CAT",
@@ -906,37 +906,37 @@
       "code": "FLA",
       "name": "Flanders",
       "sourceScope": "BE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "WAL",
       "name": "Wallonia",
       "sourceScope": "BE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "BRU",
       "name": "Brussels-Capital Region",
       "sourceScope": "BE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "RSM",
       "name": "Republic of San Marino road jurisdiction",
       "sourceScope": "SM",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "it",
-      "candidateFindings": 0
+      "candidateFindings": 6
     }
   ]
 }
