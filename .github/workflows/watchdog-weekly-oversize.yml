@@ -67,6 +67,8 @@ jobs:
 
       - name: Final data refresh
         if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run oversize:monitor
 
       - name: Generate weekly article

@@ -92,8 +92,12 @@ describe('W41 regression: none of the published filler may pass again', () => {
 });
 
 describe('checkFreshness', () => {
-  it('accepts a source published within the last 14 days', () => {
-    expect(checkFreshness({ publishedAt: '2026-09-18' }, { now }).ok).toBe(true);
+  it('accepts a source published within the last 7 days', () => {
+    expect(checkFreshness({ publishedAt: '2026-09-24' }, { now }).ok).toBe(true);
+  });
+
+  it('rejects a source published more than 7 days ago', () => {
+    expect(checkFreshness({ publishedAt: '2026-09-23' }, { now }).reason).toMatch(/older than the 7-day freshness window/);
   });
 
   it('rejects a page published earlier, however recently it was discovered', () => {
@@ -111,6 +115,12 @@ describe('checkFreshness', () => {
     expect(checkFreshness({ publishedAt: '2026-08-01', validFrom: '2026-10-06' }, ctx).ok).toBe(true);
     expect(checkFreshness({ publishedAt: '2026-08-01', validTo: '2026-10-09' }, ctx).ok).toBe(true);
     expect(checkFreshness({ publishedAt: '2026-08-01', validFrom: '2026-11-16' }, ctx).ok).toBe(false);
+  });
+
+  it('accepts a change taking effect up to one month after preparation, not later', () => {
+    const ctx = { now, weekStart, weekEnd };
+    expect(checkFreshness({ publishedAt: '2026-08-01', validFrom: '2026-10-31' }, ctx)).toMatchObject({ ok: true, basis: 'outlook' });
+    expect(checkFreshness({ publishedAt: '2026-08-01', validFrom: '2026-11-01' }, ctx).ok).toBe(false);
   });
 });
 
@@ -159,12 +169,12 @@ describe('checkNotPreviouslyPublished', () => {
 describe('editionFreshSince', () => {
   const slot = new Date('2026-10-02T10:00:00Z'); // Friday 12:00 Prague
   it('anchors a late (Friday/Saturday) run to the Thursday preparation day', () => {
-    expect(editionFreshSince(new Date('2026-10-02T12:17:00Z'), slot).toISOString().slice(0, 10)).toBe('2026-09-17');
-    expect(editionFreshSince(new Date('2026-10-03T06:17:00Z'), slot).toISOString().slice(0, 10)).toBe('2026-09-17');
+    expect(editionFreshSince(new Date('2026-10-02T12:17:00Z'), slot).toISOString().slice(0, 10)).toBe('2026-09-24');
+    expect(editionFreshSince(new Date('2026-10-03T06:17:00Z'), slot).toISOString().slice(0, 10)).toBe('2026-09-24');
   });
   it('uses the run day itself for an earlier run', () => {
-    expect(editionFreshSince(new Date('2026-10-01T03:17:00Z'), slot).toISOString().slice(0, 10)).toBe('2026-09-17');
-    expect(editionFreshSince(new Date('2026-09-28T09:00:00Z'), slot).toISOString().slice(0, 10)).toBe('2026-09-14');
+    expect(editionFreshSince(new Date('2026-10-01T03:17:00Z'), slot).toISOString().slice(0, 10)).toBe('2026-09-24');
+    expect(editionFreshSince(new Date('2026-09-28T09:00:00Z'), slot).toISOString().slice(0, 10)).toBe('2026-09-21');
   });
 });
 

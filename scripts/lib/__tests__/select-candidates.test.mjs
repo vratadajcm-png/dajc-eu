@@ -29,7 +29,7 @@ describe('selectCandidates', () => {
     ], ctx);
     expect(selected.map((f) => f.sourceUrl)).toEqual([finding(1).sourceUrl]);
     expect(rejected.map((r) => r.reason)).toEqual([
-      expect.stringMatching(/older than the 14-day freshness window/),
+      expect.stringMatching(/older than the 7-day freshness window/),
       expect.stringMatching(/undated material/),
       'status expired',
     ]);
