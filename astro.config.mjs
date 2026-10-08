@@ -29,13 +29,17 @@ export default defineConfig({
   // Stays 'static' (the default): every existing page keeps being
   // prerendered at build time exactly as before. The adapter below only
   // enables individual routes to opt OUT of prerendering (`export const
-  // prerender = false`) - used exclusively by the DAJC Partner Portal
-  // (src/pages/partner-portal/**), which needs real on-demand server
-  // requests so its feature gate, sessions and DB access are enforced
+  // prerender = false`) - used by the DAJC Partner Portal and investor
+  // routes, which need real on-demand server
+  // requests so private routes enforce sessions and access per request
   // server-side per request instead of baked into a static build. See
-  // docs/PARTNER_PORTAL.md.
+  // docs/PARTNER_PORTAL.md and docs/INVESTOR_DOCUMENTS.md.
   output: 'static',
   adapter: vercel({
+    includeFiles: [
+      './private/investor/pitch-deck-en.pdf.enc',
+      './private/investor/pitch-deck-en.pptx.enc',
+    ],
     webAnalytics: {
       enabled: true,
     },
@@ -45,7 +49,7 @@ export default defineConfig({
       // The Partner Portal is a private, ungated-by-default governance
       // surface - it must never appear in the public sitemap regardless of
       // DAJC_PARTNER_PORTAL_ENABLED. See docs/PARTNER_PORTAL.md.
-      filter: (page) => !page.includes('/partner-portal'),
+      filter: (page) => !page.includes('/partner-portal') && !page.includes('/investor/'),
       // On-demand public pages are not discovered automatically.
       customPages: [`${SITE}/driving-bans`, ...publicEuOversizeArticleUrls()],
     }),
