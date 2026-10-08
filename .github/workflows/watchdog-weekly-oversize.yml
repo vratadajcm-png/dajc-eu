@@ -81,6 +81,25 @@ jobs:
         if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         run: node scripts/publish-gate-commit.mjs
 
+      - name: Alert when no edition was produced
+        if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        shell: bash
+        run: |
+          target="${{ steps.publish-needed.outputs.target }}"
+          if [ -f "$target" ]; then
+            echo "Edition present: $target"
+            exit 0
+          fi
+          msg="No EU Oversize Weekly edition for ${{ steps.publish-needed.outputs.week }}: nothing passed the editorial rules (see the generator log above)."
+          # Thursday evening only warns; the Friday-morning check fails so the
+          # owner is e-mailed before the 12:00 release.
+          if [ "$(TZ=Europe/Prague date +%u)" = "4" ]; then
+            echo "::warning::$msg"
+          else
+            echo "::error::$msg"
+            exit 1
+          fi
+
       - name: Watchdog outcome
         if: always()
         shell: bash
