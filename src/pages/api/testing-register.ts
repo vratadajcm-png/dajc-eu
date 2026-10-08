@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
+import { allowRegistrationAttempt } from '../../lib/testing-registration/throttle';
 
 export const prerender = false;
 
@@ -72,12 +73,22 @@ export const GET: APIRoute = async ({ request }) => {
   );
 };
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
   const origin = request.headers.get('origin');
   const headers = corsHeaders(origin);
 
-  if (origin && !ALLOWED_ORIGINS.has(origin)) {
+  // Browsers always send Origin on a cross-site or same-site fetch POST; a
+  // request without it is a script, not the registration form.
+  if (!origin || !ALLOWED_ORIGINS.has(origin)) {
     return new Response(JSON.stringify({ ok: false, error: 'Origin not allowed.' }), { status: 403, headers });
+  }
+
+  if (!allowRegistrationAttempt(clientAddress || 'unknown')) {
+    headers.set('Retry-After', '3600');
+    return new Response(
+      JSON.stringify({ ok: false, error: 'Too many registrations. Please try again later.', fallbackEmail: DESTINATION }),
+      { status: 429, headers }
+    );
   }
 
   try {
@@ -188,8 +199,10 @@ export const POST: APIRoute = async ({ request }) => {
         to: [businessEmail],
         replyTo: DESTINATION,
         subject: 'DAJC Platform Testing 2027 — registration received',
+        // Fixed text only: the recipient address is caller-supplied, so no
+        // caller-supplied text may appear in a mail sent from a DAJC domain.
         text: [
-          `Hello ${fullName},`,
+          'Hello,',
           '',
           'Thank you for registering for DAJC Platform pre-production testing.',
           'Testing starts on Monday, 4 January 2027.',

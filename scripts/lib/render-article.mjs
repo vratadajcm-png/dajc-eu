@@ -10,8 +10,34 @@
 // scripts/lib/__tests__/render-article.test.mjs (the W35 incident rendered
 // developments twice because category flags were additive overlays).
 
+// Article text comes from an LLM that read third-party pages, so it is
+// untrusted: a prompt-injected source must not be able to put raw HTML into
+// the published page (Astro renders raw HTML inside Markdown). Escaping the
+// three HTML metacharacters keeps the visible text identical.
 function mdEscape(text) {
-  return String(text ?? '').replace(/\r\n/g, '\n').trim();
+  return String(text ?? '')
+    .replace(/\r\n/g, '\n')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .trim();
+}
+
+// Only absolute http(s) links may reach the article (no javascript:, data:
+// or relative targets). Parentheses and spaces are percent-encoded so a URL
+// cannot break out of the Markdown link syntax. Throws, so a bad source
+// fails the edition instead of publishing an unsafe link.
+export function safeUrl(url) {
+  let parsed;
+  try {
+    parsed = new URL(String(url ?? ''));
+  } catch {
+    throw new Error(`Unsafe source URL rejected: ${JSON.stringify(url)}`);
+  }
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+    throw new Error(`Unsafe source URL rejected: ${JSON.stringify(url)}`);
+  }
+  return parsed.href.replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/ /g, '%20');
 }
 
 function formatDateRange(item) {
@@ -58,9 +84,9 @@ function renderDevelopmentItem(item, { weekEnd = null } = {}) {
     lines.push(`**Exemptions/conditions:** ${mdEscape(item.exemptions)}`);
     lines.push('');
   }
-  lines.push(`*Source: [${mdEscape(item.sourceName)}](${item.sourceUrl})*`);
+  lines.push(`*Source: [${mdEscape(item.sourceName)}](${safeUrl(item.sourceUrl)})*`);
   for (const extra of item.additionalSources || []) {
-    lines.push(`*Also see: [${mdEscape(extra.name)}](${extra.url})*`);
+    lines.push(`*Also see: [${mdEscape(extra.name)}](${safeUrl(extra.url)})*`);
   }
   return lines.join('\n');
 }
@@ -84,7 +110,7 @@ function renderRoundupItem(item, { weekEnd = null } = {}) {
   const action = item.recommendedAction || item.impact;
   if (action) lines.push('', `**Operator action:** ${mdEscape(action)}`);
 
-  lines.push('', `*Source: [${mdEscape(item.sourceName)}](${item.sourceUrl})*`);
+  lines.push('', `*Source: [${mdEscape(item.sourceName)}](${safeUrl(item.sourceUrl)})*`);
   return lines.join('\n');
 }
 
@@ -141,9 +167,9 @@ export function renderArticleMarkdown(article, { slug, publishedAt, updatedAt = 
 
   const uniqueSources = new Map();
   for (const item of [...article.developments, ...roundup]) {
-    uniqueSources.set(item.sourceUrl, { name: item.sourceName, url: item.sourceUrl });
+    uniqueSources.set(item.sourceUrl, { name: item.sourceName, url: safeUrl(item.sourceUrl) });
     for (const extra of item.additionalSources || []) {
-      uniqueSources.set(extra.url, { name: extra.name, url: extra.url });
+      uniqueSources.set(extra.url, { name: extra.name, url: safeUrl(extra.url) });
     }
   }
   const sourcesList = [...uniqueSources.values()];

@@ -19,7 +19,8 @@ const newsSchema = z.object({
     .array(
       z.object({
         name: z.string(),
-        url: z.string().url(),
+        // http(s) only: rendered as <a href> on the article page.
+        url: z.string().url().regex(/^https?:\/\//i),
       })
     )
     .optional(),

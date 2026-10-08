@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { renderArticleMarkdown, categorizeDevelopment, toFrontmatterYaml } from '../render-article.mjs';
+import { renderArticleMarkdown, categorizeDevelopment, toFrontmatterYaml, safeUrl } from '../render-article.mjs';
 
 function makeArticle(developments, extra = {}) {
   return {
@@ -214,5 +214,43 @@ describe('renderArticleMarkdown', () => {
       slug: 'eu-oversize-weekly-2026-w41', publishedAt: '2026-10-02', nextPublicationLabel: null, weekEnd: '2026-10-11',
     });
     expect(body).toContain('**Outlook:** takes effect 2026-10-20');
+  });
+});
+
+// Audit DAJC-SEC-AUDIT-2026-10, F-09: article text is LLM output derived from
+// third-party pages and is published without human review, so a
+// prompt-injected source must not be able to inject HTML or script links.
+describe('untrusted article content', () => {
+  const base = {
+    country: 'Germany', title: 'Report', whatChanged: 'Change.', where: 'DE', impact: 'Impact.',
+    recommendedAction: 'Act.', isDrivingBan: false, isInfrastructure: true,
+    sourceUrl: 'https://example.test/a', sourceName: 'Source',
+  };
+  const opts = { slug: 'eu-oversize-weekly-2026-w99', publishedAt: '2026-08-21', nextPublicationLabel: null };
+
+  it('escapes HTML in every text field', () => {
+    const item = {
+      ...base,
+      title: '<img src=x onerror=alert(1)>',
+      whatChanged: '<script>alert(1)</script> A&B',
+      sourceName: '</a><iframe>',
+    };
+    const { body } = renderArticleMarkdown(makeArticle([item], { intro: '<b>x</b>' }), opts);
+    expect(body).not.toMatch(/<(script|img|iframe|b)\b/i);
+    expect(body).not.toContain('</a>');
+    expect(body).toContain('&lt;script&gt;alert(1)&lt;/script&gt; A&amp;B');
+  });
+
+  it('rejects non-http(s) source URLs', () => {
+    for (const url of ['javascript:alert(1)', 'data:text/html,<script>', '/relative', 'not a url']) {
+      expect(() => renderArticleMarkdown(makeArticle([{ ...base, sourceUrl: url }]), opts)).toThrow(/Unsafe source URL/);
+    }
+    expect(() =>
+      renderArticleMarkdown(makeArticle([{ ...base, additionalSources: [{ name: 'x', url: 'javascript:alert(1)' }] }]), opts)
+    ).toThrow(/Unsafe source URL/);
+  });
+
+  it('keeps URLs from breaking out of Markdown link syntax', () => {
+    expect(safeUrl('https://example.test/a)(b c')).toBe('https://example.test/a%29%28b%20c');
   });
 });
