@@ -1,942 +1,1046 @@
 {
   "week": "2026-W41",
-  "checkedAt": "2026-10-08T12:39:51.578Z",
+  "checkedAt": "2026-10-09T12:26:50.173Z",
   "jurisdictions": [
     {
       "code": "AL",
       "name": "Albania",
       "sourceScope": "AL",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "balkans",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "AD",
       "name": "Andorra",
       "sourceScope": "AD",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "AM",
       "name": "Armenia",
       "sourceScope": "AM",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "east",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "AT",
       "name": "Austria",
       "sourceScope": "AT",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "at",
-      "candidateFindings": 4
+      "candidateFindings": 4,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "AZ",
       "name": "Azerbaijan",
       "sourceScope": "AZ",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "east",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "BY",
       "name": "Belarus",
       "sourceScope": "BY",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "east",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "BE",
       "name": "Belgium",
       "sourceScope": "BE",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 5
+      "candidateFindings": 5,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "BA",
       "name": "Bosnia and Herzegovina",
       "sourceScope": "BA",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "balkans",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "BG",
       "name": "Bulgaria",
       "sourceScope": "BG",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "HR",
       "name": "Croatia",
       "sourceScope": "HR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "si-hr",
-      "candidateFindings": 7
+      "candidateFindings": 7,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "CY",
       "name": "Cyprus",
       "sourceScope": "CY",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "islands",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "CZ",
       "name": "Czechia",
       "sourceScope": "CZ",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "cz",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "DK",
       "name": "Denmark",
       "sourceScope": "DK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "EE",
       "name": "Estonia",
       "sourceScope": "EE",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "baltics",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "FI",
       "name": "Finland",
       "sourceScope": "FI",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "FR",
       "name": "France",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "GE",
       "name": "Georgia",
       "sourceScope": "GE",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "east",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "DE",
       "name": "Germany",
       "sourceScope": "DE",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "de",
-      "candidateFindings": 8
+      "candidateFindings": 8,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "GR",
       "name": "Greece",
       "sourceScope": "GR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "balkans",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "HU",
       "name": "Hungary",
       "sourceScope": "HU",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "hu",
-      "candidateFindings": 5
+      "candidateFindings": 5,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "IS",
       "name": "Iceland",
       "sourceScope": "IS",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "IE",
       "name": "Ireland",
       "sourceScope": "IE",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "IT",
       "name": "Italy",
       "sourceScope": "IT",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "it",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "KZ",
       "name": "Kazakhstan (European transport scope)",
       "sourceScope": "KZ",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "east",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "XK",
       "name": "Kosovo",
       "sourceScope": "XK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "balkans",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "LV",
       "name": "Latvia",
       "sourceScope": "LV",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "baltics",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "LI",
       "name": "Liechtenstein",
       "sourceScope": "LI",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "ch-li",
-      "candidateFindings": 4
+      "candidateFindings": 4,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "LT",
       "name": "Lithuania",
       "sourceScope": "LT",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "baltics",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "LU",
       "name": "Luxembourg",
       "sourceScope": "LU",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 5
+      "candidateFindings": 5,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "MT",
       "name": "Malta",
       "sourceScope": "MT",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "islands",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "MD",
       "name": "Moldova",
       "sourceScope": "MD",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "MC",
       "name": "Monaco",
       "sourceScope": "MC",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "ME",
       "name": "Montenegro",
       "sourceScope": "ME",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "balkans",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "NL",
       "name": "Netherlands",
       "sourceScope": "NL",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 5
+      "candidateFindings": 5,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "MK",
       "name": "North Macedonia",
       "sourceScope": "MK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "balkans",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "NO",
       "name": "Norway",
       "sourceScope": "NO",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "PL",
       "name": "Poland",
       "sourceScope": "PL",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "pl",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "PT",
       "name": "Portugal",
       "sourceScope": "PT",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "RO",
       "name": "Romania",
       "sourceScope": "RO",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "RU",
       "name": "Russia (European transport scope)",
       "sourceScope": "RU",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "east",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "SM",
       "name": "San Marino",
       "sourceScope": "SM",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "it",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "RS",
       "name": "Serbia",
       "sourceScope": "RS",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "balkans",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "SK",
       "name": "Slovakia",
       "sourceScope": "SK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "sk",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "SI",
       "name": "Slovenia",
       "sourceScope": "SI",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "si-hr",
-      "candidateFindings": 7
+      "candidateFindings": 7,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "ES",
       "name": "Spain",
       "sourceScope": "ES",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "SE",
       "name": "Sweden",
       "sourceScope": "SE",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "CH",
       "name": "Switzerland",
       "sourceScope": "CH",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "ch-li",
-      "candidateFindings": 4
+      "candidateFindings": 4,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "TR",
       "name": "Türkiye (European transport scope)",
       "sourceScope": "TR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "east",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "UA",
       "name": "Ukraine",
       "sourceScope": "UA",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "east",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "UK",
       "name": "United Kingdom",
       "sourceScope": "UK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "VA",
       "name": "Vatican City",
       "sourceScope": "VA",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "it",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "AX",
       "name": "Åland Islands",
       "sourceScope": "FI",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "FO",
       "name": "Faroe Islands",
       "sourceScope": "DK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "GI",
       "name": "Gibraltar",
       "sourceScope": "UK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "GG",
       "name": "Guernsey",
       "sourceScope": "UK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "JE",
       "name": "Jersey",
       "sourceScope": "UK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "IM",
       "name": "Isle of Man",
       "sourceScope": "UK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "ALDERNEY",
       "name": "Alderney",
       "sourceScope": "UK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "SVALBARD",
       "name": "Svalbard",
       "sourceScope": "NO",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "JANMAYEN",
       "name": "Jan Mayen",
       "sourceScope": "NO",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "GL",
       "name": "Greenland (European jurisdiction link)",
       "sourceScope": "DK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "SBA",
       "name": "Akrotiri and Dhekelia",
       "sourceScope": "CY",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "islands",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "NCY",
       "name": "Northern Cyprus",
       "sourceScope": "CY",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "islands",
-      "candidateFindings": 1
+      "candidateFindings": 1,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "CEU",
       "name": "Ceuta",
       "sourceScope": "ES",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "MLL",
       "name": "Melilla",
       "sourceScope": "ES",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "AZO",
       "name": "Azores",
       "sourceScope": "PT",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "MAD",
       "name": "Madeira",
       "sourceScope": "PT",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "CAN",
       "name": "Canary Islands",
       "sourceScope": "ES",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "GP",
       "name": "Guadeloupe",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "MQ",
       "name": "Martinique",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "GF",
       "name": "French Guiana",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "RE",
       "name": "Réunion",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "YT",
       "name": "Mayotte",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "MF",
       "name": "Saint-Martin",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "BL",
       "name": "Saint-Barthélemy",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "PM",
       "name": "Saint-Pierre-et-Miquelon",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "NC",
       "name": "New Caledonia",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "PF",
       "name": "French Polynesia",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "WF",
       "name": "Wallis and Futuna",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "CLIPPERTON",
       "name": "Clipperton",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "TF",
       "name": "French Southern and Antarctic Lands",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "fr",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "AW",
       "name": "Aruba",
       "sourceScope": "NL",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 5
+      "candidateFindings": 5,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "CW",
       "name": "Curaçao",
       "sourceScope": "NL",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 5
+      "candidateFindings": 5,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "SX",
       "name": "Sint Maarten",
       "sourceScope": "NL",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 5
+      "candidateFindings": 5,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "BQ-BO",
       "name": "Bonaire",
       "sourceScope": "NL",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 5
+      "candidateFindings": 5,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "BQ-SA",
       "name": "Saba",
       "sourceScope": "NL",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 5
+      "candidateFindings": 5,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "BQ-SE",
       "name": "Sint Eustatius",
       "sourceScope": "NL",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 5
+      "candidateFindings": 5,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "ENG",
       "name": "England",
       "sourceScope": "UK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "SCT",
       "name": "Scotland",
       "sourceScope": "UK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "WLS",
       "name": "Wales",
       "sourceScope": "UK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "NIR",
       "name": "Northern Ireland",
       "sourceScope": "UK",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "FBIH",
       "name": "Federation of Bosnia and Herzegovina",
       "sourceScope": "BA",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "balkans",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "RSBA",
       "name": "Republika Srpska",
       "sourceScope": "BA",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "balkans",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "AB",
       "name": "Abkhazia",
       "sourceScope": "GE",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "east",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "SO",
       "name": "South Ossetia",
       "sourceScope": "GE",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "east",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "TRN",
       "name": "Transnistria",
       "sourceScope": "MD",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "GAG",
       "name": "Gagauzia",
       "sourceScope": "MD",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
-      "candidateFindings": 2
+      "candidateFindings": 2,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "CAT",
       "name": "Catalonia",
       "sourceScope": "ES",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "BAS",
       "name": "Basque Country",
       "sourceScope": "ES",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "GAL",
       "name": "Galicia",
       "sourceScope": "ES",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 3
+      "candidateFindings": 3,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "FLA",
       "name": "Flanders",
       "sourceScope": "BE",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 5
+      "candidateFindings": 5,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "WAL",
       "name": "Wallonia",
       "sourceScope": "BE",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 5
+      "candidateFindings": 5,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "BRU",
       "name": "Brussels-Capital Region",
       "sourceScope": "BE",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 5
+      "candidateFindings": 5,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     },
     {
       "code": "RSM",
       "name": "Republic of San Marino road jurisdiction",
       "sourceScope": "SM",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-source-availability-limited",
       "discovery": "web-search",
       "searchGroup": "it",
-      "candidateFindings": 6
+      "candidateFindings": 6,
+      "error": "oversize: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.; heavy: 429 You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/."
     }
   ]
 }
