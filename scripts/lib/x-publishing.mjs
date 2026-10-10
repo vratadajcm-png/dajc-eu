@@ -104,12 +104,16 @@ export function readXCredentials(env = process.env) {
   return credentials;
 }
 
-export async function checkPublicArticle(url, fetchFn = fetch) {
+export async function checkPublicArticle(url, expectedTitle, fetchFn = fetch) {
   const result = await fetchFn(url, { redirect: 'error', signal: AbortSignal.timeout(12000), headers: { 'Cache-Control': 'no-cache' } });
   if (result.status === 404) return false; // not deployed yet; next scheduled run will retry
   if (!result.ok) throw new Error(`Article readiness check failed: HTTP ${result.status}`);
   if (!(result.headers.get('content-type') || '').includes('text/html')) {
     throw new Error('Article readiness check did not return HTML');
+  }
+  const html = await result.text();
+  if (!html.includes(expectedTitle.slice(0, 18))) {
+    throw new Error('Public article page did not contain the expected title');
   }
   return true;
 }
@@ -131,12 +135,16 @@ async function xRequest(method, endpoint, credentials, payload, fetchFn = fetch)
   return response.json();
 }
 
-export async function publishToX(text, credentials, fetchFn = fetch) {
+export async function checkXAccount(credentials, fetchFn = fetch) {
   // Prevent inadvertently posting from the founder's personal X account.
   const me = await xRequest('GET', '/2/users/me', credentials, null, fetchFn);
   if (me?.data?.username?.toLowerCase() !== X_ACCOUNT.toLowerCase()) {
     throw new Error('Authorized X account is not @DAJCeu; refusing to publish');
   }
+}
+
+export async function publishToX(text, credentials, fetchFn = fetch) {
+  await checkXAccount(credentials, fetchFn);
   const result = await xRequest('POST', '/2/tweets', credentials, { text }, fetchFn);
   const id = result?.data?.id;
   if (!/^\d+$/.test(String(id ?? ''))) throw new Error('X API success response contained no post ID; manual reconciliation required');
