@@ -1,0 +1,49 @@
+---
+interface Props {
+  label?: string;
+}
+
+const { label = 'LinkedIn' } = Astro.props;
+const profileURL = 'https://www.linkedin.com/in/miroslav-daj%C4%8D-034a4540a/';
+---
+<a
+  class="linkedin-link"
+  href={profileURL}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Miroslav Dajč on LinkedIn (opens in a new tab)"
+>
+  <svg width="20" height="20" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+    <rect width="16" height="16" rx="1.5" fill="#0A66C2" />
+    <path fill="#fff" d="M4.98 3.5C4.98 4.33 4.31 5 3.49 5S2 4.33 2 3.5 2.67 2 3.49 2s1.49.67 1.49 1.5zM2.25 6h2.5v8h-2.5zM6.25 6h2.39v1.09h.03C9 6.46 9.82 5.8 10.98 5.8 13.45 5.8 14 7.43 14 9.55V14h-2.5v-3.95c0-.94-.02-2.15-1.31-2.15-1.31 0-1.51 1.02-1.51 2.08V14h-2.5V6z" />
+  </svg>
+  <span>{label}</span>
+</a>
+
+<style>
+  .linkedin-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    vertical-align: middle;
+    color: var(--dajc-muted);
+    text-decoration: none;
+    border-radius: 3px;
+  }
+
+  .linkedin-link svg {
+    flex-shrink: 0;
+  }
+
+  .linkedin-link:hover,
+  .linkedin-link:focus-visible {
+    color: var(--dajc-orange);
+    text-decoration: underline;
+  }
+
+  .linkedin-link:focus-visible {
+    outline: 2px solid var(--dajc-orange);
+    outline-offset: 4px;
+  }
+</style>

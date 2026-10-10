@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import LinkedInLink from '../components/LinkedInLink.astro';
 import ProviderCard from '../components/ProviderCard.astro';
 import { PROVIDER_CATEGORIES } from '../data/provider-categories';
 import { getCollection } from 'astro:content';
@@ -179,6 +180,9 @@ const providerGroups = PROVIDER_CATEGORIES.map((category) => ({
         </p>
         <p class="ecosystem-form__fallback">
           Prefer email? Write directly to <a href="mailto:miroslav@dajc.eu">miroslav@dajc.eu</a>.
+        </p>
+        <p class="ecosystem-form__fallback">
+          <LinkedInLink label="LinkedIn · Miroslav Dajč" />
         </p>
       </form>
     </section>
