@@ -4,7 +4,7 @@ import { appendFile, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  buildPostText, checkPublicArticle, currentPublication, frontmatterFields,
+  buildPostText, checkPublicArticle, checkXAccount, currentPublication, frontmatterFields,
   postingDecision, publishToX, readXCredentials, validateArticle,
 } from './lib/x-publishing.mjs';
 
@@ -72,12 +72,13 @@ async function main() {
       await output('send', 'false');
       return;
     }
-    const ready = await checkPublicArticle(article.url);
+    const ready = await checkPublicArticle(article.url, article.title);
     if (!ready) {
       console.log('Public page still returns 404; waiting for a later scheduled run.');
       await output('send', 'false');
       return;
     }
+    await checkXAccount(credentials); // Reject a wrong-account token before reserving an irreversible attempt.
     ledger.posts[article.slug] = {
       status: 'pending',
       sourceUrl: article.url,
