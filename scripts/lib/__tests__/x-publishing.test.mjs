@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  buildPostText, checkPublicArticle, currentPublication, frontmatterFields,
+  buildPostText, checkPublicArticle, checkXAccount, currentPublication, frontmatterFields,
   oauth1Header, postingDecision, publishToX, validateArticle,
 } from '../x-publishing.mjs';
 
@@ -64,14 +64,15 @@ describe('X API safety', () => {
   });
 
   it('accepts only publicly served HTML and retries 404 next scheduled run', async () => {
-    expect(await checkPublicArticle('https://www.dajc.eu/a', async () => ({ status: 404 }))).toBe(false);
-    expect(await checkPublicArticle('https://www.dajc.eu/a', async () => ({ ok: true, status: 200, headers: { get: () => 'text/html' } }))).toBe(true);
+    expect(await checkPublicArticle('https://www.dajc.eu/a', 'Test Article', async () => ({ status: 404 }))).toBe(false);
+    expect(await checkPublicArticle('https://www.dajc.eu/a', 'Test Article', async () => ({ ok: true, status: 200, headers: { get: () => 'text/html' }, text: async () => '<h1>Test Article</h1>' }))).toBe(true);
   });
 
   it('rejects an OAuth token for any account other than @DAJCeu', async () => {
     const mocked = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: { username: 'somebodyelse' } }) });
     await expect(publishToX('test', credentials, mocked)).rejects.toThrow('not @DAJCeu');
     expect(mocked).toHaveBeenCalledTimes(1);
+    await expect(checkXAccount(credentials, mocked)).rejects.toThrow('not @DAJCeu');
   });
 
   it('sends exactly one POST after verifying account identity', async () => {
