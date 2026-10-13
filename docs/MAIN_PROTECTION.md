@@ -1,7 +1,32 @@
 # Main protection and publication automation
 
-Code and public articles reach `main` only through reviewed PRs. Neither
+Code and public articles reach `main` only through PRs with required CI.
+The owner reviews changes before manually merging them. Neither
 `GITHUB_TOKEN` nor a publication bot receives a bypass for main.
+
+## Applied protection — 13 October 2026
+
+Both public repositories have an active `DAJC main — PR and CI` ruleset,
+matching `refs/heads/main` only. PRs, resolved review conversations and an
+up-to-date branch with passing checks are required. Force pushes and branch
+deletion are blocked. The bypass lists are empty, including for the owner.
+
+| Repository | Required checks from GitHub Actions | Required approving reviews |
+|---|---|---|
+| `dajc-eu` | `application-validate`, `news-validate` | 0 — independent reviewer still needed |
+| `dajc-cz` | `cz-validate` | 0 — independent reviewer still needed |
+
+**The one-review requirement is not active yet.** Both repositories currently
+have no independent collaborator with write access, and an author cannot
+approve their own PR. Once the owner selects and authorizes an independent
+reviewer, require one approving review without adding an owner or bot bypass.
+Until then, owner review before manual merge is the release procedure; it
+must not be reported as an enforced approving-review gate.
+
+Actions PR creation is enabled for `dajc-eu`; the default token remains
+read-only, with explicit job permissions where writes are needed. Repair
+PRs `dajc-eu#35` and `dajc-cz#2` are merged with passing CI. X authentication,
+profile completion and the private HaulBoard protection gate remain open.
 
 ## Automation paths
 
@@ -31,7 +56,8 @@ Apply after this change is merged and the new CI check names exist:
    and `news-validate` checks from GitHub Actions. Both workflows run for
    every PR and have unique job names, so path-filtered absent checks cannot
    leave a PR stuck waiting.
-3. Require one approving review and dismiss stale approvals. Confirm that
+3. After an independent reviewer is available, require one approving review
+   and dismiss stale approvals. Confirm that
    an independent reviewer with write access is available for owner-authored
    code PRs: GitHub does not allow authors to approve their own PRs. The owner
    can approve the publication PRs created by `github-actions[bot]`.
