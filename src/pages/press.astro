@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const facts = [
+  ['Project', 'DAJC — European heavy and oversized transport coordination'],
+  ['Founder', 'Miroslav Dajč, Czech Republic'],
+  ['DAJC Platform', 'Provider-neutral coordination and operational intelligence; in active development'],
+  ['Testing', 'Registration open; pre-production testing planned from 4 January 2027'],
+  ['DAJC Assistance', 'Proposed vehicle-assistance coordination capability; research and design stage'],
+  ['Current availability', 'No commercial production Platform or Assistance service announced'],
+];
+---
+<BaseLayout
+  title="DAJC Press & Media | European Heavy and Oversized Transport"
+  description="Media information about DAJC Platform, DAJC Assistance, the founder and European pre-production testing beginning January 2027."
+>
+  <main class="press">
+    <p class="eyebrow">DAJC · PRESS &amp; MEDIA</p>
+    <h1>A European project built around real heavy-transport operations.</h1>
+    <p class="lead">DAJC is developing a provider-neutral coordination and operational-intelligence layer for heavy and oversized road transport. The goal is to connect the people, permits, route information and documents required to execute complex journeys — while working with, rather than replacing, existing systems.</p>
+    <div class="actions">
+      <a class="primary" href="/testing">Register for Platform Testing 2027</a>
+      <a href="mailto:miroslav@dajc.eu?subject=DAJC%20media%20enquiry">Contact the founder</a>
+    </div>
+
+    <section aria-labelledby="update">
+      <p class="eyebrow">PUBLIC PROJECT UPDATE · 13 OCTOBER 2026</p>
+      <h2 id="update">DAJC invites European heavy-transport professionals to take part in 2027 Platform testing.</h2>
+      <p>Registrations are open to carriers, dispatchers, drivers, industrial shippers, escort providers, permit specialists and other professionals working in heavy and oversized transport. Pre-production testing of the DAJC Platform product is planned to start on <strong>4 January 2027</strong>. This is an invitation to help validate a product still in development, not the launch of a live commercial service.</p>
+      <p>Alongside DAJC Platform, the project is researching <a href="/assistance">DAJC Assistance</a> — a future way to coordinate the information flow between a motorist or fleet, an assistance organisation and an authorised recovery or service provider. No active assistance network, provider integration, territorial coverage or commercial availability is claimed.</p>
+      <p><a href="/news/platform/dajc-testing-2027-and-assistance">Read the full public project update →</a></p>
+    </section>
+
+    <section aria-labelledby="facts">
+      <h2 id="facts">Fact sheet for journalists</h2>
+      <dl class="facts">{facts.map(([label, value]) => <div><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+      <p class="note">Status matters: DAJC is in development. No certification, government approval, signed provider partnership or European operational coverage should be inferred from this page.</p>
+    </section>
+
+    <section aria-labelledby="coverage">
+      <h2 id="coverage">What DAJC covers</h2>
+      <div class="two">
+        <article>
+          <h3>DAJC Platform</h3>
+          <p>Coordination across participants, D-ID transport context, permits, documents, routes, constraints and progress for European heavy and oversized road freight. Provider-neutral by design. The Platform is not a transport broker or marketplace.</p>
+          <a href="/testing">Testing registration →</a>
+        </article>
+        <article>
+          <h3>DAJC Assistance</h3>
+          <p>A proposed digital coordination capability for incidents involving motor vehicles, from passenger vehicles to heavy road transport. It would support handoffs to responsible, authorised providers, subject to actual agreements, data permissions and service validation.</p>
+          <a href="/assistance">Assistance concept and limitations →</a>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="assets">
+      <h2 id="assets">Media resources</h2>
+      <p>For accurate background, use the <a href="/news/platform/why-dajc-exists">founder's story</a>, <a href="/news">public updates</a>, the <a href="/partners">integration ecosystem</a> and the <a href="/investors">public project overview</a>. Further material and interviews are available on request.</p>
+      <div class="brandasset">
+        <img src="/assets/dajc-google-brand.svg" alt="Official DAJC brand mark" width="90" height="90" loading="lazy" />
+        <div>
+          <strong>Official DAJC brand asset</strong>
+          <p>For press coverage, please reproduce the supplied mark unchanged and credit DAJC. Contact us for alternative formats or image permissions.</p>
+          <a href="/assets/dajc-google-brand.svg" download="dajc-official-brand.svg">Download brand mark (SVG) →</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact" aria-labelledby="contact">
+      <h2 id="contact">Editorial contact</h2>
+      <p><strong>Miroslav Dajč</strong> · Founder, DAJC · Czech Republic</p>
+      <p><a href="mailto:miroslav@dajc.eu">miroslav@dajc.eu</a> · <a href="https://www.dajc.eu/">www.dajc.eu</a></p>
+      <p>Interview and fact-check requests in English or Czech are welcome by email. Please arrange interviews in advance.</p>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+.press {position:relative;z-index:2;max-width:1000px;margin:0 auto;padding:6vh 1.5rem 9vh;}
+.eyebrow {font:500 12px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:var(--dajc-orange);text-transform:uppercase;margin:0 0 1rem;}
+h1,h2,h3 {font-family:'Space Grotesk',sans-serif;line-height:1.22;}
+h1 {font-size:clamp(2rem,5vw,3.15rem);max-width:21ch;margin:0 0 1.3rem;}
+h2 {font-size:clamp(1.35rem,3vw,1.85rem);margin:0 0 1.2rem;}
+h3 {margin:0 0 .7rem;font-size:1.15rem;}
+p {line-height:1.75;}
+.lead {color:var(--dajc-muted);max-width:78ch;font-size:1.08rem;}
+section {border-top:1px solid var(--dajc-line);margin-top:3.5rem;padding-top:2.5rem;}
+section p {max-width:80ch;color:var(--dajc-muted);}
+strong {color:var(--dajc-white);}
+a {color:var(--dajc-orange);text-underline-offset:3px;}
+.actions {display:flex;flex-wrap:wrap;align-items:center;gap:1rem;margin-top:1.8rem;}
+.actions a {padding:.75rem 1rem;border:1px solid var(--dajc-orange);border-radius:6px;text-decoration:none;font:500 12px 'IBM Plex Mono',monospace;}
+.actions .primary {background:var(--dajc-orange);color:var(--dajc-dark);font-weight:700;}
+.facts {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;}
+.facts div,.two article,.brandasset {border:1px solid var(--dajc-line);border-radius:8px;padding:1.1rem;background:rgba(0,38,92,.22);}
+dt {font:500 11px 'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--dajc-orange);margin-bottom:.45rem;}
+dd {margin:0;line-height:1.6;color:var(--dajc-white);}
+.note {font-size:13px;}
+.two {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;}
+.two p {min-height:7rem;}
+.brandasset {display:flex;gap:1.2rem;align-items:center;}
+.brandasset p {margin:.35rem 0;}
+.brandasset img {flex:none;object-fit:contain;}
+.contact {border-left:3px solid var(--dajc-orange);padding-left:1.5rem;}
+@media(max-width:650px) {.facts,.two{grid-template-columns:1fr}.two p{min-height:0}.brandasset{align-items:flex-start}.press{padding-top:4vh}}
+</style>
