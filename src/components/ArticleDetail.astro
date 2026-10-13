@@ -21,8 +21,33 @@ const updatedLabel = data.updatedAt?.toLocaleDateString('en-GB', {
   month: 'long',
   day: 'numeric',
 });
+const articleStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: data.title,
+  description: data.description,
+  url: new URL(Astro.url.pathname, Astro.site).toString(),
+  datePublished: data.publishedAt.toISOString(),
+  dateModified: (data.updatedAt ?? data.publishedAt).toISOString(),
+  inLanguage: data.language,
+  isAccessibleForFree: true,
+  articleSection: categoryLabel,
+  author: data.author === 'DAJC'
+    ? { '@type': 'Organization', name: 'DAJC', url: 'https://www.dajc.eu/' }
+    : { '@type': 'Person', name: data.author },
+  publisher: {
+    '@type': 'Organization',
+    name: 'DAJC',
+    url: 'https://www.dajc.eu/',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://www.dajc.eu/assets/dajc-google-brand.svg',
+    },
+  },
+};
 ---
 <BaseLayout title={`${data.title} - DAJC`} description={data.description}>
+  <script type="application/ld+json" set:html={JSON.stringify(articleStructuredData)}></script>
   <main class="article">
     <div class="article__meta">
       <span class="article__category">{categoryLabel}</span>
