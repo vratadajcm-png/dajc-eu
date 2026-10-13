@@ -43,6 +43,8 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
+  actions: write
 
 concurrency:
   group: oversize-weekly-publish
@@ -52,7 +54,12 @@ concurrency:
 
 jobs:
   publish:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      OVERSIZE_PREVIEW: ${{ github.event.inputs.preview == 'true' && '1' || '' }}
+      OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
     steps:
       - name: Resolve scheduled trigger
         id: trigger
@@ -125,6 +132,10 @@ jobs:
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         run: npm ci
 
+      - name: Load latest monitoring data
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        run: node scripts/automation-data.mjs load findings
+
       - name: Final data refresh
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
@@ -140,7 +151,7 @@ jobs:
         # retry for (no lead/Rest-of-Europe minimum, no padding loop).
         run: node scripts/generate-weekly-article.mjs ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }} ${{ steps.trigger.outputs.preview == 'true' && '--preview' || '' }} ${{ github.event.inputs.correction == 'true' && '--correction' || '' }}
 
-      - name: Commit new article and refreshed data
+      - name: Open reviewed publication PR or persist data-only refresh
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true'
         run: node scripts/publish-gate-commit.mjs
 
@@ -172,9 +183,9 @@ jobs:
           if [ "${{ steps.trigger.outputs.should_run }}" != "true" ]; then
             echo "Outcome: intentional no-op."
           elif [ "${{ steps.publish-needed.outputs.needed }}" = "false" ]; then
-            echo "Outcome: target article already exists; idempotent no-op."
+            echo "Outcome: article already exists or its PR awaits review; no generation repeated."
           elif [ "${{ job.status }}" = "success" ]; then
-            echo "Outcome: publication/dry-run pipeline completed successfully."
+            echo "Outcome: preparation/dry-run completed. A content PR requires review and merge before publication."
           else
             echo "Outcome: publication pipeline failed; inspect the failed step above."
           fi

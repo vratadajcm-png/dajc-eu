@@ -27,8 +27,8 @@ if ! git rev-parse HEAD~1 >/dev/null 2>&1; then
   exit 1
 fi
 
-if git diff --quiet HEAD~1 HEAD -- . ':!data/oversize'; then
-  echo "Only data/oversize/** changed in this commit - skipping this deployment."
+if git diff --quiet HEAD~1 HEAD -- . ':!data/oversize' ':!data/x-publications.json'; then
+  echo "Only raw monitoring data or the X ledger changed - skipping this deployment."
   exit 0
 else
   echo "Site-relevant files changed - proceeding with the build."

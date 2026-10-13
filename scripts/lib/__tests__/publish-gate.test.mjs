@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement } from '../publish-gate.mjs';
+import { decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from '../publish-gate.mjs';
+
+describe('reviewed publication branches', () => {
+  it('keeps final editions, previews and explicit corrections in distinct PRs', () => {
+    expect(publicationBranchFor('2026-W43')).toBe('automation/weekly-2026-w43');
+    expect(publicationBranchFor('2026-W43', { preview: true })).toBe('automation/weekly-2026-w43-preview');
+    expect(publicationBranchFor('2026-W43', { correction: true })).toBe('automation/weekly-2026-w43-correction');
+    expect(() => publicationBranchFor('main')).toThrow('Invalid');
+    expect(extractArticleWeekFromStatus('?? src/content/news/eu-oversize/eu-oversize-weekly-preview-2026-w43.md\n').week).toBe('2026-W43');
+  });
+});
 
 describe('decidePublishCommit', () => {
   it('produces a publish commit when a new article was added', () => {

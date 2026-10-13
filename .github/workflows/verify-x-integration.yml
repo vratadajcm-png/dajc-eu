@@ -44,6 +44,7 @@ jobs:
           console.log('All four X credentials are available without whitespace. No X API request was made.');
           JS
       - name: Verify OAuth account is @DAJCeu (one metered read, no post)
+        id: oauth
         if: ${{ inputs.check_x_account == true }}
         env:
           X_API_KEY: ${{ secrets.X_API_KEY }}
@@ -55,4 +56,19 @@ jobs:
           import { checkXAccount, readXCredentials } from './scripts/lib/x-publishing.mjs';
           await checkXAccount(readXCredentials());
           console.log('OAuth 1.0a credentials verified for @DAJCeu. No post was sent.');
+          JS
+      - name: Report authentication separately from credential presence
+        if: always()
+        env:
+          CHECK_REQUESTED: ${{ inputs.check_x_account }}
+          OAUTH_OUTCOME: ${{ steps.oauth.outcome }}
+        run: |
+          node --input-type=module <<'JS'
+          import { appendFileSync } from 'node:fs';
+          const result = process.env.CHECK_REQUESTED !== 'true'
+            ? 'NOT TESTED: no X API request was made. A green run does not verify authentication.'
+            : process.env.OAUTH_OUTCOME === 'success'
+              ? 'PASS: OAuth identified @DAJCeu. No post was sent.'
+              : 'NOT VERIFIED: the OAuth account check failed or did not run. Publishing must remain disabled.';
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### X authentication\n\n${result}\n`);
           JS

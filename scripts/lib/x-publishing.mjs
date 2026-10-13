@@ -81,7 +81,8 @@ export function oauth1Header(method, url, credentials, nonce = randomBytes(16).t
   const parsed = new URL(url);
   const pairs = [...Object.entries(params), ...parsed.searchParams.entries()]
     .map(([key, value]) => [encode(key), encode(value)])
-    .sort(([ak, av], [bk, bv]) => ak.localeCompare(bk) || av.localeCompare(bv));
+    // OAuth sorts encoded bytes, not locale-dependent alphabetic order.
+    .sort(([ak, av], [bk, bv]) => ak < bk ? -1 : ak > bk ? 1 : av < bv ? -1 : av > bv ? 1 : 0);
   const normalized = pairs.map(([k, v]) => `${k}=${v}`).join('&');
   const baseUrl = parsed.origin + parsed.pathname;
   const signatureBase = [method.toUpperCase(), encode(baseUrl), encode(normalized)].join('&');
@@ -100,6 +101,9 @@ export function readXCredentials(env = process.env) {
   };
   if (Object.values(credentials).some((value) => typeof value !== 'string' || !value.trim())) {
     throw new Error('Missing X API credentials; configure all four GitHub Actions secrets');
+  }
+  if (Object.values(credentials).some((value) => /\s/.test(value) || /^["']|["']$/.test(value))) {
+    throw new Error('An X credential contains whitespace or wrapping quotes; copy the exact value from DAJC Publisher again');
   }
   return credentials;
 }
@@ -131,7 +135,15 @@ async function xRequest(method, endpoint, credentials, payload, fetchFn = fetch)
     signal: AbortSignal.timeout(15000),
     redirect: 'error',
   });
-  if (!response.ok) throw new Error(`X API ${method} ${endpoint} returned HTTP ${response.status}; manual reconciliation may be necessary`);
+  if (!response.ok) {
+    const advice = response.status === 401
+      ? 'verify the matching API key/secret and user access token/secret from DAJC Publisher; regenerate the user pair after enabling OAuth 1.0a Read and Write'
+      : response.status === 402
+        ? 'API credit/billing limit reached; do not buy or top up credits automatically'
+        : 'manual reconciliation may be necessary';
+    // Never log the response body or signed Authorization header.
+    throw new Error(`X API ${method} ${endpoint} returned HTTP ${response.status}; ${advice}`);
+  }
   return response.json();
 }
 

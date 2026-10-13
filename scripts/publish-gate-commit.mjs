@@ -11,8 +11,11 @@
 // for the pure decision logic and why this exists.
 
 import { execFileSync } from 'node:child_process';
-import { appendFileSync } from 'node:fs';
-import { decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement } from './lib/publish-gate.mjs';
+import { appendFileSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from './lib/publish-gate.mjs';
+import { saveAutomationData } from './lib/automation-data.mjs';
 
 function git(args) {
   return execFileSync('git', args, { encoding: 'utf-8' });
@@ -41,10 +44,11 @@ function summary(line) {
 git(['config', 'user.name', 'dajc-bot']);
 git(['config', 'user.email', 'bot@users.noreply.github.com']);
 
-const ALLOWED_AUTOMATION_PREFIXES = [
-  'data/oversize/',
-  'src/content/news/eu-oversize/',
+const ALLOWED_AUTOMATION_PATHS = [
+  /^data\/oversize\/\d{4}-W\d{2}\/(?:findings|coverage)\.json$/,
+  /^src\/content\/news\/eu-oversize\/eu-oversize-weekly-(?:preview-)?\d{4}-w\d{2}\.md$/,
 ];
+const approvedPath = (relative) => ALLOWED_AUTOMATION_PATHS.some((pattern) => pattern.test(relative));
 
 function pathFromPorcelainLine(line) {
   const raw = line.slice(3).trim();
@@ -57,7 +61,7 @@ const unexpectedChanges = workspaceStatus
   .split('\n')
   .filter(Boolean)
   .map(pathFromPorcelainLine)
-  .filter((path) => !ALLOWED_AUTOMATION_PREFIXES.some((prefix) => path.startsWith(prefix)));
+  .filter((relative) => !approvedPath(relative));
 
 if (unexpectedChanges.length > 0) {
   console.error('::error::Publication automation modified files outside the approved content/data paths.');
@@ -97,10 +101,34 @@ if (!decision.commit) {
   process.exit(0);
 }
 
-for (const addPath of decision.addPaths) git(['add', addPath]);
-git(['commit', '-m', decision.message]);
-git(['push']);
+if (!articleAdded) {
+  saveAutomationData('findings');
+  summary('### EU Oversize Weekly - data refreshed only\n\nNo article was generated or published. Findings were saved to automation/oversize-data.');
+  process.exit(0);
+}
 
-summary('### EU Oversize Weekly publish gate');
-summary(`- Article published this run: **${articleAdded ? 'yes' : 'no'}**`);
-summary(`- Commit message: \`${decision.message}\``);
+const repository = process.env.GITHUB_REPOSITORY;
+if (!/^[\w.-]+\/[\w.-]+$/.test(repository || '') || !process.env.GH_TOKEN) throw new Error('GitHub publication PR access is not configured');
+const branch = publicationBranchFor(week, { preview: process.env.OVERSIZE_PREVIEW === '1', correction: process.env.OVERSIZE_CORRECTION === '1' || articleReplaced });
+git(['switch', '-c', branch]);
+for (const addPath of decision.addPaths) git(['add', addPath]);
+// Include both sides of a rename, so a staged source deletion cannot hide
+// behind an allowed article/data destination.
+const stagedPaths = git(['diff', '--cached', '--no-renames', '--name-only', '-z']).split('\0').filter(Boolean);
+if (stagedPaths.some((relative) => !approvedPath(relative))) throw new Error('Publication commit contains an unapproved staged path');
+git(['commit', '-m', decision.message]);
+git(['push', 'origin', `HEAD:refs/heads/${branch}`]);
+
+// A standard PR respects the main rules. Never approve or merge our own PR.
+// GITHUB_TOKEN-created PR checks need workflow approval before starting,
+// so dispatch both trusted CI workflows on the exact content branch.
+const temporary = mkdtempSync(path.join(tmpdir(), 'dajc-publication-pr-'));
+try {
+  const bodyFile = path.join(temporary, 'body.md');
+  writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\nPublication requires review, passing application-validate and news-validate checks, and merge into main. This run has not published the article. Only approved article/data paths are changed.\n`);
+  const prUrl = execFileSync('gh', ['pr', 'create', '--repo', repository, '--base', 'main', '--head', branch, '--title', decision.message, '--body-file', bodyFile], { encoding: 'utf8' }).trim();
+  summary(`### EU Oversize Weekly - prepared for review\n\n${prUrl}\n\nArticle published this run: **no**. Review and merge are required before the Friday release.`);
+  for (const workflow of ['application-ci.yml', 'news-ci.yml']) execFileSync('gh', ['workflow', 'run', workflow, '--repo', repository, '--ref', branch], { stdio: 'inherit' });
+} finally {
+  rmSync(temporary, { recursive: true, force: true });
+}
