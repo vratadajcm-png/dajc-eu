@@ -1,132 +1,139 @@
 ---
 ---
-<header class="mark">
-  <a class="brand" href="/" aria-label="DAJC home">
-    <img src="/assets/dajc-icon-mono-white.png" alt="" />
-    <span>DAJC</span>
-  </a>
-  <nav aria-label="Primary navigation">
-    <a href="/#platform">Platform</a>
-    <a href="/assistance">Assistance</a>
-    <a href="/intelligence">Intelligence</a>
-    <a href="/driving-bans">Driving Bans</a>
-    <a href="/partners">Integrations</a>
-    <a href="/investors">Investors</a>
-    <a href="/news">News</a>
-    <a href="/press">Press</a>
-    <a href="/pricing">Pricing</a>
-    <a href="/support">Support</a>
-    <a class="demo-cta" href="https://demo.dajc.eu" target="_blank" rel="noopener">Live Demo</a>
-    <a class="testing-cta" href="/testing">Testing 2027</a>
-  </nav>
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="/" aria-label="DAJC home">
+      <img src="/assets/dajc-logo-white-orange-official.png" alt="" width="40" height="40" />
+      <span>DAJC</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      <a href="/#platform-overview">Platform</a>
+      <a href="/assistance">Assistance</a>
+      <details class="tools-dropdown">
+        <summary>Tools <span aria-hidden="true">⌄</span></summary>
+        <div class="tools-dropdown__panel">
+          <a href="/driving-bans">Driving Bans</a>
+          <a href="/intelligence">DAJC Intelligence</a>
+          <a href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">Live Demo ↗</a>
+          <a href="/pricing">Access &amp; Availability</a>
+        </div>
+      </details>
+      <a href="/partners">Partners</a>
+      <a href="/news">News</a>
+    </nav>
+
+    <div class="header-actions">
+      <a class="header-secondary" href="/investors">Investors</a>
+      <a class="header-secondary" href="/press">Press</a>
+      <a class="testing-link" href="/testing">Testing <span class="testing-year">2027</span><span aria-hidden="true"> ↗</span></a>
+      <details class="mobile-navigation">
+        <summary aria-label="Open navigation menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </summary>
+        <nav aria-label="Mobile navigation" class="mobile-navigation__panel">
+          <a href="/#platform-overview">DAJC Platform</a>
+          <a href="/assistance">DAJC Assistance</a>
+          <a href="/driving-bans">Driving Bans</a>
+          <a href="/intelligence">DAJC Intelligence</a>
+          <a href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">Live Demo ↗</a>
+          <a href="/partners">Partners &amp; Integrations</a>
+          <a href="/news">News</a>
+          <a href="/investors">Investors</a>
+          <a href="/press">Press &amp; Media</a>
+          <a href="/pricing">Access &amp; Availability</a>
+          <a href="/support">Support DAJC</a>
+          <a href="/testing" class="mobile-navigation__testing">Register for Testing 2027</a>
+        </nav>
+      </details>
+    </div>
+  </div>
 </header>
 
 <style>
-  header.mark {
+  .site-header {
     position: relative;
-    z-index: 2;
+    z-index: 60;
+    width: 100%;
+    border-bottom: 1px solid rgba(124, 141, 166, .20);
+    background: rgba(6, 26, 51, .92);
+    backdrop-filter: blur(16px);
+  }
+  .site-header__inner {
+    max-width: 1380px;
+    min-height: 82px;
+    margin: 0 auto;
+    padding: 1rem clamp(1rem, 3vw, 2.4rem);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 2.2rem 2.4rem 0;
+    gap: clamp(1rem, 2.5vw, 2.8rem);
   }
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    text-decoration: none;
+  .brand { display: inline-flex; flex-shrink: 0; align-items: center; gap: .6rem; color: var(--dajc-white); text-decoration: none; }
+  .brand img { display:block; width:40px; height:40px; object-fit:contain; flex-shrink:0; }
+  .brand span { font: 700 1.65rem/1 'Space Grotesk', sans-serif; letter-spacing:.04em; color:var(--dajc-white); }
+  .desktop-nav { display:flex; align-items:center; gap:clamp(.8rem, 1.6vw, 1.5rem); margin-left:auto; white-space:nowrap; }
+  .desktop-nav>a, .desktop-nav summary, .header-secondary {
+    color:#c4d0e2; text-decoration:none; font:500 .78rem/1.4 'IBM Plex Sans',sans-serif;
+    transition:color .18s ease;
   }
-
-  header.mark img {
-    width: 28px;
-    height: 28px;
-    opacity: 0.9;
+  .desktop-nav a:hover, .desktop-nav a:focus-visible, .desktop-nav summary:hover, .header-secondary:hover, .header-secondary:focus-visible { color:var(--dajc-orange); }
+  .tools-dropdown { position:relative; }
+  .tools-dropdown summary { cursor:pointer; list-style:none; }
+  .tools-dropdown summary::-webkit-details-marker {display:none;}
+  .tools-dropdown__panel {
+    position:absolute; top:calc(100% + 1.1rem); left:-1rem; min-width:220px;
+    display:grid; padding:.65rem; gap:.2rem;
+    border:1px solid #39516b; border-radius:12px;
+    background:#0c2540; box-shadow:0 18px 45px rgba(0,0,0,.36);
   }
-
-  header.mark span {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 0.06em;
-    color: var(--dajc-white);
+  .tools-dropdown:not([open]) .tools-dropdown__panel {display:none;}
+  .tools-dropdown__panel a {padding:.65rem .7rem; border-radius:7px; color:#dce6f2; text-decoration:none; font-size:.83rem;}
+  .tools-dropdown__panel a:hover,.tools-dropdown__panel a:focus-visible { background:rgba(255,159,0,.09);}
+  .header-actions {display:flex; align-items:center; gap:clamp(.6rem, 1.4vw, 1.2rem); margin-left:auto;}
+  .header-secondary { white-space:nowrap; }
+  .testing-link {
+    display:inline-flex; flex-shrink:0; gap:.2rem; align-items:center; justify-content:center;
+    min-height:42px; padding:0 1rem; border-radius:8px;
+    background:var(--dajc-orange); color:#061A33;
+    font:700 .76rem/1.2 'IBM Plex Mono',monospace;
+    text-transform:uppercase; letter-spacing:.02em; text-decoration:none;
+    transition:transform .2s ease, filter .2s ease;
   }
-
-  nav {
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    flex-wrap: wrap;
-    justify-content: flex-end;
+  .testing-link:hover,.testing-link:focus-visible {filter:brightness(1.12);transform:translateY(-1px);}
+  .mobile-navigation {display:none;position:relative;}
+  .mobile-navigation>summary {
+    width:44px; height:44px; padding:.55rem; cursor:pointer; list-style:none;
+    border:1px solid #38516b; border-radius:8px; display:grid; place-items:center; color:#f5f7fa;
   }
-
-  nav a {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--dajc-muted);
-    text-decoration: none;
+  .mobile-navigation>summary::-webkit-details-marker {display:none;}
+  .mobile-navigation>summary svg {width:24px;height:24px;}
+  .mobile-navigation__panel {
+    position:absolute; top:calc(100% + 1.15rem); right:0; width:min(88vw,360px); max-height:calc(100dvh - 100px);
+    overflow-y:auto; padding:.75rem; display:grid; gap:.15rem;
+    background:#0b213b; border:1px solid #39516b; border-radius:13px;
+    box-shadow:0 28px 70px rgba(0,0,0,.48);
   }
-
-  nav a:hover,
-  nav a:focus-visible {
-    color: var(--dajc-orange);
+  .mobile-navigation:not([open]) .mobile-navigation__panel {display:none;}
+  .mobile-navigation__panel a {
+    text-decoration:none; color:#dce6f2; padding:.85rem .9rem; border-radius:7px;
+    font-size:.91rem; line-height:1.35;
   }
-
-  nav a.testing-cta {
-    display: inline-flex;
-    min-height: 38px;
-    align-items: center;
-    justify-content: center;
-    padding: 0 0.9rem;
-    border: 1px solid var(--dajc-orange);
-    border-radius: 7px;
-    background: var(--dajc-orange);
-    color: var(--dajc-dark);
-    font-weight: 700;
-    box-shadow: 0 8px 24px rgba(239, 125, 0, 0.18);
+  .mobile-navigation__panel a:hover,.mobile-navigation__panel a:focus-visible {background:rgba(255,159,0,.10);color:#fff;}
+  .mobile-navigation__panel a.mobile-navigation__testing {margin-top:.45rem;background:var(--dajc-orange);font-weight:700;color:#061A33;text-align:center;}
+  .site-header :is(a,summary):focus-visible {outline:2px solid var(--dajc-orange);outline-offset:4px;}
+  @media (max-width:1150px) {
+    .desktop-nav,.header-secondary {display:none;}
+    .header-actions {margin-left:auto;}
+    .mobile-navigation {display:block;}
+    .site-header__inner {min-height:72px;}
   }
-
-  nav a.testing-cta:hover,
-  nav a.testing-cta:focus-visible {
-    color: var(--dajc-dark);
-    transform: translateY(-1px);
-  }
-
-  nav a.demo-cta {
-    display: inline-flex;
-    min-height: 36px;
-    align-items: center;
-    justify-content: center;
-    padding: 0 0.75rem;
-    border: 1px solid var(--dajc-line);
-    border-radius: 7px;
-    background: transparent;
-    color: var(--dajc-muted);
-    font-weight: 500;
-  }
-
-  nav a.demo-cta:hover,
-  nav a.demo-cta:focus-visible {
-    border-color: var(--dajc-orange);
-    color: var(--dajc-orange);
-    transform: translateY(-1px);
-  }
-
-  @media (max-width: 560px) {
-    header.mark {
-      padding: 1.6rem 1.4rem 0;
-      align-items: flex-start;
-    }
-
-    nav {
-      max-width: 72%;
-      gap: 0.5rem 0.75rem;
-      flex-direction: row;
-      align-items: flex-start;
-      justify-content: flex-end;
-    }
+  @media (max-width:430px) {
+    .site-header__inner {gap:.7rem;padding:.8rem 1rem;}
+    .brand span {font-size:1.42rem;}
+    .brand img {width:36px;height:36px;}
+    .testing-link {padding:0 .7rem;font-size:.68rem;}
+    .testing-year {display:none;}
   }
 </style>

@@ -1,62 +1,61 @@
 ---
 import LinkedInLink from './LinkedInLink.astro';
 ---
-<footer>
-  <span>DAJC</span>
-  <span class="dot">&middot;</span>
-  <span>Operated by Miroslav Dajč</span>
-  <span class="dot">&middot;</span>
-  <span>Coordination for heavy &amp; oversized transport</span>
-  <span class="dot">&middot;</span>
-  <a href="/intelligence">Intelligence</a>
-  <span class="dot">&middot;</span>
-  <a href="/assistance">Assistance</a>
-  <span class="dot">&middot;</span>
-  <a href="/pricing">Pricing</a>
-  <span class="dot">&middot;</span>
-  <a href="/investors">Investors</a>
-  <span class="dot">&middot;</span>
-  <a href="/press">Press</a>
-  <span class="dot">&middot;</span>
-  <a href="/support">Support</a>
-  <span class="dot">&middot;</span>
-  <a href="/terms">Terms</a>
-  <span class="dot">&middot;</span>
-  <a href="/privacy">Privacy</a>
-  <span class="dot">&middot;</span>
-  <a href="mailto:team@dajc.eu">team@dajc.eu</a>
-  <span class="dot">&middot;</span>
-  <LinkedInLink />
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <a href="/" aria-label="DAJC home" class="site-footer__logo">
+        <img src="/assets/dajc-logo-white-orange-official.png" alt="" width="40" height="40"/>
+        <strong>DAJC</strong>
+      </a>
+      <p>Provider-neutral coordination for European heavy transport, with vehicle-assistance coordination being researched as a related Platform capability.</p>
+      <small>Founded and operated by Miroslav Dajč · Czech Republic</small>
+    </div>
+    <nav aria-label="Footer navigation">
+      <div>
+        <span class="footer-label">Explore</span>
+        <a href="/#platform-overview">Platform</a>
+        <a href="/assistance">Assistance</a>
+        <a href="/driving-bans">Driving Bans</a>
+        <a href="/intelligence">Intelligence</a>
+      </div>
+      <div>
+        <span class="footer-label">Connect</span>
+        <a href="/partners">Integrations</a>
+        <a href="/investors">Investors</a>
+        <a href="/press">Press</a>
+        <a href="/news">News</a>
+      </div>
+      <div>
+        <span class="footer-label">DAJC</span>
+        <a href="/testing">Testing 2027</a>
+        <a href="/pricing">Access &amp; Availability</a>
+        <a href="/support">Support</a>
+        <a href="mailto:team@dajc.eu">team@dajc.eu</a>
+        <LinkedInLink />
+      </div>
+    </nav>
+  </div>
+  <div class="site-footer__bottom">
+    <span>© {new Date().getFullYear()} DAJC.eu</span>
+    <span>Project in development — not a live assistance or commercial transport service.</span>
+    <span><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a></span>
+  </div>
 </footer>
-
 <style>
-  footer {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem 0.9rem;
-    text-align: center;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    color: var(--dajc-navy);
-    padding: 0 1.5rem 2.4rem;
-  }
-
-  footer .dot {
-    color: var(--dajc-line);
-  }
-
-  footer a {
-    color: var(--dajc-muted);
-    text-decoration: none;
-  }
-
-  footer a:hover,
-  footer a:focus-visible {
-    color: var(--dajc-orange);
-  }
+  .site-footer {position:relative;z-index:2;background:rgba(3,16,33,.76);border-top:1px solid var(--dajc-line);padding:3rem 1.5rem 1.4rem;}
+  .site-footer__inner {max-width:1200px;margin:auto;display:grid;grid-template-columns:minmax(250px,1fr) minmax(0,1.3fr);gap:clamp(2rem,7vw,6rem);}
+  .site-footer__logo {display:inline-flex;align-items:center;gap:.6rem;text-decoration:none;color:#f5f7fa;}
+  .site-footer__logo img {height:40px;width:40px;}
+  .site-footer__logo strong {font:700 1.55rem/1 'Space Grotesk',sans-serif;letter-spacing:.04em;}
+  .site-footer__brand p {max-width:38ch;color:#9aadc5;font-size:.9rem;line-height:1.65;margin:1rem 0;}
+  .site-footer__brand small {color:#8fa2ba;font-size:.72rem;}
+  .site-footer nav {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5rem;}
+  .site-footer nav>div {display:flex;flex-direction:column;align-items:flex-start;gap:.85rem;}
+  .footer-label {color:var(--dajc-orange);font:.7rem 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.3rem;}
+  .site-footer nav a,.site-footer__bottom a {color:#a6b8cf;font-size:.85rem;text-decoration:none;}
+  .site-footer nav a:hover,.site-footer nav a:focus-visible,.site-footer__bottom a:hover,.site-footer__bottom a:focus-visible {color:var(--dajc-orange);}
+  .site-footer__bottom {max-width:1200px;margin:2.6rem auto 0;padding-top:1.25rem;border-top:1px solid rgba(124,141,166,.18);display:flex;gap:1rem;justify-content:space-between;flex-wrap:wrap;font-size:.72rem;color:#8fa2ba;}
+  @media(max-width:800px){.site-footer__inner{grid-template-columns:1fr;gap:2rem;}.site-footer nav{gap:.9rem}.site-footer__bottom{gap:.7rem;}}
+  @media(max-width:430px){.site-footer{padding:2.4rem 1.1rem 1.2rem}.site-footer nav{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:2rem;}}
 </style>

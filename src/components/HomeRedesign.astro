@@ -1,0 +1,255 @@
+---
+const audiences = [
+  { icon: '01', title: 'Carriers & fleets', description: 'Explore connected planning and prepare to test real transport workflows.', href: '/testing', action: 'Join testing' },
+  { icon: '02', title: 'Assistance networks', description: 'Discuss future information handoffs with insurers, dispatchers and recovery operators.', href: '/assistance', action: 'Explore Assistance' },
+  { icon: '03', title: 'Investors', description: 'Understand the opportunity, the current stage and how to request materials.', href: '/investors', action: 'Investor overview' },
+  { icon: '04', title: 'Media', description: 'Get accurate background, project updates and the official DAJC brand mark.', href: '/press', action: 'Press room' },
+];
+const resources = [
+  { number: '01', title: 'Driving Bans', description: 'European HGV restrictions, with transparent verification status.', href: '/driving-bans', action: 'Open calendar' },
+  { number: '02', title: 'Live Demo', description: 'Explore Platform workflows with synthetic data and no live integrations.', href: 'https://demo.dajc.eu/', action: 'Explore demo ↗' },
+  { number: '03', title: 'DAJC Intelligence', description: 'Public information today; a wider operational layer in development.', href: '/intelligence', action: 'Learn more' },
+  { number: '04', title: 'Testing 2027', description: 'Registration is open for pre-production testing from 4 January 2027.', href: '/testing', action: 'Register now' },
+];
+---
+<main class="home-redesign" id="platform">
+  <section class="hero" aria-labelledby="home-title">
+    <div class="hero-visual" aria-hidden="true">
+      <svg viewBox="0 0 740 590" fill="none" xmlns="http://www.w3.org/2000/svg" class="hero-svg">
+        <defs>
+          <radialGradient id="dajcHalo"><stop stop-color="#155C86" stop-opacity=".45"/><stop offset="1" stop-color="#155C86" stop-opacity="0"/></radialGradient>
+          <linearGradient id="dajcRoad" x1="150" y1="460" x2="740" y2="560"><stop stop-color="#254462" stop-opacity=".05"/><stop offset="1" stop-color="#FF9F00" stop-opacity=".18"/></linearGradient>
+          <linearGradient id="dajcTruck" x1="260" y1="430" x2="640" y2="480"><stop stop-color="#153B5B"/><stop offset="1" stop-color="#071C35"/></linearGradient>
+        </defs>
+        <circle cx="460" cy="285" r="350" fill="url(#dajcHalo)"/>
+        <g stroke="#3C7CA0" stroke-opacity=".22" stroke-width="1">
+          <path d="M18 140H730M18 220H730M18 300H730M18 380H730M18 460H730"/>
+          <path d="M110 20V565M205 20V565M300 20V565M395 20V565M490 20V565M585 20V565M680 20V565"/>
+        </g>
+        <path d="M225 94L262 76 296 91 325 77 353 107 392 97 426 116 448 142 483 137 509 168 556 162 585 201 577 238 601 271 580 317 595 355 566 391 519 389 494 413 449 393 416 409 384 384 349 398 318 377 280 362 267 329 224 305 240 267 207 228 222 196 194 169 224 144Z" fill="#123656" fill-opacity=".45" stroke="#63A1C4" stroke-opacity=".3" stroke-width="2"/>
+        <path d="M160 184C251 81 388 137 448 228C498 303 588 312 648 221" stroke="#FF9F00" stroke-width="2" stroke-opacity=".65"/>
+        <path d="M206 285C334 213 400 315 538 227" stroke="#FF9F00" stroke-width="2" stroke-opacity=".66" stroke-dasharray="5 9"/>
+        <path d="M304 141Q387 210 438 340Q493 388 592 311" stroke="#75B1D6" stroke-width="2" stroke-opacity=".55"/>
+        <g fill="#FF9F00">
+          <circle cx="160" cy="184" r="5"/><circle cx="448" cy="228" r="6"/><circle cx="648" cy="221" r="5"/>
+          <circle cx="206" cy="285" r="4"/><circle cx="538" cy="227" r="5"/><circle cx="304" cy="141" r="4"/><circle cx="438" cy="340" r="5"/>
+        </g>
+        <g fill="#FF9F00" opacity=".08"><circle cx="448" cy="228" r="22"/><circle cx="206" cy="285" r="18"/><circle cx="538" cy="227" r="18"/></g>
+        <path d="M80 514Q420 463 760 510" stroke="#6889A8" stroke-opacity=".24" stroke-width="12"/>
+        <path d="M160 544Q460 490 760 548" stroke="url(#dajcRoad)" stroke-width="80"/>
+        <g transform="translate(180 378)">
+          <rect x="0" y="42" width="287" height="89" rx="6" fill="url(#dajcTruck)" stroke="#5D809C" stroke-width="2"/>
+          <path d="M286 64H333L362 106V131H286V64Z" fill="#09253F" stroke="#FF9F00" stroke-opacity=".8" stroke-width="2"/>
+          <path d="M308 74H329L344 102H308V74Z" fill="#285371" stroke="#76A4C4" stroke-width="1.5"/>
+          <path d="M8 108H361V130H8V108Z" fill="#112E4A"/>
+          <rect x="30" y="22" width="220" height="17" rx="3" fill="#193B5C" stroke="#6388A7" stroke-opacity=".5"/>
+          <rect x="35" y="17" width="199" height="8" rx="4" fill="#FF9F00" opacity=".4"/>
+          <circle cx="66" cy="132" r="22" fill="#071423" stroke="#7C9BB6" stroke-width="4"/>
+          <circle cx="251" cy="132" r="22" fill="#071423" stroke="#7C9BB6" stroke-width="4"/>
+          <circle cx="320" cy="132" r="22" fill="#071423" stroke="#7C9BB6" stroke-width="4"/>
+          <circle cx="66" cy="132" r="7" fill="#45627A"/><circle cx="251" cy="132" r="7" fill="#45627A"/><circle cx="320" cy="132" r="7" fill="#45627A"/>
+          <rect x="342" y="117" width="15" height="5" fill="#FFCC73"/>
+        </g>
+      </svg>
+      <span class="hero-visual__label">CONCEPT VISUALISATION · EUROPEAN COORDINATION</span>
+    </div>
+    <div class="hero-copy">
+      <p class="eyebrow">European digital coordination ecosystem</p>
+      <h1 id="home-title">Connecting European <em>transport</em> and vehicle assistance.</h1>
+      <p class="hero-lead">DAJC Platform is developing coordination for complex transport. DAJC Assistance is a related capability in research and design, all under one DAJC brand.</p>
+      <p class="hero-status">Built from real operations. Developed step by step. No unannounced commercial services or integrations implied.</p>
+    </div>
+
+    <div class="solution-grid" aria-label="Explore DAJC solutions">
+      <article class="solution-card solution-card--primary">
+        <div class="solution-card__top">
+          <span class="solution-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 56 40" fill="none"><path d="M3 6h29v23H3V6ZM32 13h10l9 9v7H32V13Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><circle cx="13" cy="31" r="5" stroke="currentColor" stroke-width="2.5"/><circle cx="41" cy="31" r="5" stroke="currentColor" stroke-width="2.5"/></svg>
+          </span>
+          <div><h2>DAJC Platform</h2><p>Heavy &amp; oversized transport coordination</p></div>
+        </div>
+        <p class="solution-card__description">A provider-neutral workflow being designed to connect participants, D-ID transport context, routes, permits and documents.</p>
+        <span class="solution-card__status"><i aria-hidden="true"></i>In development · Testing from 4 Jan 2027</span>
+        <a class="solution-card__button" href="#platform-overview">Explore DAJC Platform <span aria-hidden="true">↗</span></a>
+      </article>
+      <article class="solution-card">
+        <div class="solution-card__top">
+          <span class="solution-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 56 40" fill="none"><path d="M4 22h26V9H18M30 20h12l9 8v7H30V20Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 10h21M15 4v12M22 11h11" stroke="currentColor" stroke-width="2.5"/><circle cx="13" cy="34" r="5" stroke="currentColor" stroke-width="2.5"/><circle cx="42" cy="34" r="5" stroke="currentColor" stroke-width="2.5"/></svg>
+          </span>
+          <div><h2>DAJC Assistance</h2><p>Vehicle recovery &amp; assistance coordination</p></div>
+        </div>
+        <p class="solution-card__description">Research into better handoffs between motorists or fleets, authorised assistance networks and recovery providers.</p>
+        <span class="solution-card__status solution-card__status--muted"><i aria-hidden="true"></i>Research &amp; design · Not a live service</span>
+        <a class="solution-card__button solution-card__button--outline" href="/assistance">Explore DAJC Assistance <span aria-hidden="true">↗</span></a>
+      </article>
+    </div>
+    <div class="hero-meta"><span>One DAJC brand · Platform and Assistance</span><a href="/testing">Registration open: Testing 2027 <span aria-hidden="true">→</span></a></div>
+  </section>
+
+  <section class="home-section real-operations" aria-labelledby="operations-heading">
+    <div class="section-heading"><div><p class="section-eyebrow">Why DAJC</p><h2 id="operations-heading">Built from real operations.</h2></div><p>Practical experience. Real workflows. Clear project status.</p></div>
+    <div class="proof-grid">
+      <article><span class="proof-number">01 / Field-informed</span><h3>Founded from operational experience</h3><p>Created by a transport professional with practical experience in heavy and oversized movements and vehicle recovery.</p></article>
+      <article><span class="proof-number">02 / Provider-neutral</span><h3>Connect, do not replace</h3><p>Designed to work alongside existing carriers, assistance providers and their established systems.</p></article>
+      <article><span class="proof-number">03 / Trust by design</span><h3>Clear roles, data and responsibilities</h3><p>Development aims to make permissions, documents and operational handoffs more transparent.</p></article>
+    </div>
+  </section>
+
+  <section class="home-section platform-overview" id="platform-overview" aria-labelledby="platform-heading">
+    <div class="platform-overview__copy">
+      <p class="section-eyebrow">DAJC Platform · In development</p>
+      <h2 id="platform-heading">One transport context. Many participants. Clearer coordination.</h2>
+      <p>DAJC Platform is being developed around a D-ID transport identity so authorised participants can work with the relevant order, route, permits, documents and progress in one coordinated environment. The planned product is not a transport broker or marketplace.</p>
+      <div class="platform-links"><a class="solid-link" href="/testing">Register for Testing 2027 ↗</a><a class="line-link" href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">Explore synthetic demo ↗</a></div>
+    </div>
+    <div class="workflow" aria-label="Illustrative DAJC Platform workflow">
+      <div><span>01</span><strong>D-ID transport context</strong><small>One shared operational reference</small></div>
+      <div><span>02</span><strong>Routes, permits &amp; documents</strong><small>Relevant information in one workflow</small></div>
+      <div><span>03</span><strong>Coordinated execution</strong><small>Permissioned status and handoffs</small></div>
+      <p>Illustrative intended workflow. Not a claim of production availability.</p>
+    </div>
+  </section>
+
+  <section class="home-section audience-section" aria-labelledby="audiences-heading">
+    <div class="section-heading"><div><p class="section-eyebrow">Find your starting point</p><h2 id="audiences-heading">Built to connect the right people.</h2></div><p>Different roles. Clear next steps.</p></div>
+    <div class="audience-grid">
+      {audiences.map((item) => (
+        <a href={item.href} class="audience-card">
+          <span class="audience-number">{item.icon}</span>
+          <h3>{item.title}</h3>
+          <p>{item.description}</p>
+          <span class="audience-action">{item.action} →</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="home-section resources-section" id="tools" aria-labelledby="resources-heading">
+    <div class="section-heading"><div><p class="section-eyebrow">Available public resources</p><h2 id="resources-heading">Tools &amp; information.</h2></div><p>Useful resources now, while DAJC grows.</p></div>
+    <div class="resource-grid">
+      {resources.map((item) => (
+        <a href={item.href} class="resource-card" target={item.href.startsWith('https://') ? '_blank' : undefined} rel={item.href.startsWith('https://') ? 'noopener noreferrer' : undefined}>
+          <span>{item.number}</span><h3>{item.title}</h3><p>{item.description}</p><strong>{item.action} →</strong>
+        </a>
+      ))}
+    </div>
+    <p class="resources-caveat">Driving restrictions must always be verified with official authorities before a real transport. The demo contains synthetic operational data.</p>
+  </section>
+
+  <section class="home-section update-section" aria-label="Latest DAJC project update">
+    <div class="update-card">
+      <p class="section-eyebrow">Latest project update · 13 October 2026</p>
+      <h2>DAJC invites European heavy-transport professionals to test the Platform in 2027.</h2>
+      <p>Registration is open for pre-production testing beginning 4 January 2027. DAJC Assistance remains a separate research direction.</p>
+      <a href="/news/platform/dajc-testing-2027-and-assistance">Read the official update →</a>
+    </div>
+    <div class="update-aside"><p>“Less fragmentation. Clearer coordination. A more connected Europe.”</p><a href="/partners">Explore the integration ecosystem →</a></div>
+  </section>
+</main>
+
+<style>
+  .home-redesign {position:relative;z-index:1;overflow:hidden;color:#f5f7fa;}
+  .home-redesign :is(a):focus-visible {outline:2px solid var(--dajc-orange);outline-offset:4px;}
+  .hero {position:relative;max-width:1300px;margin:0 auto;padding:clamp(4rem,7vw,6.7rem) clamp(1.2rem,4vw,3rem) 4rem;isolation:isolate;}
+  .hero:before {content:'';position:absolute;z-index:-1;inset:-1rem -20vw 0;background:radial-gradient(ellipse at 75% 28%,rgba(18,83,126,.25),transparent 52%);pointer-events:none;}
+  .hero-copy {max-width:750px;position:relative;z-index:2;}
+  .eyebrow,.section-eyebrow {color:var(--dajc-orange);font:500 .72rem/1.4 'IBM Plex Mono',monospace;letter-spacing:.17em;text-transform:uppercase;}
+  .eyebrow {margin:0 0 1.2rem;}
+  .hero h1 {margin:0;max-width:15ch;font:700 clamp(2.6rem,5.25vw,5.05rem)/1.03 'Space Grotesk',sans-serif;letter-spacing:-.035em;text-wrap:balance;}
+  .hero h1 em {font-style:normal;color:#f5f7fa;text-decoration:underline;text-decoration-color:#ff9f00;text-decoration-thickness:.075em;text-underline-offset:.13em;}
+  .hero-lead {font:400 clamp(1rem,1.45vw,1.2rem)/1.7 'IBM Plex Sans',sans-serif;color:#d3dfed;max-width:57ch;margin:1.7rem 0 0;}
+  .hero-status {font-size:.76rem;letter-spacing:.01em;color:#9eafc5;line-height:1.6;max-width:68ch;margin:.85rem 0 0;}
+  .hero-visual {position:absolute;z-index:0;pointer-events:none;top:0;right:-1.5rem;width:min(65%,790px);height:590px;opacity:.86;}
+  .hero-svg {width:100%;height:100%;object-fit:contain;}
+  .hero-visual__label {position:absolute;bottom:1.7rem;right:3rem;color:#7d9db6;font: .59rem 'IBM Plex Mono',monospace;letter-spacing:.18em;white-space:nowrap;}
+  .solution-grid {position:relative;z-index:3;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.2rem;max-width:1020px;margin:clamp(3rem,5vw,4.5rem) 0 0;}
+  .solution-card {display:flex;flex-direction:column;gap:1.15rem;padding:clamp(1.3rem,2vw,2rem);border:1px solid #49617a;border-radius:16px;background:linear-gradient(145deg,rgba(15,44,74,.96),rgba(7,26,49,.97));box-shadow:0 25px 55px rgba(0,0,0,.28);min-width:0;}
+  .solution-card--primary {border-color:rgba(255,159,0,.8);background:linear-gradient(145deg,rgba(26,54,78,.98),rgba(7,26,49,.98));}
+  .solution-card__top {display:flex;align-items:flex-start;gap:1rem;}
+  .solution-card__icon {color:var(--dajc-orange);display:inline-grid;place-items:center;flex:0 0 57px;width:57px;height:55px;border:1px solid rgba(255,159,0,.2);border-radius:11px;background:rgba(255,159,0,.06);}
+  .solution-card__icon svg {width:42px;height:auto;}
+  .solution-card h2 {font:700 clamp(1.24rem,2vw,1.55rem)/1.2 'Space Grotesk',sans-serif;margin:0 0 .35rem;}
+  .solution-card__top p {color:#c5d3e5;margin:0;font-size:.87rem;line-height:1.4;}
+  .solution-card__description {color:#acbed2;line-height:1.65;font-size:.89rem;margin:0;flex:1;}
+  .solution-card__status {display:inline-flex;align-items:center;gap:.5rem;align-self:flex-start;padding:.5rem .7rem;border-radius:999px;background:#163956;color:#e8f1f9;font-size:.72rem;border:1px solid #2f597a;}
+  .solution-card__status i {display:block;width:8px;height:8px;flex-shrink:0;border-radius:50%;background:#ff9f00;}
+  .solution-card__status--muted i {background:#9bb6df;}
+  .solution-card__button {display:flex;align-items:center;justify-content:center;gap:1rem;min-height:48px;border-radius:8px;padding:.7rem 1rem;background:var(--dajc-orange);color:#081c33;text-decoration:none;font:700 .79rem/1.3 'IBM Plex Mono',monospace;text-align:center;transition:filter .2s ease;}
+  .solution-card__button:hover {filter:brightness(1.11);}
+  .solution-card__button--outline {background:transparent;color:#f3f7fc;border:1px solid var(--dajc-orange);}
+  .hero-meta {display:flex;align-items:center;flex-wrap:wrap;gap:.8rem 2rem;justify-content:space-between;max-width:1020px;margin:1.45rem 0 0;color:#8ea7c2;font:.7rem/1.6 'IBM Plex Mono',monospace;letter-spacing:.04em;}
+  .hero-meta a {color:#ffb542;text-decoration:none;}
+  .home-section {position:relative;max-width:1300px;margin:0 auto;padding:clamp(3.1rem,5vw,4.6rem) clamp(1.2rem,4vw,3rem);}
+  .section-heading {display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;margin-bottom:2rem;}
+  .section-heading h2,.platform-overview h2 {font:700 clamp(1.7rem,2.8vw,2.5rem)/1.13 'Space Grotesk',sans-serif;letter-spacing:-.025em;margin:.35rem 0 0;}
+  .section-heading>p {max-width:34ch;text-align:right;font-size:.8rem;letter-spacing:.08em;color:#91abc7;text-transform:uppercase;}
+  .section-eyebrow {margin:0 0 .6rem;}
+  .real-operations {border-top:1px solid rgba(124,141,166,.2);}
+  .proof-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;}
+  .proof-grid article {border-left:2px solid rgba(255,159,0,.55);padding:.2rem 1.3rem .5rem;min-width:0;}
+  .proof-number,.audience-number {color:var(--dajc-orange);font:.69rem 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;}
+  .proof-grid h3 {margin:.9rem 0 .6rem;font:700 1.1rem/1.3 'Space Grotesk',sans-serif;}
+  .proof-grid p {margin:0;color:#a6b8cd;font-size:.88rem;line-height:1.75;}
+  .platform-overview {display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:clamp(2rem,7vw,6rem);align-items:center;border-top:1px solid rgba(124,141,166,.18);}
+  .platform-overview__copy>p:not(.section-eyebrow) {color:#abc0d7;line-height:1.75;max-width:62ch;font-size:.98rem;}
+  .platform-links {display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;margin-top:1.6rem;}
+  .solid-link,.line-link {font:700 .75rem/1.35 'IBM Plex Mono',monospace;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:.75rem 1rem;border-radius:8px;}
+  .solid-link {background:var(--dajc-orange);color:#061a33;}
+  .line-link {border:1px solid #6283a4;color:#e6eff9;}
+  .workflow {border:1px solid #3d5673;background:linear-gradient(125deg,rgba(24,58,89,.55),rgba(6,26,51,.7));padding:1.3rem;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.16);}
+  .workflow>div {display:grid;grid-template-columns:38px 1fr;gap:.12rem .85rem;align-items:center;padding:.9rem .5rem;border-bottom:1px solid rgba(124,141,166,.17);}
+  .workflow>div span {grid-row:span 2;color:var(--dajc-orange);font:700 .86rem 'IBM Plex Mono',monospace;}
+  .workflow strong {font-size:.94rem;}
+  .workflow small {color:#9fb4ce;font-size:.76rem;line-height:1.6;}
+  .workflow>p {color:#8ea6c1;font-size:.72rem;line-height:1.6;padding:.7rem .5rem 0;margin:0;}
+  .audience-section,.resources-section {border-top:1px solid rgba(124,141,166,.18);}
+  .audience-grid,.resource-grid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem;}
+  .audience-card,.resource-card {display:flex;flex-direction:column;align-items:flex-start;min-height:215px;padding:1.3rem;border:1px solid #3a5673;border-radius:12px;background:rgba(10,36,65,.7);text-decoration:none;color:#f5f7fa;transition:transform .2s ease,border-color .2s ease,background .2s ease;}
+  .audience-card:hover,.resource-card:hover {transform:translateY(-3px);border-color:var(--dajc-orange);background:rgba(16,45,74,.94);}
+  .audience-card h3,.resource-card h3 {font:700 1.05rem/1.25 'Space Grotesk',sans-serif;margin:1.2rem 0 .6rem;}
+  .audience-card p,.resource-card p {font-size:.83rem;line-height:1.65;color:#a6bdd5;margin:0 0 1.1rem;}
+  .audience-action,.resource-card strong {margin-top:auto;color:var(--dajc-orange);font:700 .71rem 'IBM Plex Mono',monospace;}
+  .resource-card>span {width:2rem;height:2rem;border:1px solid #7d5a2d;color:var(--dajc-orange);display:grid;place-items:center;border-radius:7px;font:.74rem 'IBM Plex Mono',monospace;}
+  .resources-caveat {color:#8ea2ba;font-size:.76rem;line-height:1.6;margin:1.2rem 0 0;}
+  .update-section {display:grid;grid-template-columns:minmax(0,1.6fr) minmax(240px,.8fr);gap:1rem;padding-top:1rem;padding-bottom:4.5rem;}
+  .update-card,.update-aside {border:1px solid #3a5673;border-radius:12px;background:linear-gradient(125deg,rgba(20,55,85,.85),rgba(8,29,52,.7));padding:clamp(1.4rem,3vw,2.2rem);}
+  .update-card h2 {font:700 clamp(1.18rem,2vw,1.62rem)/1.3 'Space Grotesk',sans-serif;max-width:52ch;margin:.4rem 0 .8rem;}
+  .update-card>p:not(.section-eyebrow) {font-size:.86rem;color:#b2c5d9;line-height:1.6;}
+  .update-card a,.update-aside a {color:var(--dajc-orange);font:700 .78rem 'IBM Plex Mono',monospace;text-decoration:none;}
+  .update-aside {display:flex;flex-direction:column;justify-content:space-between;gap:1rem;}
+  .update-aside p {margin:0;font:500 clamp(1.2rem,2vw,1.7rem)/1.4 'Space Grotesk',sans-serif;color:#edf4fd;}
+  @media(max-width:1050px){
+    .hero-visual {width:75%;opacity:.45;}
+    .hero-copy {max-width:720px;}
+    .audience-grid,.resource-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+    .audience-card,.resource-card {min-height:190px;}
+  }
+  @media(max-width:760px){
+    .hero {padding:3.5rem 1.25rem 3.25rem;}
+    .hero h1 {font-size:clamp(2.35rem,8vw,3.6rem);}
+    .hero-visual {width:100%;top:5rem;right:-30%;opacity:.2;}
+    .solution-grid {grid-template-columns:1fr;gap:.85rem;margin-top:2.2rem;}
+    .solution-card {padding:1.3rem;}
+    .hero-meta {align-items:flex-start;flex-direction:column;}
+    .section-heading {align-items:flex-start;flex-direction:column;gap:.3rem;}
+    .section-heading>p {text-align:left;}
+    .proof-grid {grid-template-columns:1fr;gap:1.4rem;}
+    .platform-overview {grid-template-columns:1fr;}
+    .update-section {grid-template-columns:1fr;}
+  }
+  @media(max-width:440px){
+    .hero {padding-top:2.8rem;}
+    .hero h1 {font-size:clamp(2.15rem,10.7vw,2.8rem);}
+    .hero-lead {font-size:1rem;}
+    .hero-visual {right:-48%;top:7rem;}
+    .solution-card__top {gap:.7rem;}
+    .solution-card__icon {width:47px;height:47px;flex-basis:47px;}
+    .solution-card__icon svg {width:35px;}
+    .solution-card__status {font-size:.67rem;}
+    .audience-grid,.resource-grid {grid-template-columns:1fr;}
+    .audience-card,.resource-card {min-height:0;}
+    .home-section {padding-left:1.1rem;padding-right:1.1rem;}
+  }
+  @media(prefers-reduced-motion:reduce){.solution-card__button,.audience-card,.resource-card{transition:none;}}
+</style>
