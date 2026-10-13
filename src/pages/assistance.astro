@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="DAJC Assistance | Planned European Vehicle Assistance Coordination"
+  description="DAJC Assistance is a planned provider-neutral coordination capability for motor-vehicle roadside and recovery assistance. Research and design stage, not a live service."
+>
+  <main class="assistance">
+    <p class="eyebrow">DAJC · ASSISTANCE</p>
+    <h1>Clearer coordination when a vehicle needs assistance.</h1>
+    <p class="lead">DAJC Assistance is a proposed digital way to help motorists, fleets, assistance centres, service companies and recovery operators exchange the right information during a vehicle-related incident. It is part of the broader DAJC direction: fewer disconnected calls, clearer responsibility and more reliable handoffs.</p>
+    <p class="status"><strong>Current stage: research and development.</strong> DAJC Assistance is not an available roadside-recovery service. There is no confirmed European coverage, live provider network, booking capability, commercial pricing or public launch date.</p>
+
+    <section aria-labelledby="approach">
+      <h2 id="approach">The intended approach</h2>
+      <div class="grid">
+        <article><span>01</span><h3>Describe the incident</h3><p>Capture the vehicle type, location and relevant incident context without requiring an existing freight transport record.</p></article>
+        <article><span>02</span><h3>Find the authorised route</h3><p>Help identify the appropriate insurer, assistance programme, dispatch centre or eligible service provider — subject to actual entitlements and partner agreements.</p></article>
+        <article><span>03</span><h3>Coordinate status</h3><p>Support permissioned updates from the responsible service network, such as acceptance, assignment, estimated arrival and completion.</p></article>
+      </div>
+    </section>
+
+    <section aria-labelledby="who">
+      <h2 id="who">Vehicles and use cases under consideration</h2>
+      <p>The first-stage design covers incidents associated with a motor vehicle: cars, motorcycles, vans, motorhomes, buses, trucks and relevant combinations, including electric and hybrid vehicles. The design is relevant both to private motorists and professional fleets.</p>
+      <p>Standalone pedestrian, cycling and other incidents without a motor vehicle are outside the proposed first stage. Assistance eligibility and costs must always be verified by the relevant provider or insurer; DAJC does not determine coverage on its own.</p>
+    </section>
+
+    <section aria-labelledby="safety">
+      <h2 id="safety">Operational and safety boundaries</h2>
+      <p><strong>For an actual emergency, contact the competent emergency services directly (112 in the EU where applicable).</strong> DAJC Assistance is not an emergency number, public rescue authority or substitute for police, fire and medical dispatch.</p>
+      <p>Any future integration would require permission from the relevant provider, appropriate security and privacy controls, documented service scope and operational testing. Potential integrations are not signed partnerships or live interfaces.</p>
+    </section>
+
+    <section class="contact" aria-labelledby="cooperate">
+      <h2 id="cooperate">Interested in helping shape DAJC Assistance?</h2>
+      <p>We welcome exploratory conversations with insurers, roadside-assistance networks, towing and recovery companies, commercial fleets, OEMs and service software providers. The purpose is to understand operational needs and integration feasibility, not to promise service activation.</p>
+      <div class="links">
+        <a class="primary" href="mailto:miroslav@dajc.eu?subject=DAJC%20Assistance%20-%20industry%20discussion">Discuss Assistance</a>
+        <a href="/partners">DAJC Integration Ecosystem →</a>
+        <a href="/press">Press and media information →</a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+<style>
+.assistance {position:relative;z-index:2;max-width:1000px;margin:0 auto;padding:6vh 1.5rem 9vh;}
+.eyebrow {font:500 12px 'IBM Plex Mono',monospace;letter-spacing:.17em;color:var(--dajc-orange);text-transform:uppercase;margin:0 0 1rem;}
+h1,h2,h3 {font-family:'Space Grotesk',sans-serif;line-height:1.22;}
+h1 {font-size:clamp(2rem,5vw,3.25rem);max-width:22ch;margin:0 0 1.5rem;}
+h2 {font-size:clamp(1.3rem,3vw,1.8rem);margin:0 0 1.2rem;}
+h3 {font-size:1.1rem;margin:.5rem 0;}
+p {color:var(--dajc-muted);line-height:1.75;max-width:80ch;}
+.lead {font-size:1.08rem;}
+.status {border:1px solid var(--dajc-orange);border-radius:8px;padding:1.25rem 1.5rem;margin-top:2rem;background:rgba(255,159,0,.06);}
+.status strong,section strong {color:var(--dajc-white);}
+section {margin-top:3.8rem;border-top:1px solid var(--dajc-line);padding-top:2.4rem;}
+.grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;}
+.grid article {border:1px solid var(--dajc-line);border-radius:8px;padding:1.3rem;background:rgba(0,38,92,.24);}
+.grid article span {color:var(--dajc-orange);font:500 12px 'IBM Plex Mono',monospace;}
+.links {display:flex;align-items:center;flex-wrap:wrap;gap:1.1rem;margin-top:1.5rem;}
+a {color:var(--dajc-orange);text-underline-offset:3px;}
+.links .primary {background:var(--dajc-orange);padding:.8rem 1rem;border-radius:6px;color:var(--dajc-dark);font:700 12px 'IBM Plex Mono',monospace;text-decoration:none;}
+.contact {border-left:3px solid var(--dajc-orange);padding-left:1.4rem;}
+@media(max-width:700px) {.grid{grid-template-columns:1fr}.assistance{padding-top:4vh}}
+</style>
