@@ -2,6 +2,10 @@
 
 > Canonical editorial rules: `docs/DAJC_WEEKLY_INTELLIGENCE_SPEC.md`. This file contains implementation notes only; if wording conflicts, the canonical spec wins.
 
+> Publication governance: [MAIN_PROTECTION.md](MAIN_PROTECTION.md). Raw data
+> persists on `automation/oversize-data`; articles require reviewed PRs into
+> `main`. A successful preparation run does not itself publish an article.
+
 How the `/news` system on dajc.eu works: the content model, the daily EU
 Oversize monitor, the Friday publication pipeline, and how to author a
 DAJC Platform Update. The site itself is a static Astro build (see the
@@ -17,7 +21,8 @@ data/oversize/<ISO week>/           raw findings gathered during that week
 scripts/
   oversize-monitor.mjs              daily: web search (default) / official sources -> data/oversize
   generate-weekly-article.mjs       thursday: data/oversize -> content/news
-  publish-gate-commit.mjs           explicit "did we publish?" commit gate
+  publish-gate-commit.mjs           article PR / data-only branch gate
+  automation-data.mjs               fixed-JSON data branch import/persistence
   lib/
     findings.mjs                    finding shape, dedup key, status, cross-week history
     web-search.mjs                  web-search discovery; every hit verified against its own page
@@ -272,7 +277,7 @@ the normal monitor and eligibility rules.
 6. Writes the result back to `data/oversize/2026-W34/findings.json`.
 
 Runs daily via `.github/workflows/daily-oversize-monitor.yml` (06:00 UTC)
-and commits the data file only if it actually changed. Never touches
+and commits changed JSON data to `automation/oversize-data`. Never touches
 `content/news`.
 
 ### Run it manually
@@ -286,10 +291,10 @@ Or trigger the GitHub Action from the Actions tab (`workflow_dispatch`) /
 
 ## Vercel: skipping data-only deployments
 
-The daily monitor commits straight to `main`, which Vercel's Git
-integration watches for every project - by default, that commit would
-trigger a full production build+deploy even though it only ever touches
-`data/oversize/**`, a directory no page reads from at build time.
+The daily monitor saves to `automation/oversize-data`, while X state is
+saved to `automation/x-publications`. These pushes do not change `main` or
+public content. Keep the ignored build step configured to avoid unnecessary
+preview builds for data-only pushes.
 
 `scripts/vercel-ignore-build.sh` is written for exactly this: Vercel's
 "Ignored Build Step" project setting runs a shell command before every
@@ -297,7 +302,7 @@ build and skips the deploy if that command exits `0` (any other exit code
 lets the build proceed - this is Vercel's own convention, not something
 this script invented). The script diffs the triggering commit against its
 parent and exits `0` (skip) only when every changed path is under
-`data/oversize/` - any other change (a real code/content push, e.g. from
+`data/oversize/` or is `data/x-publications.json` - any other change (a real code/content push, e.g. from
 the Friday publish workflow or a manual edit) proceeds with a normal
 build and deploy.
 
@@ -338,8 +343,10 @@ The pipeline is split instead:
    early). The generator writes the article with
    `publishedAt` = the Friday 12:00 Europe/Prague instant as a UTC timestamp
    (e.g. `2026-09-25T10:00:00.000Z`, CET/CEST handled by
-   `publicationSlotFor()` in `scripts/lib/next-publication.mjs`). The commit
-   deploys to Vercel right away.
+   `publicationSlotFor()` in `scripts/lib/next-publication.mjs`). It opens a
+   PR, explicitly dispatches CI and waits for review. Approve and merge the
+   PR before Friday noon for the usual scheduled release; only that merge
+   deploys the article to production.
 2. **Release (Friday 12:00, no job involved).** The homepage, `/news` and
    `/news/eu-oversize/<slug>` are rendered on demand (`prerender = false`)
    and filter with `isNewsEntryPublic()` (`src/config/news.ts`): an article
@@ -352,12 +359,13 @@ If the quality gate rejects the edition on Thursday, the failed run notifies
 by email and there is a day left to fix it and re-run the workflow
 manually. A recovery run on Friday after 12:00 or on Saturday still uses the
 same Friday slot as `publishedAt`, which is then already in the past, so the
-article goes live as soon as it is deployed.
+article goes live after review, merge and deployment.
 
 Every trigger runs `scripts/check-weekly-publication.mjs` first (before
 dependency installation or any OpenAI work). It checks for the target
 week's article - the ISO week after the run's publication Friday - and
-turns the run into a reported idempotent no-op if it already exists.
+turns the run into a reported idempotent no-op if it already exists or its
+publication PR is awaiting review. The latter is reported as not published.
 `workflow_dispatch` remains available for manual dry-runs, previews (public
 immediately) or emergency publication.
 
@@ -366,8 +374,8 @@ adds the EU Oversize article URLs that are public at build time to the
 sitemap; a prepared article joins the sitemap on the next deploy after its
 release.
 
-A successful scheduled run pushes the new article commit straight to
-`main`, which the existing Vercel Git integration deploys automatically -
+A successful scheduled run opens a content PR; review, passing CI and merge
+into `main` are required for the existing Vercel Git integration to deploy it -
 no separate deployment step exists or is needed in this repository (see
 "Vercel: skipping data-only deployments" above for why a *data-only*
 commit is prevented from triggering a wasted rebuild; a real article
@@ -523,8 +531,9 @@ behind** under any of these outcomes.
 current target edition from source data (monitor -> eligibility ->
 verification -> synthesis -> post-generation filters -> quality gate ->
 build). The published file is replaced only after all of that passes,
-in one commit (`content: replace EU Oversize Weekly <week> with corrected
-edition`) and with `updatedAt` set. If the regenerated edition does not
+in a reviewed correction PR (`content: replace EU Oversize Weekly <week> with corrected
+edition`) and with `updatedAt` set. The live edition changes only after that
+PR passes CI and is approved and merged. If the regenerated edition does not
 qualify (nothing passes the rules, gate or build failure), the published
 edition is left untouched and the run fails with `CORRECTION BLOCKED` and
 the exact reason. A `dry_run` + `correction` run previews the result.
@@ -587,19 +596,24 @@ No other secrets are needed: the site deploys via the existing Vercel
 GitHub integration (deploys automatically on push to `main`), which is
 unrelated to these workflows and is not configured here.
 
+GitHub Actions must be allowed to create PRs in repository settings. The
+weekly workflows use the standard job token for PR creation and explicit
+CI dispatch; no separate personal token or main bypass is required. See
+[MAIN_PROTECTION.md](MAIN_PROTECTION.md) before enabling main protection.
+
 ### Run the workflows manually
 
 ```bash
 gh workflow run daily-oversize-monitor.yml
-gh workflow run publish-weekly-oversize.yml                       # real publish
+gh workflow run publish-weekly-oversize.yml                       # prepare reviewed publication PR
 gh workflow run publish-weekly-oversize.yml -f dry_run=true        # safe test, no commit
 ```
 
 Or from the GitHub UI: Actions tab -> select the workflow -> "Run
 workflow" (the `dry_run` checkbox is there for `publish-weekly-oversize.yml`).
-A manual real publish is prepared exactly like the Thursday run: when run
-before Friday 12:00 Europe/Prague, the article stays hidden until then; when
-run later, it goes live on deploy. Only the commit step is gated on
+A manual real run prepares the same reviewed PR as Thursday: after approval
+and merge before Friday 12:00 Europe/Prague, the article stays hidden until
+then; a later merge makes it public on deploy. Only the PR/data persistence step is gated on
 `dry_run`.
 
 **Recommended first real test**: run with `dry_run=true` and a real

@@ -44,6 +44,9 @@ jobs:
         run: |
           echo '::error::Set repository variable DAJC_X_ENABLED=true after developer-account setup and dry-run validation.'
           exit 1
+      - name: Load durable X ledger from its data branch
+        if: ${{ github.event_name == 'schedule' || inputs.dry_run == false }}
+        run: node scripts/automation-data.mjs load x
       - name: Reserve post and verify public site
         id: reserve
         if: ${{ github.event_name == 'schedule' || inputs.dry_run == false }}
@@ -55,13 +58,7 @@ jobs:
         run: node scripts/publish-x-weekly.mjs --prepare
       - name: Persist reservation before any X API write
         if: ${{ steps.reserve.outputs.send == 'true' }}
-        run: |
-          git config user.name dajc-bot
-          git config user.email bot@users.noreply.github.com
-          git add -- data/x-publications.json
-          git commit -m 'chore(x): reserve weekly X publication'
-          git pull --rebase origin main
-          git push origin HEAD:main
+        run: node scripts/automation-data.mjs save x
       - name: Publish one post via official X API
         if: ${{ steps.reserve.outputs.send == 'true' }}
         env:
@@ -72,8 +69,4 @@ jobs:
         run: node scripts/publish-x-weekly.mjs --publish
       - name: Record confirmed X post
         if: ${{ steps.reserve.outputs.send == 'true' }}
-        run: |
-          git add -- data/x-publications.json
-          git commit -m 'chore(x): record weekly X publication'
-          git pull --rebase origin main
-          git push origin HEAD:main
+        run: node scripts/automation-data.mjs save x

@@ -16,6 +16,8 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
+  actions: write
 
 concurrency:
   group: oversize-weekly-publish
@@ -23,7 +25,10 @@ concurrency:
 
 jobs:
   watchdog:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Decide whether watchdog may run
         id: gate
@@ -65,6 +70,10 @@ jobs:
         if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         run: npm ci
 
+      - name: Load latest monitoring data
+        if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        run: node scripts/automation-data.mjs load findings
+
       - name: Final data refresh
         if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
@@ -77,7 +86,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: node scripts/generate-weekly-article.mjs
 
-      - name: Commit new article and refreshed data
+      - name: Open reviewed publication PR or persist data-only refresh
         if: steps.gate.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         run: node scripts/publish-gate-commit.mjs
 
@@ -107,9 +116,9 @@ jobs:
           if [ "${{ steps.gate.outputs.should_run }}" != "true" ]; then
             echo "Outcome: watchdog intentionally inactive for this trigger."
           elif [ "${{ steps.publish-needed.outputs.needed }}" = "false" ]; then
-            echo "Outcome: target weekly article already exists; no action needed."
+            echo "Outcome: article already exists or its PR awaits review; no generation repeated."
           elif [ "${{ job.status }}" = "success" ]; then
-            echo "Outcome: watchdog recovered the missing weekly publication successfully."
+            echo "Outcome: watchdog prepared the edition or refreshed data. Review and merge are required before publication."
           else
             echo "Outcome: watchdog recovery failed; inspect the failed step above."
             exit 1

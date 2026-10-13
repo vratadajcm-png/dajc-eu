@@ -1,0 +1,98 @@
+import { afterEach, describe, expect, it } from 'vitest';
+import { execFileSync } from 'node:child_process';
+import { copyFileSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { loadAutomationData } from '../automation-data.mjs';
+
+const sourceRoot = fileURLToPath(new URL('../../../', import.meta.url));
+const cleanup = [];
+const git = (root, args) => execFileSync('git', ['-C', root, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+function put(root, relative, text) {
+  mkdirSync(path.dirname(path.join(root, relative)), { recursive: true });
+  writeFileSync(path.join(root, relative), text);
+}
+function fixture() {
+  const base = mkdtempSync(path.join(tmpdir(), 'dajc-pr-test-'));
+  cleanup.push(base);
+  const remote = path.join(base, 'remote.git');
+  const root = path.join(base, 'runner');
+  execFileSync('git', ['init', '--bare', '-b', 'main', remote], { stdio: 'ignore' });
+  execFileSync('git', ['clone', remote, root], { stdio: 'ignore' });
+  git(root, ['config', 'user.name', 'Test']);
+  git(root, ['config', 'user.email', 'test@example.invalid']);
+  for (const relative of ['scripts/check-weekly-publication.mjs', 'scripts/publish-gate-commit.mjs', 'scripts/lib/publish-gate.mjs', 'scripts/lib/automation-data.mjs', 'scripts/lib/next-publication.mjs', 'scripts/lib/week.mjs']) {
+    mkdirSync(path.dirname(path.join(root, relative)), { recursive: true });
+    copyFileSync(path.join(sourceRoot, relative), path.join(root, relative));
+  }
+  put(root, 'data/oversize/2026-W42/findings.json', '{"findings":[]}');
+  put(root, 'src/content/news/eu-oversize/example-template.md', 'reviewed template');
+  git(root, ['add', '.']);
+  git(root, ['commit', '-m', 'reviewed code']);
+  git(root, ['push', 'origin', 'main']);
+  const main = git(root, ['rev-parse', 'HEAD']).trim();
+  writeFileSync(path.join(remote, 'hooks/pre-receive'), '#!/bin/sh\nwhile read old new ref; do\n  if [ "$ref" = "refs/heads/main" ]; then exit 1; fi\ndone\n', { mode: 0o755 });
+  const bin = path.join(base, 'bin');
+  mkdirSync(bin);
+  const log = path.join(base, 'gh.jsonl');
+  writeFileSync(path.join(bin, 'gh'), `#!${process.execPath}\nimport { appendFileSync, readFileSync } from 'node:fs';\nconst args = process.argv.slice(2);\nconst bodyIndex = args.indexOf('--body-file');\nappendFileSync(process.env.GH_TEST_LOG, JSON.stringify({args, body: bodyIndex < 0 ? null : readFileSync(args[bodyIndex + 1], 'utf8')}) + '\\n');\nif(args[0] === 'pr' && args[1] === 'create') console.log('https://github.com/example/dajc/pull/9001');\nif(args[0] === 'pr' && args[1] === 'list') console.log(process.env.GH_TEST_PENDING === '1' ? '[{"url":"https://github.com/example/dajc/pull/9001"}]' : '[]');\n`, { mode: 0o755 });
+  const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, GH_TOKEN: 'synthetic-test-token', GITHUB_REPOSITORY: 'example/dajc', GH_TEST_LOG: log, GITHUB_ACTIONS: 'true', GITHUB_OUTPUT: path.join(base, 'outputs'), GITHUB_STEP_SUMMARY: path.join(base, 'summary'), OVERSIZE_NOW: '2026-10-15T10:00:00Z', OVERSIZE_CORRECTION: '', OVERSIZE_PREVIEW: '' };
+  return { base, root, remote, main, env, log };
+}
+function run(f, script, env = {}) {
+  return execFileSync(process.execPath, [path.join(f.root, 'scripts', script)], { cwd: f.root, env: { ...f.env, ...env }, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+}
+afterEach(() => { for (const directory of cleanup.splice(0)) rmSync(directory, { recursive: true, force: true }); });
+
+describe('reviewed weekly publication', () => {
+  it('opens a PR and explicitly dispatches CI, without writing protected main', () => {
+    const f = fixture();
+    loadAutomationData('findings', f.root);
+    put(f.root, 'src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md', 'validated article fixture');
+    const output = run(f, 'publish-gate-commit.mjs');
+    const calls = readFileSync(f.log, 'utf8').trim().split('\n').map(JSON.parse);
+    expect(calls[0].args.slice(0, 2)).toEqual(['pr', 'create']);
+    expect(calls[0].body).toContain('This run has not published the article');
+    expect(calls.slice(1).map((call) => call.args)).toEqual([
+      ['workflow', 'run', 'application-ci.yml', '--repo', 'example/dajc', '--ref', 'automation/weekly-2026-w43'],
+      ['workflow', 'run', 'news-ci.yml', '--repo', 'example/dajc', '--ref', 'automation/weekly-2026-w43'],
+    ]);
+    expect(output).toContain('Article published this run: **no**');
+    expect(git(f.remote, ['rev-parse', 'main']).trim()).toBe(f.main);
+    expect(git(f.remote, ['diff', '--name-only', 'main', 'automation/weekly-2026-w43']).trim()).toBe('src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md');
+  });
+
+  it('does not regenerate an edition already awaiting approval', () => {
+    const f = fixture();
+    const outputFile = path.join(f.base, 'outputs');
+    const output = run(f, 'check-weekly-publication.mjs', { GH_TEST_PENDING: '1', GITHUB_OUTPUT: outputFile });
+    expect(readFileSync(outputFile, 'utf8')).toContain('needed=false');
+    expect(output).toContain('no regeneration or additional AI spend');
+    expect(git(f.remote, ['show-ref', '--heads']).trim()).toBe(`${f.main} refs/heads/main`);
+  });
+
+  it('stores a data-only run separately and never opens a publication PR', () => {
+    const f = fixture();
+    loadAutomationData('findings', f.root);
+    put(f.root, 'data/oversize/2026-W42/findings.json', '{"findings":["fresh"]}');
+    expect(run(f, 'publish-gate-commit.mjs')).toContain('No article was generated or published');
+    expect(git(f.remote, ['rev-parse', 'main']).trim()).toBe(f.main);
+    expect(git(f.remote, ['show', 'automation/oversize-data:data/oversize/2026-W42/findings.json'])).toContain('fresh');
+  });
+
+  it('rejects a generator change to source code before pushing or creating a PR', () => {
+    const f = fixture();
+    put(f.root, 'scripts/lib/week.mjs', 'throw new Error("unapproved code");');
+    expect(() => run(f, 'publish-gate-commit.mjs')).toThrow();
+    expect(git(f.remote, ['show-ref', '--heads']).trim()).toBe(`${f.main} refs/heads/main`);
+  });
+
+  it('rejects a staged rename from source code into an otherwise allowed data path', () => {
+    const f = fixture();
+    git(f.root, ['mv', 'scripts/lib/week.mjs', 'data/oversize/2026-W42/coverage.json']);
+    put(f.root, 'src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md', 'validated article fixture');
+    expect(() => run(f, 'publish-gate-commit.mjs')).toThrow();
+    expect(git(f.remote, ['show-ref', '--heads']).trim()).toBe(`${f.main} refs/heads/main`);
+  });
+});

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   buildPostText, checkPublicArticle, checkXAccount, currentPublication, frontmatterFields,
   oauth1Header, postingDecision, publishToX, validateArticle,
+  readXCredentials,
 } from '../x-publishing.mjs';
 
 const articleText = `---
@@ -56,11 +57,28 @@ describe('X Friday publication eligibility', () => {
 });
 
 describe('X API safety', () => {
+  it('rejects pasted whitespace and wrapping quotes without logging a credential', () => {
+    const env = { X_API_KEY: 'key', X_API_SECRET: 'secret', X_ACCESS_TOKEN: 'token', X_ACCESS_TOKEN_SECRET: 'token-secret' };
+    expect(() => readXCredentials({ ...env, X_ACCESS_TOKEN: ' token' })).toThrow('whitespace');
+    expect(() => readXCredentials({ ...env, X_API_SECRET: '"secret"' })).toThrow('wrapping quotes');
+  });
+
+  it('401 stops before any POST and reports the credential repair without response contents', async () => {
+    const mocked = vi.fn().mockResolvedValue({ ok: false, status: 401, json: async () => ({ secret: 'must-not-be-logged' }) });
+    await expect(publishToX('test', credentials, mocked)).rejects.toThrow('matching API key/secret');
+    expect(mocked).toHaveBeenCalledTimes(1);
+    expect(mocked.mock.calls[0][1].method).toBe('GET');
+  });
   it('creates an OAuth 1.0a HMAC signature dependent on method and token', () => {
     const base = oauth1Header('GET', 'https://api.x.com/2/users/me', credentials, 'nonce', '123');
     expect(base).toContain('oauth_signature=');
     expect(base).toContain('oauth_consumer_key="test-key"');
     expect(oauth1Header('POST', 'https://api.x.com/2/users/me', credentials, 'nonce', '123')).not.toBe(base);
+  });
+
+  it('matches an independently calculated encoded-byte signature vector', () => {
+    const header = oauth1Header('GET', 'https://api.x.com/2/users/me?a=lower&Z=upper', credentials, 'nonce', '123');
+    expect(header).toContain('oauth_signature="RHlM0KLkCjfbTRQFIl4jZKH8%2FI4%3D"');
   });
 
   it('accepts only publicly served HTML and retries 404 next scheduled run', async () => {

@@ -1,18 +1,8 @@
 name: Application CI
 
 on:
-  pull_request:
-    paths:
-      - 'src/**'
-      - 'config/**'
-      - 'data/driving-bans/**'
-      - 'tests/**'
-      - 'scripts/*driving-bans.mjs'
-      - 'astro.config.mjs'
-      - 'tsconfig.json'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/application-ci.yml'
+  # Required checks must run for every PR, including workflow-only changes.
+  pull_request: {}
   workflow_dispatch: {}
 
 permissions:
@@ -23,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
+  application-validate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

@@ -13,7 +13,12 @@
 // new file under src/content/news/eu-oversize - a data-only change must
 // never produce a "publish" commit message.
 
-const ARTICLE_FILENAME_PATTERN = /^eu-oversize-weekly-(\d{4})-w(\d{2})\.md$/i;
+const ARTICLE_FILENAME_PATTERN = /^eu-oversize-weekly-(?:preview-)?(\d{4})-w(\d{2})\.md$/i;
+
+export function publicationBranchFor(week, { preview = false, correction = false } = {}) {
+  if (!/^\d{4}-W(?:0[1-9]|[1-4]\d|5[0-3])$/.test(week || '')) throw new Error('Invalid publication week');
+  return `automation/weekly-${week.toLowerCase()}${preview ? '-preview' : ''}${correction ? '-correction' : ''}`;
+}
 
 /**
  * A second, distinct incident (fixed alongside the one above): even after
