@@ -1,0 +1,58 @@
+name: Verify DAJC X integration
+
+# Uses the existing publisher helpers. Default runs never contact the X API.
+on:
+  workflow_dispatch:
+    inputs:
+      check_x_account:
+        description: 'Check @DAJCeu with one X API read (may use paid credits; never posts)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dajc-x-verification
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Preview current publication (no X API or ledger writes)
+        run: node scripts/publish-x-weekly.mjs --dry-run
+      - name: Check four secret values are available (no X API)
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+        run: |
+          node --input-type=module <<'JS'
+          import { readXCredentials } from './scripts/lib/x-publishing.mjs';
+          const credentials = readXCredentials();
+          if (Object.values(credentials).some((value) => /\s/.test(value))) {
+            throw new Error('An X credential contains whitespace; copy each value directly from X again.');
+          }
+          console.log('All four X credentials are available without whitespace. No X API request was made.');
+          JS
+      - name: Verify OAuth account is @DAJCeu (one metered read, no post)
+        if: ${{ inputs.check_x_account == true }}
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+        run: |
+          node --input-type=module <<'JS'
+          import { checkXAccount, readXCredentials } from './scripts/lib/x-publishing.mjs';
+          await checkXAccount(readXCredentials());
+          console.log('OAuth 1.0a credentials verified for @DAJCeu. No post was sent.');
+          JS
