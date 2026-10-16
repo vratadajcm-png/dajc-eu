@@ -1,6 +1,6 @@
 {
   "week": "2026-W42",
-  "checkedAt": "2026-10-15T10:44:10.389Z",
+  "checkedAt": "2026-10-16T10:31:28.334Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -36,7 +36,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "at",
-      "candidateFindings": 3
+      "candidateFindings": 7
     },
     {
       "code": "AZ",
