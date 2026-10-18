@@ -1,6 +1,6 @@
 {
   "week": "2026-W42",
-  "checkedAt": "2026-10-17T10:01:37.323Z",
+  "checkedAt": "2026-10-18T10:14:14.736Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -159,10 +159,10 @@
       "code": "DE",
       "name": "Germany",
       "sourceScope": "DE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "de",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "GR",
@@ -384,10 +384,10 @@
       "code": "SK",
       "name": "Slovakia",
       "sourceScope": "SK",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "sk",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "SI",
