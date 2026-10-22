@@ -1,0 +1,71 @@
+name: Publish approved DAJC News to LinkedIn Company Page
+
+# Personal account posting is forbidden; company organization URN is required.
+# The workflow is inert until the official company token is verified.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/content/news/platform/**'
+      - 'src/content/news/eu-oversize/**'
+  schedule:
+    - cron: '37 13 * * *'
+      timezone: 'Europe/Prague'
+    - cron: '43 18 * * *'
+      timezone: 'Europe/Prague'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview copy without API calls, costs or ledger writes'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dajc-linkedin-publications
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || vars.DAJC_LINKEDIN_ENABLED == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Preview company LinkedIn content
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run == true
+        run: node scripts/publish-social-news.mjs linkedin --dry-run
+      - name: Require verified LinkedIn company authorization
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run == false && vars.DAJC_LINKEDIN_ENABLED != 'true'
+        run: |
+          echo '::error::LinkedIn automation disabled; authorize DAJC organization w_organization_social first.'
+          exit 1
+      - name: Load LinkedIn publication state
+        if: github.event_name != 'workflow_dispatch' || inputs.dry_run == false
+        run: node scripts/automation-data.mjs load linkedin
+      - name: Verify publicly approved news and reserve post
+        id: reserve
+        if: github.event_name != 'workflow_dispatch' || inputs.dry_run == false
+        env:
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          DAJC_LINKEDIN_ORGANIZATION_URN: ${{ vars.DAJC_LINKEDIN_ORGANIZATION_URN }}
+        run: node scripts/publish-social-news.mjs linkedin --prepare
+      - name: Persist reservation before LinkedIn API call
+        if: steps.reserve.outputs.send == 'true'
+        run: node scripts/automation-data.mjs save linkedin
+      - name: Publish only from DAJC company page
+        if: steps.reserve.outputs.send == 'true'
+        env:
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          DAJC_LINKEDIN_ORGANIZATION_URN: ${{ vars.DAJC_LINKEDIN_ORGANIZATION_URN }}
+        run: node scripts/publish-social-news.mjs linkedin --publish
+      - name: Persist confirmed LinkedIn post
+        if: steps.reserve.outputs.send == 'true'
+        run: node scripts/automation-data.mjs save linkedin

@@ -8,6 +8,7 @@ import path from 'node:path';
 export const DATA_BRANCHES = {
   findings: { branch: 'automation/oversize-data', prefix: 'data/oversize/', pattern: /^data\/oversize\/\d{4}-W\d{2}\/(?:findings|coverage)\.json$/ },
   x: { branch: 'automation/x-publications', prefix: 'data/x-publications.json', pattern: /^data\/x-publications\.json$/ },
+  linkedin: { branch: 'automation/linkedin-publications', prefix: 'data/linkedin-publications.json', pattern: /^data\/linkedin-publications\.json$/ },
 };
 
 function git(root, args) {
@@ -34,7 +35,7 @@ function remoteHead(root, config) {
 
 function validateJson(content, kind) {
   const value = JSON.parse(content);
-  if (kind === 'x' && (value.schemaVersion !== 1 || !value.posts || typeof value.posts !== 'object' || Array.isArray(value.posts))) {
+  if ((kind === 'x' || kind === 'linkedin') && (value.schemaVersion !== 1 || !value.posts || typeof value.posts !== 'object' || Array.isArray(value.posts))) {
     throw new Error('Invalid X publication ledger (fail closed)');
   }
   return content;
@@ -78,7 +79,7 @@ export function loadAutomationData(kind, root = process.cwd()) {
     return;
   }
   const entries = git(root, ['ls-tree', '-r', '-z', sha, '--', config.prefix]).split('\0').filter(Boolean);
-  if (kind === 'x' && entries.length !== 1) throw new Error('X ledger branch is missing its ledger; refusing to use an empty fallback');
+  if ((kind === 'x' || kind === 'linkedin') && entries.length !== 1) throw new Error('X ledger branch is missing its ledger; refusing to use an empty fallback');
   const files = entries.map((entry) => {
     const [metadata, relative] = entry.split('\t');
     if (!/^100644 blob [a-f0-9]{40}$/.test(metadata) || !config.pattern.test(relative || '')) throw new Error('Unapproved automation data path or mode');
@@ -93,7 +94,7 @@ export function loadAutomationData(kind, root = process.cwd()) {
 export function saveAutomationData(kind, root = process.cwd()) {
   const config = configFor(kind);
   const relatives = git(root, ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', config.prefix]).split('\0').filter(Boolean);
-  if (kind === 'x' && relatives.length !== 1) throw new Error('Missing X ledger');
+  if ((kind === 'x' || kind === 'linkedin') && relatives.length !== 1) throw new Error('Missing X ledger');
   const files = [...new Set(relatives)].map((relative) => {
     if (!config.pattern.test(relative)) throw new Error('Unapproved automation data path');
     assertSafePath(root, relative);

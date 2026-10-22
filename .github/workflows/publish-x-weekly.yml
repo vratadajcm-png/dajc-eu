@@ -1,19 +1,22 @@
-name: Publish DAJC EU Oversize Weekly on X
+name: Publish approved DAJC News to X
 
-# Independent of article generation: the article is publicly released on Friday
-# at 12:00 Europe/Prague, and is checked from the live site before an X call.
+# Only approved and live news can be published. The existing X state branch
+# provides durable exactly-one-attempt reservations against duplicate posts.
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/content/news/platform/**'
+      - 'src/content/news/eu-oversize/**'
   schedule:
-    - cron: '17 13 * * 5'
+    - cron: '17 13 * * *'
       timezone: 'Europe/Prague'
-    - cron: '23 17 * * 5'
-      timezone: 'Europe/Prague'
-    - cron: '37 10 * * 6'
+    - cron: '23 18 * * *'
       timezone: 'Europe/Prague'
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Preview only: no credentials, costs, posts or ledger writes'
+        description: 'Prepare preview without API calls, costs or ledger writes'
         type: boolean
         default: true
 
@@ -26,7 +29,7 @@ concurrency:
 
 jobs:
   publish:
-    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || vars.DAJC_X_ENABLED == 'true') }}
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || vars.DAJC_X_ENABLED == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -36,37 +39,37 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Preview X announcement (no side effects)
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == true }}
-        run: node scripts/publish-x-weekly.mjs --dry-run
-      - name: Refuse live manual posts while feature disabled
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == false && vars.DAJC_X_ENABLED != 'true' }}
+      - name: Preview approved news for X
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run == true
+        run: node scripts/publish-social-news.mjs x --dry-run
+      - name: Require explicit X publishing activation
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run == false && vars.DAJC_X_ENABLED != 'true'
         run: |
-          echo '::error::Set repository variable DAJC_X_ENABLED=true after developer-account setup and dry-run validation.'
+          echo '::error::X publication is disabled; verify @DAJCeu account, API permission and budget, then set DAJC_X_ENABLED=true.'
           exit 1
-      - name: Load durable X ledger from its data branch
-        if: ${{ github.event_name == 'schedule' || inputs.dry_run == false }}
+      - name: Load protected X ledger
+        if: github.event_name != 'workflow_dispatch' || inputs.dry_run == false
         run: node scripts/automation-data.mjs load x
-      - name: Reserve post and verify public site
+      - name: Verify X account and reserve exactly one live post
         id: reserve
-        if: ${{ github.event_name == 'schedule' || inputs.dry_run == false }}
+        if: github.event_name != 'workflow_dispatch' || inputs.dry_run == false
         env:
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
-        run: node scripts/publish-x-weekly.mjs --prepare
-      - name: Persist reservation before any X API write
-        if: ${{ steps.reserve.outputs.send == 'true' }}
+        run: node scripts/publish-social-news.mjs x --prepare
+      - name: Persist reservation before posting
+        if: steps.reserve.outputs.send == 'true'
         run: node scripts/automation-data.mjs save x
-      - name: Publish one post via official X API
-        if: ${{ steps.reserve.outputs.send == 'true' }}
+      - name: Publish from verified company X account
+        if: steps.reserve.outputs.send == 'true'
         env:
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
-        run: node scripts/publish-x-weekly.mjs --publish
-      - name: Record confirmed X post
-        if: ${{ steps.reserve.outputs.send == 'true' }}
+        run: node scripts/publish-social-news.mjs x --publish
+      - name: Persist confirmed post
+        if: steps.reserve.outputs.send == 'true'
         run: node scripts/automation-data.mjs save x

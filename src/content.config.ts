@@ -15,6 +15,7 @@ const newsSchema = z.object({
   language: z.string().default('en'),
   author: z.string().default('DAJC'),
   status: z.enum(['draft', 'published']),
+  socialPublish: z.boolean().optional(), // explicit editorial opt-in for Platform Update social posting
   sources: z
     .array(
       z.object({
