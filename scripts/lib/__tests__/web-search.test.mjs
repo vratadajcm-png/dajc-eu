@@ -32,6 +32,26 @@ const item = (overrides = {}) => ({
 
 const okPage = (html) => async (url) => ({ ok: true, text: html, finalUrl: url });
 
+it('preserves reviewed main-road evidence through discovery and rejects a changed source', async () => {
+  const url = 'https://example.test/official-o3';
+  const corridorEvidence = {corridor:'European international freight corridor',roadClass:'motorway',roadOrSection:'O-3',excerpt:'Motorway O-3',reviewedBy:'test source review',sourceUrl:url};
+  const reviewed = item({country:'TR',url,corridorEvidence});
+  const html = page({text:`Motorway O-3: ${ARTICLE_TEXT}`});
+  const result = await verifySearchItem(reviewed,{now,fetchPage:okPage(html)});
+  expect(result.ok).toBe(true);
+  expect(result.finding.corridorEvidence).toEqual(corridorEvidence);
+  expect((await verifySearchItem(reviewed,{now,fetchPage:okPage(page())})).reason).toBe('CORRIDOR_SOURCE_EVIDENCE_CHANGED');
+  expect((await verifySearchItem(reviewed,{now,fetchPage:async()=>({ok:true,text:html,finalUrl:'https://example.test/different'})})).reason).toBe('CORRIDOR_SOURCE_REDIRECT_REQUIRES_REVIEW');
+});
+
+it('keeps source-backed regional scope inside the tracked country and rejects an invented region', async () => {
+  const regional = item({country:'Spain',region:'Catalunya'});
+  const result = await verifySearchItem(regional,{now,fetchPage:okPage(page({text:`Catalunya: ${ARTICLE_TEXT}`}))});
+  expect(result.ok).toBe(true);
+  expect(result.finding).toMatchObject({jurisdiction:'ES',country:'Spain',region:'Catalunya'});
+  expect((await verifySearchItem(regional,{now,fetchPage:okPage(page())})).reason).toBe('REGIONAL_SCOPE_REQUIRES_REVIEW');
+});
+
 describe('buildSearchPrompt', () => {
   it('asks for one week back, one month ahead, >12 t scope with oversize first', () => {
     const prompt = buildSearchPrompt(SEARCH_GROUPS[0], now, 'oversize');
@@ -52,11 +72,10 @@ describe('SEARCH_GROUPS', () => {
     expect(SEARCH_GROUPS.slice(0, 6).map((g) => g.codes[0])).toEqual(['CZ', 'DE', 'AT', 'SK', 'PL', 'HU']);
   });
 
-  it('covers every sovereign coverage code directly or through a parent search', () => {
-    const codes = new Set(SEARCH_GROUPS.flatMap((g) => g.codes));
-    const sovereign = dajcEuropeCoverage.map(([code]) => code).filter((code) => /^[A-Z]{2}$/.test(code));
-    const parented = new Set(['GP', 'MQ', 'GF', 'RE', 'YT', 'MF', 'BL', 'PM', 'NC', 'PF', 'WF', 'TF', 'AW', 'CW', 'SX']);
-    expect(sovereign.filter((code) => !codes.has(code) && !parented.has(code))).toEqual([]);
+  it('covers each central-registry code exactly once without parent fallbacks', () => {
+    const codes = SEARCH_GROUPS.flatMap(group => group.codes);
+    expect([...codes].sort()).toEqual(dajcEuropeCoverage.map(([code]) => code).sort());
+    expect(new Set(codes).size).toBe(codes.length);
   });
 });
 
@@ -158,7 +177,7 @@ describe('discoverWithWebSearch', () => {
     expect(calls).toHaveLength(4);
     expect(calls[0].tools[0].type).toBe('web_search_preview');
     expect(findings).toHaveLength(1);
-    expect(findings[0].searchGroup).toBe(groups[0].id);
+    expect(findings[0].searchGroup).toBe(groups.find(group => group.codes.includes('DE')).id);
     expect(report.map((r) => r.status)).toEqual(['ok', 'ok']);
   });
 

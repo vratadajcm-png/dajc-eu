@@ -1,10 +1,10 @@
 # DAJC Driving Bans — canonical contract and unfinished review
 
-Scope: dajc.eu only. This repair is NOT a claim that the 104-jurisdiction legal review is complete.
+Scope: dajc.eu only. This repair is NOT a claim that the central-registry legal review is complete.
 
 ## Single runtime authority
 
-Edit `data/driving-bans/canonical.json`. Its sources, profiles, rules and jurisdiction reviews are one maintained dataset. Identity is taken, unchanged, from `config/europe-coverage.mjs` (104) and matched with Change Register Coverage. Never invent or silently merge its identities.
+Edit `data/driving-bans/canonical.json`. Its sources, profiles, rules and jurisdiction reviews are one maintained dataset. Active identity is taken from `config/europe-coverage.mjs` (50 approved codes) and matched with Change Register Coverage. Never invent identities. Regional reorganization retains exact territorial applicability; see `GEOGRAPHIC_COVERAGE_MIGRATION.md`.
 
 `config/driving-ban-calendars/canonical.mjs` hydrates explicit UNKNOWN/UNVERIFIED records for missing reviews and validates the dataset. `runtime.mjs` and `index.mjs` are compatibility exports, not independent data. Web, JSON, ICS and Intelligence consume this boundary. Retired source files are retained under `docs/driving-bans-legacy` for historical review only. `tests/fixtures` is an immutable regression fixture, never a runtime input.
 
@@ -20,11 +20,11 @@ Maintain exact weight operators, kg thresholds and vehicle categories, roads/reg
 
 ## State after the 26 September 2026 sweep (dataset 2026-09-26.r2-sweep)
 
-Reviewed span 2026-09-01..2026-11-30. 104 tracked; 12 jurisdictions fully PRIMARY_VERIFIED for all 12 scope checks (CH, CZ, DE, FR, HR, HU, IT, LI, LU, PL, SI, SK); 18 HAS_BAN (the 12 plus AT, BG, ES, GR, ME, PT with individually verified rules but incomplete jurisdiction scope); 0 NO_BAN; 86 UNKNOWN/UNVERIFIED with explicit `coverage_failures`. No NO_BAN was set because no jurisdiction had an explicit primary statement covering all 12 scope checks; absence of search results is never used.
+Reviewed span 2026-09-01..2026-11-30. Historical pre-delta assessment: 50 retained jurisdictions; 12 jurisdictions fully PRIMARY_VERIFIED for all 12 scope checks (CH, CZ, DE, FR, HR, HU, IT, LI, LU, PL, SI, SK); 18 HAS_BAN (the 12 plus AT, BG, ES, GR, ME, PT with individually verified rules but incomplete jurisdiction scope); 0 NO_BAN; 32 UNKNOWN/UNVERIFIED with explicit `coverage_failures`. No NO_BAN was set because no jurisdiction had an explicit primary statement covering all 12 scope checks; absence of search results is never used.
 
 Corrected errors: AT 26 October holiday missing and Tyrol A12 IG-L night ban missing; LI 8 September (Maria Geburt) missing; LU France-bound 11 November added; ES held only 14 of the Annex II rows (6 September, full 8-12 October, 30 October-2 November and 27-29 November tables now encoded, GP Valencia moved per BOE-A-2026-13892, legacy rows SUPERSEDED); BG 18 and 22 September Independence Day restrictions missing. Newly encoded from primary law: DE, FR (incl. Ile-de-France), IT, CH, CZ, SK (2026: 1 Sep, 15 Sep, 28 Oct, 17 Nov are NOT days of rest), PL (>12t), HU, SI, HR, PT (Porto VCI from 15 Sep 2026, >3.5t with >=3 axles and >=1.1 m height), GR (>3.5t, ΦΕΚ Β΄ 912/2026).
 
-Open items are listed per jurisdiction in `coverage_failures` (e.g. AT Laender secondary-road orders, ES Annex V exceptional/ADR events, GR permanent 2017 network decision, BG ad-hoc orders, RO CNAIR texts, CAT/BAS own resolutions, French overseas application). `regional` scope means statutory national/regional calendars; individually signposted local restrictions are not enumerated and are stated as such.
+Open items are listed per jurisdiction in `coverage_failures` (e.g. AT Laender secondary-road orders, ES Annex V exceptional/ADR events, GR permanent 2017 network decision, BG ad-hoc orders, RO CNAIR texts, Catalonia/Basque Country resolutions under ES; overseas territories are excluded from monitoring). `regional` scope means statutory national/regional calendars; individually signposted local restrictions are not enumerated and are stated as such.
 
 ## Delta of 1 October 2026 (dataset 2026-10-01.r3-fr-de-delta)
 
@@ -36,7 +36,7 @@ DE: temporary Länder low-water exemptions (targeted review 30 September, NRW re
 
 ## Thursday operation and urgent exceptions
 
-The existing DAJC Daily Intelligence automation owns the semantic review. Its HGV branch is Thursday-only, Europe/Prague; other daily DAJC topics are unchanged. Each Thursday it must read all 104 identities, determine the full two-month window, review current primary legislation/amendments and relevant secondary sources, update canonical reviews/rules with evidence, compare old/new states, run all quality gates, publish only supported changes and verify deployment. Outside Thursday only a sourced urgent recheck of one already-published jurisdiction/rule is allowed.
+The existing DAJC Daily Intelligence automation owns the semantic review. Its HGV branch is Thursday-only, Europe/Prague; other daily DAJC topics are unchanged. Each Thursday it must read all identities from the shared registry, determine the full two-month window, review current primary legislation/amendments and relevant secondary sources, update canonical reviews/rules with evidence, compare old/new states, run all quality gates, prepare supported changes for review; publishing and deployment require explicit approval. Outside Thursday only a sourced urgent recheck of one already-published jurisdiction/rule is allowed.
 
 The scheduled Claude routine "DAJC HGV Driving Bans Thursday sweep" (Thursday 06:47 Europe/Prague) performs the semantic sweep on this repository and pushes a reviewed branch; `.github/workflows/driving-bans-thursday.yml` then runs on Thursday as a technical gate (`--mode full --max-sweep-age-days 8`) and fails when the reviewed span no longer contains the active window or the last sweep is stale. `assertSweepRequest` enforces those scope/day rules. `npm run driving-bans:audit -- --mode full` exports the Thursday work/evidence manifest; it DOES NOT fetch or interpret external sources and must never be reported as a completed legal sweep. `--mode urgent --jurisdiction CODE --published-ban-id ID --urgent-source HTTPS_URL` validates targeted scope. Default `--mode validate` is a technical CI check, not a full sweep, and may run any day. `--previous path/to/previous-canonical.json` produces deterministic changes without duplicate no-op entries. `--require-complete` fails when the legal coverage remains incomplete.
 
@@ -44,4 +44,32 @@ The scheduled Claude routine "DAJC HGV Driving Bans Thursday sweep" (Thursday 06
 
 Run `npm run lint:driving-bans`, `npm run typecheck`, `npm test`, `npm run build`, and `npm run driving-bans:audit`. Application CI includes data/tests/script paths and uploads reproducible evidence. The scoped lint checks syntax, real production provenance and canonical import boundaries; no repository-wide ESLint setup is claimed.
 
-A green build permits a fail-closed technical release with visible UNKNOWN coverage, not a claim of complete source verification. Never merge a failing build. After release compare live `/driving-bans`, `/api/driving-bans.json`, `/api/driving-bans.ics`, dataset version, all 104 identities and actual UIDs/UTC times. Confirm unrelated homepage/news pages remain reachable. Update HGV-specific Change Register fields without overwriting unrelated topic coverage; preserve history and use a single deduplicated change record for this migration.
+A green build permits a fail-closed technical release with visible UNKNOWN coverage, not a claim of complete source verification. Never merge a failing build. After release compare live `/driving-bans`, `/api/driving-bans.json`, `/api/driving-bans.ics`, dataset version, all current registry identities and actual UIDs/UTC times. Confirm unrelated homepage/news pages remain reachable. Update HGV-specific Change Register fields without overwriting unrelated topic coverage; preserve history and use a single deduplicated change record for this migration.
+
+## Geographic migration (22 October 2026)
+
+The active scope is the 50-code central registry. See `GEOGRAPHIC_COVERAGE_MIGRATION.md` for the exact retained/removed identities, backup, regional semantics and rollout boundary. The migration does not refresh legal review dates. At the pinned audit clock 2026-10-22 10:00 UTC: 17 HAS_BAN, 0 NO_BAN, 33 UNKNOWN, 11 full-scope verification records; the freshness gate still fails because the evidence is stale.
+
+## Official web checks and road scope (22 October 2026 follow-up)
+
+AT, DE, ES, BE, UK and PT must be checked on official legislation, road-authority,
+ministry and police websites. The same primary-evidence standard remains applicable
+to the other tracked countries. Associations and press reports are discovery leads.
+`config/driving-ban-calendars/verification.mjs` generates the full work plan from the
+central registry and current+next month, using official source seeds from the
+targeted evidence log `data/driving-bans/source-reviews/2026-10-22.json`.
+The technical audit exports `verification-plan.json` and `targeted-source-review.json`.
+Neither this export nor a targeted check refreshes the full-sweep timestamp.
+
+KZ/RU/TR monitor motorways and main roads in the approved European and connecting
+international freight scope, including bridges, tunnels and border sections on
+those roads. Keep a sourced road identifier/section and category (`motorway` or
+`main_road`); local/secondary roads do not become additional monitoring coverage.
+National laws are relevant where they apply to this network. A source reviewer
+records the applicability; the user's approval of road categories is not evidence
+for an individual prohibition. Findings carry `corridorEvidence.roadClass` and
+`roadOrSection`; calendar rules carry `corridor_scope.road_classes` and `roads`.
+
+See `DRIVING_BANS_OFFICIAL_WEB_REVIEW.md` for the targeted findings and remaining
+work. These observations have not been converted into executable calendar events;
+the existing 182 rules and their legal-verification timestamps are preserved.

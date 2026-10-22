@@ -1,3 +1,4 @@
+import { dajcEuropeCoverage, geographicScopePolicy, COVERAGE_VERSION, corridorOnlyJurisdictions, isTrackedCorridorRoadClass, coverageRegions } from '../../../config/europe-coverage.mjs';
 /** Pure canonical Driving Bans engine. No network, no guessed prohibitions. */
 export const VERIFICATION_STATES = ['PRIMARY_VERIFIED', 'CROSSCHECKED', 'UNVERIFIED', 'SOURCE_UNAVAILABLE'];
 export const BAN_STATES = ['HAS_BAN', 'NO_BAN', 'UNKNOWN'];
@@ -78,14 +79,15 @@ export function hydrateCanonical(raw, identities) {
     coverage_failures: ['FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED'],
     scope_checks: Object.fromEntries(SCOPE_CHECKS.map(key => [key, {state: 'UNVERIFIED', evidence_ids: []}])),
     ...(reviews[code] || {}),
-    jurisdiction: code, name, period: {from: raw.window.from, to: raw.window.to}
+    jurisdiction: code, name, monitoring_regions: coverageRegions(code), geographic_scope: corridorOnlyJurisdictions.includes(code) ? geographicScopePolicy.corridor_scope : geographicScopePolicy.regional_scope, period: {from: raw.window.from, to: raw.window.to}
   })) };
 }
 export function validateCanonical(data, identities) {
   assert(data.schema_version === 1, 'Unsupported canonical schema');
   assert(isDate(data.window?.from) && isDate(data.window?.to) && data.window.from <= data.window.to, 'Invalid canonical window');
-  assert(identities.length === 104 && new Set(identities.map(r => r[0])).size === 104, 'Authoritative Coverage must have exactly 104 unique identities');
-  assert(data.jurisdictions.length === 104, 'Exactly 104 jurisdiction records required');
+  const authoritative = new Map(dajcEuropeCoverage);
+  assert(identities.length === authoritative.size && new Set(identities.map(r => r[0])).size === identities.length && identities.every(([code, name]) => authoritative.get(code) === name), 'Coverage must match the unique central registry identities');
+  assert(data.jurisdictions.length === identities.length, 'Jurisdiction records must match the central registry');
   const expected = new Map(identities), seen = new Set();
   const sources = new Map(data.sources.map(s => [s.source_id, s]));
   assert(sources.size === data.sources.length, 'Duplicate source identity');
@@ -96,6 +98,12 @@ export function validateCanonical(data, identities) {
     assert(typeof rule.ban_id === 'string' && /^[a-z0-9][a-z0-9_-]+$/.test(rule.ban_id), 'Invalid ban identity');
     assert(!ruleIds.has(rule.ban_id), `Duplicate ban identity ${rule.ban_id}`); ruleIds.add(rule.ban_id);
     assert(expected.has(rule.jurisdiction), `Untracked jurisdiction ${rule.jurisdiction}`);
+    assert(sources.has(rule.source_id) && rule.evidence_ids?.every(id => sources.has(id)), `Dangling rule evidence ${rule.ban_id}`);
+    if (corridorOnlyJurisdictions.includes(rule.jurisdiction)) {
+      assert(rule.corridor_scope?.description && rule.corridor_scope?.reviewed_by && rule.corridor_scope?.evidence_ids?.length && rule.corridor_scope.evidence_ids.every(id => sources.has(id)), `Corridor scope requires review ${rule.ban_id}`);
+      assert(rule.corridor_scope.road_classes?.length && rule.corridor_scope.road_classes.every(isTrackedCorridorRoadClass) && rule.roads?.length && rule.roads.every(road => typeof road === 'string' && road.trim()), `Corridor road class and section required ${rule.ban_id}`);
+    }
+    if (rule.geographic_migration?.region) assert(rule.regions?.includes(rule.geographic_migration.region), `Lost regional scope ${rule.ban_id}`);
     assert(VERIFICATION_STATES.includes(rule.verification_state), 'Invalid rule verification state');
     assert(['ACTIVE','CANCELLED','SUPERSEDED'].includes(rule.status), 'Invalid rule lifecycle');
     assert(isDate(rule.valid_from) && isDate(rule.valid_to) && rule.valid_from <= rule.valid_to, `Invalid rule period ${rule.ban_id}`);
@@ -124,7 +132,12 @@ export function validateCanonical(data, identities) {
     for (const parent of data.rules.find(r => r.ban_id === id).supersedes) visit(parent, next);
   };
   for (const id of ruleIds) visit(id);
+  for (const row of data.regional_reviews || []) {
+    assert(expected.has(row.jurisdiction) && row.region, 'Invalid regional review scope');
+    assert((row.review.source_ids || []).every(id => sources.has(id)), 'Dangling regional review source');
+  }
   for (const row of data.jurisdictions) {
+    assert(row.source_ids.every(id => sources.has(id)) && Object.values(row.scope_checks || {}).every(check => (check.evidence_ids || []).every(id => sources.has(id))) && (row.no_ban_evidence || []).every(e => sources.has(e.source_id)), `Dangling jurisdiction evidence ${row.jurisdiction}`);
     assert(expected.get(row.jurisdiction) === row.name && !seen.has(row.jurisdiction), `Duplicate or changed Coverage identity ${row.jurisdiction}`); seen.add(row.jurisdiction);
     assert(VERIFICATION_STATES.includes(row.verification_state) && BAN_STATES.includes(row.ban_state), 'Invalid jurisdiction state');
     assert(row.period?.from === data.window.from && row.period?.to === data.window.to, `Missing active window ${row.jurisdiction}`);
@@ -188,7 +201,7 @@ export function snapshot(data, identities, now = new Date()) {
     if (staleWindow) failures.push('ACTIVE_WINDOW_NOT_REVERIFIED');
     return { ...row, period: { from: window.from, to: window.to }, ban_state: rules.length ? 'HAS_BAN' : canKeepNoBan ? 'NO_BAN' : 'UNKNOWN', verification_state: staleWindow ? 'UNVERIFIED' : row.verification_state, coverage_complete: !staleWindow && row.coverage_complete, coverage_failures: [...new Set(failures)], event_count: rules.length, last_verified: row.last_verified };
   });
-  return { schema_version: 1, dataset_version: data.dataset_version, generated_at: now.toISOString(), window, jurisdictions, events, upcoming_events: events.filter(e => e.ends_at > now.toISOString()), sources: data.sources, complete: jurisdictions.every(r => r.coverage_complete) };
+  return { schema_version: 1, coverage_version: COVERAGE_VERSION, geographic_scope: geographicScopePolicy, dataset_version: data.dataset_version, generated_at: now.toISOString(), window, jurisdictions, events, upcoming_events: events.filter(e => e.ends_at > now.toISOString()), sources: data.sources, complete: jurisdictions.every(r => r.coverage_complete) };
 }
 const esc = value => String(value ?? '').replaceAll('\\','\\\\').replaceAll('\r','').replaceAll('\n','\\n').replaceAll(';','\\;').replaceAll(',','\\,');
 const stamp = value => value.replaceAll('-','').replaceAll(':','').replace(/\.\d{3}Z$/, 'Z');
@@ -203,7 +216,7 @@ export function toIcs(view, { countries = [], type = 'all', upcoming = true } = 
   assert(countries.every(c => valid.has(c)), 'Unknown jurisdiction');
   const events = (upcoming ? view.upcoming_events : view.events).filter(e => (!countries.length || countries.includes(e.jurisdiction)) && (type !== 'general' || e.restriction_types.includes('general')));
   const selected = view.jurisdictions.filter(r => !countries.length || countries.includes(r.jurisdiction));
-  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DAJC//Canonical Driving Bans//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:DAJC HGV Driving Bans',`X-DAJC-WINDOW:${view.window.from}/${view.window.to}`,`X-DAJC-DATASET:${esc(view.dataset_version)}`,`X-DAJC-EVENT-SCOPE:${upcoming ? 'UPCOMING' : 'WHOLE-WINDOW'}`,`X-DAJC-COVERAGE-COMPLETE:${selected.every(r => r.coverage_complete) ? 'TRUE':'FALSE'}`,`X-DAJC-UNKNOWN:${esc(selected.filter(r => r.ban_state === 'UNKNOWN').map(r => r.jurisdiction).join(','))}`,'X-WR-CALDESC:Verified ban events only. Missing events are NOT evidence of no ban. Consult the DAJC coverage status and official sources.','REFRESH-INTERVAL;VALUE=DURATION:PT1H','X-PUBLISHED-TTL:PT1H'];
+  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DAJC//Canonical Driving Bans//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:DAJC HGV Driving Bans',`X-DAJC-WINDOW:${view.window.from}/${view.window.to}`,`X-DAJC-DATASET:${esc(view.dataset_version)}`,`X-DAJC-COVERAGE-VERSION:${COVERAGE_VERSION}`,`X-DAJC-JURISDICTIONS:${esc(selected.map(r => r.jurisdiction).join(','))}`,`X-DAJC-EVENT-SCOPE:${upcoming ? 'UPCOMING' : 'WHOLE-WINDOW'}`,`X-DAJC-COVERAGE-COMPLETE:${selected.every(r => r.coverage_complete) ? 'TRUE':'FALSE'}`,`X-DAJC-UNKNOWN:${esc(selected.filter(r => r.ban_state === 'UNKNOWN').map(r => r.jurisdiction).join(','))}`,'X-WR-CALDESC:Verified ban events only. Missing events are NOT evidence of no ban. Consult the DAJC coverage status and official sources.','REFRESH-INTERVAL;VALUE=DURATION:PT1H','X-PUBLISHED-TTL:PT1H'];
   for (const e of events) {
     const description = [`Local time: ${e.date} ${e.start_time} to ${e.end_date} ${e.end_time} (${e.timezone})`, `Vehicles: ${e.vehicle_scope}`, `Weight condition: ${JSON.stringify(e.weight_threshold)}`, `Roads: ${e.roads.join('; ')}`, `Regions: ${e.regions.join('; ')}`, `Direction: ${e.direction}`, `Exceptions: ${e.exceptions.join('; ')}`, `ADR: ${e.adr_relevance}`, `Exceptional transport: ${e.exceptional_relevance}`, `Legal basis: ${e.legal_basis}`, `Authority: ${e.source_authority}`, `Verified: ${e.verified_at}`, `Version: ${e.source_version}`, e.notes, 'Coverage may be incomplete. Check permits and current official instructions.'].join('\n');
     lines.push('BEGIN:VEVENT',`UID:${esc(e.uid)}`,`DTSTAMP:${stamp(e.verified_at)}`,`LAST-MODIFIED:${stamp(e.verified_at)}`,`SEQUENCE:${e.sequence}`,`DTSTART:${stamp(e.starts_at)}`,`DTEND:${stamp(e.ends_at)}`,`SUMMARY:${esc(`${e.jurisdiction} — ${e.title}`)}`,`DESCRIPTION:${esc(description)}`,`URL:${e.source_url}`,`X-DAJC-TIMEZONE:${e.timezone}`,`X-DAJC-VERIFICATION:${e.verification_state}`,'STATUS:CONFIRMED','TRANSP:TRANSPARENT','END:VEVENT');

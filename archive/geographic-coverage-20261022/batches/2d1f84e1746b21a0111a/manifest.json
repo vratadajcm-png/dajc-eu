@@ -1,0 +1,32 @@
+{
+  "files": [
+    {
+      "path": "data/oversize/2026-W35/findings.json",
+      "sha256": "2f13ca0c35cb6a43c36b3f2eead7beed9e5bf5e638b103b623b9dbb83bcd30ee"
+    },
+    {
+      "path": "data/oversize/2026-W36/findings.json",
+      "sha256": "7a0d69529b0f5ca2e688af29352df6d691e8df8c24e5e172dccb8a4ab09e2b26"
+    },
+    {
+      "path": "data/oversize/2026-W37/findings.json",
+      "sha256": "322857d830b489f3aefb79ca02cb427d662ed89b5fd22360d08d9d8b9116aa96"
+    },
+    {
+      "path": "data/oversize/2026-W38/findings.json",
+      "sha256": "1ea81873a2dccfb23a0da569b749a008f2489c269ce77669f7bdc605bf4f3ef9"
+    },
+    {
+      "path": "data/oversize/2026-W39/findings.json",
+      "sha256": "dc5b26f112aabae8f0c233d289027a882ed4dbe5986beed4a906af3ff5d42239"
+    },
+    {
+      "path": "data/oversize/2026-W40/findings.json",
+      "sha256": "c8f1ea006bedc6eb8bf3be07530db69b4a522536ca65e05882b01ee1253d9a3d"
+    },
+    {
+      "path": "data/oversize/2026-W41/findings.json",
+      "sha256": "64d473f1ffa9675a7da33322ead98508fa6112efbbf528366fecd867ae7a6f50"
+    }
+  ]
+}

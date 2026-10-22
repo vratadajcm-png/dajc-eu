@@ -1,3 +1,4 @@
+import { isTrackedJurisdiction } from '../../../config/europe-coverage.mjs';
 import type { IntelligenceAlertCandidate } from './alerts';
 import type { IntelligenceHistoryEntry, IntelligenceSnapshotItem } from './change-detection';
 
@@ -26,7 +27,7 @@ export class InMemoryIntelligenceStateStore implements IntelligenceStateStore {
   private delivered = new Set<string>();
 
   async readSnapshot(sourceId: string): Promise<IntelligenceSnapshotItem[]> {
-    return structuredClone(this.snapshots.get(sourceId) ?? []);
+    return structuredClone(this.snapshots.get(sourceId) ?? []).filter(item => isTrackedJurisdiction(item.jurisdiction));
   }
 
   async commitCycle(commit: IntelligenceCycleCommit): Promise<void> {
@@ -39,9 +40,10 @@ export class InMemoryIntelligenceStateStore implements IntelligenceStateStore {
       }
     }
 
-    const nextOutbox = structuredClone(this.outbox);
+    const nextOutbox = structuredClone(this.outbox).filter(candidate => isTrackedJurisdiction(candidate.change.jurisdiction));
     const outboxSeen = new Set(nextOutbox.map((candidate) => candidate.dedupeKey));
     for (const candidate of commit.alertCandidates) {
+      if (!isTrackedJurisdiction(candidate.change.jurisdiction)) continue;
       if (!outboxSeen.has(candidate.dedupeKey) && !this.delivered.has(candidate.dedupeKey)) {
         nextOutbox.push(structuredClone(candidate));
         outboxSeen.add(candidate.dedupeKey);
@@ -51,7 +53,7 @@ export class InMemoryIntelligenceStateStore implements IntelligenceStateStore {
     // Apply the staged state only after every part of the commit has been prepared.
     this.history = nextHistory;
     this.outbox = nextOutbox;
-    this.snapshots.set(commit.sourceId, structuredClone(commit.snapshot));
+    this.snapshots.set(commit.sourceId, structuredClone(commit.snapshot).filter(item => isTrackedJurisdiction(item.jurisdiction)));
   }
 
   async hasDeliveredDedupeKey(dedupeKey: string): Promise<boolean> {

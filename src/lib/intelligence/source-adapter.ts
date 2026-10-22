@@ -1,3 +1,4 @@
+import { isTrackedJurisdiction } from '../../../config/europe-coverage.mjs';
 import { z } from 'zod';
 import {
   intelligenceSnapshotItemSchema,
@@ -51,6 +52,7 @@ export function validateSourceSnapshot(
   const parsed = intelligenceSourceSnapshotSchema.parse(snapshot);
 
   for (const item of parsed.items) {
+    if (!isTrackedJurisdiction(item.jurisdiction)) throw new Error(`Untracked monitoring jurisdiction: ${item.jurisdiction}`);
     if (item.sourceUrl && parsed.provenance.sourceUrl && item.sourceUrl !== parsed.provenance.sourceUrl) {
       throw new Error(`Snapshot item ${item.key} sourceUrl does not match adapter provenance URL`);
     }

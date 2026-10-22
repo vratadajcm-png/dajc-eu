@@ -13,27 +13,17 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { oversizeSources } from '../config/oversize-sources/index.mjs';
-import { dajcEuropeCoverage } from '../config/europe-coverage.mjs';
+import { dajcEuropeCoverage, COVERAGE_VERSION } from '../config/europe-coverage.mjs';
 import { fetchSourceFindings } from './lib/fetch-source.mjs';
 import { discoverWithWebSearch, SEARCH_GROUPS } from './lib/web-search.mjs';
 import { buildFindingHistory, mergeFindings, markExpired } from './lib/findings.mjs';
 import { loadWeekFindings, saveWeekFindings } from './lib/store.mjs';
+import { scopeFindings } from './lib/geographic-scope.mjs';
 import { isoWeekLabel } from './lib/week.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const HISTORY_WEEKS = 6;
-
-const PARENT_SOURCE = {
-  ENG: 'UK', SCT: 'UK', WLS: 'UK', NIR: 'UK', GG: 'UK', JE: 'UK', IM: 'UK', GI: 'UK', ALDERNEY: 'UK',
-  AX: 'FI', FO: 'DK', GL: 'DK', SVALBARD: 'NO', JANMAYEN: 'NO', SBA: 'CY', NCY: 'CY',
-  CEU: 'ES', MLL: 'ES', CAN: 'ES', CAT: 'ES', BAS: 'ES', GAL: 'ES',
-  AZO: 'PT', MAD: 'PT', FLA: 'BE', WAL: 'BE', BRU: 'BE',
-  GP: 'FR', MQ: 'FR', GF: 'FR', RE: 'FR', YT: 'FR', MF: 'FR', BL: 'FR', PM: 'FR',
-  NC: 'FR', PF: 'FR', WF: 'FR', CLIPPERTON: 'FR', TF: 'FR',
-  AW: 'NL', CW: 'NL', SX: 'NL', 'BQ-BO': 'NL', 'BQ-SA': 'NL', 'BQ-SE': 'NL',
-  FBIH: 'BA', RSBA: 'BA', TRN: 'MD', GAG: 'MD', AB: 'GE', SO: 'GE', RSM: 'SM',
-};
 
 async function main() {
   const now = new Date();
@@ -128,7 +118,9 @@ async function main() {
     }
   }
 
-  let merged = mergeFindings(existing, allCandidates, nowIso, { history });
+  const scoped = scopeFindings(allCandidates);
+  for (const entry of scoped.excluded) console.log(`[scope-review] ${entry.finding.sourceUrl}: ${entry.reason}`);
+  let merged = mergeFindings(existing, scoped.kept, nowIso, { history });
   merged = markExpired(merged, now);
 
   const statusCounts = { new: 0, updated: 0, active: 0, expired: 0, superseded: 0 };
@@ -138,29 +130,25 @@ async function main() {
   const findingsByScope = new Map();
   for (const finding of merged.values()) {
     const source = oversizeSources.find((s) => s.name === finding.sourceName || s.authority === finding.sourceName);
-    const scope = source?.jurisdictionId || source?.country;
+    const scope = finding.jurisdiction || source?.country;
     if (scope) findingsByScope.set(scope, (findingsByScope.get(scope) || 0) + 1);
   }
 
-  const webFindingsByGroup = new Map();
-  for (const finding of merged.values()) {
-    if (finding.searchGroup) webFindingsByGroup.set(finding.searchGroup, (webFindingsByGroup.get(finding.searchGroup) || 0) + 1);
-  }
-
   const coverage = dajcEuropeCoverage.map(([code, name]) => {
-    const effectiveCode = PARENT_SOURCE[code] || code;
+    const effectiveCode = code;
     if (useWeb) {
-      const entry = webGroups.find(({ group }) => group.codes.includes(code))
-        || webGroups.find(({ group }) => group.codes.includes(effectiveCode));
+      const entry = webGroups.find(({ group }) => group.codes.includes(code));
       if (entry && (entry.status === 'ok' || !useOfficial)) {
-        const findingCount = webFindingsByGroup.get(entry.group.id) || 0;
+        const findingCount = findingsByScope.get(code) || 0;
+        const scopeReviewRequired = entry.rejected.some(item => item.jurisdiction === code && /SCOPE|CORRIDOR/.test(item.reason));
         return {
           code,
           name,
           sourceScope: effectiveCode,
-          status: entry.status !== 'ok'
+          status: entry.status !== 'ok' || scopeReviewRequired
             ? 'checked-source-availability-limited'
             : findingCount > 0 ? 'checked-major-or-short-update-candidates-found' : 'checked-no-material-development-found',
+          scopeReviewRequired,
           discovery: 'web-search',
           searchGroup: entry.group.id,
           candidateFindings: findingCount,
@@ -171,12 +159,10 @@ async function main() {
         return { code, name, sourceScope: effectiveCode, status: 'checked-source-availability-limited', discovery: 'web-search', searchGroup: null, candidateFindings: 0 };
       }
     }
-    const direct = sourceResults.filter(({ source }) => source.jurisdictionId === code);
-    const inherited = sourceResults.filter(({ source }) => !source.jurisdictionId && source.country === effectiveCode);
-    const relevant = direct.length > 0 ? direct : inherited;
+    const relevant = sourceResults.filter(({ source }) => source.country === code);
     const ok = relevant.filter(({ result }) => result.status === 'ok');
     const unavailableForJurisdiction = relevant.filter(({ result }) => result.status !== 'ok');
-    const findingCount = findingsByScope.get(code) || (direct.length === 0 ? (findingsByScope.get(effectiveCode) || 0) : 0);
+    const findingCount = findingsByScope.get(code) || 0;
 
     let status;
     if (ok.length > 0 && findingCount > 0) status = 'checked-major-or-short-update-candidates-found';
@@ -200,7 +186,7 @@ async function main() {
   await mkdir(coverageDir, { recursive: true });
   await writeFile(
     path.join(coverageDir, 'coverage.json'),
-    `${JSON.stringify({ week: weekLabel, checkedAt: nowIso, jurisdictions: coverage }, null, 2)}\n`,
+    `${JSON.stringify({ week: weekLabel, checkedAt: nowIso, coverageVersion: COVERAGE_VERSION, jurisdictions: coverage }, null, 2)}\n`,
     'utf-8'
   );
 

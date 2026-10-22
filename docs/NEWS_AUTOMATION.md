@@ -844,3 +844,35 @@ the only way to set it.
 it's a deliberate plain-Node duplicate (see the comment at the top of
 that file for why) and the quality gate will otherwise validate against a
 stale shape.
+
+
+## Shared geographic scope (22 October 2026)
+
+`config/europe-coverage.mjs` is the single authority for the 50 approved monitoring
+jurisdictions. Search groups partition it exactly once; country labels in search
+and synthesis prompts are derived from it. Regional sources (e.g. Madeira) use
+the parent country plus a `region`, never an independent monitoring identity.
+Untracked dependencies and overseas sources have no parent-country fallback.
+
+Automation data loading, findings storage, candidate selection and generated-item
+validation enforce the same boundary, including old `automation/oversize-data`
+commits. The original Git commits remain historical evidence. The data branch is
+not changed by this development PR. On an approved rollout the next ordinary
+monitoring run persists the normalized data; no untracked item can reach an AI
+candidate request in the meantime. Production schedules still run main until
+an approved merge. Do not run an old main monitor after migrating production data.
+
+KZ/RU/TR discovery prompts are restricted to European and connecting international
+road-freight corridors. A discovered item needs a `corridorEvidence` object with
+`corridor`, `excerpt`, `sourceUrl` matching the finding, and `reviewedBy` before
+it can enter the active findings store or weekly output. Unassigned candidates
+are emitted as `[scope-review]` diagnostics, not country-wide rules or NO_BAN.
+This is a geographic review, separate from legal/source-law verification.
+
+The official-source registry shrinks from 84 to 56 endpoints. The existing 19
+web-search groups remain (two focuses per group): this change does not claim a
+proportional reduction in the number of OpenAI calls. It removes excluded source
+fetches and narrows the search/candidate scope without dropping monitored countries.
+
+Run `npm run lint:geographic-coverage` before activation. The migration and rollback
+procedures are in `docs/GEOGRAPHIC_COVERAGE_MIGRATION.md`.

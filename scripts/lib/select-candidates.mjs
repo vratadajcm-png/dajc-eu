@@ -1,3 +1,4 @@
+import { scopeFinding } from './geographic-scope.mjs';
 // Pre-selection for the Weekly: every finding must first pass the complete
 // deterministic eligibility check (weekly-eligibility.mjs). Only then are the
 // survivors ranked - by how recently the source published them, how directly
@@ -112,7 +113,10 @@ export function selectCandidates(findings, ctx) {
   const eligible = [];
   // Effective dates stated in the record's own text travel with the
   // candidate from here on (to the model, cross-validation and the gate).
-  for (const finding of dedupeFindingsByUrl(findings).map(deriveValidity)) {
+  for (const input of dedupeFindingsByUrl(findings).map(deriveValidity)) {
+    const scope = scopeFinding(input);
+    if (!scope.ok) { rejected.push({ finding: input, reason: scope.reason }); continue; }
+    const finding = scope.finding;
     if (finding.status === 'expired' || finding.status === 'superseded') {
       rejected.push({ finding, reason: `status ${finding.status}` });
       continue;

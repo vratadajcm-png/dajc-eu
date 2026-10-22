@@ -1,3 +1,4 @@
+import { dajcCoverageCount } from '../../../config/europe-coverage.mjs';
 import { drivingBanCalendars, restrictionTypesOf, getDrivingBansSnapshot } from '../../../config/driving-ban-calendars/runtime.mjs';
 import type { IntelligenceSourceAdapter, IntelligenceSourceSnapshot } from './source-adapter';
 import type { IntelligenceSnapshotItem } from './change-detection';
@@ -171,7 +172,7 @@ export class DrivingBansRegistryAdapter implements IntelligenceSourceAdapter {
     const coverage = getDrivingBansSnapshot(new Date(`${this.from}T12:00:00Z`));
     if (!coverage.complete || coverage.window.from > this.from || coverage.window.to < this.to) {
       result.complete = false;
-      result.warnings = [...(result.warnings ?? []), '104-jurisdiction primary coverage is incomplete for the requested period; missing records are not NO_BAN.'];
+      result.warnings = [...(result.warnings ?? []), `${dajcCoverageCount}-jurisdiction primary coverage is incomplete for the requested period; missing records are not NO_BAN.`];
     }
     return result;
   }

@@ -1,3 +1,4 @@
+import { isTrackedJurisdiction } from '../../../config/europe-coverage.mjs';
 import { z } from 'zod';
 import {
   intelligencePreferenceSchema,
@@ -72,7 +73,7 @@ export function removeDeliveredCandidates(
   const delivered = new Set(deliveredDedupeKeys);
   return candidates
     .map((candidate) => intelligenceAlertCandidateSchema.parse(candidate))
-    .filter((candidate) => !delivered.has(candidate.dedupeKey));
+    .filter((candidate) => isTrackedJurisdiction(candidate.change.jurisdiction) && !delivered.has(candidate.dedupeKey));
 }
 
 export function hasImmediateChannel(recipient: IntelligenceAlertRecipient): boolean {

@@ -1,0 +1,60 @@
+{
+  "review_id": "2026-10-22-official-web",
+  "reviewed_on": "2026-10-22",
+  "requested_window": {"from": "2026-10-01", "to": "2026-11-30"},
+  "status": "PARTIAL_SOURCE_REVIEW",
+  "full_registry_sweep": false,
+  "calendar_rules_updated": false,
+  "note": "Targeted official-web checks requested by the user. Source observations are not executable bans, complete country reviews or fresh NO_BAN evidence. Original canonical rules and their verification dates are unchanged.",
+  "jurisdictions": [
+    {
+      "jurisdiction": "AT",
+      "sources": [
+        {"source_id": "at-tyrol-sectoral-web-20261022", "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=LrT&Gesetzesnummer=20000636", "authority": "RIS / Land Tirol", "role": "PRIMARY", "retrieval": "OFFICIAL_TEXT_READ", "version": "Consolidated version displayed 21 October 2026", "scope": "Tyrol; A12 km 6.35 Langkampfen to km 72.00 Ampass; both directions", "finding": "Section 3 defines goods-specific restrictions for trucks/articulated vehicles above 7.5 t MAM and truck/trailer combinations whose combined MAM exceeds 7.5 t. The listed goods and section 4 exceptions must be encoded together. Exceptions include specified origin/destination zones, documented rail feeder journeys, qualifying Euro VI vehicles and other expressly listed categories; no universal ban for all cargo is inferred."}
+      ],
+      "remaining": ["Encode the complete goods/exception model before publishing a new A12 sectoral calendar rule.", "Other Laender secondary-road orders and individual exceptional-transport permits remain outside this targeted check."]
+    },
+    {
+      "jurisdiction": "DE",
+      "sources": [
+        {"source_id": "de-saarland-order-20260928-web-20261022", "url": "https://www.saarland.de/SharedDocs/Downloads/DE/mukmav/verkehr/Strassenverkehrsbehoerde/dl_erweiterung_aussetzung_sonn_u_feiertag_1.pdf?__blob=publicationFile&v=2", "authority": "Saarland Landesbetrieb fuer Strassenbau", "role": "PRIMARY", "retrieval": "OFFICIAL_PDF_TEXT_READ", "version": "Order 28 September 2026, VKR-400-0004#0003, pages 2-3", "scope": "Saarland; qualifying Rhine low-water replacement transport and associated empty journeys; through 31 October 2026 inclusive", "finding": "The order expressly extends the Sunday/holiday exemption to qualifying gross-dimension/heavy transport. For low-water-related journeys up to 44 t, the indivisibility requirement is relaxed within the stated permit procedure; technical suitability and the stated authorisation conditions remain. The summer Saturday exemption ended 31 August. The document does not establish a November extension or an unrestricted German exemption."},
+        {"source_id": "de-rp-extension-web-20261022", "url": "https://mdi.rlp.de/service/pressemitteilungen/detail/rheinland-pfalz-verlaengert-aussetzung-des-sonn-und-feiertagsverbots-fuer-lkw-transporte", "authority": "Rhineland-Palatinate ministry", "role": "PRIMARY", "retrieval": "OFFICIAL_PAGE_READ", "version": "September 2026 extension notice", "scope": "Rhineland-Palatinate low-water replacement transport", "finding": "The official extension page was located and reviewed. This check did not resolve the separate post-30-September scope of GST/44 t easing; do not infer that scope from the extension headline."}
+      ],
+      "remaining": ["Apply the Saarland exception with exact conditions to the canonical rule model; do not delete federal ban events.", "Rhineland-Palatinate GST/44 t scope and any November extensions require their own current primary documents.", "This is not a full review of every Land."]
+    },
+    {
+      "jurisdiction": "ES",
+      "sources": [
+        {"source_id": "es-dgt-annex-v-web-20261022", "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-1255", "authority": "BOE / DGT", "role": "PRIMARY", "retrieval": "OFFICIAL_TEXT_READ", "version": "Resolution 14 January 2026; sections B.2 and B.3", "scope": "Territory subject to this DGT resolution; retain autonomous authority boundaries", "finding": "B.2 links orange-panel ADR vehicles to Annex V and, when MAM/combination MAM exceeds 7500 kg, Annex II. B.3 links special vehicles and vehicles requiring complementary circulation authorisation to Annex II and V, with separate exceptions including road-recovery vehicles and specified lifting cranes. These categories must not become one universal >7.5 t rule."},
+        {"source_id": "es-catalonia-october-web-20261022", "url": "https://transit.gencat.cat/web/.content/restriccions_circulacio/documents/10-octubre/Restriccions-10-Octubre-2026_TE_VE.pdf", "authority": "Servei Catala de Transit", "role": "PRIMARY", "retrieval": "OFFICIAL_PDF_TEXT_READ", "version": "October 2026 TE/VE calendar", "scope": "Catalonia; special transports/special vehicles; road- and direction-specific rows", "finding": "The October calendar contains dated restrictions for special transport, AP-7 dimension-specific sections and C-153 transit restrictions. Preserve each row's section, dates, time and vehicle category. This is a Catalonia source under ES, not a separate jurisdiction."},
+        {"source_id": "es-basque-2026-web-20261022", "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2026-2625", "authority": "BOE / Basque traffic authority", "role": "PRIMARY", "retrieval": "OFFICIAL_TEXT_READ", "version": "Resolution 9 January 2026; in force 17 February 2026", "scope": "Basque Country only, under ES", "finding": "A separate 2026 Basque traffic resolution exists. Do not apply DGT calendar rows as substitutes. Its annexes must be assessed for the relevant vehicle and route before generating events."}
+      ],
+      "remaining": ["Complete October/November row-by-row extraction, exception handling and event tests for Catalonia, Basque Country and DGT Annex V.", "The November Catalonia general-goods PDF was discovered but was not fully checked; it is not accepted as a completed November special-transport calendar.", "Navarra and regional holiday variants require separate authority checks."]
+    },
+    {
+      "jurisdiction": "BE",
+      "sources": [
+        {"source_id": "be-flanders-windows-web-20261022", "url": "https://www.vlaanderen.be/belastingen-en-begroting/vlaamse-belastingen/boetes-uitzonderlijk-vervoer", "authority": "Vlaamse overheid", "role": "PRIMARY", "retrieval": "OFFICIAL_PAGE_READ", "version": "Official exceptional-transport enforcement table, section D", "scope": "Flanders only", "finding": "The authority table specifies Saturday 12:00 to Sunday 24:00, holiday windows and size-dependent daytime/peak-hour restrictions. Its mobile-crane weekend exception uses a maximum of 96 t and width not above 3.00 m. Preserve the conjunction and additional agricultural/permit conditions."},
+        {"source_id": "be-wallonia-article35-web-20261022", "url": "https://wallex.wallonie.be/eli/arrete/2024/03/21/2024007525/2026/02/13", "authority": "WALLEX / Walloon government", "role": "PRIMARY", "retrieval": "OFFICIAL_TEXT_READ", "version": "Consolidated version 13 February 2026; article 35", "scope": "Wallonia only", "finding": "Article 35 states Saturday 22:00 to Sunday 24:00, daytime dimension thresholds and weekday peak windows. It has its own crane/accessory-vehicle exception wording (108 t / 3.00 m), permit derogations and weather-alert conditions. Do not copy Flemish hours or convert the French exception wording into an unreviewed Boolean rule."}
+      ],
+      "remaining": ["Encode each regional exception exactly and test cross-region journeys before publishing calendar events.", "Brussels and the complete ordinary-goods regime were not verified in this targeted review; BE remains incomplete."]
+    },
+    {
+      "jurisdiction": "UK",
+      "sources": [
+        {"source_id": "uk-scotland-abnormal-web-20261022", "url": "https://www.scotland.police.uk/contact-us/moving-an-abnormal-load/", "authority": "Police Scotland", "role": "PRIMARY", "retrieval": "OFFICIAL_PAGE_READ", "version": "Current abnormal-load guidance retrieved 22 October 2026", "scope": "Scotland only; abnormal-load movements", "finding": "The guidance states weekday peak restrictions 06:30-09:30 and 15:30-18:30, individual notification assessment, and darkness restrictions in some rural areas. It requests two clear working days' notice. This guidance must not become a UK-wide ban or an unconditional permission outside peak hours."},
+        {"source_id": "uk-ni-abnormal-web-20261022", "url": "https://www.psni.police.uk/safety-and-support/roads-and-driving/abnormal-loads", "authority": "Police Service of Northern Ireland", "role": "PRIMARY", "retrieval": "OFFICIAL_PAGE_READ", "version": "Current abnormal-load guidance retrieved 22 October 2026", "scope": "Northern Ireland only", "finding": "The authority directs abnormal-load notifications through the Department for Infrastructure AL1 procedure. No nationwide NO_BAN conclusion follows from this notification page."},
+        {"source_id": "uk-national-highways-web-20261022", "url": "https://nationalhighways.co.uk/roads-and-travel/freight-and-professional-drivers/abnormal-loads-and-the-esdal-system/notifying-an-abnormal-load-movement-offline/", "authority": "National Highways", "role": "PRIMARY", "retrieval": "OFFICIAL_PAGE_READ", "version": "Current offline notification guidance", "scope": "National Highways / England procedure; other authorities retain their own competence", "finding": "Forms depend on load/vehicle dimensions and mass; approval is not automatic. The older GOV.UK forms page was labelled withdrawn, so it is not used as the current procedural authority."}
+      ],
+      "remaining": ["Wales, individual English police areas, route-specific restrictions and permit conditions remain to be checked.", "Encode Scottish guidance only with the relevant abnormal-load category and notification/derogation context."]
+    },
+    {
+      "jurisdiction": "PT",
+      "sources": [
+        {"source_id": "pt-adr-consolidated-web-20261022", "url": "https://diariodarepublica.pt/dr/legislacao-consolidada/portaria/2019-168527126", "authority": "Diario da Republica", "role": "PRIMARY", "retrieval": "OFFICIAL_TEXT_READ", "version": "Portaria 281/2019 consolidated with Portaria 163/2021", "scope": "Mainland Portugal; specific dangerous-goods vehicle categories", "finding": "Article 2 sets 00:00-24:00 Sunday/holiday restrictions for the tank category, with the stated Saturday/Monday holiday exception. Articles 3-4 contain different road/time/direction conditions for the specified dangerous-goods categories; article 5 permits the covered vehicles on Ponte 25 de Abril/north viaduct only 02:00-05:00. Articles 6-8 contain tunnel rules, substantive exceptions and special authorisations. Do not transfer this mainland regime to Madeira/Azores or ordinary non-ADR freight."},
+        {"source_id": "pt-adr-amendment-web-20261022", "url": "https://diariodarepublica.pt/dr/detalhe/portaria/163-2021-168561725", "authority": "Diario da Republica", "role": "PRIMARY", "retrieval": "OFFICIAL_TEXT_READ", "version": "Portaria 163/2021 of 29 July; effective 30 July 2021", "scope": "Mainland Portugal", "finding": "The amendment changes articles 2, 5, 7 and 8 of Portaria 281/2019. The similarly numbered April education measure is unrelated. The official IMT notice confirms the mainland ADR scope; its obsolete detail link redirects to the homepage, so the legal text is used directly."}
+      ],
+      "remaining": ["Encode exact tank/non-tank scope, road lists, calendar exceptions and special-authorisation conditions before adding events.", "Check subsequent emergency orders, applicable tunnel decisions, Madeira and Azores separately; this is not full PT verification."]
+    }
+  ]
+}

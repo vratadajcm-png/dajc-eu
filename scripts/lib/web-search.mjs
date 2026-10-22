@@ -15,6 +15,8 @@
 // ever recorded. Editorial eligibility is then decided later, unchanged, by
 // weekly-eligibility.mjs.
 
+import { dajcEuropeCoverage, coverageName, isTrackedJurisdiction, resolveCoverageScope, coverageRegions, geographicScopePolicy } from '../../config/europe-coverage.mjs';
+import { scopeFinding } from './geographic-scope.mjs';
 import OpenAI from 'openai';
 import { FINDING_TYPES } from './findings.mjs';
 import {
@@ -37,32 +39,38 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * Search groups in operator-first order. `codes` are the coverage codes the
  * group answers for (config/europe-coverage.mjs).
  */
-export const SEARCH_GROUPS = [
-  { id: 'cz', countries: ['Czechia'], codes: ['CZ'], languages: 'Czech, English' },
-  { id: 'de', countries: ['Germany'], codes: ['DE'], languages: 'German, English' },
-  { id: 'at', countries: ['Austria'], codes: ['AT'], languages: 'German, English' },
-  { id: 'sk', countries: ['Slovakia'], codes: ['SK'], languages: 'Slovak, English' },
-  { id: 'pl', countries: ['Poland'], codes: ['PL'], languages: 'Polish, English' },
-  { id: 'hu', countries: ['Hungary'], codes: ['HU'], languages: 'Hungarian, English' },
-  { id: 'ch-li', countries: ['Switzerland', 'Liechtenstein'], codes: ['CH', 'LI'], languages: 'German, French, Italian, English' },
-  { id: 'si-hr', countries: ['Slovenia', 'Croatia'], codes: ['SI', 'HR'], languages: 'Slovenian, Croatian, English' },
-  { id: 'fr', countries: ['France', 'Monaco'], codes: ['FR', 'MC'], languages: 'French, English' },
-  { id: 'benelux', countries: ['Belgium', 'Netherlands', 'Luxembourg'], codes: ['BE', 'NL', 'LU', 'FLA', 'WAL', 'BRU'], languages: 'Dutch, French, German, English' },
-  { id: 'it', countries: ['Italy', 'San Marino', 'Vatican City'], codes: ['IT', 'SM', 'VA', 'RSM'], languages: 'Italian, English' },
-  { id: 'ro-bg-md', countries: ['Romania', 'Bulgaria', 'Moldova'], codes: ['RO', 'BG', 'MD', 'TRN', 'GAG'], languages: 'Romanian, Bulgarian, English' },
-  { id: 'iberia', countries: ['Spain', 'Portugal', 'Andorra', 'Gibraltar'], codes: ['ES', 'PT', 'AD', 'GI', 'CAT', 'BAS', 'GAL', 'CEU', 'MLL', 'CAN', 'AZO', 'MAD'], languages: 'Spanish, Portuguese, Catalan, English' },
-  { id: 'uk-ie', countries: ['United Kingdom', 'Ireland'], codes: ['UK', 'IE', 'ENG', 'SCT', 'WLS', 'NIR', 'GG', 'JE', 'IM', 'ALDERNEY'], languages: 'English' },
-  { id: 'nordics', countries: ['Denmark', 'Sweden', 'Norway', 'Finland', 'Iceland'], codes: ['DK', 'SE', 'NO', 'FI', 'IS', 'AX', 'FO', 'GL', 'SVALBARD', 'JANMAYEN'], languages: 'Danish, Swedish, Norwegian, Finnish, English' },
-  { id: 'baltics', countries: ['Estonia', 'Latvia', 'Lithuania'], codes: ['EE', 'LV', 'LT'], languages: 'Estonian, Latvian, Lithuanian, English' },
-  { id: 'balkans', countries: ['Serbia', 'Bosnia and Herzegovina', 'Montenegro', 'North Macedonia', 'Albania', 'Kosovo', 'Greece'], codes: ['RS', 'BA', 'ME', 'MK', 'AL', 'XK', 'GR', 'FBIH', 'RSBA'], languages: 'local languages, English' },
-  { id: 'east', countries: ['Ukraine', 'Türkiye', 'Georgia', 'Armenia', 'Azerbaijan', 'Belarus', 'Russia (European part)', 'Kazakhstan (European transit)'], codes: ['UA', 'TR', 'GE', 'AM', 'AZ', 'BY', 'AB', 'SO', 'RU', 'KZ'], languages: 'local languages, English' },
-  { id: 'islands', countries: ['Cyprus', 'Malta'], codes: ['CY', 'MT', 'SBA', 'NCY'], languages: 'Greek, Maltese, English' },
+const SEARCH_GROUP_DEFINITIONS = [
+  { id: 'cz', codes: ['CZ'], languages: 'Czech, English' },
+  { id: 'de', codes: ['DE'], languages: 'German, English' },
+  { id: 'at', codes: ['AT'], languages: 'German, English' },
+  { id: 'sk', codes: ['SK'], languages: 'Slovak, English' },
+  { id: 'pl', codes: ['PL'], languages: 'Polish, English' },
+  { id: 'hu', codes: ['HU'], languages: 'Hungarian, English' },
+  { id: 'ch-li', codes: ['CH', 'LI'], languages: 'German, French, Italian, English' },
+  { id: 'si-hr', codes: ['SI', 'HR'], languages: 'Slovenian, Croatian, English' },
+  { id: 'fr', codes: ['FR', 'MC'], languages: 'French, English' },
+  { id: 'benelux', codes: ['BE', 'NL', 'LU'], languages: 'Dutch, French, German, English' },
+  { id: 'it', codes: ['IT', 'SM'], languages: 'Italian, English' },
+  { id: 'ro-bg-md', codes: ['RO', 'BG', 'MD'], languages: 'Romanian, Bulgarian, English' },
+  { id: 'iberia', codes: ['ES', 'PT', 'AD'], languages: 'Spanish, Portuguese, Catalan, English' },
+  { id: 'uk-ie', codes: ['UK', 'IE'], languages: 'English' },
+  { id: 'nordics', codes: ['DK', 'SE', 'NO', 'FI', 'IS'], languages: 'Danish, Swedish, Norwegian, Finnish, English' },
+  { id: 'baltics', codes: ['EE', 'LV', 'LT'], languages: 'Estonian, Latvian, Lithuanian, English' },
+  { id: 'balkans', codes: ['RS', 'BA', 'ME', 'MK', 'AL', 'XK', 'GR'], languages: 'local languages, English' },
+  { id: 'east', codes: ['UA', 'TR', 'GE', 'AM', 'AZ', 'BY', 'RU', 'KZ'], languages: 'local languages, English' },
+  { id: 'islands', codes: ['CY', 'MT'], languages: 'Greek, Maltese, English' },
 ];
+export const SEARCH_GROUPS = SEARCH_GROUP_DEFINITIONS.map(group => ({
+  ...group, countries: group.codes.map(coverageName),
+}));
+const groupedCodes = SEARCH_GROUPS.flatMap(group => group.codes);
+if (groupedCodes.length !== dajcEuropeCoverage.length || new Set(groupedCodes).size !== groupedCodes.length || !groupedCodes.every(isTrackedJurisdiction)) throw new Error('Search groups must partition the central registry exactly once');
 
 const SEARCH_ITEM_SCHEMA = {
   type: 'object',
   properties: {
-    country: { type: 'string', description: 'English country name the development applies to.' },
+    country: { type: 'string', enum: dajcEuropeCoverage.map(([, name]) => name), description: 'Tracked parent country the development applies to.' },
+    region: { type: ['string', 'null'], description: 'Exact regional applicability copied from the source page, or null for country-level/road-specific scope. Never broaden a regional notice to the whole country.' },
     title: { type: 'string', description: 'Headline of the source article, in its original language.' },
     url: { type: 'string', description: 'Direct URL of the specific article or notice (never a homepage or listing).' },
     sourceName: { type: 'string', description: 'Publisher, e.g. the road authority, ministry or trade publication.' },
@@ -73,7 +81,7 @@ const SEARCH_ITEM_SCHEMA = {
     type: { type: 'string', enum: FINDING_TYPES },
     oversize: { type: 'boolean', description: 'True when it explicitly concerns oversize/abnormal/exceptional transport.' },
   },
-  required: ['country', 'title', 'url', 'sourceName', 'publishedAt', 'validFrom', 'validTo', 'summary', 'type', 'oversize'],
+  required: ['country', 'region', 'title', 'url', 'sourceName', 'publishedAt', 'validFrom', 'validTo', 'summary', 'type', 'oversize'],
   additionalProperties: false,
 };
 
@@ -117,11 +125,13 @@ const FOCUS_TOPICS = {
 
 /** The prompt for one search group and focus. Pure - exported for tests. */
 export function buildSearchPrompt(group, now = new Date(), focus = 'oversize') {
+  if (!group.codes?.length || !group.codes.every(isTrackedJurisdiction)) throw new Error('Untracked search jurisdiction');
   const since = isoDay(new Date(now.getTime() - FRESHNESS_WINDOW_DAYS * DAY_MS));
   const today = isoDay(now);
   const horizon = isoDay(new Date(now.getTime() + FORWARD_HORIZON_DAYS * DAY_MS));
   return `Today is ${today}. You are researching news for a weekly briefing for road freight operators running vehicles over 12 tonnes, where oversize/abnormal transport has priority.
-Countries: ${group.countries.join(', ')}. Search in ${group.languages}.
+Countries: ${group.codes.map(coverageName).join(', ')}. Search in ${group.languages}.
+Regional applicability to preserve inside these countries: ${group.codes.flatMap(code => coverageRegions(code).map(region => `${code}: ${region}`)).join('; ') || 'national and regional rules with their exact scope'}.
 
 TOPIC:
 ${FOCUS_TOPICS[focus] || FOCUS_TOPICS.oversize}
@@ -130,6 +140,8 @@ DATES - STRICT:
 Return a page only if its visible publication date is between ${since} and ${today}, OR it announces a change that takes effect or ends between ${today} and ${horizon}. Skip every page that shows an older date and no such upcoming effective date. Search news sections and press releases of the last days, not evergreen pages.
 
 NEVER RETURN: general recurring truck driving bans (Sunday, holiday, weekend, night, summer bans - they are covered elsewhere), accidents, incidents, crime, short local roadworks, tenders, statistics, company/market news, service or company pages, guides, FAQs, homepages, listing pages, undated pages.
+
+Search only the listed tracked countries. Retain regional road, permit, toll and escort conditions under their country with exact regional applicability. Exclude untracked dependencies, French/Dutch overseas territories and Vatican City; keep the listed regional locations within their tracked country; never inherit rules from an administering country. For KZ, RU and TR: ${geographicScopePolicy.corridor_scope} ${geographicScopePolicy.corridor_evidence} Search these corridors, not their whole territories. XK is an operational jurisdiction, without a diplomatic-recognition claim.
 
 Prefer official sources (road authorities, ministries, police, toll operators) and established transport trade media. Each item must link to the specific article. Copy dates exactly as shown on the page; use null when the page shows none. Return at most ${MAX_ITEMS_PER_SEARCH} items; return an empty list when nothing qualifies - never pad.`;
 }
@@ -187,6 +199,8 @@ export function cleanUrl(raw) {
  * @returns {Promise<{ ok: true, finding: object } | { ok: false, reason: string }>}
  */
 export async function verifySearchItem(item, { fetchPage = (url) => fetchTextWithRetry(url, 'text/html, application/xhtml+xml, */*'), now = new Date() } = {}) {
+  const scope = scopeFinding({ ...item, sourceUrl: item.sourceUrl || item.url });
+  if (!scope.ok) return scope;
   let sourceUrl;
   try {
     sourceUrl = cleanUrl(item.url);
@@ -203,6 +217,7 @@ export async function verifySearchItem(item, { fetchPage = (url) => fetchTextWit
       // keep the requested URL
     }
   }
+  if (scope.finding.corridorEvidence && scope.finding.corridorEvidence.sourceUrl !== sourceUrl) return { ok: false, reason: 'CORRIDOR_SOURCE_REDIRECT_REQUIRES_REVIEW' };
 
   // Binary documents (PDF) cannot be read as text here: only the URL date is
   // evidence, and the page text cannot confirm the transport context.
@@ -213,12 +228,15 @@ export async function verifySearchItem(item, { fetchPage = (url) => fetchTextWit
 
   const title = extractDetailHeading(fetched.text || '') || String(item.title || '').trim();
   const evidence = `${title} ${pageText}`;
+  const normalizeEvidence = value => String(value || '').replace(/\s+/g, ' ').trim().toLocaleLowerCase();
+  if (scope.finding.corridorEvidence && !normalizeEvidence(evidence).includes(normalizeEvidence(scope.finding.corridorEvidence.excerpt))) return { ok: false, reason: 'CORRIDOR_SOURCE_EVIDENCE_CHANGED' };
+  if (item.region && !evidence.toLocaleLowerCase().includes(item.region.toLocaleLowerCase())) return { ok: false, reason: 'REGIONAL_SCOPE_REQUIRES_REVIEW' };
   if (!checkOperationalRelevance(evidence, { now }).ok) return { ok: false, reason: 'page is not an operational development' };
   if (!checkTransportDomainRelevance({ title, summary: pageText }).ok) {
     return { ok: false, reason: 'page text shows no freight-vehicle (>12 t) or oversize-transport context' };
   }
 
-  const country = String(item.country || '').trim();
+  const country = scope.finding.country;
   let publication = extractPublicationDate({ html: fetched.text, text: pageText, url: sourceUrl, country, now });
   if (!publication && isIsoDay(item.publishedAt) && findDates(pageText, { country }).some((d) => d.iso === item.publishedAt)) {
     publication = { date: item.publishedAt, source: 'page-text' };
@@ -240,7 +258,9 @@ export async function verifySearchItem(item, { fetchPage = (url) => fetchTextWit
     ok: true,
     finding: {
       country,
-      region: null,
+      jurisdiction: scope.finding.jurisdiction,
+      region: scope.finding.region || null,
+      ...(scope.finding.corridorEvidence ? { corridorEvidence: scope.finding.corridorEvidence } : {}),
       location: guessLocation(evidence, null),
       type,
       title,
@@ -281,6 +301,7 @@ async function pool(items, limit, fn) {
  * @returns {Promise<{ status: 'ok', items: object[] } | { status: 'unavailable', error: string, items: [] }>}
  */
 export async function searchGroup(client, group, { now = new Date(), model, focuses = SEARCH_FOCUSES } = {}) {
+  if (!group.codes?.length || !group.codes.every(isTrackedJurisdiction)) throw new Error('Untracked search jurisdiction');
   const items = [];
   const seen = new Set();
   const errors = [];
@@ -293,7 +314,8 @@ export async function searchGroup(client, group, { now = new Date(), model, focu
         text: { format: SEARCH_RESULT_FORMAT },
       });
       for (const item of parseSearchResponse(response.output_text)) {
-        if (seen.has(item.url)) continue;
+        const scope = resolveCoverageScope(item.country);
+        if (!scope || !group.codes.includes(scope.jurisdiction) || seen.has(item.url)) continue;
         seen.add(item.url);
         items.push(item);
       }
@@ -325,7 +347,7 @@ export async function discoverWithWebSearch({ apiKey, now = new Date(), groups =
     const verified = await pool(result.items, VERIFY_CONCURRENCY, (item) => verifySearchItem(item, { now, ...(fetchPage ? { fetchPage } : {}) }));
     verified.forEach((outcome, index) => {
       if (!outcome.ok) {
-        entry.rejected.push({ url: result.items[index].url, reason: outcome.reason });
+        entry.rejected.push({ url: result.items[index].url, jurisdiction: resolveCoverageScope(result.items[index].country)?.jurisdiction, reason: outcome.reason });
         return;
       }
       if (seen.has(outcome.finding.sourceUrl)) return;

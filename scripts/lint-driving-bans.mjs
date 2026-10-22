@@ -1,3 +1,4 @@
+import { dajcCoverageCount, dajcCoverageCodes } from '../config/europe-coverage.mjs';
 /** Scoped syntax, provenance and consumer-boundary lint; not an external legal review. */
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -11,5 +12,5 @@ for (const file of ['src/pages/driving-bans.astro','src/pages/api/driving-bans.i
   assert(code.includes('driving-ban-calendars/runtime.mjs'),`${file}: missing canonical boundary`);
   assert(!/from\s+['"][^'"]*(?:driving-bans-legacy|verified-sep-oct-2026|current-exceptions|public-holidays|tests\/fixtures)/.test(code),`${file}: archived/test evidence imported at runtime`);
 }
-assert.equal(getDrivingBansSnapshot().jurisdictions.length,104);
+assert.equal(getDrivingBansSnapshot().jurisdictions.length,dajcCoverageCount);
 console.log('Driving Bans scoped lint: syntax, production provenance, canonical consumer boundaries PASS');

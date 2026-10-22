@@ -22,7 +22,7 @@ function fixture() {
   execFileSync('git', ['clone', remote, root], { stdio: 'ignore' });
   git(root, ['config', 'user.name', 'Test']);
   git(root, ['config', 'user.email', 'test@example.invalid']);
-  for (const relative of ['scripts/check-weekly-publication.mjs', 'scripts/publish-gate-commit.mjs', 'scripts/lib/publish-gate.mjs', 'scripts/lib/automation-data.mjs', 'scripts/lib/next-publication.mjs', 'scripts/lib/week.mjs']) {
+  for (const relative of ['scripts/check-weekly-publication.mjs', 'scripts/publish-gate-commit.mjs', 'scripts/lib/publish-gate.mjs', 'scripts/lib/automation-data.mjs', 'scripts/lib/geographic-scope.mjs', 'config/europe-coverage.mjs', 'config/oversize-sources/index.mjs', 'scripts/lib/next-publication.mjs', 'scripts/lib/week.mjs']) {
     mkdirSync(path.dirname(path.join(root, relative)), { recursive: true });
     copyFileSync(path.join(sourceRoot, relative), path.join(root, relative));
   }
@@ -75,7 +75,7 @@ describe('reviewed weekly publication', () => {
   it('stores a data-only run separately and never opens a publication PR', () => {
     const f = fixture();
     loadAutomationData('findings', f.root);
-    put(f.root, 'data/oversize/2026-W42/findings.json', '{"findings":["fresh"]}');
+    put(f.root, 'data/oversize/2026-W42/findings.json', '{"findings":[{"id":"fresh","country":"Czechia","jurisdiction":"CZ"}]}');
     expect(run(f, 'publish-gate-commit.mjs')).toContain('No article was generated or published');
     expect(git(f.remote, ['rev-parse', 'main']).trim()).toBe(f.main);
     expect(git(f.remote, ['show', 'automation/oversize-data:data/oversize/2026-W42/findings.json'])).toContain('fresh');

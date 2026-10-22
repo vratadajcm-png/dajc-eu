@@ -3,6 +3,7 @@
 // select, structure and phrase those candidates; source URLs are cross-validated
 // again after generation before publication.
 
+import { dajcEuropeCoverage, geographicScopePolicy } from '../../config/europe-coverage.mjs';
 import OpenAI from 'openai';
 import { readableText } from './text-quality.mjs';
 
@@ -11,7 +12,7 @@ const DEFAULT_MODEL = 'gpt-4o';
 const DEVELOPMENT_SCHEMA = {
   type: 'object',
   properties: {
-    country: { type: 'string' },
+    country: { type: 'string', enum: dajcEuropeCoverage.map(([, name]) => name) },
     title: { type: 'string' },
     whatChanged: { type: 'string' },
     where: { type: 'string' },
@@ -82,7 +83,7 @@ QUALITY OVER COUNT — CRITICAL
 There is NO minimum number of reports. Include a candidate only when it passes every rule below. A well-supplied week can fill up to 30 lead reports and up to 15 Rest-of-Europe updates, but these are capacities, never quotas: if 6 candidates qualify, return 6; if nothing qualifies for Rest of Europe, return an empty europeRoundup; if nothing qualifies at all, return empty arrays. Never add an old, generic, marginal or weakly relevant item to make a section look fuller. Never split one development into several reports. If any item qualifies, the most important ones belong in developments (never return an empty developments array together with a non-empty europeRoundup).
 
 GEOGRAPHIC PRINCIPLE
-The upstream DAJC monitor scans the complete DAJC European coverage area, including smaller countries, territories and relevant jurisdictions. Coverage remains Europe-wide and evidence-led. For the PUBLISHED LEAD ORDER, however, DAJC is operator-first: place verified, substantive developments from the wider Central-European transport core first when available — Czechia, Germany, Austria, Slovakia, Poland, Hungary, Switzerland and Slovenia — followed by directly connected high-value transit corridors, then the rest of Europe. This ordering must never promote weak material over a materially more important verified change. Peripheral territories such as Madeira, Guernsey, Jersey, Monaco or similar jurisdictions belong later in the article/Rest of Europe unless a genuinely critical exceptional-transport event justifies elevation. There is no country quota: never include an item to add a country.
+The upstream monitor covers only these jurisdictions from the shared DAJC registry: ${dajcEuropeCoverage.map(([code, name]) => `${code} (${name})`).join(', ')}. Regions are scoped inside their tracked country, never extra jurisdictions. Preserve the supplied region, roads and corridor scope in every report; never expand a regional restriction nationwide. Excluded dependencies and overseas territories must not be added. KZ, RU and TR: ${geographicScopePolicy.corridor_scope} ${geographicScopePolicy.corridor_evidence} XK is an operational jurisdiction without a diplomatic-recognition claim. For lead order, place substantive Central-European transport developments first when available, then directly connected transit corridors and the remaining tracked countries. Geographic order never promotes weak material over a materially more important verified change. There is no country quota.
 
 PUBLIC OUTPUT RULE — INTERNAL EDITORIAL MECHANICS MUST NEVER APPEAR IN PUBLIC TEXT
 The reader must never see internal DAJC publishing mechanics. Do not mention candidate/report counts, capacities such as 30 or 15, editorial thresholds, quality gates, retries, verification pool size, source-pool insufficiency, padding/filler decisions, workflow behavior, or why an edition contains fewer items. Public copy contains operational intelligence and user-facing context only.
@@ -124,6 +125,8 @@ Write practical professional English. Each lead must contain concrete What chang
 function candidatePayload(c, { required = false, summaryChars = 1200 } = {}) {
   return {
     country: c.country,
+    region: c.region || null,
+    corridorEvidence: c.corridorEvidence || null,
     location: c.location,
     type: c.type,
     title: c.title,
