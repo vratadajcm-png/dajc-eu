@@ -64,6 +64,8 @@ export function migrateCanonicalCoverage(input) {
   const removedSources = data.sources.filter(s => !sourceIds.has(s.source_id));
   data.sources = data.sources.filter(s => sourceIds.has(s.source_id));
   if (data.jurisdiction_reviews.FR?.notes) data.jurisdiction_reviews.FR.notes = data.jurisdiction_reviews.FR.notes.replace('Overseas departments are separate DAJC jurisdictions.', 'Overseas territories are outside active monitoring and do not inherit metropolitan rules.');
+  const esRegional = data.jurisdiction_reviews.ES?.scope_checks?.regional;
+  if (esRegional?.note) esRegional.note = esRegional.note.replace('Catalonia and Basque Country run their own calendars (separate DAJC jurisdictions)', 'Catalonia and Basque Country run their own calendars within ES, with separate regional applicability');
   data.coverage_authority = 'config/europe-coverage.mjs';
   data.coverage_version = COVERAGE_VERSION;
   if (!data.dataset_version.endsWith('.geo50')) data.dataset_version += '.geo50';

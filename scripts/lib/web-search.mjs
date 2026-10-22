@@ -15,7 +15,7 @@
 // ever recorded. Editorial eligibility is then decided later, unchanged, by
 // weekly-eligibility.mjs.
 
-import { dajcEuropeCoverage, coverageName, isTrackedJurisdiction, resolveCoverageScope, coverageRegions } from '../../config/europe-coverage.mjs';
+import { dajcEuropeCoverage, coverageName, isTrackedJurisdiction, resolveCoverageScope, coverageRegions, geographicScopePolicy } from '../../config/europe-coverage.mjs';
 import { scopeFinding } from './geographic-scope.mjs';
 import OpenAI from 'openai';
 import { FINDING_TYPES } from './findings.mjs';
@@ -141,7 +141,7 @@ Return a page only if its visible publication date is between ${since} and ${tod
 
 NEVER RETURN: general recurring truck driving bans (Sunday, holiday, weekend, night, summer bans - they are covered elsewhere), accidents, incidents, crime, short local roadworks, tenders, statistics, company/market news, service or company pages, guides, FAQs, homepages, listing pages, undated pages.
 
-Search only the listed tracked countries. Retain regional road, permit, toll and escort conditions under their country with exact regional applicability. Exclude untracked dependencies, French/Dutch overseas territories and Vatican City; keep the listed regional locations within their tracked country; never inherit rules from an administering country. For KZ, RU and TR search only European and connected international road-freight corridors, not their whole territories. XK is an operational jurisdiction, without a diplomatic-recognition claim.
+Search only the listed tracked countries. Retain regional road, permit, toll and escort conditions under their country with exact regional applicability. Exclude untracked dependencies, French/Dutch overseas territories and Vatican City; keep the listed regional locations within their tracked country; never inherit rules from an administering country. For KZ, RU and TR: ${geographicScopePolicy.corridor_scope} ${geographicScopePolicy.corridor_evidence} Search these corridors, not their whole territories. XK is an operational jurisdiction, without a diplomatic-recognition claim.
 
 Prefer official sources (road authorities, ministries, police, toll operators) and established transport trade media. Each item must link to the specific article. Copy dates exactly as shown on the page; use null when the page shows none. Return at most ${MAX_ITEMS_PER_SEARCH} items; return an empty list when nothing qualifies - never pad.`;
 }
@@ -199,7 +199,7 @@ export function cleanUrl(raw) {
  * @returns {Promise<{ ok: true, finding: object } | { ok: false, reason: string }>}
  */
 export async function verifySearchItem(item, { fetchPage = (url) => fetchTextWithRetry(url, 'text/html, application/xhtml+xml, */*'), now = new Date() } = {}) {
-  const scope = scopeFinding(item);
+  const scope = scopeFinding({ ...item, sourceUrl: item.sourceUrl || item.url });
   if (!scope.ok) return scope;
   let sourceUrl;
   try {
@@ -217,6 +217,7 @@ export async function verifySearchItem(item, { fetchPage = (url) => fetchTextWit
       // keep the requested URL
     }
   }
+  if (scope.finding.corridorEvidence && scope.finding.corridorEvidence.sourceUrl !== sourceUrl) return { ok: false, reason: 'CORRIDOR_SOURCE_REDIRECT_REQUIRES_REVIEW' };
 
   // Binary documents (PDF) cannot be read as text here: only the URL date is
   // evidence, and the page text cannot confirm the transport context.
@@ -227,6 +228,8 @@ export async function verifySearchItem(item, { fetchPage = (url) => fetchTextWit
 
   const title = extractDetailHeading(fetched.text || '') || String(item.title || '').trim();
   const evidence = `${title} ${pageText}`;
+  const normalizeEvidence = value => String(value || '').replace(/\s+/g, ' ').trim().toLocaleLowerCase();
+  if (scope.finding.corridorEvidence && !normalizeEvidence(evidence).includes(normalizeEvidence(scope.finding.corridorEvidence.excerpt))) return { ok: false, reason: 'CORRIDOR_SOURCE_EVIDENCE_CHANGED' };
   if (item.region && !evidence.toLocaleLowerCase().includes(item.region.toLocaleLowerCase())) return { ok: false, reason: 'REGIONAL_SCOPE_REQUIRES_REVIEW' };
   if (!checkOperationalRelevance(evidence, { now }).ok) return { ok: false, reason: 'page is not an operational development' };
   if (!checkTransportDomainRelevance({ title, summary: pageText }).ok) {
@@ -257,6 +260,7 @@ export async function verifySearchItem(item, { fetchPage = (url) => fetchTextWit
       country,
       jurisdiction: scope.finding.jurisdiction,
       region: scope.finding.region || null,
+      ...(scope.finding.corridorEvidence ? { corridorEvidence: scope.finding.corridorEvidence } : {}),
       location: guessLocation(evidence, null),
       type,
       title,

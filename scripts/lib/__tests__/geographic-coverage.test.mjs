@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { dajcEuropeCoverage, dajcCoverageCodes, resolveCoverageScope } from '../../../config/europe-coverage.mjs';
 import { oversizeSources } from '../../../config/oversize-sources/index.mjs';
 import { canonicalDrivingBans } from '../../../config/driving-ban-calendars/runtime.mjs';
+import { buildDrivingBanVerificationPlan, targetedSourceReview } from '../../../config/driving-ban-calendars/verification.mjs';
 import { hydrateCanonical, expandRules, validateCanonical, snapshot, assertSweepRequest, SCOPE_CHECKS } from '../../../src/lib/driving-bans/core.mjs';
 import { migrateCanonicalCoverage } from '../geographic-migration.mjs';
 import { scopeFinding, scopeMonitoringDocument } from '../geographic-scope.mjs';
@@ -39,6 +40,7 @@ describe('approved geographic scope and data preservation', () => {
     for (const code of expected) {
       const prior = structuredClone(original.jurisdiction_reviews[code]);
       if (code === 'FR') prior.notes = prior.notes.replace('Overseas departments are separate DAJC jurisdictions.', 'Overseas territories are outside active monitoring and do not inherit metropolitan rules.');
+      if (code === 'ES') prior.scope_checks.regional.note = prior.scope_checks.regional.note.replace('Catalonia and Basque Country run their own calendars (separate DAJC jurisdictions)', 'Catalonia and Basque Country run their own calendars within ES, with separate regional applicability');
       expect(active.jurisdiction_reviews[code]).toEqual(prior);
     }
     const old = { ...original, rules: fullRules(original).map(rule => {
@@ -113,7 +115,36 @@ describe('approved geographic scope and data preservation', () => {
     const prompt = buildSearchPrompt(SEARCH_GROUPS.find(group=>group.id==='east'));
     expect(prompt).toContain('not their whole territories');
     for (const country of ['KZ','RU','TR']) expect(scopeFinding({country}).reason).toBe('CORRIDOR_SCOPE_REQUIRES_REVIEW');
-    expect(scopeFinding({country:'TR',sourceUrl:'https://example.test/a',corridorEvidence:{corridor:'European international route',reviewedBy:'operator',sourceUrl:'https://example.test/a',excerpt:'source passage'}}).ok).toBe(true);
+    const finding = {country:'TR',sourceUrl:'https://example.test/a',corridorEvidence:{corridor:'European international route',reviewedBy:'operator',sourceUrl:'https://example.test/a',excerpt:'source passage',roadClass:'motorway',roadOrSection:'O-3; European freight corridor'}};
+    expect(scopeFinding(finding).ok).toBe(true);
+    expect(scopeFinding({...finding,corridorEvidence:{...finding.corridorEvidence,roadClass:'main_road'}}).ok).toBe(true);
+    for (const roadClass of ['local_road','secondary_road',null]) expect(scopeFinding({...finding,corridorEvidence:{...finding.corridorEvidence,roadClass}}).ok).toBe(false);
+    expect(scopeFinding({...finding,corridorEvidence:{...finding.corridorEvidence,roadOrSection:''}}).ok).toBe(false);
+    expect(prompt).toContain('Motorways and main roads');
+  });
+
+  it('rejects a corridor calendar rule without a tracked road class and precise road scope', () => {
+    const input = structuredClone(active);
+    const base = {...fullRules(active)[0], ban_id:'tr-scope-test', jurisdiction:'TR', supersedes:[], roads:['O-3; defined section'], corridor_scope:{description:'European freight corridor',reviewed_by:'test fixture',evidence_ids:[fullRules(active)[0].source_id],road_classes:['motorway']}};
+    delete base.profile;
+    input.rules.push(base);
+    expect(validateCanonical(hydrateCanonical(input,dajcEuropeCoverage),dajcEuropeCoverage)).toBe(true);
+    base.corridor_scope.road_classes = ['local_road'];
+    expect(() => validateCanonical(hydrateCanonical(input,dajcEuropeCoverage),dajcEuropeCoverage)).toThrow(/road class/);
+    base.corridor_scope.road_classes = ['main_road']; base.roads = [];
+    expect(() => validateCanonical(hydrateCanonical(input,dajcEuropeCoverage),dajcEuropeCoverage)).toThrow(/road class/);
+  });
+
+  it('exports official web review tasks for the central registry without claiming a fresh complete sweep', () => {
+    const plan = buildDrivingBanVerificationPlan(new Date('2026-12-22T10:00:00Z'));
+    expect(plan.window).toMatchObject({from:'2026-12-01',to:'2027-01-31'});
+    expect(plan.jurisdictions.map(row=>row.jurisdiction)).toEqual(expected);
+    for (const code of ['AT','DE','ES','BE','UK','PT']) expect(plan.jurisdictions.find(row=>row.jurisdiction===code).official_source_seeds.length).toBeGreaterThan(0);
+    for (const code of ['KZ','RU','TR']) expect(plan.jurisdictions.find(row=>row.jurisdiction===code).road_classes).toEqual(['motorway','main_road']);
+    expect(targetedSourceReview.full_registry_sweep).toBe(false);
+    expect(targetedSourceReview.calendar_rules_updated).toBe(false);
+    expect(targetedSourceReview.jurisdictions.every(row=>row.remaining.length && row.sources.every(source=>source.role==='PRIMARY'))).toBe(true);
+    expect(active.jurisdiction_reviews.UK.last_checked).toBeNull();
   });
 
   it('partitions discovery into the approved registry exactly once and scopes official sources', () => {
@@ -148,6 +179,8 @@ describe('approved geographic scope and data preservation', () => {
       expect(summary.external_source_review_performed).toBe(false);
       expect(summary.selected_jurisdictions).toEqual(expected);
       expect(summary.sweep_age_days).toBeGreaterThan(8);
+      expect(JSON.parse(readFileSync(join(root,'verification-plan.json'),'utf8')).jurisdictions.map(row=>row.jurisdiction)).toEqual(expected);
+      expect(JSON.parse(readFileSync(join(root,'targeted-source-review.json'),'utf8')).full_registry_sweep).toBe(false);
       const summaryPath = join(root,'summary.json');
       const statusPath = join(root,'status.json');
       execFileSync(process.execPath,['scripts/driving-bans-technical-status.mjs',summaryPath,statusPath],{stdio:'pipe'});

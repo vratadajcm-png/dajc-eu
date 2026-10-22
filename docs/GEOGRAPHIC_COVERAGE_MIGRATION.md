@@ -194,7 +194,7 @@ snapshoty/čekající alerty se nevyužívají, historické položky zůstávaj�
   verze pokrytí, odmítnutí nesledovaných kalendářových filtrů.
 - Záloha před zápisem, idempotence a zachování kontrolních součtů archivu.
 - Automatické kontroly i staré vstupy jsou omezeny centrálním registrem.
-- Lokální sada: 627/627 testů v 57 souborech. Oba linty prošly. Typová kontrola: 0 chyb a 0 varování (65 informativních hints). Produkční build prošel. Stav vzdáleného CI bude v Pull Requestu.
+- Lokální sada: 630/630 testů v 57 souborech. Oba linty prošly. Typová kontrola: 0 chyb a 0 varování (64 informativních hints). Produkční build prošel. Stav vzdáleného CI bude v Pull Requestu.
 
 Čtvrteční technický audit a jeho pravidla zůstávají aktivní v konfiguraci.
 Při kontrolním čase 22. 10. 2026 10:00 UTC: 17 HAS_BAN, 0 NO_BAN, 33 UNKNOWN,
@@ -224,12 +224,12 @@ Tato větev nevytváří veřejný release ani nasazení. `vercel.json` vypíná
 nasazení pouze této vývojové větve (podle oficiální konfigurace Vercel:
 https://vercel.com/docs/project-configuration/git-configuration).
 
-Main, živý web, produkční databáze, externí naplánované úlohy ChatGPT a existující
+Main, živý web, produkční databáze a existující
 větev `automation/oversize-data` se nyní nemění. Teprve po výslovném schválení
 merge/aktivace začne produkce používat tuto konfiguraci. Následný běžný běh
-monitoru normalizuje datovou větev přes nový vstupní filtr. Externí čtvrteční úloha
-musí číst seznam z tohoto centrálního registru na schváleném produkčním commitu,
-nikoli z původní kopie 104 položek. Nevzniká žádná nová paralelní úloha.
+monitoru normalizuje datovou větev přes nový vstupní filtr. Existující externí čtvrteční úloha
+byla na následný pokyn uživatele upravena: do sloučení čte centrální registr
+z aktuální hlavy PR #46, poté z main; nikdy nespouští původní rozsah 104. Nevzniká žádná nová paralelní úloha.
 
 PR kontrola porovnává navržený dataset lokálně; ručně spuštěná produkční akceptace
 na main nadále kontroluje skutečné veřejné HTTP odpovědi. PR tak nevyžaduje
@@ -243,9 +243,11 @@ zakázané předčasné nasazení jen kvůli porovnání 50 proti dosud živým 
 - `.github/workflows/driving-bans-thursday.yml`
 - `.gitignore`
 - `config/driving-ban-calendars/canonical.mjs`
+- `config/driving-ban-calendars/verification.mjs`
 - `config/europe-coverage.mjs`
 - `config/oversize-sources/index.mjs`
 - `data/driving-bans/canonical.json`
+- `data/driving-bans/source-reviews/2026-10-22.json`
 - `data/oversize/2026-W34/findings.json`
 - `data/oversize/2026-W35/coverage.json`
 - `data/oversize/2026-W35/findings.json`
@@ -264,6 +266,7 @@ zakázané předčasné nasazení jen kvůli porovnání 50 proti dosud živým 
 - `data/oversize/2026-W42/coverage.json`
 - `data/oversize/2026-W42/findings.json`
 - `docs/DRIVING_BANS_CANONICAL.md`
+- `docs/DRIVING_BANS_OFFICIAL_WEB_REVIEW.md`
 - `docs/DRIVING_BANS_TEST_MIGRATION.md`
 - `docs/GEOGRAPHIC_COVERAGE_MIGRATION.md`
 - `docs/NEWS_AUTOMATION.md`
@@ -308,4 +311,16 @@ zakázané předčasné nasazení jen kvůli porovnání 50 proti dosud živým 
 - `vercel.json`
 - `vitest.config.ts`
 
-Archiv: 55 souborů pod `archive/geographic-coverage-20261022/`, včetně originálů, manifestů SHA-256, zpráv aplikačních dávek a seznamu vyřazených zdrojů. Úplný výčet je také ve Files changed připraveného PR.
+Archiv: 58 souborů pod `archive/geographic-coverage-20261022/`, včetně originálů, manifestů SHA-256, zpráv aplikačních dávek a seznamu vyřazených zdrojů. Úplný výčet je také ve Files changed připraveného PR.
+
+
+## Následné upřesnění uživatele 22. 10. 2026
+
+AT/DE/ES/BE/UK/PT se ověřují na oficiálních webech. Cílená kontrola 13 úředních
+zdrojů je v `DRIVING_BANS_OFFICIAL_WEB_REVIEW.md`; nejde o nový úplný sweep ani
+o nové kalendářové události. KZ/RU/TR jsou upřesněny na dálnice a hlavní silnice
+v již schváleném koridorovém rozsahu. Původních 182 pravidel a jejich ověřovací
+data zůstávají beze změny. Stará organizační poznámka ES byla opravena se zálohou.
+Plán kontroly se exportuje z centrálního registru; existující čtvrteční úloha má
+stejné načasování a zůstává read-only. Celkem 73 implementačních/datových/dokumentačních
+souborů a 58 archivních souborů v celém PR.

@@ -7,6 +7,9 @@ name: Driving Bans Thursday gate
 # law; it fails when the reviewed span no longer contains the active
 # current+next calendar month, or when the last sweep is older than 8 days, so
 # a missed Thursday sweep is visible instead of silently decaying to UNKNOWN.
+# The exported verification-plan.json supplies official web source seeds and
+# the central KZ/RU/TR motorway/main-road scope to the semantic reviewer.
+# Targeted source checks do not count as a fresh full-registry sweep.
 
 on:
   schedule:

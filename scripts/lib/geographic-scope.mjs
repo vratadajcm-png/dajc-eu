@@ -1,5 +1,5 @@
 import { oversizeSources } from '../../config/oversize-sources/index.mjs';
-import { coverageName, resolveCoverageScope, isTrackedJurisdiction, corridorOnlyJurisdictions, isExcludedTerritory, COVERAGE_VERSION } from '../../config/europe-coverage.mjs';
+import { coverageName, resolveCoverageScope, isTrackedJurisdiction, corridorOnlyJurisdictions, isTrackedCorridorRoadClass, isExcludedTerritory, COVERAGE_VERSION } from '../../config/europe-coverage.mjs';
 
 /** Resolve identity before any page fetch, AI request or active-store write.
  * Explicit territory identity wins over an administering-country label.
@@ -20,6 +20,9 @@ export function scopeFinding(finding) {
     // sourced, reviewed corridor assignment, keep the item out of active use.
     if (!evidence?.corridor || !evidence?.reviewedBy || evidence.sourceUrl !== finding.sourceUrl || !evidence.excerpt) {
       return { ok: false, reason: 'CORRIDOR_SCOPE_REQUIRES_REVIEW' };
+    }
+    if (!isTrackedCorridorRoadClass(evidence.roadClass) || !String(evidence.roadOrSection || '').trim()) {
+      return { ok: false, reason: 'CORRIDOR_ROAD_CLASS_OR_SECTION_REQUIRES_REVIEW' };
     }
   }
   const source = oversizeSources.find(source => source.country === scope.jurisdiction && source.name === finding.sourceName);

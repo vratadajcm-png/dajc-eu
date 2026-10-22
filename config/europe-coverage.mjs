@@ -67,10 +67,14 @@ export const coverageName = code => dajcEuropeCoverage.find(([c]) => c === code)
 export const isTrackedJurisdiction = code => codes.has(code);
 export const COVERAGE_VERSION = '2026-10-22.50';
 export const corridorOnlyJurisdictions = Object.freeze(['KZ', 'RU', 'TR']);
+export const corridorRoadClasses = Object.freeze(['motorway', 'main_road']);
+export const isTrackedCorridorRoadClass = roadClass => corridorRoadClasses.includes(roadClass);
 export const geographicScopePolicy = Object.freeze({
   version: COVERAGE_VERSION,
   corridor_only: corridorOnlyJurisdictions,
-  corridor_scope: 'European and connecting international road freight corridors only; never whole-territory coverage.',
+  corridor_scope: 'Motorways and main roads in European and connecting international road freight corridors only; never whole-territory coverage.',
+  corridor_road_classes: corridorRoadClasses,
+  corridor_evidence: 'Preserve the road identifier or precise section and its official road class. Include bridges, tunnels and border sections on these roads. National rules apply only within this monitored network; local and secondary roads do not expand coverage.',
   regional_scope: 'Regional rules retain their own roads, regions, directions, thresholds and exceptions.',
   dependencies: 'Untracked territories do not inherit parent-country rules.',
   xk: 'Operational transport jurisdiction; no position on diplomatic recognition.',

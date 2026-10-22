@@ -1,4 +1,4 @@
-import { dajcEuropeCoverage, geographicScopePolicy, COVERAGE_VERSION, corridorOnlyJurisdictions, coverageRegions } from '../../../config/europe-coverage.mjs';
+import { dajcEuropeCoverage, geographicScopePolicy, COVERAGE_VERSION, corridorOnlyJurisdictions, isTrackedCorridorRoadClass, coverageRegions } from '../../../config/europe-coverage.mjs';
 /** Pure canonical Driving Bans engine. No network, no guessed prohibitions. */
 export const VERIFICATION_STATES = ['PRIMARY_VERIFIED', 'CROSSCHECKED', 'UNVERIFIED', 'SOURCE_UNAVAILABLE'];
 export const BAN_STATES = ['HAS_BAN', 'NO_BAN', 'UNKNOWN'];
@@ -99,7 +99,10 @@ export function validateCanonical(data, identities) {
     assert(!ruleIds.has(rule.ban_id), `Duplicate ban identity ${rule.ban_id}`); ruleIds.add(rule.ban_id);
     assert(expected.has(rule.jurisdiction), `Untracked jurisdiction ${rule.jurisdiction}`);
     assert(sources.has(rule.source_id) && rule.evidence_ids?.every(id => sources.has(id)), `Dangling rule evidence ${rule.ban_id}`);
-    if (corridorOnlyJurisdictions.includes(rule.jurisdiction)) assert(rule.corridor_scope?.description && rule.corridor_scope?.reviewed_by && rule.corridor_scope?.evidence_ids?.length && rule.corridor_scope.evidence_ids.every(id => sources.has(id)), `Corridor scope requires review ${rule.ban_id}`);
+    if (corridorOnlyJurisdictions.includes(rule.jurisdiction)) {
+      assert(rule.corridor_scope?.description && rule.corridor_scope?.reviewed_by && rule.corridor_scope?.evidence_ids?.length && rule.corridor_scope.evidence_ids.every(id => sources.has(id)), `Corridor scope requires review ${rule.ban_id}`);
+      assert(rule.corridor_scope.road_classes?.length && rule.corridor_scope.road_classes.every(isTrackedCorridorRoadClass) && rule.roads?.length && rule.roads.every(road => typeof road === 'string' && road.trim()), `Corridor road class and section required ${rule.ban_id}`);
+    }
     if (rule.geographic_migration?.region) assert(rule.regions?.includes(rule.geographic_migration.region), `Lost regional scope ${rule.ban_id}`);
     assert(VERIFICATION_STATES.includes(rule.verification_state), 'Invalid rule verification state');
     assert(['ACTIVE','CANCELLED','SUPERSEDED'].includes(rule.status), 'Invalid rule lifecycle');

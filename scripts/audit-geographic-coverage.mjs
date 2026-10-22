@@ -6,11 +6,13 @@ import { canonicalDrivingBans } from '../config/driving-ban-calendars/runtime.mj
 import { oversizeSources } from '../config/oversize-sources/index.mjs';
 import { SEARCH_GROUPS } from './lib/web-search.mjs';
 import { scopeMonitoringDocument } from './lib/geographic-scope.mjs';
+import { buildDrivingBanVerificationPlan } from '../config/driving-ban-calendars/verification.mjs';
 
 const codes = dajcEuropeCoverage.map(([code]) => code);
 assert.equal(new Set(codes).size, codes.length);
 assert.deepEqual(Object.keys(canonicalDrivingBans.jurisdiction_reviews).sort(), [...codes].sort());
 assert.deepEqual(SEARCH_GROUPS.flatMap(group => group.codes).sort(), [...codes].sort());
+assert.deepEqual(buildDrivingBanVerificationPlan().jurisdictions.map(row=>row.jurisdiction).sort(), [...codes].sort());
 assert(oversizeSources.every(source => dajcCoverageCodes.has(source.country) && !source.jurisdictionId));
 let documents = 0;
 for (const week of readdirSync('data/oversize').filter(name => /^\d{4}-W\d{2}$/.test(name))) {

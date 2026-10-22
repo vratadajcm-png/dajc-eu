@@ -49,3 +49,27 @@ A green build permits a fail-closed technical release with visible UNKNOWN cover
 ## Geographic migration (22 October 2026)
 
 The active scope is the 50-code central registry. See `GEOGRAPHIC_COVERAGE_MIGRATION.md` for the exact retained/removed identities, backup, regional semantics and rollout boundary. The migration does not refresh legal review dates. At the pinned audit clock 2026-10-22 10:00 UTC: 17 HAS_BAN, 0 NO_BAN, 33 UNKNOWN, 11 full-scope verification records; the freshness gate still fails because the evidence is stale.
+
+## Official web checks and road scope (22 October 2026 follow-up)
+
+AT, DE, ES, BE, UK and PT must be checked on official legislation, road-authority,
+ministry and police websites. The same primary-evidence standard remains applicable
+to the other tracked countries. Associations and press reports are discovery leads.
+`config/driving-ban-calendars/verification.mjs` generates the full work plan from the
+central registry and current+next month, using official source seeds from the
+targeted evidence log `data/driving-bans/source-reviews/2026-10-22.json`.
+The technical audit exports `verification-plan.json` and `targeted-source-review.json`.
+Neither this export nor a targeted check refreshes the full-sweep timestamp.
+
+KZ/RU/TR monitor motorways and main roads in the approved European and connecting
+international freight scope, including bridges, tunnels and border sections on
+those roads. Keep a sourced road identifier/section and category (`motorway` or
+`main_road`); local/secondary roads do not become additional monitoring coverage.
+National laws are relevant where they apply to this network. A source reviewer
+records the applicability; the user's approval of road categories is not evidence
+for an individual prohibition. Findings carry `corridorEvidence.roadClass` and
+`roadOrSection`; calendar rules carry `corridor_scope.road_classes` and `roads`.
+
+See `DRIVING_BANS_OFFICIAL_WEB_REVIEW.md` for the targeted findings and remaining
+work. These observations have not been converted into executable calendar events;
+the existing 182 rules and their legal-verification timestamps are preserved.

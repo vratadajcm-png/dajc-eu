@@ -32,6 +32,18 @@ const item = (overrides = {}) => ({
 
 const okPage = (html) => async (url) => ({ ok: true, text: html, finalUrl: url });
 
+it('preserves reviewed main-road evidence through discovery and rejects a changed source', async () => {
+  const url = 'https://example.test/official-o3';
+  const corridorEvidence = {corridor:'European international freight corridor',roadClass:'motorway',roadOrSection:'O-3',excerpt:'Motorway O-3',reviewedBy:'test source review',sourceUrl:url};
+  const reviewed = item({country:'TR',url,corridorEvidence});
+  const html = page({text:`Motorway O-3: ${ARTICLE_TEXT}`});
+  const result = await verifySearchItem(reviewed,{now,fetchPage:okPage(html)});
+  expect(result.ok).toBe(true);
+  expect(result.finding.corridorEvidence).toEqual(corridorEvidence);
+  expect((await verifySearchItem(reviewed,{now,fetchPage:okPage(page())})).reason).toBe('CORRIDOR_SOURCE_EVIDENCE_CHANGED');
+  expect((await verifySearchItem(reviewed,{now,fetchPage:async()=>({ok:true,text:html,finalUrl:'https://example.test/different'})})).reason).toBe('CORRIDOR_SOURCE_REDIRECT_REQUIRES_REVIEW');
+});
+
 it('keeps source-backed regional scope inside the tracked country and rejects an invented region', async () => {
   const regional = item({country:'Spain',region:'Catalunya'});
   const result = await verifySearchItem(regional,{now,fetchPage:okPage(page({text:`Catalunya: ${ARTICLE_TEXT}`}))});
