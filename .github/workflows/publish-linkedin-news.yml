@@ -54,6 +54,9 @@ jobs:
         id: reserve
         if: github.event_name != 'workflow_dispatch' || inputs.dry_run == false
         env:
+          DAJC_SOCIAL_BACKEND: ${{ vars.DAJC_LINKEDIN_BACKEND }}
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          DAJC_BUFFER_LINKEDIN_CHANNEL_ID: ${{ vars.DAJC_BUFFER_LINKEDIN_CHANNEL_ID }}
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           DAJC_LINKEDIN_ORGANIZATION_URN: ${{ vars.DAJC_LINKEDIN_ORGANIZATION_URN }}
         run: node scripts/publish-social-news.mjs linkedin --prepare
@@ -63,6 +66,9 @@ jobs:
       - name: Publish only from DAJC company page
         if: steps.reserve.outputs.send == 'true'
         env:
+          DAJC_SOCIAL_BACKEND: ${{ vars.DAJC_LINKEDIN_BACKEND }}
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          DAJC_BUFFER_LINKEDIN_CHANNEL_ID: ${{ vars.DAJC_BUFFER_LINKEDIN_CHANNEL_ID }}
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           DAJC_LINKEDIN_ORGANIZATION_URN: ${{ vars.DAJC_LINKEDIN_ORGANIZATION_URN }}
         run: node scripts/publish-social-news.mjs linkedin --publish
