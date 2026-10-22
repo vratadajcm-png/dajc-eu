@@ -1,0 +1,54 @@
+name: Driving Bans technical-only monitor
+
+# Read-only Thursday technical audit. NO legal/source review.
+# Does not alter canonical data or replace the strict freshness/legal gate.
+on:
+  schedule:
+    # Thursday 07:29 UTC (08:29 CET / 09:29 CEST).
+    - cron: '29 7 * * 4'
+  workflow_dispatch: {}
+  pull_request:
+    paths:
+      - '.github/workflows/driving-bans-technical-only.yml'
+      - 'scripts/driving-bans-technical-status.mjs'
+      - 'data/driving-bans/**'
+      - 'src/lib/driving-bans/**'
+      - 'config/driving-ban-calendars/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: driving-bans-technical-only
+  cancel-in-progress: false
+
+jobs:
+  technical-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Driving Bans scoped lint
+        run: npm run lint:driving-bans
+      - name: Driving Bans unit tests
+        run: npx vitest run src/lib/driving-bans
+      - name: Export canonical technical evidence (no legal review)
+        run: npm run driving-bans:audit -- --mode validate
+      - name: Classify technical status without refreshing verification
+        run: node scripts/driving-bans-technical-status.mjs
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: driving-bans-technical-evidence
+          path: artifacts/driving-bans/
+          if-no-files-found: error
+          retention-days: 90
