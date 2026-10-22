@@ -1,6 +1,6 @@
 {
   "week": "2026-W43",
-  "checkedAt": "2026-10-21T11:01:31.254Z",
+  "checkedAt": "2026-10-22T08:40:05.429Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -60,10 +60,10 @@
       "code": "BE",
       "name": "Belgium",
       "sourceScope": "BE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "BA",
@@ -117,7 +117,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 3
+      "candidateFindings": 10
     },
     {
       "code": "EE",
@@ -135,7 +135,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 3
+      "candidateFindings": 10
     },
     {
       "code": "FR",
@@ -177,10 +177,10 @@
       "code": "HU",
       "name": "Hungary",
       "sourceScope": "HU",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "hu",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "IS",
@@ -189,7 +189,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 3
+      "candidateFindings": 10
     },
     {
       "code": "IE",
@@ -258,10 +258,10 @@
       "code": "LU",
       "name": "Luxembourg",
       "sourceScope": "LU",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "MT",
@@ -303,10 +303,10 @@
       "code": "NL",
       "name": "Netherlands",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "MK",
@@ -324,7 +324,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 3
+      "candidateFindings": 10
     },
     {
       "code": "PL",
@@ -414,7 +414,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 3
+      "candidateFindings": 10
     },
     {
       "code": "CH",
@@ -468,7 +468,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 3
+      "candidateFindings": 10
     },
     {
       "code": "FO",
@@ -477,7 +477,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 3
+      "candidateFindings": 10
     },
     {
       "code": "GI",
@@ -531,7 +531,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 3
+      "candidateFindings": 10
     },
     {
       "code": "JANMAYEN",
@@ -540,7 +540,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 3
+      "candidateFindings": 10
     },
     {
       "code": "GL",
@@ -549,7 +549,7 @@
       "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 3
+      "candidateFindings": 10
     },
     {
       "code": "SBA",
@@ -735,55 +735,55 @@
       "code": "AW",
       "name": "Aruba",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "CW",
       "name": "Curaçao",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "SX",
       "name": "Sint Maarten",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "BQ-BO",
       "name": "Bonaire",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "BQ-SA",
       "name": "Saba",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "BQ-SE",
       "name": "Sint Eustatius",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "ENG",
@@ -906,28 +906,28 @@
       "code": "FLA",
       "name": "Flanders",
       "sourceScope": "BE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "WAL",
       "name": "Wallonia",
       "sourceScope": "BE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "BRU",
       "name": "Brussels-Capital Region",
       "sourceScope": "BE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "RSM",
