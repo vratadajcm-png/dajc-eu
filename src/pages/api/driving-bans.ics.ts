@@ -8,7 +8,7 @@ export const GET: APIRoute = ({ request }) => {
   const view = getDrivingBansSnapshot();
   const countries = [...new Set((url.searchParams.get('countries') || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean))];
   const type = url.searchParams.get('type') || 'all';
-  const headers = { 'Cache-Control': 'no-store', 'Vercel-CDN-Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
+  const headers = { 'X-DAJC-Coverage-Version': view.coverage_version, 'Cache-Control': 'no-store', 'Vercel-CDN-Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
   for (const key of ['from', 'to']) {
     if (url.searchParams.has(key) && url.searchParams.get(key) !== view.window[key]) return new Response('The public feed covers the current and next calendar month only.', { status: 400, headers });
   }

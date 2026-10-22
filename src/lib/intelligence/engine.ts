@@ -1,3 +1,4 @@
+import { isTrackedJurisdiction } from '../../../config/europe-coverage.mjs';
 import {
   buildAlertCandidates,
   type IntelligenceAlertCandidate,
@@ -52,7 +53,7 @@ export async function runIntelligenceCycle(args: {
     throw new Error(`Adapter sourceId mismatch: ${args.adapter.sourceId} != ${snapshot.sourceId}`);
   }
 
-  const previous = await args.store.readSnapshot(snapshot.sourceId);
+  const previous = (await args.store.readSnapshot(snapshot.sourceId)).filter(item => isTrackedJurisdiction(item.jurisdiction));
   const current = withSnapshotProvenance(snapshot);
   const detected = detectIntelligenceChanges({
     previous,

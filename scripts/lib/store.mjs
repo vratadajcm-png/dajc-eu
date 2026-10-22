@@ -1,3 +1,4 @@
+import { scopeFindings } from './geographic-scope.mjs';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -19,7 +20,7 @@ export async function loadWeekFindings(weekLabel) {
   try {
     const raw = await readFile(findingsPath(weekLabel), 'utf-8');
     const parsed = JSON.parse(raw);
-    return new Map((parsed.findings || []).map((f) => [f.id, f]));
+    return new Map(scopeFindings(parsed.findings || []).kept.map((f) => [f.id, f]));
   } catch (err) {
     if (err.code === 'ENOENT') return new Map();
     throw err;
@@ -28,8 +29,8 @@ export async function loadWeekFindings(weekLabel) {
 
 export async function saveWeekFindings(weekLabel, findingsByKey, meta = {}) {
   await mkdir(weekDir(weekLabel), { recursive: true });
-  const findings = [...findingsByKey.entries()]
-    .map(([id, finding]) => ({ id, ...finding }))
+  const findings = scopeFindings([...findingsByKey.entries()]
+    .map(([id, finding]) => ({ id, ...finding }))).kept
     .sort((a, b) => (a.firstSeenAt < b.firstSeenAt ? 1 : -1));
 
   const payload = {

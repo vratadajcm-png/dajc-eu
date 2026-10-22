@@ -3,31 +3,6 @@
   "updatedAt": "2026-10-11T11:58:27.533Z",
   "findings": [
     {
-      "id": "09c2e8cabf228a2c",
-      "country": "European Union",
-      "region": null,
-      "location": null,
-      "type": "permit_system",
-      "title": "EU truck tolls: what changed in 2026 and what&rsquo;s coming in 2027",
-      "summary": "EU | Online EU truck tolls: what changed in 2026 and what&rsquo;s coming in 2027 6 Oct 2026 &middot; Intelligence Fuel is not the only operating cost going up. Truck tolls have risen by around 20% since 2023, and no operator can ignore them. They changed almost every month across the EU in 2026, and early 2027 looks to be just as busy. The trend is clear: more kilometre-based charging and CO₂ pricing. A varied tolling landscape EU countries use different tolling systems. Four schemes currently coexist. Cyprus, Malta and Finland do not levy tolls on trucks. Eleven countries use distance-based charging, billing per kilometre via satellite positioning (GNSS) or roadside beacons (DSRC), backed by enforcement tools such as cameras... Please complete the form below to access the content * Title * Title Mr Ms Last name Firstname Company Type of company Type of company Transport Association Transport & logistics operator Mobility / passenger operator Manufacturer Energy provider Service provider Academia & Research Media Regulatory authority International organisation Other Job title Country Country Afghanistan Albania Algeria American Samoa Andorra Angola Anguilla Antigua & Barbuda Argentina Armenia Aruba Australia Austria Azerbaijan Azores Bahamas Bahrain Bangladesh Barbados Belarus Belgium Belize Benin Bermuda Bhutan Bolivia Bonaire Bosnia & Herzegovina Botswana Brazil British Indian Ocean Ter Brunei Bulgaria Burkina Faso Burundi Cambodia Cameroon Canada Canary Islands Cape Verde Cayman Islands Central African Republic Chad Channel Islands Chile China Christmas Island Cocos Island Colombia Comoros Congo Congo Democratic Rep Cook Islands Costa Rica Cote D'Ivoire Croatia Cuba Curacao Cyprus Czech Republic Denmark Djibouti Dominica Dominican Republic East Timor Ecuador Egypt El",
-      "searchSummary": "As of 6 October 2026, truck tolls in the EU have increased by approximately 20% since 2023. The trend indicates a shift towards more kilometre-based charging and CO₂ pricing, with further changes expected in early 2027.",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "publishedAt": "2026-10-06",
-      "publishedAtSource": "jsonld",
-      "sourceName": "IRU",
-      "sourceUrl": "https://www.iru.org/news-resources/newsroom/eu-truck-tolls-what-changed-2026-and-whats-coming-2027",
-      "discoveredVia": "web-search",
-      "oversize": false,
-      "confidence": "unverified",
-      "searchGroup": "islands",
-      "status": "new",
-      "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
-    },
-    {
       "id": "f661b6e7795c3611",
       "country": "Estonia",
       "region": null,
@@ -50,7 +25,8 @@
       "searchGroup": "baltics",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "EE"
     },
     {
       "id": "9580b4f43d4c8caa",
@@ -75,7 +51,8 @@
       "searchGroup": "uk-ie",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "IE"
     },
     {
       "id": "0a3110e635d7b5d1",
@@ -100,7 +77,8 @@
       "searchGroup": "uk-ie",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "UK"
     },
     {
       "id": "bcc8a2c654da9c5f",
@@ -125,7 +103,8 @@
       "searchGroup": "ro-bg-md",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "RO"
     },
     {
       "id": "79ce0ad42f7ce3e6",
@@ -150,7 +129,8 @@
       "searchGroup": "it",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "IT"
     },
     {
       "id": "eaf5285f4819db9f",
@@ -175,7 +155,8 @@
       "searchGroup": "it",
       "status": "expired",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "IT"
     },
     {
       "id": "8cbcb55718ef800e",
@@ -200,7 +181,8 @@
       "searchGroup": "it",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "IT"
     },
     {
       "id": "085bc2fe22103b28",
@@ -225,7 +207,8 @@
       "searchGroup": "it",
       "status": "expired",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "IT"
     },
     {
       "id": "0ea7e118d62cbb51",
@@ -250,7 +233,8 @@
       "searchGroup": "it",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "IT"
     },
     {
       "id": "5885931df96e9cdd",
@@ -275,7 +259,8 @@
       "searchGroup": "it",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "IT"
     },
     {
       "id": "50e25134673bab7a",
@@ -300,7 +285,8 @@
       "searchGroup": "benelux",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "BE"
     },
     {
       "id": "2d1e70b5b5e971f1",
@@ -325,7 +311,8 @@
       "searchGroup": "benelux",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "LU"
     },
     {
       "id": "b4c43d33f57e1a86",
@@ -350,7 +337,8 @@
       "searchGroup": "benelux",
       "status": "expired",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "LU"
     },
     {
       "id": "540ffd33151f2bda",
@@ -375,7 +363,8 @@
       "searchGroup": "benelux",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "NL"
     },
     {
       "id": "cf90e3ca1450fe3f",
@@ -400,7 +389,8 @@
       "searchGroup": "benelux",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "NL"
     },
     {
       "id": "100aae0d4765cd57",
@@ -425,7 +415,8 @@
       "searchGroup": "fr",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "FR"
     },
     {
       "id": "9071381959c01c8d",
@@ -450,7 +441,8 @@
       "searchGroup": "fr",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "FR"
     },
     {
       "id": "041a11d30872a895",
@@ -475,7 +467,8 @@
       "searchGroup": "si-hr",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "88d40aaef8ade00a",
@@ -500,7 +493,8 @@
       "searchGroup": "si-hr",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "83ea3be06d378178",
@@ -525,7 +519,8 @@
       "searchGroup": "si-hr",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "SI"
     },
     {
       "id": "3ff127f2e06d7a08",
@@ -550,7 +545,8 @@
       "searchGroup": "si-hr",
       "status": "expired",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "SI"
     },
     {
       "id": "938f27180b63a42a",
@@ -575,7 +571,8 @@
       "searchGroup": "ch-li",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "ce589a7853030bf1",
@@ -600,7 +597,8 @@
       "searchGroup": "ch-li",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "5fec18513b1c7508",
@@ -625,7 +623,8 @@
       "searchGroup": "hu",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "HU"
     },
     {
       "id": "1da43e9c590a3702",
@@ -650,7 +649,8 @@
       "searchGroup": "hu",
       "status": "expired",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "HU"
     },
     {
       "id": "35f5356426d19d40",
@@ -675,7 +675,8 @@
       "searchGroup": "hu",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "HU"
     },
     {
       "id": "c85ed4c821c21947",
@@ -700,7 +701,8 @@
       "searchGroup": "sk",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "SK"
     },
     {
       "id": "2467dda72b641bd6",
@@ -725,7 +727,8 @@
       "searchGroup": "at",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "AT"
     },
     {
       "id": "aef4caf91bc81247",
@@ -750,7 +753,8 @@
       "searchGroup": "at",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "AT"
     },
     {
       "id": "5f4c930f8f5e7634",
@@ -775,7 +779,8 @@
       "searchGroup": "at",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "AT"
     },
     {
       "id": "15e12f73ed7a3df4",
@@ -800,7 +805,8 @@
       "searchGroup": "de",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "2eee1ddc07c70560",
@@ -825,7 +831,8 @@
       "searchGroup": "de",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "8efba5e2d2d0026e",
@@ -850,7 +857,8 @@
       "searchGroup": "de",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "31fcb835da54fc42",
@@ -875,7 +883,8 @@
       "searchGroup": "cz",
       "status": "new",
       "firstSeenAt": "2026-10-08T09:07:32.970Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "CZ"
     },
     {
       "id": "fdae997101b396fe",
@@ -900,7 +909,8 @@
       "searchGroup": "iberia",
       "status": "active",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "ES"
     },
     {
       "id": "48dfd020ea0c53ea",
@@ -925,7 +935,8 @@
       "searchGroup": "de",
       "status": "active",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "37e53c8fc47197fd",
@@ -950,7 +961,8 @@
       "searchGroup": "cz",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "CZ"
     },
     {
       "id": "10e1fa6e0d620f0a",
@@ -975,7 +987,8 @@
       "searchGroup": "de",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "4fb4399605fb3b27",
@@ -1000,7 +1013,8 @@
       "searchGroup": "de",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "1cdb59162b672327",
@@ -1025,7 +1039,8 @@
       "searchGroup": "de",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "6297784e89c8a996",
@@ -1050,7 +1065,8 @@
       "searchGroup": "de",
       "status": "active",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T09:07:32.970Z"
+      "lastCheckedAt": "2026-10-08T09:07:32.970Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "a3a25df9e4f2fee3",
@@ -1075,7 +1091,8 @@
       "searchGroup": "at",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "AT"
     },
     {
       "id": "95950803537b77da",
@@ -1100,7 +1117,8 @@
       "searchGroup": "pl",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "PL"
     },
     {
       "id": "b245b5196142f067",
@@ -1125,7 +1143,8 @@
       "searchGroup": "hu",
       "status": "updated",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T12:39:51.578Z"
+      "lastCheckedAt": "2026-10-08T12:39:51.578Z",
+      "jurisdiction": "HU"
     },
     {
       "id": "0ec4318b552eed3c",
@@ -1150,7 +1169,8 @@
       "searchGroup": "hu",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "HU"
     },
     {
       "id": "4ae5a130e9ad7161",
@@ -1175,7 +1195,8 @@
       "searchGroup": "ch-li",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "b57e97ef6a148a12",
@@ -1200,7 +1221,8 @@
       "searchGroup": "ch-li",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "534aa8853bdf7fcd",
@@ -1225,7 +1247,8 @@
       "searchGroup": "si-hr",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "SI"
     },
     {
       "id": "f32bccb2620bc74f",
@@ -1250,7 +1273,8 @@
       "searchGroup": "si-hr",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "SI"
     },
     {
       "id": "1da6797bb1dcc179",
@@ -1275,7 +1299,8 @@
       "searchGroup": "si-hr",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "SI"
     },
     {
       "id": "f772aceaf01fcba1",
@@ -1300,7 +1325,8 @@
       "searchGroup": "ro-bg-md",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "RO"
     },
     {
       "id": "28f33160d5c3f466",
@@ -1325,7 +1351,8 @@
       "searchGroup": "iberia",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "ES"
     },
     {
       "id": "1a5b93afe0376fd1",
@@ -1350,7 +1377,8 @@
       "searchGroup": "iberia",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "AD"
     },
     {
       "id": "c7548c661a7a9490",
@@ -1375,7 +1403,8 @@
       "searchGroup": "uk-ie",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "UK"
     },
     {
       "id": "7298747ba756b6cd",
@@ -1400,7 +1429,8 @@
       "searchGroup": "uk-ie",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "UK"
     },
     {
       "id": "316b47a0702f84b7",
@@ -1425,7 +1455,8 @@
       "searchGroup": "uk-ie",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "IE"
     },
     {
       "id": "99fa9c175dc656d3",
@@ -1450,7 +1481,8 @@
       "searchGroup": "uk-ie",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "UK"
     },
     {
       "id": "da59a42270b40060",
@@ -1475,7 +1507,8 @@
       "searchGroup": "nordics",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "DK"
     },
     {
       "id": "4d6d3e7bbfb354f9",
@@ -1500,7 +1533,8 @@
       "searchGroup": "baltics",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "LV"
     },
     {
       "id": "60c957d05dc09766",
@@ -1525,7 +1559,8 @@
       "searchGroup": "baltics",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "LT"
     },
     {
       "id": "a9ad5274daa62cbd",
@@ -1550,7 +1585,8 @@
       "searchGroup": "balkans",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "BA"
     },
     {
       "id": "b6af8962abf765f3",
@@ -1575,7 +1611,8 @@
       "searchGroup": "balkans",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "MK"
     },
     {
       "id": "a0f36748475cd7f3",
@@ -1600,7 +1637,8 @@
       "searchGroup": "balkans",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "MK"
     },
     {
       "id": "4e7a1a9d6a9a812f",
@@ -1625,7 +1663,8 @@
       "searchGroup": "east",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "UA"
     },
     {
       "id": "36f05c0bc01874e2",
@@ -1650,7 +1689,8 @@
       "searchGroup": "east",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "AZ"
     },
     {
       "id": "3c0433d2fe154ed7",
@@ -1675,7 +1715,8 @@
       "searchGroup": "east",
       "status": "new",
       "firstSeenAt": "2026-10-08T08:33:53.177Z",
-      "lastCheckedAt": "2026-10-08T08:33:53.177Z"
+      "lastCheckedAt": "2026-10-08T08:33:53.177Z",
+      "jurisdiction": "GE"
     },
     {
       "id": "6df6cca877472cb4",
@@ -1696,7 +1737,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-10-07T12:30:14.028Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "PT"
     },
     {
       "id": "ecbd36525a85aeb7",
@@ -1717,7 +1759,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-10-06T12:36:54.361Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "UK"
     },
     {
       "id": "c5cf12fc795f455f",
@@ -1738,7 +1781,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-10-06T12:36:54.361Z",
-      "lastCheckedAt": "2026-10-06T12:36:54.361Z"
+      "lastCheckedAt": "2026-10-06T12:36:54.361Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "bacaaea1beb412fc",
@@ -1759,7 +1803,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-10-06T12:36:54.361Z",
-      "lastCheckedAt": "2026-10-06T12:36:54.361Z"
+      "lastCheckedAt": "2026-10-06T12:36:54.361Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "2ed0883b93a762ac",
@@ -1780,7 +1825,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-10-06T12:36:54.361Z",
-      "lastCheckedAt": "2026-10-06T12:36:54.361Z"
+      "lastCheckedAt": "2026-10-06T12:36:54.361Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "980b7441ffa46458",
@@ -1801,7 +1847,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-10-06T12:36:54.361Z",
-      "lastCheckedAt": "2026-10-06T12:36:54.361Z"
+      "lastCheckedAt": "2026-10-06T12:36:54.361Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "6d7321092556ca29",
@@ -1822,7 +1869,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-10-06T12:36:54.361Z",
-      "lastCheckedAt": "2026-10-06T12:36:54.361Z"
+      "lastCheckedAt": "2026-10-06T12:36:54.361Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "50cb2276be5c0028",
@@ -1843,7 +1891,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-10-02T11:45:04.161Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "SK"
     },
     {
       "id": "cb969b3beac2777b",
@@ -1864,7 +1913,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-10-01T10:12:02.793Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "NO"
     },
     {
       "id": "7bddc2572e91dbfa",
@@ -1885,7 +1935,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-30T11:46:58.301Z",
-      "lastCheckedAt": "2026-10-05T13:22:06.668Z"
+      "lastCheckedAt": "2026-10-05T13:22:06.668Z",
+      "jurisdiction": "NO"
     },
     {
       "id": "4f303310dc2a8828",
@@ -1906,7 +1957,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-17T10:50:04.401Z",
-      "lastCheckedAt": "2026-10-06T12:36:54.361Z"
+      "lastCheckedAt": "2026-10-06T12:36:54.361Z",
+      "jurisdiction": "LT"
     },
     {
       "id": "8d4fe6bd42233ab0",
@@ -1927,7 +1979,8 @@
       "confidence": "unverified",
       "status": "expired",
       "firstSeenAt": "2026-09-10T10:25:24.166Z",
-      "lastCheckedAt": "2026-10-06T12:36:54.361Z"
+      "lastCheckedAt": "2026-10-06T12:36:54.361Z",
+      "jurisdiction": "LU"
     },
     {
       "id": "f05c8e83d55fa587",
@@ -1948,7 +2001,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-09T10:37:46.925Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "UK"
     },
     {
       "id": "c7c56d19af93273f",
@@ -1969,7 +2023,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-08T10:27:09.003Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "UK"
     },
     {
       "id": "70927f2f6a78f0c7",
@@ -1990,11 +2045,12 @@
       "confidence": "unverified",
       "status": "updated",
       "firstSeenAt": "2026-09-08T10:27:09.003Z",
-      "lastCheckedAt": "2026-10-06T12:36:54.361Z"
+      "lastCheckedAt": "2026-10-06T12:36:54.361Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "33e36eb8e9046c6c",
-      "country": "AM",
+      "country": "Armenia",
       "region": null,
       "location": "Road Department of Armenia",
       "type": "bridge_restriction",
@@ -2011,11 +2067,12 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "AM"
     },
     {
       "id": "45fb212fcfdb9dea",
-      "country": "AM",
+      "country": "Armenia",
       "region": null,
       "location": "Road Department of Armenia",
       "type": "bridge_restriction",
@@ -2032,7 +2089,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "AM"
     },
     {
       "id": "1bab54931fe738f2",
@@ -2053,133 +2111,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
-    },
-    {
-      "id": "7eb350822803e291",
-      "country": "Jersey",
-      "region": null,
-      "location": "Government of Jersey",
-      "type": "road_closure",
-      "title": "Rue de la Forge (St Ouen) resurfacing",
-      "summary": "--> Rue de la Forge (St Ouen) resurfacing Body Content ​​About the project As part of our ongoing essential highway maintenance, Infrastructure and Environment (IE) will undertake work in St Ouen on: Rue de la Forge Rue Militaire Le Chemin de l’Eglise We’ll carry out the works in early January 2027. It'​ll take about 3 weeks and be completed in sections to minimise disruption. We'll carry out the works under road closures and provide diversion routes. Map of working area on Rue de la Forge Working hours and traffic management More information will be provided as the project develops. Dates Section Traffic management January 2027, Monday 7.30am to Friday 9pm To be confirmed Full road closures Diversion routes More information will be provided as the project develops. Access Access to all businesses and premises will be maintained where possible during the works. Buses Find more information about changes to the bus service on diversions and roadworks on LibertyBus​ .",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "publishedAt": null,
-      "publishedAtSource": null,
-      "sourceName": "Jersey road closures and delays",
-      "sourceUrl": "https://www.gov.je/Travel/Roads/RoadClosures/Pages/RueDeLaForge.aspx",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
-    },
-    {
-      "id": "ee25894c76b08ed3",
-      "country": "Jersey",
-      "region": null,
-      "location": "Government of Jersey",
-      "type": "road_closure",
-      "title": "Map of road closures and delays",
-      "summary": "Road information map WHAT IS THE PURPOSE OF THIS??? --> Road information map --> Road works Road resurfacing & embargoes Road ownership Search Now Today Tomorrow This week Next week This month Next month to Traffic Info Summary traffic report Road closure Diversion Diversion (Cars) One way One way (Cars) Single line traffic Other Road closed from this point Embargoes Under Embargo* Planned Resurfacing Within 6 months 6 to 12 months 12 to 24 months Over 24 months Last Resurfaced 0 to 5 years ago 5 to 10 years ago >10 years ago * Excavations will normally be prohibited unless for exceptional reasons approved by the Highway Authority Road ownership Other --> &copy; How to use the map Select a time period from the drop down or set the dates you want, then press 'Update'. To find out about an activity on the map click on the highlighted road. If you are interested in a particular road go to the 'Search' field and enter its name, a word or the post code, press 'Go' and select from the result list. Click 'Reset' to restart your search. How to use the map If you want to find information about a particular road go to the 'Search' field and enter its name, a word or postcode, press 'Go' and select from the result list. To obtain the information about the road (i.e who administers it, when will it next be resurfaced or if it's under a utility embargo) click on it. Click 'Reset' to restart your search. How to use the map If you want to find information about a particular road go to the 'Search' field and enter its name, a word or postcode, press 'Go' and select from the result list. To obtain the information about the road (i.e who administers it) click on it. Click 'Reset' to restart your search.",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "publishedAt": null,
-      "publishedAtSource": null,
-      "sourceName": "Jersey road closures and delays",
-      "sourceUrl": "https://roadworks.gov.je/JSW/roadworks.htm",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
-    },
-    {
-      "id": "52334fd37084a027",
-      "country": "Jersey",
-      "region": null,
-      "location": "Government of Jersey",
-      "type": "tunnel_restriction",
-      "title": "Esplanade and Gloucester Street reconstruction works",
-      "summary": "--> Esplanade and Gloucester Street reconstruction works Body Content ​​​About the project As part of our ongoing road maintenance, we'll rebuild the Esplanade road at the Gloucester Street junction on the side heading towards the Tunnel (eastbound). The works will be completed in October 2026 during weekends. More information will be provided as the project develops. Map of working area Schedule of work More information will be provided as the project develops. Dates Working hours Traffic management Weekends in October, dates to be confirmed​ Saturday, 2pm to 10pm Sunday, 9am to 10pm Lane closure ​Diversion routes Diversion routes will be in place. Gloucester Street diversion map​ Esplanade and Gloucester Street diversion map​ Access Pedestrian access to premises and businesses will be maintained during the works. Vehicle access to premises and businesses will be maintained where possible, but access will be restricted for certain operations. Access to the castle slipway by vehicle won't be possible. Buses There may be minor disruptions to the bus service. Find more information about diversions and roadworks on LibertyBus .",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "publishedAt": null,
-      "publishedAtSource": null,
-      "sourceName": "Jersey road closures and delays",
-      "sourceUrl": "https://www.gov.je/Travel/Roads/RoadClosures/Pages/GloucesterEsplanade.aspx",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
-    },
-    {
-      "id": "92e26f06149c02e3",
-      "country": "Jersey",
-      "region": null,
-      "location": "Government of Jersey",
-      "type": "road_closure",
-      "title": "Current road closures and delays",
-      "summary": "Summary traffic report Road closures and delays Traffic information --> Current --> Road closures Trinity - La Grande Route de St Jean - between La Rue du Becquet Vincent and La Rue des Houguettes Start date: Saturday, 24/01/26 End date: Wednesday, 31/03/27 Traffic details: Road Closure All Day Promoter: GoJ Drainage Capital Works Contractor: Techno Groundworks Description: Work starting 12:00 PM on Sat 24 Jan 26 and finishing 11:59 PM on Wed 31 Mar 27 - Northern Sewer Network Upgrades project Delays St.Saviour - Longueville Road - Between Avenue le Bas to New York Lane Start date: Thursday, 01/10/26 End date: Wednesday, 07/10/26 Traffic details: Portable Signals All Day Promoter: Jersey Electricity Contractor: Geomarine Description: Temporary traffic lights will be in operation to allow the JEC to provide 2 new services. Expect delays, especially at peak times. St.Clement - La Greve d`Azette - Between Green Road and Plat Douet Road Start date: Monday, 05/10/26 End date: Friday, 09/10/26 Traffic details: Portable Signals All Day Promoter: Jersey Electricity Contractor: Geomarine Description: Work starting 12:00 AM on Mon 05 Oct 26 and finishing 04:00 PM on Fri 09 Oct 26 - 2 x service replacements for Fuel Switch. Emergency Activity - St.Saviour - Longueville Road - GHA Start date: Wednesday, 07/10/26 End date: Wednesday, 07/10/26 Traffic details: Portable Signals Between AM and PM Peaks Promoter: Jersey Water Contractor: Jayen Description: Repair split water meter Starting - next 7 days Road closures No future road closures at present Delays No future delays at present",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "publishedAt": null,
-      "publishedAtSource": null,
-      "sourceName": "Jersey road closures and delays",
-      "sourceUrl": "https://roadworks.gov.je/trafficreport/",
-      "confidence": "unverified",
-      "status": "updated",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
-    },
-    {
-      "id": "adcf692d7e550fa9",
-      "country": "Jersey",
-      "region": null,
-      "location": "Government of Jersey",
-      "type": "road_closure",
-      "title": "Road closures and delays",
-      "summary": "--> Road closures and delays Belmont Road surface water separation Find out about the major drainage improvement project in St Helier including Belmont Road, Simon Place, St Saviours Road and Woodville Avenue Broad Street public realm improvements Find out about the improvements to Broad Street between Lloyds Bank to the Post Office Creating Safer School Zones (Bagatelle and Trinity School trial) Find out how we're making roads safer around schools, including the Bagatelle project and Trinity School trial Current road closures and delays Find a list of the current main road closures and delays for the next 7 days on Trafficworx Esplanade and Gloucester Street reconstruction works Find out about the road works on the Esplanade at the junction with Gloucester Street La Grande Route de St Clement resurfacing Find out about the resurfacing works on St Clement's inner road La Rue D’Asplet resurfacing Find out about the resurfacing works on La Rue D’Asplet in Trinity Map of road closures and delays Use the interactive map to find road closures, diversions and traffic restrictions on Trafficworx Northern sewer network upgrades Find out about the major upgrade to the drainage network on La Grande Route de St Jean Planned highway maintenance Where and when to expect major highway maintenance for the next 5 years Road repairs and maintenance Find out how we review and plan road maintenance, including the treatments we use Rue de la Forge (St Ouen) resurfacing Find out about the roadworks on Rue de la Forge in St Ouen School Street Scheme for safer travel to school Find out about the current School Street projects to create a safer environment for children to travel to and from school St Peter’s drainage network upgrades Find out about the major upgrade to the drainage network in ",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "publishedAt": null,
-      "publishedAtSource": null,
-      "sourceName": "Jersey road closures and delays",
-      "sourceUrl": "https://www.gov.je/travel/roads/roadclosures",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
-    },
-    {
-      "id": "5b3b3ed4cb43014b",
-      "country": "Guernsey",
-      "region": null,
-      "location": "States of Guernsey Traffic and Highway Services",
-      "type": "road_closure",
-      "title": "Traffic & Highways Road Information Map",
-      "summary": "Road information map WHAT IS THE PURPOSE OF THIS??? --> Road information map --> Road works Road resurfacing & embargoes Road ownership Search Now Today Tomorrow This week Next week This month Next month to Traffic Info Summary traffic report Road closure Diversion Diversion (Cars) One way One way (Cars) Single line traffic Other Road closed from this point Embargoes Under Embargo* Planned Resurfacing Within 6 months 6 to 12 months 12 to 24 months Over 24 months Last Resurfaced 0 to 5 years ago 5 to 10 years ago >10 years ago * Excavations will normally be prohibited unless for exceptional reasons approved by the Highway Authority Road ownership Other --> &copy; How to use the map Select a time period from the drop down or set the dates you want, then press 'Update'. To find out about an activity on the map click on the highlighted road. If you are interested in a particular road go to the 'Search' field and enter its name, a word or the post code, press 'Go' and select from the result list. Click 'Reset' to restart your search. How to use the map If you want to find information about a particular road go to the 'Search' field and enter its name, a word or postcode, press 'Go' and select from the result list. To obtain the information about the road (i.e who administers it, when will it next be resurfaced or if it's under a utility embargo) click on it. Click 'Reset' to restart your search. How to use the map If you want to find information about a particular road go to the 'Search' field and enter its name, a word or postcode, press 'Go' and select from the result list. To obtain the information about the road (i.e who administers it) click on it. Click 'Reset' to restart your search.",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "publishedAt": null,
-      "publishedAtSource": null,
-      "sourceName": "Guernsey road closures and delays",
-      "sourceUrl": "https://roadworks.gov.gg/GSW/Roadworks.htm",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "CZ"
     },
     {
       "id": "cf7f27a0f817108e",
@@ -2200,7 +2133,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "SK"
     },
     {
       "id": "96e364d40cbf6f32",
@@ -2221,7 +2155,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "4ce143b4869fb617",
@@ -2242,7 +2177,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "f09e2e9dd8d75cfa",
@@ -2263,7 +2199,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "a3f1b49025fd4ca4",
@@ -2284,7 +2221,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "LU"
     },
     {
       "id": "1899114ec9858919",
@@ -2305,7 +2243,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "ME"
     },
     {
       "id": "aae4888836bb8b17",
@@ -2326,7 +2265,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "ME"
     },
     {
       "id": "1bb2d5abbe134f2a",
@@ -2347,7 +2287,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "ME"
     },
     {
       "id": "eebbba9d62eed1fc",
@@ -2368,12 +2309,13 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "ME"
     },
     {
       "id": "b1a2a8cd01be39e4",
       "country": "Bosnia and Herzegovina",
-      "region": null,
+      "region": "Federation of Bosnia and Herzegovina",
       "location": "M17",
       "type": "tunnel_restriction",
       "title": "Izgradnja Južne Obilaznice Mostara, dionica Miljkovići - Rodoč veza na M17, poddionica tunel Novi (P305A) - čvor Rodoč (P386) sa izgradnjom privremene veze na postojeću lokalnu cestu",
@@ -2389,7 +2331,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "BA"
     },
     {
       "id": "f6557262bcf12519",
@@ -2410,7 +2353,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "SI"
     },
     {
       "id": "125616a411744338",
@@ -2431,7 +2375,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "1137477b968105bb",
@@ -2452,7 +2397,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "e085e0ae3f5fd6d5",
@@ -2473,7 +2419,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "42c529f65871199a",
@@ -2494,7 +2441,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "1509ad27429ea683",
@@ -2515,7 +2463,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "b285994319696413",
@@ -2536,7 +2485,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "f93a0e519503cd46",
@@ -2557,7 +2507,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "79ee0bd617b81e62",
@@ -2578,7 +2529,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "6a5ae05b88fc0999",
@@ -2599,7 +2551,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "32f15aaa88032ac1",
@@ -2620,7 +2573,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "FR"
     },
     {
       "id": "0aafeeeb40d860e4",
@@ -2641,7 +2595,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "b08b99a0d7ba3e6a",
@@ -2662,7 +2617,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-29T06:53:42.938Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "214232ff1fd8d9f5",
@@ -2683,7 +2639,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-23T06:31:53.208Z",
-      "lastCheckedAt": "2026-10-07T12:30:14.028Z"
+      "lastCheckedAt": "2026-10-07T12:30:14.028Z",
+      "jurisdiction": "ME"
     }
   ]
 }

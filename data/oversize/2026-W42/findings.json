@@ -25,7 +25,8 @@
       "searchGroup": "hu",
       "status": "new",
       "firstSeenAt": "2026-10-12T14:11:34.433Z",
-      "lastCheckedAt": "2026-10-12T14:11:34.433Z"
+      "lastCheckedAt": "2026-10-12T14:11:34.433Z",
+      "jurisdiction": "HU"
     },
     {
       "id": "a1a9e0905e69185b",
@@ -50,7 +51,8 @@
       "searchGroup": "hu",
       "status": "new",
       "firstSeenAt": "2026-10-12T14:11:34.433Z",
-      "lastCheckedAt": "2026-10-12T14:11:34.433Z"
+      "lastCheckedAt": "2026-10-12T14:11:34.433Z",
+      "jurisdiction": "HU"
     }
   ]
 }

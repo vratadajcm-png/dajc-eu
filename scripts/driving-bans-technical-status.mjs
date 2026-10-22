@@ -1,3 +1,4 @@
+import { dajcCoverageCount, dajcCoverageCodes } from '../config/europe-coverage.mjs';
 /** Read-only classification of canonical Driving Bans CI evidence.
  * Does not fetch legislation, refresh timestamps, or change source data.
  */
@@ -8,10 +9,10 @@ const source = resolve(process.argv[2] || 'artifacts/driving-bans/summary.json')
 const target = resolve(process.argv[3] || 'artifacts/driving-bans/technical-status.json');
 const summary = JSON.parse(readFileSync(source, 'utf8'));
 const selected = summary.selected_jurisdictions;
-if (summary.mode !== 'validate' || summary.tracked !== 104 ||
-    !Array.isArray(selected) || selected.length !== 104 ||
-    new Set(selected).size !== 104 || summary.external_source_review_performed !== false) {
-  throw new Error('Invalid technical audit input: requires 104 distinct jurisdictions and explicit no-legal-review evidence');
+if (summary.mode !== 'validate' || summary.tracked !== dajcCoverageCount ||
+    !Array.isArray(selected) || selected.length !== dajcCoverageCount ||
+    new Set(selected).size !== dajcCoverageCount || !selected.every(code => dajcCoverageCodes.has(code)) || summary.external_source_review_performed !== false) {
+  throw new Error('Invalid technical audit input: requires the complete distinct central registry and explicit no-legal-review evidence');
 }
 const age = summary.sweep_age_days;
 const reviewedSpanOk = summary.active_window_reviewed === true;
@@ -44,7 +45,7 @@ writeFileSync(target, JSON.stringify(result, null, 2) + '\n');
 const md = [
   '# Driving Bans — read-only technical check',
   '',
-  '- Technical checks: **PASS** (104 distinct jurisdictions)',
+  `- Technical checks: **PASS** (${dajcCoverageCount} distinct jurisdictions)`,
   '- Legal/source review performed: **NO**',
   '- Dataset: ' + result.dataset_version,
   '- Current public window: ' + (summary.window?.from || '?') + ' — ' + (summary.window?.to || '?'),

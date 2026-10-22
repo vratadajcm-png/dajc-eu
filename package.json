@@ -13,7 +13,9 @@
     "lint:driving-bans": "node scripts/lint-driving-bans.mjs",
     "driving-bans:audit": "node scripts/audit-driving-bans.mjs",
     "oversize:monitor": "node scripts/oversize-monitor.mjs",
-    "oversize:publish": "node scripts/generate-weekly-article.mjs"
+    "oversize:publish": "node scripts/generate-weekly-article.mjs",
+    "lint:geographic-coverage": "node scripts/audit-geographic-coverage.mjs",
+    "migrate:geographic-coverage": "node scripts/migrate-geographic-coverage.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",

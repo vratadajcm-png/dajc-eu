@@ -6,4 +6,4 @@ The original Driving Bans tests are retained under docs/driving-bans-legacy, not
 
 vitest.config.ts explicitly includes the new 48-case canonical suite, which the previous include pattern did not discover. The existing portal/config/news suites remain enabled. src/portal/__tests__/driving-bans-feed.test.ts tests only the DAJC.eu public endpoint; no DAJC Platform application functionality is changed.
 
-A passing test suite does NOT certify complete legal coverage. All 104 jurisdiction-wide reviews remain incomplete at this migration.
+A passing test suite does NOT certify complete legal coverage. At that historical test-fixture migration all original jurisdiction-wide reviews were incomplete. Active monitoring now follows the central registry; see GEOGRAPHIC_COVERAGE_MIGRATION.md.

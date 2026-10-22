@@ -17,3 +17,6 @@ node_modules/
 # throwaway file before exiting, but ignore the pattern too in case a run
 # is killed mid-way and a temp file is left behind
 src/content/news/eu-oversize/_dry-run-*.md
+
+# Reproducible CI evidence; durable migration backups live in archive/.
+artifacts/

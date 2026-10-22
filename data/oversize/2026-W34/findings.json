@@ -19,7 +19,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-08-23T06:31:53.208Z",
-      "lastCheckedAt": "2026-08-23T06:31:53.208Z"
+      "lastCheckedAt": "2026-08-23T06:31:53.208Z",
+      "jurisdiction": "ME"
     },
     {
       "id": "5a201a09bca1f6a0",
@@ -38,7 +39,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-08-23T06:31:53.208Z",
-      "lastCheckedAt": "2026-08-23T06:31:53.208Z"
+      "lastCheckedAt": "2026-08-23T06:31:53.208Z",
+      "jurisdiction": "MC"
     },
     {
       "id": "951458a2294d129d",
@@ -57,7 +59,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-08-22T06:30:19.240Z",
-      "lastCheckedAt": "2026-08-22T06:30:19.240Z"
+      "lastCheckedAt": "2026-08-22T06:30:19.240Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "e0b2e33373d767a9",
@@ -76,7 +79,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-08-21T17:38:10.176Z",
-      "lastCheckedAt": "2026-08-21T17:38:10.176Z"
+      "lastCheckedAt": "2026-08-21T17:38:10.176Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "89d7614a525f285c",
@@ -95,7 +99,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-08-21T06:36:53.431Z",
-      "lastCheckedAt": "2026-08-21T06:36:53.431Z"
+      "lastCheckedAt": "2026-08-21T06:36:53.431Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "2300e00376724e50",
@@ -114,7 +119,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-08-21T06:36:53.431Z",
-      "lastCheckedAt": "2026-08-21T06:36:53.431Z"
+      "lastCheckedAt": "2026-08-21T06:36:53.431Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "59ef8acfb4ee78ed",
@@ -133,7 +139,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-08-20T06:37:05.946Z",
-      "lastCheckedAt": "2026-08-20T06:37:05.946Z"
+      "lastCheckedAt": "2026-08-20T06:37:05.946Z",
+      "jurisdiction": "PL"
     },
     {
       "id": "20e60e99956e5c75",
@@ -152,7 +159,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-19T06:34:24.186Z",
-      "lastCheckedAt": "2026-08-23T06:31:53.208Z"
+      "lastCheckedAt": "2026-08-23T06:31:53.208Z",
+      "jurisdiction": "MC"
     },
     {
       "id": "42e89493ee8cc907",
@@ -171,7 +179,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-18T10:11:40.505Z",
-      "lastCheckedAt": "2026-08-21T17:38:10.176Z"
+      "lastCheckedAt": "2026-08-21T17:38:10.176Z",
+      "jurisdiction": "AL"
     },
     {
       "id": "f7db82b295418a88",
@@ -190,7 +199,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-18T10:11:40.505Z",
-      "lastCheckedAt": "2026-08-19T06:34:24.186Z"
+      "lastCheckedAt": "2026-08-19T06:34:24.186Z",
+      "jurisdiction": "BY"
     },
     {
       "id": "85a1214860c5f4c0",
@@ -209,7 +219,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-18T10:11:40.505Z",
-      "lastCheckedAt": "2026-08-23T06:31:53.208Z"
+      "lastCheckedAt": "2026-08-23T06:31:53.208Z",
+      "jurisdiction": "CZ"
     },
     {
       "id": "6631b73617780fa7",
@@ -228,7 +239,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-18T10:11:40.505Z",
-      "lastCheckedAt": "2026-08-23T06:31:53.208Z"
+      "lastCheckedAt": "2026-08-23T06:31:53.208Z",
+      "jurisdiction": "CZ"
     },
     {
       "id": "898e1b9997dea6b0",
@@ -247,7 +259,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-18T10:11:40.505Z",
-      "lastCheckedAt": "2026-08-23T06:31:53.208Z"
+      "lastCheckedAt": "2026-08-23T06:31:53.208Z",
+      "jurisdiction": "CZ"
     },
     {
       "id": "abbd6210dcde6ace",
@@ -266,7 +279,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-18T10:11:40.505Z",
-      "lastCheckedAt": "2026-08-23T06:31:53.208Z"
+      "lastCheckedAt": "2026-08-23T06:31:53.208Z",
+      "jurisdiction": "CZ"
     },
     {
       "id": "44a38a17488cc535",
@@ -285,7 +299,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-18T10:11:40.505Z",
-      "lastCheckedAt": "2026-08-23T06:31:53.208Z"
+      "lastCheckedAt": "2026-08-23T06:31:53.208Z",
+      "jurisdiction": "CZ"
     },
     {
       "id": "34238a2ab961cac8",
@@ -304,7 +319,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-18T10:11:40.505Z",
-      "lastCheckedAt": "2026-08-23T06:31:53.208Z"
+      "lastCheckedAt": "2026-08-23T06:31:53.208Z",
+      "jurisdiction": "CZ"
     },
     {
       "id": "913ab320303d2b20",
@@ -323,7 +339,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-18T10:11:40.505Z",
-      "lastCheckedAt": "2026-08-23T06:31:53.208Z"
+      "lastCheckedAt": "2026-08-23T06:31:53.208Z",
+      "jurisdiction": "CZ"
     },
     {
       "id": "790ade0ea0131cd4",
@@ -342,7 +359,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-18T10:11:40.505Z",
-      "lastCheckedAt": "2026-08-23T06:31:53.208Z"
+      "lastCheckedAt": "2026-08-23T06:31:53.208Z",
+      "jurisdiction": "LT"
     },
     {
       "id": "b336f56e9256ea6c",
@@ -361,7 +379,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-18T10:11:40.505Z",
-      "lastCheckedAt": "2026-08-23T06:31:53.208Z"
+      "lastCheckedAt": "2026-08-23T06:31:53.208Z",
+      "jurisdiction": "LT"
     }
   ]
 }

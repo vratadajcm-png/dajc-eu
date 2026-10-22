@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Validate shared geographic scope and migration idempotence
+        run: npm run lint:geographic-coverage
+
       - name: Driving Bans scoped lint
         run: npm run lint:driving-bans
 

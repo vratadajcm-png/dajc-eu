@@ -1,6 +1,7 @@
 import raw from '../../data/driving-bans/canonical.json' with { type: 'json' };
-import { dajcEuropeCoverage } from '../europe-coverage.mjs';
+import { dajcEuropeCoverage, COVERAGE_VERSION } from '../europe-coverage.mjs';
 import { hydrateCanonical, validateCanonical, snapshot, calendarRules } from '../../src/lib/driving-bans/core.mjs';
+if (raw.coverage_version !== COVERAGE_VERSION) throw new Error('Canonical coverage requires scripts/migrate-geographic-coverage.mjs');
 export const canonicalDrivingBans = hydrateCanonical(raw, dajcEuropeCoverage);
 validateCanonical(canonicalDrivingBans, dajcEuropeCoverage);
 export const drivingBanCalendars = calendarRules(canonicalDrivingBans);

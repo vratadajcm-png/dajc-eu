@@ -13,6 +13,10 @@ export function crossValidateDevelopments(developments = [], verifiedCandidates 
     kept.push({
       ...item,
       country: candidate.country || item.country || '',
+      jurisdiction: candidate.jurisdiction,
+      region: candidate.region || null,
+      corridorEvidence: candidate.corridorEvidence,
+      where: candidate.region && !String(item.where || '').includes(candidate.region) ? `${candidate.region}; ${item.where || candidate.location || ''}` : item.where,
       sourceName: candidate.sourceName || item.sourceName || '',
       sourceUrl: candidate.sourceUrl,
       // Candidate dates have already passed deterministic verification before

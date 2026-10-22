@@ -1,3 +1,4 @@
+import { isTrackedJurisdiction } from '../../../config/europe-coverage.mjs';
 import { z } from 'zod';
 import { intelligenceAlertCandidateSchema, type IntelligenceAlertCandidate } from './alerts';
 
@@ -92,6 +93,9 @@ export function leaseOutboxRecord(args: {
   const now = z.string().datetime().parse(args.now);
   const policy = intelligenceRetryPolicySchema.parse(args.policy ?? defaultIntelligenceRetryPolicy);
 
+  if (!isTrackedJurisdiction(record.candidate.change.jurisdiction)) {
+    return { ...record, state: 'suppressed', leaseUntil: undefined, lastErrorCode: 'outside-monitoring-scope' };
+  }
   if (!['pending', 'failed'].includes(record.state)) {
     throw new Error(`Cannot lease outbox record from state ${record.state}`);
   }

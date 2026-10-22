@@ -1,0 +1,29 @@
+{
+  "base_commit": "95772f61a875497d927398d18d580237c7914065",
+  "purpose": "Immutable pre-migration evidence; never imported by active monitoring",
+  "files": {
+    "config/driving-ban-calendars/canonical.mjs": "67d35ae49a63517a4f193116eb6ecf0939cfee437e7ff64f4a24f85ac9e99c1b",
+    "config/europe-coverage.mjs": "7eb6887bae2a4807b10a510f3bc2ef7364128ef1c377e452d66556b336abd130",
+    "config/oversize-sources/index.mjs": "4e90b8ca33be3570985eaee4b948f5ada5e6011fe4ee1046c94e5a1ee305e903",
+    "data/driving-bans/canonical.json": "f518555bf8bb80537146f6a6f6e2c7737638f374b2d05ba5b5bf38b2d30a9cc0",
+    "data/oversize/2026-W34/findings.json": "de7d63987c5291c0de3723889a2e6eae34a9d50a4a9652fc0ea07dd77e5775a1",
+    "data/oversize/2026-W35/coverage.json": "aa252b987e813e3e3cb16d1f27d546511682d9a1d83474d7369ea02b2aef81bb",
+    "data/oversize/2026-W35/findings.json": "1a5d26ac1d0e5b8c85f0a16a7ecd28137174d195c0bf69260e4c97ccf8a2b20b",
+    "data/oversize/2026-W36/coverage.json": "5a68f3a3a1c5037e65d9c3724f923dc9319aa954f96310800eef07a66ce77f38",
+    "data/oversize/2026-W36/findings.json": "a69160b0b8d50a532db521579c3c78b4fba8eb9ff10202aa6e62e3aba226ff27",
+    "data/oversize/2026-W37/coverage.json": "e040f790b33814a216ccca9707ccd2f88e05672a4c0893428d86cbb26b30fea6",
+    "data/oversize/2026-W37/findings.json": "d01edf35f2b9d1b4804d514472ba0fc16546b8fb9c4462f68d99bf1d965c916f",
+    "data/oversize/2026-W38/coverage.json": "3a9638bf11d08f89558818dab8b7a0b5e73f742f6afb399f32b71cae9bd3033e",
+    "data/oversize/2026-W38/findings.json": "45bc5fceb5924b66c91535ed27e995ab128fa5631c7e687ee17e301d0a813f9b",
+    "data/oversize/2026-W39/coverage.json": "8e78d10c4f4682c7725878a55483db34800167aad42a54702124e63b5433eb5f",
+    "data/oversize/2026-W39/findings.json": "75cea0df350339d3b128284463299d151caaa356eb62725080ef7237d1647f0a",
+    "data/oversize/2026-W40/coverage.json": "9fc8cdfcdec10a7ea69da0b028b2b1252ec3dc244803dd9e66dc277a0447304c",
+    "data/oversize/2026-W40/findings.json": "37378f575c34cd778f0659bfb8a5761af80571fc07eff54ec3f71ee4b345c5fd",
+    "data/oversize/2026-W41/coverage.json": "fbfd94d64f6b6fe7916cd3bcdc9fd2dc4458f7e058e0c3c71296d9b58c813eca",
+    "data/oversize/2026-W41/findings.json": "19166a475a315aab2f628b3e094b877747c0eafa0b01b10000941c38c7e1b77b",
+    "data/oversize/2026-W42/coverage.json": "27449918bcf943ed0cc467d9fa7a7951f49cf6a1b7f13c9c066e56fe81f71f88",
+    "data/oversize/2026-W42/findings.json": "98e3a8981c04a57b33f8bfdc0fd0fc9ab8d48efa1e69bbcba9397f8c08e751c6",
+    "scripts/lib/web-search.mjs": "066c16bab781373e7aa52fa2fc126b7359b582a9125107920550b0c15959fe12",
+    "scripts/oversize-monitor.mjs": "1f9779627c870b6b09484e524ea4ed134993998d0c08457c0bd05ca9fd37d537"
+  }
+}

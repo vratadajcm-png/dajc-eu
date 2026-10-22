@@ -1,3 +1,4 @@
+import { isTrackedJurisdiction, dajcCoverageCount } from '../../../config/europe-coverage.mjs';
 import { z } from 'zod';
 
 /**
@@ -6,12 +7,15 @@ import { z } from 'zod';
  * It defines the client/server contract that a future authenticated DAJC Intelligence
  * preference store can implement without changing the public Driving Bans feed.
  */
+export const monitoredJurisdictionSchema = z.string().refine(isTrackedJurisdiction, 'Untracked monitoring jurisdiction');
+const uniqueJurisdictions = z.array(monitoredJurisdictionSchema).max(dajcCoverageCount).refine(values => new Set(values).size === values.length, 'Duplicate monitoring jurisdiction');
+
 export const intelligencePreferenceSchema = z.object({
-  jurisdictions: z.array(z.string().min(2).max(16)).max(100).default([]),
+  jurisdictions: uniqueJurisdictions.default([]),
   corridors: z.array(z.object({
     id: z.string().min(1).max(80),
     label: z.string().min(1).max(120),
-    jurisdictions: z.array(z.string().min(2).max(16)).min(1).max(30),
+    jurisdictions: z.array(monitoredJurisdictionSchema).min(1).max(dajcCoverageCount).refine(values => new Set(values).size === values.length, 'Duplicate corridor jurisdiction'),
   })).max(30).default([]),
   vehicleProfile: z.object({
     grossWeightKg: z.number().int().positive().max(250_000).optional(),
@@ -64,6 +68,7 @@ export function isRelevantChange(
   change: IntelligenceChange,
   preferences: IntelligencePreferences,
 ): boolean {
+  if (!isTrackedJurisdiction(change.jurisdiction)) return false;
   if (preferences.alertMode === 'off') return false;
   if (!preferences.alertTopics.includes(change.topic)) return false;
 

@@ -7,9 +7,11 @@ import { MAX_REPORTS, MAX_ROUNDUP_REPORTS } from './quality-gate.mjs';
 
 const mapCandidate = (c) => ({
   country: c.country,
+  region: c.region || null,
+  corridorEvidence: c.corridorEvidence,
   title: c.title,
   whatChanged: c.summary || c.title,
-  where: c.location || c.country,
+  where: [c.region, c.location || c.country].filter(Boolean).join("; "),
   vehicleScope: c.vehicleScope || 'Heavy/exceptional road transport',
   timeWindow: c.timeWindow || '',
   validFrom: c.validFrom || '',

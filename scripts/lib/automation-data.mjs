@@ -1,5 +1,6 @@
 // Data branches never supply executable code. Only the fixed JSON paths below
 // are imported; writes use a detached worktree and a normal, non-force push.
+import { scopeMonitoringDocument } from './geographic-scope.mjs';
 import { execFileSync } from 'node:child_process';
 import { appendFileSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -38,6 +39,7 @@ function validateJson(content, kind) {
   if ((kind === 'x' || kind === 'linkedin') && (value.schemaVersion !== 1 || !value.posts || typeof value.posts !== 'object' || Array.isArray(value.posts))) {
     throw new Error('Invalid X publication ledger (fail closed)');
   }
+  if (kind === 'findings') return JSON.stringify(scopeMonitoringDocument(value).value, null, 2) + '\n';
   return content;
 }
 

@@ -1,3 +1,4 @@
+import { coverageName, isTrackedJurisdiction } from '../../config/europe-coverage.mjs';
 // Best-effort fetch + classification of one configured source into zero or
 // more candidate findings. Sources can be read from a known RSS/Atom feed
 // OR directly from an official HTML page. This matters because many European
@@ -25,18 +26,6 @@ const MAX_HTML_ANCHORS_SCANNED = 300;
 const MAX_SUMMARY_CHARS = 1_800;
 const DETAIL_CONCURRENCY = 4;
 
-const COUNTRY_NAMES = {
-  AL: 'Albania', AT: 'Austria', BA: 'Bosnia and Herzegovina', BE: 'Belgium',
-  BG: 'Bulgaria', BY: 'Belarus', CH: 'Switzerland', CY: 'Cyprus',
-  CZ: 'Czechia', DE: 'Germany', DK: 'Denmark', EE: 'Estonia', ES: 'Spain',
-  FI: 'Finland', FR: 'France', GR: 'Greece', HR: 'Croatia', HU: 'Hungary',
-  IE: 'Ireland', IS: 'Iceland', IT: 'Italy', LT: 'Lithuania', LU: 'Luxembourg',
-  LV: 'Latvia', MC: 'Monaco', MD: 'Moldova', ME: 'Montenegro',
-  MK: 'North Macedonia', MT: 'Malta', NL: 'Netherlands', NO: 'Norway',
-  PL: 'Poland', PT: 'Portugal', RO: 'Romania', RS: 'Serbia', SE: 'Sweden',
-  SI: 'Slovenia', SK: 'Slovakia', TR: 'Turkey', UA: 'Ukraine', UK: 'United Kingdom',
-  XK: 'Kosovo',
-};
 
 const CLASSIFICATION_RULES = [
   { type: 'driving_ban', pattern: /driving ban|weekend ban|holiday ban|seasonal ban|fahrverbot|lkw-fahrverbot|interdiction de circuler|restriction de circulation|zakaz jazd|zákaz jízd|restricții de circulație|restricciones de circulación/i },
@@ -189,7 +178,7 @@ function enclosingHtmlContext(html, start, end) {
 }
 
 function countryNameFor(source) {
-  return source.jurisdictionName || COUNTRY_NAMES[source.country] || source.country;
+  return coverageName(source.country);
 }
 
 function toFinding({ source, title, summary, sourceUrl, publication = null }) {
@@ -199,7 +188,8 @@ function toFinding({ source, title, summary, sourceUrl, publication = null }) {
   const validity = extractValidityPeriod(text, { country: countryNameFor(source) });
   return {
     country: countryNameFor(source),
-    region: null,
+    jurisdiction: source.country,
+    region: source.region || null,
     location: guessLocation(text, source.authority),
     type,
     title,
@@ -432,6 +422,7 @@ function htmlCandidates(source) {
  * }>}
  */
 export async function fetchSourceFindings(source, { now = new Date().toISOString() } = {}) {
+  if (!isTrackedJurisdiction(source.country) || source.jurisdictionId) throw new Error('Out-of-scope monitoring source');
   void now;
   const parser = new Parser({ timeout: FETCH_TIMEOUT_MS });
   const collected = [];

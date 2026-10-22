@@ -21,7 +21,7 @@ function fixture() {
   git(root, ['config', 'user.name', 'Test']);
   git(root, ['config', 'user.email', 'test@example.invalid']);
   put(root, 'data/x-publications.json', { schemaVersion: 1, posts: {} });
-  put(root, 'data/oversize/2026-W42/findings.json', { findings: ['reviewed'] });
+  put(root, 'data/oversize/2026-W42/findings.json', { findings: [{ id: 'reviewed', country: 'Czechia', jurisdiction: 'CZ' }] });
   put(root, 'src/do-not-import.mjs', 'throw new Error("Data branch code must never execute");\n');
   git(root, ['add', '.']);
   git(root, ['commit', '-m', 'reviewed baseline']);
@@ -87,12 +87,12 @@ describe('durable automation branches with protected main', () => {
   it('persists and imports monitoring JSON without importing branch code', () => {
     const f = fixture();
     loadAutomationData('findings', f.root);
-    put(f.root, 'data/oversize/2026-W42/findings.json', { findings: ['latest'] });
+    put(f.root, 'data/oversize/2026-W42/findings.json', { findings: [{ id: 'latest', country: 'Czechia', jurisdiction: 'CZ' }] });
     put(f.root, 'src/do-not-import.mjs', 'throw new Error("Unreviewed local code");\n');
     saveAutomationData('findings', f.root);
     expect(git(f.remote, ['show', 'automation/oversize-data:src/do-not-import.mjs'])).toContain('must never execute');
     loadAutomationData('findings', f.root);
-    expect(JSON.parse(readFileSync(path.join(f.root, 'data/oversize/2026-W42/findings.json'))).findings).toEqual(['latest']);
+    expect(JSON.parse(readFileSync(path.join(f.root, 'data/oversize/2026-W42/findings.json'))).findings).toEqual([{ id: 'latest', country: 'Czechia', jurisdiction: 'CZ' }]);
     expect(readFileSync(path.join(f.root, 'src/do-not-import.mjs'), 'utf8')).toContain('Unreviewed local code');
     expect(git(f.remote, ['rev-parse', 'main']).trim()).toBe(f.main);
   });

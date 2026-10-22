@@ -1,3 +1,4 @@
+import { scopeFinding } from './geographic-scope.mjs';
 // Deterministic filter for every item the model returns. The model may only
 // select, structure and phrase verified candidates; this filter re-applies
 // the complete Weekly eligibility check to the underlying verified record and
@@ -16,6 +17,14 @@ import { checkWeeklyEligibility, OUTLOOK_DAYS } from './weekly-eligibility.mjs';
  */
 export function checkGeneratedItem(item, { weekStart, weekEnd, candidate = null, eligibilityContext = null } = {}) {
   if (!item?.sourceUrl) return { ok: false, reason: 'missing sourceUrl' };
+
+  const scope = scopeFinding(item);
+  if (!scope.ok) return scope;
+  if (candidate) {
+    const original = scopeFinding(candidate);
+    if (!original.ok || original.finding.jurisdiction !== scope.finding.jurisdiction) return { ok: false, reason: 'generated geographic scope differs from source' };
+    if (original.finding.region && item.region !== original.finding.region) return { ok: false, reason: 'generated item lost regional scope' };
+  }
 
   // Text-level rules on the model's own wording first ...
   const closure = checkLongRoadClosure(item);
