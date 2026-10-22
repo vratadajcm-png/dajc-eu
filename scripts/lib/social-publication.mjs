@@ -38,9 +38,11 @@ export function selectNextSocialArticle(articles, ledger) {
     throw new Error('Pending social publication requires manual reconciliation; no new posts may be attempted');
   }
   for (const article of articles) {
-    const status = ledger.posts[candidateKey(article)]?.status;
-    if (status === 'published') continue;
-    if (status !== undefined) throw new Error('Invalid social ledger record');
+    const record = ledger.posts[candidateKey(article)];
+    if (record !== undefined) {
+      if (record?.status === 'published') continue;
+      throw new Error('Unknown or unfinished social ledger record; refusing a duplicate');
+    }
     return article;
   }
   return null;
