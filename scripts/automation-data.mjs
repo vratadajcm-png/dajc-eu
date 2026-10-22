@@ -3,7 +3,7 @@ import { loadAutomationData, saveAutomationData } from './lib/automation-data.mj
 
 try {
   const [action, kind, extra] = process.argv.slice(2);
-  if (!['load', 'save'].includes(action) || !['findings', 'x'].includes(kind) || extra) throw new Error('Usage: node scripts/automation-data.mjs load|save findings|x');
+  if (!['load', 'save'].includes(action) || !['findings', 'x', 'linkedin'].includes(kind) || extra) throw new Error('Usage: node scripts/automation-data.mjs load|save findings|x|linkedin');
   if (action === 'load') loadAutomationData(kind);
   else saveAutomationData(kind);
 } catch (error) {
