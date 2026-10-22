@@ -8,6 +8,8 @@ vi.mock('../../../config/driving-ban-calendars/runtime.mjs', async () => {
   const { hydrateCanonical, snapshot } = await import('../../lib/driving-bans/core.mjs');
   const { dajcEuropeCoverage } = await import('../../../config/europe-coverage.mjs');
   const raw = JSON.parse(readFileSync(new URL('../../../tests/fixtures/driving-bans-sep-oct-2026.json', import.meta.url), 'utf8'));
+  // Historical fixture includes retired dependent territories; they are not monitored.
+  raw.jurisdiction_reviews = Object.fromEntries(Object.entries(raw.jurisdiction_reviews).filter(([code]) => dajcEuropeCoverage.some(([tracked]) => tracked === code)));
   const data = hydrateCanonical(raw, dajcEuropeCoverage);
   return { getDrivingBansSnapshot: () => snapshot(data, dajcEuropeCoverage, new Date()) };
 });
