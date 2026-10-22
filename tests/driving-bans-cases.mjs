@@ -19,13 +19,20 @@ function syntheticNoBan(data, code = 'AL') {
 }
 /** The same cases run in node:test locally and Vitest / Application CI remotely. */
 export function registerDrivingBanTests(test, a) {
-  test('exact authoritative 104 identities and active window records',()=>{
-    const v=render(fresh()); a.equal(v.jurisdictions.length,104); a.deepEqual(v.jurisdictions.map(j=>[j.jurisdiction,j.name]),coverage);
-    a.equal(new Set(v.jurisdictions.map(j=>j.jurisdiction)).size,104); a.ok(v.jurisdictions.every(j=>j.period.from==='2026-09-01' && j.period.to==='2026-10-31'));
+  test('exact authoritative 76 identities and active window records',()=>{
+    const v=render(fresh()); a.equal(v.jurisdictions.length,76); a.deepEqual(v.jurisdictions.map(j=>[j.jurisdiction,j.name]),coverage);
+    a.equal(new Set(v.jurisdictions.map(j=>j.jurisdiction)).size,76); a.ok(v.jurisdictions.every(j=>j.period.from==='2026-09-01' && j.period.to==='2026-10-31'));
   });
-  test('current production dataset remains valid as independent releases evolve',()=>{a.equal(validateCanonical(current,coverage),true);const v=getDrivingBansSnapshot();a.equal(v.jurisdictions.length,104);a.deepEqual(uids(toIcs(v)).sort(),v.upcoming_events.map(e=>e.uid).sort());});
+  test('current production dataset remains valid as independent releases evolve',()=>{a.equal(validateCanonical(current,coverage),true);const v=getDrivingBansSnapshot();a.equal(v.jurisdictions.length,76);a.deepEqual(uids(toIcs(v)).sort(),v.upcoming_events.map(e=>e.uid).sort());});
   test('duplicate semantic event with a different ID is rejected',()=>{const d=fresh();const copy=structuredClone(d.rules[0]);copy.ban_id='duplicate-different-id';d.rules.push(copy);a.throws(()=>render(d),/Duplicate semantic/);});
   test('A10 origin OR versus origin AND exceptions retained',()=>{const rule=maintained.rules.find(r=>r.ban_id==='at-a10-north-september-2026');a.match(rule.exceptions.join(' '),/Origin OR/);a.match(rule.exceptions.join(' '),/Origin AND/);});
+  test('excluded former jurisdictions are absent from active coverage, snapshots and calendar exports',()=>{
+    const removed = ['GP','GF','RE','PF','GL','SVALBARD','SBA','NCY','AB','TRN'];
+    const currentCodes = new Set(coverage.map(([code]) => code));
+    const view = getDrivingBansSnapshot();
+    a.ok(removed.every(code => !currentCodes.has(code) && !view.jurisdictions.some(row => row.jurisdiction === code)));
+    a.ok(!view.events.some(event => removed.includes(event.jurisdiction)));
+  });
   test('duplicate jurisdiction rejected',()=>{const d=fresh();d.jurisdictions[1]=d.jurisdictions[0];a.throws(()=>validateCanonical(d,coverage));});
   test('tracked identities are not automatically verified or NO_BAN',()=>{const v=render(fresh());a.equal(v.jurisdictions.filter(j=>j.ban_state==='NO_BAN').length,0);a.equal(v.complete,false);a.equal(v.jurisdictions.filter(j=>j.coverage_complete).length,0);});
   test('NO_BAN without PRIMARY_VERIFIED is rejected',()=>{const d=fresh();d.jurisdictions[1].ban_state='NO_BAN';a.throws(()=>validateCanonical(d,coverage));});
@@ -65,8 +72,8 @@ export function registerDrivingBanTests(test, a) {
   test('page and public endpoints import the single canonical entrypoint',()=>{for(const file of ['src/pages/driving-bans.astro','src/pages/api/driving-bans.ics.ts','src/pages/api/driving-bans.json.ts']){const s=readFileSync(new URL('../'+file,import.meta.url),'utf8');a.match(s,/getDrivingBansSnapshot/);a.ok(!s.includes('requestedCodes'));}for(const file of ['runtime.mjs','index.mjs'])a.match(readFileSync(new URL('../config/driving-ban-calendars/'+file,import.meta.url),'utf8'),/canonical.mjs/);});
   test('calendar month rollover handles Prague midnight, year end and leap years',()=>{a.deepEqual(publicationWindow(new Date('2026-09-30T22:01:00Z')),{from:'2026-10-01',to:'2026-11-30',timezone:'Europe/Prague'});a.equal(publicationWindow(new Date('2026-12-15')).to,'2027-01-31');a.equal(publicationWindow(new Date('2028-01-15')).to,'2028-02-29');a.equal(isDate('2026-02-29'),false);});
   test('old NO_BAN never rolls forward as verified',()=>{const d=fresh();syntheticNoBan(d);const v=snapshot(d,coverage,new Date('2026-10-01T12:00:00Z'));const j=v.jurisdictions.find(j=>j.jurisdiction==='AL');a.equal(j.ban_state,'UNKNOWN');a.equal(j.verification_state,'UNVERIFIED');a.equal(j.coverage_complete,false);});
-  test('unreviewed future months contain no extrapolated occurrences',()=>{const v=snapshot(fresh(),coverage,new Date('2026-12-01T12:00:00Z'));a.equal(v.events.length,0);a.equal(v.jurisdictions.filter(j=>j.ban_state==='UNKNOWN').length,104);});
-  test('scheduled full sweep is Thursday-only and includes exactly104',()=>{a.equal(assertSweepRequest({mode:'full'},maintained,new Date('2026-10-01T08:00:00Z')).length,104);a.throws(()=>assertSweepRequest({mode:'full'},maintained,CLOCK),/Thursday/);});
+  test('unreviewed future months contain no extrapolated occurrences',()=>{const v=snapshot(fresh(),coverage,new Date('2026-12-01T12:00:00Z'));a.equal(v.events.length,0);a.equal(v.jurisdictions.filter(j=>j.ban_state==='UNKNOWN').length,76);});
+  test('scheduled full sweep is Thursday-only and includes exactly76',()=>{a.equal(assertSweepRequest({mode:'full'},maintained,new Date('2026-10-01T08:00:00Z')).length,76);a.throws(()=>assertSweepRequest({mode:'full'},maintained,CLOCK),/Thursday/);});
   test('off-Thursday urgent recheck is one jurisdiction with source and existing rule',()=>{a.deepEqual(assertSweepRequest({mode:'urgent',jurisdiction:'AT',publishedBanId:'at-night',urgentSource:'https://www.usp.gv.at/'},maintained,CLOCK),['AT']);a.throws(()=>assertSweepRequest({mode:'urgent',jurisdiction:'AT'},maintained,CLOCK));});
   test('audit distinguishes rule time, weight, exceptions, cancellation and source failure',()=>{const old=fresh(),next=fresh();next.rules[0].schedule.start_time='08:00';next.rules[0].weight_threshold.value=12000;next.rules[0].exceptions.push('SYNTHETIC TEST');next.rules[1].status='CANCELLED';const fields=diffCanonical(old,next).map(c=>c.field);for(const f of ['schedule','weight_threshold','exceptions','status'])a.ok(fields.includes(f));a.ok(diffCanonical(old,invalidateSources(old,['li-asv'],CLOCK.toISOString())).some(c=>c.field==='verification_state'&&c.after==='SOURCE_UNAVAILABLE'));});
   test('audit is empty for unchanged input; no duplicate change-register entry needed',()=>{a.deepEqual(diffCanonical(fresh(),fresh()),[]);});
