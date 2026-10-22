@@ -25,7 +25,8 @@
       "searchGroup": "hu",
       "status": "new",
       "firstSeenAt": "2026-10-22T19:12:59.995Z",
-      "lastCheckedAt": "2026-10-22T19:12:59.995Z"
+      "lastCheckedAt": "2026-10-22T19:12:59.995Z",
+      "jurisdiction": "HU"
     },
     {
       "id": "001279e4778af4b3",
@@ -50,7 +51,8 @@
       "searchGroup": "hu",
       "status": "new",
       "firstSeenAt": "2026-10-22T19:12:59.995Z",
-      "lastCheckedAt": "2026-10-22T19:12:59.995Z"
+      "lastCheckedAt": "2026-10-22T19:12:59.995Z",
+      "jurisdiction": "HU"
     },
     {
       "id": "2d59f3f1e8feb916",
@@ -75,7 +77,8 @@
       "searchGroup": "nordics",
       "status": "new",
       "firstSeenAt": "2026-10-22T14:32:20.395Z",
-      "lastCheckedAt": "2026-10-22T14:32:20.395Z"
+      "lastCheckedAt": "2026-10-22T14:32:20.395Z",
+      "jurisdiction": "NO"
     },
     {
       "id": "4b9d614e7e46d206",
@@ -100,7 +103,8 @@
       "searchGroup": "sk",
       "status": "new",
       "firstSeenAt": "2026-10-22T10:59:56.364Z",
-      "lastCheckedAt": "2026-10-22T10:59:56.364Z"
+      "lastCheckedAt": "2026-10-22T10:59:56.364Z",
+      "jurisdiction": "SK"
     },
     {
       "id": "e4eac316e5f65380",
@@ -125,7 +129,8 @@
       "searchGroup": "hu",
       "status": "active",
       "firstSeenAt": "2026-10-22T08:40:05.429Z",
-      "lastCheckedAt": "2026-10-22T10:59:56.364Z"
+      "lastCheckedAt": "2026-10-22T10:59:56.364Z",
+      "jurisdiction": "HU"
     },
     {
       "id": "20a610bbd964017e",
@@ -150,7 +155,8 @@
       "searchGroup": "benelux",
       "status": "new",
       "firstSeenAt": "2026-10-22T08:40:05.429Z",
-      "lastCheckedAt": "2026-10-22T08:40:05.429Z"
+      "lastCheckedAt": "2026-10-22T08:40:05.429Z",
+      "jurisdiction": "BE"
     },
     {
       "id": "6bff3d2c1a1f5e0b",
@@ -175,7 +181,8 @@
       "searchGroup": "nordics",
       "status": "active",
       "firstSeenAt": "2026-10-22T08:40:05.429Z",
-      "lastCheckedAt": "2026-10-22T14:32:20.395Z"
+      "lastCheckedAt": "2026-10-22T14:32:20.395Z",
+      "jurisdiction": "NO"
     },
     {
       "id": "bc3860f6ebee52f8",
@@ -200,7 +207,8 @@
       "searchGroup": "nordics",
       "status": "active",
       "firstSeenAt": "2026-10-22T08:40:05.429Z",
-      "lastCheckedAt": "2026-10-22T14:32:20.395Z"
+      "lastCheckedAt": "2026-10-22T14:32:20.395Z",
+      "jurisdiction": "NO"
     },
     {
       "id": "1bd859c831eef02b",
@@ -225,7 +233,8 @@
       "searchGroup": "nordics",
       "status": "active",
       "firstSeenAt": "2026-10-22T08:40:05.429Z",
-      "lastCheckedAt": "2026-10-22T14:32:20.395Z"
+      "lastCheckedAt": "2026-10-22T14:32:20.395Z",
+      "jurisdiction": "SE"
     },
     {
       "id": "861200388fef691f",
@@ -250,7 +259,8 @@
       "searchGroup": "nordics",
       "status": "new",
       "firstSeenAt": "2026-10-22T08:40:05.429Z",
-      "lastCheckedAt": "2026-10-22T08:40:05.429Z"
+      "lastCheckedAt": "2026-10-22T08:40:05.429Z",
+      "jurisdiction": "NO"
     },
     {
       "id": "92237a2366cafa0c",
@@ -275,7 +285,8 @@
       "searchGroup": "nordics",
       "status": "new",
       "firstSeenAt": "2026-10-22T08:40:05.429Z",
-      "lastCheckedAt": "2026-10-22T08:40:05.429Z"
+      "lastCheckedAt": "2026-10-22T08:40:05.429Z",
+      "jurisdiction": "SE"
     },
     {
       "id": "1420702546f13dfd",
@@ -300,7 +311,8 @@
       "searchGroup": "nordics",
       "status": "new",
       "firstSeenAt": "2026-10-22T08:40:05.429Z",
-      "lastCheckedAt": "2026-10-22T08:40:05.429Z"
+      "lastCheckedAt": "2026-10-22T08:40:05.429Z",
+      "jurisdiction": "SE"
     },
     {
       "id": "b1184bbe4c5fb020",
@@ -325,7 +337,8 @@
       "searchGroup": "nordics",
       "status": "active",
       "firstSeenAt": "2026-10-22T08:40:05.429Z",
-      "lastCheckedAt": "2026-10-22T14:32:20.395Z"
+      "lastCheckedAt": "2026-10-22T14:32:20.395Z",
+      "jurisdiction": "NO"
     },
     {
       "id": "105cba28288b7dd1",
@@ -350,7 +363,8 @@
       "searchGroup": "nordics",
       "status": "new",
       "firstSeenAt": "2026-10-19T11:52:40.110Z",
-      "lastCheckedAt": "2026-10-19T11:52:40.110Z"
+      "lastCheckedAt": "2026-10-19T11:52:40.110Z",
+      "jurisdiction": "FI"
     },
     {
       "id": "79a7398e8adb2880",
@@ -375,7 +389,8 @@
       "searchGroup": "nordics",
       "status": "new",
       "firstSeenAt": "2026-10-19T11:52:40.110Z",
-      "lastCheckedAt": "2026-10-19T11:52:40.110Z"
+      "lastCheckedAt": "2026-10-19T11:52:40.110Z",
+      "jurisdiction": "NO"
     },
     {
       "id": "c252440875f427b4",
@@ -400,7 +415,8 @@
       "searchGroup": "nordics",
       "status": "new",
       "firstSeenAt": "2026-10-19T11:52:40.110Z",
-      "lastCheckedAt": "2026-10-19T11:52:40.110Z"
+      "lastCheckedAt": "2026-10-19T11:52:40.110Z",
+      "jurisdiction": "DK"
     }
   ]
 }

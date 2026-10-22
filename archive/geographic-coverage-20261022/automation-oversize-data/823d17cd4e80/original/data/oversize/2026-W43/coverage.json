@@ -1,0 +1,942 @@
+{
+  "week": "2026-W43",
+  "checkedAt": "2026-10-22T19:12:59.995Z",
+  "jurisdictions": [
+    {
+      "code": "AL",
+      "name": "Albania",
+      "sourceScope": "AL",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "balkans",
+      "candidateFindings": 0
+    },
+    {
+      "code": "AD",
+      "name": "Andorra",
+      "sourceScope": "AD",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "iberia",
+      "candidateFindings": 0
+    },
+    {
+      "code": "AM",
+      "name": "Armenia",
+      "sourceScope": "AM",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "east",
+      "candidateFindings": 0
+    },
+    {
+      "code": "AT",
+      "name": "Austria",
+      "sourceScope": "AT",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "at",
+      "candidateFindings": 0
+    },
+    {
+      "code": "AZ",
+      "name": "Azerbaijan",
+      "sourceScope": "AZ",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "east",
+      "candidateFindings": 0
+    },
+    {
+      "code": "BY",
+      "name": "Belarus",
+      "sourceScope": "BY",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "east",
+      "candidateFindings": 0
+    },
+    {
+      "code": "BE",
+      "name": "Belgium",
+      "sourceScope": "BE",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "benelux",
+      "candidateFindings": 1
+    },
+    {
+      "code": "BA",
+      "name": "Bosnia and Herzegovina",
+      "sourceScope": "BA",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "balkans",
+      "candidateFindings": 0
+    },
+    {
+      "code": "BG",
+      "name": "Bulgaria",
+      "sourceScope": "BG",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "ro-bg-md",
+      "candidateFindings": 0
+    },
+    {
+      "code": "HR",
+      "name": "Croatia",
+      "sourceScope": "HR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "si-hr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "CY",
+      "name": "Cyprus",
+      "sourceScope": "CY",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "islands",
+      "candidateFindings": 0
+    },
+    {
+      "code": "CZ",
+      "name": "Czechia",
+      "sourceScope": "CZ",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "cz",
+      "candidateFindings": 0
+    },
+    {
+      "code": "DK",
+      "name": "Denmark",
+      "sourceScope": "DK",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "nordics",
+      "candidateFindings": 11
+    },
+    {
+      "code": "EE",
+      "name": "Estonia",
+      "sourceScope": "EE",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "baltics",
+      "candidateFindings": 0
+    },
+    {
+      "code": "FI",
+      "name": "Finland",
+      "sourceScope": "FI",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "nordics",
+      "candidateFindings": 11
+    },
+    {
+      "code": "FR",
+      "name": "France",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "GE",
+      "name": "Georgia",
+      "sourceScope": "GE",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "east",
+      "candidateFindings": 0
+    },
+    {
+      "code": "DE",
+      "name": "Germany",
+      "sourceScope": "DE",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "de",
+      "candidateFindings": 0
+    },
+    {
+      "code": "GR",
+      "name": "Greece",
+      "sourceScope": "GR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "balkans",
+      "candidateFindings": 0
+    },
+    {
+      "code": "HU",
+      "name": "Hungary",
+      "sourceScope": "HU",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "hu",
+      "candidateFindings": 3
+    },
+    {
+      "code": "IS",
+      "name": "Iceland",
+      "sourceScope": "IS",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "nordics",
+      "candidateFindings": 11
+    },
+    {
+      "code": "IE",
+      "name": "Ireland",
+      "sourceScope": "IE",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "uk-ie",
+      "candidateFindings": 0
+    },
+    {
+      "code": "IT",
+      "name": "Italy",
+      "sourceScope": "IT",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "it",
+      "candidateFindings": 0
+    },
+    {
+      "code": "KZ",
+      "name": "Kazakhstan (European transport scope)",
+      "sourceScope": "KZ",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "east",
+      "candidateFindings": 0
+    },
+    {
+      "code": "XK",
+      "name": "Kosovo",
+      "sourceScope": "XK",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "balkans",
+      "candidateFindings": 0
+    },
+    {
+      "code": "LV",
+      "name": "Latvia",
+      "sourceScope": "LV",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "baltics",
+      "candidateFindings": 0
+    },
+    {
+      "code": "LI",
+      "name": "Liechtenstein",
+      "sourceScope": "LI",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "ch-li",
+      "candidateFindings": 0
+    },
+    {
+      "code": "LT",
+      "name": "Lithuania",
+      "sourceScope": "LT",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "baltics",
+      "candidateFindings": 0
+    },
+    {
+      "code": "LU",
+      "name": "Luxembourg",
+      "sourceScope": "LU",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "benelux",
+      "candidateFindings": 1
+    },
+    {
+      "code": "MT",
+      "name": "Malta",
+      "sourceScope": "MT",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "islands",
+      "candidateFindings": 0
+    },
+    {
+      "code": "MD",
+      "name": "Moldova",
+      "sourceScope": "MD",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "ro-bg-md",
+      "candidateFindings": 0
+    },
+    {
+      "code": "MC",
+      "name": "Monaco",
+      "sourceScope": "MC",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "ME",
+      "name": "Montenegro",
+      "sourceScope": "ME",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "balkans",
+      "candidateFindings": 0
+    },
+    {
+      "code": "NL",
+      "name": "Netherlands",
+      "sourceScope": "NL",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "benelux",
+      "candidateFindings": 1
+    },
+    {
+      "code": "MK",
+      "name": "North Macedonia",
+      "sourceScope": "MK",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "balkans",
+      "candidateFindings": 0
+    },
+    {
+      "code": "NO",
+      "name": "Norway",
+      "sourceScope": "NO",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "nordics",
+      "candidateFindings": 11
+    },
+    {
+      "code": "PL",
+      "name": "Poland",
+      "sourceScope": "PL",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "pl",
+      "candidateFindings": 0
+    },
+    {
+      "code": "PT",
+      "name": "Portugal",
+      "sourceScope": "PT",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "iberia",
+      "candidateFindings": 0
+    },
+    {
+      "code": "RO",
+      "name": "Romania",
+      "sourceScope": "RO",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "ro-bg-md",
+      "candidateFindings": 0
+    },
+    {
+      "code": "RU",
+      "name": "Russia (European transport scope)",
+      "sourceScope": "RU",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "east",
+      "candidateFindings": 0
+    },
+    {
+      "code": "SM",
+      "name": "San Marino",
+      "sourceScope": "SM",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "it",
+      "candidateFindings": 0
+    },
+    {
+      "code": "RS",
+      "name": "Serbia",
+      "sourceScope": "RS",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "balkans",
+      "candidateFindings": 0
+    },
+    {
+      "code": "SK",
+      "name": "Slovakia",
+      "sourceScope": "SK",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "sk",
+      "candidateFindings": 1
+    },
+    {
+      "code": "SI",
+      "name": "Slovenia",
+      "sourceScope": "SI",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "si-hr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "ES",
+      "name": "Spain",
+      "sourceScope": "ES",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "iberia",
+      "candidateFindings": 0
+    },
+    {
+      "code": "SE",
+      "name": "Sweden",
+      "sourceScope": "SE",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "nordics",
+      "candidateFindings": 11
+    },
+    {
+      "code": "CH",
+      "name": "Switzerland",
+      "sourceScope": "CH",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "ch-li",
+      "candidateFindings": 0
+    },
+    {
+      "code": "TR",
+      "name": "Türkiye (European transport scope)",
+      "sourceScope": "TR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "east",
+      "candidateFindings": 0
+    },
+    {
+      "code": "UA",
+      "name": "Ukraine",
+      "sourceScope": "UA",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "east",
+      "candidateFindings": 0
+    },
+    {
+      "code": "UK",
+      "name": "United Kingdom",
+      "sourceScope": "UK",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "uk-ie",
+      "candidateFindings": 0
+    },
+    {
+      "code": "VA",
+      "name": "Vatican City",
+      "sourceScope": "VA",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "it",
+      "candidateFindings": 0
+    },
+    {
+      "code": "AX",
+      "name": "Åland Islands",
+      "sourceScope": "FI",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "nordics",
+      "candidateFindings": 11
+    },
+    {
+      "code": "FO",
+      "name": "Faroe Islands",
+      "sourceScope": "DK",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "nordics",
+      "candidateFindings": 11
+    },
+    {
+      "code": "GI",
+      "name": "Gibraltar",
+      "sourceScope": "UK",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "iberia",
+      "candidateFindings": 0
+    },
+    {
+      "code": "GG",
+      "name": "Guernsey",
+      "sourceScope": "UK",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "uk-ie",
+      "candidateFindings": 0
+    },
+    {
+      "code": "JE",
+      "name": "Jersey",
+      "sourceScope": "UK",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "uk-ie",
+      "candidateFindings": 0
+    },
+    {
+      "code": "IM",
+      "name": "Isle of Man",
+      "sourceScope": "UK",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "uk-ie",
+      "candidateFindings": 0
+    },
+    {
+      "code": "ALDERNEY",
+      "name": "Alderney",
+      "sourceScope": "UK",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "uk-ie",
+      "candidateFindings": 0
+    },
+    {
+      "code": "SVALBARD",
+      "name": "Svalbard",
+      "sourceScope": "NO",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "nordics",
+      "candidateFindings": 11
+    },
+    {
+      "code": "JANMAYEN",
+      "name": "Jan Mayen",
+      "sourceScope": "NO",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "nordics",
+      "candidateFindings": 11
+    },
+    {
+      "code": "GL",
+      "name": "Greenland (European jurisdiction link)",
+      "sourceScope": "DK",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "nordics",
+      "candidateFindings": 11
+    },
+    {
+      "code": "SBA",
+      "name": "Akrotiri and Dhekelia",
+      "sourceScope": "CY",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "islands",
+      "candidateFindings": 0
+    },
+    {
+      "code": "NCY",
+      "name": "Northern Cyprus",
+      "sourceScope": "CY",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "islands",
+      "candidateFindings": 0
+    },
+    {
+      "code": "CEU",
+      "name": "Ceuta",
+      "sourceScope": "ES",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "iberia",
+      "candidateFindings": 0
+    },
+    {
+      "code": "MLL",
+      "name": "Melilla",
+      "sourceScope": "ES",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "iberia",
+      "candidateFindings": 0
+    },
+    {
+      "code": "AZO",
+      "name": "Azores",
+      "sourceScope": "PT",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "iberia",
+      "candidateFindings": 0
+    },
+    {
+      "code": "MAD",
+      "name": "Madeira",
+      "sourceScope": "PT",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "iberia",
+      "candidateFindings": 0
+    },
+    {
+      "code": "CAN",
+      "name": "Canary Islands",
+      "sourceScope": "ES",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "iberia",
+      "candidateFindings": 0
+    },
+    {
+      "code": "GP",
+      "name": "Guadeloupe",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "MQ",
+      "name": "Martinique",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "GF",
+      "name": "French Guiana",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "RE",
+      "name": "Réunion",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "YT",
+      "name": "Mayotte",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "MF",
+      "name": "Saint-Martin",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "BL",
+      "name": "Saint-Barthélemy",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "PM",
+      "name": "Saint-Pierre-et-Miquelon",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "NC",
+      "name": "New Caledonia",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "PF",
+      "name": "French Polynesia",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "WF",
+      "name": "Wallis and Futuna",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "CLIPPERTON",
+      "name": "Clipperton",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "TF",
+      "name": "French Southern and Antarctic Lands",
+      "sourceScope": "FR",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "fr",
+      "candidateFindings": 0
+    },
+    {
+      "code": "AW",
+      "name": "Aruba",
+      "sourceScope": "NL",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "benelux",
+      "candidateFindings": 1
+    },
+    {
+      "code": "CW",
+      "name": "Curaçao",
+      "sourceScope": "NL",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "benelux",
+      "candidateFindings": 1
+    },
+    {
+      "code": "SX",
+      "name": "Sint Maarten",
+      "sourceScope": "NL",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "benelux",
+      "candidateFindings": 1
+    },
+    {
+      "code": "BQ-BO",
+      "name": "Bonaire",
+      "sourceScope": "NL",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "benelux",
+      "candidateFindings": 1
+    },
+    {
+      "code": "BQ-SA",
+      "name": "Saba",
+      "sourceScope": "NL",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "benelux",
+      "candidateFindings": 1
+    },
+    {
+      "code": "BQ-SE",
+      "name": "Sint Eustatius",
+      "sourceScope": "NL",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "benelux",
+      "candidateFindings": 1
+    },
+    {
+      "code": "ENG",
+      "name": "England",
+      "sourceScope": "UK",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "uk-ie",
+      "candidateFindings": 0
+    },
+    {
+      "code": "SCT",
+      "name": "Scotland",
+      "sourceScope": "UK",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "uk-ie",
+      "candidateFindings": 0
+    },
+    {
+      "code": "WLS",
+      "name": "Wales",
+      "sourceScope": "UK",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "uk-ie",
+      "candidateFindings": 0
+    },
+    {
+      "code": "NIR",
+      "name": "Northern Ireland",
+      "sourceScope": "UK",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "uk-ie",
+      "candidateFindings": 0
+    },
+    {
+      "code": "FBIH",
+      "name": "Federation of Bosnia and Herzegovina",
+      "sourceScope": "BA",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "balkans",
+      "candidateFindings": 0
+    },
+    {
+      "code": "RSBA",
+      "name": "Republika Srpska",
+      "sourceScope": "BA",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "balkans",
+      "candidateFindings": 0
+    },
+    {
+      "code": "AB",
+      "name": "Abkhazia",
+      "sourceScope": "GE",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "east",
+      "candidateFindings": 0
+    },
+    {
+      "code": "SO",
+      "name": "South Ossetia",
+      "sourceScope": "GE",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "east",
+      "candidateFindings": 0
+    },
+    {
+      "code": "TRN",
+      "name": "Transnistria",
+      "sourceScope": "MD",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "ro-bg-md",
+      "candidateFindings": 0
+    },
+    {
+      "code": "GAG",
+      "name": "Gagauzia",
+      "sourceScope": "MD",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "ro-bg-md",
+      "candidateFindings": 0
+    },
+    {
+      "code": "CAT",
+      "name": "Catalonia",
+      "sourceScope": "ES",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "iberia",
+      "candidateFindings": 0
+    },
+    {
+      "code": "BAS",
+      "name": "Basque Country",
+      "sourceScope": "ES",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "iberia",
+      "candidateFindings": 0
+    },
+    {
+      "code": "GAL",
+      "name": "Galicia",
+      "sourceScope": "ES",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "iberia",
+      "candidateFindings": 0
+    },
+    {
+      "code": "FLA",
+      "name": "Flanders",
+      "sourceScope": "BE",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "benelux",
+      "candidateFindings": 1
+    },
+    {
+      "code": "WAL",
+      "name": "Wallonia",
+      "sourceScope": "BE",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "benelux",
+      "candidateFindings": 1
+    },
+    {
+      "code": "BRU",
+      "name": "Brussels-Capital Region",
+      "sourceScope": "BE",
+      "status": "checked-major-or-short-update-candidates-found",
+      "discovery": "web-search",
+      "searchGroup": "benelux",
+      "candidateFindings": 1
+    },
+    {
+      "code": "RSM",
+      "name": "Republic of San Marino road jurisdiction",
+      "sourceScope": "SM",
+      "status": "checked-no-material-development-found",
+      "discovery": "web-search",
+      "searchGroup": "it",
+      "candidateFindings": 0
+    }
+  ]
+}

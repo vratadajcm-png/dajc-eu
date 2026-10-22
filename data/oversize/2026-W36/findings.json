@@ -19,7 +19,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-06T10:07:31.848Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "bedec48396a5a6d5",
@@ -38,7 +39,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-06T10:07:31.848Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "9a09f72ea5d47262",
@@ -57,7 +59,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-06T10:07:31.848Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "312e08efa6ef7bff",
@@ -76,7 +79,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-06T10:07:31.848Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "720cc79c451f19a8",
@@ -95,7 +99,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-06T10:07:31.848Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "762f7cd9711c4fbf",
@@ -114,7 +119,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-06T10:07:31.848Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "887627d7bd1e706a",
@@ -133,7 +139,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-05T09:50:31.599Z",
-      "lastCheckedAt": "2026-09-05T09:50:31.599Z"
+      "lastCheckedAt": "2026-09-05T09:50:31.599Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "8220380a56284ab9",
@@ -152,7 +159,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-04T15:55:13.807Z",
-      "lastCheckedAt": "2026-09-04T15:55:13.807Z"
+      "lastCheckedAt": "2026-09-04T15:55:13.807Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "0861cd0d9506697a",
@@ -171,7 +179,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-04T15:55:13.807Z",
-      "lastCheckedAt": "2026-09-04T15:55:13.807Z"
+      "lastCheckedAt": "2026-09-04T15:55:13.807Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "3c1ffda5fb417558",
@@ -190,7 +199,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-04T15:55:13.807Z",
-      "lastCheckedAt": "2026-09-04T15:55:13.807Z"
+      "lastCheckedAt": "2026-09-04T15:55:13.807Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "e78cf4f1063c74a4",
@@ -209,7 +219,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-04T15:55:13.807Z",
-      "lastCheckedAt": "2026-09-04T15:55:13.807Z"
+      "lastCheckedAt": "2026-09-04T15:55:13.807Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "c2b7ccb97392bd47",
@@ -228,7 +239,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-04T15:55:13.807Z",
-      "lastCheckedAt": "2026-09-04T15:55:13.807Z"
+      "lastCheckedAt": "2026-09-04T15:55:13.807Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "3764b9c22420a3be",
@@ -247,7 +259,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-04T10:29:17.797Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "UK"
     },
     {
       "id": "b4ff15fadab6f8fe",
@@ -266,7 +279,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-04T10:29:17.797Z",
-      "lastCheckedAt": "2026-09-04T10:29:17.797Z"
+      "lastCheckedAt": "2026-09-04T10:29:17.797Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "995efa6e3f73bf76",
@@ -285,7 +299,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-04T10:29:17.797Z",
-      "lastCheckedAt": "2026-09-04T10:29:17.797Z"
+      "lastCheckedAt": "2026-09-04T10:29:17.797Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "e67035a9e9e1ce8e",
@@ -304,7 +319,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-04T10:29:17.797Z",
-      "lastCheckedAt": "2026-09-04T10:29:17.797Z"
+      "lastCheckedAt": "2026-09-04T10:29:17.797Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "68e2f721e5f6ac69",
@@ -323,7 +339,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-04T10:29:17.797Z",
-      "lastCheckedAt": "2026-09-04T10:29:17.797Z"
+      "lastCheckedAt": "2026-09-04T10:29:17.797Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "0e9b09d0f69bfc7f",
@@ -342,7 +359,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-04T10:29:17.797Z",
-      "lastCheckedAt": "2026-09-04T10:29:17.797Z"
+      "lastCheckedAt": "2026-09-04T10:29:17.797Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "335bdafb08a36eb7",
@@ -361,7 +379,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-04T10:29:17.797Z",
-      "lastCheckedAt": "2026-09-04T10:29:17.797Z"
+      "lastCheckedAt": "2026-09-04T10:29:17.797Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "adb5e32d04247e41",
@@ -380,7 +399,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-03T10:33:28.701Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "PT"
     },
     {
       "id": "512ec39d2fb0d68b",
@@ -399,7 +419,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-02T10:25:58.205Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "UK"
     },
     {
       "id": "bbf01f01fd8907e1",
@@ -418,7 +439,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-02T10:25:58.205Z",
-      "lastCheckedAt": "2026-09-02T10:25:58.205Z"
+      "lastCheckedAt": "2026-09-02T10:25:58.205Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "30aabc505341137d",
@@ -437,7 +459,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-02T10:25:58.205Z",
-      "lastCheckedAt": "2026-09-02T10:25:58.205Z"
+      "lastCheckedAt": "2026-09-02T10:25:58.205Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "02285b8d2e8abd85",
@@ -456,7 +479,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-02T10:25:58.205Z",
-      "lastCheckedAt": "2026-09-02T10:25:58.205Z"
+      "lastCheckedAt": "2026-09-02T10:25:58.205Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "64299aa776bc71de",
@@ -475,11 +499,12 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-02T10:25:58.205Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "LU"
     },
     {
       "id": "33e36eb8e9046c6c",
-      "country": "AM",
+      "country": "Armenia",
       "region": null,
       "location": "Road Department of Armenia",
       "type": "bridge_restriction",
@@ -494,11 +519,12 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "AM"
     },
     {
       "id": "45fb212fcfdb9dea",
-      "country": "AM",
+      "country": "Armenia",
       "region": null,
       "location": "Road Department of Armenia",
       "type": "bridge_restriction",
@@ -513,7 +539,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "AM"
     },
     {
       "id": "214232ff1fd8d9f5",
@@ -532,7 +559,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "ME"
     },
     {
       "id": "1899114ec9858919",
@@ -551,7 +579,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "ME"
     },
     {
       "id": "aae4888836bb8b17",
@@ -570,7 +599,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "ME"
     },
     {
       "id": "1bb2d5abbe134f2a",
@@ -589,7 +619,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "ME"
     },
     {
       "id": "86666d0c487dd187",
@@ -608,7 +639,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "ME"
     },
     {
       "id": "1bab54931fe738f2",
@@ -627,7 +659,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "CZ"
     },
     {
       "id": "c2921a70ec7d560c",
@@ -646,7 +679,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "MC"
     },
     {
       "id": "5a201a09bca1f6a0",
@@ -665,7 +699,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "MC"
     },
     {
       "id": "649721a4b8971161",
@@ -684,7 +719,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "MC"
     },
     {
       "id": "0df7cfaf851cd4c8",
@@ -703,7 +739,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "BY"
     },
     {
       "id": "bb66062099208360",
@@ -722,7 +759,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-01T10:57:32.190Z"
+      "lastCheckedAt": "2026-09-01T10:57:32.190Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "52241fd16010c03d",
@@ -741,7 +779,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-01T10:57:32.190Z"
+      "lastCheckedAt": "2026-09-01T10:57:32.190Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "4a2879e0c2b1e8a8",
@@ -760,7 +799,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-01T10:57:32.190Z"
+      "lastCheckedAt": "2026-09-01T10:57:32.190Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "0b4746b926621b21",
@@ -779,7 +819,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-01T10:57:32.190Z"
+      "lastCheckedAt": "2026-09-01T10:57:32.190Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "85deff00a47227a8",
@@ -798,7 +839,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-01T10:57:32.190Z"
+      "lastCheckedAt": "2026-09-01T10:57:32.190Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "f563bfd783cb8b5b",
@@ -817,7 +859,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-09-01T10:57:32.190Z",
-      "lastCheckedAt": "2026-09-01T10:57:32.190Z"
+      "lastCheckedAt": "2026-09-01T10:57:32.190Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "d00998baa12b6e2d",
@@ -836,7 +879,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-03T10:33:28.701Z"
+      "lastCheckedAt": "2026-09-03T10:33:28.701Z",
+      "jurisdiction": "UK"
     },
     {
       "id": "03ad03896fb3a95b",
@@ -855,7 +899,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-08-31T12:27:47.360Z"
+      "lastCheckedAt": "2026-08-31T12:27:47.360Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "faf36e91d88f1adc",
@@ -874,7 +919,8 @@
       "confidence": "unverified",
       "status": "new",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-08-31T12:27:47.360Z"
+      "lastCheckedAt": "2026-08-31T12:27:47.360Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "6ca41f616541c35b",
@@ -893,7 +939,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-01T10:57:32.190Z"
+      "lastCheckedAt": "2026-09-01T10:57:32.190Z",
+      "jurisdiction": "LT"
     },
     {
       "id": "b08b99a0d7ba3e6a",
@@ -912,7 +959,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-05T09:50:31.599Z"
+      "lastCheckedAt": "2026-09-05T09:50:31.599Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "0aafeeeb40d860e4",
@@ -931,7 +979,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-05T09:50:31.599Z"
+      "lastCheckedAt": "2026-09-05T09:50:31.599Z",
+      "jurisdiction": "DE"
     },
     {
       "id": "32f15aaa88032ac1",
@@ -950,7 +999,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "FR"
     },
     {
       "id": "f09e2e9dd8d75cfa",
@@ -969,7 +1019,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "6a5ae05b88fc0999",
@@ -988,7 +1039,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "79ee0bd617b81e62",
@@ -1007,7 +1059,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "4ce143b4869fb617",
@@ -1026,7 +1079,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "092146e1577b5d94",
@@ -1045,7 +1099,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "CH"
     },
     {
       "id": "8126f1b76cc27249",
@@ -1064,7 +1119,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-03T10:33:28.701Z"
+      "lastCheckedAt": "2026-09-03T10:33:28.701Z",
+      "jurisdiction": "PT"
     },
     {
       "id": "f93a0e519503cd46",
@@ -1083,7 +1139,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "b285994319696413",
@@ -1102,7 +1159,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "1509ad27429ea683",
@@ -1121,7 +1179,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "42c529f65871199a",
@@ -1140,7 +1199,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "e085e0ae3f5fd6d5",
@@ -1159,7 +1219,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "1137477b968105bb",
@@ -1178,7 +1239,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "125616a411744338",
@@ -1197,7 +1259,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "HR"
     },
     {
       "id": "f6557262bcf12519",
@@ -1216,12 +1279,13 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "SI"
     },
     {
       "id": "b1a2a8cd01be39e4",
       "country": "Bosnia and Herzegovina",
-      "region": null,
+      "region": "Federation of Bosnia and Herzegovina",
       "location": "M17",
       "type": "tunnel_restriction",
       "title": "Izgradnja Južne Obilaznice Mostara, dionica Miljkovići - Rodoč veza na M17, poddionica tunel Novi (P305A) - čvor Rodoč (P386) sa izgradnjom privremene veze na postojeću lokalnu cestu",
@@ -1235,7 +1299,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "BA"
     },
     {
       "id": "a3f1b49025fd4ca4",
@@ -1254,11 +1319,12 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "LU"
     },
     {
       "id": "31101d3e248bd1d2",
-      "country": "AD",
+      "country": "Andorra",
       "region": null,
       "location": "Govern d'Andorra - Transports i Mobilitat",
       "type": "bridge_restriction",
@@ -1273,7 +1339,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "AD"
     },
     {
       "id": "9769ca9694c1c0d9",
@@ -1292,216 +1359,8 @@
       "confidence": "unverified",
       "status": "active",
       "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
-    },
-    {
-      "id": "5b3b3ed4cb43014b",
-      "country": "Guernsey",
-      "region": null,
-      "location": "States of Guernsey Traffic and Highway Services",
-      "type": "road_closure",
-      "title": "Traffic & Highways Road Information Map",
-      "summary": "Road information map WHAT IS THE PURPOSE OF THIS??? --> Road information map --> Road works Road resurfacing & embargoes Road ownership Search Now Today Tomorrow This week Next week This month Next month to Traffic Info Summary traffic report Road closure Diversion Diversion (Cars) One way One way (Cars) Single line traffic Other Road closed from this point Embargoes Under Embargo* Planned Resurfacing Within 6 months 6 to 12 months 12 to 24 months Over 24 months Last Resurfaced 0 to 5 years ago 5 to 10 years ago >10 years ago * Excavations will normally be prohibited unless for exceptional reasons approved by the Highway Authority Road ownership Other --> &copy; How to use the map Select a time period from the drop down or set the dates you want, then press 'Update'. To find out about an activity on the map click on the highlighted road. If you are interested in a particular road go to the 'Search' field and enter its name, a word or the post code, press 'Go' and select from the result list. Click 'Reset' to restart your search. How to use the map If you want to find information about a particular road go to the 'Search' field and enter its name, a word or postcode, press 'Go' and select from the result list. To obtain the information about the road (i.e who administers it, when will it next be resurfaced or if it's under a utility embargo) click on it. Click 'Reset' to restart your search. How to use the map If you want to find information about a particular road go to the 'Search' field and enter its name, a word or postcode, press 'Go' and select from the result list. To obtain the information about the road (i.e who administers it) click on it. Click 'Reset' to restart your search.",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "sourceName": "Guernsey road closures and delays",
-      "sourceUrl": "https://roadworks.gov.gg/GSW/Roadworks.htm",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
-    },
-    {
-      "id": "adcf692d7e550fa9",
-      "country": "Jersey",
-      "region": null,
-      "location": "Government of Jersey",
-      "type": "road_closure",
-      "title": "Road closures and delays",
-      "summary": "--> Road closures and delays Bagatelle Road and Mont Millais resurfacing Find out about the road works on Mont Millais, Bagatelle Road and St Saviours Road Bagatelle Road by Les Varines pedestrian crossing Find out about the new signal controlled pedestrian crossing being installed on Bagatelle Road Broad Street public realm improvements Find out about the improvements to Broad Street between Lloyds Bank to the Post Office Creating Safer School Zones (Bagatelle and Trinity School trial) Find out how we're making roads safer around schools, including the Bagatelle project and Trinity School trial Current road closures and delays Find a list of the current main road closures and delays for the next 7 days on Trafficworx Esplanade and Gloucester Street reconstruction works Find out about the road works on the Esplanade at the junction with Gloucester Street Green Street car park refurbishment Find out about the works in Green Street car park from 29 June to 28 August 2026 La Grande Route de St Clement resurfacing Find out about the resurfacing works on St Clement's inner road Map of road closures and delays Use the interactive map to find road closures, diversions and traffic restrictions on Trafficworx Northern sewer network upgrades Find out about the major upgrade to the drainage network on La Grande Route de St Jean Planned highway maintenance Where and when to expect major highway maintenance for the next 5 years Road repairs and maintenance Find out how we review and plan road maintenance, including the treatments we use Rue de la Forge (St Ouen) resurfacing Find out about the roadworks on Rue de la Forge in St Ouen School Street Scheme for safer travel to school Find out about the current School Street projects to create a safer environment for children to travel to",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "sourceName": "Jersey road closures and delays",
-      "sourceUrl": "https://www.gov.je/travel/roads/roadclosures",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
-    },
-    {
-      "id": "efa86b3b947b3ec5",
-      "country": "Jersey",
-      "region": null,
-      "location": "Government of Jersey",
-      "type": "road_closure",
-      "title": "Bagatelle Road and Mont Millais resurfacing",
-      "summary": "--> Bagatelle Road and Mont Millais resurfacing Body Content ​ ​About the work As part of our ongoing highway maintenance, we'll undertake work along a section of: Bagatelle Road, from the junction of Patier Road to Langford Sports Centre Mont Millais, the junction of Don Road to junction with Le Jardin du Soleil Works will be carried out 20 July to 20 August 2026. We'll deliver the work in sections to minimise disruption. We also coordinated with Jersey Electricity (JE) to carry out their essential works at the same time as part of their Big Update project. This will reduce disruption and shorten the duration of the roadworks Find out more about the works on St Saviour's Road, St Helier, 20 July on JE . Working hours Working hours will be Monday to Friday, 7.30am to 9pm. A full road closure with traffic management will be in place 24 hours a day, 7 days a week. More details about the works may be provided as the project develops. ​ Dates Location Traffic management 20 to 22 July 28 July Mont Millais, at the junction with Don Road and its junction with Mont Pinel (Section 1) ​Full road closure with traffic management in place 24 hours ​a day, 7 days a week. ​ ​ 23 July to 5 August 17 and 18 August Bagatelle Road, from carpark of Langford Sports centre to Wellington Road (Section 2) 6 to 14 August 19 and 20 August Bagatelle Road, from Wellington Road to Patier Road (Section 3) Diversion routes Map of diversion routes Northbound La Colomberie, St James Street, St Saviours Road, Brooklyn Street, Ann Street, Simon Place, St Saviours Road, La Rue le Masurier, Stopford Road, St Saviours Road, St Mark’s Road, Janvrin Road, Springfield Rd, St Saviours Hill, Five Oaks. Southbound St Saviours Hill, St Saviours Road, Pleasant Street, Clarence Road, Don Road. Access Access to busin",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "sourceName": "Jersey road closures and delays",
-      "sourceUrl": "https://www.gov.je/Travel/Roads/RoadClosures/Pages/BagatelleRoadMontMillais.aspx",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
-    },
-    {
-      "id": "92e26f06149c02e3",
-      "country": "Jersey",
-      "region": null,
-      "location": "Government of Jersey",
-      "type": "road_closure",
-      "title": "Current road closures and delays",
-      "summary": "Summary traffic report Road closures and delays Traffic information --> Current --> Road closures Trinity - La Grande Route de St Jean - between La Rue du Becquet Vincent and La Rue des Houguettes Start date: Saturday, 24/01/26 End date: Saturday, 17/10/26 Traffic details: Road Closure All Day Promoter: GoJ Drainage Capital Works Contractor: Techno Groundworks Description: Road closed for the northern Sewer Network Upgrades project - area 8. Diversion routes posted. Delays Emergency Activity - St.Helier - Queen's Road - GHA Start date: Wednesday, 02/09/26 End date: Tuesday, 08/09/26 Traffic details: Portable Signals All Day Promoter: Jersey Electricity Contractor: Geomarine Description: HV fault on cable Starting - next 7 days Road closures 2026 Jersey International Air Display Start date: Thursday, 10/09/26 End date: Thursday, 10/09/26 Traffic details: Road Closure Between AM and PM Peaks Promoter: Jersey International Air Display Contractor: N/A Description: 2026 Jersey International Air Display Delays No future delays at present",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "sourceName": "Jersey road closures and delays",
-      "sourceUrl": "https://roadworks.gov.je/trafficreport/",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
-    },
-    {
-      "id": "52334fd37084a027",
-      "country": "Jersey",
-      "region": null,
-      "location": "Government of Jersey",
-      "type": "tunnel_restriction",
-      "title": "Esplanade and Gloucester Street reconstruction works",
-      "summary": "--> Esplanade and Gloucester Street reconstruction works Body Content ​​About the project As part of our ongoing road maintenance, we'll rebuild the Esplanade road at the Gloucester Street junction on the side heading towards the Tunnel (eastbound). The works will be completed in October 2026 during weekends. More information will be provided as the project develops. Map of working area Schedule of work More information will be provided as the project develops. Dates Working hours Traffic management Weekends in October, dates to be confirmed​ Saturday, 2pm to 10pm Sunday, 9am to 10pm Lane closure ​Diversion routes Diversion routes will be in place. More information will be provided as the project develops. Access Pedestrian access to premises and businesses will be maintained during the works. Vehicle access to premises and businesses will be maintained where possible, but access will be restricted for certain operations. Access to the castle slipway by vehicle won't be possible. Buses There may be minor disruptions to the bus service. Find more information about diversions and roadworks on LibertyBus .",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "sourceName": "Jersey road closures and delays",
-      "sourceUrl": "https://www.gov.je/Travel/Roads/RoadClosures/Pages/GloucesterEsplanade.aspx",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
-    },
-    {
-      "id": "ee25894c76b08ed3",
-      "country": "Jersey",
-      "region": null,
-      "location": "Government of Jersey",
-      "type": "road_closure",
-      "title": "Map of road closures and delays",
-      "summary": "Road information map WHAT IS THE PURPOSE OF THIS??? --> Road information map --> Road works Road resurfacing & embargoes Road ownership Search Now Today Tomorrow This week Next week This month Next month to Traffic Info Summary traffic report Road closure Diversion Diversion (Cars) One way One way (Cars) Single line traffic Other Road closed from this point Embargoes Under Embargo* Planned Resurfacing Within 6 months 6 to 12 months 12 to 24 months Over 24 months Last Resurfaced 0 to 5 years ago 5 to 10 years ago >10 years ago * Excavations will normally be prohibited unless for exceptional reasons approved by the Highway Authority Road ownership Other --> &copy; How to use the map Select a time period from the drop down or set the dates you want, then press 'Update'. To find out about an activity on the map click on the highlighted road. If you are interested in a particular road go to the 'Search' field and enter its name, a word or the post code, press 'Go' and select from the result list. Click 'Reset' to restart your search. How to use the map If you want to find information about a particular road go to the 'Search' field and enter its name, a word or postcode, press 'Go' and select from the result list. To obtain the information about the road (i.e who administers it, when will it next be resurfaced or if it's under a utility embargo) click on it. Click 'Reset' to restart your search. How to use the map If you want to find information about a particular road go to the 'Search' field and enter its name, a word or postcode, press 'Go' and select from the result list. To obtain the information about the road (i.e who administers it) click on it. Click 'Reset' to restart your search.",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "sourceName": "Jersey road closures and delays",
-      "sourceUrl": "https://roadworks.gov.je/JSW/roadworks.htm",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
-    },
-    {
-      "id": "7eb350822803e291",
-      "country": "Jersey",
-      "region": null,
-      "location": "Government of Jersey",
-      "type": "road_closure",
-      "title": "Rue de la Forge (St Ouen) resurfacing",
-      "summary": "--> Rue de la Forge (St Ouen) resurfacing Body Content ​​About the project As part of our ongoing essential highway maintenance, Infrastructure and Environment (IE) will undertake work in St Ouen on: Rue de la Forge Rue Militaire Le Chemin de l’Eglise We’ll carry out the works in early January 2027. It'​ll take about 3 weeks and be completed in sections to minimise disruption. We'll carry out the works under road closures and provide diversion routes. Map of working area on Rue de la Forge Working hours and traffic management More information will be provided as the project develops. Dates Section Traffic management January 2027, Monday 7.30am to Friday 9pm To be confirmed Full road closures Diversion routes More information will be provided as the project develops. Access Access to all businesses and premises will be maintained where possible during the works. Buses Find more information about changes to the bus service on diversions and roadworks on LibertyBus​ .",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "sourceName": "Jersey road closures and delays",
-      "sourceUrl": "https://www.gov.je/Travel/Roads/RoadClosures/Pages/RueDeLaForge.aspx",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
-    },
-    {
-      "id": "ab3d8c380ef74338",
-      "country": "Vatican City",
-      "region": null,
-      "location": "Governatorato dello Stato della Citta del Vaticano",
-      "type": "bridge_restriction",
-      "title": "Direzioni delle Ville Pontificie",
-      "summary": "Tweet La Direzione delle Ville Pontificie si occupa principalmente della gestione, della manutenzione e del mantenimento dei due Palazzi ad essa affidati, quello Apostolico con tutte le sue pertinenze, e Villa Barberini. La Direzione inoltre, cura la gestione delle infrastrutture e delle reti elettriche ed idriche, comprese le Sorgenti di Palazzolo e la cabina del lago, che garantiscono la disponibilità di energia ed acqua in tutto il territorio delle Ville Pontificie, parliamo di circa 55 ettari. La Direzione delle Ville Pontificie è una realtà al servizio dei Successori di Pietro, perché ha sempre avuto come missione quella di assistere il Pontefice nei periodi di riposo. Questi luoghi, che in passato hanno a lungo ospitato, nel periodo estivo, il Santo Padre, hanno sempre rappresentato per tutti coloro che vi lavorano e vi abitano, la loro casa, il loro orgoglio, la loro storia e per molti di loro, la famiglia. Per moltissimi anni, servire il Santo Padre è stato il principale collante delle loro relazioni umane e professionali. La struttura organizzativa è stata pensata come una replica in “piccolo” del Vaticano. Infatti, all’interno della Direzione ci sono servizi che coprono tutte le potenziali necessità che il Santo Padre ed il suo seguito possano avere, ci sono i florieri che supportano nel Palazzo Apostolico le necessità quotidiane degli ospiti, il personale operativo come elettricisti, idraulici, falegnami, autisti e giardinieri, ed infine, un gruppo di responsabili di settore, che insieme al Direttore sovraintendono a tutte le necessità che la Famiglia Pontificia possa avere durante il soggiorno. Sicuramente, in questi ultimi anni, lo stile ed anche l’utilizzo dell’enorme patrimonio delle Ville è profondamente cambiato. La residenza estiva dei Papi è divenuta ",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "sourceName": "Vatican City State",
-      "sourceUrl": "https://www.vaticanstate.va/it/direzioni/direzione-delle-ville-pontificie.html",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
-    },
-    {
-      "id": "a5030270e9f2fd88",
-      "country": "Vatican City",
-      "region": null,
-      "location": "Governatorato dello Stato della Citta del Vaticano",
-      "type": "bridge_restriction",
-      "title": "Serie divisionale monete 2026 - Pontificato Leone XIV",
-      "summary": "Tweet La nuova serie divisionale di monete vaticana, la prima del pontificato di Papa Leone XIV, si ispira direttamente allo stemma del Pontefice, riprodotto in copertina con un effetto “gesso” e reso in rilievo su un fondo avorio, mentre un blu intenso caratterizza le iscrizioni e gli elementi grafici di risalto, richiamando i colori dei due campi araldici dello stemma pontificio. Tagged under: YouTube video Monete",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "sourceName": "Vatican City State",
-      "sourceUrl": "https://www.vaticanstate.va/it/video/4414-serie-divisionale-monete-2026-pontificato-leone-xiv.html",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
-    },
-    {
-      "id": "329e546468cac9c0",
-      "country": "Vatican City",
-      "region": null,
-      "location": "Governatorato dello Stato della Citta del Vaticano",
-      "type": "bridge_restriction",
-      "title": "La serie divisionale vaticana di monete in euro cambia linguaggio, tra colore e grafica",
-      "summary": "La nuova serie divisionale di monete vaticana, la prima del pontificato di Papa Leone XIV, si ispira direttamente allo stemma del Pontefice, riprodotto in copertina con un effetto “gesso” e reso in rilievo su un fondo avorio, mentre un blu intenso caratterizza le iscrizioni e gli elementi grafici di risalto, richiamando i colori dei due campi araldici dello stemma pontificio. Lo stesso binomio cromatico troverà poi spazio, in forma ancora più evidente, nella nuova linea di packaging che accompagnerà le prossime emissioni numismatiche. Non una scelta puramente estetica dunque, ma un vero e proprio omaggio e un richiamo diretto al nuovo pontificato. Le monete custodite all’interno presentano un'alternanza inedita tra effigie del Pontefice e stemma pontificio: l'effigie compare sui tagli maggiori, lo stemma su quelli minori, in un progetto grafico senza precedenti nella storia delle divisionali vaticane. La moneta da 2 euro inoltre racchiude gli elementi distintivi dello stemma di Leone: il giglio, simbolo di purezza e devozione mariana, e il cuore ardente trafitto da una freccia sopra un libro aperto, emblema della spiritualità agostiniana e della forza della Parola di Dio, capace di trasformare il cuore dell'uomo. La serie è disponibile, come sempre, nella versione tradizionale comprendente le otto monete in euro aventi corso legale e in quella speciale contenente anche la moneta bimetallica da 5 euro, dedicata quest’anno all'ottavo centenario della morte di San Francesco d'Assisi. Quest’ultima raffigura la spoliazione, momento decisivo della conversione del Santo e autentico manifesto della spiritualità francescana: l'abbandono di ogni possesso, il distacco dal passato e il totale affidamento a Dio. Con queste due emissioni il Governatorato dello Stato della Città del V",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "sourceName": "Vatican City State",
-      "sourceUrl": "https://www.vaticanstate.va/it/novita/4412-la-divisionale-vaticana-di-monete-cambia-linguaggio-tra-colore-e-grafica.html",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
-    },
-    {
-      "id": "0d4099a20f6c6a61",
-      "country": "Vatican City",
-      "region": null,
-      "location": "Governatorato dello Stato della Citta del Vaticano",
-      "type": "bridge_restriction",
-      "title": "Nel Braccio Nuovo dei Musei Vaticani, concerto in occasione del 325° anniversario della fondazione della Pontificia Accademia Ecclesiastica",
-      "summary": "Nell’ambito delle celebrazioni per il 325°Anniversario della Pontificia Accademia Ecclesiastica, nel Braccio Nuovo dei Musei Vaticani, il Coro della Fondazione Cardinale Domenico Bartolucci ha tenuto un concerto, mercoledì pomeriggio, 27 maggio. Per l’occasione, il Coro, diretto dal Maestro Adriano Caroletti, ha eseguito per la prima volta In Christo vocati l’inno della Pontificia Accademia composto dal Maestro Michele Manganelli. Erano presenti, tra gli altri, il Cardinale Pietro Parolin, Segretario di Stato, i Cardinali Dominique Mamberti, Rolandas Makrickas, George Jacob Koovakad, Christophe Pierre, Lorenzo Baldisseri, gli Arcivescovi Paolo Rudelli, Sostituto della Segreteria di Stato, Luciano Russo, Segretario della Sezione per il personale di ruolo diplomatico della Segreteria di Stato, Edgar Peña Parra, Nunzio Apostolico in Italia e nella Repubblica di San Marino, e Salvatore Pennacchio, Presidente della Pontificia Accademia Ecclesiastica, Sr. Raffaella Petrini, Presidente del Governatorato dello Stato della Città del Vaticano, l’Avvocato Giuseppe Puglisi-Alibrandi, Segretario Generale, e la dott.ssa Barbara Jatta, Direttore della Direzione dei Musei e dei Beni Culturali. Per commemorare l’anniversario dei 325 anni di fondazione, il Governatorato dello Stato della Città del Vaticano, attraverso il Servizio Poste e Filatelia della Direzione delle Telecomunicazioni e dei Sistemi Informatici, ha realizzato una serie filatelica commemorativa, un folder, una busta ricordo e un annullo postale speciale Era stato Papa Leone XIV, nel corso della visita alla Pontificia Accademia Ecclesiastica, ad apporre la sua firma sulla maxi riproduzione del francobollo commemorativo, lunedì pomeriggio, 27 aprile, nella sede storica della Pontificia Accademia, il Palazzo Severoli, situa",
-      "validFrom": null,
-      "validTo": null,
-      "impact": null,
-      "recommendedAction": null,
-      "sourceName": "Vatican City State",
-      "sourceUrl": "https://www.vaticanstate.va/it/novita/4219-nel-braccio-nuovo-dei-musei-vaticani-concerto-in-occasione-del-325-anniversario-della-fondazione-della-pontificia-accademia-ecclesiastica.html",
-      "confidence": "unverified",
-      "status": "active",
-      "firstSeenAt": "2026-08-31T12:27:47.360Z",
-      "lastCheckedAt": "2026-09-06T10:07:31.848Z"
+      "lastCheckedAt": "2026-09-06T10:07:31.848Z",
+      "jurisdiction": "SK"
     }
   ]
 }

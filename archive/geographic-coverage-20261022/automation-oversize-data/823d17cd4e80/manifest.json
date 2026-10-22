@@ -1,0 +1,179 @@
+{
+  "coverage_version": "2026-10-22.50",
+  "source_branch": "automation/oversize-data",
+  "source_commit": "823d17cd4e80298af5f098d81602740a88ba1bf8",
+  "approved_main_commit": "a5e0ea815659157030487913b5d5daee5fa188e3",
+  "archive": "archive/geographic-coverage-20261022/automation-oversize-data/823d17cd4e80",
+  "totals": {
+    "documents": 19,
+    "changed": 19,
+    "findings_before": 683,
+    "findings_after": 618,
+    "coverage_rows_removed": 465,
+    "findings_excluded": 65,
+    "excluded_reasons": {
+      "OUTSIDE_MONITORING_SCOPE_OR_MANUAL_ASSIGNMENT_REQUIRED": 65
+    }
+  },
+  "files": [
+    {
+      "path": "data/oversize/2026-W34/findings.json",
+      "before_blob": "ad608e0cc55955d4097b11322de0811d65d1bb06",
+      "before_sha256": "de7d63987c5291c0de3723889a2e6eae34a9d50a4a9652fc0ea07dd77e5775a1",
+      "after_blob": "d648b9ad4931a01e8c921f118e6c51bedaaff0e8",
+      "after_sha256": "2e03b4d36ea86b420cd2b2bbda6bfa59e17c7b64c71c3618561a688a83a48911",
+      "excluded_count": 0
+    },
+    {
+      "path": "data/oversize/2026-W35/coverage.json",
+      "before_blob": "a45ca76002f4e9bcb198ec8584b87405488231ca",
+      "before_sha256": "aa252b987e813e3e3cb16d1f27d546511682d9a1d83474d7369ea02b2aef81bb",
+      "after_blob": "631492bd2b54b53f12d8c61150e5d06fa283b131",
+      "after_sha256": "7d0fb68b52ed678b479811866f5388be2a7f258d1362abf8dffa59e30e879cd3",
+      "excluded_count": 33
+    },
+    {
+      "path": "data/oversize/2026-W35/findings.json",
+      "before_blob": "2a91a1d80ab5869331dd59017387401404f5880b",
+      "before_sha256": "1a5d26ac1d0e5b8c85f0a16a7ecd28137174d195c0bf69260e4c97ccf8a2b20b",
+      "after_blob": "b23ff25eabfa648d5f9e5d4745025cb5b0484507",
+      "after_sha256": "393ec04d891ecee3e58034cc9cdf6d922a40c8a8252b9a2d52742855283376e3",
+      "excluded_count": 0
+    },
+    {
+      "path": "data/oversize/2026-W36/coverage.json",
+      "before_blob": "8b9c4404cbbaaa107c03b3e7dbfc64b6be33fa6d",
+      "before_sha256": "5a68f3a3a1c5037e65d9c3724f923dc9319aa954f96310800eef07a66ce77f38",
+      "after_blob": "f4db550f9c645e5e7196a87067082c1640c16b42",
+      "after_sha256": "70923e8e61abc7312a348f887eca60482c2bcfad419b6ef587f2c1c724465c70",
+      "excluded_count": 54
+    },
+    {
+      "path": "data/oversize/2026-W36/findings.json",
+      "before_blob": "9021e56f5efbb250d3d08ee43d23eb1e85e908d9",
+      "before_sha256": "a69160b0b8d50a532db521579c3c78b4fba8eb9ff10202aa6e62e3aba226ff27",
+      "after_blob": "554964152e33e1deebbff47a10335de285e3ae27",
+      "after_sha256": "73f9ded3090dfadc7f9854a541c67e4f2927f7a39fdf7dfd439114bbd9ed6e13",
+      "excluded_count": 11
+    },
+    {
+      "path": "data/oversize/2026-W37/coverage.json",
+      "before_blob": "46beebe56571c3ea0e9c734a2efc4b55a61eda14",
+      "before_sha256": "e040f790b33814a216ccca9707ccd2f88e05672a4c0893428d86cbb26b30fea6",
+      "after_blob": "d94bc31459dd6e134ddbf97d8e4eb4d3b2ed5ee9",
+      "after_sha256": "d88fa346becfe33d0a2af18371b5b9a6f696bf5a1dcec01b9fed7f96b7af5a96",
+      "excluded_count": 54
+    },
+    {
+      "path": "data/oversize/2026-W37/findings.json",
+      "before_blob": "826fba9533473ffb4e720045eb9e5d875e996d95",
+      "before_sha256": "d01edf35f2b9d1b4804d514472ba0fc16546b8fb9c4462f68d99bf1d965c916f",
+      "after_blob": "5c0ca49f3f25ad379fa9eb74ddbe1937ccecb5ec",
+      "after_sha256": "5d1e851a3c4790a54209aa05e5e06d627c45669d10f6a171e0be20559cb3d625",
+      "excluded_count": 11
+    },
+    {
+      "path": "data/oversize/2026-W38/coverage.json",
+      "before_blob": "d8c541062fcfd9b5ff7540dcd01824efd8630dbe",
+      "before_sha256": "3a9638bf11d08f89558818dab8b7a0b5e73f742f6afb399f32b71cae9bd3033e",
+      "after_blob": "41faadd669e9ddce1b8cb9b12afcbaec758295d7",
+      "after_sha256": "e9f03a6959cf68f7ea20871f3fb3f443c7916bad18d182c21b6264f08889e9a1",
+      "excluded_count": 54
+    },
+    {
+      "path": "data/oversize/2026-W38/findings.json",
+      "before_blob": "b04dfb6ebb59aa9a8e4a8ae03cced2b1c55fde85",
+      "before_sha256": "45bc5fceb5924b66c91535ed27e995ab128fa5631c7e687ee17e301d0a813f9b",
+      "after_blob": "351b94cc43e887b4277cfeccb2aa0a03a149c558",
+      "after_sha256": "020d572731962ff7b265e915e4320241af5e319cbddf5a07fbc69a0463c18fd5",
+      "excluded_count": 12
+    },
+    {
+      "path": "data/oversize/2026-W39/coverage.json",
+      "before_blob": "8b78e92a5d7d5b7820dd805049b6117f1c8e0e7b",
+      "before_sha256": "8e78d10c4f4682c7725878a55483db34800167aad42a54702124e63b5433eb5f",
+      "after_blob": "27fe1a9508d943692276e4ac39d9e894810ed4aa",
+      "after_sha256": "5ee466a158cbc6f413f6d5511fb9e52102f136c3031b3fa0a592e8ea19fc525b",
+      "excluded_count": 54
+    },
+    {
+      "path": "data/oversize/2026-W39/findings.json",
+      "before_blob": "4f21eb7dbe7a1216af7eec0748b2dfd12793e45c",
+      "before_sha256": "75cea0df350339d3b128284463299d151caaa356eb62725080ef7237d1647f0a",
+      "after_blob": "480652f9e91b6b102764859fc52f775fa053be2a",
+      "after_sha256": "ac6118afad7c2cdcb126167898d49a3d432b1d4faa0f1e8887b391f47b41a64d",
+      "excluded_count": 14
+    },
+    {
+      "path": "data/oversize/2026-W40/coverage.json",
+      "before_blob": "a7acd79087465ef2da143a6c0b9da47d669a5901",
+      "before_sha256": "9fc8cdfcdec10a7ea69da0b028b2b1252ec3dc244803dd9e66dc277a0447304c",
+      "after_blob": "d3a5c092302f3f4ca0d12f751066a4cf6aae56db",
+      "after_sha256": "bd7fe8eb6bec674c3950742444375bfae17555a4f2390a361a8b8a7ec5872539",
+      "excluded_count": 54
+    },
+    {
+      "path": "data/oversize/2026-W40/findings.json",
+      "before_blob": "cf42f124909818d63efc3da136cfb2555ad46beb",
+      "before_sha256": "37378f575c34cd778f0659bfb8a5761af80571fc07eff54ec3f71ee4b345c5fd",
+      "after_blob": "729f9ea7c0b012a4b203b741ed9e3210ee2e3533",
+      "after_sha256": "24be51ebd642f0943530a8520cba99d76cc0f0db97fb581e69674dfed20cc23b",
+      "excluded_count": 10
+    },
+    {
+      "path": "data/oversize/2026-W41/coverage.json",
+      "before_blob": "2b34670605e45cacf4cb14439f2df85627c26f8b",
+      "before_sha256": "fbfd94d64f6b6fe7916cd3bcdc9fd2dc4458f7e058e0c3c71296d9b58c813eca",
+      "after_blob": "cb0f6ee805d85cbdb2940eca559c7bbc59beb57d",
+      "after_sha256": "78bbced58613b1e1588e9cc41c79519fd9e09ee632058a9eff28ef21f95508ab",
+      "excluded_count": 54
+    },
+    {
+      "path": "data/oversize/2026-W41/findings.json",
+      "before_blob": "3a634a7b4508a1ab1f1c954568d7c0497db50bb7",
+      "before_sha256": "19166a475a315aab2f628b3e094b877747c0eafa0b01b10000941c38c7e1b77b",
+      "after_blob": "bee3e8cfc50e12b0a622bfa4634d57663168108f",
+      "after_sha256": "e293cb37f83577326603894b98b8ff9b591afc8f58101cd0db695f155fbe93cb",
+      "excluded_count": 7
+    },
+    {
+      "path": "data/oversize/2026-W42/coverage.json",
+      "before_blob": "86b78f64e892334eb091d60f7c4ee3407aafec70",
+      "before_sha256": "3bc160a308eb2201eca7670d49fa45f7be6a5c8cac01c07852aba17186452fe3",
+      "after_blob": "0093f2c45f15622ffcba61e0f339dcbf770b7744",
+      "after_sha256": "0fe609d9169fe535c9564576550e1cc166131ffe5c6d7bdeab00e6e3f040695b",
+      "excluded_count": 54
+    },
+    {
+      "path": "data/oversize/2026-W42/findings.json",
+      "before_blob": "ca28d33b14be7bb49dd053b6132124d813870555",
+      "before_sha256": "3b7f868e3bc305c7b2462399f4d6f128d3be9cba3ea834e41eb49c55fb1141c2",
+      "after_blob": "66beb8e1cd1780cde8bba8aab20d43e3eba7407c",
+      "after_sha256": "7d36c1e580eefd2c4870e9396263b05d5433752a8ee57fe4f84199e02e521850",
+      "excluded_count": 0
+    },
+    {
+      "path": "data/oversize/2026-W43/coverage.json",
+      "before_blob": "0ef3907aa965aa84cc550deb70af9a4c9405b8f8",
+      "before_sha256": "6ba406b7032ef1a949510501dcb46239dd03de866f36ab172bc24fe0d5c8d7d8",
+      "after_blob": "106f3ca6c8cd9c8a4bb2aa7f69ab2b2d72cf7071",
+      "after_sha256": "a7d94977f154fc214c88a6e1b4f8495581ca9746a2e3b477f0933f723ea0a69a",
+      "excluded_count": 54
+    },
+    {
+      "path": "data/oversize/2026-W43/findings.json",
+      "before_blob": "8ade4b1170cf41383465e5b2dcc744678dda5c2e",
+      "before_sha256": "578ee7a532ef448d69cf3452cf80cf304b647ec78f0b84669b8d7b23e49543fa",
+      "after_blob": "b7d90c60ac14046d69ef9176e1deb2f246056c39",
+      "after_sha256": "bfdede2c5b12e6fd919436c7b1a29cd1c4a6b78312d7ad9a125d4c3b4faa5927",
+      "excluded_count": 0
+    }
+  ],
+  "idempotent": true,
+  "active_codes_valid": true,
+  "notes": [
+    "Only active monitoring JSON is normalized. Executable code is loaded from main.",
+    "Original bytes are preserved in the separate archive in the same atomic Git tree update.",
+    "No source-check timestamps, legal rules, permits, business documents or publication ledgers are changed."
+  ]
+}
