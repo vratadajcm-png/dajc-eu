@@ -57,6 +57,8 @@ const resources = [
       <p class="eyebrow">European digital coordination ecosystem</p>
       <h1 id="home-title">Connecting European <em>transport</em> and vehicle assistance.</h1>
       <p class="hero-lead">DAJC Platform is developing coordination for complex transport. DAJC Assistance is a related capability in research and design, all under one DAJC brand.</p>
+      <div class="platform-links hero-actions"><a class="solid-link" href="/testing#register">Register for Testing 2027</a><a class="line-link" href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">View Platform Demo ↗</a></div>
+      <p class="hero-status">Demo uses synthetic data. Testing begins 4 January 2027; this is not a commercial launch.</p>
       <p class="hero-status">Built from real operations. Developed step by step. No unannounced commercial services or integrations implied.</p>
     </div>
 
@@ -70,7 +72,7 @@ const resources = [
         </div>
         <p class="solution-card__description">A provider-neutral workflow being designed to connect participants, D-ID transport context, routes, permits and documents.</p>
         <span class="solution-card__status"><i aria-hidden="true"></i>In development · Testing from 4 Jan 2027</span>
-        <a class="solution-card__button" href="#platform-overview">Explore DAJC Platform <span aria-hidden="true">↗</span></a>
+        <a class="solution-card__button" href="/platform">Explore DAJC Platform <span aria-hidden="true">↗</span></a>
       </article>
       <article class="solution-card">
         <div class="solution-card__top">
@@ -101,7 +103,7 @@ const resources = [
       <p class="section-eyebrow">DAJC Platform · In development</p>
       <h2 id="platform-heading">One transport context. Many participants. Clearer coordination.</h2>
       <p>DAJC Platform is being developed around a D-ID transport identity so authorised participants can work with the relevant order, route, permits, documents and progress in one coordinated environment. The planned product is not a transport broker or marketplace.</p>
-      <div class="platform-links"><a class="solid-link" href="/testing">Register for Testing 2027 ↗</a><a class="line-link" href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">Explore synthetic demo ↗</a></div>
+      <div class="platform-links"><a class="solid-link" href="/testing">Register for Testing 2027 ↗</a><a class="line-link" href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">View Platform Demo ↗</a><a class="line-link" href="/platform">How D-ID works →</a></div>
     </div>
     <div class="workflow" aria-label="Illustrative DAJC Platform workflow">
       <div><span>01</span><strong>D-ID transport context</strong><small>One shared operational reference</small></div>
@@ -109,6 +111,16 @@ const resources = [
       <div><span>03</span><strong>Coordinated execution</strong><small>Permissioned status and handoffs</small></div>
       <p>Illustrative intended workflow. Not a claim of production availability.</p>
     </div>
+  </section>
+
+  <section class="home-section dispatch-section" aria-labelledby="dispatch-heading">
+    <div class="section-heading"><div><p class="section-eyebrow">A dispatcher’s day</p><h2 id="dispatch-heading">Less searching. A clearer handover.</h2></div><p>Illustrative scenario · to be validated in testing</p></div>
+    <div class="comparison-grid">
+      <article><p class="section-eyebrow">Today</p><h3>A change arrives in three places.</h3><p>A revised loading time is in an email, the permit is in a shared folder and the driver has an older message. The dispatcher checks each source and calls everyone again.</p></article>
+      <article><p class="section-eyebrow">With DAJC · planned workflow</p><h3>One transport identity links the change.</h3><p>The D-ID brings the relevant documents, approved changes and handover status together for authorised participants. The aim is less repeated entry and a traceable record of who confirmed what.</p></article>
+    </div>
+    <p class="resources-caveat">Example only: avoiding four repeated five-minute lookups would save 20 minutes on one transport. This is an illustrative calculation, not a measured DAJC result or a guaranteed saving.</p>
+    <div class="platform-links"><a class="line-link" href="/platform#d-id">See the D-ID workflow →</a><a class="solid-link" href="/testing#register">Help test this workflow →</a></div>
   </section>
 
   <section class="home-section audience-section" aria-labelledby="audiences-heading">
@@ -149,6 +161,11 @@ const resources = [
 </main>
 
 <style>
+  .comparison-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;}
+  .comparison-grid article {padding:1.5rem;border:1px solid #3a5673;border-radius:12px;background:rgba(10,36,65,.7);}
+  .comparison-grid h3 {font:700 1.2rem/1.3 'Space Grotesk',sans-serif;}
+  .comparison-grid p:not(.section-eyebrow) {color:#abc0d7;line-height:1.75;}
+  .dispatch-section {border-top:1px solid rgba(124,141,166,.18);}
   .home-redesign {position:relative;z-index:1;overflow:hidden;color:#f5f7fa;}
   .home-redesign :is(a):focus-visible {outline:2px solid var(--dajc-orange);outline-offset:4px;}
   .hero {position:relative;max-width:1300px;margin:0 auto;padding:clamp(4rem,7vw,6.7rem) clamp(1.2rem,4vw,3rem) 4rem;isolation:isolate;}
@@ -235,7 +252,7 @@ const resources = [
     .section-heading {align-items:flex-start;flex-direction:column;gap:.3rem;}
     .section-heading>p {text-align:left;}
     .proof-grid {grid-template-columns:1fr;gap:1.4rem;}
-    .platform-overview {grid-template-columns:1fr;}
+    .platform-overview,.comparison-grid {grid-template-columns:1fr;}
     .update-section {grid-template-columns:1fr;}
   }
   @media(max-width:440px){
