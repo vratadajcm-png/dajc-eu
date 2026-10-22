@@ -1,6 +1,6 @@
 {
   "week": "2026-W43",
-  "checkedAt": "2026-10-22T08:40:05.429Z",
+  "checkedAt": "2026-10-22T10:59:56.364Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -384,10 +384,10 @@
       "code": "SK",
       "name": "Slovakia",
       "sourceScope": "SK",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "sk",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "SI",
