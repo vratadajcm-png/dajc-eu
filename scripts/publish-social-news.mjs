@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { collectSocialCandidates, selectNextSocialArticle, candidateKey } from './lib/social-publication.mjs';
 import { checkPublicArticle, checkXAccount, publishToX, readXCredentials } from './lib/x-publishing.mjs';
 import { linkedinConfig, publishToLinkedIn } from './lib/linkedin-publishing.mjs';
+import { readBufferConfig, checkBufferChannel, publishViaBuffer } from './lib/buffer-publishing.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHANNELS = {
@@ -28,9 +29,14 @@ async function saveLedger(filename, ledger) {
   await writeFile(path.join(ROOT, filename), JSON.stringify(ledger, null, 2) + '\n');
 }
 function getConfig(channel) {
-  return channel === 'x' ? readXCredentials() : linkedinConfig();
+  if (process.env.DAJC_SOCIAL_BACKEND === 'buffer') return readBufferConfig(channel);
+  if (!process.env.DAJC_SOCIAL_BACKEND || process.env.DAJC_SOCIAL_BACKEND === 'direct') {
+    return channel === 'x' ? readXCredentials() : linkedinConfig();
+  }
+  throw new Error('Unsupported publishing backend');
 }
 async function post(channel, text, credentials) {
+  if (credentials.backend === 'buffer') return publishViaBuffer(text, credentials);
   return channel === 'x' ? publishToX(text, credentials) : publishToLinkedIn(text, credentials);
 }
 function getText(channel, article) {
@@ -73,7 +79,8 @@ async function main() {
       return;
     }
     const credentials = getConfig(channel);
-    if (channel === 'x') await checkXAccount(credentials);
+    if (credentials.backend === 'buffer') await checkBufferChannel(credentials);
+    else if (channel === 'x') await checkXAccount(credentials);
     // For LinkedIn, only an explicit company URN passes config validation;
     // the API enforces whether the token may post for that organization.
     const key = candidateKey(article);
@@ -100,14 +107,14 @@ async function main() {
   const credentials = getConfig(channel);
   const confirmed = await post(channel, getText(channel, article), credentials);
   ledger.posts[key] = {
-    status: 'published',
+    status: confirmed.status || 'published',
     sourceUrl: article.url,
     postId: confirmed.id,
     postUrl: confirmed.url,
     publishedAt: new Date().toISOString(),
   };
   await saveLedger(ledgerConfig.file, ledger);
-  console.log('Social post confirmed and locally recorded: ' + confirmed.url);
+  console.log('Social publishing transaction recorded for ' + channel + ': ' + (confirmed.url || 'Buffer post ' + confirmed.id) + ', status ' + ledger.posts[key].status);
 }
 
 main().catch((error) => {
