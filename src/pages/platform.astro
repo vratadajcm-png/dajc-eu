@@ -1,71 +1,9 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-const steps = [
-  ['Define the transport', 'Cargo, vehicle, participants and requirements form one D-ID transport context.'],
-  ['Agree and confirm', 'Authorised participants confirm the agreed plan. Later changes are recorded as amendments.'],
-  ['Coordinate execution', 'The relevant permit, route, documents and handover status stay linked to that transport.'],
-  ['Record delivery', 'Delivery evidence and the history of approved changes remain linked for review.'],
-];
+// Platform and its development material are intentionally not public.
+// Keep this route server-rendered so direct URLs run through the request gate.
+export const prerender = false;
+return new Response('Not found', {
+  status: 404,
+  headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet', 'Cache-Control': 'no-store' },
+});
 ---
-<BaseLayout title="DAJC Platform | D-ID, transport coordination and Testing 2027" description="Explore the planned DAJC Platform workflow, understand D-ID, try the synthetic demo and register for testing from 4 January 2027.">
-  <main class="platform-page">
-    <section class="intro" aria-labelledby="platform-title">
-      <p class="eyebrow">DAJC Platform · In development</p>
-      <h1 id="platform-title">One transport.<br />One shared context.</h1>
-      <p class="lead">Heavy and oversized transport brings together dispatchers, drivers, permit specialists, escorts and customers. DAJC is being built to connect their information and responsibilities around one transport identity: the D-ID.</p>
-      <div class="actions"><a class="button primary" href="/testing#register">Register for Testing 2027</a><a class="button" href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">View Platform Demo ↗</a></div>
-      <p class="note">The demo uses synthetic data. Pre-production testing starts 4 January 2027; this is not a confirmed commercial launch.</p>
-    </section>
-
-    <section id="d-id" aria-labelledby="did-title">
-      <p class="eyebrow">D-ID, explained</p><h2 id="did-title">A reference for the whole transport.</h2>
-      <p>Think of D-ID as a shared transport file with a unique identity. It links the relevant order, participants, permits, documents and approved changes. Each participant sees the information their role permits.</p>
-      <ol class="workflow">{steps.map(([title, description], i) => <li><span aria-hidden="true">0{i + 1}</span><div><h3>{title}</h3><p>{description}</p></div></li>)}</ol>
-      <p class="note">Illustrative intended workflow. A D-ID does not replace an authority-issued permit or override its route and conditions.</p>
-    </section>
-
-    <section aria-labelledby="examples-title">
-      <p class="eyebrow">Practical examples</p><h2 id="examples-title">What better coordination could change.</h2>
-      <div class="cards">
-        <article><h3>Time spent finding documents</h3><p><strong>Today:</strong> a dispatcher looks through messages and folders to locate the latest agreed document.</p><p><strong>Planned with DAJC:</strong> authorised participants open the relevant version from the same D-ID.</p><p class="note">Illustration: four avoided five-minute searches equal 20 minutes. This is an assumption for testing, not a measured saving.</p></article>
-        <article><h3>A changed loading time</h3><p><strong>Today:</strong> the dispatcher must reconcile separate replies to find out whether the driver and escort received an update.</p><p><strong>Planned with DAJC:</strong> the amendment, responsible participants and confirmations are linked to the transport, making missing handovers easier to spot.</p><p class="note">The expected benefit is a clearer audit trail and fewer missed changes. No error-reduction rate has been measured yet.</p></article>
-      </div>
-    </section>
-
-    <section aria-labelledby="solutions-title">
-      <p class="eyebrow">One brand, different workflows</p><h2 id="solutions-title">Platform and Assistance.</h2>
-      <div class="cards">
-        <article><h3>DAJC Platform</h3><p>Coordination before, during and after a heavy or oversized transport: planning, permits, documents and participant handovers.</p><p class="note">In development · Testing from 4 January 2027</p><a href="/testing">Join Platform testing →</a></article>
-        <article><h3>DAJC Assistance</h3><p>A related research direction focused on vehicle assistance and recovery coordination between fleets, authorised networks and recovery providers.</p><p class="note">Research and design · No live assistance service</p><a href="/assistance">Explore Assistance →</a></article>
-      </div>
-    </section>
-
-    <section class="closing" aria-labelledby="next-title"><p class="eyebrow">Next step</p><h2 id="next-title">Explore it. Help test it.</h2><p>Start with the synthetic demo, then register your interest in testing the developing Platform with transport professionals.</p><div class="actions"><a class="button primary" href="/testing#register">Register for Testing 2027</a><a class="button" href="mailto:team@dajc.eu?subject=DAJC%20Platform%20question">Contact DAJC by email</a></div></section>
-  </main>
-</BaseLayout>
-<style>
-  .platform-page{position:relative;z-index:1;width:min(1100px,calc(100% - 2.5rem));margin:auto;padding:4rem 0;color:#f5f7fa;}
-  section{padding:3.5rem 0;border-bottom:1px solid #344b66;scroll-margin-top:2rem;}
-  .intro{padding-top:1rem;max-width:850px;}
-  h1,h2,h3{font-family:'Space Grotesk',sans-serif;line-height:1.15;}
-  h1{font-size:clamp(2.5rem,6vw,4.8rem);margin:1rem 0;letter-spacing:-.035em;}
-  h2{font-size:clamp(1.7rem,3.3vw,2.7rem);margin:.75rem 0 1.3rem;}
-  h3{font-size:1.2rem;margin:0 0 .75rem;}
-  p{line-height:1.75;color:#b7c8db;max-width:78ch;}
-  .lead{font-size:1.15rem;}
-  .eyebrow{font:.75rem/1.5 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#ff9f00;}
-  .actions{display:flex;flex-wrap:wrap;gap:.8rem;margin:1.7rem 0;}
-  a{color:#ffb542;}
-  .button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.75rem 1.2rem;border:1px solid #ff9f00;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;}
-  .primary{background:#ff9f00;color:#061a33;}
-  a:focus-visible{outline:2px solid #ff9f00;outline-offset:4px;}
-  .note{font-size:.83rem;color:#a6b8cf;}
-  .workflow{list-style:none;padding:0;display:grid;gap:.8rem;counter-reset:step;}
-  .workflow li{display:flex;gap:1.5rem;padding:1.4rem;background:#0c2540;border:1px solid #3a5673;border-radius:12px;}
-  .workflow span{color:#ff9f00;font:700 1.3rem 'IBM Plex Mono',monospace;}
-  .workflow p{margin:0;}
-  .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;}
-  .cards article{padding:1.5rem;border:1px solid #3a5673;border-radius:12px;background:#0c2540;}
-  .closing{border:0;}
-  @media(max-width:650px){.cards{grid-template-columns:1fr;}section{padding:2.5rem 0;}.platform-page{padding-top:2rem;}.actions .button{width:100%;}.workflow li{gap:1rem;padding:1.1rem;}}
-</style>

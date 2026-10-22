@@ -6,7 +6,7 @@ category: "platform"
 publishedAt: 2026-09-18
 language: "en"
 author: "DAJC"
-status: "published"
+status: "draft"
 tags:
   - "eFTI"
   - "integrations"

@@ -2,5 +2,8 @@
 // The public Integration Ecosystem catalogue is intentionally withdrawn until
 // working integrations are validated. Preserve the provider content internally.
 export const prerender = false;
-return Astro.redirect('/', 302);
+return new Response('Not found', {
+  status: 404,
+  headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet', 'Cache-Control': 'no-store' },
+});
 ---
