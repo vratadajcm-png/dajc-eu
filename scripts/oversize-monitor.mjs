@@ -24,17 +24,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const HISTORY_WEEKS = 6;
 
-const PARENT_SOURCE = {
-  ENG: 'UK', SCT: 'UK', WLS: 'UK', NIR: 'UK', GG: 'UK', JE: 'UK', IM: 'UK', GI: 'UK', ALDERNEY: 'UK',
-  AX: 'FI', FO: 'DK', GL: 'DK', SVALBARD: 'NO', JANMAYEN: 'NO', SBA: 'CY', NCY: 'CY',
-  CEU: 'ES', MLL: 'ES', CAN: 'ES', CAT: 'ES', BAS: 'ES', GAL: 'ES',
-  AZO: 'PT', MAD: 'PT', FLA: 'BE', WAL: 'BE', BRU: 'BE',
-  GP: 'FR', MQ: 'FR', GF: 'FR', RE: 'FR', YT: 'FR', MF: 'FR', BL: 'FR', PM: 'FR',
-  NC: 'FR', PF: 'FR', WF: 'FR', CLIPPERTON: 'FR', TF: 'FR',
-  AW: 'NL', CW: 'NL', SX: 'NL', 'BQ-BO': 'NL', 'BQ-SA': 'NL', 'BQ-SE': 'NL',
-  FBIH: 'BA', RSBA: 'BA', TRN: 'MD', GAG: 'MD', AB: 'GE', SO: 'GE', RSM: 'SM',
-};
-
 async function main() {
   const now = new Date();
   const weekLabel = isoWeekLabel(now);
@@ -148,7 +137,7 @@ async function main() {
   }
 
   const coverage = dajcEuropeCoverage.map(([code, name]) => {
-    const effectiveCode = PARENT_SOURCE[code] || code;
+    const effectiveCode = code;
     if (useWeb) {
       const entry = webGroups.find(({ group }) => group.codes.includes(code))
         || webGroups.find(({ group }) => group.codes.includes(effectiveCode));
