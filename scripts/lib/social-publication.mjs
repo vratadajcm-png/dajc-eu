@@ -40,7 +40,7 @@ export function selectNextSocialArticle(articles, ledger) {
   for (const article of articles) {
     const record = ledger.posts[candidateKey(article)];
     if (record !== undefined) {
-      if (record?.status === 'published') continue;
+      if (record?.status === 'published' || record?.status === 'submitted') continue;
       throw new Error('Unknown or unfinished social ledger record; refusing a duplicate');
     }
     return article;
