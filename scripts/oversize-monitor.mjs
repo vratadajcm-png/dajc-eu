@@ -13,7 +13,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { oversizeSources } from '../config/oversize-sources/index.mjs';
-import { dajcEuropeCoverage } from '../config/europe-coverage.mjs';
+import { dajcEuropeCoverage, dajcCoverageCodes } from '../config/europe-coverage.mjs';
 import { fetchSourceFindings } from './lib/fetch-source.mjs';
 import { discoverWithWebSearch, SEARCH_GROUPS } from './lib/web-search.mjs';
 import { buildFindingHistory, mergeFindings, markExpired } from './lib/findings.mjs';
@@ -25,15 +25,16 @@ const ROOT = path.resolve(__dirname, '..');
 const HISTORY_WEEKS = 6;
 
 const PARENT_SOURCE = {
-  ENG: 'UK', SCT: 'UK', WLS: 'UK', NIR: 'UK', GG: 'UK', JE: 'UK', IM: 'UK', GI: 'UK', ALDERNEY: 'UK',
-  AX: 'FI', FO: 'DK', GL: 'DK', SVALBARD: 'NO', JANMAYEN: 'NO', SBA: 'CY', NCY: 'CY',
-  CEU: 'ES', MLL: 'ES', CAN: 'ES', CAT: 'ES', BAS: 'ES', GAL: 'ES',
-  AZO: 'PT', MAD: 'PT', FLA: 'BE', WAL: 'BE', BRU: 'BE',
-  GP: 'FR', MQ: 'FR', GF: 'FR', RE: 'FR', YT: 'FR', MF: 'FR', BL: 'FR', PM: 'FR',
-  NC: 'FR', PF: 'FR', WF: 'FR', CLIPPERTON: 'FR', TF: 'FR',
-  AW: 'NL', CW: 'NL', SX: 'NL', 'BQ-BO': 'NL', 'BQ-SA': 'NL', 'BQ-SE': 'NL',
-  FBIH: 'BA', RSBA: 'BA', TRN: 'MD', GAG: 'MD', AB: 'GE', SO: 'GE', RSM: 'SM',
+  ENG: 'UK', SCT: 'UK', WLS: 'UK', NIR: 'UK', GG: 'UK',
+  JE: 'UK', IM: 'UK', GI: 'UK', ALDERNEY: 'UK', AX: 'FI',
+  FO: 'DK', CEU: 'ES', MLL: 'ES', CAN: 'ES', CAT: 'ES',
+  BAS: 'ES', GAL: 'ES', AZO: 'PT', MAD: 'PT', FLA: 'BE',
+  WAL: 'BE', BRU: 'BE', FBIH: 'BA', RSBA: 'BA', RSM: 'SM',
 };
+
+// Translate official source local aliases into DAJC canonical territory IDs.
+const SOURCE_JURISDICTION_ALIASES = { 'PT-AZORES': 'AZO', 'PT-MADEIRA': 'MAD', 'ES-CANARY': 'CAN', 'ES-CEUTA': 'CEU', 'ES-MELILLA': 'MLL' };
+const sourceCode = source => SOURCE_JURISDICTION_ALIASES[source.jurisdictionId] || source.jurisdictionId || source.country;
 
 async function main() {
   const now = new Date();
@@ -93,7 +94,7 @@ async function main() {
     allCandidates.push(...web.findings);
   }
 
-  const officialSources = useOfficial ? oversizeSources : [];
+  const officialSources = useOfficial ? oversizeSources.filter(source => dajcCoverageCodes.has(sourceCode(source))) : [];
   const results = new Array(officialSources.length);
   let nextIndex = 0;
 
@@ -138,7 +139,7 @@ async function main() {
   const findingsByScope = new Map();
   for (const finding of merged.values()) {
     const source = oversizeSources.find((s) => s.name === finding.sourceName || s.authority === finding.sourceName);
-    const scope = source?.jurisdictionId || source?.country;
+    const scope = source ? sourceCode(source) : null;
     if (scope) findingsByScope.set(scope, (findingsByScope.get(scope) || 0) + 1);
   }
 
@@ -171,7 +172,7 @@ async function main() {
         return { code, name, sourceScope: effectiveCode, status: 'checked-source-availability-limited', discovery: 'web-search', searchGroup: null, candidateFindings: 0 };
       }
     }
-    const direct = sourceResults.filter(({ source }) => source.jurisdictionId === code);
+    const direct = sourceResults.filter(({ source }) => source.jurisdictionId && sourceCode(source) === code);
     const inherited = sourceResults.filter(({ source }) => !source.jurisdictionId && source.country === effectiveCode);
     const relevant = direct.length > 0 ? direct : inherited;
     const ok = relevant.filter(({ result }) => result.status === 'ok');
