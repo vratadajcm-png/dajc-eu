@@ -1,0 +1,37 @@
+name: Prepare DAJC News Social Drafts
+
+# Converts already-public news to downloadable social copy without channel credentials.
+# A publish-to-social stage is NOT enabled; account authorization and dedupe
+# must be verified before attaching a channel writer.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/content/news/platform/**'
+      - 'src/content/news/eu-oversize/**'
+  schedule:
+    - cron: '23 13 * * 5'
+      timezone: 'Europe/Prague'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Prepare channel-specific drafts from published DAJC News
+        run: node scripts/prepare-social-posts.mjs
+      - name: Save social drafts as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dajc-social-drafts-${{ github.run_id }}
+          path: artifacts/social/
+          if-no-files-found: error
+          retention-days: 14
