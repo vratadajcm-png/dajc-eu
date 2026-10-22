@@ -70,3 +70,43 @@ copy only, with no token, API charges, social posts or state changes.
 If the official LinkedIn organization API cannot be authorized, an account
 owner can instead connect an approved publishing service such as Metricool;
 that must be a deliberate external connection.
+
+
+## Alternative: Buffer free plan (no new LinkedIn Developer application)
+
+Buffer's official GraphQL API (https://developers.buffer.com/) supports X and
+LinkedIn channels, including the Free plan. The existing GitHub posting
+workflows can optionally send through Buffer instead of direct X/LinkedIn APIs.
+
+Requirements (human owner sign-in/consent at https://buffer.com/):
+1. Sign up for the free plan, connect the exact X @DAJCeu account and the
+   real **DAJC LinkedIn company page** via their own OAuth permissions.
+   Do not connect the founder's personal LinkedIn profile. Confirm that the
+   company page actually exists; absent pages cannot be authorized.
+2. In Buffer Settings -> API create a personal API key. Store it in
+   GitHub Actions **secret** BUFFER_API_KEY; never enter the key in chat.
+3. Read the two channel IDs from Buffer. Store these GitHub repository
+   **variables**:
+      DAJC_BUFFER_X_CHANNEL_ID
+      DAJC_BUFFER_LINKEDIN_CHANNEL_ID
+   IDs are hex strings. The connector checks channel name, social service,
+   account type and provider-reported public URL before posting.
+4. For each authorized channel individually, set backend repo variable
+   DAJC_X_BACKEND=buffer or DAJC_LINKEDIN_BACKEND=buffer.
+   Only after verifying account access and a no-write dry-run should the
+   existing master enable variables be set to true:
+      DAJC_X_ENABLED=true
+      DAJC_LINKEDIN_ENABLED=true
+
+Without all prerequisites, publishing remains safely disabled. Merely setting
+the backend option cannot authorize the remote Buffer account.
+
+Buffer returns a post ID but may not report that the content has already
+appeared on the destination social network. Our ledger marks it as
+"submitted" rather than falsely declaring a public post. Such submissions
+are never repeated automatically. Verify delivery in the Buffer queue/social
+feed. Buffer API publishing uses mode shareNow and schedulingType automatic.
+See https://developers.buffer.com/types/ShareMode.html.
+
+Do not subscribe to a paid social tool, buy X credits, or enable direct X
+posting unless its actual cost has been approved separately.
