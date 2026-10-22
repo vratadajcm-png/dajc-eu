@@ -23,14 +23,11 @@ const CONNECTED_CORRIDORS = new Set([
   'fr', 'be', 'nl', 'lu', 'it', 'hr', 'ro',
 ]);
 const PERIPHERAL = new Set([
-  'madeira', 'azores', 'canary islands', 'ceuta', 'melilla', 'guernsey', 'jersey', 'isle of man', 'gibraltar',
-  'alderney', 'sark', 'monaco', 'andorra', 'san marino', 'vatican city', 'vatican', 'liechtenstein',
-  'faroe islands', 'greenland', 'svalbard', 'jan mayen', 'aland', 'aland islands', 'akrotiri and dhekelia',
-  'northern cyprus', 'guadeloupe', 'martinique', 'french guiana', 'reunion', 'mayotte', 'saint-martin',
-  'saint martin', 'saint-barthelemy', 'saint barthelemy', 'saint-pierre-et-miquelon', 'wallis and futuna',
-  'new caledonia', 'french polynesia', 'aruba', 'curacao', 'sint maarten', 'bonaire', 'saba', 'sint eustatius',
-  'abkhazia', 'south ossetia', 'transnistria', 'gagauzia',
-  'mc', 'ad', 'sm', 'va', 'li', 'gg', 'je', 'im', 'gi',
+  'madeira', 'azores', 'canary islands', 'ceuta', 'melilla', 'guernsey',
+  'jersey', 'isle of man', 'gibraltar', 'alderney', 'sark', 'monaco',
+  'andorra', 'san marino', 'vatican city', 'vatican', 'liechtenstein', 'faroe islands',
+  'aland', 'aland islands', 'mc', 'ad', 'sm', 'va',
+  'li', 'gg', 'je', 'im', 'gi',
 ]);
 
 /** 0-7 Central Europe (in the order above), 8 connected corridors, 9 rest of Europe, 10 peripheral. */
