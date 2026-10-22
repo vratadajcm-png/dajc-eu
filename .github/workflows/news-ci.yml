@@ -30,6 +30,11 @@ jobs:
       - name: Build site
         run: npm run build
 
+      - name: Validate X and LinkedIn publishing previews without credentials
+        run: |
+          node scripts/publish-social-news.mjs x --dry-run
+          node scripts/publish-social-news.mjs linkedin --dry-run
+
       - name: Exercise live official-source monitor
         # CI has no OpenAI key and must not spend on web search; the
         # web-search path is covered by scripts/lib/__tests__/web-search.test.mjs.
