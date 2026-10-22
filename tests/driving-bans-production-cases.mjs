@@ -12,10 +12,10 @@ const uids = text => [...text.replace(/\r\n[ \t]/g, '').matchAll(/^UID:(.+)$/gm)
 const TZ = {AT:'Europe/Vienna', LI:'Europe/Vaduz', LU:'Europe/Luxembourg', ME:'Europe/Podgorica', BG:'Europe/Sofia', ES:'Europe/Madrid', DE:'Europe/Berlin', FR:'Europe/Paris', IT:'Europe/Rome', CH:'Europe/Zurich', CZ:'Europe/Prague', SK:'Europe/Bratislava', PL:'Europe/Warsaw', HU:'Europe/Budapest', SI:'Europe/Ljubljana', HR:'Europe/Zagreb', PT:'Europe/Lisbon', GR:'Europe/Athens'};
 
 export function registerProductionDrivingBanTests(test, a) {
-  test('production: exactly 104 unique Coverage identities, each with a state for the active window', () => {
+  test('production: exactly 76 unique Coverage identities, each with a state for the active window', () => {
     const v = at();
-    a.equal(v.jurisdictions.length, 104);
-    a.equal(new Set(v.jurisdictions.map(j => j.jurisdiction)).size, 104);
+    a.equal(v.jurisdictions.length, 76);
+    a.equal(new Set(v.jurisdictions.map(j => j.jurisdiction)).size, 76);
     a.deepEqual(v.jurisdictions.map(j => [j.jurisdiction, j.name]), coverage);
     for (const j of v.jurisdictions) {
       a.deepEqual(j.period, {from: '2026-09-01', to: '2026-10-31'});
@@ -157,7 +157,7 @@ export function registerProductionDrivingBanTests(test, a) {
   test('1 Oct 2026 rollover: Oct-Nov window stays verified (11 full, 0 NO_BAN), no ACTIVE_WINDOW_NOT_REVERIFIED', () => {
     const v = at(new Date('2026-10-01T08:30:00Z'));
     a.deepEqual(v.window, {from: '2026-10-01', to: '2026-11-30', timezone: 'Europe/Prague'});
-    a.equal(v.jurisdictions.length, 104);
+    a.equal(v.jurisdictions.length, 76);
     a.equal(v.jurisdictions.filter(j => j.verification_state === 'PRIMARY_VERIFIED').length, 11);
     a.equal(v.jurisdictions.filter(j => j.ban_state === 'NO_BAN').length, 0);
     a.ok(v.jurisdictions.every(j => !j.coverage_failures.includes('ACTIVE_WINDOW_NOT_REVERIFIED')));
