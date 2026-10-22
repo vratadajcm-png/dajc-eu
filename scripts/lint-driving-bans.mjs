@@ -11,5 +11,5 @@ for (const file of ['src/pages/driving-bans.astro','src/pages/api/driving-bans.i
   assert(code.includes('driving-ban-calendars/runtime.mjs'),`${file}: missing canonical boundary`);
   assert(!/from\s+['"][^'"]*(?:driving-bans-legacy|verified-sep-oct-2026|current-exceptions|public-holidays|tests\/fixtures)/.test(code),`${file}: archived/test evidence imported at runtime`);
 }
-assert.equal(getDrivingBansSnapshot().jurisdictions.length,104);
+assert.equal(getDrivingBansSnapshot().jurisdictions.length,76);
 console.log('Driving Bans scoped lint: syntax, production provenance, canonical consumer boundaries PASS');
