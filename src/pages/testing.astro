@@ -171,6 +171,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(20000),
         });
         const result = await response.json();
 
@@ -184,9 +185,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Registration could not be sent.';
         const link = document.createElement('a');
-        link.href = 'mailto:platform@dajc.cz?subject=DAJC%20Platform%20Testing%202027%20registration';
-        link.textContent = 'platform@dajc.cz';
-        status.replaceChildren(`${message} Please email `, link, '.');
+        const emailBody = [
+          'DAJC Testing 2027 registration',
+          ...['fullName', 'company', 'businessEmail', 'country', 'role', 'operationType', 'fleetSize', 'biggestProblem'].map((key) => `${key}: ${Array.isArray(payload[key]) ? payload[key].join(', ') : payload[key] || '—'}`),
+          'Privacy notice acknowledged: yes',
+        ].join('\n');
+        link.href = 'mailto:platform@dajc.cz?subject=DAJC%20Platform%20Testing%202027%20registration&body=' + encodeURIComponent(emailBody);
+        link.textContent = 'Open your completed registration in your email app';
+        status.replaceChildren(`${message} `, link, '. Review and send the draft yourself; opening it does not send anything.');
         status.dataset.state = 'error';
       } finally {
         if (button instanceof HTMLButtonElement) {
