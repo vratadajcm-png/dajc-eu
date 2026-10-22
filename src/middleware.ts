@@ -11,6 +11,18 @@ import { defineMiddleware } from 'astro:middleware';
 import { isPartnerPortalEnabled, isPartnerPortalPath } from './portal/config/gate';
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  // These sections are deliberately private, regardless of navigation or
+  // indexing settings. Never invoke their page handlers on the public site.
+  if (/^\/(?:platform|partners|integration-ecosystem)(?:\/|$)/i.test(context.url.pathname)) {
+    return new Response('Not found', {
+      status: 404,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+        'Cache-Control': 'no-store',
+      },
+    });
+  }
   if (context.url.pathname === '/investor' || context.url.pathname.startsWith('/investor/')) {
     const response = await next();
     response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');

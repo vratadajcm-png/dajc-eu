@@ -50,7 +50,7 @@ For actual emergencies, contact the competent emergency services. DAJC Assistanc
 DAJC welcomes practical input from operators working in heavy and oversized transport, as well as exploratory discussions with insurers, recovery networks, vehicle manufacturers, data providers and other relevant organisations.
 
 - **Platform testing:** [dajc.eu/testing](/testing/)
-- **Integration discussions:** [dajc.eu/partners](/partners/)
+- **Integration discussions:** [contact DAJC by email](mailto:team@dajc.eu?subject=DAJC%20integration%20discussion) (contact link updated 23 October 2026; the public integration catalogue is currently withdrawn)
 - **Press and interviews:** [dajc.eu/press](/press/)
 - **Founder contact:** miroslav@dajc.eu
 

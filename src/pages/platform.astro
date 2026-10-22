@@ -1,0 +1,9 @@
+---
+// Platform and its development material are intentionally not public.
+// Keep this route server-rendered so direct URLs run through the request gate.
+export const prerender = false;
+return new Response('Not found', {
+  status: 404,
+  headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet', 'Cache-Control': 'no-store' },
+});
+---

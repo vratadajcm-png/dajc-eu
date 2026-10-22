@@ -24,6 +24,29 @@ afterEach(() => {
   delete process.env[ENV_KEY];
 });
 
+describe('private Platform and Integration Ecosystem sections', () => {
+  it.each([
+    '/platform', '/platform/', '/platform/development', '/platform/development/notes',
+    '/partners', '/partners/providers', '/integration-ecosystem', '/integration-ecosystem/internal',
+  ])('blocks direct access to %s without rendering content', async (path) => {
+    const next = vi.fn(async () => new Response('private content'));
+    const response = await callMiddleware(path, next);
+    expect(response.status).toBe(404);
+    expect(await response.text()).toBe('Not found');
+    expect(response.headers.get('X-Robots-Tag')).toContain('noindex');
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it.each(['/testing', '/news/platform/dajc-testing-2027-and-assistance', '/investors'])(
+    'preserves the explicitly public information at %s', async (path) => {
+      const next = vi.fn(async () => new Response('public content'));
+      expect((await callMiddleware(path, next)).status).toBe(200);
+      expect(next).toHaveBeenCalledOnce();
+    },
+  );
+});
+
 const PORTAL_PATHS = [
   '/partner-portal',
   '/partner-portal/admin',

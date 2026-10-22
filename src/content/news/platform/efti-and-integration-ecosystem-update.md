@@ -6,7 +6,7 @@ category: "platform"
 publishedAt: 2026-09-18
 language: "en"
 author: "DAJC"
-status: "published"
+status: "draft"
 tags:
   - "eFTI"
   - "integrations"
@@ -29,7 +29,7 @@ At the same time, DAJC is continuing discussions with additional organisations a
 
 These conversations cover different parts of European heavy and oversized transport and are intended to gradually broaden the range of services, data and infrastructure that can work alongside DAJC.
 
-Only information that is appropriate for public disclosure is published. Current publicly listed integration relationships and their general status can be followed in the [DAJC Integration Ecosystem](/partners/).
+Only information that is appropriate for public disclosure is published. **Update, 23 October 2026:** the public integration catalogue is currently withdrawn. For current information, [contact DAJC by email](mailto:team@dajc.eu?subject=DAJC%20integration%20discussion).
 
 ## Building carefully, step by step
 

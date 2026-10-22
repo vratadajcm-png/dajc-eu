@@ -3,5 +3,8 @@ Allow: /
 Disallow: /api/
 Disallow: /partner-portal/
 Disallow: /investor/
+Disallow: /platform
+Disallow: /partners
+Disallow: /integration-ecosystem
 
 Sitemap: https://www.dajc.eu/sitemap-index.xml
