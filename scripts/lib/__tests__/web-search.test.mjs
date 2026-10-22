@@ -55,8 +55,10 @@ describe('SEARCH_GROUPS', () => {
   it('covers every sovereign coverage code directly or through a parent search', () => {
     const codes = new Set(SEARCH_GROUPS.flatMap((g) => g.codes));
     const sovereign = dajcEuropeCoverage.map(([code]) => code).filter((code) => /^[A-Z]{2}$/.test(code));
-    const parented = new Set(['GP', 'MQ', 'GF', 'RE', 'YT', 'MF', 'BL', 'PM', 'NC', 'PF', 'WF', 'TF', 'AW', 'CW', 'SX']);
-    expect(sovereign.filter((code) => !codes.has(code) && !parented.has(code))).toEqual([]);
+    expect(sovereign.filter((code) => !codes.has(code))).toEqual([]);
+    expect(dajcEuropeCoverage).toHaveLength(76);
+    const removed = ['GP', 'GF', 'RE', 'PF', 'GL', 'SVALBARD', 'SBA', 'NCY', 'AB', 'TRN'];
+    expect(removed.some(code => codes.has(code))).toBe(false);
   });
 });
 
