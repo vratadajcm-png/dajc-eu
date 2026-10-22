@@ -7,6 +7,7 @@ publishedAt: 2026-10-22T00:00:00+02:00
 language: "en"
 author: "DAJC"
 status: "published"
+socialPublish: true
 tags: ["media partnerships", "heavy transport", "intelligence", "research"]
 ---
 
