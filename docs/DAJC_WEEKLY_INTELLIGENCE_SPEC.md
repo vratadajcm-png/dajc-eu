@@ -118,3 +118,15 @@ If there is no meaningful current operational answer, exclude it. A newly discov
 ## 11. Permanent official-first, open-European-media fallback (23 October 2026)
 
 This is a **standing** rule. The 50 approved DAJC jurisdictions remain the geographic scope; research covers all publicly discoverable European websites relevant to commercial road freight and heavy/oversize work, without a hard media-domain whitelist. Research **cannot guarantee exhaustive crawling of every website**. Official notices lead; the second open-web pass runs for a group when fewer than 3 primary-source hits survive first-page evidence checks. The 3-hit trigger is **not** a news quota and must not induce padding. An ordinary industry report is allowed without independent primary authority confirmation as long as its direct dated article supports what DAJC attributes to it, and its provenance is labelled; legal/route safety claims remain unconfirmed until checked against the competent authority. All source dates, geographic scope, no duplicate reports, no general Driving Bans, and quality-before-count protections remain mandatory.
+
+## 12. Autonomous Sonar / Claude editorial and social distribution (23 October 2026)
+
+This is a permanent rule: **Perplexity Sonar research and article synthesis → Claude editorial veto/approval → protected GitHub PR and CI → verified public website → Claude-tailored X and LinkedIn copy → existing Buffer social publishing adapter.** No second weekly publishing pipeline.
+
+- Sonar discovers links in the existing official-first open-European-media search and synthesizes an English article only from verified source candidates. Hard checks on dates, geography, ISO week, duplicate stories, binding weight/permit limits, source provenance and the no-general-Driving-Bans exclusion remain.
+- Claude checks the exact article plus original source excerpts and emits one structured approve/reject verdict with blocking reasons and coverage of every cited URL. A missing/rejecting verdict, unsupported source or altered SHA-256 receipt fails closed.
+- The final article alone may request ordinary GitHub auto-merge of a content-only PR after required CI. Corrections, previews, code, security and workflow changes do not auto-merge.
+- Public release means the actual accessible DAJC.eu article; a green CI run or prepared PR is not publication.
+- Once an article is verified public, Claude prepares distinct factual English short copy for X and an industry-oriented post for the DAJC LinkedIn company page, each with the exact URL. The existing persistent ledger blocks duplicate attempts. Buffer is used only with explicitly connected/authorized company channels.
+- Never post unpublished Platform / Integration Ecosystem material. Platform updates require explicit socialPublish=true.
+- Activation requires funded API credentials and spending limits: PERPLEXITY_API_KEY, ANTHROPIC_API_KEY, and for Buffer, BUFFER_API_KEY with exact X and LinkedIn channel IDs and enabled publishing flags.
