@@ -58,7 +58,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
-      DAJC_AUTONOMOUS_WEEKLY: '1' # final weekly content-only; never code or correction
+      DAJC_AUTONOMOUS_WEEKLY: ${{ vars.DAJC_SONAR_ENABLED == 'true' && '1' || '0' }}
+      DAJC_SONAR_ENABLED: ${{ vars.DAJC_SONAR_ENABLED }}
       OVERSIZE_PREVIEW: ${{ github.event.inputs.preview == 'true' && '1' || '' }}
       OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
     steps:
@@ -115,13 +116,16 @@ jobs:
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          if [ -z "$PERPLEXITY_API_KEY" ]; then
-            echo "::error::PERPLEXITY_API_KEY missing. No article will be generated."
+          selected="$OPENAI_API_KEY"
+          if [ "$DAJC_SONAR_ENABLED" = "true" ]; then selected="$PERPLEXITY_API_KEY"; fi
+          if [ -z "$selected" ]; then
+            echo "::error::The selected publisher API key is missing. No article will be generated."
             exit 1
           fi
-          if [ "${{ github.event.inputs.dry_run }}" != "true" ] && [ "${{ github.event.inputs.preview }}" != "true" ] && [ "${{ github.event.inputs.correction }}" != "true" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
+          if [ "$DAJC_SONAR_ENABLED" = "true" ] && [ "${{ github.event.inputs.dry_run }}" != "true" ] && [ "${{ github.event.inputs.preview }}" != "true" ] && [ "${{ github.event.inputs.correction }}" != "true" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
             echo "::error::ANTHROPIC_API_KEY missing. Autonomous release blocked before paid research."
             exit 1
           fi
@@ -146,19 +150,21 @@ jobs:
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run oversize:monitor
 
       - name: Generate weekly article
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         # One generation attempt. Quality > count: an edition contains exactly
         # the items that pass every editorial rule, so there is nothing to
         # retry for (no lead/Rest-of-Europe minimum, no padding loop).
         run: node scripts/generate-weekly-article.mjs ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }} ${{ steps.trigger.outputs.preview == 'true' && '--preview' || '' }} ${{ github.event.inputs.correction == 'true' && '--correction' || '' }}
 
       - name: Claude final editorial approval for Sonar article
-        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true'
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true' && vars.DAJC_SONAR_ENABLED == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5' }}
