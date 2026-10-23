@@ -1,6 +1,6 @@
 {
   "week": "2026-W43",
-  "checkedAt": "2026-10-22T21:56:28.265Z",
+  "checkedAt": "2026-10-23T10:53:35.888Z",
   "coverageVersion": "2026-10-22.50",
   "jurisdictions": [
     {
@@ -207,8 +207,8 @@
       "code": "HR",
       "name": "Croatia",
       "sourceScope": "HR",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "si-hr",
       "candidateFindings": 0
@@ -357,11 +357,11 @@
       "code": "NL",
       "name": "Netherlands",
       "sourceScope": "NL",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "NO",
@@ -437,11 +437,11 @@
       "code": "SI",
       "name": "Slovenia",
       "sourceScope": "SI",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "si-hr",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "SK",
