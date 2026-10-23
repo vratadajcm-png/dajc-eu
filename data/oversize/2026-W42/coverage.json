@@ -1,6 +1,6 @@
 {
   "week": "2026-W42",
-  "checkedAt": "2026-10-12T14:11:34.433Z",
+  "checkedAt": "2026-10-18T10:14:14.736Z",
   "jurisdictions": [
     {
       "code": "AL",
@@ -33,10 +33,10 @@
       "code": "AT",
       "name": "Austria",
       "sourceScope": "AT",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "at",
-      "candidateFindings": 0
+      "candidateFindings": 7
     },
     {
       "code": "AZ",
@@ -114,10 +114,10 @@
       "code": "DK",
       "name": "Denmark",
       "sourceScope": "DK",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 0
+      "candidateFindings": 4
     },
     {
       "code": "EE",
@@ -132,10 +132,10 @@
       "code": "FI",
       "name": "Finland",
       "sourceScope": "FI",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 0
+      "candidateFindings": 4
     },
     {
       "code": "FR",
@@ -159,10 +159,10 @@
       "code": "DE",
       "name": "Germany",
       "sourceScope": "DE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "de",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "GR",
@@ -186,10 +186,10 @@
       "code": "IS",
       "name": "Iceland",
       "sourceScope": "IS",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 0
+      "candidateFindings": 4
     },
     {
       "code": "IE",
@@ -240,10 +240,10 @@
       "code": "LI",
       "name": "Liechtenstein",
       "sourceScope": "LI",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "ch-li",
-      "candidateFindings": 0
+      "candidateFindings": 3
     },
     {
       "code": "LT",
@@ -321,10 +321,10 @@
       "code": "NO",
       "name": "Norway",
       "sourceScope": "NO",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 0
+      "candidateFindings": 4
     },
     {
       "code": "PL",
@@ -384,10 +384,10 @@
       "code": "SK",
       "name": "Slovakia",
       "sourceScope": "SK",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "sk",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "SI",
@@ -411,19 +411,19 @@
       "code": "SE",
       "name": "Sweden",
       "sourceScope": "SE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 0
+      "candidateFindings": 4
     },
     {
       "code": "CH",
       "name": "Switzerland",
       "sourceScope": "CH",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "discovery": "web-search",
       "searchGroup": "ch-li",
-      "candidateFindings": 0
+      "candidateFindings": 3
     },
     {
       "code": "TR",
