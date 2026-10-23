@@ -40,11 +40,11 @@ import { loadWeekFindings } from './lib/store.mjs';
 import { isoWeekLabel, isoWeekRangeLabel, isoWeekStart, isoWeekEnd } from './lib/week.mjs';
 import { selectCandidates } from './lib/select-candidates.mjs';
 import { verifyCandidates } from './lib/verify-candidates.mjs';
-import { generateArticleWithOpenAI, generateRequiredItemsWithOpenAI } from './lib/openai-client.mjs';
+import { generateArticleWithSonar, generateRequiredItemsWithSonar } from './lib/openai-client.mjs';
 import { generateArticleMock, generateRequiredItemsMock } from './lib/mock-generator.mjs';
 import { renderArticleMarkdown, toFrontmatterYaml } from './lib/render-article.mjs';
 import { runQualityGate, MAX_REPORTS, MAX_ROUNDUP_REPORTS } from './lib/quality-gate.mjs';
-import { checkOpenAiKeyPreflight } from './lib/preflight.mjs';
+import { checkSonarKeyPreflight } from './lib/preflight.mjs';
 import { formatNextPublicationLabel, publicationSlotFor, targetWeekDateFor } from './lib/next-publication.mjs';
 import { crossValidateDevelopments } from './lib/cross-validate.mjs';
 import { attachCriticalGroupSources, criticalWeeklyGroups, missingCriticalGroups } from './lib/critical-floor.mjs';
@@ -135,8 +135,8 @@ async function main() {
   // Preflight, before any network/data work: a missing key on a real run is
   // a configuration error, not something worth spending verification time
   // on first. See scripts/lib/preflight.mjs.
-  const apiKey = process.env.OPENAI_API_KEY;
-  const preflight = checkOpenAiKeyPreflight({ mock, apiKey });
+  const apiKey = process.env.PERPLEXITY_API_KEY;
+  const preflight = checkSonarKeyPreflight({ mock, apiKey });
   if (!preflight.ok) {
     await fail(preflight.reason);
     return;
@@ -274,7 +274,7 @@ async function main() {
   try {
     article = mock
       ? await generateArticleMock({ candidates: verified, weekRangeLabel })
-      : await generateArticleWithOpenAI({
+      : await generateArticleWithSonar({
           candidates: verified,
           requiredSourceUrls,
           weekRangeLabel,
@@ -316,7 +316,7 @@ async function main() {
     try {
       const written = mock
         ? await generateRequiredItemsMock({ groups: missing })
-        : await generateRequiredItemsWithOpenAI({
+        : await generateRequiredItemsWithSonar({
             candidates: missing.flatMap((group) => group.candidates),
             targetWeekStart: targetWeekStartIso,
             targetWeekEnd: targetWeekEndIso,
