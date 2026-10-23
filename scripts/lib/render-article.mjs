@@ -152,7 +152,7 @@ export function renderArticleMarkdown(article, { slug, publishedAt, updatedAt = 
 
   const roundup = Array.isArray(article.europeRoundup) ? article.europeRoundup : [];
   if (roundup.length > 0) {
-    const parts = ['## Rest of Europe: verified operational roundup', ''];
+    const parts = ['## Rest of Europe: sourced operational reports', ''];
     for (const item of roundup) parts.push(renderRoundupItem(item, { weekEnd }), '');
     sections.push(parts.join('\n').trim());
   }
