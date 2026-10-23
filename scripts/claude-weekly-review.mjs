@@ -149,7 +149,7 @@ async function reviewClaude(article, evidence) {
   if (!key || !model) throw new Error('ANTHROPIC_API_KEY or CLAUDE_REVIEW_MODEL missing: autonomous release disabled');
   const r = await apiJson('https://api.anthropic.com/v1/messages',
     { 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-    { model, max_tokens: 3000, messages: [{ role: 'user', content: reviewerPrompt(article, evidence) }],
+    { model, max_tokens: 12000, messages: [{ role: 'user', content: reviewerPrompt(article, evidence) }],
       output_config: { format: { type: 'json_schema', schema: REVIEW_SCHEMA } }
     });
   const content = r.content?.find(x => x.type === 'text')?.text;
