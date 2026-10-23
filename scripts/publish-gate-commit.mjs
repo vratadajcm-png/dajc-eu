@@ -11,7 +11,8 @@
 // for the pure decision logic and why this exists.
 
 import { execFileSync } from 'node:child_process';
-import { appendFileSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdtempSync, rmSync, writeFileSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from './lib/publish-gate.mjs';
@@ -92,6 +93,25 @@ if (articleAdded) {
 }
 
 const articleReplaced = articleAdded && isArticleReplacement(articleStatusOutput);
+const autonomousFinal = process.env.DAJC_AUTONOMOUS_WEEKLY === '1' &&
+  process.env.OVERSIZE_PREVIEW !== '1' &&
+  process.env.OVERSIZE_CORRECTION !== '1' &&
+  !articleReplaced;
+
+// A GitHub check cannot fabricate approval merely by reaching this step.
+// Both reviewer calls must have succeeded on the exact bytes subsequently committed.
+if (articleAdded && autonomousFinal) {
+  if (!process.env.RUNNER_TEMP) throw new Error('Missing trusted review receipt directory');
+  const receipt = JSON.parse(readFileSync(path.join(process.env.RUNNER_TEMP, 'dajc-weekly-review-approved.json'), 'utf8'));
+  const articlePath = 'src/content/news/eu-oversize/' + extractArticleWeekFromStatus(articleStatusOutput).filename;
+  const actualHash = createHash('sha256').update(readFileSync(articlePath)).digest('hex');
+  if (receipt.articlePath !== articlePath || receipt.targetWeek !== week ||
+      receipt.sha256 !== actualHash || !receipt.grokModel || !receipt.claudeModel ||
+      receipt.leadCount < 1 || receipt.sourceCount < 1) {
+    throw new Error('Autonomous release blocked: reviewer receipt does not match generated article');
+  }
+  summary('### Independent editorial approval\n\nOpenAI generation, Grok factual gate and Claude final gate passed for SHA-256 ' + actualHash.slice(0, 12) + '.');
+}
 const decision = decidePublishCommit({ articleAdded, articleReplaced, dataChanged, week });
 
 if (!decision.commit) {
@@ -129,6 +149,14 @@ try {
   const prUrl = execFileSync('gh', ['pr', 'create', '--repo', repository, '--base', 'main', '--head', branch, '--title', decision.message, '--body-file', bodyFile], { encoding: 'utf8' }).trim();
   summary(`### EU Oversize Weekly - prepared for review\n\n${prUrl}\n\nArticle published this run: **no**. Review and merge are required before the Friday release.`);
   for (const workflow of ['application-ci.yml', 'news-ci.yml']) execFileSync('gh', ['workflow', 'run', workflow, '--repo', repository, '--ref', branch], { stdio: 'inherit' });
+  // Auto-merge requests an ordinary, protected-branch PR merge; it never
+  // bypasses required application-validate/news-validate or branch rules.
+  // If auto-merge is disabled or a required gate fails, keep the PR pending.
+  if (autonomousFinal) {
+    execFileSync('gh', ['pr', 'merge', prUrl, '--repo', repository, '--auto', '--squash'], { stdio: 'inherit' });
+    summary('Claude approved publication; GitHub auto-merge requested. This is NOT confirmation of public release. CI and production deployment remain mandatory.');
+  }
+
 } finally {
   rmSync(temporary, { recursive: true, force: true });
 }
