@@ -8,6 +8,7 @@ import { scopeFinding } from './geographic-scope.mjs';
 import { checkWeeklyEligibility, deriveValidity, FRESHNESS_WINDOW_DAYS } from './weekly-eligibility.mjs';
 import { isCriticalWeeklyCandidate } from './critical-floor.mjs';
 import { foldText } from './publication-date.mjs';
+import { PRIMARY_TIER } from './source-policy.mjs';
 
 const SPECIFIC_TYPES = new Set([
   'permit_change', 'permit_system', 'escort_requirement',
@@ -74,7 +75,8 @@ export function dedupeNearDuplicates(findings = []) {
     ));
     if (duplicateIndex < 0) {
       kept.push(finding);
-    } else if (String(finding.publishedAt || '') > String(kept[duplicateIndex].publishedAt || '')) {
+    } else if (((finding.sourceTier || PRIMARY_TIER) === PRIMARY_TIER && kept[duplicateIndex].sourceTier !== PRIMARY_TIER) ||
+               ((finding.sourceTier || PRIMARY_TIER) === (kept[duplicateIndex].sourceTier || PRIMARY_TIER) && String(finding.publishedAt || '') > String(kept[duplicateIndex].publishedAt || ''))) {
       kept[duplicateIndex] = finding;
     }
   }
@@ -87,6 +89,8 @@ function score(finding, now) {
   const ageDays = published ? Math.max(0, (now - published) / DAY_MS) : FRESHNESS_WINDOW_DAYS;
   total += Math.max(0, FRESHNESS_WINDOW_DAYS - ageDays) / 2;
   if (SPECIFIC_TYPES.has(finding.type)) total += 3;
+  // An official primary authority has priority over otherwise similar trade reports.
+  if ((finding.sourceTier || PRIMARY_TIER) === PRIMARY_TIER) total += 14;
   const text = `${finding.title || ''} ${finding.summary || ''}`;
   if (/exceptional transport|oversize|abnormal load|ausnahmetransport|schwertransport|convoi exceptionnel|trasporto eccezionale|transporte especial|izvanredni prijevoz|nadrozm[eě]rn|nadmern/i.test(text)) total += 6;
   if (/escort|begleit|pilot vehicle|doprovod|accompagnement/i.test(text)) total += 5;
