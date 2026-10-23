@@ -47,16 +47,22 @@ jobs:
       - name: Pre-flight - verify PERPLEXITY_API_KEY is configured
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DAJC_SONAR_ENABLED: ${{ vars.DAJC_SONAR_ENABLED }}
         run: |
-          if [ -z "$PERPLEXITY_API_KEY" ]; then
-            echo "::error::PERPLEXITY_API_KEY repository secret is not set - web-search discovery needs it."
+          selected="$OPENAI_API_KEY"
+          if [ "$DAJC_SONAR_ENABLED" = "true" ]; then selected="$PERPLEXITY_API_KEY"; fi
+          if [ -z "$selected" ]; then
+            echo "::error::Research API key missing for selected provider."
             exit 1
           fi
-          echo "Pre-flight OK: PERPLEXITY_API_KEY is configured (value not printed)."
+          echo "Pre-flight OK: selected research provider credential is present."
 
       - name: Run oversize monitor (web search)
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DAJC_SONAR_ENABLED: ${{ vars.DAJC_SONAR_ENABLED }}
         run: npm run oversize:monitor
 
       - name: Commit updated findings (only if meaningfully changed)
