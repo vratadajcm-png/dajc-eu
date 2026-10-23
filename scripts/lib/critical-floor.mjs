@@ -15,6 +15,7 @@
 
 import { checkFreshness } from './weekly-eligibility.mjs';
 import { readableText } from './text-quality.mjs';
+import { SECONDARY_TIER } from './source-policy.mjs';
 
 const HIGH_SIGNAL_TYPES = new Set([
   'permit_change',
@@ -38,6 +39,9 @@ const REGULATORY_SIGNAL =
 
 export function isCriticalWeeklyCandidate(candidate, ctx = {}) {
   if (!candidate?.sourceUrl || !ctx.now) return false;
+  // A trade publication is useful intelligence, not an authoritative legal notice.
+  // It cannot alone create a mandatory regulatory coverage claim.
+  if (candidate.sourceTier === SECONDARY_TIER) return false;
   if (!checkFreshness(candidate, ctx).ok) return false;
 
   const text = `${candidate.title || ''} ${readableText(candidate.summary) || ''}`;
