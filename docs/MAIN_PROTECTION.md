@@ -1,8 +1,7 @@
 # Main protection and publication automation
 
 Code and public articles reach `main` only through PRs with required CI.
-The owner reviews changes before manually merging them. Neither
-`GITHUB_TOKEN` nor a publication bot receives a bypass for main.
+The owner reviews code, security, policy and manual correction changes before merging. The final EU Oversize Weekly content-only PR may auto-merge after independent Grok and Claude source checks plus mandatory GitHub CI. Neither `GITHUB_TOKEN` nor a publication bot receives a bypass for main.
 
 ## Applied protection — 13 October 2026
 
@@ -65,14 +64,14 @@ Apply after this change is merged and the new CI check names exist:
    main rule. A matching rule for every branch would also block durable
    data reservations and must not be substituted for the main-only rule.
 
-The weekly automation opens a PR and explicitly dispatches Application CI
+The weekly automation opens a content-only PR and explicitly dispatches Application CI
 and News Pipeline CI on that content branch. GitHub places `pull_request`
 runs created using `GITHUB_TOKEN` in an approval-required state; explicit
 `workflow_dispatch` starts these trusted checks without waiting for that
 separate workflow-approval banner.
-It never submits its own approving review or merges its own article.
-Scheduled retries see the open PR and skip before making additional AI calls.
-A prepared PR is reported as **awaiting review**, never as a published article.
+For a normal final edition, OpenAI generates, Grok and Claude independently review, and only their matching SHA-bound approvals permit `gh pr merge --auto --squash`; GitHub enforces the required checks and protected `main` (no bypass, no formal bot approval). A preview or manual correction remains manually reviewed.
+Scheduled retries see an open PR and skip extra AI calls.
+A prepared PR is **awaiting protected auto-merge**, never an already public article.
 
 If PR creation is disabled, the run fails after preserving the generated
 edition on its content branch. Enable the setting and open that existing
