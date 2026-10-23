@@ -86,7 +86,9 @@ async function main() {
     // the API enforces whether the token may post for that organization.
     // Generate social copy only after the article has been independently
     // confirmed public and the official account has been verified.
-    const copy = await createClaudeSocialCopy(channel, article);
+    const copy = process.env.DAJC_CLAUDE_SOCIAL_ENABLED === 'true'
+      ? await createClaudeSocialCopy(channel, article)
+      : getText(channel, article);
     const key = candidateKey(article);
     ledger.posts[key] = {
       approvedText: copy,
@@ -110,7 +112,9 @@ async function main() {
   if (!await checkPublicArticle(article.url, article.title)) throw new Error('Reserved article not served publicly: refusing POST');
 
   const credentials = getConfig(channel);
-  const approvedText = validateSocialCopy(channel, article, record.approvedText);
+  const approvedText = process.env.DAJC_CLAUDE_SOCIAL_ENABLED === 'true'
+    ? validateSocialCopy(channel, article, record.approvedText)
+    : (record.approvedText || getText(channel, article));
   const confirmed = await post(channel, approvedText, credentials);
   ledger.posts[key] = {
     status: confirmed.status || 'published',
