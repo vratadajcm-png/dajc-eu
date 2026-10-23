@@ -392,6 +392,12 @@ async function main() {
     article.intro = `PREVIEW EDITION — published early to demonstrate the production Friday format. Friday's final edition will be rebuilt from the complete week's monitoring.\n\n${article.intro}`;
   }
 
+  // Deterministically attach source provenance after model output and source
+  // cross-validation. The model cannot promote a media report to official.
+  for (const item of [...article.developments, ...article.europeRoundup]) {
+    item.sourceTier = candidatesByUrl.get(item.sourceUrl)?.sourceTier || 'official';
+  }
+
   // A preview is public as soon as it is deployed; the final edition waits
   // for its Friday slot.
   const publishedAt = (preview ? now : publicationSlot).toISOString();
