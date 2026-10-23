@@ -16,7 +16,7 @@ export function validateSocialCopy(channel, article, text) {
 }
 export async function createClaudeSocialCopy(channel, article, {
   apiKey = process.env.ANTHROPIC_API_KEY,
-  model = process.env.CLAUDE_SOCIAL_MODEL || 'claude-sonnet-5',
+  model = process.env.CLAUDE_SOCIAL_MODEL || 'claude-sonnet-5-5',
   fetchFn = fetch,
 } = {}) {
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY missing: no new social post will be reserved');
