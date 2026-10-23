@@ -174,7 +174,9 @@ describe('discoverWithWebSearch', () => {
       },
     };
     const { findings, groups: report } = await discoverWithWebSearch({ client, now, groups, fetchPage: okPage(page()) });
-    expect(calls).toHaveLength(4);
+    // Sparse primary-source findings trigger two additional broad industry searches per group.
+    expect(calls).toHaveLength(8);
+    expect(report.every(r => r.fallbackSearched)).toBe(true);
     expect(calls[0].tools[0].type).toBe('web_search_preview');
     expect(findings).toHaveLength(1);
     expect(findings[0].searchGroup).toBe(groups.find(group => group.codes.includes('DE')).id);
@@ -185,6 +187,30 @@ describe('discoverWithWebSearch', () => {
     const client = { responses: { create: async () => { throw new Error('rate limited'); } } };
     const { findings, groups } = await discoverWithWebSearch({ client, now, groups: SEARCH_GROUPS.slice(0, 1), fetchPage: okPage(page()) });
     expect(findings).toEqual([]);
-    expect(groups[0]).toMatchObject({ status: 'unavailable', error: 'oversize: rate limited; heavy: rate limited' });
+    expect(groups[0].status).toBe('unavailable');
+    expect(groups[0].error).toContain('rate limited');
+    expect(groups[0].fallbackSearched).toBe(true);
+  });
+});
+
+
+describe('Open Europe-wide source expansion', () => {
+  it('asks for primary notices first and professional industry coverage only on fallback', () => {
+    const primary = buildSearchPrompt(SEARCH_GROUPS[0], now, 'oversize', 'official');
+    const secondary = buildSearchPrompt(SEARCH_GROUPS[0], now, 'operations', 'industry');
+    expect(primary).toContain('OFFICIAL PRIMARY');
+    expect(secondary).toContain('ALL accessible European specialist transport news sites');
+    expect(secondary).toContain('dispatchers');
+    expect(secondary).toContain('not an instruction to pad');
+  });
+  it('keeps non-official source provenance rather than treating media as an authority', async () => {
+    const article = item({
+      url: 'https://trade-news.example/posts/heavy-haulage-technology',
+      sourceName: 'European Haulage Media',
+      type: 'equipment',
+    });
+    const result = await verifySearchItem(article, { now, fetchPage: okPage(page()) });
+    expect(result.ok).toBe(true);
+    expect(result.finding.sourceTier).toBe('industry');
   });
 });

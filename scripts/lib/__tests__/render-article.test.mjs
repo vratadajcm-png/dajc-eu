@@ -35,7 +35,7 @@ describe('renderArticleMarkdown', () => {
     const { body } = renderArticleMarkdown(makeArticle([lead], { europeRoundup: [roundup] }), {
       slug: 'eu-oversize-weekly-2026-w99', publishedAt: '2026-08-21', nextPublicationLabel: null,
     });
-    expect(body).toContain('## Rest of Europe: verified operational roundup');
+    expect(body).toContain('## Rest of Europe: sourced operational reports');
     expect(body).toContain('Romania roundup report');
     expect(body.split('Romania roundup report').length - 1).toBe(1);
   });

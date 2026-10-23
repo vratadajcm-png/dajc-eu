@@ -13,6 +13,7 @@ import { checkOperationalRelevance } from './relevance-filter.mjs';
 import { checkTransportDomainRelevance } from './transport-domain.mjs';
 import { checkLongRoadClosure } from './closure-duration.mjs';
 import { checkWeeklyDrivingBanPolicy } from './weekly-driving-ban-policy.mjs';
+import { SECONDARY_TIER } from './source-policy.mjs';
 import { isValidIsoDate, validateDevelopmentDateRange } from './date-validation.mjs';
 import { readableText } from './text-quality.mjs';
 import { extractValidityPeriod, foldText } from './publication-date.mjs';
@@ -229,6 +230,12 @@ export function checkEditorialExclusions(candidate = {}) {
   const text = foldText(`${candidate.title || ''} ${readableText(candidate.summary) || ''}`);
   for (const rule of EDITORIAL_EXCLUSIONS) {
     if (!rule.pattern.test(title)) continue;
+    // An industry article can cover a concrete freight-operator cost, fleet,
+    // business or dispatcher change without being an official restriction.
+    // A bare earnings/market press release remains excluded.
+    if (candidate.sourceTier === SECONDARY_TIER && rule.reason.startsWith('market/financial') &&
+        /(?:haulage|freight|heavy.transport|oversize|abnormal.load|truck|lorry|lkw|vrachtwagen|nakladn|kamion|transport.operator|carrier|fleet)/i.test(text) &&
+        /(?:fuel|diesel|driver|dispatcher|fleet|insurance|telematic|service|parking|working condition|business operation|route|cost|maintenance|truck|oversize)/i.test(text)) continue;
     if (rule.unlessRestriction && RESTRICTION_TERMS.test(text)) continue;
     if (rule.unlessEnforcement && ENFORCEMENT_CAMPAIGN.test(text)) continue;
     return { ok: false, reason: rule.reason };
