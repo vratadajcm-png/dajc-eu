@@ -884,3 +884,13 @@ fetches and narrows the search/candidate scope without dropping monitored countr
 
 Run `npm run lint:geographic-coverage` before activation. The migration and rollback
 procedures are in `docs/GEOGRAPHIC_COVERAGE_MIGRATION.md`.
+
+## Operational implementation: Sonar → Claude → Buffer (23 October 2026)
+
+The existing daily European source research and Weekly generator use the Perplexity Sonar OpenAI-compatible Chat Completions API. The existing retrieved-page checks, monitored evidence, deterministic source validation and content quality gates remain active. Required production key: PERPLEXITY_API_KEY. Perplexity model is sonar-pro by default; source and writer models can be set through PERPLEXITY_SEARCH_MODEL / PERPLEXITY_WRITER_MODEL.
+
+scripts/claude-weekly-review.mjs reviews the exact markdown against source excerpts and refuses the edition if factual support is lacking. It binds approval to the article SHA-256 before scripts/publish-gate-commit.mjs may request ordinary protected CI-gated auto-merge. Required key: ANTHROPIC_API_KEY. Claude model defaults to claude-sonnet-5 (CLAUDE_REVIEW_MODEL). No automatic code merges.
+
+The existing X and LinkedIn publishing workflows remain unchanged in purpose: only a confirmed publicly accessible article may be posted. scripts/lib/claude-social-copy.mjs creates channel-specific English copy, which is validated for exact URL, length and nonempty content and persisted in the pre-send ledger. Buffer GraphQL is the default outbound backend, but an OAuth-connected DAJC X account and DAJC company LinkedIn page, BUFFER_API_KEY and channel IDs must be configured and DAJC_X_ENABLED / DAJC_LINKEDIN_ENABLED explicitly set before activation. Ambiguous send results are not retried without reconciliation.
+
+No separate n8n/Zapier social app or alternative news pipeline is created. The full chain is fail-closed without configured API keys, approved spend, supported models and connected channels.
