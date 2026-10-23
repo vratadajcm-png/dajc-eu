@@ -894,3 +894,11 @@ scripts/claude-weekly-review.mjs reviews the exact markdown against source excer
 The existing X and LinkedIn publishing workflows remain unchanged in purpose: only a confirmed publicly accessible article may be posted. scripts/lib/claude-social-copy.mjs creates channel-specific English copy, which is validated for exact URL, length and nonempty content and persisted in the pre-send ledger. Buffer GraphQL is the default outbound backend, but an OAuth-connected DAJC X account and DAJC company LinkedIn page, BUFFER_API_KEY and channel IDs must be configured and DAJC_X_ENABLED / DAJC_LINKEDIN_ENABLED explicitly set before activation. Ambiguous send results are not retried without reconciliation.
 
 No separate n8n/Zapier social app or alternative news pipeline is created. The full chain is fail-closed without configured API keys, approved spend, supported models and connected channels.
+
+### Safe transition into production
+
+Shipping this code to the production `main` branch does **not** switch off the existing successful OpenAI-based pipeline. The repository variable `DAJC_SONAR_ENABLED` must be explicitly set to `true` **only after** the following are confirmed: funded Perplexity API access, funded Anthropic API access, successful Sonar structured-response smoke test, successful Claude source-check smoke test, configured GitHub auto-merge and approved API spending limits. With this variable unset or not equal to `true`, the daily monitor and Friday writer continue to use the existing `OPENAI_API_KEY`, the ordinary reviewed PR, and no Claude auto-merge. No new unapproved production spending is incurred by merely merging the code.
+
+X/LinkedIn publication activation is independent: Buffer channels and keys have to exist, and the DAJC_X_ENABLED / DAJC_LINKEDIN_ENABLED flags stay false until connection and a safe test. A connected but not authorized personal profile must never be used.
+
+Do not turn off existing `OPENAI_API_KEY` until a paid Sonar/Claude end-to-end rehearsal proves the new pathway works. If the new provider fails after activation, disable `DAJC_SONAR_ENABLED` to return to the reviewed legacy editor (do not silently fallback inside one failed run).
