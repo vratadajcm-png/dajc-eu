@@ -312,7 +312,7 @@ async function pool(items, limit, fn) {
  * Run one web search for a group.
  * @returns {Promise<{ status: 'ok', items: object[] } | { status: 'unavailable', error: string, items: [] }>}
  */
-export async function searchGroup(client, group, { now = new Date(), model, focuses = SEARCH_FOCUSES, tier = PRIMARY_TIER } = {}) {
+export async function searchGroup(client, group, { now = new Date(), model, focuses = SEARCH_FOCUSES, tier = PRIMARY_TIER, provider = 'openai' } = {}) {
   if (!group.codes?.length || !group.codes.every(isTrackedJurisdiction)) throw new Error('Untracked search jurisdiction');
   const items = [];
   const seen = new Set();
@@ -322,7 +322,7 @@ export async function searchGroup(client, group, { now = new Date(), model, focu
       // Production: Perplexity Sonar's web-grounded OpenAI-compatible Chat Completions.
       // Legacy injected responses.create is preserved only for deterministic unit tests.
       const prompt = buildSearchPrompt(group, now, focus, tier);
-      const sonar = Boolean(client.chat?.completions?.create);
+      const sonar = provider === 'perplexity';
       const response = sonar
         ? await client.chat.completions.create({
             model: model || process.env.PERPLEXITY_SEARCH_MODEL || DEFAULT_SEARCH_MODEL,
@@ -363,11 +363,12 @@ export async function discoverWithWebSearch({
   apiKey, now = new Date(), groups = SEARCH_GROUPS, client = null, fetchPage,
   secondaryThreshold = undefined,
 } = {}) {
-  const api = client || new OpenAI({ apiKey, baseURL: 'https://api.perplexity.ai' });
+  const provider = process.env.DAJC_SONAR_ENABLED === 'true' ? 'perplexity' : 'openai';
+  const api = client || new OpenAI(provider === 'perplexity' ? { apiKey, baseURL: 'https://api.perplexity.ai' } : { apiKey });
   const verifier = item => verifySearchItem(item, { now, ...(fetchPage ? { fetchPage } : {}) });
 
   async function discoverGroup(group) {
-    const first = await searchGroup(api, group, { now, tier: PRIMARY_TIER });
+    const first = await searchGroup(api, group, { now, tier: PRIMARY_TIER, provider });
     const rejected = [], accepted = [], localSeen = new Set();
     let primaryCount = 0;
     async function collect(result, tier) {
@@ -390,7 +391,7 @@ export async function discoverWithWebSearch({
     // This threshold controls SEARCH ONLY, not article minimums or quality.
     if (needsSecondaryDiscovery(primaryCount, secondaryThreshold)) {
       second = await searchGroup(api, group, {
-        now, tier: SECONDARY_TIER, focuses: FALLBACK_SEARCH_FOCUSES,
+        now, tier: SECONDARY_TIER, focuses: FALLBACK_SEARCH_FOCUSES, provider,
       });
       await collect(second, SECONDARY_TIER);
     }
