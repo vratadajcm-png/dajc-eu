@@ -54,7 +54,9 @@ jobs:
         id: reserve
         if: github.event_name != 'workflow_dispatch' || inputs.dry_run == false
         env:
-          DAJC_SOCIAL_BACKEND: ${{ vars.DAJC_X_BACKEND }}
+          DAJC_SOCIAL_BACKEND: ${{ vars.DAJC_X_BACKEND || 'buffer' }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_SOCIAL_MODEL: ${{ vars.CLAUDE_SOCIAL_MODEL || 'claude-sonnet-5' }}
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
           DAJC_BUFFER_X_CHANNEL_ID: ${{ vars.DAJC_BUFFER_X_CHANNEL_ID }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
@@ -68,7 +70,7 @@ jobs:
       - name: Publish from verified company X account
         if: steps.reserve.outputs.send == 'true'
         env:
-          DAJC_SOCIAL_BACKEND: ${{ vars.DAJC_X_BACKEND }}
+          DAJC_SOCIAL_BACKEND: ${{ vars.DAJC_X_BACKEND || 'buffer' }}
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
           DAJC_BUFFER_X_CHANNEL_ID: ${{ vars.DAJC_BUFFER_X_CHANNEL_ID }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
