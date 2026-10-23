@@ -111,16 +111,24 @@ jobs:
             echo "dry_run=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Pre-flight - verify OPENAI_API_KEY is configured
+      - name: Pre-flight - verify all review API keys before paid generation
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           if [ -z "$OPENAI_API_KEY" ]; then
             echo "::error::OPENAI_API_KEY repository secret is not set."
             exit 1
           fi
-          echo "Pre-flight OK: OPENAI_API_KEY is configured (value not printed)."
+          if [ "${{ github.event.inputs.dry_run }}" != "true" ] && [ "${{ github.event.inputs.preview }}" != "true" ] && [ "${{ github.event.inputs.correction }}" != "true" ]; then
+            if [ -z "$XAI_API_KEY" ] || [ -z "$ANTHROPIC_API_KEY" ]; then
+              echo "::error::Autonomous review requires configured XAI_API_KEY and ANTHROPIC_API_KEY repository secrets. Nothing will be generated or published."
+              exit 1
+            fi
+          fi
+          echo "Pre-flight OK: necessary API keys are present (values not printed)."
 
       - name: Setup Node
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
