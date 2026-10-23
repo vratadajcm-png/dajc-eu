@@ -846,6 +846,16 @@ that file for why) and the quality gate will otherwise validate against a
 stale shape.
 
 
+## Three-model autonomous final-edition review (23 October 2026)
+
+Normal final weekly edition: existing OpenAI source-grounded generation and deterministic quality gate -> Grok factual/source verification -> Claude final independently reasoned approval -> content-only GitHub PR -> required `application-validate` and `news-validate` -> GitHub protected auto-merge -> production deployment -> live public verification. Green CI, an AI approval or a merged commit is not proof of a live article.
+
+Required **GitHub Actions secrets**: `OPENAI_API_KEY`, `XAI_API_KEY`, `ANTHROPIC_API_KEY`. Optional repo variables: `XAI_REVIEW_MODEL` (default `grok-4.5`) and `CLAUDE_REVIEW_MODEL` (default `claude-sonnet-5-5`). Configure approved API budgets and enable GitHub **Allow auto-merge**; otherwise the release will fail closed or remain a pending PR. Credentials are never stored in the repo.
+
+The Grok/Claude review uses source excerpts previously collected by the independent live monitor and only verified candidate URLs, without claiming a fresh fetch by those models. Both reviewers must endorse every source; rejection, no evidence, timeout, missing key/model, or malformed verdict blocks PR publication. Reviews are tied to the exact article SHA-256 using an ephemeral runner receipt; corrections and previews never auto-merge.
+
+Unlike historical instructions above, owner merge is **not required for a normal final Weekly** once protected auto-merge is properly enabled and all AI and CI checks are green. Manual corrections and non-content changes still require owner review. Existing branch protection is not weakened.
+
 ## Shared geographic scope (22 October 2026)
 
 `config/europe-coverage.mjs` is the single authority for the 50 approved monitoring
