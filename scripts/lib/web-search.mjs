@@ -27,6 +27,7 @@ import { checkOperationalRelevance } from './relevance-filter.mjs';
 import { checkTransportDomainRelevance } from './transport-domain.mjs';
 import { looksBinary } from './text-quality.mjs';
 import { FRESHNESS_WINDOW_DAYS, FORWARD_HORIZON_DAYS } from './weekly-eligibility.mjs';
+import { sourceTier, isOfficialPublisher, needsSecondaryDiscovery, PRIMARY_TIER, SECONDARY_TIER } from './source-policy.mjs';
 
 const DEFAULT_SEARCH_MODEL = 'gpt-4.1';
 const MAX_ITEMS_PER_SEARCH = 12;
@@ -107,6 +108,7 @@ function isoDay(date) {
  * affect goods vehicles over 12 t.
  */
 export const SEARCH_FOCUSES = ['oversize', 'heavy'];
+export const FALLBACK_SEARCH_FOCUSES = ['oversize', 'operations'];
 
 const FOCUS_TOPICS = {
   oversize: `ONLY oversize / abnormal / exceptional / special transport (Schwertransport, Ausnahmetransport, nadrozměrná přeprava, convoi exceptionnel, trasporto eccezionale, transporte especial ...):
@@ -115,6 +117,12 @@ const FOCUS_TOPICS = {
 - movement windows and time restrictions for abnormal loads
 - approved abnormal-load routes, diversions for abnormal loads
 - bridges or tunnels newly restricted or reopened for abnormal loads`,
+  operations: `Latest European news and tangible professional updates relevant to truck drivers, dispatchers, fleet/transport managers or road-freight companies (prefer oversize and heavy haulage):
+- truck-driver working conditions, duty, cabotage, tachograph, rest, parking, safety, occupational training and operational tools
+- dispatcher workflow, permits, customs, e-CMR/eFTI, slot booking, traffic systems and digitalisation
+- fleet operations, transport insurance, telematics, route planning, truck/trailer/heavy-haul technology and maintenance
+- diesel, energy and operating costs, service availability, supply chains, industry projects, employer/operator changes with real freight-operational consequences
+- verified market, company and industry developments that directly affect road transport workers or transport businesses; exclude generic earnings-only press releases`,
   heavy: `Changes that affect goods vehicles over 12 t (not specifically oversize):
 - new or changed weight, axle-load, height or width limits; bridges or tunnels closed or restricted for trucks
 - closures or diversions of motorways and main freight routes lasting more than 30 days
@@ -124,7 +132,7 @@ const FOCUS_TOPICS = {
 };
 
 /** The prompt for one search group and focus. Pure - exported for tests. */
-export function buildSearchPrompt(group, now = new Date(), focus = 'oversize') {
+export function buildSearchPrompt(group, now = new Date(), focus = 'oversize', tier = PRIMARY_TIER) {
   if (!group.codes?.length || !group.codes.every(isTrackedJurisdiction)) throw new Error('Untracked search jurisdiction');
   const since = isoDay(new Date(now.getTime() - FRESHNESS_WINDOW_DAYS * DAY_MS));
   const today = isoDay(now);
@@ -143,7 +151,10 @@ NEVER RETURN: general recurring truck driving bans (Sunday, holiday, weekend, ni
 
 Search only the listed tracked countries. Retain regional road, permit, toll and escort conditions under their country with exact regional applicability. Exclude untracked dependencies, French/Dutch overseas territories and Vatican City; keep the listed regional locations within their tracked country; never inherit rules from an administering country. For KZ, RU and TR: ${geographicScopePolicy.corridor_scope} ${geographicScopePolicy.corridor_evidence} Search these corridors, not their whole territories. XK is an operational jurisdiction, without a diplomatic-recognition claim.
 
-Prefer official sources (road authorities, ministries, police, toll operators) and established transport trade media. Each item must link to the specific article. Copy dates exactly as shown on the page; use null when the page shows none. Return at most ${MAX_ITEMS_PER_SEARCH} items; return an empty list when nothing qualifies - never pad.`;
+${tier === PRIMARY_TIER
+ ? 'FIRST PASS: Prioritize and return OFFICIAL PRIMARY sources such as government, road and permit authorities, road operators, enforcement bodies, ports and toll agencies. Do not use trade news if an official notice is accessible. Search official sites directly.'
+ : 'SECOND PASS, OPEN-WEB DISCOVERY: Search across ALL accessible European specialist transport news sites, trade magazines, industry associations, driver and dispatcher publications, company and OEM operator blogs, technology providers and independent freight outlets in their local languages. DO NOT restrict this to a whitelist of sites or require an official authority corroboration for ordinary industry or professional news. For legal rules, permits and actual road restrictions, attribute the report to its publisher and avoid claiming it is an official binding notice unless backed by an authoritative source. This is a fallback search only, not an instruction to pad the edition.'}
+Each item must link to the specific article. Copy dates exactly as shown on the page; use null when the page shows none. Return at most ${MAX_ITEMS_PER_SEARCH} items; return an empty list when nothing qualifies - never pad.`;
 }
 
 /** Parse the structured output of one search call. Pure - exported for tests. */
@@ -276,6 +287,7 @@ export async function verifySearchItem(item, { fetchPage = (url) => fetchTextWit
       sourceName: cleanSourceName(item.sourceName, sourceUrl),
       sourceUrl,
       discoveredVia: 'web-search',
+      sourceTier: sourceTier(sourceUrl),
       oversize: Boolean(item.oversize),
       confidence: 'unverified',
     },
@@ -300,7 +312,7 @@ async function pool(items, limit, fn) {
  * Run one web search for a group.
  * @returns {Promise<{ status: 'ok', items: object[] } | { status: 'unavailable', error: string, items: [] }>}
  */
-export async function searchGroup(client, group, { now = new Date(), model, focuses = SEARCH_FOCUSES } = {}) {
+export async function searchGroup(client, group, { now = new Date(), model, focuses = SEARCH_FOCUSES, tier = PRIMARY_TIER } = {}) {
   if (!group.codes?.length || !group.codes.every(isTrackedJurisdiction)) throw new Error('Untracked search jurisdiction');
   const items = [];
   const seen = new Set();
@@ -310,7 +322,7 @@ export async function searchGroup(client, group, { now = new Date(), model, focu
       const response = await client.responses.create({
         model: model || process.env.OPENAI_SEARCH_MODEL || DEFAULT_SEARCH_MODEL,
         tools: [{ type: 'web_search_preview', search_context_size: 'high' }],
-        input: buildSearchPrompt(group, now, focus),
+        input: buildSearchPrompt(group, now, focus, tier),
         text: { format: SEARCH_RESULT_FORMAT },
       });
       for (const item of parseSearchResponse(response.output_text)) {
@@ -333,29 +345,67 @@ export async function searchGroup(client, group, { now = new Date(), model, focu
  * Search every group, then verify each hit against its own page.
  * @returns {Promise<{ findings: object[], groups: { group: object, status: string, error?: string, hits: number, kept: number, rejected: { url: string, reason: string }[] }[] }>}
  */
-export async function discoverWithWebSearch({ apiKey, now = new Date(), groups = SEARCH_GROUPS, client = null, fetchPage } = {}) {
+export async function discoverWithWebSearch({
+  apiKey, now = new Date(), groups = SEARCH_GROUPS, client = null, fetchPage,
+  secondaryThreshold = undefined,
+} = {}) {
   const api = client || new OpenAI({ apiKey });
-  const searched = await pool(groups, SEARCH_CONCURRENCY, (group) => searchGroup(api, group, { now }));
+  const verifier = item => verifySearchItem(item, { now, ...(fetchPage ? { fetchPage } : {}) });
 
-  const report = [];
-  const findings = [];
-  const seen = new Set();
-  for (let i = 0; i < groups.length; i += 1) {
-    const group = groups[i];
-    const result = searched[i];
-    const entry = { group, status: result.status, error: result.error, hits: result.items.length, kept: 0, rejected: [] };
-    const verified = await pool(result.items, VERIFY_CONCURRENCY, (item) => verifySearchItem(item, { now, ...(fetchPage ? { fetchPage } : {}) }));
-    verified.forEach((outcome, index) => {
-      if (!outcome.ok) {
-        entry.rejected.push({ url: result.items[index].url, jurisdiction: resolveCoverageScope(result.items[index].country)?.jurisdiction, reason: outcome.reason });
-        return;
-      }
-      if (seen.has(outcome.finding.sourceUrl)) return;
-      seen.add(outcome.finding.sourceUrl);
-      entry.kept += 1;
-      findings.push({ ...outcome.finding, searchGroup: group.id });
-    });
-    report.push(entry);
+  async function discoverGroup(group) {
+    const first = await searchGroup(api, group, { now, tier: PRIMARY_TIER });
+    const rejected = [], accepted = [], localSeen = new Set();
+    let primaryCount = 0;
+    async function collect(result, tier) {
+      const checked = await pool(result.items, VERIFY_CONCURRENCY, verifier);
+      checked.forEach((outcome, index) => {
+        if (!outcome.ok) {
+          rejected.push({ url: result.items[index].url, jurisdiction: resolveCoverageScope(result.items[index].country)?.jurisdiction, reason: outcome.reason });
+          return;
+        }
+        const record = outcome.finding;
+        if (localSeen.has(record.sourceUrl)) return;
+        localSeen.add(record.sourceUrl);
+        if (isOfficialPublisher(record.sourceUrl)) primaryCount += 1;
+        accepted.push({ ...record, searchGroup: group.id, discoveryPass: tier });
+      });
+    }
+    await collect(first, PRIMARY_TIER);
+    let second = null;
+    // Always expand if official-primary evidence is absent or sparse.
+    // This threshold controls SEARCH ONLY, not article minimums or quality.
+    if (needsSecondaryDiscovery(primaryCount, secondaryThreshold)) {
+      second = await searchGroup(api, group, {
+        now, tier: SECONDARY_TIER, focuses: FALLBACK_SEARCH_FOCUSES,
+      });
+      await collect(second, SECONDARY_TIER);
+    }
+    const status = first.status === 'ok' || second?.status === 'ok' ? 'ok' : 'unavailable';
+    const errors = [first.error, second?.error].filter(Boolean);
+    return {
+      report: {
+        group, status, ...(errors.length ? { error: errors.join('; ') } : {}),
+        hits: first.items.length + (second?.items.length || 0),
+        kept: accepted.length, primaryCount,
+        fallbackSearched: Boolean(second), industryCount: accepted.filter(x => x.sourceTier === SECONDARY_TIER).length,
+        rejected,
+      },
+      accepted,
+    };
+  }
+
+  const perGroup = await pool(groups, SEARCH_CONCURRENCY, discoverGroup);
+  const report = [], findings = [], seen = new Set();
+  for (const result of perGroup) {
+    report.push(result.report);
+    // Official sources lead whenever a domain was identified as authoritative.
+    const ordered = [...result.accepted].sort((a, b) =>
+      (a.sourceTier === PRIMARY_TIER ? 0 : 1) - (b.sourceTier === PRIMARY_TIER ? 0 : 1));
+    for (const finding of ordered) {
+      if (seen.has(finding.sourceUrl)) continue;
+      seen.add(finding.sourceUrl);
+      findings.push(finding);
+    }
   }
   return { findings, groups: report };
 }
