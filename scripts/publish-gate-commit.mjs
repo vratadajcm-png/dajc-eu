@@ -11,7 +11,8 @@
 // for the pure decision logic and why this exists.
 
 import { execFileSync } from 'node:child_process';
-import { appendFileSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdtempSync, rmSync, writeFileSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from './lib/publish-gate.mjs';
@@ -92,6 +93,21 @@ if (articleAdded) {
 }
 
 const articleReplaced = articleAdded && isArticleReplacement(articleStatusOutput);
+const autonomousFinal = process.env.DAJC_AUTONOMOUS_WEEKLY === '1' &&
+  process.env.OVERSIZE_PREVIEW !== '1' && process.env.OVERSIZE_CORRECTION !== '1' && !articleReplaced;
+
+if (articleAdded && autonomousFinal) {
+  if (!process.env.RUNNER_TEMP) throw new Error('Trusted Claude receipt directory unavailable');
+  const receipt = JSON.parse(readFileSync(path.join(process.env.RUNNER_TEMP, 'dajc-weekly-review-approved.json'), 'utf8'));
+  const pathFromStatus = 'src/content/news/eu-oversize/' + extractArticleWeekFromStatus(articleStatusOutput).filename;
+  const hash = createHash('sha256').update(readFileSync(pathFromStatus)).digest('hex');
+  if (receipt.articlePath !== pathFromStatus || receipt.targetWeek !== week ||
+      receipt.sha256 !== hash || receipt.researchProvider !== 'perplexity-sonar' ||
+      !receipt.claudeModel || receipt.leadCount < 1 || receipt.sourceCount < 1) {
+    throw new Error('Claude review receipt missing or differs from exact article bytes');
+  }
+  summary('Claude editorial review approved exact Sonar article SHA-256: ' + hash.slice(0, 12));
+}
 const decision = decidePublishCommit({ articleAdded, articleReplaced, dataChanged, week });
 
 if (!decision.commit) {
@@ -125,10 +141,16 @@ git(['push', 'origin', `HEAD:refs/heads/${branch}`]);
 const temporary = mkdtempSync(path.join(tmpdir(), 'dajc-publication-pr-'));
 try {
   const bodyFile = path.join(temporary, 'body.md');
-  writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\nPublication requires review, passing application-validate and news-validate checks, and merge into main. This run has not published the article. Only approved article/data paths are changed.\n`);
+  writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\nThe final Sonar article was reviewed by Claude; protected application-validate and news-validate checks and GitHub merge are required before any public release. This run has not published the article. Only approved article/data paths are changed.\n`);
   const prUrl = execFileSync('gh', ['pr', 'create', '--repo', repository, '--base', 'main', '--head', branch, '--title', decision.message, '--body-file', bodyFile], { encoding: 'utf8' }).trim();
-  summary(`### EU Oversize Weekly - prepared for review\n\n${prUrl}\n\nArticle published this run: **no**. Review and merge are required before the Friday release.`);
+  summary(`### EU Oversize Weekly - prepared for review\n\n${prUrl}\n\nArticle published this run: **no**. Final weekly content may auto-merge only after Claude approval and protected CI.`);
   for (const workflow of ['application-ci.yml', 'news-ci.yml']) execFileSync('gh', ['workflow', 'run', workflow, '--repo', repository, '--ref', branch], { stdio: 'inherit' });
+  if (autonomousFinal) {
+    // GitHub protects main; auto-merge does not bypass CI or branch rules.
+    // This is not confirmation of deployment or public visibility.
+    execFileSync('gh', ['pr', 'merge', prUrl, '--repo', repository, '--auto', '--squash'], { stdio: 'inherit' });
+    summary('Protected auto-merge requested following Claude approval; live publication still unconfirmed.');
+  }
 } finally {
   rmSync(temporary, { recursive: true, force: true });
 }
