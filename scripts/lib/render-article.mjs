@@ -1,3 +1,5 @@
+import { secondaryAttribution } from './source-policy.mjs';
+
 // Turns the validated, cross-checked article JSON (see openai-client.mjs /
 // mock-generator.mjs, after cross-validation in generate-weekly-article.mjs)
 // into frontmatter + Markdown body matching src/content.config.ts's schema
@@ -84,7 +86,8 @@ function renderDevelopmentItem(item, { weekEnd = null } = {}) {
     lines.push(`**Exemptions/conditions:** ${mdEscape(item.exemptions)}`);
     lines.push('');
   }
-  lines.push(`*Source: [${mdEscape(item.sourceName)}](${safeUrl(item.sourceUrl)})*`);
+  const provenance = secondaryAttribution(item);
+  lines.push(`*Source: [${mdEscape(item.sourceName)}](${safeUrl(item.sourceUrl)})${provenance ? ` — ${mdEscape(provenance)}` : ''}*`);
   for (const extra of item.additionalSources || []) {
     lines.push(`*Also see: [${mdEscape(extra.name)}](${safeUrl(extra.url)})*`);
   }
@@ -110,7 +113,8 @@ function renderRoundupItem(item, { weekEnd = null } = {}) {
   const action = item.recommendedAction || item.impact;
   if (action) lines.push('', `**Operator action:** ${mdEscape(action)}`);
 
-  lines.push('', `*Source: [${mdEscape(item.sourceName)}](${safeUrl(item.sourceUrl)})*`);
+  const provenance = secondaryAttribution(item);
+  lines.push('', `*Source: [${mdEscape(item.sourceName)}](${safeUrl(item.sourceUrl)})${provenance ? ` — ${mdEscape(provenance)}` : ''}*`);
   return lines.join('\n');
 }
 
