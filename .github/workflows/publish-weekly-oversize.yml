@@ -58,6 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
+      DAJC_AUTONOMOUS_WEEKLY: '1'  # Final articles only; no code or corrections
       OVERSIZE_PREVIEW: ${{ github.event.inputs.preview == 'true' && '1' || '' }}
       OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
     steps:
@@ -151,6 +152,22 @@ jobs:
         # retry for (no lead/Rest-of-Europe minimum, no padding loop).
         run: node scripts/generate-weekly-article.mjs ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }} ${{ steps.trigger.outputs.preview == 'true' && '--preview' || '' }} ${{ github.event.inputs.correction == 'true' && '--correction' || '' }}
 
+      - name: Grok factual review and Claude final release review
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true'
+        env:
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          XAI_REVIEW_MODEL: ${{ vars.XAI_REVIEW_MODEL || 'grok-4.5' }}
+          CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}
+        shell: bash
+        run: |
+          target="${{ steps.publish-needed.outputs.target }}"
+          if [ -f "$target" ]; then
+            node scripts/weekly-autonomous-review.mjs "$target"
+          else
+            echo "::warning::No editorially qualified article generated; no AI approval and no publication."
+          fi
+
       - name: Open reviewed publication PR or persist data-only refresh
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true'
         run: node scripts/publish-gate-commit.mjs
@@ -185,7 +202,7 @@ jobs:
           elif [ "${{ steps.publish-needed.outputs.needed }}" = "false" ]; then
             echo "Outcome: article already exists or its PR awaits review; no generation repeated."
           elif [ "${{ job.status }}" = "success" ]; then
-            echo "Outcome: preparation/dry-run completed. A content PR requires review and merge before publication."
+            echo "Outcome: preparation/dry-run completed. Autonomous final editions require Grok + Claude + protected CI auto-merge; production availability must still be checked."
           else
             echo "Outcome: publication pipeline failed; inspect the failed step above."
           fi
