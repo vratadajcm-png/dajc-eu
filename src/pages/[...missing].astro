@@ -1,0 +1,17 @@
+---
+// A real fallback route prevents the hosting adapter from attaching a 404
+// status to the middleware's public-page redirect. No private content is read.
+export const prerender = false;
+const path = Astro.url.pathname;
+const publicNavigation = Astro.request.method === 'GET'
+  && (Astro.request.headers.get('accept') ?? '').includes('text/html')
+  && !/^\/(?:api|assets|_astro|partner-portal|investor)(?:\/|$)/i.test(path)
+  && !/\.[^/]+$/.test(path);
+if (publicNavigation) {
+  return new Response(null, { status: 302, headers: {
+    Location: '/', 'Cache-Control': 'no-store',
+    'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+  }});
+}
+return new Response(null, { status: 404 });
+---
