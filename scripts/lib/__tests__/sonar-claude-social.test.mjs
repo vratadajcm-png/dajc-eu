@@ -32,7 +32,7 @@ describe('Sonar / Claude / Buffer chain - nonpublishing gates', () => {
      calls.push(payload);
      return { choices: [{ message: { content: JSON.stringify({ items: [] }) } }] };
    } } } };
-   const result = await searchGroup(client, SEARCH_GROUPS[0], { now, focuses: ['oversize'] });
+   const result = await searchGroup(client, SEARCH_GROUPS[0], { now, focuses: ['oversize'], provider: 'perplexity' });
    expect(result).toMatchObject({ status: 'ok', items: [] });
    expect(calls[0].model).toBe('sonar-pro');
    expect(calls[0].response_format.type).toBe('json_schema');
