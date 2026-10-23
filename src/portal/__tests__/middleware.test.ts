@@ -31,8 +31,9 @@ describe('private Platform and Integration Ecosystem sections', () => {
   ])('blocks direct access to %s without rendering content', async (path) => {
     const next = vi.fn(async () => new Response('private content'));
     const response = await callMiddleware(path, next);
-    expect(response.status).toBe(404);
-    expect(await response.text()).toBe('Not found');
+    expect(response.status).toBe(302);
+    expect(response.headers.get('Location')).toBe('/');
+    expect(await response.text()).toBe('');
     expect(response.headers.get('X-Robots-Tag')).toContain('noindex');
     expect(response.headers.get('Cache-Control')).toBe('no-store');
     expect(next).not.toHaveBeenCalled();
@@ -111,5 +112,21 @@ describe('portal middleware gate (paths outside the portal)', () => {
     expect(next).toHaveBeenCalledTimes(1);
     expect(response.status).toBe(200);
     expect(response.headers.get('X-Robots-Tag')).toBeNull();
+  });
+});
+
+
+describe('public missing-page recovery', () => {
+  it.each([
+    ['/mistyped-page', 'text/html', 302],
+    ['/api/missing', 'text/html', 404],
+    ['/missing.js', 'text/html', 404],
+    ['/mistyped-page', 'application/json', 404],
+  ])('handles %s with accept %s', async (path, accept, expected) => {
+    const context = { url: new URL(`https://www.dajc.eu${path}`), request: new Request(`https://www.dajc.eu${path}`, { headers: { accept } }) } as Parameters<typeof onRequest>[0];
+    const result = await onRequest(context, async () => new Response('missing', { status: 404 }));
+    if (!result) throw new Error('Expected response');
+    expect(result.status).toBe(expected);
+    if (expected === 302) expect(result.headers.get('Location')).toBe('/');
   });
 });
