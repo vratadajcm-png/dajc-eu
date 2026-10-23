@@ -4,7 +4,7 @@ This is the **single editorial authority** for the automated DAJC.eu weekly Euro
 
 ## 0. Scope
 
-The Weekly covers **road freight transport with vehicles over 12 t** (EU category N3) across Europe. **Oversize, abnormal and special transport has priority**: it is searched first, ranked first, placed first in the edition (§1) and is the required-coverage floor (§4). Other developments for goods vehicles over 12 t — weight, axle and dimension limits, bridge/tunnel restrictions for trucks, long-term closures of freight routes, truck tolls, goods border crossings, ferries/RoRo, rules for HGV operators and drivers — are in scope and follow after it.
+The Weekly covers **commercial road freight and the practical work of European truck drivers, dispatchers, fleets and transport companies**. Vehicles over 12 t (N3) remain the operational core. **Oversize, abnormal and special transport has priority**: it is searched first, ranked first, placed first in the edition (§1) and is the required-coverage floor (§4). Other material road-freight developments follow: truck/route restrictions, tolls, border/customs, ports, freight ferries, plus drivers' working conditions, professional safety, truck parking, training, operational tools, dispatch/routing/telematics, fleet/vehicle services, insurance, fuel/operating costs and transport-company changes that materially affect the job. General consumer car news and unsupported PR are excluded.
 
 ## 1. Geographic research coverage
 
@@ -22,11 +22,11 @@ Research coverage remains Europe-wide, but the published lead order is operator-
 
 ## 2. Source discovery
 
-- **News is discovered by web search** (`scripts/lib/web-search.mjs`, OpenAI web search): one search per region group, Central Europe country by country first, asking for developments published in the last 7 days or taking effect within one month (§7), oversize/abnormal transport first, then goods vehicles over 12 t.
+- **Two-stage open-web discovery** (`scripts/lib/web-search.mjs`, OpenAI web search): official primary authority sources first for each geographical research group; if fewer than **3** eligible *primary discovery hits* are found in a group, search broadly across **all discoverable European freight, heavy-haul/oversize, driver/dispatcher, trade, fleet, operator, OEM and professional transport websites** without an exhaustive publisher whitelist. Search in local languages, oversize first. The threshold is only a *search-expansion trigger*, not a required published report count.
 - The search model only finds links. Every hit is fetched and the finding is built from **the page itself** (heading, text, publication date). A date the model reports is kept only when the page text shows it. Unreachable pages, PDFs, and pages whose own text shows no freight-vehicle (>12 t) or oversize context are dropped and logged.
 - The previous crawler of configured official authority pages (`config/oversize-sources`, `scripts/lib/fetch-source.mjs`) remains available with `OVERSIZE_DISCOVERY=official` (or `both`).
-- Official sources (authorities, ministries, toll operators, police) are preferred, and established transport trade media are acceptable. Primary sources are required for permits, legal rules, escorts, route/weight/dimension limits and other high-impact regulatory claims whenever available.
-- Generic landing pages, image-only URLs, stale archive pages, unrelated permits/administration and non-operational statistics are excluded.
+- **Official sources always have priority.** Industry news can be included on the evidence of its own readable, dated article without separate official corroboration for routine professional, fleet, driver or company news. It must be clearly attributed as an **industry report**. **No unconfirmed media claim may be stated as an officially binding permit, escort, axle/weight, legal or route restriction**; these claims must be clearly labelled as requiring confirmation with the responsible authority. Repetition of an existing official item does not count as separate news.
+- Generic landing pages, image-only URLs, stale archive pages, unrelated permits/administration, promotional copy and non-operational statistics are excluded. An opened original article (not only an AI-generated snippet), date evidence and concrete professional relevance remain mandatory, but no separate official corroboration is required for ordinary industry reporting.
 - **Discovery date is not publication freshness.** A page first discovered this week is not a new development merely because the crawler found it now. Completed civic/school projects, old archive pages, generic infrastructure achievements and historical announcements without a current operational consequence are excluded.
 - The monitor records, for every finding, the date the **official source published it** (`publishedAt`: page `datePublished`/publication metadata, feed date, a labelled or leading date in the text, or a date in the URL) and keeps the real first-discovery time across ISO weeks. Without such evidence the date is unknown — never "today".
 
@@ -39,7 +39,7 @@ A well-supplied week has room for:
 
 These numbers are **capacities, never quotas**. An edition contains exactly the items that pass every rule in this specification — 17 + 8, 9 + 0 or 25 + 12 are all correct editions. There is **no minimum** number of lead reports, no Rest-of-Europe minimum and no country/jurisdiction quota.
 
-Never satisfy a number with filler. The pipeline has no supplement, repair or retry step that asks for "more" items, never moves items between sections to reach a count, and never relaxes a rule because an edition is short. If nothing qualifies, no edition is published that week — a weak edition is never published instead.
+Never satisfy a number with filler. The pipeline has no supplement, repair or retry step that asks for "more" items, never moves items between sections to reach a count, and never relaxes a rule because an edition is short. If nothing qualifies *after official and broader media searches*, no edition is published that week — a weak edition is never published instead.
 
 The Rest-of-Europe items are deliberately short: country/jurisdiction, what changed, where/when relevant, operator action and official source. If at least one item qualifies, the most important items are lead reports; the Rest-of-Europe section is omitted when it has no item.
 
@@ -71,14 +71,14 @@ Other non-closure restrictions such as weight, width, height, axle, permit, esco
 
 ## 7. Relevance, freshness and verification
 
-Every published item must demonstrably relate to road freight with vehicles over 12 t — oversize, abnormal or special transport first — freight routing, relevant tolling, vehicle/route limits, escorts, borders, ports/ferries/project cargo, heavy-haul equipment, or another directly operational DAJC intelligence topic.
+Every published item must demonstrably relate to European commercial road freight work, preferably heavy vehicles over 12 t and above all oversize/abnormal transport, including driver/dispatcher/company/fleet topics with demonstrable operational significance, routing, permits, costs, working conditions, equipment, borders, project cargo or similar practical intelligence.
 
 Exclude driver-licence/auto-school administration, environmental/water-law permits unrelated to transport, crime/theft/accident/breakdown incidents, procurement/tender noise, generic authority pages, toll revenue/statistics without an operational rule change, stale historical archive material, ordinary short roadworks/closures, completed school/public-building renovations, generic completed civic projects, and infrastructure announcements whose only claimed relevance is a theoretical future logistics benefit.
 
 Every published item must also prove that it is current:
 
 - **Freshness — discovery is not news.** The pipeline distinguishes DISCOVERY date (`firstSeenAt`, never a freshness signal), SOURCE PUBLICATION date (`publishedAt`), EFFECTIVE date (`validFrom`/`validTo`, read only from explicit wording) and TARGET-WEEK relevance. An item is current only if (a) the source published it within the **7 days** before the edition's Thursday preparation (one week back), (b) it takes effect or ends inside the target week, (c) explicit start and end dates show it is in force during the target week, or (d) it takes effect within **one month (30 days) after the Thursday preparation** (outlook; `FRESHNESS_WINDOW_DAYS`, `FORWARD_HORIZON_DAYS` in `weekly-eligibility.mjs`). Otherwise it is excluded; undated material without such evidence is never published.
-- **Hard exclusions:** completed projects and openings without a current restriction, pedestrian/cycling facilities, school/civic/public-space projects, PR/event items, market/financial news, statistics, accidents, breakdowns, crime, procurement, generic landing/roadworks pages and anything without proven relevance for freight vehicles over 12 t or oversize/special transport. A generic mention of road, bridge, tunnel, vehicle or transport is not enough.
+- **Hard exclusions:** completed projects and openings without a current restriction, pedestrian/cycling facilities, school/civic/public-space projects, PR/event items, financial/market stories with no concrete freight business or driver/dispatcher operational impact, statistics, accidents, breakdowns, crime, procurement, generic landing/roadworks pages and anything without proven relevance for freight vehicles over 12 t or oversize/special transport. A generic mention of road, bridge, tunnel, vehicle or transport is not enough.
 - **One specific development:** homepages, listing/landing pages, project/programme pages, FAQ pages, organisation pages and bare topic titles are not developments.
 - **No repetition:** a source already cited by an earlier edition is not published again unless the source republished it after that edition or the change takes effect or ends in the target week.
 - **Source suitability:** police press feeds contribute only announced enforcement campaigns, never single incidents or one-off local movements.
@@ -100,7 +100,7 @@ These rules are deterministic (`scripts/lib/weekly-eligibility.mjs`) and are app
 1. SEO title, publication date and covered week.
 2. Standfirst / executive summary.
 3. Substantive lead reports (up to 30; as many as genuinely qualify) as one list in the deterministic operator-first order (§1), each with a category label and What changed / Where / When / Impact / Action; outlook items carry an explicit "takes effect" date.
-4. Rest of Europe — concise reports (up to 15; omitted when none qualify).
+4. Rest of Europe — concise attributed reports (up to 15; omitted when none qualify).
 5. Critical European corridors when materially relevant.
 6. One-month outlook when materially relevant.
 7. Dispatcher/operator checklist.
@@ -114,3 +114,7 @@ Every item must answer:
 > Why does this matter **now** to someone planning or executing road freight transport with vehicles over 12 t — and above all oversize, abnormal or special transport?
 
 If there is no meaningful current operational answer, exclude it. A newly discovered old page is not news. A short edition is a correct edition; a padded edition is not.
+
+## 11. Permanent official-first, open-European-media fallback (23 October 2026)
+
+This is a **standing** rule. The 50 approved DAJC jurisdictions remain the geographic scope; research covers all publicly discoverable European websites relevant to commercial road freight and heavy/oversize work, without a hard media-domain whitelist. Research **cannot guarantee exhaustive crawling of every website**. Official notices lead; the second open-web pass runs for a group when fewer than 3 primary-source hits survive first-page evidence checks. The 3-hit trigger is **not** a news quota and must not induce padding. An ordinary industry report is allowed without independent primary authority confirmation as long as its direct dated article supports what DAJC attributes to it, and its provenance is labelled; legal/route safety claims remain unconfirmed until checked against the competent authority. All source dates, geographic scope, no duplicate reports, no general Driving Bans, and quality-before-count protections remain mandatory.
