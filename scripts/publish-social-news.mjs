@@ -8,6 +8,7 @@ import { collectSocialCandidates, selectNextSocialArticle, candidateKey } from '
 import { checkPublicArticle, checkXAccount, publishToX, readXCredentials } from './lib/x-publishing.mjs';
 import { linkedinConfig, publishToLinkedIn } from './lib/linkedin-publishing.mjs';
 import { readBufferConfig, checkBufferChannel, publishViaBuffer } from './lib/buffer-publishing.mjs';
+import { createClaudeSocialCopy, validateSocialCopy } from './lib/claude-social-copy.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHANNELS = {
@@ -83,8 +84,12 @@ async function main() {
     else if (channel === 'x') await checkXAccount(credentials);
     // For LinkedIn, only an explicit company URN passes config validation;
     // the API enforces whether the token may post for that organization.
+    // Generate social copy only after the article has been independently
+    // confirmed public and the official account has been verified.
+    const copy = await createClaudeSocialCopy(channel, article);
     const key = candidateKey(article);
     ledger.posts[key] = {
+      approvedText: copy,
       status: 'pending',
       sourceUrl: article.url,
       reservedByRunId: id,
@@ -105,7 +110,8 @@ async function main() {
   if (!await checkPublicArticle(article.url, article.title)) throw new Error('Reserved article not served publicly: refusing POST');
 
   const credentials = getConfig(channel);
-  const confirmed = await post(channel, getText(channel, article), credentials);
+  const approvedText = validateSocialCopy(channel, article, record.approvedText);
+  const confirmed = await post(channel, approvedText, credentials);
   ledger.posts[key] = {
     status: confirmed.status || 'published',
     sourceUrl: article.url,
