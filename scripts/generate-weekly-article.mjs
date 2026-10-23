@@ -395,7 +395,11 @@ async function main() {
   // Deterministically attach source provenance after model output and source
   // cross-validation. The model cannot promote a media report to official.
   for (const item of [...article.developments, ...article.europeRoundup]) {
-    item.sourceTier = candidatesByUrl.get(item.sourceUrl)?.sourceTier || 'official';
+    const source = candidatesByUrl.get(item.sourceUrl);
+    item.sourceTier = source?.sourceTier || 'official';
+    // The source-backed category, not the model's wording, determines whether
+    // an industry citation is about a high-consequence permit/route rule.
+    item.type = source?.type || 'operational_change';
   }
 
   // A preview is public as soon as it is deployed; the final edition waits
