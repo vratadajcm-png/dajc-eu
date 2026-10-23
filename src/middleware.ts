@@ -14,10 +14,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // These sections are deliberately private, regardless of navigation or
   // indexing settings. Never invoke their page handlers on the public site.
   if (/^\/(?:platform|partners|integration-ecosystem)(?:\/|$)/i.test(context.url.pathname)) {
-    return new Response('Not found', {
-      status: 404,
+    return new Response(null, {
+      status: 302,
       headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
+        'Location': '/',
         'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
         'Cache-Control': 'no-store',
       },
@@ -55,5 +55,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return response;
   }
 
-  return next();
+  const response = await next();
+  // A mistyped public page should lead visitors back to the public homepage.
+  // Preserve API and missing-asset status codes so clients never receive HTML.
+  if (response.status === 404 && context.request?.method === 'GET'
+    && context.request.headers.get('accept')?.includes('text/html')
+    && !/^\/(?:api|assets|_astro)(?:\/|$)/i.test(context.url.pathname)
+    && !/\.[a-z0-9]+$/i.test(context.url.pathname)) {
+    return new Response(null, { status: 302, headers: { Location: '/', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } });
+  }
+  return response;
 });
