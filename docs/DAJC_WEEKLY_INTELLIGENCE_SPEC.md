@@ -89,11 +89,22 @@ These rules are deterministic (`scripts/lib/weekly-eligibility.mjs`) and are app
 ## 8. Publication schedule and preview
 
 - Normal final edition: Friday at **12:00 Europe/Prague**, covering the upcoming Monday–Sunday week.
-- The edition is prepared on Thursday and committed with `publishedAt` set to Friday 12:00 Europe/Prague; the site shows it only from that instant. Thursday/Friday-morning retries, the watchdog and a Saturday catch-up are idempotent recovery layers that run only if the final week article is missing.
+- The edition is prepared on Thursday as a content-only PR with `publishedAt` set to Friday 12:00 Europe/Prague. Once the protected PR merges and the production build completes, the site shows it no earlier than this instant. Thursday/Friday-morning retries, the watchdog and a Saturday catch-up are idempotent recovery layers; a pending PR does not count as a public article.
 - Final publication is idempotent; an existing final week file is not automatically overwritten.
 - A manual **correction** run (workflow input `correction`) regenerates the current target edition from source data and replaces the published file atomically — only after the regenerated edition has passed every gate and the build, stamped with `updatedAt`. If the regenerated edition does not qualify, the published edition is left untouched and the run fails with the blocker.
 - A manually requested **preview** uses the same research, verification, counts, quality gates and article layout, but a separate preview slug. It never consumes or blocks Friday's final slug.
 - The final edition is built from the complete monitoring data available at Thursday preparation.
+
+### Autonomous three-model release policy (23 October 2026)
+
+- **OpenAI** generates the English article from monitored evidence, after the existing deterministic eligibility, source, quality, critical-coverage and build gates.
+- **xAI Grok** independently checks every source and its claims against provenance excerpts recorded by the monitoring system; missing evidence, material mismatches, unsupported limits or dates, and inability to verify block the release.
+- **Anthropic Claude** independently checks the same complete article and evidence plus Grok's verdict. Only explicit approval from both reviewers on the same article SHA-256 authorizes an autonomous publication PR.
+- The publisher opens a **content-only PR**, dispatches `application-validate` and `news-validate`, and requests standard protected-branch GitHub auto-merge. It must never bypass CI, branch protection, source policy or the scheduled public release time.
+- Any failed or missing API key, unsupported model, rejected review, incomplete JSON verdict, missing monitored source, failing CI, blocked PR, build/deploy issue or failed website check **stops publication** and is an alert, not success.
+- Automated merging applies only to final weekly content. Preview, manual correction, changes to code, policies, security, CI or infrastructure still require deliberate human review; no automated overwrite of prior public articles.
+- A green preparation workflow / approved AI verdict / merged PR / READY deployment must never be described as a verified public release without fetching the actual public article.
+- Model use incurs API cost; keys and a funded, approved provider budget are prerequisites. Missing prerequisites are a hard stop; there is no fallback to one AI model or to humanless unreviewed publishing.
 
 ## 9. Article structure
 
