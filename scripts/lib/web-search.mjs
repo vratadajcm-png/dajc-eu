@@ -30,6 +30,7 @@ import { FRESHNESS_WINDOW_DAYS, FORWARD_HORIZON_DAYS } from './weekly-eligibilit
 import { sourceTier, isOfficialPublisher, needsSecondaryDiscovery, PRIMARY_TIER, SECONDARY_TIER } from './source-policy.mjs';
 
 const DEFAULT_SEARCH_MODEL = 'gpt-4.1';
+// Secondary pass is triggered only by a sparse primary-source result per area.
 const MAX_ITEMS_PER_SEARCH = 12;
 const SEARCH_CONCURRENCY = 3;
 const VERIFY_CONCURRENCY = 6;
@@ -147,7 +148,7 @@ ${FOCUS_TOPICS[focus] || FOCUS_TOPICS.oversize}
 DATES - STRICT:
 Return a page only if its visible publication date is between ${since} and ${today}, OR it announces a change that takes effect or ends between ${today} and ${horizon}. Skip every page that shows an older date and no such upcoming effective date. Search news sections and press releases of the last days, not evergreen pages.
 
-NEVER RETURN: general recurring truck driving bans (Sunday, holiday, weekend, night, summer bans - they are covered elsewhere), accidents, incidents, crime, short local roadworks, tenders, statistics, company/market news, service or company pages, guides, FAQs, homepages, listing pages, undated pages.
+NEVER RETURN: general recurring truck driving bans (Sunday, holiday, weekend, night, summer bans - they are covered elsewhere), accidents, incidents, crime, short local roadworks, tenders, unrelated statistics, service or company homepages, guides, FAQs, listing pages, undated pages. ${focus === 'operations' ? 'INCLUDE recent material transport-company, driver, dispatcher, fleet and industry news when it has specific practical consequences for road-freight operations; not unsubstantiated promotional claims.' : 'Do not include mere sales results, generic company announcements or promotional news with no proven freight-operational significance.'}
 
 Search only the listed tracked countries. Retain regional road, permit, toll and escort conditions under their country with exact regional applicability. Exclude untracked dependencies, French/Dutch overseas territories and Vatican City; keep the listed regional locations within their tracked country; never inherit rules from an administering country. For KZ, RU and TR: ${geographicScopePolicy.corridor_scope} ${geographicScopePolicy.corridor_evidence} Search these corridors, not their whole territories. XK is an operational jurisdiction, without a diplomatic-recognition claim.
 
