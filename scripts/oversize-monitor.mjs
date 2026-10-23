@@ -36,8 +36,8 @@ async function main() {
   }
   const useWeb = discovery !== 'official';
   const useOfficial = discovery !== 'web';
-  if (useWeb && !process.env.OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY is not set - web-search discovery needs it (set OVERSIZE_DISCOVERY=official to use only the official-source crawler).');
+  if (useWeb && !process.env.PERPLEXITY_API_KEY) {
+    throw new Error('PERPLEXITY_API_KEY is not set - Sonar web-search discovery needs it (set OVERSIZE_DISCOVERY=official to use only the official-source crawler).');
   }
 
   console.log(`DAJC European Oversize monitor - ${nowIso}`);
@@ -69,7 +69,7 @@ async function main() {
 
   let webGroups = [];
   if (useWeb) {
-    const web = await discoverWithWebSearch({ apiKey: process.env.OPENAI_API_KEY, now });
+    const web = await discoverWithWebSearch({ apiKey: process.env.PERPLEXITY_API_KEY, now });
     webGroups = web.groups;
     for (const entry of web.groups) {
       const label = `[web:${entry.group.id}] (${entry.group.countries.join(', ')})`;
