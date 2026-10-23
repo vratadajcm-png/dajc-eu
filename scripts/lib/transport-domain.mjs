@@ -71,6 +71,12 @@ export const HEAVY_TRANSPORT_CONTEXT = new RegExp([
   // heavy-haul equipment
   'low[- ]?loader', 'low[- ]?bed', 'tieflader', 'semi-?trailer', 'auflieger', 'modular trailer', '\\bspmts?\\b',
   'self-propelled modular', 'mobile crane', '\\bcranes?\\b', 'autokran', 'rotorbl(?:a|ä)tt', 'turbine blade',
+  // Driver, dispatcher and transport-company work only with road-freight context.
+  'truck driver', 'lorry driver', 'professional hgv driver', 'truck parking', 'truck stop',
+  'truck dispatch', 'freight dispatch', 'fleet management', 'transport planner',
+  'transport operations', 'road haulage business', 'cargo insurance', 'truck telematics',
+  'truck fleet', 'lorry fleet', 'fleet maintenance', 'fuel card', 'fleet operator',
+  'spedition', 'spediteur', 'dispečer', 'dispečink', 'dispečersk', 'dopravce', 'dopravn[ií] firm',
 ].join('|'), 'i');
 
 const ROAD_NETWORK_CONTEXT =
