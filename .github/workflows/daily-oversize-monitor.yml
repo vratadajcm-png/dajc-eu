@@ -44,19 +44,19 @@ jobs:
       - name: Load latest monitoring data
         run: node scripts/automation-data.mjs load findings
 
-      - name: Pre-flight - verify OPENAI_API_KEY is configured
+      - name: Pre-flight - verify PERPLEXITY_API_KEY is configured
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
         run: |
-          if [ -z "$OPENAI_API_KEY" ]; then
-            echo "::error::OPENAI_API_KEY repository secret is not set - web-search discovery needs it."
+          if [ -z "$PERPLEXITY_API_KEY" ]; then
+            echo "::error::PERPLEXITY_API_KEY repository secret is not set - web-search discovery needs it."
             exit 1
           fi
-          echo "Pre-flight OK: OPENAI_API_KEY is configured (value not printed)."
+          echo "Pre-flight OK: PERPLEXITY_API_KEY is configured (value not printed)."
 
       - name: Run oversize monitor (web search)
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
         run: npm run oversize:monitor
 
       - name: Commit updated findings (only if meaningfully changed)
