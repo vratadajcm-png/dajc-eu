@@ -244,9 +244,9 @@ describe('generate-weekly-article.mjs (mock, subprocess)', () => {
   );
 
   it(
-    'fails hard (non-zero exit) on a real run with no PERPLEXITY_API_KEY, before writing anything',
+    'fails hard (non-zero exit) with Sonar enabled but no PERPLEXITY_API_KEY, before writing anything',
     () => {
-      const result = runGenerate([], { PERPLEXITY_API_KEY: '' });
+      const result = runGenerate([], { PERPLEXITY_API_KEY: '', DAJC_SONAR_ENABLED: 'true' });
       expect(result.code).not.toBe(0);
       expect(result.stdout).toMatch(/PERPLEXITY_API_KEY/);
       expect(existsSync(targetFilePath)).toBe(false);
