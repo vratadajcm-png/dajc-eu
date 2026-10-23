@@ -20,3 +20,10 @@ export function checkOpenAiKeyPreflight({ mock, apiKey }) {
   }
   return { ok: true };
 }
+
+// Primary production research/writer provider: Perplexity Sonar. A missing
+// key is a configuration failure, never a claim that there is no news.
+export function checkSonarKeyPreflight({ mock, apiKey }) {
+  if (mock) return { ok: true };
+  return apiKey ? { ok: true } : { ok: false, reason: 'PERPLEXITY_API_KEY is not configured; no article may be generated or published' };
+}

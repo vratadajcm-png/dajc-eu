@@ -1,8 +1,7 @@
 // Web-search discovery for the EU Oversize Weekly.
 //
-// The daily monitor finds news through OpenAI's web search (Responses API,
-// `web_search_preview` tool) instead of crawling a fixed list of authority
-// pages. One search runs per region group; Central Europe is searched country
+// The daily monitor uses Perplexity Sonar web-grounded source discovery via
+// Chat Completions instead of crawling a fixed list of authority pages. One search runs per region group; Central Europe is searched country
 // by country so it is never crowded out.
 //
 // The model only DISCOVERS links. Nothing it says is trusted as evidence:
@@ -29,7 +28,7 @@ import { looksBinary } from './text-quality.mjs';
 import { FRESHNESS_WINDOW_DAYS, FORWARD_HORIZON_DAYS } from './weekly-eligibility.mjs';
 import { sourceTier, isOfficialPublisher, needsSecondaryDiscovery, PRIMARY_TIER, SECONDARY_TIER } from './source-policy.mjs';
 
-const DEFAULT_SEARCH_MODEL = 'gpt-4.1';
+const DEFAULT_SEARCH_MODEL = 'sonar-pro';
 // Secondary pass is triggered only by a sparse primary-source result per area.
 const MAX_ITEMS_PER_SEARCH = 12;
 const SEARCH_CONCURRENCY = 3;
@@ -313,20 +312,34 @@ async function pool(items, limit, fn) {
  * Run one web search for a group.
  * @returns {Promise<{ status: 'ok', items: object[] } | { status: 'unavailable', error: string, items: [] }>}
  */
-export async function searchGroup(client, group, { now = new Date(), model, focuses = SEARCH_FOCUSES, tier = PRIMARY_TIER } = {}) {
+export async function searchGroup(client, group, { now = new Date(), model, focuses = SEARCH_FOCUSES, tier = PRIMARY_TIER, provider = 'openai' } = {}) {
   if (!group.codes?.length || !group.codes.every(isTrackedJurisdiction)) throw new Error('Untracked search jurisdiction');
   const items = [];
   const seen = new Set();
   const errors = [];
   for (const focus of focuses) {
     try {
-      const response = await client.responses.create({
-        model: model || process.env.OPENAI_SEARCH_MODEL || DEFAULT_SEARCH_MODEL,
-        tools: [{ type: 'web_search_preview', search_context_size: 'high' }],
-        input: buildSearchPrompt(group, now, focus, tier),
-        text: { format: SEARCH_RESULT_FORMAT },
-      });
-      for (const item of parseSearchResponse(response.output_text)) {
+      // Production: Perplexity Sonar's web-grounded OpenAI-compatible Chat Completions.
+      // Legacy injected responses.create is preserved only for deterministic unit tests.
+      const prompt = buildSearchPrompt(group, now, focus, tier);
+      const sonar = provider === 'perplexity';
+      const response = sonar
+        ? await client.chat.completions.create({
+            model: model || process.env.PERPLEXITY_SEARCH_MODEL || DEFAULT_SEARCH_MODEL,
+            messages: [
+              { role: 'system', content: 'Discover specific European transport-source URLs. Return JSON only; no invented dates or sources.' },
+              { role: 'user', content: prompt },
+            ],
+            response_format: { type: 'json_schema', json_schema: { schema: SEARCH_RESULT_FORMAT.schema } },
+          })
+        : await client.responses.create({
+            model: model || process.env.OPENAI_SEARCH_MODEL || 'gpt-4.1',
+            tools: [{ type: 'web_search_preview', search_context_size: 'high' }],
+            input: prompt,
+            text: { format: SEARCH_RESULT_FORMAT },
+          });
+      const output = sonar ? response.choices?.[0]?.message?.content : response.output_text;
+      for (const item of parseSearchResponse(output)) {
         const scope = resolveCoverageScope(item.country);
         if (!scope || !group.codes.includes(scope.jurisdiction) || seen.has(item.url)) continue;
         seen.add(item.url);
@@ -350,11 +363,12 @@ export async function discoverWithWebSearch({
   apiKey, now = new Date(), groups = SEARCH_GROUPS, client = null, fetchPage,
   secondaryThreshold = undefined,
 } = {}) {
-  const api = client || new OpenAI({ apiKey });
+  const provider = process.env.DAJC_SONAR_ENABLED === 'true' ? 'perplexity' : 'openai';
+  const api = client || new OpenAI(provider === 'perplexity' ? { apiKey, baseURL: 'https://api.perplexity.ai' } : { apiKey });
   const verifier = item => verifySearchItem(item, { now, ...(fetchPage ? { fetchPage } : {}) });
 
   async function discoverGroup(group) {
-    const first = await searchGroup(api, group, { now, tier: PRIMARY_TIER });
+    const first = await searchGroup(api, group, { now, tier: PRIMARY_TIER, provider });
     const rejected = [], accepted = [], localSeen = new Set();
     let primaryCount = 0;
     async function collect(result, tier) {
@@ -377,7 +391,7 @@ export async function discoverWithWebSearch({
     // This threshold controls SEARCH ONLY, not article minimums or quality.
     if (needsSecondaryDiscovery(primaryCount, secondaryThreshold)) {
       second = await searchGroup(api, group, {
-        now, tier: SECONDARY_TIER, focuses: FALLBACK_SEARCH_FOCUSES,
+        now, tier: SECONDARY_TIER, focuses: FALLBACK_SEARCH_FOCUSES, provider,
       });
       await collect(second, SECONDARY_TIER);
     }

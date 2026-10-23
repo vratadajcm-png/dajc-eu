@@ -25,7 +25,7 @@ describe('quality over count', () => {
   });
 
   it('exports no lead or Rest-of-Europe supplement generators', () => {
-    expect(Object.keys(openaiClient).sort()).toEqual(['generateArticleWithOpenAI', 'generateRequiredItemsWithOpenAI']);
+    expect(Object.keys(openaiClient).sort()).toEqual(['generateArticleWithOpenAI', 'generateArticleWithSonar', 'generateRequiredItemsWithOpenAI', 'generateRequiredItemsWithSonar']);
   });
 
   it('has no repair loop, tier rebalancing or retry-until-padded runner', () => {
@@ -42,10 +42,14 @@ describe('quality over count', () => {
   });
 
   it('workflows run the generator once and never patch source files at runtime', () => {
-    for (const workflow of ['.github/workflows/publish-weekly-oversize.yml', '.github/workflows/watchdog-weekly-oversize.yml']) {
-      const yaml = read(workflow);
-      expect(yaml, workflow).toMatch(/node scripts\/generate-weekly-article\.mjs/);
-      expect(yaml, workflow).not.toMatch(/run-weekly-publisher|apply-weekly-editorial-policy/);
+    const primary = read('.github/workflows/publish-weekly-oversize.yml');
+    const watchdog = read('.github/workflows/watchdog-weekly-oversize.yml');
+    expect(primary).toMatch(/node scripts\/generate-weekly-article\.mjs/);
+    expect(primary).toMatch(/node scripts\/claude-weekly-review\.mjs/);
+    expect(watchdog).not.toMatch(/node scripts\/generate-weekly-article\.mjs/);
+    expect(watchdog).toMatch(/gh workflow run publish-weekly-oversize\.yml/);
+    for (const yaml of [primary, watchdog]) {
+      expect(yaml).not.toMatch(/run-weekly-publisher|apply-weekly-editorial-policy/);
     }
   });
 

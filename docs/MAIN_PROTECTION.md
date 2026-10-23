@@ -1,8 +1,7 @@
 # Main protection and publication automation
 
-Code and public articles reach `main` only through PRs with required CI.
-The owner reviews changes before manually merging them. Neither
-`GITHUB_TOKEN` nor a publication bot receives a bypass for main.
+Code and public articles reach `main` only through protected PRs with required CI.
+The owner reviews code, security, workflow and correction changes. The normal final EU Oversize Weekly article may auto-merge only after Sonar-grounded source checks and SHA-bound Claude approval plus required CI. Neither `GITHUB_TOKEN` nor a publication bot bypasses main.
 
 ## Applied protection — 13 October 2026
 
@@ -102,3 +101,11 @@ purchase a plan, merge its stacked PRs, or deploy Platform as a workaround.
 
 References: [GitHub protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches),
 [GITHUB_TOKEN-triggered workflow rules](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow#triggering-a-workflow-from-a-workflow).
+
+## Sonar / Claude guarded release and Buffer social setup (23 October 2026)
+
+The final weekly editorial article uses Perplexity Sonar for research and writing and Claude for final source-by-source approval. A SHA-256 approval receipt is checked immediately before the publication PR is created. The normal content-only final Weekly may request GitHub protected auto-merge after passing required CI. There is **no ruleset bypass** and no autonomous merge for code, infrastructure, security policies, previews or manually corrected past articles.
+
+The independent watchdog delegates to the canonical workflow; it cannot create a parallel publisher. READY deployment is not a public article until checked on the live DAJC.eu URL.
+
+X and LinkedIn postings remain disabled until the intended DAJC company channel(s), Buffer API key, the specific channel IDs, Claude key and spending limits are confirmed. Existing persistent social ledgers reserve a post before any POST and prevent blind duplicate retries. Company LinkedIn only; no personal profile fallback. Auto-merge and social activation require separate configuration.

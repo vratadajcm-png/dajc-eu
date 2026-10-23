@@ -8,6 +8,17 @@ import OpenAI from 'openai';
 import { readableText } from './text-quality.mjs';
 
 const DEFAULT_MODEL = 'gpt-4o';
+const SONAR_MODEL = 'sonar-pro';
+function researchClient(apiKey, provider) {
+  return new OpenAI(provider === 'perplexity'
+    ? { apiKey, baseURL: 'https://api.perplexity.ai' }
+    : { apiKey });
+}
+function researchResponseFormat(schema, provider) {
+  return provider === 'perplexity'
+    ? { type: 'json_schema', json_schema: { schema: schema.schema } }
+    : { type: 'json_schema', json_schema: schema };
+}
 
 const DEVELOPMENT_SCHEMA = {
   type: 'object',
@@ -152,19 +163,19 @@ function candidatePayload(c, { required = false, summaryChars = 1200 } = {}) {
 }
 
 export async function generateArticleWithOpenAI({
-  candidates, requiredSourceUrls = [], weekRangeLabel, targetWeekStart, targetWeekEnd, apiKey, model,
+  candidates, requiredSourceUrls = [], weekRangeLabel, targetWeekStart, targetWeekEnd, apiKey, model, provider = 'openai',
 }) {
-  const client = new OpenAI({ apiKey });
+  const client = researchClient(apiKey, provider);
   const required = new Set(requiredSourceUrls);
   const mapped = candidates.slice(0, 60).map((c) => candidatePayload(c, { required: required.has(c.sourceUrl) }));
 
   const response = await client.chat.completions.create({
-    model: model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
+    model: model || (provider === 'perplexity' ? (process.env.PERPLEXITY_WRITER_MODEL || SONAR_MODEL) : (process.env.OPENAI_MODEL || DEFAULT_MODEL)),
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: `Target publication window: ${targetWeekStart} to ${targetWeekEnd} (${weekRangeLabel}). Select only verified material that passes every editorial rule; there is no minimum count. General HGV driving bans are out of scope.\n\nVerified candidates (JSON):\n${JSON.stringify(mapped, null, 2)}` },
     ],
-    response_format: { type: 'json_schema', json_schema: ARTICLE_JSON_SCHEMA },
+    response_format: researchResponseFormat(ARTICLE_JSON_SCHEMA, provider),
   });
 
   const text = response.choices?.[0]?.message?.content;
@@ -175,20 +186,29 @@ export async function generateArticleWithOpenAI({
 // Writes report text for specific verified critical developments the main
 // synthesis left out (critical-floor.mjs). This is mandatory-coverage repair
 // for named items only - it never asks for "more" items to reach a count.
-export async function generateRequiredItemsWithOpenAI({ candidates, targetWeekStart, targetWeekEnd, apiKey, model }) {
+export async function generateRequiredItemsWithOpenAI({ candidates, targetWeekStart, targetWeekEnd, apiKey, model, provider = 'openai' }) {
   if (!candidates?.length) return [];
-  const client = new OpenAI({ apiKey });
+  const client = researchClient(apiKey, provider);
   const payload = candidates.map((c) => candidatePayload(c, { required: true, summaryChars: 1500 }));
   const response = await client.chat.completions.create({
-    model: model || process.env.OPENAI_MODEL || DEFAULT_MODEL,
+    model: model || (provider === 'perplexity' ? (process.env.PERPLEXITY_WRITER_MODEL || SONAR_MODEL) : (process.env.OPENAI_MODEL || DEFAULT_MODEL)),
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: `Target publication window: ${targetWeekStart} to ${targetWeekEnd}. Write exactly one report for each verified critical development below (merge candidates that describe the same change). Return nothing else.\n\nRequired verified candidates (JSON):\n${JSON.stringify(payload, null, 2)}` },
     ],
-    response_format: { type: 'json_schema', json_schema: REQUIRED_ITEMS_SCHEMA },
+    response_format: researchResponseFormat(REQUIRED_ITEMS_SCHEMA, provider),
   });
   const text = response.choices?.[0]?.message?.content;
   if (!text) return [];
   const parsed = JSON.parse(text);
   return Array.isArray(parsed.items) ? parsed.items : [];
+}
+
+// Production wrappers. The original exports are retained for regression tests
+// and manual legacy runs only; the scheduled DAJC Weekly uses Perplexity.
+export async function generateArticleWithSonar(args) {
+  return generateArticleWithOpenAI({ ...args, provider: 'perplexity' });
+}
+export async function generateRequiredItemsWithSonar(args) {
+  return generateRequiredItemsWithOpenAI({ ...args, provider: 'perplexity' });
 }
