@@ -59,6 +59,14 @@ The homepage renders `News` before `Integration ecosystem`, so current
 operational intelligence is visible before the provider directory. The
 system reuses the global DAJC styles and does not alter the hero or header.
 
+## Permanent two-pass European source discovery (23 October 2026)
+
+The canonical policy is in `DAJC_WEEKLY_INTELLIGENCE_SPEC.md` §2 and §11. The **single existing** `oversize-monitor.mjs` / `web-search.mjs` implementation now searches official sources first in each geographic group; if fewer than 3 usable primary reports are retrieved, it runs a second unrestricted, multilingual industry/professional news search. The second pass spans specialist abnormal-load/oversize media, general truck/haulage journalism, driver and dispatcher information, transport-company/operator news, fleet and heavy-haul equipment, OEM and telematics sites. There is no static publisher allowlist for the fallback; only DAJC's geographic limits remain fixed.
+
+`scripts/lib/source-policy.mjs` classifies official vs industry sources, sets `MIN_PRIMARY_ITEMS_BEFORE_FALLBACK = 3` (a research expansion trigger, not an output quota) and marks industry reports. The generator preserves the original publisher and outputs visibly attributed `Industry report` citations, explicitly calling for official checks on reported binding transport restrictions. Original web pages still must be readable and timely, with subject/region/date relevance proven by their own content; a media item doesn't need additional independent official corroboration for routine professional/business intelligence. A model's URL/date assertion alone cannot substitute for the page.
+
+The original editorial maximums (30 lead + 15 Rest), zero filler requirement, expiry, dedup, no general Driving Bans and >30-day closure threshold still apply. This changes existing source discovery, selection and presentation only; it does not create a second publication workflow or change GitHub security gates.
+
 ## Editorial rules
 
 All editorial rules - scope (freight vehicles over 12 t, oversize/abnormal
