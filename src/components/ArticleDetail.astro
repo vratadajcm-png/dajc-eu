@@ -2,6 +2,7 @@
 import { render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { formatNewsDate } from '../config/news';
+import { socialImageForNews } from '../config/social-image';
 
 interface Props {
   entry: CollectionEntry<'eu-oversize'> | CollectionEntry<'platform'>;
@@ -39,7 +40,7 @@ const articleStructuredData = {
   },
 };
 ---
-<BaseLayout title={`${data.title} - DAJC`} description={data.description}>
+<BaseLayout title={`${data.title} - DAJC`} description={data.description} socialImage={socialImageForNews(categoryLabel)}>
   <script type="application/ld+json" set:html={JSON.stringify(articleStructuredData)}></script>
   <main class="article">
     <div class="article__meta">
