@@ -1,0 +1,26 @@
+name: One-time W44 regeneration dispatcher (no direct publication)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dispatch-withdrawn-w44-once.yml'
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch:
+    if: github.event.head_commit.message == 'chore(news): one-time W44 Search-Claude regeneration trigger'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Request one existing Weekly workflow run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh workflow run publish-weekly-oversize.yml --repo "$GH_REPO" --ref main \
+            -f search_claude=true -f dry_run=false -f preview=false -f correction=false
+          echo "Requested one existing Weekly workflow run; article publication still requires independent Claude review, protected CI and approval."
