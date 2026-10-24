@@ -387,7 +387,7 @@ export async function verifySearchItem(item, { fetchPage = (url) => fetchTextWit
     publication = { date: item.publishedAt, source: 'page-text' };
   }
 
-  const validity = extractValidityPeriod(evidence, { country });
+  const validity = extractValidityPeriod(evidence, { country, referenceDate: publication?.date });
 
   // An old page announcing nothing upcoming is not worth recording.
   const staleBefore = isoDay(new Date(now.getTime() - FRESHNESS_WINDOW_DAYS * DAY_MS));

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractPublicationDate, findDates, toIsoDay } from '../publication-date.mjs';
+import { extractPublicationDate, extractValidityPeriod, findDates, toIsoDay } from '../publication-date.mjs';
 
 const now = new Date('2026-10-02T12:00:00Z');
 
@@ -78,5 +78,30 @@ describe('extractPublicationDate', () => {
 
   it('returns null without evidence instead of assuming today', () => {
     expect(extractPublicationDate({ text: 'Izvanredni prijevoz - osnovne informacije', url: 'https://hrvatske-ceste.hr/hr/stranice/izvanredni-prijevoz/2', now })).toBeNull();
+  });
+});
+
+describe('extractValidityPeriod', () => {
+  it('reads Dutch start and end labels', () => {
+    expect(extractValidityPeriod('Vanaf 21 oktober 2026 geldt een gewichtsbeperking van 15 ton.')).toEqual({ validFrom: '2026-10-21', validTo: null });
+    expect(extractValidityPeriod('De N50 is van 3 november 2026 tot en met 7 november 2026 dicht.')).toEqual({ validFrom: '2026-11-03', validTo: '2026-11-07' });
+    expect(extractValidityPeriod('Met ingang van 1 januari 2027 stijgt de heffing.')).toEqual({ validFrom: '2027-01-01', validTo: null });
+  });
+
+  it('reads a labelled date without a year only against the verified publication date (Rijkswaterstaat N307, W44)', () => {
+    const text = 'N307: gewichtsbeperking Markerwaarddijk; vanaf 21 oktober. Vanaf 21 oktober geldt op de Markerwaarddijk een gewichtsbeperking van 15 ton.';
+    expect(extractValidityPeriod(text)).toBeNull();
+    expect(extractValidityPeriod(text, { referenceDate: '2026-09-28' })).toEqual({ validFrom: '2026-10-21', validTo: null });
+  });
+
+  it('takes the year nearest the publication date across a year end', () => {
+    expect(extractValidityPeriod('Ab 5. Januar gilt die neue Achslastbeschränkung.', { referenceDate: '2026-12-18' })).toEqual({ validFrom: '2027-01-05', validTo: null });
+    expect(extractValidityPeriod('Seit 15. Dezember gilt die Sperre.', { referenceDate: '2027-01-10' })).toEqual({ validFrom: '2026-12-15', validTo: null });
+    expect(extractValidityPeriod('Gesperrt ab 21.10. für Fahrzeuge über 7,5 t.', { referenceDate: '2026-10-01' })).toEqual({ validFrom: '2026-10-21', validTo: null });
+  });
+
+  it('keeps a full date over a year-less reading of the same words, and ignores unlabelled dates', () => {
+    expect(extractValidityPeriod('Vanaf 21 oktober 2025 geldt de beperking.', { referenceDate: '2026-09-28' })).toEqual({ validFrom: '2025-10-21', validTo: null });
+    expect(extractValidityPeriod('Op 21 oktober was er een overleg.', { referenceDate: '2026-09-28' })).toBeNull();
   });
 });

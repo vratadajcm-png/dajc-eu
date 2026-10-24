@@ -62,7 +62,10 @@ export function editionFreshSince(now, publicationSlot, days = FRESHNESS_WINDOW_
  */
 export function deriveValidity(candidate = {}) {
   if (candidate.validFrom || candidate.validTo) return candidate;
-  const period = extractValidityPeriod(`${candidate.title || ''} ${readableText(candidate.summary) || ''}`, { country: candidate.country });
+  const period = extractValidityPeriod(`${candidate.title || ''} ${readableText(candidate.summary) || ''}`, {
+    country: candidate.country,
+    referenceDate: String(candidate.publishedAt || '').slice(0, 10) || undefined,
+  });
   return period ? { ...candidate, validFrom: period.validFrom, validTo: period.validTo } : candidate;
 }
 

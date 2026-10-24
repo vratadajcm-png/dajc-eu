@@ -204,3 +204,31 @@ describe('lowest-cost discovery', () => {
     expect(isRecentRefresh(null, new Date('2026-10-22T09:20:00Z'), 18)).toBe(false);
   });
 });
+
+describe('Official notice with a year-less effective date (N307, W44)', () => {
+  // Rijkswaterstaat's own wording: "Vanaf 21 oktober geldt ..." with no year.
+  // Before the fix the page was dropped as "older than 7 days, nothing upcoming".
+  const html = `<html><head><script type="application/ld+json">{"@type":"NewsArticle","datePublished":"2026-09-28T15:47:49Z"}</script></head><body><main>
+    <h1>N307: gewichtsbeperking Markerwaarddijk; vanaf 21 oktober</h1>
+    <p>Vanaf 21 oktober geldt op de Markerwaarddijk (N307, ook wel Houtribdijk) een gewichtsbeperking van 15 ton en een aslastbeperking van 7,3 ton.
+    Hierdoor kan zwaar verkeer, met name vrachtwagens, niet langer gebruik maken van de bruggen over de Houtribsluizen bij Lelystad.
+    Vrachtverkeer moet omrijden via Amsterdam of de Afsluitdijk. Personenauto's, hulpdiensten en bestelbussen kunnen de route blijven gebruiken.</p>
+  </main></body></html>`;
+  const url = 'https://www.rijkswaterstaat.nl/nieuws/archief/2026/09/n307-gewichtsbeperking-markerwaarddijk-vanaf-21-oktober-2026';
+
+  it('is kept as recently in force, so a skipped edition can catch it up', async () => {
+    const result = await verifySearchItem(
+      { country: 'Netherlands', region: null, url, title: 'N307: gewichtsbeperking Markerwaarddijk; vanaf 21 oktober' },
+      { fetchPage: async () => ({ ok: true, text: html, finalUrl: url }), now: new Date('2026-10-24T10:12:00Z') },
+    );
+    expect(result.ok).toBe(true);
+    expect(result.finding.publishedAt).toBe('2026-09-28');
+    expect(result.finding.validFrom).toBe('2026-10-21');
+    expect(checkFreshness(result.finding, {
+      now: new Date('2026-10-24T10:12:00Z'),
+      catchUpSince: new Date('2026-10-19T00:00:00Z'),
+      weekStart: new Date('2026-10-26T00:00:00Z'),
+      weekEnd: new Date('2026-11-01T00:00:00Z'),
+    })).toMatchObject({ ok: true, basis: 'catch-up' });
+  });
+});
