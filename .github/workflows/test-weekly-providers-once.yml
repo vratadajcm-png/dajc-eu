@@ -1,0 +1,31 @@
+name: One-time DAJC provider smoke test (no publication)
+
+on:
+  push:
+    branches:
+      - test/weekly-provider-smoke-20261024
+    paths:
+      - .github/workflows/test-weekly-providers-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: one-time-dajc-weekly-provider-smoke
+  cancel-in-progress: false
+
+jobs:
+  check-apis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@v4
+      - name: Check Perplexity and Claude with no publication
+        env:
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PERPLEXITY_SEARCH_MODEL: ${{ vars.PERPLEXITY_SEARCH_MODEL }}
+          CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL }}
+        run: python3 scripts/smoke-weekly-providers.py
