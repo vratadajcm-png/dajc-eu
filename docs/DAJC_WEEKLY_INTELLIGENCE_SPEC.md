@@ -147,7 +147,7 @@ Every output channel has an independent editorial format, derived from the same 
 
 The channel adaptations must not invent any dates, weights, restrictions, source citations or safety claims. A social publication can happen only after independent confirmation that the linked article is actually public. Duplicate protection and account authorization remain mandatory. A missing/failed Search or Claude API call is a hard stop; do not switch to an unreviewed publishing path. QUALITY > COUNT, official-first priority, 50 jurisdictions and Driving Bans exclusions remain.
 
-This policy does not by itself activate the new Search/Claude producer or DAJC.cz route. Production feature flags and external channel authorizations require a separate validated deployment; the existing working publisher stays in place until then.
+This policy does not by itself activate the DAJC.cz route or external channel authorizations. Since 24 October 2026 the Search/Claude research path is the default (§16); automatic merging still requires the repository variables.
 
 ### Social traffic objective (24 October 2026)
 
@@ -171,3 +171,12 @@ This policy does not by itself activate the new Search/Claude producer or DAJC.c
 X and company LinkedIn are acquisition channels, not independent news archives. Each posts an independently adapted, accurate teaser linking to the exact live DAJC.eu article. English posts are standard; if Czech teasers are added, explicitly disclose that the full linked article is in English. Never invent a DAJC.cz article URL or mirror content to dajc.cz.
 
 Source research: use the tested Perplexity Search API to discover candidate URLs, then Claude to classify and draft from original-source-verified records, followed by independent final editorial review and protected GitHub CI. Production activation requires end-to-end evidence and a spend budget; source failure must not silently publish unreviewed content.
+
+## 16. Lowest-cost operation (24 October 2026)
+
+The owner's standing instruction is to run the Weekly at the lowest cost without weakening the rules above.
+
+- Research defaults to the Perplexity Search API with Claude Haiku 5.5 classifying the leads at low effort; OpenAI web search is used only when `DAJC_SEARCH_CLAUDE_ENABLED` is set to `false`.
+- Focuses share one Search request whenever every language's terms fit (Search bills per request, not per query).
+- The monitor runs on Monday and Wednesday; Thursday's preparation refreshes the data once, and retries reuse findings written in the last 18 hours.
+- Writing the edition, the final editorial review and social copy keep the stronger `CLAUDE_REVIEW_MODEL` / `CLAUDE_SOCIAL_MODEL`: they run once or twice a week and decide what readers see.

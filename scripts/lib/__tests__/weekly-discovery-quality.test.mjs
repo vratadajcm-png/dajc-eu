@@ -5,8 +5,9 @@
 import { describe, expect, it } from 'vitest';
 import { isOwnPublication, officialDomainsFor, sourceTier } from '../source-policy.mjs';
 import {
-  buildSearchQueries, buildSearchRequest, searchWithPerplexitySearch, SEARCH_GROUPS, verifySearchItem,
+  buildSearchQueries, buildSearchRequest, DEFAULT_CLASSIFIER_MODEL, searchBundles, searchWithPerplexitySearch, SEARCH_GROUPS, verifySearchItem,
 } from '../web-search.mjs';
+import { isRecentRefresh } from '../store.mjs';
 import { checkFreshness, checkSpecificDevelopment } from '../weekly-eligibility.mjs';
 import { alignEditionSummary, mentionedCountries, operatorChecklistFromReports } from '../edition-summary.mjs';
 import { withOriginalPages } from '../../claude-weekly-review.mjs';
@@ -165,5 +166,41 @@ describe('final Claude review evidence', () => {
   it('marks an unreachable page instead of failing the review', async () => {
     const [record] = await withOriginalPages([{ url: 'https://www.rijkswaterstaat.nl/nieuws/x' }], async () => { throw new Error('timeout'); });
     expect(record).toMatchObject({ sourceTier: 'official', originalPageFetched: false, originalPageText: null });
+  });
+});
+
+describe('lowest-cost discovery', () => {
+  it('classifies Search leads on the cheapest model at low effort', async () => {
+    const calls = [];
+    const fetchFn = async (url, options) => {
+      calls.push({ url, payload: JSON.parse(options.body) });
+      if (url.endsWith('/search')) return { ok: true, json: async () => ({ results: [{ url: 'https://www.rsd.cz/novinky/x', title: 'Omezení', snippet: 'nadrozměrná přeprava' }] }) };
+      return { ok: true, json: async () => ({ stop_reason: 'end_turn', content: [{ type: 'text', text: '{"items":[]}' }] }) };
+    };
+    await searchWithPerplexitySearch(group('cz'), buildSearchRequest(group('cz'), now, ['oversize', 'heavy']), { searchKey: 'k', claudeKey: 'k', fetchFn });
+    expect(DEFAULT_CLASSIFIER_MODEL).toBe('claude-haiku-5-5');
+    expect(calls[1].payload.model).toBe('claude-haiku-5-5');
+    expect(calls[1].payload.output_config.effort).toBe('low');
+  });
+
+  it('bundles both focuses into one Search request when every language fits', () => {
+    expect(searchBundles(group('cz'), ['oversize', 'heavy'])).toEqual([['oversize', 'heavy']]);
+    const queries = buildSearchQueries(group('cz'), ['oversize', 'heavy']);
+    expect(queries).toContain('nadrozměrná přeprava');
+    expect(queries).toContain('omezení nákladních vozidel most tonáž');
+    expect(queries.length).toBeLessThanOrEqual(5);
+  });
+
+  it('keeps one request per focus where bundling would drop a language', () => {
+    expect(searchBundles(group('nordics'), ['oversize', 'heavy'])).toEqual([['oversize'], ['heavy']]);
+    expect(buildSearchQueries(group('nordics'), 'oversize')).toEqual(expect.arrayContaining(['særtransport', 'dispenstransport', 'erikoiskuljetus']));
+  });
+
+  it('reuses findings written less than the allowed age ago', () => {
+    const written = new Date('2026-10-22T03:20:00Z');
+    expect(isRecentRefresh(written, new Date('2026-10-22T09:20:00Z'), 18)).toBe(true);
+    expect(isRecentRefresh(written, new Date('2026-10-23T03:20:00Z'), 18)).toBe(false);
+    expect(isRecentRefresh(written, new Date('2026-10-22T09:20:00Z'), 0)).toBe(false);
+    expect(isRecentRefresh(null, new Date('2026-10-22T09:20:00Z'), 18)).toBe(false);
   });
 });

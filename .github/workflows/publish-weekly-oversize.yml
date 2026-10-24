@@ -64,7 +64,10 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       DAJC_AUTONOMOUS_WEEKLY: ${{ (vars.DAJC_SONAR_ENABLED == 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED == 'true') && '1' || '0' }}
       DAJC_SONAR_ENABLED: ${{ vars.DAJC_SONAR_ENABLED }}
-      DAJC_SEARCH_CLAUDE_ENABLED: ${{ github.event.inputs.search_claude == 'true' && 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED }}
+      # Perplexity Search + Claude is the default (cheapest) research path;
+      # the variable set to 'false' switches back to OpenAI. Auto-merge still
+      # follows the variables only (DAJC_AUTONOMOUS_WEEKLY above).
+      DAJC_SEARCH_CLAUDE_ENABLED: ${{ github.event.inputs.search_claude == 'true' && 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED || 'true' }}
       OVERSIZE_PREVIEW: ${{ github.event.inputs.preview == 'true' && '1' || '' }}
       OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
     steps:
@@ -157,7 +160,10 @@ jobs:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}
+          CLAUDE_CLASSIFIER_MODEL: ${{ vars.CLAUDE_CLASSIFIER_MODEL || 'claude-haiku-5-5' }}
+          # Retries reuse findings from a run in the last 18 h instead of
+          # paying for the same search again (Thursday retries, Friday 12:17).
+          OVERSIZE_REFRESH_MAX_AGE_HOURS: '18'
         run: npm run oversize:monitor
 
       - name: Generate weekly article

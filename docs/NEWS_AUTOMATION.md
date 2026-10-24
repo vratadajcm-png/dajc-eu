@@ -19,7 +19,7 @@ config/oversize-sources/index.mjs   registry of European official sources (legac
 data/oversize/<ISO week>/           raw findings gathered during that week
   findings.json
 scripts/
-  oversize-monitor.mjs              daily: web search (default) / official sources -> data/oversize
+  oversize-monitor.mjs              Mon/Wed + Thursday refresh: web search (default) / official sources -> data/oversize
   generate-weekly-article.mjs       thursday: data/oversize -> content/news
   publish-gate-commit.mjs           article PR / data-only branch gate
   automation-data.mjs               fixed-JSON data branch import/persistence
@@ -284,9 +284,22 @@ the normal monitor and eligibility rules.
    `expired` (`markExpired`).
 6. Writes the result back to `data/oversize/2026-W34/findings.json`.
 
-Runs daily via `.github/workflows/daily-oversize-monitor.yml` (06:00 UTC)
-and commits changed JSON data to `automation/oversize-data`. Never touches
-`content/news`.
+Runs on Monday and Wednesday via `.github/workflows/daily-oversize-monitor.yml`
+(06:00 UTC) and commits changed JSON data to `automation/oversize-data`. Never
+touches `content/news`. Each run searches the last 7 days, so these two runs
+plus Thursday's final refresh cover the week; publication retries reuse
+findings written in the last 18 hours (`OVERSIZE_REFRESH_MAX_AGE_HOURS`)
+instead of searching again.
+
+**Cost profile (lowest-cost default, 24 October 2026).** Discovery uses the
+Perplexity Search API ($5 per 1,000 requests; up to five queries per request
+are billed as one) and classifies the leads with Claude Haiku 5.5
+(`CLAUDE_CLASSIFIER_MODEL`, $0.10 / $0.50 per million tokens) at low effort.
+Focuses share one request where every language fits (52 requests per full
+run instead of 76). Writing the edition and the final review stay on
+`CLAUDE_REVIEW_MODEL` (one or two calls a week). The previous default, OpenAI
+web search, costs $25 per 1,000 calls plus gpt-4.1 tokens; set the repository
+variable `DAJC_SEARCH_CLAUDE_ENABLED=false` to return to it.
 
 ### Run it manually
 

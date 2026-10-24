@@ -17,7 +17,7 @@ import { dajcEuropeCoverage, COVERAGE_VERSION } from '../config/europe-coverage.
 import { fetchSourceFindings } from './lib/fetch-source.mjs';
 import { discoverWithWebSearch, SEARCH_GROUPS } from './lib/web-search.mjs';
 import { buildFindingHistory, mergeFindings, markExpired } from './lib/findings.mjs';
-import { loadWeekFindings, saveWeekFindings } from './lib/store.mjs';
+import { isRecentRefresh, loadWeekFindings, loadWeekUpdatedAt, saveWeekFindings } from './lib/store.mjs';
 import { scopeFindings } from './lib/geographic-scope.mjs';
 import { isoWeekLabel } from './lib/week.mjs';
 
@@ -36,6 +36,15 @@ async function main() {
   }
   const useWeb = discovery !== 'official';
   const useOfficial = discovery !== 'web';
+
+  // Publication retries (Thursday/Friday/Saturday) reuse findings written by
+  // an earlier run instead of paying for the same web search again.
+  const maxAgeHours = Number(process.env.OVERSIZE_REFRESH_MAX_AGE_HOURS || 0);
+  const lastRefresh = await loadWeekUpdatedAt(weekLabel);
+  if (useWeb && isRecentRefresh(lastRefresh, now, maxAgeHours)) {
+    console.log(`Findings for ${weekLabel} were refreshed at ${lastRefresh.toISOString()} (under ${maxAgeHours} h ago); reusing them without a new paid search.`);
+    return;
+  }
   const sonarEnabled = process.env.DAJC_SONAR_ENABLED === 'true';
   const searchClaudeEnabled = process.env.DAJC_SEARCH_CLAUDE_ENABLED === 'true';
   const researchKey = (sonarEnabled || searchClaudeEnabled) ? process.env.PERPLEXITY_API_KEY : process.env.OPENAI_API_KEY;

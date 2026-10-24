@@ -1,7 +1,9 @@
 name: Daily Oversize Monitor
 
-# Runs every morning (Europe-time, see docs/NEWS_AUTOMATION.md for the exact
-# UTC/DST reasoning), discovers news by web search (scripts/lib/web-search.mjs)
+# Runs on Monday and Wednesday mornings (Europe-time, see
+# docs/NEWS_AUTOMATION.md for the exact UTC/DST reasoning). Each run searches
+# the last 7 days, so two runs plus Thursday's final refresh cover the week at
+# the lowest cost. Discovers news by web search (scripts/lib/web-search.mjs)
 # and writes whatever it verifies to data/oversize/<ISO week>/findings.json. Never touches
 # content/news - this only maintains the raw dataset the Friday publish
 # workflow reads from.
@@ -14,7 +16,7 @@ on:
     # 06:00 UTC = 07:00 CET / 08:00 CEST - close enough to "morning Europe"
     # without needing DST-aware cron math for a run that isn't time-critical
     # (unlike the Friday publish window, see publish-weekly-oversize.yml).
-    - cron: '0 6 * * *'
+    - cron: '0 6 * * 1,3'
   workflow_dispatch: {}
 
 permissions:
@@ -49,7 +51,7 @@ jobs:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DAJC_SONAR_ENABLED: ${{ vars.DAJC_SONAR_ENABLED }}
-          DAJC_SEARCH_CLAUDE_ENABLED: ${{ vars.DAJC_SEARCH_CLAUDE_ENABLED }}
+          DAJC_SEARCH_CLAUDE_ENABLED: ${{ vars.DAJC_SEARCH_CLAUDE_ENABLED || 'true' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           selected="$OPENAI_API_KEY"
@@ -61,16 +63,17 @@ jobs:
           echo "Pre-flight OK: selected research provider credential is present."
 
       - name: Run oversize monitor (web search)
-        # Same provider selection as the pre-flight above: with Search/Claude
-        # enabled the pre-flight checked the Perplexity key, but the monitor
-        # never received the flag and silently searched through OpenAI.
+        # Same provider selection as the pre-flight above. Perplexity Search
+        # ($5 per 1,000 requests) with Claude Haiku classification is the
+        # default - the cheapest path; OpenAI web search costs $25 per 1,000
+        # calls plus model tokens. Set the variable to 'false' to switch back.
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DAJC_SONAR_ENABLED: ${{ vars.DAJC_SONAR_ENABLED }}
-          DAJC_SEARCH_CLAUDE_ENABLED: ${{ vars.DAJC_SEARCH_CLAUDE_ENABLED }}
+          DAJC_SEARCH_CLAUDE_ENABLED: ${{ vars.DAJC_SEARCH_CLAUDE_ENABLED || 'true' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}
+          CLAUDE_CLASSIFIER_MODEL: ${{ vars.CLAUDE_CLASSIFIER_MODEL || 'claude-haiku-5-5' }}
         run: npm run oversize:monitor
 
       - name: Commit updated findings (only if meaningfully changed)
