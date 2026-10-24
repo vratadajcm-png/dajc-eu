@@ -58,8 +58,17 @@ function outlookLine(item, weekEnd) {
     : null;
 }
 
+// "Italy: stricter BESS criteria (Italy)" - the writer often leads the title
+// with the country already, so the suffix is added only when it does not.
+function itemHeading(item) {
+  const title = String(item.title ?? '');
+  const country = String(item.country ?? '');
+  const named = country && title.toLocaleLowerCase().startsWith(country.toLocaleLowerCase());
+  return named ? `### ${mdEscape(title)}` : `### ${mdEscape(title)} (${mdEscape(country)})`;
+}
+
 function renderDevelopmentItem(item, { weekEnd = null } = {}) {
-  const lines = [`### ${mdEscape(item.title)} (${mdEscape(item.country)})`, ''];
+  const lines = [itemHeading(item), ''];
   lines.push(mdEscape(item.whatChanged));
   lines.push('');
   const meta = [`**Category:** ${CATEGORY_LABELS[categorizeDevelopment(item)]}`];
@@ -103,7 +112,7 @@ function renderRoundupItem(item, { weekEnd = null } = {}) {
   else if (range) bits.push(`When: ${range}`);
 
   const lines = [
-    `### ${mdEscape(item.title)} (${mdEscape(item.country)})`,
+    itemHeading(item),
     '',
     mdEscape(item.whatChanged),
   ];

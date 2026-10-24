@@ -16,9 +16,30 @@ function escapeRegExp(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-const COUNTRY_PATTERNS = COUNTRY_NAMES.map((name) => [name, new RegExp(`(?<![\\p{L}])${escapeRegExp(name)}(?![\\p{L}])`, 'iu')]);
+// Adjectives and other names that also point at a country. The W44
+// correction run of 24 October promised "a Czech draft toll increase" in an
+// intro whose Czech report the model had dropped.
+const COUNTRY_ALIASES = {
+  Albania: ['Albanian'], Andorra: ['Andorran'], Armenia: ['Armenian'], Austria: ['Austrian'],
+  Azerbaijan: ['Azerbaijani'], 'Bosnia and Herzegovina': ['Bosnian', 'Bosnia'], Belgium: ['Belgian'],
+  Bulgaria: ['Bulgarian'], Belarus: ['Belarusian'], Switzerland: ['Swiss'], Cyprus: ['Cypriot'],
+  Czechia: ['Czech', 'Czech Republic'], Germany: ['German'], Denmark: ['Danish'], Estonia: ['Estonian'],
+  Spain: ['Spanish'], Finland: ['Finnish'], France: ['French'], Greece: ['Greek'], Croatia: ['Croatian'],
+  Hungary: ['Hungarian'], Ireland: ['Irish'], Iceland: ['Icelandic'], Italy: ['Italian'],
+  Kazakhstan: ['Kazakh'], Lithuania: ['Lithuanian'], Luxembourg: ['Luxembourgish'], Latvia: ['Latvian'],
+  Moldova: ['Moldovan'], Montenegro: ['Montenegrin'], 'North Macedonia': ['Macedonian'], Malta: ['Maltese'],
+  Netherlands: ['Dutch', 'Holland'], Norway: ['Norwegian'], Poland: ['Polish'], Portugal: ['Portuguese'],
+  Romania: ['Romanian'], Serbia: ['Serbian'], Russia: ['Russian'], Sweden: ['Swedish'], Slovenia: ['Slovenian'],
+  Slovakia: ['Slovak'], Türkiye: ['Turkey', 'Turkish'], Ukraine: ['Ukrainian'],
+  'United Kingdom': ['UK', 'British', 'Britain', 'England', 'Scotland', 'Wales'], Kosovo: ['Kosovar'],
+};
 
-/** Tracked country names mentioned in a text. Pure - exported for tests. */
+const COUNTRY_PATTERNS = COUNTRY_NAMES.map((name) => {
+  const names = [name, ...(COUNTRY_ALIASES[name] || [])].map(escapeRegExp).join('|');
+  return [name, new RegExp(`(?<![\\p{L}])(?:${names})(?![\\p{L}])`, 'iu')];
+});
+
+/** Tracked countries named in a text, by name or adjective. Pure - exported for tests. */
 export function mentionedCountries(text) {
   const value = String(text || '');
   return COUNTRY_PATTERNS.filter(([, pattern]) => pattern.test(value)).map(([name]) => name);

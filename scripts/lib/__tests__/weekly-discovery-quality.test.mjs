@@ -127,9 +127,22 @@ describe('edition copy matches the published reports', () => {
     recommendedAction: 'Check gross and axle weights before assigning the N307.', sourceUrl: 'https://www.rijkswaterstaat.nl/nieuws/archief/2026/09/n307',
   };
 
-  it('finds tracked countries as whole words', () => {
+  it('finds tracked countries as whole words, by name or adjective', () => {
     expect(mentionedCountries('Updates for the Netherlands and Hungary')).toEqual(expect.arrayContaining(['Netherlands', 'Hungary']));
-    expect(mentionedCountries('Hungarian decree')).toEqual([]);
+    expect(mentionedCountries('Hungarian decree')).toEqual(['Hungary']);
+    expect(mentionedCountries('Czechoslovak history, Germanic roots')).toEqual([]);
+  });
+
+  it('replaces an intro that promises a report the edition dropped, named by adjective (W44 correction run)', () => {
+    const article = {
+      seoTitle: 'European Oversize & Special Transport Weekly: 26 Oct - 1 Nov 2026',
+      metaDescription: 'Weekly DAJC briefing: the N307 Houtribdijk weight limit in the Netherlands and Czech toll plans.',
+      intro: 'The Netherlands now has a weight limit on the N307. Further items cover a Czech draft toll increase.',
+      developments: [report], europeRoundup: [],
+    };
+    const { fixed } = alignEditionSummary(article, { weekRangeLabel: '26 October - 1 November 2026' });
+    expect(fixed).toEqual(['metaDescription', 'intro']);
+    expect(`${article.metaDescription} ${article.intro}`).not.toMatch(/Czech/);
   });
 
   it('replaces a description naming a country without a report and rebuilds the checklist', () => {
