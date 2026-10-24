@@ -22,6 +22,21 @@ jobs:
     steps:
       - name: Checkout test branch
         uses: actions/checkout@v4
+      - name: Diagnose secret visibility (names only, no values)
+        env:
+          CHECK_PERPLEXITY: ${{ secrets.PERPLEXITY_API_KEY != '' }}
+          CHECK_ANTHROPIC: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+          CHECK_CLAUDE_ALIAS: ${{ secrets.CLAUDE_API_KEY != '' }}
+          CHECK_PERPLEXITY_ALIAS: ${{ secrets.PERPLEXITY_KEY != '' }}
+          CHECK_BUFFER: ${{ secrets.BUFFER_API_KEY != '' }}
+          CHECK_OPENAI: ${{ secrets.OPENAI_API_KEY != '' }}
+        run: |
+          echo "Expected Perplexity secret visible: $CHECK_PERPLEXITY"
+          echo "Expected Anthropic secret visible: $CHECK_ANTHROPIC"
+          echo "Possible Claude alias visible: $CHECK_CLAUDE_ALIAS"
+          echo "Possible Perplexity alias visible: $CHECK_PERPLEXITY_ALIAS"
+          echo "Buffer secret visible: $CHECK_BUFFER"
+          echo "Existing OpenAI secret visible: $CHECK_OPENAI"
       - name: Check Perplexity and Claude with no publication
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
