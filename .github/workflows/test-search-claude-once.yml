@@ -1,0 +1,26 @@
+name: One-time Search Claude Integration Test (no publication)
+on:
+  push:
+    branches:
+      - test/search-claude-e2e-nonpublishing-20261024
+    paths:
+      - .github/workflows/test-search-claude-once.yml
+permissions:
+  contents: read
+jobs:
+  test-providers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: One bounded Search and Claude rehearsal
+        env:
+          PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}
+        run: node scripts/smoke-search-claude.mjs
