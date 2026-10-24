@@ -58,8 +58,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
-      DAJC_AUTONOMOUS_WEEKLY: ${{ vars.DAJC_SONAR_ENABLED == 'true' && '1' || '0' }}
+      DAJC_AUTONOMOUS_WEEKLY: ${{ (vars.DAJC_SONAR_ENABLED == 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED == 'true') && '1' || '0' }}
       DAJC_SONAR_ENABLED: ${{ vars.DAJC_SONAR_ENABLED }}
+      DAJC_SEARCH_CLAUDE_ENABLED: ${{ vars.DAJC_SEARCH_CLAUDE_ENABLED }}
       OVERSIZE_PREVIEW: ${{ github.event.inputs.preview == 'true' && '1' || '' }}
       OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
     steps:
@@ -120,12 +121,12 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           selected="$OPENAI_API_KEY"
-          if [ "$DAJC_SONAR_ENABLED" = "true" ]; then selected="$PERPLEXITY_API_KEY"; fi
+          if [ "$DAJC_SONAR_ENABLED" = "true" ] || [ "$DAJC_SEARCH_CLAUDE_ENABLED" = "true" ]; then selected="$PERPLEXITY_API_KEY"; fi
           if [ -z "$selected" ]; then
             echo "::error::The selected publisher API key is missing. No article will be generated."
             exit 1
           fi
-          if [ "$DAJC_SONAR_ENABLED" = "true" ] && [ "${{ github.event.inputs.dry_run }}" != "true" ] && [ "${{ github.event.inputs.preview }}" != "true" ] && [ "${{ github.event.inputs.correction }}" != "true" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
+          if { [ "$DAJC_SONAR_ENABLED" = "true" ] || [ "$DAJC_SEARCH_CLAUDE_ENABLED" = "true" ]; } && [ "${{ github.event.inputs.dry_run }}" != "true" ] && [ "${{ github.event.inputs.preview }}" != "true" ] && [ "${{ github.event.inputs.correction }}" != "true" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
             echo "::error::ANTHROPIC_API_KEY missing. Autonomous release blocked before paid research."
             exit 1
           fi
@@ -164,7 +165,7 @@ jobs:
         run: node scripts/generate-weekly-article.mjs ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }} ${{ steps.trigger.outputs.preview == 'true' && '--preview' || '' }} ${{ github.event.inputs.correction == 'true' && '--correction' || '' }}
 
       - name: Claude final editorial approval for Sonar article
-        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true' && vars.DAJC_SONAR_ENABLED == 'true'
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true' && (vars.DAJC_SONAR_ENABLED == 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED == 'true')
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}
