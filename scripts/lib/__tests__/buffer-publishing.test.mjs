@@ -75,3 +75,16 @@ describe('social publishing workflows', () => {
     expect(values(text, channelKey).size).toBe(1);
   });
 });
+
+describe('social publishing activation', () => {
+  // Owner decision, 24 October 2026: on by default, the variable is an off switch.
+  it.each([
+    ['publish-x-weekly.yml', 'DAJC_X_ENABLED'],
+    ['publish-linkedin-news.yml', 'DAJC_LINKEDIN_ENABLED'],
+  ])('%s publishes unless %s is false', (name, flag) => {
+    const text = readFileSync(new URL(`../../../.github/workflows/${name}`, import.meta.url), 'utf8');
+    expect(text).toContain(`vars.${flag} != 'false'`);
+    expect(text).toContain(`inputs.dry_run == false && vars.${flag} == 'false'`);
+    expect(text).not.toContain(`vars.${flag} == 'true'`);
+  });
+});

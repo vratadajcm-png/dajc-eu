@@ -1,7 +1,8 @@
 name: Publish approved DAJC News to LinkedIn (temporary personal profile)
 
 # Temporary owner-approved personal profile through Buffer only.
-# Inert until DAJC_LINKEDIN_ENABLED is explicitly true; no company-page fallback.
+# On by owner decision (24 October 2026), via Buffer; set the repository
+# variable DAJC_LINKEDIN_ENABLED=false to stop all live runs. No company-page fallback.
 on:
   push:
     branches: [main]
@@ -29,7 +30,7 @@ concurrency:
 
 jobs:
   publish:
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || vars.DAJC_LINKEDIN_ENABLED == 'true')
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || vars.DAJC_LINKEDIN_ENABLED != 'false')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -46,9 +47,9 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && inputs.dry_run == true
         run: node scripts/publish-social-news.mjs linkedin --dry-run
       - name: Require explicit LinkedIn publishing activation
-        if: github.event_name == 'workflow_dispatch' && inputs.dry_run == false && vars.DAJC_LINKEDIN_ENABLED != 'true'
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run == false && vars.DAJC_LINKEDIN_ENABLED == 'false'
         run: |
-          echo '::error::LinkedIn automation disabled; set DAJC_LINKEDIN_ENABLED=true only after validating the approved Buffer personal channel.'
+          echo '::error::LinkedIn publication is switched off (DAJC_LINKEDIN_ENABLED=false); remove the variable or set it to true to publish.'
           exit 1
       - name: Load LinkedIn publication state
         if: github.event_name != 'workflow_dispatch' || inputs.dry_run == false

@@ -2,7 +2,13 @@
 
 The official account is [@DAJCeu](https://x.com/DAJCeu). This integration publishes the *newly released* Friday EU Oversize Weekly edition and its canonical article URL. It is deliberately independent from the Thursday generation pipeline and does **not** expose credentials in the static Astro site or in this public repository.
 
-## Activation (currently disabled by default)
+> **Activated 24 October 2026 (owner decision).** X and LinkedIn teasers are
+> published through Buffer by default. `DAJC_X_ENABLED` / `DAJC_LINKEDIN_ENABLED`
+> are now off switches: setting either to `false` stops that channel; leaving it
+> unset publishes. The account checks, the live-article check and the
+> anti-duplicate ledger still apply to every post.
+
+## Activation (history: originally disabled by default)
 
 1. In the official [X Developer Console](https://console.x.com/), sign in as `@DAJCeu`, use **DAJC Publisher** with **Read and Write** access and enable **OAuth 1.0a User Context**. Verify current prices, existing credit and a monthly spending cap no higher than the owner's approved **USD 2**. No automatic credit purchase or top-up is authorized. Do not activate if these conditions cannot be enforced.
 2. In GitHub repository `vratadajcm-png/dajc-eu` -> **Settings -> Secrets and variables -> Actions -> Secrets**, securely create `X_API_KEY`, `X_API_SECRET`, `X_ACCESS_TOKEN`, `X_ACCESS_TOKEN_SECRET`. Create/generate **user** access token and secret for the *DAJCeu* account **after** enabling Read and Write; do not paste secrets into issues, source code, PR comments, or ChatGPT. A bearer-only app token will not work.

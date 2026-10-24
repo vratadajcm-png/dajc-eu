@@ -17,6 +17,12 @@ Eligible articles:
 
 The credential-free draft workflow (prepare-news-social.yml) remains separate.
 
+> **Activated 24 October 2026 (owner decision).** X and LinkedIn teasers are
+> published through Buffer by default. `DAJC_X_ENABLED` / `DAJC_LINKEDIN_ENABLED`
+> are now off switches: setting either to `false` stops that channel; leaving it
+> unset publishes. The account checks, the live-article check and the
+> anti-duplicate ledger still apply to every post.
+
 ## X — @DAJCeu
 
 Workflow: .github/workflows/publish-x-weekly.yml (handles all eligible News).
@@ -98,7 +104,7 @@ Requirements (human owner sign-in/consent at https://buffer.com/):
       DAJC_X_ENABLED=true
       DAJC_LINKEDIN_ENABLED=true
 
-Without all prerequisites, publishing remains safely disabled. Merely setting
+Without all prerequisites, every run stops at the Buffer key, channel or identity check before any reservation. Merely setting
 the backend option cannot authorize the remote Buffer account.
 
 Buffer returns a post ID but may not report that the content has already
