@@ -1,6 +1,7 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { formatNewsDate } from '../config/news';
 
 interface Props {
   entry: CollectionEntry<'eu-oversize'> | CollectionEntry<'platform'>;
@@ -11,16 +12,8 @@ const { entry, categoryLabel } = Astro.props;
 const { data } = entry;
 const { Content } = await render(entry);
 
-const publishedLabel = data.publishedAt.toLocaleDateString('en-GB', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-});
-const updatedLabel = data.updatedAt?.toLocaleDateString('en-GB', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-});
+const publishedLabel = formatNewsDate(data.publishedAt);
+const updatedLabel = data.updatedAt ? formatNewsDate(data.updatedAt) : undefined;
 const articleStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'Article',

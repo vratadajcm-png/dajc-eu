@@ -20,7 +20,7 @@ export function crossValidateDevelopments(developments = [], verifiedCandidates 
       sourceName: candidate.sourceName || item.sourceName || '',
       sourceUrl: candidate.sourceUrl,
       // Candidate dates have already passed deterministic verification before
-      // the OpenAI synthesis call. They are therefore authoritative. If the
+      // the Claude synthesis call. They are therefore authoritative. If the
       // official source does not provide an exact date, keep it unknown (null)
       // rather than accepting a model-generated prose placeholder.
       validFrom: candidate.validFrom || null,

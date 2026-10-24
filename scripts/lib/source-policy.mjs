@@ -2,17 +2,60 @@
 // Search is OPEN-WEB (not a fixed site allowlist); this register only identifies
 // known primary authorities for priority and attribution.
 import { oversizeSources } from '../../config/oversize-sources/index.mjs';
+import { officialAuthorityDomains } from '../../config/official-authority-domains.mjs';
 
 export const MIN_PRIMARY_ITEMS_BEFORE_FALLBACK = 3;
 export const PRIMARY_TIER = 'official';
 export const SECONDARY_TIER = 'industry';
 
+// DAJC's own sites are never a source. Search engines rank the DAJC archive
+// highly for Weekly-style queries: in the W44 run about 40 % of all Search
+// hits were dajc.eu editions, crowding out real notices.
+export const OWN_PUBLICATION_DOMAINS = ['dajc.eu', 'dajc.cz'];
+
+function hostOf(url) {
+  return new URL(url).hostname.toLowerCase().replace(/^www\./, '');
+}
+
+export function isOwnPublication(url) {
+  try {
+    const host = hostOf(url);
+    return OWN_PUBLICATION_DOMAINS.some((d) => host === d || host.endsWith('.' + d));
+  } catch { return false; }
+}
+
+const sourceHostsByCode = new Map();
 const knownAuthorities = new Set();
 for (const source of oversizeSources) {
   for (const url of [source.url, source.feedUrl, ...(source.htmlUrls || [])].filter(Boolean)) {
-    try { knownAuthorities.add(new URL(url).hostname.toLowerCase().replace(/^www\./, '')); }
-    catch { /* An invalid legacy endpoint cannot make an unknown site official. */ }
+    try {
+      const host = hostOf(url);
+      knownAuthorities.add(host);
+      if (!sourceHostsByCode.has(source.country)) sourceHostsByCode.set(source.country, new Set());
+      sourceHostsByCode.get(source.country).add(host);
+    } catch { /* An invalid legacy endpoint cannot make an unknown site official. */ }
   }
+}
+for (const domains of Object.values(officialAuthorityDomains)) {
+  for (const domain of domains) knownAuthorities.add(domain);
+}
+
+/**
+ * Official authority domains for the given coverage codes, for the
+ * official-first Search pass: curated authorities first, then configured
+ * official sources (police feeds excluded - they rarely carry permit or route
+ * notices). Deduplicated; a parent domain makes its subdomains redundant.
+ */
+export function officialDomainsFor(codes = [], max = 20) {
+  const ordered = [];
+  for (const code of codes) ordered.push(...(officialAuthorityDomains[code] || []));
+  for (const code of codes) {
+    const police = new Set(oversizeSources.filter((s) => s.country === code && s.type === 'police').flatMap((s) => [s.url, s.feedUrl]).filter(Boolean).map(hostOf));
+    for (const host of sourceHostsByCode.get(code) || []) if (!police.has(host)) ordered.push(host);
+  }
+  const unique = [...new Set(ordered)];
+  const kept = unique.filter((d) => !unique.some((other) => other !== d && d.endsWith('.' + other)));
+  return kept.slice(0, max);
 }
 
 export function isOfficialPublisher(url) {

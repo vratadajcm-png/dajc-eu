@@ -1,7 +1,7 @@
 # Main protection and publication automation
 
 Code and public articles reach `main` only through protected PRs with required CI.
-The owner reviews code, security, workflow and correction changes. The normal final EU Oversize Weekly article may auto-merge only after Sonar-grounded source checks and SHA-bound Claude approval plus required CI. Neither `GITHUB_TOKEN` nor a publication bot bypasses main.
+The owner reviews code, security, workflow and correction changes. The normal final EU Oversize Weekly article may auto-merge only when `DAJC_WEEKLY_AUTO_MERGE=true`, every cited source is an official authority, and the article passed source-grounded checks, SHA-bound Claude approval and required CI. Neither `GITHUB_TOKEN` nor a publication bot bypasses main.
 
 ## Applied protection — 13 October 2026
 
@@ -104,7 +104,7 @@ References: [GitHub protected branches](https://docs.github.com/en/repositories/
 
 ## Sonar / Claude guarded release and Buffer social setup (23 October 2026)
 
-The final weekly editorial article uses Perplexity Sonar for research and writing and Claude for final source-by-source approval. A SHA-256 approval receipt is checked immediately before the publication PR is created. The normal content-only final Weekly may request GitHub protected auto-merge after passing required CI. There is **no ruleset bypass** and no autonomous merge for code, infrastructure, security policies, previews or manually corrected past articles.
+The final weekly editorial article uses the Perplexity Search API for research, Claude for classification and writing, and Claude for final source-by-source approval (OpenAI and Sonar removed 24 October 2026). Auto-merge requires `DAJC_WEEKLY_AUTO_MERGE=true` and official sources only. A SHA-256 approval receipt is checked immediately before the publication PR is created. The normal content-only final Weekly may request GitHub protected auto-merge after passing required CI. There is **no ruleset bypass** and no autonomous merge for code, infrastructure, security policies, previews or manually corrected past articles.
 
 The independent watchdog delegates to the canonical workflow; it cannot create a parallel publisher. READY deployment is not a public article until checked on the live DAJC.eu URL.
 

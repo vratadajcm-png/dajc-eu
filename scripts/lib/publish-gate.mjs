@@ -85,3 +85,37 @@ export function decidePublishCommit({ articleAdded, articleReplaced = false, dat
   }
   return { commit: false, addPaths: [], message: null };
 }
+
+/**
+ * Sources that keep an autonomous final edition out of protected auto-merge.
+ * Claude approved the W44 Search edition built on a third-hand relay
+ * (24tv.ua citing 40ton.net citing Trafikverket); an edition citing anything
+ * but official authorities therefore always waits for human review.
+ * @param {string} articleMarkdown - the article file content
+ * @param {(url: string) => string} tierOf - source-policy.sourceTier
+ * @returns {string[]} cited source URLs that are not official
+ */
+export function autoMergeBlockers(articleMarkdown, tierOf) {
+  const frontmatter = String(articleMarkdown || '').match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] || '';
+  const urls = [...frontmatter.matchAll(/^\s+url:\s*"([^"]+)"\s*$/gm)].map((match) => match[1]);
+  if (urls.length === 0) return ['(no cited source)'];
+  return urls.filter((url) => tierOf(url) !== 'official');
+}
+
+/**
+ * Open publication PRs relevant to the target edition. `pending` is the
+ * target week's PR, including regenerated `-retry-<run>` branches (W44's
+ * retry PR was invisible to the old exact-branch lookup). `stale` are open
+ * edition PRs for weeks that have already passed - W43's PR sat unmerged for
+ * nine days without any alert.
+ * @param {{ headRefName: string, url: string }[]} pulls - open PRs into main
+ */
+export function classifyEditionPulls(pulls, { branch, targetWeek }) {
+  const isTarget = (head) => head === branch || head.startsWith(`${branch}-retry-`);
+  const pending = pulls.find((pull) => isTarget(String(pull.headRefName || ''))) || null;
+  const stale = pulls.filter((pull) => {
+    const match = String(pull.headRefName || '').match(/^automation\/weekly-(\d{4})-w(\d{2})(?:-|$)/);
+    return match && `${match[1]}-W${match[2]}` < targetWeek;
+  });
+  return { pending, stale };
+}

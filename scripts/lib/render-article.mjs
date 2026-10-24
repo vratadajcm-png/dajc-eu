@@ -1,6 +1,6 @@
 import { secondaryAttribution } from './source-policy.mjs';
 
-// Turns the validated, cross-checked article JSON (see openai-client.mjs /
+// Turns the validated, cross-checked article JSON (see article-writer.mjs /
 // mock-generator.mjs, after cross-validation in generate-weekly-article.mjs)
 // into frontmatter + Markdown body matching src/content.config.ts's schema
 // and the structure required for EU Oversize Weekly articles.

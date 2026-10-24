@@ -28,7 +28,7 @@ sources:
     url: "https://www.vegvesen.no/nn/om-oss/presse/aktuelt/2026/08/mer-trafikk-pa-e18-forbi-porsgrunn/"
   - name: "Wallonia Infrastructure - exceptional transport works"
     url: "https://infrastructures.wallonie.be/entreprises--non-marchand/nos-thematiques/routes/reglementation-routiere-1/transport-exceptionnel/travaux-importants.html"
-  - name: "Wallonia Infrastructure - N29 Jodoigne"
+  - name: "Wallonia Infrastructure - N29 Jodoigne (notice no longer online)"
     url: "https://infrastructures.wallonie.be/news/jodoigne-n29-travaux-prevus-a-partir-du-5-aout-2026-mise-a-jour"
   - name: "DGT - traffic restrictions"
     url: "https://www.dgt.es/conoce-el-estado-del-trafico/restricciones-a-la-circulacion/"
@@ -42,6 +42,8 @@ sources:
     url: "https://www.gouv.mc/actualites/la-vuelta-2026-a-monaco-quels-amenagements-routiers"
 ---
 
+*Archive note (24 October 2026): this edition predates the scope decision of 2 October 2026. General HGV driving bans are now covered by [DAJC Driving Bans](/driving-bans), not by EU Oversize Weekly, and the restrictions below are not current.*
+
 > **Backfill edition.** This Week 34 report covers **17–23 August 2026** and was published on 29 August after the DAJC weekly publishing pipeline was repaired and expanded. It deliberately excludes unchanged year-round Sunday bans unless they materially interacted with a seasonal, holiday or exceptional-transport restriction.
 
 ## Executive summary
@@ -50,9 +52,9 @@ Week 34 was still firmly inside Europe’s summer-restriction season. The most c
 
 For dispatchers, the core lesson was the same across several countries: a road being open to ordinary traffic did **not** mean that an abnormal-load permit remained executable. Route geometry, approved corridors, escort conditions and country-specific movement windows still had to be checked separately.
 
-# Top developments — 17–23 August 2026
+## Top developments — 17–23 August 2026
 
-## 1. Austria — A10 summer HGV restriction returned on 22 August
+### 1. Austria — A10 summer HGV restriction returned on 22 August
 
 **Status:** Effective  
 **Where:** A10 Tauern Autobahn, Salzburg–Villach corridor, both directions  
@@ -67,7 +69,7 @@ The second late-summer block of Austria’s A10 seasonal restriction began on 22
 
 *Source: [WKO — Austria truck driving bans](https://www.wko.at/transport/lkw-fahrverbote-oesterreich-ueberblick)*
 
-## 2. Austria — additional A10 exit closures on the same Saturday
+### 2. Austria — additional A10 exit closures on the same Saturday
 
 **Status:** Effective  
 **Where:** A10, Pfarrwerfen-Werfen Exit 44 and Pongau Exit 46  
@@ -81,7 +83,7 @@ As part of Austria’s transit-management pilot, selected A10 exits were closed 
 
 *Source: [WKO — current Austrian traffic information](https://www.wko.at/transport/lkw-fahrverbote-oesterreich-ueberblick)*
 
-## 3. Hungary — national-holiday and summer-weekend restrictions created two separate stop windows
+### 3. Hungary — national-holiday and summer-weekend restrictions created two separate stop windows
 
 **Status:** Effective  
 **Where:** Hungary, subject to the national regulation and listed exceptions  
@@ -96,7 +98,7 @@ Hungary’s 20 August national holiday created a mid-week restriction, followed 
 
 *Source: [WKO — Hungary summer weekend driving ban 2026](https://www.wko.at/aussenwirtschaft/ungarn-lkw-wochenendfahrverbot)*
 
-## 4. Germany — Ferienreiseverordnung remained active on Saturday 22 August
+### 4. Germany — Ferienreiseverordnung remained active on Saturday 22 August
 
 **Status:** Effective  
 **Where:** The motorway and federal-road sections listed under the German summer-holiday regulation  
@@ -111,7 +113,7 @@ Germany’s summer Saturday restriction remained in force on the designated holi
 
 *Source: [BALM — LKW-Fahrverbote](https://www.balm.bund.de/DE/Themen/RechtsentwicklungRechtsvorschriften/Rechtsvorschriften/Strassenverkehrsrecht/LKW-Fahrverbote/LKW-Fahrverbote.html)*
 
-## 5. Italy — Saturday summer ban still applied after Ferragosto
+### 5. Italy — Saturday summer ban still applied after Ferragosto
 
 **Status:** Effective  
 **Where:** Italian roads outside built-up areas within the national decree’s scope  
@@ -126,7 +128,7 @@ The extreme Ferragosto period had ended, but the summer calendar had not. Saturd
 
 *Source: [MIT — Decreto n. 325/2025](https://www.mit.gov.it/normativa/decreto-ministeriale-n-325-del-12-dicembre-2025)*
 
-## 6. Poland — summer restrictions remained active through the full weekend pattern
+### 6. Poland — summer restrictions remained active through the full weekend pattern
 
 **Status:** Effective  
 **Where:** Poland, within the national holiday-season restriction framework  
@@ -141,7 +143,7 @@ Poland was still inside its summer holiday-ban period. The important operational
 
 *Source: [WITD Radom — summer truck restrictions](https://www.gov.pl/web/witd-radom/wakacyjne-zakazy-jazdy-dla-pojazdow-ciezarowych)*
 
-## 7. Czechia — summer Friday and Saturday restrictions remained in force
+### 7. Czechia — summer Friday and Saturday restrictions remained in force
 
 **Status:** Effective  
 **Where:** Motorways and Class I roads in Czechia  
@@ -155,7 +157,7 @@ The Czech summer extension still applied in Week 34. The Friday and Saturday win
 
 *Source: [Czech Ministry of Transport — driving-ban exemptions](https://md.gov.cz/Dokumenty/Silnicni-doprava/Vyjimky-ze-zakazu-jizdy-%28povoleni%29)*
 
-## 8. Switzerland — A18 Eggflue tunnel entered a three-week night-closure programme
+### 8. Switzerland — A18 Eggflue tunnel entered a three-week night-closure programme
 
 **Status:** Effective / newly relevant  
 **Where:** A18 Tunnel Eggflue  
@@ -169,7 +171,7 @@ ASTRA started safety works requiring full closure of the Eggflue tunnel in both 
 
 *Source: [ASTRA — A18 Tunnel Eggflue](https://www.astra.admin.ch/de/a18-tunnel-eggflue-baustart-zur-entschaerfung-von-gefahrenstellen)*
 
-## 9. Switzerland — Oensingen access remained constrained through 21 August
+### 9. Switzerland — Oensingen access remained constrained through 21 August
 
 **Status:** Effective  
 **Where:** VEBO junction / Oensingen area  
@@ -183,7 +185,7 @@ ASTRA’s intensive construction phase included closure of the motorway feeder b
 
 *Source: [ASTRA — VEBO Oensingen intensive construction phase](https://www.astra.admin.ch/de/intensivbauphase-vebo-knoten-oensingen)*
 
-## 10. Norway — Brevik bridge closed for the 21–24 August weekend
+### 10. Norway — Brevik bridge closed for the 21–24 August weekend
 
 **Status:** Effective  
 **Where:** Rv. 354 Brevik bridge; diversion via E18  
@@ -197,7 +199,7 @@ Statens vegvesen closed Brevik bridge for reinforcement work during the third Au
 
 *Source: [Statens vegvesen — Brevik bridge closure](https://www.vegvesen.no/nn/om-oss/presse/aktuelt/2026/08/mer-trafikk-pa-e18-forbi-porsgrunn/)*
 
-## 11. Belgium / Wallonia — N29 Jodoigne restriction explicitly warned exceptional transport away from the diversion
+### 11. Belgium / Wallonia — N29 Jodoigne restriction explicitly warned exceptional transport away from the diversion
 
 **Status:** Effective until 21 August  
 **Where:** N29 around Jodoigne, between the N240 junction and the direction of Tienen  
@@ -209,9 +211,9 @@ Wallonia maintained one-way traffic with potentially reduced available width on 
 
 **Action:** Exceptional-transport operators should obtain route-specific guidance instead of following the general diversion.
 
-*Source: [Wallonia Infrastructure — N29 Jodoigne](https://infrastructures.wallonie.be/news/jodoigne-n29-travaux-prevus-a-partir-du-5-aout-2026-mise-a-jour)*
+*Source: [Wallonia Infrastructure — N29 Jodoigne](https://infrastructures.wallonie.be/news/jodoigne-n29-travaux-prevus-a-partir-du-5-aout-2026-mise-a-jour) (notice no longer online)*
 
-## 12. Belgium / Wallonia — several long-running exceptional-transport corridors remained restricted
+### 12. Belgium / Wallonia — several long-running exceptional-transport corridors remained restricted
 
 **Status:** Effective  
 **Where:** Walloon exceptional-transport network, including N7 and N50 corridors  
@@ -225,7 +227,7 @@ Wallonia’s dedicated exceptional-transport infrastructure page continued to li
 
 *Source: [Wallonia Infrastructure — important exceptional-transport works](https://infrastructures.wallonie.be/entreprises--non-marchand/nos-thematiques/routes/reglementation-routiere-1/transport-exceptionnel/travaux-importants.html)*
 
-## 13. Spain — DGT restrictions explicitly include special vehicles and movements requiring complementary authorisation
+### 13. Spain — DGT restrictions explicitly include special vehicles and movements requiring complementary authorisation
 
 **Status:** Effective / information refreshed 21 August  
 **Where:** DGT-controlled Spanish road network; Catalonia, Basque Country and Navarre operate their own traffic-competence regimes  
@@ -239,7 +241,7 @@ DGT’s restriction service identifies affected groups including goods vehicles 
 
 *Source: [DGT — traffic restrictions](https://www.dgt.es/conoce-el-estado-del-trafico/restricciones-a-la-circulacion/)*
 
-## 14. Latvia — P114 works created seven signal-controlled sections near the Lithuanian border
+### 14. Latvia — P114 works created seven signal-controlled sections near the Lithuanian border
 
 **Status:** Effective  
 **Where:** P114 from Priekule toward the Lithuanian border  
@@ -253,7 +255,7 @@ Latvijas Valsts ceļi reported seven temporary traffic-light sections on the P11
 
 *Source: [Latvijas Valsts ceļi — 21 August restrictions](https://lvceli.lv/aktualitates/vidzeme-notiek-baltijas-cela-velobrauciens-no-priekules-lidz-lietuvas-robezai-septini-pagaidu-luksofori/)*
 
-# Around Europe — Short Updates
+## Around Europe — Short Updates
 
 ### Monaco — La Vuelta closed streets on 21–23 August
 The Monaco government published a detailed traffic plan for La Vuelta, with closures beginning on 21 August and extensive measures around the 22 August time trial and the 23 August Monaco–Manosque stage. The closures were short-lived, but for a permitted oversized movement inside Monaco they were operationally decisive. *Source: [Gouvernement de Monaco](https://www.gouv.mc/actualites/la-vuelta-2026-a-monaco-quels-amenagements-routiers).*
@@ -273,25 +275,25 @@ The Dutch government had already confirmed that the new kilometre-based truck ch
 ### Switzerland — night closures continued beyond Week 34
 The Eggflue programme did not end on 21 August. Additional 20:00–05:00 closure blocks began again on the night of 23/24 August and continued into early September. Operators using the A18 at night needed to carry the restriction into the following week’s route plan. *Source: [ASTRA](https://www.astra.admin.ch/de/a18-tunnel-eggflue-baustart-zur-entschaerfung-von-gefahrenstellen).*
 
-# Critical European corridors
+## Critical European corridors
 
-## Austria’s Alpine north–south routes
+### Austria’s Alpine north–south routes
 The A10 Tauern corridor was the clearest Week 34 example of layered restrictions: a summer HGV window, traffic-management measures and the separate requirements of exceptional-transport permits. Route planning had to be permit-led rather than navigation-led.
 
-## Belgian exceptional-transport network
+### Belgian exceptional-transport network
 Wallonia remained notable because its road authority publishes restrictions specifically for exceptional transport. N29 demonstrated the practical value of that distinction: the ordinary diversion itself was explicitly unsuitable for exceptional transport.
 
-## Swiss construction corridors
+### Swiss construction corridors
 Eggflue and Oensingen showed why weekly intelligence must track individual infrastructure projects rather than only national driving bans. Short windows can be critical when they coincide with a permitted night movement or remove an approved feeder route.
 
-# What changes next — 30-day outlook
+## What changes next — 30-day outlook
 
 **Netherlands — 1 September 2026:** the truck kilometre-charge tariff falls by 22.3% through 31 December. Update cost models for September movements.  
 **Germany / Poland / Czechia / Italy:** late-August summer restriction calendars move toward their seasonal end; do not carry August Saturday windows into September without checking the new calendar.  
 **Austria:** A10 summer restrictions continue on specified Saturdays into September, and corridor-specific rules remain separate from the general weekend regime.  
 **Switzerland:** the Eggflue night-work programme continues into early September.
 
-# Dispatcher / driver checklist
+## Dispatcher / driver checklist
 
 - Check the **individual abnormal-load permit** separately from the general HGV calendar.
 - Never assume that a signed diversion is suitable for an oversized combination.

@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { formatNewsDate, newsCategoryLabel } from '../config/news';
 
 interface Props {
   entry: CollectionEntry<'eu-oversize'> | CollectionEntry<'platform'>;
@@ -8,12 +9,8 @@ interface Props {
 const { entry } = Astro.props;
 const { data, collection } = entry;
 const href = `/news/${collection}/${data.slug}`;
-const categoryLabel = collection === 'eu-oversize' ? 'EU Oversize Weekly' : 'DAJC Platform Updates';
-const dateLabel = data.publishedAt.toLocaleDateString('en-GB', {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-});
+const categoryLabel = newsCategoryLabel(collection, data.slug);
+const dateLabel = formatNewsDate(data.publishedAt, 'short');
 ---
 <article class="news-card">
   <div class="news-card__meta">

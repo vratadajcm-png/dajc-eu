@@ -1,4 +1,4 @@
-// Deterministic zero-cost stand-in for OpenAI synthesis (--mock).
+// Deterministic zero-cost stand-in for Claude synthesis (--mock).
 // Mirrors the production contract: every verified candidate it is given is
 // reported once, up to the maximums of 30 lead reports and 15 Rest-of-Europe
 // updates. There is no minimum and nothing is invented to fill a section.
@@ -33,14 +33,14 @@ export async function generateArticleMock({ candidates, weekRangeLabel }) {
   return {
     seoTitle: `DAJC European Oversize Intelligence for ${weekRangeLabel} (MOCK)`,
     metaDescription: 'Mock-generated DAJC European oversize intelligence for pipeline validation only.',
-    intro: 'Mock-mode article generated without OpenAI from the verified candidates only, for pipeline validation.',
+    intro: 'Mock-mode article generated without Claude from the verified candidates only, for pipeline validation.',
     developments,
     europeRoundup,
     operatorChecklist: ['Mock mode - verify real sources before production publication.'],
   };
 }
 
-/** Mock counterpart of generateRequiredItemsWithOpenAI: one item per development. */
+/** Mock counterpart of generateRequiredItemsWithClaude: one item per development. */
 export async function generateRequiredItemsMock({ groups }) {
   return groups.map((group) => mapCandidate(group.candidates[0]));
 }

@@ -10,7 +10,7 @@
 //
 // This module only identifies critical developments and checks coverage. It
 // never writes report text itself; missing critical items are written by the
-// model (openai-client.mjs generateRequiredItemsWithOpenAI) and the quality
+// model (article-writer.mjs generateRequiredItemsWithClaude) and the quality
 // gate blocks publication if one is still missing.
 
 import { checkFreshness } from './weekly-eligibility.mjs';

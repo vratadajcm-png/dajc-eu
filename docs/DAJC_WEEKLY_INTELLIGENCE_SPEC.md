@@ -1,6 +1,6 @@
 # DAJC European Oversize & Special Transport Intelligence — canonical production rules
 
-This is the **single editorial authority** for the automated DAJC.eu weekly European oversize/special-transport publication. It is the only document that states the rules; `NEWS_AUTOMATION.md` describes how they are implemented and links here instead of repeating them. In code the rules live in `scripts/lib/weekly-eligibility.mjs` (deterministic checks), `scripts/lib/quality-gate.mjs` (final gate) and the model prompt in `scripts/lib/openai-client.mjs`; a rule change must update this document and those files together.
+This is the **single editorial authority** for the automated DAJC.eu weekly European oversize/special-transport publication. It is the only document that states the rules; `NEWS_AUTOMATION.md` describes how they are implemented and links here instead of repeating them. In code the rules live in `scripts/lib/weekly-eligibility.mjs` (deterministic checks), `scripts/lib/quality-gate.mjs` (final gate) and the model prompt in `scripts/lib/article-writer.mjs`; a rule change must update this document and those files together.
 
 ## 0. Scope
 
@@ -22,7 +22,9 @@ Research coverage remains Europe-wide, but the published lead order is operator-
 
 ## 2. Source discovery
 
-- **Two-stage open-web discovery** (`scripts/lib/web-search.mjs`, OpenAI web search): official primary authority sources first for each geographical research group; if fewer than **3** eligible *primary discovery hits* are found in a group, search broadly across **all discoverable European freight, heavy-haul/oversize, driver/dispatcher, trade, fleet, operator, OEM and professional transport websites** without an exhaustive publisher whitelist. Search in local languages, oversize first. The threshold is only a *search-expansion trigger*, not a required published report count.
+- **Two-stage open-web discovery** (`scripts/lib/web-search.mjs`, Perplexity Search API with Claude classification; OpenAI is not used): official primary authority sources first for each geographical research group; if fewer than **3** eligible *primary discovery hits* are found in a group, search broadly across **all discoverable European freight, heavy-haul/oversize, driver/dispatcher, trade, fleet, operator, OEM and professional transport websites** without an exhaustive publisher whitelist. Search in local languages, oversize first. The threshold is only a *search-expansion trigger*, not a required published report count.
+- **DAJC's own sites (dajc.eu, dajc.cz) are never a source.** They are excluded from every search request, rejected before any page fetch and rejected again by the eligibility rules (`isOwnPublication`, `scripts/lib/source-policy.mjs`). In the W44 run about 40 % of all Search hits were DAJC editions.
+- **The Perplexity Search API receives short keyword queries in the group's local languages** (`buildSearchQueries`, `buildSearchRequest`), never the long LLM prompt. The official-first pass is restricted to the group's public authority domains (`config/official-authority-domains.mjs` plus the configured official sources); the open-web pass excludes DAJC and general driving-ban aggregators, is limited to the group's languages plus English and to pages from the last 30 days.
 - The search model only finds links. Every hit is fetched and the finding is built from **the page itself** (heading, text, publication date). A date the model reports is kept only when the page text shows it. Unreachable pages, PDFs, and pages whose own text shows no freight-vehicle (>12 t) or oversize context are dropped and logged.
 - The previous crawler of configured official authority pages (`config/oversize-sources`, `scripts/lib/fetch-source.mjs`) remains available with `OVERSIZE_DISCOVERY=official` (or `both`).
 - **Official sources always have priority.** Industry news can be included on the evidence of its own readable, dated article without separate official corroboration for routine professional, fleet, driver or company news. It must be clearly attributed as an **industry report**. **No unconfirmed media claim may be stated as an officially binding permit, escort, axle/weight, legal or route restriction**; these claims must be clearly labelled as requiring confirmation with the responsible authority. Repetition of an existing official item does not count as separate news.
@@ -77,9 +79,9 @@ Exclude driver-licence/auto-school administration, environmental/water-law permi
 
 Every published item must also prove that it is current:
 
-- **Freshness — discovery is not news.** The pipeline distinguishes DISCOVERY date (`firstSeenAt`, never a freshness signal), SOURCE PUBLICATION date (`publishedAt`), EFFECTIVE date (`validFrom`/`validTo`, read only from explicit wording) and TARGET-WEEK relevance. An item is current only if (a) the source published it within the **7 days** before the edition's Thursday preparation (one week back), (b) it takes effect or ends inside the target week, (c) explicit start and end dates show it is in force during the target week, or (d) it takes effect within **one month (30 days) after the Thursday preparation** (outlook; `FRESHNESS_WINDOW_DAYS`, `FORWARD_HORIZON_DAYS` in `weekly-eligibility.mjs`). Otherwise it is excluded; undated material without such evidence is never published.
+- **Freshness — discovery is not news.** The pipeline distinguishes DISCOVERY date (`firstSeenAt`, never a freshness signal), SOURCE PUBLICATION date (`publishedAt`), EFFECTIVE date (`validFrom`/`validTo`, read only from explicit wording) and TARGET-WEEK relevance. An item is current only if (a) the source published it within the **7 days** before the edition's Thursday preparation (one week back), (b) it takes effect or ends inside the target week, (c) explicit start and end dates show it is in force during the target week, or (d) it takes effect within **one month (30 days) after the Thursday preparation** (outlook; `FRESHNESS_WINDOW_DAYS`, `FORWARD_HORIZON_DAYS` in `weekly-eligibility.mjs`), or (e) **catch-up:** the previous week's final edition was not published, and the change took effect during that skipped week and is still in force (W43 was never published, so the N307 limit in force since 21 October would otherwise have fallen between two editions). Otherwise it is excluded; undated material without such evidence is never published.
 - **Hard exclusions:** completed projects and openings without a current restriction, pedestrian/cycling facilities, school/civic/public-space projects, PR/event items, financial/market stories with no concrete freight business or driver/dispatcher operational impact, statistics, accidents, breakdowns, crime, procurement, generic landing/roadworks pages and anything without proven relevance for freight vehicles over 12 t or oversize/special transport. A generic mention of road, bridge, tunnel, vehicle or transport is not enough.
-- **One specific development:** homepages, listing/landing pages, project/programme pages, FAQ pages, organisation pages and bare topic titles are not developments.
+- **One specific development:** homepages, listing/landing pages, project/programme pages, FAQ pages, organisation pages and bare topic titles are not developments. Neither are evergreen guides and explainers re-dated every season ("Winter Rules for Trucks in Europe 2026/27", "Oversize load permit in Hungary (2026): authority, fees", "Transport to Italy"), nor blog, knowledge-base, country-guide or permit-guide pages of non-official sites.
 - **No repetition:** a source already cited by an earlier edition is not published again unless the source republished it after that edition or the change takes effect or ends in the target week.
 - **Source suitability:** police press feeds contribute only announced enforcement campaigns, never single incidents or one-off local movements.
 - **One report per real-world development:** several pages about one change are reported once.
@@ -93,7 +95,8 @@ These rules are deterministic (`scripts/lib/weekly-eligibility.mjs`) and are app
 - Final publication is idempotent; an existing final week file is not automatically overwritten.
 - A manual **correction** run (workflow input `correction`) regenerates the current target edition from source data and replaces the published file atomically — only after the regenerated edition has passed every gate and the build, stamped with `updatedAt`. If the regenerated edition does not qualify, the published edition is left untouched and the run fails with the blocker.
 - A manually requested **preview** uses the same research, verification, counts, quality gates and article layout, but a separate preview slug. It never consumes or blocks Friday's final slug.
-- The final edition is built from the complete monitoring data available at Thursday preparation.
+- The final edition is built from the complete monitoring data available at Thursday preparation. The findings behind a prepared edition are also persisted on `automation/oversize-data`, so closing a rejected PR never discards them.
+- The watchdog fails loudly when an edition PR is still unmerged after its Friday 12:00 slot, and while any edition PR for an already passed week remains open.
 
 ## 9. Article structure
 
@@ -103,7 +106,7 @@ These rules are deterministic (`scripts/lib/weekly-eligibility.mjs`) and are app
 4. Rest of Europe — concise attributed reports (up to 15; omitted when none qualify).
 5. Critical European corridors when materially relevant.
 6. One-month outlook when materially relevant.
-7. Dispatcher/operator checklist.
+7. Dispatcher/operator checklist — one line per published report, built from the reports themselves. Title, description and intro never name a country without a published report; such model text is replaced deterministically (`scripts/lib/edition-summary.mjs`).
 8. Full source list.
 9. Next scheduled publication.
 
@@ -121,11 +124,13 @@ This is a **standing** rule. The 50 approved DAJC jurisdictions remain the geogr
 
 ## 12. Autonomous Sonar / Claude editorial and social distribution (23 October 2026)
 
+> Research and writing moved from Sonar to Perplexity Search + Claude (§13, §16). The approval, auto-merge and social rules below still apply; auto-merge is enabled by the repository variable `DAJC_WEEKLY_AUTO_MERGE=true`.
+
 This is a permanent rule: **Perplexity Sonar research and article synthesis → Claude editorial veto/approval → protected GitHub PR and CI → verified public website → Claude-tailored X and LinkedIn copy → existing Buffer social publishing adapter.** No second weekly publishing pipeline.
 
 - Sonar discovers links in the existing official-first open-European-media search and synthesizes an English article only from verified source candidates. Hard checks on dates, geography, ISO week, duplicate stories, binding weight/permit limits, source provenance and the no-general-Driving-Bans exclusion remain.
-- Claude checks the exact article plus original source excerpts and emits one structured approve/reject verdict with blocking reasons and coverage of every cited URL. A missing/rejecting verdict, unsupported source or altered SHA-256 receipt fails closed.
-- The final article alone may request ordinary GitHub auto-merge of a content-only PR after required CI. Corrections, previews, code, security and workflow changes do not auto-merge.
+- Claude checks the exact article plus original source excerpts **and the publisher's own current page text, host and source tier**, and emits one structured approve/reject verdict with blocking reasons and coverage of every cited URL. It rejects weight/permit/legal/route claims resting on second- or third-hand relays, general-interest outlets or evergreen guides. A missing/rejecting verdict, unsupported source or altered SHA-256 receipt fails closed.
+- The final article alone may request ordinary GitHub auto-merge of a content-only PR after required CI, **and only when every cited source is an official authority**. An edition citing any industry or relayed source always waits for human review (W44: Claude approved a Russian-language 24tv.ua relay of a Swedish proposal). Corrections, previews, code, security and workflow changes do not auto-merge.
 - Public release means the actual accessible DAJC.eu article; a green CI run or prepared PR is not publication.
 - Once an article is verified public, Claude prepares distinct factual English short copy for X and an industry-oriented post for the DAJC LinkedIn company page, each with the exact URL. The existing persistent ledger blocks duplicate attempts. Buffer is used only with explicitly connected/authorized company channels.
 - Never post unpublished Platform / Integration Ecosystem material. Platform updates require explicit socialPublish=true.
@@ -144,7 +149,7 @@ Every output channel has an independent editorial format, derived from the same 
 
 The channel adaptations must not invent any dates, weights, restrictions, source citations or safety claims. A social publication can happen only after independent confirmation that the linked article is actually public. Duplicate protection and account authorization remain mandatory. A missing/failed Search or Claude API call is a hard stop; do not switch to an unreviewed publishing path. QUALITY > COUNT, official-first priority, 50 jurisdictions and Driving Bans exclusions remain.
 
-This policy does not by itself activate the new Search/Claude producer or DAJC.cz route. Production feature flags and external channel authorizations require a separate validated deployment; the existing working publisher stays in place until then.
+This policy does not by itself activate the DAJC.cz route or external channel authorizations. Since 24 October 2026 the Search/Claude research path is the default (§16); automatic merging still requires the repository variables.
 
 ### Social traffic objective (24 October 2026)
 
@@ -168,3 +173,12 @@ This policy does not by itself activate the new Search/Claude producer or DAJC.c
 X and company LinkedIn are acquisition channels, not independent news archives. Each posts an independently adapted, accurate teaser linking to the exact live DAJC.eu article. English posts are standard; if Czech teasers are added, explicitly disclose that the full linked article is in English. Never invent a DAJC.cz article URL or mirror content to dajc.cz.
 
 Source research: use the tested Perplexity Search API to discover candidate URLs, then Claude to classify and draft from original-source-verified records, followed by independent final editorial review and protected GitHub CI. Production activation requires end-to-end evidence and a spend budget; source failure must not silently publish unreviewed content.
+
+## 16. Lowest-cost operation (24 October 2026)
+
+The owner's standing instruction is to run the Weekly at the lowest cost without weakening the rules above.
+
+- Research uses the Perplexity Search API with Claude Haiku 5.5 classifying the leads at low effort. OpenAI and Perplexity Sonar are not used (removed 24 October 2026).
+- Focuses share one Search request whenever every language's terms fit (Search bills per request, not per query).
+- The monitor runs on Monday and Wednesday; Thursday's preparation refreshes the data once, and retries reuse findings written in the last 18 hours.
+- Writing the edition, the final editorial review and social copy keep the stronger `CLAUDE_REVIEW_MODEL` / `CLAUDE_SOCIAL_MODEL`: they run once or twice a week and decide what readers see.

@@ -13,7 +13,7 @@ import { checkOperationalRelevance } from './relevance-filter.mjs';
 import { checkTransportDomainRelevance } from './transport-domain.mjs';
 import { checkLongRoadClosure } from './closure-duration.mjs';
 import { checkWeeklyDrivingBanPolicy } from './weekly-driving-ban-policy.mjs';
-import { SECONDARY_TIER } from './source-policy.mjs';
+import { SECONDARY_TIER, isOwnPublication, sourceTier } from './source-policy.mjs';
 import { isValidIsoDate, validateDevelopmentDateRange } from './date-validation.mjs';
 import { readableText } from './text-quality.mjs';
 import { extractValidityPeriod, foldText } from './publication-date.mjs';
@@ -76,12 +76,15 @@ export function deriveValidity(candidate = {}) {
  *   outlook      it takes effect within OUTLOOK_DAYS after the target week
  *   ongoing      explicit start AND end dates show it is in force during the
  *                target week (a time-bounded restriction with real impact)
+ *   catch-up     only when the previous week's edition was not published
+ *                (`catchUpSince` set): it took effect in that skipped week and
+ *                is still in force, so it would otherwise never be reported
  *
  * Undated material, and older material none of these grounds covers, is out.
  * @returns {{ ok: true, basis: string, bases: string[] } | { ok: false, reason: string }}
  */
 export function checkFreshness(candidate = {}, {
-  now, freshSince = null, weekStart, weekEnd, windowDays = FRESHNESS_WINDOW_DAYS, outlookDays = OUTLOOK_DAYS,
+  now, freshSince = null, catchUpSince = null, weekStart, weekEnd, windowDays = FRESHNESS_WINDOW_DAYS, outlookDays = OUTLOOK_DAYS,
 } = {}) {
   if (!(now instanceof Date) || Number.isNaN(now.getTime())) {
     throw new Error('checkFreshness requires a valid `now`');
@@ -105,6 +108,7 @@ export function checkFreshness(candidate = {}, {
     if (to && to >= weekStart && to <= weekEnd) bases.push('ends');
     if (from && from > weekEnd && from <= outlookEnd) bases.push('outlook');
     if (from && to && from <= weekEnd && to >= weekStart && !bases.includes('takes-effect') && !bases.includes('ends')) bases.push('ongoing');
+    if (catchUpSince && from && from >= catchUpSince && from < weekStart && (!to || to >= weekStart)) bases.push('catch-up');
   }
 
   if (bases.length > 0) return { ok: true, basis: bases[0], bases };
@@ -138,6 +142,14 @@ const GENERIC_PATHS = [
 const GENERIC_TITLE =
   /^(?:aktuelles aus\b|polizei\w*\b|kreispolizeibeh|bundespolizei\w*\b|road closures? and delays|current road closures|map of road closures|traffic (?:&|and) highways road information map|road information map|current roadworks|zahtjevi i suglasnosti|faq\b|le gouvernement luxembourgeois|startseite|home ?page|newsroom$|news$|aktuelles$|medienmitteilungen$)/i;
 
+// Evergreen explainers re-dated every season ("Winter Rules for Trucks in
+// Europe 2026/27", "Oversize load permit in Hungary (2026): authority, fees",
+// "Transport to Italy") are reference material, not a dated development.
+const EVERGREEN_TITLE =
+  /\b(?:guide|explained|overview|everything you need to know|what you need to know|by country|knowledge ?base|how to)\b|\b20\d\d\/\d\d\b|^transport to [a-z ]+$|\bpermits? and procedures\b|\((?:20\d\d)\)\s*:/;
+// Non-official sites only: blogs, knowledge bases and country/permit guides.
+const EVERGREEN_PATH = /\/(?:blogs?|guides?|knowledge-?base|wiki|glossary|country|countries|permits)\//i;
+
 function wordCount(title) {
   return String(title || '')
     .replace(/[^\p{L}\p{N}]+/gu, ' ')
@@ -158,6 +170,9 @@ export function checkSpecificDevelopment(candidate = {}) {
   } catch {
     return { ok: false, reason: 'source URL is not a valid absolute URL' };
   }
+  if (isOwnPublication(url.href)) {
+    return { ok: false, reason: 'DAJC own publication - never a source' };
+  }
   const { pathname, search } = url;
   if ((!search && HOMEPAGE_PATHS.some((re) => re.test(pathname))) || GENERIC_PATHS.some((re) => re.test(pathname))) {
     return { ok: false, reason: 'generic homepage/listing/project/landing page, not a specific development' };
@@ -165,6 +180,10 @@ export function checkSpecificDevelopment(candidate = {}) {
   const title = String(candidate.sourceTitle || candidate.title || '').trim();
   if (GENERIC_TITLE.test(title)) {
     return { ok: false, reason: `generic page title "${title}", not a specific development` };
+  }
+  const tier = candidate.sourceTier || sourceTier(url.href);
+  if (EVERGREEN_TITLE.test(foldText(title)) || (tier === SECONDARY_TIER && EVERGREEN_PATH.test(pathname))) {
+    return { ok: false, reason: `evergreen guide/explainer "${title}", not a dated development` };
   }
   if (wordCount(title) < 3) {
     return { ok: false, reason: `bare topic/landing title "${title}", not a specific development` };

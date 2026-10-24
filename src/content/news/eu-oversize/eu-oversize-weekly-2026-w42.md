@@ -12,7 +12,7 @@ sources:
     url: "https://www.sftrf.fr/convois-exceptionnels/"
   - name: "Autobahn GmbH — A40"
     url: "https://www.autobahn.de/betrieb-verkehr/verkehrsmeldung/a40-vollsperrung-zwischen-muelheim-winkhausen-und-muelheim-heissen"
-  - name: "Autobahn GmbH — A3/A93 Regensburg"
+  - name: "Autobahn GmbH — A3/A93 Regensburg (notice removed by the publisher after the closure)"
     url: "https://www.autobahn.de/betrieb-verkehr/verkehrsmeldung/a3-i-a93-grossraum-regensburg"
   - name: "Autobahn GmbH — A7 Egestorf–Evendorf"
     url: "https://www.autobahn.de/betrieb-verkehr/verkehrsmeldung/a7-rifa-hannover-deckschichterneuerung-zwischen-der-as-egestorf-41-und-der-as-evendorf-42-ab-0610-bis-vrs-ende-dezember-2026"
@@ -69,7 +69,7 @@ Autobahn GmbH plans a **full closure of the A93 at the Regensburg interchange in
 
 **Operator action:** confirm the final timing before dispatch. The announced diversions via Regensburg-Universität and Sinzing are not automatically approved for GST movements.
 
-*Source: [Autobahn GmbH — A3/A93 Regensburg](https://www.autobahn.de/betrieb-verkehr/verkehrsmeldung/a3-i-a93-grossraum-regensburg).*
+*Source: [Autobahn GmbH — A3/A93 Regensburg](https://www.autobahn.de/betrieb-verkehr/verkehrsmeldung/a3-i-a93-grossraum-regensburg) (notice removed by the publisher after the closure).*
 
 ## Germany: A7 Egestorf–Evendorf narrows from 12 October
 
@@ -186,7 +186,7 @@ No additional item was added merely to reach a numerical target. Absence from th
 
 - [SFTRF — Exceptional convoys](https://www.sftrf.fr/convois-exceptionnels/)
 - [Autobahn GmbH — A40 closure](https://www.autobahn.de/betrieb-verkehr/verkehrsmeldung/a40-vollsperrung-zwischen-muelheim-winkhausen-und-muelheim-heissen)
-- [Autobahn GmbH — A3/A93 Regensburg](https://www.autobahn.de/betrieb-verkehr/verkehrsmeldung/a3-i-a93-grossraum-regensburg)
+- [Autobahn GmbH — A3/A93 Regensburg](https://www.autobahn.de/betrieb-verkehr/verkehrsmeldung/a3-i-a93-grossraum-regensburg) (notice removed by the publisher after the closure)
 - [Autobahn GmbH — A7 Egestorf–Evendorf](https://www.autobahn.de/betrieb-verkehr/verkehrsmeldung/a7-rifa-hannover-deckschichterneuerung-zwischen-der-as-egestorf-41-und-der-as-evendorf-42-ab-0610-bis-vrs-ende-dezember-2026)
 - [Autobahn GmbH — A565 Bonn](https://www.autobahn.de/betrieb-verkehr/verkehrsmeldung/a565-naechtliche-sperrungen-zwischen-der-aus-und-der-auffahrt-bonn-poppelsdorf)
 - [Landesbetrieb Straßenwesen Brandenburg](https://www.ls.brandenburg.de/ls/de/verwalten/grossraum-und-schwertransporte/)

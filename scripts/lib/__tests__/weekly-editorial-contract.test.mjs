@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as openaiClient from '../openai-client.mjs';
+import * as articleWriter from '../article-writer.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -17,7 +17,7 @@ const WEEKLY_FILES = [
 
 describe('quality over count', () => {
   it('the LLM prompt and schema contain no minimum-count instruction', () => {
-    const source = read('scripts/lib/openai-client.mjs');
+    const source = read('scripts/lib/article-writer.mjs');
     expect(source).not.toMatch(/hard (?:editorial )?minimum|Minimum 20|Minimum 10|at least 10|at least 6 distinct|reach the 20|Return 20-30/i);
     expect(source).toMatch(/There is NO minimum number of reports/);
     expect(source).toMatch(/Maximum 30/);
@@ -25,7 +25,7 @@ describe('quality over count', () => {
   });
 
   it('exports no lead or Rest-of-Europe supplement generators', () => {
-    expect(Object.keys(openaiClient).sort()).toEqual(['generateArticleWithClaude', 'generateArticleWithOpenAI', 'generateArticleWithSonar', 'generateRequiredItemsWithClaude', 'generateRequiredItemsWithOpenAI', 'generateRequiredItemsWithSonar']);
+    expect(Object.keys(articleWriter).sort()).toEqual(['generateArticleWithClaude', 'generateRequiredItemsWithClaude']);
   });
 
   it('has no repair loop, tier rebalancing or retry-until-padded runner', () => {

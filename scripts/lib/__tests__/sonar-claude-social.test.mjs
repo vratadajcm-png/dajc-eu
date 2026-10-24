@@ -1,8 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { parseCandidateArticle, reviewApproved } from '../../claude-weekly-review.mjs';
 import { createClaudeSocialCopy, validateSocialCopy } from '../claude-social-copy.mjs';
-import { checkSonarKeyPreflight } from '../preflight.mjs';
-import { buildSearchPrompt, SEARCH_GROUPS, searchGroup } from '../web-search.mjs';
+import { checkClaudeKeyPreflight } from '../preflight.mjs';
 
 const articleUrl = 'https://www.dajc.eu/news/eu-oversize/eu-oversize-weekly-2026-w44';
 const now = new Date('2026-10-22T11:00:00Z');
@@ -20,23 +19,11 @@ const markdown = [
  '## Sources', '- [Road authority](' + source + ')',
 ].join('\n');
 
-describe('Sonar / Claude / Buffer chain - nonpublishing gates', () => {
- it('requires a Sonar key for the scheduled writer, but not dry-run mock', () => {
-   expect(checkSonarKeyPreflight({ mock: false, apiKey: '' }).ok).toBe(false);
-   expect(checkSonarKeyPreflight({ mock: true, apiKey: '' }).ok).toBe(true);
-   expect(checkSonarKeyPreflight({ mock: false, apiKey: 'dummy' }).ok).toBe(true);
- });
- it('uses Sonar chat completions for researched discovery while preserving canonical sources', async () => {
-   const calls = [];
-   const client = { chat: { completions: { create: async payload => {
-     calls.push(payload);
-     return { choices: [{ message: { content: JSON.stringify({ items: [] }) } }] };
-   } } } };
-   const result = await searchGroup(client, SEARCH_GROUPS[0], { now, focuses: ['oversize'], provider: 'perplexity' });
-   expect(result).toMatchObject({ status: 'ok', items: [] });
-   expect(calls[0].model).toBe('sonar-pro');
-   expect(calls[0].response_format.type).toBe('json_schema');
-   expect(calls[0].messages[1].content).toContain('OFFICIAL PRIMARY');
+describe('Search / Claude / Buffer chain - nonpublishing gates', () => {
+ it('requires a Claude key for the scheduled writer, but not dry-run mock', () => {
+   expect(checkClaudeKeyPreflight({ mock: false, apiKey: '' }).ok).toBe(false);
+   expect(checkClaudeKeyPreflight({ mock: true, apiKey: '' }).ok).toBe(true);
+   expect(checkClaudeKeyPreflight({ mock: false, apiKey: 'dummy' }).ok).toBe(true);
  });
  it('refuses wrong week or release date and requires all source reviews', () => {
    const candidate = parseCandidateArticle('src/content/news/eu-oversize/eu-oversize-weekly-2026-w44.md', markdown, now);

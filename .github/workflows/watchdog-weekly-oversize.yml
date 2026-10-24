@@ -1,12 +1,17 @@
 name: Watchdog Weekly Oversize Publication
 
-# Recovery-only watchdog. The ONE primary publisher generates through Sonar,
+# Recovery-only watchdog. The ONE primary publisher researches with Perplexity Search,
 # validates with Claude, opens the protected PR and waits for GitHub checks.
 # This watchdog cannot write weekly content or bypass the editorial gate.
 on:
   schedule:
     - cron: '47 18 * * 4'
     - cron: '47 4 * * 5'
+    # After the Friday 12:00 Europe/Prague slot (13:37 CEST / 12:37 CET) and on
+    # Saturday: an edition PR still waiting for review means the site shows
+    # nothing for the week (W43 waited nine days without an alert).
+    - cron: '37 11 * * 5'
+    - cron: '37 8 * * 6'
   workflow_dispatch:
 permissions:
   contents: read
@@ -31,6 +36,19 @@ jobs:
         run: |
           gh workflow run publish-weekly-oversize.yml --repo "$GITHUB_REPOSITORY" --ref main
           echo "One primary workflow dispatched. Does not establish successful publication."
+      - name: Alert on an overdue edition or open PRs of past weeks
+        if: steps.publication.outputs.overdue == 'true' || steps.publication.outputs.stale_prs != ''
+        env:
+          OVERDUE: ${{ steps.publication.outputs.overdue }}
+          STALE_PRS: ${{ steps.publication.outputs.stale_prs }}
+        run: |
+          if [ "$OVERDUE" = "true" ]; then
+            echo "::error::The ${{ steps.publication.outputs.week }} edition is past its Friday 12:00 Europe/Prague slot and its PR is not merged. Review and merge it, or close it if the edition is withdrawn."
+          fi
+          for pr in $STALE_PRS; do
+            echo "::error::Edition PR for a week that has already passed is still open: $pr - close it or merge it as a correction."
+          done
+          exit 1
       - name: Outcome
         if: always()
         run: |

@@ -22,7 +22,7 @@ function fixture() {
   execFileSync('git', ['clone', remote, root], { stdio: 'ignore' });
   git(root, ['config', 'user.name', 'Test']);
   git(root, ['config', 'user.email', 'test@example.invalid']);
-  for (const relative of ['scripts/check-weekly-publication.mjs', 'scripts/publish-gate-commit.mjs', 'scripts/lib/publish-gate.mjs', 'scripts/lib/automation-data.mjs', 'scripts/lib/geographic-scope.mjs', 'config/europe-coverage.mjs', 'config/oversize-sources/index.mjs', 'scripts/lib/next-publication.mjs', 'scripts/lib/week.mjs']) {
+  for (const relative of ['scripts/check-weekly-publication.mjs', 'scripts/publish-gate-commit.mjs', 'scripts/lib/publish-gate.mjs', 'scripts/lib/automation-data.mjs', 'scripts/lib/geographic-scope.mjs', 'config/europe-coverage.mjs', 'config/oversize-sources/index.mjs', 'scripts/lib/next-publication.mjs', 'scripts/lib/week.mjs', 'scripts/lib/source-policy.mjs', 'config/official-authority-domains.mjs']) {
     mkdirSync(path.dirname(path.join(root, relative)), { recursive: true });
     copyFileSync(path.join(sourceRoot, relative), path.join(root, relative));
   }
@@ -36,7 +36,7 @@ function fixture() {
   const bin = path.join(base, 'bin');
   mkdirSync(bin);
   const log = path.join(base, 'gh.jsonl');
-  writeFileSync(path.join(bin, 'gh'), `#!${process.execPath}\nimport { appendFileSync, readFileSync } from 'node:fs';\nconst args = process.argv.slice(2);\nconst bodyIndex = args.indexOf('--body-file');\nappendFileSync(process.env.GH_TEST_LOG, JSON.stringify({args, body: bodyIndex < 0 ? null : readFileSync(args[bodyIndex + 1], 'utf8')}) + '\\n');\nif(args[0] === 'pr' && args[1] === 'create') console.log('https://github.com/example/dajc/pull/9001');\nif(args[0] === 'pr' && args[1] === 'list') console.log(process.env.GH_TEST_PENDING === '1' ? '[{"url":"https://github.com/example/dajc/pull/9001"}]' : '[]');\n`, { mode: 0o755 });
+  writeFileSync(path.join(bin, 'gh'), `#!${process.execPath}\nimport { appendFileSync, readFileSync } from 'node:fs';\nconst args = process.argv.slice(2);\nconst bodyIndex = args.indexOf('--body-file');\nappendFileSync(process.env.GH_TEST_LOG, JSON.stringify({args, body: bodyIndex < 0 ? null : readFileSync(args[bodyIndex + 1], 'utf8')}) + '\\n');\nif(args[0] === 'pr' && args[1] === 'create') console.log('https://github.com/example/dajc/pull/9001');\nif(args[0] === 'pr' && args[1] === 'list') console.log(process.env.GH_TEST_PULLS || (process.env.GH_TEST_PENDING === '1' ? '[{"url":"https://github.com/example/dajc/pull/9001","headRefName":"automation/weekly-2026-w43"}]' : '[]'));\n`, { mode: 0o755 });
   const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, GH_TOKEN: 'synthetic-test-token', GITHUB_REPOSITORY: 'example/dajc', GH_TEST_LOG: log, GITHUB_ACTIONS: 'true', GITHUB_OUTPUT: path.join(base, 'outputs'), GITHUB_STEP_SUMMARY: path.join(base, 'summary'), OVERSIZE_NOW: '2026-10-15T10:00:00Z', OVERSIZE_CORRECTION: '', OVERSIZE_PREVIEW: '' };
   return { base, root, remote, main, env, log };
 }
@@ -70,6 +70,39 @@ describe('reviewed weekly publication', () => {
     expect(readFileSync(outputFile, 'utf8')).toContain('needed=false');
     expect(output).toContain('no regeneration or additional AI spend');
     expect(git(f.remote, ['show-ref', '--heads']).trim()).toBe(`${f.main} refs/heads/main`);
+  });
+
+  it('recognises a regenerated retry PR and reports it overdue after the Friday slot', () => {
+    const f = fixture();
+    const outputFile = path.join(f.base, 'outputs');
+    const pulls = JSON.stringify([
+      { url: 'https://github.com/example/dajc/pull/63', headRefName: 'automation/weekly-2026-w43-retry-40074547124' },
+      { url: 'https://github.com/example/dajc/pull/39', headRefName: 'automation/weekly-2026-w42' },
+    ]);
+    // Friday 16 October 13:00 CEST - one hour after the W43 slot.
+    const output = run(f, 'check-weekly-publication.mjs', { GH_TEST_PULLS: pulls, GITHUB_OUTPUT: outputFile, OVERSIZE_NOW: '2026-10-16T11:00:00Z' });
+    const outputs = readFileSync(outputFile, 'utf8');
+    expect(outputs).toContain('needed=false');
+    expect(outputs).toContain('overdue=true');
+    expect(outputs).toContain('stale_prs=https://github.com/example/dajc/pull/39');
+    expect(output).toContain('::error::EU Oversize Weekly 2026-W43 is past its Friday 12:00');
+  });
+
+  it('is not overdue while the PR still has time before the slot', () => {
+    const f = fixture();
+    const outputFile = path.join(f.base, 'outputs');
+    run(f, 'check-weekly-publication.mjs', { GH_TEST_PENDING: '1', GITHUB_OUTPUT: outputFile });
+    expect(readFileSync(outputFile, 'utf8')).toContain('overdue=false');
+  });
+
+  it('keeps the findings of a prepared edition on the data branch as well', () => {
+    const f = fixture();
+    loadAutomationData('findings', f.root);
+    put(f.root, 'data/oversize/2026-W42/findings.json', '{"findings":[{"id":"n307","country":"Netherlands","jurisdiction":"NL"}]}');
+    put(f.root, 'src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md', 'validated article fixture');
+    run(f, 'publish-gate-commit.mjs');
+    expect(git(f.remote, ['show', 'automation/oversize-data:data/oversize/2026-W42/findings.json'])).toContain('n307');
+    expect(git(f.remote, ['rev-parse', 'main']).trim()).toBe(f.main);
   });
 
   it('stores a data-only run separately and never opens a publication PR', () => {

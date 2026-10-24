@@ -5,7 +5,7 @@
 // deterministic Weekly eligibility rules (scripts/lib/weekly-eligibility.mjs:
 // heavy-transport scope, publication-date freshness, no generic/landing pages,
 // no general driving bans, no repetition of earlier editions, >30-day closure
-// rule), re-verifies the survivors, asks OpenAI (or a free local mock, with
+// rule), re-verifies the survivors, asks Claude (or a free local mock, with
 // --mock) to write a briefing for the UPCOMING week from those candidates only,
 // cross-validates and re-filters every returned item, runs a quality gate,
 // and only then writes content/news/eu-oversize/<slug>.md - followed by an
@@ -40,11 +40,11 @@ import { loadWeekFindings } from './lib/store.mjs';
 import { isoWeekLabel, isoWeekRangeLabel, isoWeekStart, isoWeekEnd } from './lib/week.mjs';
 import { selectCandidates } from './lib/select-candidates.mjs';
 import { verifyCandidates } from './lib/verify-candidates.mjs';
-import { generateArticleWithOpenAI, generateRequiredItemsWithOpenAI, generateArticleWithSonar, generateRequiredItemsWithSonar, generateArticleWithClaude, generateRequiredItemsWithClaude } from './lib/openai-client.mjs';
+import { generateArticleWithClaude, generateRequiredItemsWithClaude } from './lib/article-writer.mjs';
 import { generateArticleMock, generateRequiredItemsMock } from './lib/mock-generator.mjs';
 import { renderArticleMarkdown, toFrontmatterYaml } from './lib/render-article.mjs';
 import { runQualityGate, MAX_REPORTS, MAX_ROUNDUP_REPORTS } from './lib/quality-gate.mjs';
-import { checkSonarKeyPreflight, checkOpenAiKeyPreflight } from './lib/preflight.mjs';
+import { checkClaudeKeyPreflight } from './lib/preflight.mjs';
 import { formatNextPublicationLabel, publicationSlotFor, targetWeekDateFor } from './lib/next-publication.mjs';
 import { crossValidateDevelopments } from './lib/cross-validate.mjs';
 import { attachCriticalGroupSources, criticalWeeklyGroups, missingCriticalGroups } from './lib/critical-floor.mjs';
@@ -52,6 +52,7 @@ import { filterGeneratedItems } from './lib/generated-item-filter.mjs';
 import { loadPreviousEditionSources } from './lib/previous-editions.mjs';
 import { FRESHNESS_WINDOW_DAYS, editionFreshSince } from './lib/weekly-eligibility.mjs';
 import { capSection, criticalGroupOwners, orderEditionItems } from './lib/edition-order.mjs';
+import { alignEditionSummary } from './lib/edition-summary.mjs';
 import { oversizeSources } from '../config/oversize-sources/index.mjs';
 
 const execFileAsync = promisify(execFile);
@@ -100,7 +101,7 @@ async function abort(reason) {
 }
 
 // Distinct from abort(): a configuration error (e.g. a missing
-// OPENAI_API_KEY) is not "no news this week" - it must fail the run
+// ANTHROPIC_API_KEY) is not "no news this week" - it must fail the run
 // (non-zero exit) so it shows up as a red workflow run instead of silently
 // looking identical to a normal quiet week.
 async function fail(reason) {
@@ -135,10 +136,8 @@ async function main() {
   // Preflight, before any network/data work: a missing key on a real run is
   // a configuration error, not something worth spending verification time
   // on first. See scripts/lib/preflight.mjs.
-  const sonarEnabled = process.env.DAJC_SONAR_ENABLED === 'true';
-  const searchClaudeEnabled = process.env.DAJC_SEARCH_CLAUDE_ENABLED === 'true';
-  const apiKey = searchClaudeEnabled ? process.env.ANTHROPIC_API_KEY : (sonarEnabled ? process.env.PERPLEXITY_API_KEY : process.env.OPENAI_API_KEY);
-  const preflight = (sonarEnabled || searchClaudeEnabled) ? checkSonarKeyPreflight({ mock, apiKey }) : checkOpenAiKeyPreflight({ mock, apiKey });
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const preflight = checkClaudeKeyPreflight({ mock, apiKey });
   if (!preflight.ok) {
     await fail(preflight.reason);
     return;
@@ -169,7 +168,7 @@ async function main() {
   console.log(`Reading findings from ISO week: ${thisWeek}`);
   console.log(`${preview ? 'Publishing PREVIEW for' : 'Publishing for upcoming week'}: ${nextWeekLabel} (${weekRangeLabel})`);
   if (!preview) console.log(`Public from: ${publicationSlot.toISOString()} (Friday 12:00 Europe/Prague)`);
-  console.log(mock ? 'Mode: MOCK (no OpenAI call, no cost)' : 'Mode: LIVE (calls OpenAI API)');
+  console.log(mock ? 'Mode: MOCK (no Claude call, no cost)' : 'Mode: LIVE (calls the Claude API)');
   if (dryRun) {
     console.log('DRY RUN: will generate, validate and build the article, then discard it - nothing will be committed.');
   }
@@ -222,9 +221,18 @@ async function main() {
   });
   const sourceByName = new Map(oversizeSources.map((source) => [source.name, source]));
   const freshSince = editionFreshSince(now, publicationSlot);
+  // Spec §7 catch-up: when the previous week's final edition was never
+  // published (W43), a change that took effect during that skipped week is
+  // still reported now instead of falling between two editions.
+  const previousTargetDate = new Date(targetWeekStart.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const previousEditionPath = path.join(ARTICLES_DIR, `eu-oversize-weekly-${isoWeekLabel(previousTargetDate).toLowerCase()}.md`);
+  const previousEditionPublished = existsSync(previousEditionPath) &&
+    /^status:\s*"?published"?\s*$/m.test(await readFile(previousEditionPath, 'utf-8'));
+  const catchUpSince = previousEditionPublished ? null : isoWeekStart(previousTargetDate);
   const eligibilityContext = {
     now,
     freshSince,
+    catchUpSince,
     weekStart: targetWeekStart,
     weekEnd: targetWeekEnd,
     previousEditions,
@@ -234,6 +242,9 @@ async function main() {
     `Eligibility: source published on/after ${freshSince.toISOString().slice(0, 10)} (${FRESHNESS_WINDOW_DAYS} days before preparation) or validity beginning/ending in ${nextWeekLabel}, ` +
       `heavy-transport scope, no general driving bans, no generic pages, ${previousEditions.size} source URL(s) already published in earlier editions.`
   );
+  if (catchUpSince) {
+    console.log(`Catch-up: the ${isoWeekLabel(previousTargetDate)} edition was not published; changes in force since ${catchUpSince.toISOString().slice(0, 10)} are eligible.`);
+  }
 
   const { selected: preSelected, rejected } = selectCandidates(findings, eligibilityContext);
   logRejections(rejected);
@@ -276,7 +287,7 @@ async function main() {
   try {
     article = mock
       ? await generateArticleMock({ candidates: verified, weekRangeLabel })
-      : await (searchClaudeEnabled ? generateArticleWithClaude : (sonarEnabled ? generateArticleWithSonar : generateArticleWithOpenAI))({
+      : await generateArticleWithClaude({
           candidates: verified,
           requiredSourceUrls,
           weekRangeLabel,
@@ -290,7 +301,6 @@ async function main() {
     return;
   }
 
-  const generatedDevelopmentUrls = [...(article.developments || []), ...(article.europeRoundup || [])].map((item) => item.sourceUrl);
   const filterOptions = { weekStart: targetWeekStart, weekEnd: targetWeekEnd, candidatesByUrl, eligibilityContext };
   const leadValidation = crossValidateDevelopments(article.developments, verified);
   const leadFilter = filterGeneratedItems(leadValidation.kept, filterOptions);
@@ -318,7 +328,7 @@ async function main() {
     try {
       const written = mock
         ? await generateRequiredItemsMock({ groups: missing })
-        : await (searchClaudeEnabled ? generateRequiredItemsWithClaude : (sonarEnabled ? generateRequiredItemsWithSonar : generateRequiredItemsWithOpenAI))({
+        : await generateRequiredItemsWithClaude({
             candidates: missing.flatMap((group) => group.candidates),
             targetWeekStart: targetWeekStartIso,
             targetWeekEnd: targetWeekEndIso,
@@ -361,25 +371,22 @@ async function main() {
 
   article = attachCriticalGroupSources(article, criticalGroups);
 
-  // The model writes the checklist before the filters above run, so it can
-  // mention developments that were removed (W42 listed Ukrainian and Irish
-  // items that were not in the edition). When anything was removed, rebuild
-  // the checklist from the reports that remain.
-  const published = [...article.developments, ...article.europeRoundup];
-  const generatedUrls = [...(generatedDevelopmentUrls || [])];
-  if (generatedUrls.some((url) => !published.some((item) => item.sourceUrl === url))) {
-    article.operatorChecklist = published
-      .filter((item) => item.recommendedAction)
-      .map((item) => `${item.country}: ${item.recommendedAction}`);
-    console.log('Operator checklist rebuilt from the published reports (some generated items were removed).');
-  }
-
   // Deterministic operator-first order: importance tier first, then Central
   // Europe before connected corridors, the rest of Europe and peripheral
   // jurisdictions. Never a relevance bypass.
   const orderOptions = { candidatesByUrl, criticalUrls: new Set(requiredSourceUrls) };
   article.developments = orderEditionItems(article.developments, orderOptions);
   article.europeRoundup = orderEditionItems(article.europeRoundup, orderOptions);
+
+  // The model writes the checklist, title, description and intro for every
+  // candidate it saw (W42-W44 promised Ukrainian, Irish, tachograph and
+  // Hungarian items that were not in the edition). The checklist always comes
+  // from the published reports; summary text naming an unpublished country is
+  // replaced.
+  const { fixed: summaryFixes } = alignEditionSummary(article, { weekRangeLabel });
+  if (summaryFixes.length > 0) {
+    console.log(`Edition copy rebuilt from the published reports: ${summaryFixes.join(', ')} named a country without a report.`);
+  }
 
   console.log(`Lead reports: ${article.developments.length}`);
   console.log(`Rest-of-Europe reports: ${article.europeRoundup.length}`);
@@ -470,7 +477,7 @@ async function main() {
     console.log('=== END OF DRY RUN ARTICLE ===\n');
     await unlink(writeTargetPath).catch(() => {});
     console.log(`Removed ${path.relative(ROOT, writeTargetPath)} (dry run - nothing is left to commit).`);
-    console.log('\nDry run complete: verification, OpenAI synthesis, cross-validation, quality gate and build all passed.');
+    console.log('\nDry run complete: verification, Claude synthesis, cross-validation, quality gate and build all passed.');
     console.log('No file was left on disk and nothing was committed or pushed. The real target path');
     console.log(`(${path.relative(ROOT, filePath)}) was never written to.`);
     await appendSummary(

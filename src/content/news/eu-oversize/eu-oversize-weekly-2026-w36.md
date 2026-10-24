@@ -32,6 +32,8 @@ sources:
     url: "https://www.promet.si/en/my-traffic"
 ---
 
+*Archive note (24 October 2026): this edition predates the scope decision of 2 October 2026. General HGV driving bans are now covered by [DAJC Driving Bans](/driving-bans), not by EU Oversize Weekly, and the restrictions below are not current.*
+
 ## Intro
 
 As we enter the week of 31 August to 6 September 2026, European heavy goods vehicle (HGV) operators face several critical movement restrictions. Key regulations are in place across Czechia, France, Germany, and more, requiring careful planning to ensure compliance and operational efficiency.
