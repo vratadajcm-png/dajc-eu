@@ -10,6 +10,8 @@ status: "published"
 sources:
   - name: "Rijkswaterstaat"
     url: "https://www.rijkswaterstaat.nl/nieuws/archief/2026/09/n307-gewichtsbeperking-markerwaarddijk-vanaf-21-oktober-2026"
+  - name: "Rijkswaterstaat — detailed Houtribdijk restriction"
+    url: "https://www.rijkswaterstaat.nl/water/waterbeheer/bescherming-tegen-het-water/waterkeringen/dijken/houtribdijk/aslast-en-gewichtsbeperking-houtribdijk"
 ---
 
 ## Intro
@@ -32,7 +34,7 @@ The Dutch road authority Rijkswaterstaat confirms that restrictions have applied
 
 **Exemptions/conditions:** Passenger cars, emergency services, vans and other vehicles meeting the posted restrictions may continue to use the route. No general exemption for oversize transport is confirmed by the cited authority notice.
 
-*Official source: [Rijkswaterstaat — N307 weight restriction from 21 October 2026](https://www.rijkswaterstaat.nl/nieuws/archief/2026/09/n307-gewichtsbeperking-markerwaarddijk-vanaf-21-oktober-2026).*
+*Official sources: [Rijkswaterstaat — N307 weight restriction from 21 October 2026](https://www.rijkswaterstaat.nl/nieuws/archief/2026/09/n307-gewichtsbeperking-markerwaarddijk-vanaf-21-oktober-2026) and [detailed Houtribdijk weight and axle-load restrictions](https://www.rijkswaterstaat.nl/water/waterbeheer/bescherming-tegen-het-water/waterkeringen/dijken/houtribdijk/aslast-en-gewichtsbeperking-houtribdijk).*
 
 ## Rest of Europe: verified operational roundup
 
@@ -48,6 +50,8 @@ No additional development meeting the Weekly's source-verification and materiali
 ## Sources
 
 - [Rijkswaterstaat — N307: weight restriction from 21 October 2026](https://www.rijkswaterstaat.nl/nieuws/archief/2026/09/n307-gewichtsbeperking-markerwaarddijk-vanaf-21-oktober-2026)
+
+- [Rijkswaterstaat — detailed Houtribdijk restriction](https://www.rijkswaterstaat.nl/water/waterbeheer/bescherming-tegen-het-water/waterkeringen/dijken/houtribdijk/aslast-en-gewichtsbeperking-houtribdijk)
 
 ## Next EU Oversize Weekly
 
