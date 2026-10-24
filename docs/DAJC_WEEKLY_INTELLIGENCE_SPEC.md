@@ -149,3 +149,14 @@ This policy does not by itself activate the new Search/Claude producer or DAJC.c
 ### Social traffic objective (24 October 2026)
 
 **X and LinkedIn are discovery channels, not mirrors of the full article.** Their primary objective is to attract genuinely interested readers to the complete, public DAJC.eu Weekly. Claude must write separate, accurate teasers with one or two substantiated highlights, relevant professional impact, and a clear call to read the full article, linking to the exact canonical DAJC.eu URL once. Never reproduce the entire article or all headlines on social platforms. No fabricated urgency, withheld safety-critical facts, misleading clickbait, unverified numbers or generic promotional filler. X should be exceptionally concise; LinkedIn should be a short, substantive professional invitation. Keep company identity and anti-duplicate safeguards unchanged. Measure link clicks and visits when authorized analytics become available, but do not invent traffic figures.
+
+
+## 14. Permanent social click-through and locale policy (24 October 2026)
+
+**Primary goal of X and LinkedIn: bring qualified readers to the complete DAJC article.** Social posts are distinct factual teasers, not complete reproductions of the Weekly. Each teaser must offer a concrete reason to open the article, a clear call to read the full briefing, and the **exact, already publicly accessible canonical URL** for its language.
+
+- English X and company LinkedIn posts link to **dajc.eu** English article.
+- Czech X and company LinkedIn posts link to **dajc.cz** Czech article.
+- Both social channels may carry both languages, but only when their matching public article exists; never link a Czech teaser to an English-only article, invent a DAJC.cz slug, or send duplicate cross-language posts for one article without the configured channel policy.
+- X is brief and curiosity-building without misleading clickbait. LinkedIn is a short professional teaser focused on why the full report matters for dispatchers, drivers and transport companies. Neither post should disclose the whole article or invent facts, restrictions, dates, or claims.
+- Social posts are scheduled **after** each language's own public website article is confirmed live. Existing social-account authorization and anti-duplicate ledgers remain mandatory. Czech localization and dual-language social posting are not activated until separately implemented and verified.
