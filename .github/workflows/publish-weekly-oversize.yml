@@ -173,7 +173,7 @@ jobs:
         run: node scripts/generate-weekly-article.mjs ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }} ${{ steps.trigger.outputs.preview == 'true' && '--preview' || '' }} ${{ github.event.inputs.correction == 'true' && '--correction' || '' }}
 
       - name: Claude final editorial approval for Sonar article
-        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true' && (vars.DAJC_SONAR_ENABLED == 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED == 'true')
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true' && (vars.DAJC_SONAR_ENABLED == 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED == 'true' || github.event.inputs.search_claude == 'true')
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}
