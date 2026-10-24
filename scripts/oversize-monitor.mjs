@@ -37,7 +37,9 @@ async function main() {
   const useWeb = discovery !== 'official';
   const useOfficial = discovery !== 'web';
   const sonarEnabled = process.env.DAJC_SONAR_ENABLED === 'true';
-  const researchKey = sonarEnabled ? process.env.PERPLEXITY_API_KEY : process.env.OPENAI_API_KEY;
+  const searchClaudeEnabled = process.env.DAJC_SEARCH_CLAUDE_ENABLED === 'true';
+  const researchKey = (sonarEnabled || searchClaudeEnabled) ? process.env.PERPLEXITY_API_KEY : process.env.OPENAI_API_KEY;
+  if (searchClaudeEnabled && !process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY required for Search classification');
   if (useWeb && !researchKey) {
     throw new Error((sonarEnabled ? 'PERPLEXITY_API_KEY' : 'OPENAI_API_KEY') + ' is not set for the chosen research backend (OVERSIZE_DISCOVERY=official is the keyless read-only crawler option).');
   }
