@@ -28,6 +28,10 @@ on:
     - cron: '17 6 * * 6'  # Saturday catch-up
   workflow_dispatch:
     inputs:
+      search_claude:
+        description: 'Use verified Perplexity Search and Claude for this one manual regeneration; leave permanent activation unchanged.'
+        type: boolean
+        default: false
       dry_run:
         description: 'Dry run: generate, verify and build the article but do not commit/push.'
         type: boolean
@@ -60,7 +64,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       DAJC_AUTONOMOUS_WEEKLY: ${{ (vars.DAJC_SONAR_ENABLED == 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED == 'true') && '1' || '0' }}
       DAJC_SONAR_ENABLED: ${{ vars.DAJC_SONAR_ENABLED }}
-      DAJC_SEARCH_CLAUDE_ENABLED: ${{ vars.DAJC_SEARCH_CLAUDE_ENABLED }}
+      DAJC_SEARCH_CLAUDE_ENABLED: ${{ github.event.inputs.search_claude == 'true' && 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED }}
       OVERSIZE_PREVIEW: ${{ github.event.inputs.preview == 'true' && '1' || '' }}
       OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
     steps:
@@ -152,6 +156,8 @@ jobs:
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}
         run: npm run oversize:monitor
 
       - name: Generate weekly article
@@ -159,13 +165,15 @@ jobs:
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}
         # One generation attempt. Quality > count: an edition contains exactly
         # the items that pass every editorial rule, so there is nothing to
         # retry for (no lead/Rest-of-Europe minimum, no padding loop).
         run: node scripts/generate-weekly-article.mjs ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }} ${{ steps.trigger.outputs.preview == 'true' && '--preview' || '' }} ${{ github.event.inputs.correction == 'true' && '--correction' || '' }}
 
       - name: Claude final editorial approval for Sonar article
-        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true' && (vars.DAJC_SONAR_ENABLED == 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED == 'true')
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true' && (vars.DAJC_SONAR_ENABLED == 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED == 'true' || github.event.inputs.search_claude == 'true')
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}

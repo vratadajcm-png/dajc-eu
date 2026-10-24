@@ -125,7 +125,14 @@ if (!articleAdded) {
 
 const repository = process.env.GITHUB_REPOSITORY;
 if (!/^[\w.-]+\/[\w.-]+$/.test(repository || '') || !process.env.GH_TOKEN) throw new Error('GitHub publication PR access is not configured');
-const branch = publicationBranchFor(week, { preview: process.env.OVERSIZE_PREVIEW === '1', correction: process.env.OVERSIZE_CORRECTION === '1' || articleReplaced });
+let branch = publicationBranchFor(week, { preview: process.env.OVERSIZE_PREVIEW === '1', correction: process.env.OVERSIZE_CORRECTION === '1' || articleReplaced });
+// Preserve old closed/rejected publication PRs for audit. Never force-push
+// or silently reuse their branch; make a fresh review branch for regeneration.
+if (git(['ls-remote', '--heads', 'origin', 'refs/heads/' + branch]).trim()) {
+  const run = process.env.GITHUB_RUN_ID;
+  if (!/^[0-9]+$/.test(run || '')) throw new Error('Cannot safely name regenerated publication branch');
+  branch += '-retry-' + run;
+}
 git(['switch', '-c', branch]);
 for (const addPath of decision.addPaths) git(['add', addPath]);
 // Include both sides of a rename, so a staged source deletion cannot hide
