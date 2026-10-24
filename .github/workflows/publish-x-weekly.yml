@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      DAJC_CLAUDE_SOCIAL_ENABLED: ${{ vars.DAJC_CLAUDE_SOCIAL_ENABLED }}
+      DAJC_CLAUDE_SOCIAL_ENABLED: ${{ vars.DAJC_CLAUDE_SOCIAL_ENABLED || 'true' }}
     steps:
       - uses: actions/checkout@v4
         with:
