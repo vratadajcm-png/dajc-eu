@@ -1,6 +1,6 @@
 {
   "week": "2026-W43",
-  "checkedAt": "2026-10-24T10:39:01.954Z",
+  "checkedAt": "2026-10-24T10:54:15.723Z",
   "coverageVersion": "2026-10-22.50",
   "jurisdictions": [
     {
@@ -57,8 +57,8 @@
       "code": "BA",
       "name": "Bosnia and Herzegovina",
       "sourceScope": "BA",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-no-material-development-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "balkans",
       "candidateFindings": 0
@@ -131,7 +131,7 @@
       "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "de",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "DK",
@@ -147,8 +147,8 @@
       "code": "EE",
       "name": "Estonia",
       "sourceScope": "EE",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "baltics",
       "candidateFindings": 0
@@ -157,8 +157,8 @@
       "code": "ES",
       "name": "Spain",
       "sourceScope": "ES",
-      "status": "checked-major-or-short-update-candidates-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "iberia",
       "candidateFindings": 2
@@ -187,11 +187,11 @@
       "code": "GE",
       "name": "Georgia",
       "sourceScope": "GE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "east",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "GR",
@@ -217,8 +217,8 @@
       "code": "HU",
       "name": "Hungary",
       "sourceScope": "HU",
-      "status": "checked-major-or-short-update-candidates-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "hu",
       "candidateFindings": 3
@@ -427,8 +427,8 @@
       "code": "SE",
       "name": "Sweden",
       "sourceScope": "SE",
-      "status": "checked-major-or-short-update-candidates-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "nordics",
       "candidateFindings": 3
@@ -477,11 +477,11 @@
       "code": "UA",
       "name": "Ukraine",
       "sourceScope": "UA",
-      "status": "checked-major-or-short-update-candidates-found",
+      "status": "checked-no-material-development-found",
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "east",
-      "candidateFindings": 1
+      "candidateFindings": 0
     },
     {
       "code": "UK",
