@@ -67,6 +67,48 @@ def claude():
         raise RuntimeError("Claude returned an unexpected structured response")
     print("PASS Claude: authenticated, structured response accepted (model " + model + ")")
 
+
+def sonar_compare_modes():
+    """Two independent, bounded API requests; no article, no writes."""
+    key = os.environ.get("PERPLEXITY_API_KEY", "")
+    if not key:
+        print("FAIL Sonar: PERPLEXITY_API_KEY not visible")
+        return 1
+    model = os.environ.get("PERPLEXITY_SEARCH_MODEL") or "sonar-pro"
+    endpoint = "https://api.perplexity.ai/chat/completions"
+    headers = {"Authorization": "Bearer " + key}
+    messages = [{"role": "user", "content": "For a connectivity test, reply with the single word OK."}]
+    basic = {"model": model, "messages": messages, "max_tokens": 40}
+    structured = {
+        "model": model,
+        "messages": [{"role": "user", "content": "For a connectivity test return JSON with status ok."}],
+        "max_tokens": 80,
+        "response_format": {
+            "type": "json_schema",
+            "json_schema": {"schema": {
+                "type": "object", "properties": {"status": {"type": "string"}},
+                "required": ["status"]
+            }}
+        }
+    }
+    outcomes = []
+    for label, payload in (("basic", basic), ("structured_json", structured)):
+        try:
+            response = post(endpoint, headers, payload)
+            text = response.get("choices", [{}])[0].get("message", {}).get("content", "")
+            if not isinstance(text, str) or not text.strip():
+                raise RuntimeError("API returned empty content")
+            if label == "structured_json" and json.loads(text).get("status") != "ok":
+                raise RuntimeError("JSON schema output did not match expected value")
+            print("PASS Sonar " + label + " (model " + model + ")")
+            outcomes.append(True)
+        except Exception as error:
+            # Do not echo response bodies or sensitive headers into CI logs.
+            print("FAIL Sonar " + label + ": " + str(error))
+            outcomes.append(False)
+    print("No article, PR, production change or social post created.")
+    return 0 if all(outcomes) else 1
+
 def main():
     results = []
     for name, fn in (("Perplexity Sonar", sonar), ("Claude", claude)):
@@ -81,4 +123,6 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
+    if '--compare-sonar' in sys.argv:
+        sys.exit(sonar_compare_modes())
     main()
