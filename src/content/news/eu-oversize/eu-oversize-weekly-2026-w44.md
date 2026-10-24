@@ -28,7 +28,7 @@ The Dutch road authority Rijkswaterstaat confirms that restrictions have applied
 **Affected vehicles:** Any vehicle or combination exceeding 15 tonnes total actual weight, or exceeding 7.3 tonnes on an axle  
 **Impact:** The affected bridges are unavailable to heavy transport exceeding either limit. Rijkswaterstaat says the measure may remain in force for years because of structural problems with the bridges.
 
-**Recommended action:** Dispatchers should check the actual gross combination weight and individual axle loads before assigning this corridor. Rijkswaterstaat directs affected heavy traffic towards the surrounding **A6 and A7** roads; verify the entire alternative route, including any oversize permit conditions, before departure. Do not treat a suggested detour as an amendment to an issued abnormal-load permit.
+**Recommended action:** Dispatchers should check the actual gross combination weight and individual axle loads before assigning this corridor. Rijkswaterstaat directs affected heavy traffic towards the surrounding **A6 and A7** roads. Its detailed Houtribdijk restriction notice also states that existing exemptions conflicting with the new restriction cease to apply. Verify the entire alternative route and obtain any required revised abnormal-load permit before departure; a suggested detour does not amend an issued permit.
 
 **Exemptions/conditions:** Passenger cars, emergency services, vans and other vehicles meeting the posted restrictions may continue to use the route. No general exemption for oversize transport is confirmed by the cited authority notice.
 
@@ -42,6 +42,7 @@ No additional development meeting the Weekly's source-verification and materiali
 
 - Check the N307 Markerwaarddijk against **both** the 15-tonne gross combination limit and the 7.3-tonne axle-load limit.
 - Review the A6/A7 alternatives and any applicable abnormal-load permits before dispatch; never silently change a permitted route.
+- Treat any existing exemption that conflicts with the new limits as invalid, as stated by Rijkswaterstaat; confirm revised permits with the competent authority.
 - Recheck the road authority's current notice and roadside signs before travel.
 
 ## Sources
