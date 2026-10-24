@@ -282,18 +282,56 @@ export function extractPublicationDate({ feedDate = null, html = '', text = '', 
 //
 // The date a change applies is not its publication date. These patterns read
 // only explicit wording - "from 5 October 2026", "vom 14.09. bis 20.12.2026",
-// "until 20 December 2026" - and never guess: no evidence means null.
+// "until 20 December 2026" - and never guess: no evidence means null. A
+// labelled date without a year ("Vanaf 21 oktober geldt ...", Rijkswaterstaat
+// N307, W44) counts only when the caller passes the page's verified
+// publication date as `referenceDate`; its year is the one nearest that date.
 
 const VALIDITY_TEXT_CHARS = 2500;
 
 const RANGE_CONNECTOR =
-  /^\s*,?\s*(?:-|–|—|to|until|till|through|bis(?: zum| einschliesslich)?|au|jusqu'?au|al|hasta(?: el)?|do|az|and|und|et|y|i)\s*$/;
+  /^\s*,?\s*(?:-|–|—|to|until|till|through|bis(?: zum| einschliesslich)?|au|jusqu'?au|al|hasta(?: el)?|do|az|and|und|et|y|i|tot(?: en met)?|t\/m)\s*$/;
 
 const START_LABEL =
-  /(?:from|as of|with effect from|effective(?: from| as of)?|starting(?: on| from)?|starts on|started on|begins on|began on|commences? on|valid from|applies from|in force from|zacal[ao]?|zacne|zacina|beginnt am|begann am|ab(?: dem)?|ab sofort|seit(?: dem)?|gultig ab|a partir du|a compter du|des le|depuis le|a partire dal|in vigore dal|dal|desde el|a partir del|a partir de|platne od|plati od|obowiazuje od|vrijedi od|velja od|od|ode|(?:tritt|treten)(?: \S+)? am|in kraft am|en vigueur le|entre en vigueur le)\s*(?:the\s*)?$/;
+  /(?:from|as of|with effect from|effective(?: from| as of)?|starting(?: on| from)?|starts on|started on|begins on|began on|commences? on|valid from|applies from|in force from|zacal[ao]?|zacne|zacina|beginnt am|begann am|ab(?: dem)?|ab sofort|seit(?: dem)?|gultig ab|a partir du|a compter du|des le|depuis le|a partire dal|in vigore dal|dal|desde el|a partir del|a partir de|platne od|plati od|obowiazuje od|vrijedi od|velja od|od|ode|(?:tritt|treten)(?: \S+)? am|in kraft am|en vigueur le|entre en vigueur le|vanaf|met ingang van|fra og med|fran och med|fra|fran|incepand cu)\s*(?:the\s*)?$/;
 
 const END_LABEL =
-  /(?:until|till|up to and including|valid until|valid to|ends on|bis(?: zum| einschliesslich| voraussichtlich)?|jusqu'?au|jusqu'?a|fino al|hasta el|ate|do)\s*(?:the\s*)?$/;
+  /(?:until|till|up to and including|valid until|valid to|ends on|bis(?: zum| einschliesslich| voraussichtlich)?|jusqu'?au|jusqu'?a|fino al|hasta el|ate|do|tot en met|t\/m|tot|til og med|till och med|til|pana la)\s*(?:the\s*)?$/;
+
+// "21 oktober", "21. Oktober", "21.10." - a day and month with no year after
+// them (a full date is matched by findDates and wins where both overlap).
+const YEARLESS_DATE = new RegExp(
+  `\\b(\\d{1,2})(?:\\.\\s?(\\d{1,2})\\.(?!\\s?\\d)|(?:\\.|er)?\\s+(?:de\\s+)?(${MONTH_ALTERNATION})\\b(?!\\.?,?\\s+(?:de\\s+)?20\\d{2}))`,
+  'g'
+);
+
+function nearestYearIso(month, day, referenceIso) {
+  const reference = new Date(`${referenceIso}T00:00:00Z`).getTime();
+  const year = Number(referenceIso.slice(0, 4));
+  let best = null;
+  for (const candidate of [year - 1, year, year + 1]) {
+    const iso = isoFromParts(candidate, month, day);
+    if (!iso) continue;
+    const distance = Math.abs(new Date(`${iso}T00:00:00Z`).getTime() - reference);
+    if (!best || distance < best.distance) best = { iso, distance };
+  }
+  return best?.iso ?? null;
+}
+
+function yearlessDates(folded, fullDates, ctx) {
+  if (!/^20\d{2}-\d{2}-\d{2}$/.test(String(ctx.referenceDate || ''))) return [];
+  const found = [];
+  YEARLESS_DATE.lastIndex = 0;
+  let m;
+  while ((m = YEARLESS_DATE.exec(folded))) {
+    const index = m.index;
+    if (fullDates.some((date) => index >= date.index && index < date.end)) continue;
+    const month = m[2] ? Number(m[2]) : monthNumber(m[3], ctx);
+    const iso = month ? nearestYearIso(month, m[1], ctx.referenceDate) : null;
+    if (iso) found.push({ iso, index, end: index + m[0].length, kind: 'yearless' });
+  }
+  return found;
+}
 
 const PARTIAL_NUMERIC_RANGE =
   /\b(\d{1,2})\.\s?(?:(\d{1,2})\.\s?)?(?:-|–|—|bis|do|az|au|to|until)\s*(\d{1,2})\.\s?(\d{1,2})\.\s?(20\d{2})(?!\d)/g;
@@ -334,6 +372,10 @@ function partialRanges(folded, ctx) {
 
 /**
  * Explicit validity period stated in a text.
+ * @param {string} text
+ * @param {{ country?: string, referenceDate?: string }} ctx - `referenceDate`
+ *   (YYYY-MM-DD, the verified publication date) enables labelled dates
+ *   written without a year.
  * @returns {{ validFrom: string|null, validTo: string|null } | null}
  */
 export function extractValidityPeriod(text, ctx = {}) {
@@ -359,7 +401,8 @@ export function extractValidityPeriod(text, ctx = {}) {
   // 2. Otherwise a labelled start and/or end date.
   let validFrom = null;
   let validTo = null;
-  for (const date of dates) {
+  const labelled = [...dates, ...yearlessDates(folded, dates, ctx)].sort((a, b) => a.index - b.index);
+  for (const date of labelled) {
     const before = folded.slice(Math.max(0, date.index - 40), date.index);
     if (!validFrom && START_LABEL.test(before)) validFrom = date.iso;
     else if (!validTo && END_LABEL.test(before)) validTo = date.iso;

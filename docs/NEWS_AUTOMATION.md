@@ -289,9 +289,10 @@ the normal monitor and eligibility rules.
 Runs on Monday and Wednesday via `.github/workflows/daily-oversize-monitor.yml`
 (06:00 UTC) and commits changed JSON data to `automation/oversize-data`. Never
 touches `content/news`. Each run searches the last 7 days, so these two runs
-plus Thursday's final refresh cover the week; publication retries reuse
-findings written in the last 18 hours (`OVERSIZE_REFRESH_MAX_AGE_HOURS`)
-instead of searching again.
+plus Thursday's final refresh cover the week; scheduled publication retries
+reuse findings written in the last 18 hours (`OVERSIZE_REFRESH_MAX_AGE_HOURS`)
+instead of searching again. A manual run (correction, preview) always
+searches again.
 
 **Cost profile (lowest-cost default, 24 October 2026).** Discovery uses the
 Perplexity Search API ($5 per 1,000 requests; up to five queries per request

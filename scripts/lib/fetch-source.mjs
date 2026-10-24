@@ -185,7 +185,7 @@ function toFinding({ source, title, summary, sourceUrl, publication = null }) {
   const text = `${title} ${summary || ''}`;
   const type = classify(text) || 'infrastructure';
   // Effective dates only when the text states them explicitly.
-  const validity = extractValidityPeriod(text, { country: countryNameFor(source) });
+  const validity = extractValidityPeriod(text, { country: countryNameFor(source), referenceDate: publication?.date });
   return {
     country: countryNameFor(source),
     jurisdiction: source.country,
@@ -370,7 +370,7 @@ async function enrichDetailFindings(findings, source, listingUrl) {
         url: finding.sourceUrl,
         country: finding.country,
       });
-      const validity = extractValidityPeriod(combined, { country: finding.country });
+      const validity = extractValidityPeriod(combined, { country: finding.country, referenceDate: publication?.date });
 
       enriched[index] = {
         ...finding,

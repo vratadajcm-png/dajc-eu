@@ -180,5 +180,5 @@ The owner's standing instruction is to run the Weekly at the lowest cost without
 
 - Research uses the Perplexity Search API with Claude Haiku 5.5 classifying the leads at low effort. OpenAI and Perplexity Sonar are not used (removed 24 October 2026).
 - Focuses share one Search request whenever every language's terms fit (Search bills per request, not per query).
-- The monitor runs on Monday and Wednesday; Thursday's preparation refreshes the data once, and retries reuse findings written in the last 18 hours.
+- The monitor runs on Monday and Wednesday; Thursday's preparation refreshes the data once, and scheduled retries reuse findings written in the last 18 hours. A manual correction or preview run always searches again.
 - Writing the edition, the final editorial review and social copy keep the stronger `CLAUDE_REVIEW_MODEL` / `CLAUDE_SOCIAL_MODEL`: they run once or twice a week and decide what readers see.
