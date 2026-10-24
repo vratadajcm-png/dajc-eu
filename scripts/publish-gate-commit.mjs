@@ -130,7 +130,7 @@ let branch = publicationBranchFor(week, { preview: process.env.OVERSIZE_PREVIEW 
 // or silently reuse their branch; make a fresh review branch for regeneration.
 if (git(['ls-remote', '--heads', 'origin', 'refs/heads/' + branch]).trim()) {
   const run = process.env.GITHUB_RUN_ID;
-  if (!/^\\d+$/.test(run || '')) throw new Error('Cannot safely name regenerated publication branch');
+  if (!/^[0-9]+$/.test(run || '')) throw new Error('Cannot safely name regenerated publication branch');
   branch += '-retry-' + run;
 }
 git(['switch', '-c', branch]);
