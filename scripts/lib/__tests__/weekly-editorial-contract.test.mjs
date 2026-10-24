@@ -25,7 +25,7 @@ describe('quality over count', () => {
   });
 
   it('exports no lead or Rest-of-Europe supplement generators', () => {
-    expect(Object.keys(openaiClient).sort()).toEqual(['generateArticleWithOpenAI', 'generateArticleWithSonar', 'generateRequiredItemsWithOpenAI', 'generateRequiredItemsWithSonar']);
+    expect(Object.keys(openaiClient).sort()).toEqual(['generateArticleWithClaude', 'generateArticleWithOpenAI', 'generateArticleWithSonar', 'generateRequiredItemsWithClaude', 'generateRequiredItemsWithOpenAI', 'generateRequiredItemsWithSonar']);
   });
 
   it('has no repair loop, tier rebalancing or retry-until-padded runner', () => {
