@@ -36,6 +36,8 @@ sources:
     url: "https://www.astra.admin.ch/de/orientierung-gesuchsteller"
 ---
 
+*Archive note (24 October 2026): this edition predates the scope decision of 2 October 2026. General HGV driving bans are now covered by [DAJC Driving Bans](/driving-bans), not by EU Oversize Weekly, and the restrictions below are not current.*
+
 ## Intro
 
 The final weekend of August brings the last major wave of 2026 summer driving bans across Europe, stacking national weekend restrictions with country-specific exceptional-transport rules. Operators moving heavy or oversized loads anywhere on the continent this weekend - not just on any single corridor - should expect Saturday and Sunday to be effectively closed to standard heavy-vehicle movement in most of the countries below, with additional corridor-specific and exceptional-transport rules layered on top.

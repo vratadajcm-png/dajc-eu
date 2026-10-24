@@ -6,7 +6,9 @@ category: "eu-oversize"
 publishedAt: 2026-09-25T10:00:00.000Z
 language: "en"
 author: "DAJC"
-status: "published"
+# Withdrawn 24 October 2026 (Weekly audit): filler, repeated and out-of-date items
+# that fail docs/DAJC_WEEKLY_INTELLIGENCE_SPEC.md. Set back to "published" to restore.
+status: "draft"
 sources:
   - name: "Bison Fute - Regime general des transports exceptionnels"
     url: "https://www2.bison-fute.gouv.fr/regime-general%2C10852.html"

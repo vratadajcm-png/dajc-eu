@@ -6,7 +6,9 @@ category: "eu-oversize"
 publishedAt: 2026-09-04
 language: "en"
 author: "DAJC"
-status: "published"
+# Withdrawn 24 October 2026 (Weekly audit): filler, repeated and out-of-date items
+# that fail docs/DAJC_WEEKLY_INTELLIGENCE_SPEC.md. Set back to "published" to restore.
+status: "draft"
 sources:
   - name: "Ministerstvo dopravy CR - stanovisko k Section 43(2)"
     url: "https://md.gov.cz/Media/Media-a-tiskove-zpravy/Stanovisko-MD-k-omezeni-jizdy-kamionu"

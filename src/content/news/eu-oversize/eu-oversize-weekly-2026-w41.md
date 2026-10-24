@@ -6,7 +6,9 @@ category: "eu-oversize"
 publishedAt: 2026-10-02T10:00:00.000Z
 language: "en"
 author: "DAJC"
-status: "published"
+# Withdrawn 24 October 2026 (Weekly audit): filler, repeated and out-of-date items
+# that fail docs/DAJC_WEEKLY_INTELLIGENCE_SPEC.md. Set back to "published" to restore.
+status: "draft"
 sources:
   - name: "ASTRA - Medienmitteilungen"
     url: "https://www.astra.admin.ch/de/newnsb/lXxVvBz-pCb1SILobeHmP"
