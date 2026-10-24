@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { readBufferConfig, validateBufferChannel, checkBufferChannel, publishViaBuffer } from '../buffer-publishing.mjs';
 
 const config = { backend: 'buffer', channel: 'x', channelId: 'abcdef0123456789abcdef01', token: 'test-token' };
@@ -54,5 +55,23 @@ describe('Buffer free-plan company publishing adapter', () => {
     await expect(publishViaBuffer('a post', config, refused)).rejects.toThrow('reconcile');
     const errors = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ errors: [{ message: 'private content' }] }) });
     await expect(publishViaBuffer('a post', config, errors)).rejects.toThrow('request refused');
+  });
+});
+
+describe('social publishing workflows', () => {
+  const workflow = (name) => readFileSync(new URL(`../../../.github/workflows/${name}`, import.meta.url), 'utf8');
+  const values = (text, key) => new Set([...text.matchAll(new RegExp(`^\\s+${key}:\\s*(.+)$`, 'gm'))].map((m) => m[1].trim()));
+
+  // A post reserved after verifying the Buffer channel must be sent through
+  // that same backend and channel. The X publish step once had no defaults,
+  // so with only DAJC_X_ENABLED set it would have switched to the direct X
+  // API and left a pending reservation that blocks every later post.
+  it.each([
+    ['publish-x-weekly.yml', 'DAJC_BUFFER_X_CHANNEL_ID'],
+    ['publish-linkedin-news.yml', 'DAJC_BUFFER_LINKEDIN_CHANNEL_ID'],
+  ])('%s reserves and publishes through the same backend and channel', (name, channelKey) => {
+    const text = workflow(name);
+    expect(values(text, 'DAJC_SOCIAL_BACKEND').size).toBe(1);
+    expect(values(text, channelKey).size).toBe(1);
   });
 });

@@ -69,12 +69,14 @@ jobs:
       - name: Persist reservation before posting
         if: steps.reserve.outputs.send == 'true'
         run: node scripts/automation-data.mjs save x
+      # Same backend and channel as the reservation step: a post reserved and
+      # verified through Buffer must not be sent through another backend.
       - name: Publish from verified company X account
         if: steps.reserve.outputs.send == 'true'
         env:
-          DAJC_SOCIAL_BACKEND: ${{ vars.DAJC_X_BACKEND }}
+          DAJC_SOCIAL_BACKEND: ${{ vars.DAJC_X_BACKEND || 'buffer' }}
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
-          DAJC_BUFFER_X_CHANNEL_ID: ${{ vars.DAJC_BUFFER_X_CHANNEL_ID }}
+          DAJC_BUFFER_X_CHANNEL_ID: ${{ vars.DAJC_BUFFER_X_CHANNEL_ID || '6ad9f03c778b240e2f8ac76d' }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
