@@ -15,7 +15,7 @@ import { appendFileSync, mkdtempSync, rmSync, writeFileSync, readFileSync } from
 import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { autoMergeBlockers, decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from './lib/publish-gate.mjs';
+import { nonOfficialSources, decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from './lib/publish-gate.mjs';
 import { saveAutomationData } from './lib/automation-data.mjs';
 import { sourceTier } from './lib/source-policy.mjs';
 
@@ -100,6 +100,22 @@ let autoMerge = autonomousFinal;
 
 if (articleAdded && autonomousFinal) {
   if (!process.env.RUNNER_TEMP) throw new Error('Trusted Claude receipt directory unavailable');
+  const receiptPath = path.join(process.env.RUNNER_TEMP, 'dajc-weekly-review-approved.json');
+  let receipt = null;
+  try {
+    receipt = JSON.parse(readFileSync(receiptPath, 'utf8'));
+  } catch {
+    // No receipt: Claude vetoed the edition or the review failed. The edition
+    // is still opened as a PR for human review instead of being lost.
+  }
+  if (!receipt) {
+    autoMerge = false;
+    summary('Claude did not approve this edition: it is opened for human review and will not be released automatically.');
+    console.log('::warning::Claude did not approve the edition; publication waits for human review.');
+  }
+}
+
+if (articleAdded && autoMerge) {
   const receipt = JSON.parse(readFileSync(path.join(process.env.RUNNER_TEMP, 'dajc-weekly-review-approved.json'), 'utf8'));
   const pathFromStatus = 'src/content/news/eu-oversize/' + extractArticleWeekFromStatus(articleStatusOutput).filename;
   const hash = createHash('sha256').update(readFileSync(pathFromStatus)).digest('hex');
@@ -109,11 +125,8 @@ if (articleAdded && autonomousFinal) {
     throw new Error('Claude review receipt missing or differs from exact article bytes');
   }
   summary('Claude editorial review approved exact article SHA-256: ' + hash.slice(0, 12));
-  const blockers = autoMergeBlockers(readFileSync(pathFromStatus, 'utf8'), sourceTier);
-  if (blockers.length > 0) {
-    autoMerge = false;
-    summary(`Auto-merge withheld: ${blockers.length} cited source(s) are not official authorities (${blockers.join(', ')}). Human review is required.`);
-  }
+  const trade = nonOfficialSources(readFileSync(pathFromStatus, 'utf8'), sourceTier);
+  if (trade.length > 0) summary(`Industry-report sources approved by Claude: ${trade.join(', ')}`);
 }
 const decision = decidePublishCommit({ articleAdded, articleReplaced, dataChanged, week });
 
@@ -160,21 +173,21 @@ if (stagedPaths.some((relative) => !approvedPath(relative))) throw new Error('Pu
 git(['commit', '-m', decision.message]);
 git(['push', 'origin', `HEAD:refs/heads/${branch}`]);
 
-// A standard PR respects the main rules. Never approve or merge our own PR.
-// GITHUB_TOKEN-created PR checks need workflow approval before starting,
-// so dispatch both trusted CI workflows on the exact content branch.
+// A standard PR respects the main rules; this script never approves or
+// merges it. GITHUB_TOKEN-created PR checks need workflow approval before
+// starting, so dispatch both trusted CI workflows on the exact content branch.
 const temporary = mkdtempSync(path.join(tmpdir(), 'dajc-publication-pr-'));
 try {
   const bodyFile = path.join(temporary, 'body.md');
-  writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\n${autonomousFinal ? 'Claude reviewed the exact final article. ' : ''}Protected application-validate and news-validate checks and GitHub merge are required before any public release. This run has not published the article. Only approved article/data paths are changed.\n`);
+  writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\n${autoMerge ? 'Claude approved the exact final article. The workflow merges it once application-validate and news-validate pass; the site shows it from its Friday 12:00 Europe/Prague slot. ' : 'Waiting for human review: merge to publish. This run has not published the article. '}Only approved article/data paths are changed.\n`);
   const prUrl = execFileSync('gh', ['pr', 'create', '--repo', repository, '--base', 'main', '--head', branch, '--title', decision.message, '--body-file', bodyFile], { encoding: 'utf8' }).trim();
-  summary(`### EU Oversize Weekly - prepared for review\n\n${prUrl}\n\nArticle published this run: **no**. Final weekly content may auto-merge only after Claude approval and protected CI.`);
+  summary(`### EU Oversize Weekly - prepared\n\n${prUrl}\n\n${autoMerge ? 'Claude-approved: the release step merges it after required CI.' : 'Opened for human review: merge to publish. Article published this run: **no**.'}`);
   for (const workflow of ['application-ci.yml', 'news-ci.yml']) execFileSync('gh', ['workflow', 'run', workflow, '--repo', repository, '--ref', branch], { stdio: 'inherit' });
-  if (autoMerge) {
-    // GitHub protects main; auto-merge does not bypass CI or branch rules.
-    // This is not confirmation of deployment or public visibility.
-    execFileSync('gh', ['pr', 'merge', prUrl, '--repo', repository, '--auto', '--squash'], { stdio: 'inherit' });
-    summary('Protected auto-merge requested following Claude approval; live publication still unconfirmed.');
+  // The workflow's release step merges an approved edition once the required
+  // checks pass, within the main ruleset (owner decision, 24 October 2026:
+  // the Weekly publishes autonomously every Friday at 12:00).
+  if (process.env.GITHUB_OUTPUT) {
+    appendFileSync(process.env.GITHUB_OUTPUT, `pr_url=${prUrl}\nauto_merge=${autoMerge ? 'true' : 'false'}\n`);
   }
 } finally {
   rmSync(temporary, { recursive: true, force: true });

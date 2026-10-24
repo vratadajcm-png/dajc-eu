@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { autoMergeBlockers, classifyEditionPulls, decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from '../publish-gate.mjs';
+import { nonOfficialSources, classifyEditionPulls, decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from '../publish-gate.mjs';
 import { sourceTier } from '../source-policy.mjs';
 
 describe('reviewed publication branches', () => {
@@ -110,20 +110,13 @@ describe('corrected edition replacing a published article', () => {
   });
 });
 
-describe('autoMergeBlockers', () => {
+describe('nonOfficialSources', () => {
   const article = (urls) => `---\ntitle: "T"\nsources:\n${urls.map((u) => `  - name: "S"\n    url: "${u}"`).join('\n')}\n---\n\nBody`;
 
-  it('allows protected auto-merge only when every cited source is an official authority', () => {
-    expect(autoMergeBlockers(article(['https://www.rijkswaterstaat.nl/nieuws/archief/2026/09/n307']), sourceTier)).toEqual([]);
-  });
-
-  it('withholds auto-merge for industry or relayed sources (W44 24tv.ua edition)', () => {
+  it('lists the cited sources that are not official authorities', () => {
     const relay = 'https://24tv.ua/auto/ru/amp/vdvoe_bolshe_dorog_dlya_35_metrovyh_avtopoezdov_n76844';
-    expect(autoMergeBlockers(article(['https://www.rijkswaterstaat.nl/nieuws/x', relay]), sourceTier)).toEqual([relay]);
-  });
-
-  it('fails closed when no source can be read', () => {
-    expect(autoMergeBlockers('no frontmatter', sourceTier)).toEqual(['(no cited source)']);
+    expect(nonOfficialSources(article(['https://www.rijkswaterstaat.nl/nieuws/archief/2026/09/n307']), sourceTier)).toEqual([]);
+    expect(nonOfficialSources(article(['https://www.rijkswaterstaat.nl/nieuws/x', relay]), sourceTier)).toEqual([relay]);
   });
 });
 

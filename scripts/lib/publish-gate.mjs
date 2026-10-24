@@ -87,18 +87,18 @@ export function decidePublishCommit({ articleAdded, articleReplaced = false, dat
 }
 
 /**
- * Sources that keep an autonomous final edition out of protected auto-merge.
- * Claude approved the W44 Search edition built on a third-hand relay
- * (24tv.ua citing 40ton.net citing Trafikverket); an edition citing anything
- * but official authorities therefore always waits for human review.
- * @param {string} articleMarkdown - the article file content
+ * Cited sources that are not official authorities. Since 24 October 2026
+ * (owner decision: the Weekly publishes autonomously every Friday) they no
+ * longer block release; Claude's source-by-source approval of every claim
+ * against the publisher's own page is the gate. They are listed in the run
+ * summary so a human can see which reports rest on trade press.
+ * @param {string} articleMarkdown
  * @param {(url: string) => string} tierOf - source-policy.sourceTier
  * @returns {string[]} cited source URLs that are not official
  */
-export function autoMergeBlockers(articleMarkdown, tierOf) {
+export function nonOfficialSources(articleMarkdown, tierOf) {
   const frontmatter = String(articleMarkdown || '').match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] || '';
   const urls = [...frontmatter.matchAll(/^\s+url:\s*"([^"]+)"\s*$/gm)].map((match) => match[1]);
-  if (urls.length === 0) return ['(no cited source)'];
   return urls.filter((url) => tierOf(url) !== 'official');
 }
 

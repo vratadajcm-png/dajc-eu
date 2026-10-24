@@ -621,8 +621,9 @@ matches what `scripts/lib/article-writer.mjs` expects the schema to be.
 
 Optional repository variables: `CLAUDE_CLASSIFIER_MODEL` (default
 `claude-haiku-5-5`), `CLAUDE_REVIEW_MODEL` (default `claude-sonnet-5-5`) and
-`DAJC_WEEKLY_AUTO_MERGE=true` (protected auto-merge of a Claude-approved final
-edition citing only official sources; off by default). `OPENAI_API_KEY` is no
+`DAJC_WEEKLY_AUTO_MERGE=false` (switches off the autonomous Friday release:
+since 24 October 2026 a Claude-approved final edition is merged by the
+workflow after required CI and goes public at Friday 12:00 Europe/Prague). `OPENAI_API_KEY` is no
 longer used and can be deleted.
 
 Set it under repository Settings -> Secrets and variables -> Actions ->
