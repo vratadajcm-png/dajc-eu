@@ -1,4 +1,12 @@
 {
   "schemaVersion": 1,
-  "posts": {}
+  "posts": {
+    "platform/media-partnerships-transport-intelligence-2026": {
+      "approvedText": "DAJC outlines 3 collaboration concepts: labelled sponsored articles, preliminary heavy-transport document and risk reviews, and a planned Intelligence Pro. Read the full article: https://www.dajc.eu/news/platform/media-partnerships-transport-intelligence-2026",
+      "status": "pending",
+      "sourceUrl": "https://www.dajc.eu/news/platform/media-partnerships-transport-intelligence-2026",
+      "reservedByRunId": "40104804861",
+      "reservedAt": "2026-10-24T14:57:46.164Z"
+    }
+  }
 }
