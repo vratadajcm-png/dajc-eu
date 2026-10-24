@@ -15,8 +15,9 @@ import { appendFileSync, mkdtempSync, rmSync, writeFileSync, readFileSync } from
 import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from './lib/publish-gate.mjs';
+import { autoMergeBlockers, decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from './lib/publish-gate.mjs';
 import { saveAutomationData } from './lib/automation-data.mjs';
+import { sourceTier } from './lib/source-policy.mjs';
 
 function git(args) {
   return execFileSync('git', args, { encoding: 'utf-8' });
@@ -95,6 +96,7 @@ if (articleAdded) {
 const articleReplaced = articleAdded && isArticleReplacement(articleStatusOutput);
 const autonomousFinal = process.env.DAJC_AUTONOMOUS_WEEKLY === '1' &&
   process.env.OVERSIZE_PREVIEW !== '1' && process.env.OVERSIZE_CORRECTION !== '1' && !articleReplaced;
+let autoMerge = autonomousFinal;
 
 if (articleAdded && autonomousFinal) {
   if (!process.env.RUNNER_TEMP) throw new Error('Trusted Claude receipt directory unavailable');
@@ -107,6 +109,11 @@ if (articleAdded && autonomousFinal) {
     throw new Error('Claude review receipt missing or differs from exact article bytes');
   }
   summary('Claude editorial review approved exact Sonar article SHA-256: ' + hash.slice(0, 12));
+  const blockers = autoMergeBlockers(readFileSync(pathFromStatus, 'utf8'), sourceTier);
+  if (blockers.length > 0) {
+    autoMerge = false;
+    summary(`Auto-merge withheld: ${blockers.length} cited source(s) are not official authorities (${blockers.join(', ')}). Human review is required.`);
+  }
 }
 const decision = decidePublishCommit({ articleAdded, articleReplaced, dataChanged, week });
 
@@ -121,6 +128,17 @@ if (!articleAdded) {
   saveAutomationData('findings');
   summary('### EU Oversize Weekly - data refreshed only\n\nNo article was generated or published. Findings were saved to automation/oversize-data.');
   process.exit(0);
+}
+
+// The findings behind a prepared edition belong on the data branch too. Until
+// W44 they lived only on the PR branch, so closing a rejected PR discarded
+// them (the N307 report found on Friday was missing from Saturday's retry).
+if (dataChanged) {
+  try {
+    saveAutomationData('findings');
+  } catch (err) {
+    console.log(`::warning::Findings were not persisted on automation/oversize-data: ${err.message || err}. They remain on the publication PR branch.`);
+  }
 }
 
 const repository = process.env.GITHUB_REPOSITORY;
@@ -152,7 +170,7 @@ try {
   const prUrl = execFileSync('gh', ['pr', 'create', '--repo', repository, '--base', 'main', '--head', branch, '--title', decision.message, '--body-file', bodyFile], { encoding: 'utf8' }).trim();
   summary(`### EU Oversize Weekly - prepared for review\n\n${prUrl}\n\nArticle published this run: **no**. Final weekly content may auto-merge only after Claude approval and protected CI.`);
   for (const workflow of ['application-ci.yml', 'news-ci.yml']) execFileSync('gh', ['workflow', 'run', workflow, '--repo', repository, '--ref', branch], { stdio: 'inherit' });
-  if (autonomousFinal) {
+  if (autoMerge) {
     // GitHub protects main; auto-merge does not bypass CI or branch rules.
     // This is not confirmation of deployment or public visibility.
     execFileSync('gh', ['pr', 'merge', prUrl, '--repo', repository, '--auto', '--squash'], { stdio: 'inherit' });

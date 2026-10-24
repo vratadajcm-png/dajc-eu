@@ -59,7 +59,7 @@ describe('buildSearchPrompt', () => {
     expect(prompt).toContain('between 2026-10-08 and 2026-11-07');
     expect(prompt).toMatch(/vehicles over 12 tonnes/);
     expect(prompt).toMatch(/ONLY oversize/);
-    expect(prompt).toMatch(/NEVER RETURN: general recurring truck driving bans/);
+    expect(prompt).toMatch(/NEVER RETURN: pages from dajc\.eu or dajc\.cz \(our own publication, never a source\), general recurring truck driving bans/);
   });
 
   it('has a separate focus for other goods vehicles over 12 t', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { searchWithPerplexitySearch, SEARCH_GROUPS } from '../web-search.mjs';
+import { searchWithPerplexitySearch, SEARCH_GROUPS, SEARCH_API_MAX_RESULTS } from '../web-search.mjs';
 import { generateArticleWithClaude } from '../openai-client.mjs';
 
 describe('Search → Claude fail-closed source flow', () => {
@@ -23,7 +23,7 @@ describe('Search → Claude fail-closed source flow', () => {
     });
     expect(result).toEqual([]);
     expect(calls.map(x => x.url)).toEqual(['https://api.perplexity.ai/search', 'https://api.anthropic.com/v1/messages']);
-    expect(calls[0].payload.max_results).toBeLessThanOrEqual(12);
+    expect(calls[0].payload.max_results).toBeLessThanOrEqual(SEARCH_API_MAX_RESULTS);
   });
 
   it('refuses provider failure and missing credentials', async () => {

@@ -12,7 +12,7 @@ import { execFileSync } from 'node:child_process';
 
 import { isoWeekLabel } from './lib/week.mjs';
 import { publicationSlotFor, targetWeekDateFor } from './lib/next-publication.mjs';
-import { publicationBranchFor } from './lib/publish-gate.mjs';
+import { classifyEditionPulls, publicationBranchFor } from './lib/publish-gate.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -35,16 +35,24 @@ async function main() {
   const correction = process.env.OVERSIZE_CORRECTION === '1';
   let needed = !exists || correction;
   let pendingPr = null;
-  if (needed && process.env.GITHUB_ACTIONS === 'true') {
+  let stalePrs = [];
+  if (process.env.GITHUB_ACTIONS === 'true') {
     if (!process.env.GH_TOKEN || !/^[\w.-]+\/[\w.-]+$/.test(process.env.GITHUB_REPOSITORY || '')) throw new Error('Publication PR access is not configured');
     const branch = publicationBranchFor(target.nextWeekLabel, { preview: process.env.OVERSIZE_PREVIEW === '1', correction });
-    const pulls = JSON.parse(execFileSync('gh', ['pr', 'list', '--repo', process.env.GITHUB_REPOSITORY, '--base', 'main', '--head', branch, '--state', 'open', '--limit', '1', '--json', 'url'], { encoding: 'utf8' }));
-    if (pulls.length) {
+    const pulls = JSON.parse(execFileSync('gh', ['pr', 'list', '--repo', process.env.GITHUB_REPOSITORY, '--base', 'main', '--state', 'open', '--limit', '100', '--json', 'url,headRefName'], { encoding: 'utf8' }));
+    const editionPulls = classifyEditionPulls(pulls, { branch, targetWeek: target.nextWeekLabel });
+    stalePrs = editionPulls.stale.map((pull) => pull.url);
+    for (const url of stalePrs) console.log(`::warning::Edition PR for a week that has already passed is still open: ${url}`);
+    if (needed && editionPulls.pending) {
       needed = false;
-      pendingPr = pulls[0].url;
+      pendingPr = editionPulls.pending.url;
       console.log(`Edition already awaits review in ${pendingPr}; no regeneration or additional AI spend.`);
     }
   }
+  // The edition is overdue when its Friday 12:00 slot has passed while its PR
+  // still waits for review: the site shows nothing for the week.
+  const overdue = Boolean(pendingPr) && process.env.OVERSIZE_PREVIEW !== '1' && now.getTime() >= publicationSlotFor(now).getTime();
+  if (overdue) console.log(`::error::EU Oversize Weekly ${target.nextWeekLabel} is past its Friday 12:00 Europe/Prague slot but its PR is not merged: ${pendingPr}`);
 
   console.log(`Target weekly article: ${target.relativePath}`);
   if (pendingPr) {
@@ -60,7 +68,7 @@ async function main() {
   if (process.env.GITHUB_OUTPUT) {
     await appendFile(
       process.env.GITHUB_OUTPUT,
-      `needed=${needed ? 'true' : 'false'}\npending_pr=${pendingPr ? 'true' : 'false'}\ntarget=${target.relativePath}\nweek=${target.nextWeekLabel}\n`
+      `needed=${needed ? 'true' : 'false'}\npending_pr=${pendingPr ? 'true' : 'false'}\noverdue=${overdue ? 'true' : 'false'}\nstale_prs=${stalePrs.join(' ')}\ntarget=${target.relativePath}\nweek=${target.nextWeekLabel}\n`
     );
   }
 

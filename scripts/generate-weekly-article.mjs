@@ -52,6 +52,7 @@ import { filterGeneratedItems } from './lib/generated-item-filter.mjs';
 import { loadPreviousEditionSources } from './lib/previous-editions.mjs';
 import { FRESHNESS_WINDOW_DAYS, editionFreshSince } from './lib/weekly-eligibility.mjs';
 import { capSection, criticalGroupOwners, orderEditionItems } from './lib/edition-order.mjs';
+import { alignEditionSummary } from './lib/edition-summary.mjs';
 import { oversizeSources } from '../config/oversize-sources/index.mjs';
 
 const execFileAsync = promisify(execFile);
@@ -222,9 +223,18 @@ async function main() {
   });
   const sourceByName = new Map(oversizeSources.map((source) => [source.name, source]));
   const freshSince = editionFreshSince(now, publicationSlot);
+  // Spec §7 catch-up: when the previous week's final edition was never
+  // published (W43), a change that took effect during that skipped week is
+  // still reported now instead of falling between two editions.
+  const previousTargetDate = new Date(targetWeekStart.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const previousEditionPath = path.join(ARTICLES_DIR, `eu-oversize-weekly-${isoWeekLabel(previousTargetDate).toLowerCase()}.md`);
+  const previousEditionPublished = existsSync(previousEditionPath) &&
+    /^status:\s*"?published"?\s*$/m.test(await readFile(previousEditionPath, 'utf-8'));
+  const catchUpSince = previousEditionPublished ? null : isoWeekStart(previousTargetDate);
   const eligibilityContext = {
     now,
     freshSince,
+    catchUpSince,
     weekStart: targetWeekStart,
     weekEnd: targetWeekEnd,
     previousEditions,
@@ -234,6 +244,9 @@ async function main() {
     `Eligibility: source published on/after ${freshSince.toISOString().slice(0, 10)} (${FRESHNESS_WINDOW_DAYS} days before preparation) or validity beginning/ending in ${nextWeekLabel}, ` +
       `heavy-transport scope, no general driving bans, no generic pages, ${previousEditions.size} source URL(s) already published in earlier editions.`
   );
+  if (catchUpSince) {
+    console.log(`Catch-up: the ${isoWeekLabel(previousTargetDate)} edition was not published; changes in force since ${catchUpSince.toISOString().slice(0, 10)} are eligible.`);
+  }
 
   const { selected: preSelected, rejected } = selectCandidates(findings, eligibilityContext);
   logRejections(rejected);
@@ -290,7 +303,6 @@ async function main() {
     return;
   }
 
-  const generatedDevelopmentUrls = [...(article.developments || []), ...(article.europeRoundup || [])].map((item) => item.sourceUrl);
   const filterOptions = { weekStart: targetWeekStart, weekEnd: targetWeekEnd, candidatesByUrl, eligibilityContext };
   const leadValidation = crossValidateDevelopments(article.developments, verified);
   const leadFilter = filterGeneratedItems(leadValidation.kept, filterOptions);
@@ -361,25 +373,22 @@ async function main() {
 
   article = attachCriticalGroupSources(article, criticalGroups);
 
-  // The model writes the checklist before the filters above run, so it can
-  // mention developments that were removed (W42 listed Ukrainian and Irish
-  // items that were not in the edition). When anything was removed, rebuild
-  // the checklist from the reports that remain.
-  const published = [...article.developments, ...article.europeRoundup];
-  const generatedUrls = [...(generatedDevelopmentUrls || [])];
-  if (generatedUrls.some((url) => !published.some((item) => item.sourceUrl === url))) {
-    article.operatorChecklist = published
-      .filter((item) => item.recommendedAction)
-      .map((item) => `${item.country}: ${item.recommendedAction}`);
-    console.log('Operator checklist rebuilt from the published reports (some generated items were removed).');
-  }
-
   // Deterministic operator-first order: importance tier first, then Central
   // Europe before connected corridors, the rest of Europe and peripheral
   // jurisdictions. Never a relevance bypass.
   const orderOptions = { candidatesByUrl, criticalUrls: new Set(requiredSourceUrls) };
   article.developments = orderEditionItems(article.developments, orderOptions);
   article.europeRoundup = orderEditionItems(article.europeRoundup, orderOptions);
+
+  // The model writes the checklist, title, description and intro for every
+  // candidate it saw (W42-W44 promised Ukrainian, Irish, tachograph and
+  // Hungarian items that were not in the edition). The checklist always comes
+  // from the published reports; summary text naming an unpublished country is
+  // replaced.
+  const { fixed: summaryFixes } = alignEditionSummary(article, { weekRangeLabel });
+  if (summaryFixes.length > 0) {
+    console.log(`Edition copy rebuilt from the published reports: ${summaryFixes.join(', ')} named a country without a report.`);
+  }
 
   console.log(`Lead reports: ${article.developments.length}`);
   console.log(`Rest-of-Europe reports: ${article.europeRoundup.length}`);

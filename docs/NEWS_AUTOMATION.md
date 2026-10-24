@@ -52,7 +52,7 @@ src/content.config.ts               Astro content collection schema
 .github/workflows/
   daily-oversize-monitor.yml
   publish-weekly-oversize.yml       Thursday preparation + Fri/Sat recovery, idempotent
-  watchdog-weekly-oversize.yml      Thursday evening / Friday morning safety net
+  watchdog-weekly-oversize.yml      Thursday evening / Friday morning safety net; after the Friday slot and on Saturday it fails on an unmerged edition PR or open PRs of past weeks
 ```
 
 The homepage renders `News` before `Integration ecosystem`, so current
@@ -354,7 +354,11 @@ The pipeline is split instead:
    `publicationSlotFor()` in `scripts/lib/next-publication.mjs`). It opens a
    PR, explicitly dispatches CI and waits for review. Approve and merge the
    PR before Friday noon for the usual scheduled release; only that merge
-   deploys the article to production.
+   deploys the article to production. The findings behind the edition are
+   saved on `automation/oversize-data` as well, so closing a rejected PR does
+   not lose them. After the slot (Friday 13:37 CEST / 12:37 CET, Saturday) the
+   watchdog fails while the edition PR, including a `-retry-<run>` PR, is
+   still unmerged, and while an edition PR of a past week remains open.
 2. **Release (Friday 12:00, no job involved).** The homepage, `/news` and
    `/news/eu-oversize/<slug>` are rendered on demand (`prerender = false`)
    and filter with `isNewsEntryPublic()` (`src/config/news.ts`): an article

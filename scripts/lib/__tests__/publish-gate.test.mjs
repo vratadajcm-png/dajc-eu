@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from '../publish-gate.mjs';
+import { autoMergeBlockers, classifyEditionPulls, decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from '../publish-gate.mjs';
+import { sourceTier } from '../source-policy.mjs';
 
 describe('reviewed publication branches', () => {
   it('keeps final editions, previews and explicit corrections in distinct PRs', () => {
@@ -106,5 +107,42 @@ describe('corrected edition replacing a published article', () => {
     expect(extraction.week).toBe('2026-W41');
     const decision = decidePublishCommit({ articleAdded: true, articleReplaced: isArticleReplacement(status), dataChanged: true, week: extraction.week });
     expect(decision.message).toBe('content: replace EU Oversize Weekly 2026-W41 with corrected edition');
+  });
+});
+
+describe('autoMergeBlockers', () => {
+  const article = (urls) => `---\ntitle: "T"\nsources:\n${urls.map((u) => `  - name: "S"\n    url: "${u}"`).join('\n')}\n---\n\nBody`;
+
+  it('allows protected auto-merge only when every cited source is an official authority', () => {
+    expect(autoMergeBlockers(article(['https://www.rijkswaterstaat.nl/nieuws/archief/2026/09/n307']), sourceTier)).toEqual([]);
+  });
+
+  it('withholds auto-merge for industry or relayed sources (W44 24tv.ua edition)', () => {
+    const relay = 'https://24tv.ua/auto/ru/amp/vdvoe_bolshe_dorog_dlya_35_metrovyh_avtopoezdov_n76844';
+    expect(autoMergeBlockers(article(['https://www.rijkswaterstaat.nl/nieuws/x', relay]), sourceTier)).toEqual([relay]);
+  });
+
+  it('fails closed when no source can be read', () => {
+    expect(autoMergeBlockers('no frontmatter', sourceTier)).toEqual(['(no cited source)']);
+  });
+});
+
+describe('classifyEditionPulls', () => {
+  const pulls = [
+    { url: 'https://example/pull/39', headRefName: 'automation/weekly-2026-w43' },
+    { url: 'https://example/pull/63', headRefName: 'automation/weekly-2026-w44-retry-40074547124' },
+    { url: 'https://example/pull/50', headRefName: 'fix/english-demo-hosting-redirects-20261023' },
+  ];
+
+  it('finds the target edition PR including regenerated retry branches', () => {
+    expect(classifyEditionPulls(pulls, { branch: 'automation/weekly-2026-w44', targetWeek: '2026-W44' }).pending.url).toBe('https://example/pull/63');
+  });
+
+  it('lists open edition PRs for weeks that have already passed', () => {
+    expect(classifyEditionPulls(pulls, { branch: 'automation/weekly-2026-w44', targetWeek: '2026-W44' }).stale.map((p) => p.url)).toEqual(['https://example/pull/39']);
+  });
+
+  it('does not treat a different week as pending', () => {
+    expect(classifyEditionPulls(pulls, { branch: 'automation/weekly-2026-w45', targetWeek: '2026-W45' }).pending).toBeNull();
   });
 });

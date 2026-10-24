@@ -7,6 +7,8 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { publicationSlotFor, targetWeekDateFor } from './lib/next-publication.mjs';
 import { isoWeekLabel } from './lib/week.mjs';
+import { extractDetailText, fetchTextWithRetry } from './lib/fetch-source.mjs';
+import { sourceTier } from './lib/source-policy.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ARTICLE_PATH = /^src\/content\/news\/eu-oversize\/eu-oversize-weekly-(\d{4}-w\d{2})\.md$/;
@@ -115,7 +117,30 @@ async function sourceEvidence(links) {
   }
   const missing = links.filter(x => !found.has(x));
   if (missing.length) throw new Error('Publication blocked: no traceable monitored evidence for sources: ' + missing.join(', '));
-  return links.map(x => found.get(x));
+  return withOriginalPages(links.map(x => found.get(x)));
+}
+
+const ORIGINAL_PAGE_CHARS = 8000;
+
+/**
+ * Adds the publisher's own current page text, host and source tier to each
+ * evidence record. The monitor excerpt alone let Claude approve a third-hand
+ * relay (W44: a Russian-language 24tv.ua page citing 40ton.net citing
+ * Trafikverket) because the reviewer could not see who actually published it.
+ */
+export async function withOriginalPages(records, fetchPage = (url) => fetchTextWithRetry(url, 'text/html, application/xhtml+xml, */*')) {
+  return Promise.all(records.map(async (record) => {
+    let page = null;
+    try { page = await fetchPage(record.url); } catch { page = null; }
+    const text = page?.ok ? extractDetailText(page.text || '').slice(0, ORIGINAL_PAGE_CHARS) : '';
+    return {
+      ...record,
+      publisherHost: new URL(record.url).hostname.replace(/^www\./, ''),
+      sourceTier: sourceTier(record.url),
+      originalPageText: text || null,
+      originalPageFetched: Boolean(text),
+    };
+  }));
 }
 
 async function apiJson(url, headers, payload) {
@@ -135,6 +160,8 @@ function reviewerPrompt(article, evidence) {
     'Check EVERY specific source-supported claim, applicable vehicle weight/axle/width/height thresholds, time validity, operating restrictions, and operational action.',
     'Reject outdated events, unsubstantiated dates, unsupported claims, missing legal nuances, ordinary HGV Driving Bans, duplicate stories, short (<=30 day) road closures/works, and content irrelevant to commercial road freight operators/drivers/dispatchers. Industry operational stories need attribution but not separate authority corroboration; high-impact permit and legal limits must not be presented as officially confirmed on second-hand media alone.',
     'If source excerpts are insufficient to validate the associated claims, REJECT instead of guessing. Report each blocking reason.',
+    'SOURCE QUALITY: each EVIDENCE record names its publisherHost, sourceTier and, when it could be fetched, originalPageText (the publisher\'s own current page). REJECT when a weight, axle, dimension, permit, escort, legal or route claim rests on a source that only relays another outlet (second- or third-hand reporting), on a general-interest outlet outside road freight, on a page in a language and from a country unrelated to the reported jurisdiction, or on an evergreen guide/blog rather than a dated notice. Such claims need the competent authority or a transport trade publisher reporting first-hand.',
+    'REJECT any source on dajc.eu or dajc.cz: DAJC never cites its own publications.',
     'Include exactly one sourceChecks entry for EACH input source URL, same spelling, supported=true ONLY if the corresponding article claims are supported by the evidence.',
     'Approve only when no blocking issues exist. Do NOT pad or demand a minimum number of stories.',
     'Return only JSON that matches the supplied schema.',
