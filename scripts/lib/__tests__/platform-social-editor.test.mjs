@@ -26,8 +26,8 @@ describe('channel-specific approved social editions', () => {
     };
     await createClaudeSocialCopy('x', article, { apiKey: 'test', fetchFn });
     await createClaudeSocialCopy('linkedin', article, { apiKey: 'test', fetchFn });
-    expect(calls[0]).toContain('X: create a concise standalone post');
-    expect(calls[1]).toContain('LinkedIn: a distinct B2B professional summary');
+    expect(calls[0]).toContain('X: write a punchy, specific headline/hook');
+    expect(calls[1]).toContain('LinkedIn: write a distinctive professional B2B teaser');
     expect(calls[0]).not.toEqual(calls[1]);
   });
 });
