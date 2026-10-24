@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "posts": {
     "platform/media-partnerships-transport-intelligence-2026": {
-      "approvedText": "How do you tell paid content from independent reporting in a niche like abnormal and oversize transport? DAJC is opening discussions on that question, along with new ways for the sector to work with its editorial platform.\n\nFor dispatchers, carriers and oversize drivers, it matters because information quality shapes planning. Clear labelling and a separation between sponsored content and analysis help readers judge what they are reading.\n\nDAJC outlines three independent collaboration concepts. Two highlights:\n\n• Clearly labelled sponsored articles under DAJC Media Partnerships\n• Preliminary heavy-transport document and risk reviews in the DAJC Intelligence Report\n\nA third concept, DAJC Intelligence Pro, is planned and not yet available.\n\nRead the COMPLETE article on DAJC.eu to see how each concept is described and what is still under discussion:\nhttps://www.dajc.eu/news/platform/media-partnerships-transport-intelligence-2026",
-      "status": "pending",
+      "status": "published",
       "sourceUrl": "https://www.dajc.eu/news/platform/media-partnerships-transport-intelligence-2026",
-      "reservedByRunId": "40103540171",
-      "reservedAt": "2026-10-24T14:40:28.562Z"
+      "postId": "6adcc3638b3d437ddcc3b693",
+      "postUrl": null,
+      "publishedAt": "2026-10-24T14:40:37.107Z"
     }
   }
 }
