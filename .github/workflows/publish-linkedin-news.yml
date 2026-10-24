@@ -1,7 +1,7 @@
-name: Publish approved DAJC News to LinkedIn Company Page
+name: Publish approved DAJC News to LinkedIn (temporary personal profile)
 
-# Personal account posting is forbidden; company organization URN is required.
-# The workflow is inert until the official company token is verified.
+# Temporary owner-approved personal profile through Buffer only.
+# Inert until DAJC_LINKEDIN_ENABLED is explicitly true; no company-page fallback.
 on:
   push:
     branches: [main]
@@ -34,6 +34,7 @@ jobs:
     timeout-minutes: 10
     env:
       DAJC_CLAUDE_SOCIAL_ENABLED: ${{ vars.DAJC_CLAUDE_SOCIAL_ENABLED || 'true' }}
+      DAJC_LINKEDIN_TARGET: personal
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,13 +42,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Preview company LinkedIn content
+      - name: Preview LinkedIn teaser
         if: github.event_name == 'workflow_dispatch' && inputs.dry_run == true
         run: node scripts/publish-social-news.mjs linkedin --dry-run
-      - name: Require verified LinkedIn company authorization
+      - name: Require explicit LinkedIn publishing activation
         if: github.event_name == 'workflow_dispatch' && inputs.dry_run == false && vars.DAJC_LINKEDIN_ENABLED != 'true'
         run: |
-          echo '::error::LinkedIn automation disabled; authorize DAJC organization w_organization_social first.'
+          echo '::error::LinkedIn automation disabled; set DAJC_LINKEDIN_ENABLED=true only after validating the approved Buffer personal channel.'
           exit 1
       - name: Load LinkedIn publication state
         if: github.event_name != 'workflow_dispatch' || inputs.dry_run == false
@@ -56,23 +57,23 @@ jobs:
         id: reserve
         if: github.event_name != 'workflow_dispatch' || inputs.dry_run == false
         env:
-          DAJC_SOCIAL_BACKEND: ${{ vars.DAJC_LINKEDIN_BACKEND || 'buffer' }}
+          DAJC_SOCIAL_BACKEND: buffer
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_SOCIAL_MODEL: ${{ vars.CLAUDE_SOCIAL_MODEL || 'claude-sonnet-5-5' }}
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
-          DAJC_BUFFER_LINKEDIN_CHANNEL_ID: ${{ vars.DAJC_BUFFER_LINKEDIN_CHANNEL_ID }}
+          DAJC_BUFFER_LINKEDIN_CHANNEL_ID: ${{ vars.DAJC_BUFFER_LINKEDIN_CHANNEL_ID || '6adc3c32778b240e2fa9f0bc' }}
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           DAJC_LINKEDIN_ORGANIZATION_URN: ${{ vars.DAJC_LINKEDIN_ORGANIZATION_URN }}
         run: node scripts/publish-social-news.mjs linkedin --prepare
       - name: Persist reservation before LinkedIn API call
         if: steps.reserve.outputs.send == 'true'
         run: node scripts/automation-data.mjs save linkedin
-      - name: Publish only from DAJC company page
+      - name: Publish only from approved temporary personal LinkedIn profile
         if: steps.reserve.outputs.send == 'true'
         env:
-          DAJC_SOCIAL_BACKEND: ${{ vars.DAJC_LINKEDIN_BACKEND }}
+          DAJC_SOCIAL_BACKEND: buffer
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
-          DAJC_BUFFER_LINKEDIN_CHANNEL_ID: ${{ vars.DAJC_BUFFER_LINKEDIN_CHANNEL_ID }}
+          DAJC_BUFFER_LINKEDIN_CHANNEL_ID: ${{ vars.DAJC_BUFFER_LINKEDIN_CHANNEL_ID || '6adc3c32778b240e2fa9f0bc' }}
           LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           DAJC_LINKEDIN_ORGANIZATION_URN: ${{ vars.DAJC_LINKEDIN_ORGANIZATION_URN }}
         run: node scripts/publish-social-news.mjs linkedin --publish
