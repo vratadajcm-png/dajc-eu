@@ -109,6 +109,32 @@ def sonar_compare_modes():
     print("No article, PR, production change or social post created.")
     return 0 if all(outcomes) else 1
 
+
+def perplexity_search():
+    key = os.environ.get("PERPLEXITY_API_KEY", "")
+    if not key:
+        print("FAIL Perplexity Search: key missing")
+        return 1
+    try:
+        response = post(
+            "https://api.perplexity.ai/search",
+            {"Authorization": "Bearer " + key},
+            {"query": "European abnormal load heavy haulage transport official news",
+             "max_results": 2, "search_context_size": "low"}
+        )
+        results = response.get("results")
+        if not isinstance(results, list):
+            raise RuntimeError("Search returned no results array")
+        if results and not all(isinstance(item.get("url"), str) and
+                               item["url"].startswith("https://") for item in results):
+            raise RuntimeError("Search returned malformed source URLs")
+        print("PASS Perplexity Search: authenticated, returned " + str(len(results)) + " results")
+        print("No article, PR, production change or social post created.")
+        return 0
+    except Exception as error:
+        print("FAIL Perplexity Search: " + str(error))
+        return 1
+
 def main():
     results = []
     for name, fn in (("Perplexity Sonar", sonar), ("Claude", claude)):
@@ -123,6 +149,8 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
+    if '--test-search' in sys.argv:
+        sys.exit(perplexity_search())
     if '--compare-sonar' in sys.argv:
         sys.exit(sonar_compare_modes())
     main()
