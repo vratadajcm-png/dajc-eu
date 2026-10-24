@@ -56,41 +56,42 @@ export async function createClaudeSocialCopy(channel, article, {
       sections: article.sections?.slice(0, 3) || [],
     }),
   ].join('\n');
-  const ask = async (messages) => {
+  const ask = async (content) => {
     const res = await fetchFn('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'x-api-key': apiKey, 'anthropic-version': '2023-06-01',
         'content-type': 'application/json',
       },
+      // Sonnet 5.5 thinks by default and thinking counts toward max_tokens:
+      // at 700 tokens and default effort an X draft was cut off before its
+      // JSON (24 October 2026). Low effort keeps thinking short; the budget
+      // leaves room for it.
       body: JSON.stringify({
-        model, max_tokens: 700,
-        messages,
-        output_config: { format: { type: 'json_schema', schema: SCHEMA } },
+        model, max_tokens: 4000,
+        messages: [{ role: 'user', content }],
+        output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA } },
       }),
       signal: AbortSignal.timeout(45000),
     });
     if (!res.ok) throw new Error('Claude social editor API HTTP ' + res.status);
     const data = await res.json();
-    if (data.stop_reason !== 'end_turn') throw new Error('Claude social editor response incomplete');
+    if (data.stop_reason !== 'end_turn') throw new Error('Claude social editor response incomplete (stop_reason: ' + data.stop_reason + ')');
     const raw = data.content?.find(x => x.type === 'text')?.text;
     if (!raw) throw new Error('Claude social editor returned no text');
-    return { raw, text: JSON.parse(raw).text };
+    return JSON.parse(raw).text;
   };
 
-  const messages = [{ role: 'user', content: instructions }];
-  const first = await ask(messages);
+  const first = await ask(instructions);
   try {
-    return validateSocialCopy(channel, article, first.text);
+    return validateSocialCopy(channel, article, first);
   } catch (err) {
     // Models miscount characters: give the measured length back once
     // (24 October 2026: the first live X run failed on length alone).
     if (channel !== 'x' || !/too long/.test(err.message)) throw err;
-    const over = xWeightedLength(first.text, article.url) - X_MAX_WEIGHT;
-    messages.push(
-      { role: 'assistant', content: first.raw },
-      { role: 'user', content: `That X post is ${over} X characters too long (${err.message}). Shorten the text by at least ${over + 20} characters, keep the exact URL once, and return JSON with the text field only.` },
-    );
-    return validateSocialCopy(channel, article, (await ask(messages)).text);
+    const over = xWeightedLength(first, article.url) - X_MAX_WEIGHT;
+    const retry = instructions + '\nYOUR PREVIOUS DRAFT: ' + JSON.stringify(first) +
+      `\nIt is ${over} X characters too long (${err.message}). Shorten it by at least ${over + 20} characters, keep the exact URL once, and return JSON with the text field only.`;
+    return validateSocialCopy(channel, article, await ask(retry));
   }
 }
