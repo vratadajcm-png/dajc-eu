@@ -130,3 +130,33 @@ This is a permanent rule: **Perplexity Sonar research and article synthesis → 
 - Once an article is verified public, Claude prepares distinct factual English short copy for X and an industry-oriented post for the DAJC LinkedIn company page, each with the exact URL. The existing persistent ledger blocks duplicate attempts. Buffer is used only with explicitly connected/authorized company channels.
 - Never post unpublished Platform / Integration Ecosystem material. Platform updates require explicit socialPublish=true.
 - Activation requires funded API credentials and spending limits: PERPLEXITY_API_KEY, ANTHROPIC_API_KEY, and for Buffer, BUFFER_API_KEY with exact X and LinkedIn channel IDs and enabled publishing flags.
+
+
+## 13. Permanent platform-specific editions and distribution (24 October 2026)
+
+The publication chain is **Perplexity Search API (source discovery only) → Claude (source-grounded synthesis, editorial checking, and per-channel copy) → protected DAJC.eu publication → X / LinkedIn company channels**. The tested Search endpoint is `https://api.perplexity.ai/search`. Sonar Chat Completions are not a required part of this design; their HTTP 403 must not be silently treated as zero news. Search results are **leads only**, never evidence until the actual source page has been opened, dated and checked by the existing deterministic verifier.
+
+Every output channel has an independent editorial format, derived from the same approved factual source set:
+- **DAJC.eu:** the complete English Weekly with SEO, lead reports, Rest of Europe, cited source URLs, operator checklist and correct ISO week.
+- **DAJC.cz:** a complete, natural Czech-language localization with the same verified facts and source links. No literal machine-translation of legal terms; do not publish a Czech edition until the separate locale and route are implemented and validated.
+- **X (DAJC company account):** a short standalone English post with a concrete operator takeaway and the exact canonical public URL, at most 260 Unicode characters under the current DAJC policy. A thread is a future opt-in feature, not automatic.
+- **LinkedIn (DAJC company page):** a distinct professional English B2B post emphasizing consequences for dispatchers, carriers and drivers, with the exact canonical URL. Never silently use a personal LinkedIn profile.
+
+The channel adaptations must not invent any dates, weights, restrictions, source citations or safety claims. A social publication can happen only after independent confirmation that the linked article is actually public. Duplicate protection and account authorization remain mandatory. A missing/failed Search or Claude API call is a hard stop; do not switch to an unreviewed publishing path. QUALITY > COUNT, official-first priority, 50 jurisdictions and Driving Bans exclusions remain.
+
+This policy does not by itself activate the new Search/Claude producer or DAJC.cz route. Production feature flags and external channel authorizations require a separate validated deployment; the existing working publisher stays in place until then.
+
+### Social traffic objective (24 October 2026)
+
+**X and LinkedIn are discovery channels, not mirrors of the full article.** Their primary objective is to attract genuinely interested readers to the complete, public DAJC.eu Weekly. Claude must write separate, accurate teasers with one or two substantiated highlights, relevant professional impact, and a clear call to read the full article, linking to the exact canonical DAJC.eu URL once. Never reproduce the entire article or all headlines on social platforms. No fabricated urgency, withheld safety-critical facts, misleading clickbait, unverified numbers or generic promotional filler. X should be exceptionally concise; LinkedIn should be a short, substantive professional invitation. Keep company identity and anti-duplicate safeguards unchanged. Measure link clicks and visits when authorized analytics become available, but do not invent traffic figures.
+
+
+## 14. Permanent social click-through and locale policy (24 October 2026)
+
+**Primary goal of X and LinkedIn: bring qualified readers to the complete DAJC article.** Social posts are distinct factual teasers, not complete reproductions of the Weekly. Each teaser must offer a concrete reason to open the article, a clear call to read the full briefing, and the **exact, already publicly accessible canonical URL** for its language.
+
+- English X and company LinkedIn posts link to **dajc.eu** English article.
+- Czech X and company LinkedIn posts link to **dajc.cz** Czech article.
+- Both social channels may carry both languages, but only when their matching public article exists; never link a Czech teaser to an English-only article, invent a DAJC.cz slug, or send duplicate cross-language posts for one article without the configured channel policy.
+- X is brief and curiosity-building without misleading clickbait. LinkedIn is a short professional teaser focused on why the full report matters for dispatchers, drivers and transport companies. Neither post should disclose the whole article or invent facts, restrictions, dates, or claims.
+- Social posts are scheduled **after** each language's own public website article is confirmed live. Existing social-account authorization and anti-duplicate ledgers remain mandatory. Czech localization and dual-language social posting are not activated until separately implemented and verified.
