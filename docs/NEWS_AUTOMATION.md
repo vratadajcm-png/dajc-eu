@@ -37,8 +37,8 @@ scripts/
     verify-candidates.mjs           eligibility (again) + source reachability
     date-validation.mjs             deterministic validFrom/validTo vs. target-week checks
     critical-floor.mjs              required critical developments (coverage check only)
-    openai-client.mjs               structured-output OpenAI call, hardened prompt
-    mock-generator.mjs              free local stand-in for openai-client.mjs
+    article-writer.mjs              structured-output Claude call, hardened prompt
+    mock-generator.mjs              free local stand-in for article-writer.mjs
     cross-validate.mjs              drops any development whose sourceUrl wasn't verified
     generated-item-filter.mjs       re-applies every rule to each model-returned item
     render-article.mjs              validated JSON -> frontmatter + Markdown
@@ -75,7 +75,7 @@ closure duration, driving-ban scope, counts and article structure - are
 stated once, in [`DAJC_WEEKLY_INTELLIGENCE_SPEC.md`](DAJC_WEEKLY_INTELLIGENCE_SPEC.md).
 They are enforced in code by `scripts/lib/weekly-eligibility.mjs` and
 `scripts/lib/quality-gate.mjs` and given to the model in
-`scripts/lib/openai-client.mjs`. This file does not repeat them.
+`scripts/lib/article-writer.mjs`. This file does not repeat them.
 
 ## Content model
 
@@ -203,7 +203,7 @@ The actual exclusion logic lives in `scripts/lib/relevance-filter.mjs`
    enter `data/oversize/<week>/findings.json`.
 2. **Weekly verification** (`verify-candidates.mjs`, Friday pipeline) - runs
    the same check again, independently, before a candidate can reach the
-   OpenAI call. This exists because a candidate may already be sitting in
+   Claude call. This exists because a candidate may already be sitting in
    `data/oversize` from before this filter existed (or under a looser
    version of it) - see "Incident: the first published W35 article" below.
 
@@ -266,15 +266,17 @@ the normal monitor and eligibility rules.
 
 1. Computes the current ISO week (e.g. `2026-W34`).
 2. Loads `data/oversize/2026-W34/findings.json` if it exists.
-3. **Web search (default, `OVERSIZE_DISCOVERY=web`).** Runs one OpenAI web
-   search per region group in `SEARCH_GROUPS` (`scripts/lib/web-search.mjs`;
-   Central Europe country by country first). Every returned URL is fetched;
+3. **Web search (default, `OVERSIZE_DISCOVERY=web`).** Runs Perplexity Search
+   API requests with short local-language keyword queries per region group in
+   `SEARCH_GROUPS` (`scripts/lib/web-search.mjs`; Central Europe country by
+   country first) and classifies the leads with Claude Haiku. OpenAI is not
+   used. Every returned URL is fetched;
    the finding's title, text and publication date come from that page, not
    from the model. Unreachable pages, PDFs and pages without freight (>12 t)
    or oversize context are dropped with a logged reason; a failed search is
    logged as `UNAVAILABLE` and the jurisdictions it covers are recorded as
-   `checked-source-availability-limited`. Model: `OPENAI_SEARCH_MODEL`
-   (default `gpt-4.1`).
+   `checked-source-availability-limited`. Classifier model:
+   `CLAUDE_CLASSIFIER_MODEL` (default `claude-haiku-5-5`).
 4. **Official-source crawler (`OVERSIZE_DISCOVERY=official` or `both`).**
    For every configured source, prefers a verified RSS/Atom endpoint and
    falls back to the authority's official HTML page/listing, then classifies
@@ -297,9 +299,10 @@ are billed as one) and classifies the leads with Claude Haiku 5.5
 (`CLAUDE_CLASSIFIER_MODEL`, $0.10 / $0.50 per million tokens) at low effort.
 Focuses share one request where every language fits (52 requests per full
 run instead of 76). Writing the edition and the final review stay on
-`CLAUDE_REVIEW_MODEL` (one or two calls a week). The previous default, OpenAI
-web search, costs $25 per 1,000 calls plus gpt-4.1 tokens; set the repository
-variable `DAJC_SEARCH_CLAUDE_ENABLED=false` to return to it.
+`CLAUDE_REVIEW_MODEL` (one or two calls a week). OpenAI is not used: its
+web search cost $25 per 1,000 calls plus gpt-4.1 tokens, and OpenAI and the
+Perplexity Sonar path (which used the OpenAI client library) were removed on
+24 October 2026.
 
 ### Run it manually
 
@@ -387,7 +390,7 @@ same Friday slot as `publishedAt`, which is then already in the past, so the
 article goes live after review, merge and deployment.
 
 Every trigger runs `scripts/check-weekly-publication.mjs` first (before
-dependency installation or any OpenAI work). It checks for the target
+dependency installation or any paid API work). It checks for the target
 week's article - the ISO week after the run's publication Friday - and
 turns the run into a reported idempotent no-op if it already exists or its
 publication PR is awaiting review. The latter is reported as not published.
@@ -422,7 +425,7 @@ commit always proceeds to a normal build+deploy).
 3. `verifyCandidates()` re-runs the same eligibility check and verifies
    source reachability (HEAD, falling back to GET). Every rejection is
    logged with its specific reason.
-4. Calls OpenAI (`scripts/lib/openai-client.mjs`, structured JSON output,
+4. Calls Claude (`scripts/lib/article-writer.mjs`, structured JSON output,
    hardened system prompt - see "Hardened editorial prompt" below) to
    select, group and phrase the verified candidates into an article for the
    **upcoming** ISO week. The model is given the target week's exact ISO
@@ -435,7 +438,7 @@ commit always proceeds to a normal build+deploy).
    (defends against model drift/hallucination) - and re-applies every rule
    to each item (`scripts/lib/generated-item-filter.mjs`). If a required
    critical development was left out, one targeted call writes exactly
-   that development (`generateRequiredItemsWithOpenAI`); nothing ever asks
+   that development (`generateRequiredItemsWithClaude`); nothing ever asks
    the model for "more" items to reach a count. Overflow beyond the
    maximums (30 / 15) is left out, never moved around to fill a section.
 6. Renders the surviving developments into frontmatter + Markdown
@@ -472,7 +475,7 @@ twice, even when both flags are true.
 
 ### Hardened editorial prompt
 
-`scripts/lib/openai-client.mjs`'s system prompt now states, as hard rules
+`scripts/lib/article-writer.mjs`'s system prompt now states, as hard rules
 the model must follow: only the exact target-week date range matters
 (exclude anything ending before it starts or starting after it ends); never
 turn an isolated accident, a stuck/broken-down vehicle, a theft report, or a
@@ -542,7 +545,7 @@ previously published site is completely unaffected.
   (success, no article; the Actions run is green). This is the correct
   outcome for a week without genuine, verified, current developments: an
   empty week is never filled with old, generic or marginal material.
-- **Something broke** - a quality-gate violation, an OpenAI/API error or a
+- **Something broke** - a quality-gate violation, an API error or a
   failed `astro build` - exits **1**, so it shows up as a **clearly failed**
   GitHub Actions run worth a human looking at.
 
@@ -596,23 +599,30 @@ common ones:
 `npm run oversize:publish -- --dry-run` (or the `dry_run` input on the
 `publish-weekly-oversize.yml` manual trigger) runs the entire real
 pipeline - final data refresh (done by the workflow's separate monitor
-step), source re-verification, and, if `OPENAI_API_KEY` is set, a real
-OpenAI call (dry run does **not** imply `--mock` - use both flags
+step), source re-verification, and, if `ANTHROPIC_API_KEY` is set, a real
+Claude call (dry run does **not** imply `--mock` - use both flags
 together, `--dry-run --mock`, if you want a completely free test) -
 through quality gate and `astro build`, prints the full article that
 *would* have been published, then discards it. Nothing is written to a
 real content path, nothing is committed, nothing is pushed.
 
-This is the recommended way to test a real OpenAI call end-to-end before
+This is the recommended way to test a real Claude call end-to-end before
 trusting the Friday automation: `--mock` proves the pipeline's own logic
 works, but only a real API call proves the model's actual JSON response
-matches what `scripts/lib/openai-client.mjs` expects the schema to be.
+matches what `scripts/lib/article-writer.mjs` expects the schema to be.
 
 ## GitHub Secrets
 
 | Secret | Required for | Why |
 |---|---|---|
-| `OPENAI_API_KEY` | `daily-oversize-monitor.yml`, `publish-weekly-oversize.yml`, `watchdog-weekly-oversize.yml` | Web-search discovery in the daily monitor and the final data refresh, and synthesis of the weekly article. |
+| `PERPLEXITY_API_KEY` | `daily-oversize-monitor.yml`, `publish-weekly-oversize.yml` | Perplexity Search API discovery in the monitor and the final data refresh. |
+| `ANTHROPIC_API_KEY` | `daily-oversize-monitor.yml`, `publish-weekly-oversize.yml`, social workflows | Claude classification of Search leads, writing the edition, the final review and social copy. |
+
+Optional repository variables: `CLAUDE_CLASSIFIER_MODEL` (default
+`claude-haiku-5-5`), `CLAUDE_REVIEW_MODEL` (default `claude-sonnet-5-5`) and
+`DAJC_WEEKLY_AUTO_MERGE=true` (protected auto-merge of a Claude-approved final
+edition citing only official sources; off by default). `OPENAI_API_KEY` is no
+longer used and can be deleted.
 
 Set it under repository Settings -> Secrets and variables -> Actions ->
 New repository secret.
@@ -642,8 +652,8 @@ then; a later merge makes it public on deploy. Only the PR/data persistence step
 `dry_run`.
 
 **Recommended first real test**: run with `dry_run=true` and a real
-`OPENAI_API_KEY` configured. This exercises the entire pipeline - including
-the actual OpenAI response - without any risk of committing or publishing
+`PERPLEXITY_API_KEY` and `ANTHROPIC_API_KEY` configured. This exercises the
+entire pipeline - including the actual Claude response - without any risk of committing or publishing
 anything (see "Dry run mode" above).
 
 ## Local development / testing
@@ -651,14 +661,14 @@ anything (see "Dry run mode" above).
 ```bash
 npm install
 npm run oversize:monitor                        # fetch sources, update data/oversize
-npm run oversize:publish -- --mock               # free: generate+build without calling OpenAI, discard nothing written to disk unless it's dry
+npm run oversize:publish -- --mock               # free: generate+build without calling Claude, discard nothing written to disk unless it's dry
 npm run oversize:publish -- --dry-run --mock     # free: same, but also discard the result (nothing left on disk)
-npm run oversize:publish -- --dry-run            # real OpenAI call, still discards the result - see "Dry run mode" above
-npm run oversize:publish                          # real publish - requires OPENAI_API_KEY in .env.local
+npm run oversize:publish -- --dry-run            # real Claude call, still discards the result - see "Dry run mode" above
+npm run oversize:publish                          # real publish - requires ANTHROPIC_API_KEY in .env.local
 npm run dev                                        # http://localhost:4321
 ```
 
-`--mock` (or `OVERSIZE_MOCK=1`) replaces the OpenAI call with a
+`--mock` (or `OVERSIZE_MOCK=1`) replaces the Claude call with a
 deterministic local generator (`scripts/lib/mock-generator.mjs`) that
 builds a valid article directly from the verified candidates - useful for
 testing the whole pipeline (selection, verification, quality gate, build)
@@ -700,19 +710,19 @@ design for now.
   same way. Already-published articles are unaffected either way - both
   workflows only ever add new files, they never modify or delete
   previously published articles.
-- **Pause without disabling**: removing/rotating the `OPENAI_API_KEY`
-  secret no longer pauses this quietly - a completely missing key now
-  fails the "Pre-flight - verify OPENAI_API_KEY is configured" step
-  (non-zero exit, red run) before any checkout, data refresh, or OpenAI
-  usage happens, and `generate-weekly-article.mjs` has the same check as
-  a second line of defense for direct/local invocations
-  (`checkOpenAiKeyPreflight` in `scripts/lib/preflight.mjs`). This is
+- **Pause without disabling**: removing/rotating the `PERPLEXITY_API_KEY`
+  or `ANTHROPIC_API_KEY` secret does not pause this quietly - a missing key
+  fails the "Pre-flight - check Perplexity and Claude API credentials" step
+  (non-zero exit, red run) before any data refresh or paid API usage
+  happens, and `generate-weekly-article.mjs` has the same check as a second
+  line of defense for direct/local invocations (`checkClaudeKeyPreflight`
+  in `scripts/lib/preflight.mjs`). This is
   intentional: a missing key is a configuration error, not a normal
   "nothing to publish this week" outcome, and must not look like one - see
   "Incident: the first live run" below. If you want to pause without a
   failing red run every Friday, disable the workflow instead (previous
   bullet). An invalid/revoked (as opposed to missing) key still fails
-  inside the OpenAI call itself, is caught, and exits 1 without writing
+  inside the API call itself, is caught, and exits 1 without writing
   anything.
 
 ## Incident: the first live run (2026-08-21)
@@ -896,13 +906,18 @@ This is a geographic review, separate from legal/source-law verification.
 
 The official-source registry shrinks from 84 to 56 endpoints. The existing 19
 web-search groups remain (two focuses per group): this change does not claim a
-proportional reduction in the number of OpenAI calls. It removes excluded source
+proportional reduction in the number of model calls. It removes excluded source
 fetches and narrows the search/candidate scope without dropping monitored countries.
 
 Run `npm run lint:geographic-coverage` before activation. The migration and rollback
 procedures are in `docs/GEOGRAPHIC_COVERAGE_MIGRATION.md`.
 
 ## Operational implementation: Sonar → Claude → Buffer (23 October 2026)
+
+> **Superseded on 24 October 2026.** OpenAI and the Perplexity Sonar path were
+> removed; see "Current production path: Search API → Claude" below. The
+> Sonar and OpenAI statements in this section and in "Safe transition into
+> production" are kept as history only.
 
 The existing daily European source research and Weekly generator use the Perplexity Sonar OpenAI-compatible Chat Completions API. The existing retrieved-page checks, monitored evidence, deterministic source validation and content quality gates remain active. Required production key: PERPLEXITY_API_KEY. Perplexity model is sonar-pro by default; source and writer models can be set through PERPLEXITY_SEARCH_MODEL / PERPLEXITY_WRITER_MODEL.
 
@@ -924,11 +939,11 @@ Do not turn off existing `OPENAI_API_KEY` until a paid Sonar/Claude end-to-end r
 Shipping the Sonar/Claude integration does **not** change existing company social-posting behavior. `DAJC_CLAUDE_SOCIAL_ENABLED=true` enables Claude-specific editing of X and LinkedIn copy, only after `ANTHROPIC_API_KEY` is configured, a paid smoke test passes and a spend limit has been approved. Without this flag, the original deterministic social drafts are used. Buffer is selected separately per channel: `DAJC_X_BACKEND=buffer` and `DAJC_LINKEDIN_BACKEND=buffer` only after the corresponding Buffer channel IDs, `BUFFER_API_KEY`, identity checks and explicit `DAJC_X_ENABLED` / `DAJC_LINKEDIN_ENABLED` flags have been verified. Missing any required provider identity keeps posting disabled or blocked; no fallback to personal profiles.
 
 
-## Current target: Search API → Claude (24 October 2026)
+## Current production path: Search API → Claude (24 October 2026)
 
 The tested Perplexity endpoint is POST https://api.perplexity.ai/search, not Sonar Chat Completions (HTTP 403 in isolated tests). The web-search adapter retrieves URL leads, Claude classifies them into the canonical finding schema, and each classified URL must match a returned Search URL. Every URL is then opened and verified by verifySearchItem. Existing eligibility, scope, freshness and official-first rules apply. Claude writes only from verified findings using the existing article schema. Independent Claude final review and protected GitHub CI remain mandatory.
 
-Feature flag DAJC_SEARCH_CLAUDE_ENABLED=true selects the new pipeline. The flag is NOT enabled by merging code. Keep DAJC_SONAR_ENABLED unset. Both PERPLEXITY_API_KEY and ANTHROPIC_API_KEY are required. The classifier incurs additional Claude API usage per search group: verify paid budget and run a controlled dry-run before enabling the schedule. Any failed API or unsupported claim blocks release; existing OpenAI publishing remains available until activation.
+This is the only research and writing path; there are no provider flags. OpenAI and Perplexity Sonar were removed on 24 October 2026 (owner decision, lowest cost), after the 24 October Search → Claude run had prepared an edition end to end. Both PERPLEXITY_API_KEY and ANTHROPIC_API_KEY are required. The classifier runs on Claude Haiku at low effort (CLAUDE_CLASSIFIER_MODEL). Any failed API or unsupported claim blocks release. Protected auto-merge stays off unless DAJC_WEEKLY_AUTO_MERGE=true.
 
 Single-source rule: all news articles live only at https://www.dajc.eu/news/. DAJC.cz contains a Czech navigation link to the English archive, not duplicate articles or a second publisher. English social teasers link only to the actual public DAJC.eu article. Any Czech teaser must disclose that the full article is in English and link to DAJC.eu. No Czech article translation or second news archive is authorized.
 

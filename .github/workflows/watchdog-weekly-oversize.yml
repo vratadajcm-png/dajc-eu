@@ -1,6 +1,6 @@
 name: Watchdog Weekly Oversize Publication
 
-# Recovery-only watchdog. The ONE primary publisher generates through Sonar,
+# Recovery-only watchdog. The ONE primary publisher researches with Perplexity Search,
 # validates with Claude, opens the protected PR and waits for GitHub checks.
 # This watchdog cannot write weekly content or bypass the editorial gate.
 on:

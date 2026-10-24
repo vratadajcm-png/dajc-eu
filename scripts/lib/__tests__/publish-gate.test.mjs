@@ -45,11 +45,11 @@ describe('decidePublishCommit', () => {
     expect(decision.message).toBe('data: refresh oversize findings (no article published this run)');
   });
 
-  // An OpenAI API failure (or any generate-step failure) never reaches this
+  // A Claude API failure (or any generate-step failure) never reaches this
   // commit step at all, because the workflow's `if:` condition is ANDed
   // with the previous step's success() - but if it somehow did, the data
   // refresh from earlier in the run must still never be labeled "publish".
-  it('an OpenAI API failure scenario (data refreshed, no article) never produces a publish commit', () => {
+  it('a Claude API failure scenario (data refreshed, no article) never produces a publish commit', () => {
     const decision = decidePublishCommit({ articleAdded: false, dataChanged: true, week: null });
     expect(decision.message).not.toMatch(/^content: publish/);
   });

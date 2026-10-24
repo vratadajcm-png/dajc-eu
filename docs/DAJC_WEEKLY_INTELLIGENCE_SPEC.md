@@ -1,6 +1,6 @@
 # DAJC European Oversize & Special Transport Intelligence — canonical production rules
 
-This is the **single editorial authority** for the automated DAJC.eu weekly European oversize/special-transport publication. It is the only document that states the rules; `NEWS_AUTOMATION.md` describes how they are implemented and links here instead of repeating them. In code the rules live in `scripts/lib/weekly-eligibility.mjs` (deterministic checks), `scripts/lib/quality-gate.mjs` (final gate) and the model prompt in `scripts/lib/openai-client.mjs`; a rule change must update this document and those files together.
+This is the **single editorial authority** for the automated DAJC.eu weekly European oversize/special-transport publication. It is the only document that states the rules; `NEWS_AUTOMATION.md` describes how they are implemented and links here instead of repeating them. In code the rules live in `scripts/lib/weekly-eligibility.mjs` (deterministic checks), `scripts/lib/quality-gate.mjs` (final gate) and the model prompt in `scripts/lib/article-writer.mjs`; a rule change must update this document and those files together.
 
 ## 0. Scope
 
@@ -22,7 +22,7 @@ Research coverage remains Europe-wide, but the published lead order is operator-
 
 ## 2. Source discovery
 
-- **Two-stage open-web discovery** (`scripts/lib/web-search.mjs`, OpenAI web search): official primary authority sources first for each geographical research group; if fewer than **3** eligible *primary discovery hits* are found in a group, search broadly across **all discoverable European freight, heavy-haul/oversize, driver/dispatcher, trade, fleet, operator, OEM and professional transport websites** without an exhaustive publisher whitelist. Search in local languages, oversize first. The threshold is only a *search-expansion trigger*, not a required published report count.
+- **Two-stage open-web discovery** (`scripts/lib/web-search.mjs`, Perplexity Search API with Claude classification; OpenAI is not used): official primary authority sources first for each geographical research group; if fewer than **3** eligible *primary discovery hits* are found in a group, search broadly across **all discoverable European freight, heavy-haul/oversize, driver/dispatcher, trade, fleet, operator, OEM and professional transport websites** without an exhaustive publisher whitelist. Search in local languages, oversize first. The threshold is only a *search-expansion trigger*, not a required published report count.
 - **DAJC's own sites (dajc.eu, dajc.cz) are never a source.** They are excluded from every search request, rejected before any page fetch and rejected again by the eligibility rules (`isOwnPublication`, `scripts/lib/source-policy.mjs`). In the W44 run about 40 % of all Search hits were DAJC editions.
 - **The Perplexity Search API receives short keyword queries in the group's local languages** (`buildSearchQueries`, `buildSearchRequest`), never the long LLM prompt. The official-first pass is restricted to the group's public authority domains (`config/official-authority-domains.mjs` plus the configured official sources); the open-web pass excludes DAJC and general driving-ban aggregators, is limited to the group's languages plus English and to pages from the last 30 days.
 - The search model only finds links. Every hit is fetched and the finding is built from **the page itself** (heading, text, publication date). A date the model reports is kept only when the page text shows it. Unreachable pages, PDFs, and pages whose own text shows no freight-vehicle (>12 t) or oversize context are dropped and logged.
@@ -124,6 +124,8 @@ This is a **standing** rule. The 50 approved DAJC jurisdictions remain the geogr
 
 ## 12. Autonomous Sonar / Claude editorial and social distribution (23 October 2026)
 
+> Research and writing moved from Sonar to Perplexity Search + Claude (§13, §16). The approval, auto-merge and social rules below still apply; auto-merge is enabled by the repository variable `DAJC_WEEKLY_AUTO_MERGE=true`.
+
 This is a permanent rule: **Perplexity Sonar research and article synthesis → Claude editorial veto/approval → protected GitHub PR and CI → verified public website → Claude-tailored X and LinkedIn copy → existing Buffer social publishing adapter.** No second weekly publishing pipeline.
 
 - Sonar discovers links in the existing official-first open-European-media search and synthesizes an English article only from verified source candidates. Hard checks on dates, geography, ISO week, duplicate stories, binding weight/permit limits, source provenance and the no-general-Driving-Bans exclusion remain.
@@ -176,7 +178,7 @@ Source research: use the tested Perplexity Search API to discover candidate URLs
 
 The owner's standing instruction is to run the Weekly at the lowest cost without weakening the rules above.
 
-- Research defaults to the Perplexity Search API with Claude Haiku 5.5 classifying the leads at low effort; OpenAI web search is used only when `DAJC_SEARCH_CLAUDE_ENABLED` is set to `false`.
+- Research uses the Perplexity Search API with Claude Haiku 5.5 classifying the leads at low effort. OpenAI and Perplexity Sonar are not used (removed 24 October 2026).
 - Focuses share one Search request whenever every language's terms fit (Search bills per request, not per query).
 - The monitor runs on Monday and Wednesday; Thursday's preparation refreshes the data once, and retries reuse findings written in the last 18 hours.
 - Writing the edition, the final editorial review and social copy keep the stronger `CLAUDE_REVIEW_MODEL` / `CLAUDE_SOCIAL_MODEL`: they run once or twice a week and decide what readers see.

@@ -1,7 +1,7 @@
 // Subprocess integration tests for the top-level pipeline script. These are
 // slower than the pure-function unit tests elsewhere in this directory, but
 // are the only way to genuinely exercise dry-run cleanup, overwrite
-// protection, the PERPLEXITY_API_KEY preflight and the end-to-end editorial
+// protection, the ANTHROPIC_API_KEY preflight and the end-to-end editorial
 // contract (quality > count) as they actually run.
 //
 // OVERSIZE_NOW pins "now" to a fixed instant (read by
@@ -244,11 +244,11 @@ describe('generate-weekly-article.mjs (mock, subprocess)', () => {
   );
 
   it(
-    'fails hard (non-zero exit) with Sonar enabled but no PERPLEXITY_API_KEY, before writing anything',
+    'fails hard (non-zero exit) without ANTHROPIC_API_KEY, before writing anything',
     () => {
-      const result = runGenerate([], { PERPLEXITY_API_KEY: '', DAJC_SONAR_ENABLED: 'true' });
+      const result = runGenerate([], { ANTHROPIC_API_KEY: '' });
       expect(result.code).not.toBe(0);
-      expect(result.stdout).toMatch(/PERPLEXITY_API_KEY/);
+      expect(result.stdout).toMatch(/ANTHROPIC_API_KEY/);
       expect(existsSync(targetFilePath)).toBe(false);
     },
     30_000

@@ -11,7 +11,7 @@ import { buildDrivingBanVerificationPlan, targetedSourceReview } from '../../../
 import { hydrateCanonical, expandRules, validateCanonical, snapshot, assertSweepRequest, SCOPE_CHECKS } from '../../../src/lib/driving-bans/core.mjs';
 import { migrateCanonicalCoverage } from '../geographic-migration.mjs';
 import { scopeFinding, scopeMonitoringDocument } from '../geographic-scope.mjs';
-import { SEARCH_GROUPS, buildSearchPrompt, searchGroup, verifySearchItem } from '../web-search.mjs';
+import { SEARCH_GROUPS, buildClassifierPrompt, searchGroup, verifySearchItem } from '../web-search.mjs';
 import { fetchSourceFindings } from '../fetch-source.mjs';
 import { selectCandidates } from '../select-candidates.mjs';
 import { checkGeneratedItem } from '../generated-item-filter.mjs';
@@ -85,9 +85,9 @@ describe('approved geographic scope and data preservation', () => {
     const fetchPage = vi.fn();
     expect((await verifySearchItem({ country:code, url:'https://example.test/outside' }, {fetchPage})).ok).toBe(false);
     expect(fetchPage).not.toHaveBeenCalled();
-    const client = {responses:{create:vi.fn()}};
-    await expect(searchGroup(client, {id:'retired',codes:[code]})).rejects.toThrow(/Untracked/);
-    expect(client.responses.create).not.toHaveBeenCalled();
+    const search = vi.fn();
+    await expect(searchGroup({id:'retired',codes:[code]}, { search })).rejects.toThrow(/Untracked/);
+    expect(search).not.toHaveBeenCalled();
     await expect(fetchSourceFindings({country:code,url:'https://example.test'})).rejects.toThrow(/Out-of-scope/);
   });
 
@@ -112,7 +112,7 @@ describe('approved geographic scope and data preservation', () => {
   });
 
   it('keeps KZ/RU/TR discovery limited and requires evidence for corridor assignment', () => {
-    const prompt = buildSearchPrompt(SEARCH_GROUPS.find(group=>group.id==='east'));
+    const prompt = buildClassifierPrompt(SEARCH_GROUPS.find(group=>group.id==='east'), []);
     expect(prompt).toContain('not their whole territories');
     for (const country of ['KZ','RU','TR']) expect(scopeFinding({country}).reason).toBe('CORRIDOR_SCOPE_REQUIRES_REVIEW');
     const finding = {country:'TR',sourceUrl:'https://example.test/a',corridorEvidence:{corridor:'European international route',reviewedBy:'operator',sourceUrl:'https://example.test/a',excerpt:'source passage',roadClass:'motorway',roadOrSection:'O-3; European freight corridor'}};

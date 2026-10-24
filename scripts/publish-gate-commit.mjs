@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Commit step for .github/workflows/publish-weekly-oversize.yml, run only
 // after "Generate weekly article" has succeeded (a failed generate step -
-// including the OPENAI_API_KEY preflight failure - already stops the job
+// including the ANTHROPIC_API_KEY preflight failure - already stops the job
 // before this runs, via GitHub Actions' implicit `success()` on the step's
 // `if:` condition).
 //
@@ -104,11 +104,11 @@ if (articleAdded && autonomousFinal) {
   const pathFromStatus = 'src/content/news/eu-oversize/' + extractArticleWeekFromStatus(articleStatusOutput).filename;
   const hash = createHash('sha256').update(readFileSync(pathFromStatus)).digest('hex');
   if (receipt.articlePath !== pathFromStatus || receipt.targetWeek !== week ||
-      receipt.sha256 !== hash || !['perplexity-sonar', 'perplexity-search'].includes(receipt.researchProvider) ||
+      receipt.sha256 !== hash || receipt.researchProvider !== 'perplexity-search' ||
       !receipt.claudeModel || receipt.leadCount < 1 || receipt.sourceCount < 1) {
     throw new Error('Claude review receipt missing or differs from exact article bytes');
   }
-  summary('Claude editorial review approved exact Sonar article SHA-256: ' + hash.slice(0, 12));
+  summary('Claude editorial review approved exact article SHA-256: ' + hash.slice(0, 12));
   const blockers = autoMergeBlockers(readFileSync(pathFromStatus, 'utf8'), sourceTier);
   if (blockers.length > 0) {
     autoMerge = false;
@@ -166,7 +166,7 @@ git(['push', 'origin', `HEAD:refs/heads/${branch}`]);
 const temporary = mkdtempSync(path.join(tmpdir(), 'dajc-publication-pr-'));
 try {
   const bodyFile = path.join(temporary, 'body.md');
-  writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\nThe final Sonar article was reviewed by Claude; protected application-validate and news-validate checks and GitHub merge are required before any public release. This run has not published the article. Only approved article/data paths are changed.\n`);
+  writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\n${autonomousFinal ? 'Claude reviewed the exact final article. ' : ''}Protected application-validate and news-validate checks and GitHub merge are required before any public release. This run has not published the article. Only approved article/data paths are changed.\n`);
   const prUrl = execFileSync('gh', ['pr', 'create', '--repo', repository, '--base', 'main', '--head', branch, '--title', decision.message, '--body-file', bodyFile], { encoding: 'utf8' }).trim();
   summary(`### EU Oversize Weekly - prepared for review\n\n${prUrl}\n\nArticle published this run: **no**. Final weekly content may auto-merge only after Claude approval and protected CI.`);
   for (const workflow of ['application-ci.yml', 'news-ci.yml']) execFileSync('gh', ['workflow', 'run', workflow, '--repo', repository, '--ref', branch], { stdio: 'inherit' });

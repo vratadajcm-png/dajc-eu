@@ -1,6 +1,6 @@
 // Re-verification pass for the Weekly pipeline. Each pre-selected candidate
 // must pass two independent checks before it is allowed anywhere near the
-// OpenAI call:
+// Claude call:
 //
 // 1. The complete deterministic Weekly eligibility check
 //    (weekly-eligibility.mjs): operational relevance, heavy-transport domain,
@@ -16,7 +16,7 @@
 //
 // A candidate that fails any check is dropped and never reaches the model -
 // this is deliberately independent of what the model itself is instructed to
-// do (see openai-client.mjs), so a prompt-following failure can't reintroduce
+// do (see article-writer.mjs), so a prompt-following failure can't reintroduce
 // the class of error this file screens out. Every rejection is logged with
 // its specific reason.
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { searchWithPerplexitySearch, SEARCH_GROUPS, SEARCH_API_MAX_RESULTS } from '../web-search.mjs';
-import { generateArticleWithClaude } from '../openai-client.mjs';
+import { generateArticleWithClaude } from '../article-writer.mjs';
 
 describe('Search → Claude fail-closed source flow', () => {
   it('never allows a Claude classifier to introduce URLs not returned by Search', async () => {

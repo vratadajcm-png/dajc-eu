@@ -1,12 +1,12 @@
 // Deterministic date validation for EU Oversize Weekly developments -
 // independent of the language model. The model can be (and is, see
-// openai-client.mjs) instructed not to invent or misplace dates, but only a
+// article-writer.mjs) instructed not to invent or misplace dates, but only a
 // plain-code check here can *guarantee* a stale or premature development
 // never reaches a published article, regardless of what the model returns.
 //
 // Used in two places: verify-candidates.mjs (drops a candidate whose
 // already-known validFrom/validTo doesn't overlap the target week, before
-// spending an OpenAI call on it) and quality-gate.mjs (the final, mandatory
+// spending a Claude call on it) and quality-gate.mjs (the final, mandatory
 // check on every development the model actually returned).
 
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;

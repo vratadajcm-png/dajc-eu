@@ -45,12 +45,10 @@ async function main() {
     console.log(`Findings for ${weekLabel} were refreshed at ${lastRefresh.toISOString()} (under ${maxAgeHours} h ago); reusing them without a new paid search.`);
     return;
   }
-  const sonarEnabled = process.env.DAJC_SONAR_ENABLED === 'true';
-  const searchClaudeEnabled = process.env.DAJC_SEARCH_CLAUDE_ENABLED === 'true';
-  const researchKey = (sonarEnabled || searchClaudeEnabled) ? process.env.PERPLEXITY_API_KEY : process.env.OPENAI_API_KEY;
-  if (searchClaudeEnabled && !process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY required for Search classification');
-  if (useWeb && !researchKey) {
-    throw new Error((sonarEnabled ? 'PERPLEXITY_API_KEY' : 'OPENAI_API_KEY') + ' is not set for the chosen research backend (OVERSIZE_DISCOVERY=official is the keyless read-only crawler option).');
+  // Web discovery = Perplexity Search + Claude classification (no OpenAI).
+  const missingKeys = ['PERPLEXITY_API_KEY', 'ANTHROPIC_API_KEY'].filter((name) => !process.env[name]);
+  if (useWeb && missingKeys.length > 0) {
+    throw new Error(`${missingKeys.join(' and ')} not set for web discovery (OVERSIZE_DISCOVERY=official is the keyless read-only crawler option).`);
   }
 
   console.log(`DAJC European Oversize monitor - ${nowIso}`);
@@ -82,7 +80,7 @@ async function main() {
 
   let webGroups = [];
   if (useWeb) {
-    const web = await discoverWithWebSearch({ apiKey: researchKey, now });
+    const web = await discoverWithWebSearch({ now });
     webGroups = web.groups;
     for (const entry of web.groups) {
       const label = `[web:${entry.group.id}] (${entry.group.countries.join(', ')})`;

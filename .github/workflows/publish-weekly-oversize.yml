@@ -28,10 +28,6 @@ on:
     - cron: '17 6 * * 6'  # Saturday catch-up
   workflow_dispatch:
     inputs:
-      search_claude:
-        description: 'Use verified Perplexity Search and Claude for this one manual regeneration; leave permanent activation unchanged.'
-        type: boolean
-        default: false
       dry_run:
         description: 'Dry run: generate, verify and build the article but do not commit/push.'
         type: boolean
@@ -62,12 +58,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
-      DAJC_AUTONOMOUS_WEEKLY: ${{ (vars.DAJC_SONAR_ENABLED == 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED == 'true') && '1' || '0' }}
-      DAJC_SONAR_ENABLED: ${{ vars.DAJC_SONAR_ENABLED }}
-      # Perplexity Search + Claude is the default (cheapest) research path;
-      # the variable set to 'false' switches back to OpenAI. Auto-merge still
-      # follows the variables only (DAJC_AUTONOMOUS_WEEKLY above).
-      DAJC_SEARCH_CLAUDE_ENABLED: ${{ github.event.inputs.search_claude == 'true' && 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED || 'true' }}
+      # Research is Perplexity Search + Claude; writing is Claude. OpenAI is
+      # not used. Protected auto-merge of a Claude-approved final edition is
+      # off unless the repository variable DAJC_WEEKLY_AUTO_MERGE is 'true'.
+      DAJC_AUTONOMOUS_WEEKLY: ${{ vars.DAJC_WEEKLY_AUTO_MERGE == 'true' && '1' || '0' }}
       OVERSIZE_PREVIEW: ${{ github.event.inputs.preview == 'true' && '1' || '' }}
       OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
     steps:
@@ -124,17 +118,10 @@ jobs:
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          selected="$OPENAI_API_KEY"
-          if [ "$DAJC_SONAR_ENABLED" = "true" ] || [ "$DAJC_SEARCH_CLAUDE_ENABLED" = "true" ]; then selected="$PERPLEXITY_API_KEY"; fi
-          if [ -z "$selected" ]; then
-            echo "::error::The selected publisher API key is missing. No article will be generated."
-            exit 1
-          fi
-          if { [ "$DAJC_SONAR_ENABLED" = "true" ] || [ "$DAJC_SEARCH_CLAUDE_ENABLED" = "true" ]; } && [ "${{ github.event.inputs.dry_run }}" != "true" ] && [ "${{ github.event.inputs.preview }}" != "true" ] && [ "${{ github.event.inputs.correction }}" != "true" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
-            echo "::error::ANTHROPIC_API_KEY missing. Autonomous release blocked before paid research."
+          if [ -z "$PERPLEXITY_API_KEY" ] || [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::PERPLEXITY_API_KEY (research) and ANTHROPIC_API_KEY (classification and writing) are both required. No article will be generated."
             exit 1
           fi
           echo "Required research/editor credentials present (values never printed)."
@@ -158,7 +145,6 @@ jobs:
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_CLASSIFIER_MODEL: ${{ vars.CLAUDE_CLASSIFIER_MODEL || 'claude-haiku-5-5' }}
           # Retries reuse findings from a run in the last 18 h instead of
@@ -170,7 +156,6 @@ jobs:
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}
         # One generation attempt. Quality > count: an edition contains exactly
@@ -178,8 +163,10 @@ jobs:
         # retry for (no lead/Rest-of-Europe minimum, no padding loop).
         run: node scripts/generate-weekly-article.mjs ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }} ${{ steps.trigger.outputs.preview == 'true' && '--preview' || '' }} ${{ github.event.inputs.correction == 'true' && '--correction' || '' }}
 
-      - name: Claude final editorial approval for Sonar article
-        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true' && (vars.DAJC_SONAR_ENABLED == 'true' || vars.DAJC_SEARCH_CLAUDE_ENABLED == 'true' || github.event.inputs.search_claude == 'true')
+      # Needed only for protected auto-merge; a PR for human review skips it
+      # (one Claude call less).
+      - name: Claude final editorial approval for auto-merge
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true' && env.DAJC_AUTONOMOUS_WEEKLY == '1'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}

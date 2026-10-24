@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Cheap, dependency-free idempotency check for the weekly publisher.
-// Runs immediately after checkout, before npm ci and before any OpenAI
+// Runs immediately after checkout, before npm ci and before any paid API
 // preflight/call. A delayed Friday trigger or Saturday catch-up therefore
 // becomes a clear no-op once the target week's article already exists.
 

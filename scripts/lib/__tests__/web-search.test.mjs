@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildSearchPrompt, cleanSourceName, cleanUrl, discoverWithWebSearch, parseSearchResponse, SEARCH_GROUPS, verifySearchItem,
+  buildClassifierPrompt, buildSearchRequest, cleanSourceName, cleanUrl, discoverWithWebSearch, parseSearchResponse, SEARCH_GROUPS, verifySearchItem,
 } from '../web-search.mjs';
 import { dajcEuropeCoverage } from '../../../config/europe-coverage.mjs';
 
@@ -19,7 +19,7 @@ function page({ heading = 'Neue Gewichtsbeschränkung für Lkw auf der A8', date
 const item = (overrides = {}) => ({
   country: 'Germany',
   title: 'Neue Gewichtsbeschränkung für Lkw auf der A8',
-  url: 'https://www.autobahn.de/aktuelles/a8-gewicht?utm_source=openai',
+  url: 'https://www.autobahn.de/aktuelles/a8-gewicht?utm_source=newsletter',
   sourceName: 'Autobahn GmbH',
   publishedAt: '2026-10-06',
   validFrom: '2026-10-12',
@@ -52,18 +52,12 @@ it('keeps source-backed regional scope inside the tracked country and rejects an
   expect((await verifySearchItem(regional,{now,fetchPage:okPage(page())})).reason).toBe('REGIONAL_SCOPE_REQUIRES_REVIEW');
 });
 
-describe('buildSearchPrompt', () => {
-  it('asks for one week back, one month ahead, >12 t scope with oversize first', () => {
-    const prompt = buildSearchPrompt(SEARCH_GROUPS[0], now, 'oversize');
-    expect(prompt).toContain('between 2026-10-01 and 2026-10-08');
-    expect(prompt).toContain('between 2026-10-08 and 2026-11-07');
-    expect(prompt).toMatch(/vehicles over 12 tonnes/);
-    expect(prompt).toMatch(/ONLY oversize/);
-    expect(prompt).toMatch(/NEVER RETURN: pages from dajc\.eu or dajc\.cz \(our own publication, never a source\), general recurring truck driving bans/);
-  });
-
-  it('has a separate focus for other goods vehicles over 12 t', () => {
-    expect(buildSearchPrompt(SEARCH_GROUPS[0], now, 'heavy')).toMatch(/goods vehicles over 12 t/);
+describe('buildClassifierPrompt', () => {
+  it('keeps the >12 t / oversize scope and never classifies DAJC pages or general driving bans', () => {
+    const prompt = buildClassifierPrompt(SEARCH_GROUPS[0], []);
+    expect(prompt).toMatch(/vehicles over 12 t, oversize\/abnormal transport first/);
+    expect(prompt).toMatch(/Skip pages from dajc\.eu or dajc\.cz, general recurring truck driving bans/);
+    expect(prompt).toContain('["Czechia"]');
   });
 });
 
@@ -90,7 +84,7 @@ describe('parseSearchResponse', () => {
 
 describe('cleanUrl', () => {
   it('drops utm tracking and fragments', () => {
-    expect(cleanUrl('https://a.example/x?id=3&utm_source=openai#top')).toBe('https://a.example/x?id=3');
+    expect(cleanUrl('https://a.example/x?id=3&utm_source=newsletter#top')).toBe('https://a.example/x?id=3');
   });
 });
 
@@ -162,30 +156,27 @@ describe('verifySearchItem', () => {
 });
 
 describe('discoverWithWebSearch', () => {
-  it('runs both focuses per group, verifies hits and dedupes URLs across groups', async () => {
+  it('runs the official pass and the fallback pass per group, verifies hits and dedupes URLs across groups', async () => {
     const groups = SEARCH_GROUPS.slice(0, 2);
     const calls = [];
-    const client = {
-      responses: {
-        create: async (request) => {
-          calls.push(request);
-          return { output_text: JSON.stringify({ items: [item()] }) };
-        },
-      },
+    const search = async (group, request) => {
+      calls.push({ group: group.id, request });
+      return [item()];
     };
-    const { findings, groups: report } = await discoverWithWebSearch({ client, now, groups, fetchPage: okPage(page()) });
-    // Sparse primary-source findings trigger two additional broad industry searches per group.
-    expect(calls).toHaveLength(8);
+    const { findings, groups: report } = await discoverWithWebSearch({ search, now, groups, fetchPage: okPage(page()) });
+    // Sparse primary-source findings trigger the open-web fallback pass; both
+    // focuses share one request for these single-language groups.
+    expect(calls).toHaveLength(4);
     expect(report.every(r => r.fallbackSearched)).toBe(true);
-    expect(calls[0].tools[0].type).toBe('web_search_preview');
+    expect(calls[0].request.search_domain_filter).toContain('rsd.cz');
     expect(findings).toHaveLength(1);
     expect(findings[0].searchGroup).toBe(groups.find(group => group.codes.includes('DE')).id);
     expect(report.map((r) => r.status)).toEqual(['ok', 'ok']);
   });
 
   it('reports a failed search as unavailable instead of hiding it', async () => {
-    const client = { responses: { create: async () => { throw new Error('rate limited'); } } };
-    const { findings, groups } = await discoverWithWebSearch({ client, now, groups: SEARCH_GROUPS.slice(0, 1), fetchPage: okPage(page()) });
+    const search = async () => { throw new Error('rate limited'); };
+    const { findings, groups } = await discoverWithWebSearch({ search, now, groups: SEARCH_GROUPS.slice(0, 1), fetchPage: okPage(page()) });
     expect(findings).toEqual([]);
     expect(groups[0].status).toBe('unavailable');
     expect(groups[0].error).toContain('rate limited');
@@ -195,13 +186,12 @@ describe('discoverWithWebSearch', () => {
 
 
 describe('Open Europe-wide source expansion', () => {
-  it('asks for primary notices first and professional industry coverage only on fallback', () => {
-    const primary = buildSearchPrompt(SEARCH_GROUPS[0], now, 'oversize', 'official');
-    const secondary = buildSearchPrompt(SEARCH_GROUPS[0], now, 'operations', 'industry');
-    expect(primary).toContain('OFFICIAL PRIMARY');
-    expect(secondary).toContain('ALL accessible European specialist transport news sites');
-    expect(secondary).toContain('dispatchers');
-    expect(secondary).toContain('not an instruction to pad');
+  it('restricts the first pass to authorities and opens the web only on fallback', () => {
+    const primary = buildSearchRequest(SEARCH_GROUPS[0], now, ['oversize', 'heavy'], 'official');
+    const secondary = buildSearchRequest(SEARCH_GROUPS[0], now, ['oversize', 'operations'], 'industry');
+    expect(primary.search_domain_filter.every((domain) => !domain.startsWith('-'))).toBe(true);
+    expect(secondary.search_domain_filter.every((domain) => domain.startsWith('-'))).toBe(true);
+    expect(secondary.query.join(' ')).toMatch(/řidiči kamionů|dopravci/);
   });
   it('keeps non-official source provenance rather than treating media as an authority', async () => {
     const article = item({

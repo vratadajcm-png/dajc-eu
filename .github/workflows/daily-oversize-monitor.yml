@@ -46,32 +46,22 @@ jobs:
       - name: Load latest monitoring data
         run: node scripts/automation-data.mjs load findings
 
-      - name: Pre-flight - verify PERPLEXITY_API_KEY is configured
+      - name: Pre-flight - verify Perplexity and Claude keys are configured
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          DAJC_SONAR_ENABLED: ${{ vars.DAJC_SONAR_ENABLED }}
-          DAJC_SEARCH_CLAUDE_ENABLED: ${{ vars.DAJC_SEARCH_CLAUDE_ENABLED || 'true' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          selected="$OPENAI_API_KEY"
-          if [ "$DAJC_SONAR_ENABLED" = "true" ] || [ "$DAJC_SEARCH_CLAUDE_ENABLED" = "true" ]; then selected="$PERPLEXITY_API_KEY"; fi
-          if [ -z "$selected" ]; then
-            echo "::error::Research API key missing for selected provider."
+          if [ -z "$PERPLEXITY_API_KEY" ] || [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::PERPLEXITY_API_KEY and ANTHROPIC_API_KEY are both required for web discovery."
             exit 1
           fi
-          echo "Pre-flight OK: selected research provider credential is present."
+          echo "Pre-flight OK: research credentials are present."
 
       - name: Run oversize monitor (web search)
-        # Same provider selection as the pre-flight above. Perplexity Search
-        # ($5 per 1,000 requests) with Claude Haiku classification is the
-        # default - the cheapest path; OpenAI web search costs $25 per 1,000
-        # calls plus model tokens. Set the variable to 'false' to switch back.
+        # Perplexity Search ($5 per 1,000 requests) with Claude Haiku
+        # classification - the lowest-cost path. OpenAI is not used.
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          DAJC_SONAR_ENABLED: ${{ vars.DAJC_SONAR_ENABLED }}
-          DAJC_SEARCH_CLAUDE_ENABLED: ${{ vars.DAJC_SEARCH_CLAUDE_ENABLED || 'true' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_CLASSIFIER_MODEL: ${{ vars.CLAUDE_CLASSIFIER_MODEL || 'claude-haiku-5-5' }}
         run: npm run oversize:monitor
