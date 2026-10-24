@@ -1,7 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
 import ArticleDetail from '../../../components/ArticleDetail.astro';
-import { isNewsEntryPublic, NEWS_PAGE_CACHE_CONTROL } from '../../../config/news';
+import NewsNotFound from '../../../components/NewsNotFound.astro';
+import { isNewsEntryPublic, NEWS_PAGE_CACHE_CONTROL, newsCategoryLabel } from '../../../config/news';
 
 // Rendered on demand (CDN-cached) instead of prerendered: the weekly article
 // is committed ahead of its Friday 12:00 Europe/Prague slot and must appear
@@ -14,11 +15,8 @@ const entry = (await getCollection('eu-oversize', ({ data }) => isNewsEntryPubli
 );
 
 Astro.response.headers.set('Cache-Control', NEWS_PAGE_CACHE_CONTROL);
-if (!entry) {
-  return new Response('Not found', {
-    status: 404,
-    headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': NEWS_PAGE_CACHE_CONTROL },
-  });
-}
+// A missing, upcoming or withdrawn edition is a 404 inside the site layout,
+// with a way back to the archive (links shared on X/LinkedIn land here).
+if (!entry) Astro.response.status = 404;
 ---
-<ArticleDetail entry={entry} categoryLabel="EU Oversize Weekly" />
+{entry ? <ArticleDetail entry={entry} categoryLabel={newsCategoryLabel('eu-oversize', entry.data.slug)} /> : <NewsNotFound />}

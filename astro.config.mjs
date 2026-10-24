@@ -9,9 +9,10 @@ const SITE = 'https://www.dajc.eu';
 // src/pages/news/eu-oversize/[slug].astro), so the sitemap integration no
 // longer discovers them - list the ones already public at build time here.
 // An article prepared for an upcoming Friday joins the sitemap on the next
-// deploy after its release.
-function publicEuOversizeArticleUrls(now = new Date()) {
-  const dir = new URL('./src/content/news/eu-oversize/', import.meta.url);
+// deploy after its release. Platform articles are prerendered and found
+// automatically; both get their publication/correction date as lastmod.
+function publicNewsArticles(collection, now = new Date()) {
+  const dir = new URL(`./src/content/news/${collection}/`, import.meta.url);
   return readdirSync(dir)
     .filter((file) => file.endsWith('.md'))
     .flatMap((file) => {
@@ -19,10 +20,14 @@ function publicEuOversizeArticleUrls(now = new Date()) {
       const field = (name) => text.match(new RegExp(`^${name}:\\s*"?([^"\\n]+)"?\\s*$`, 'm'))?.[1];
       const slug = field('slug');
       const publishedAt = new Date(field('publishedAt') ?? '');
+      const updatedAt = field('updatedAt') ? new Date(field('updatedAt')) : null;
       const isPublic = field('status') === 'published' && publishedAt.getTime() <= now.getTime();
-      return slug && isPublic ? [`${SITE}/news/eu-oversize/${slug}/`] : [];
+      return slug && isPublic ? [{ url: `${SITE}/news/${collection}/${slug}/`, lastmod: (updatedAt ?? publishedAt).toISOString() }] : [];
     });
 }
+
+const newsArticles = [...publicNewsArticles('eu-oversize'), ...publicNewsArticles('platform')];
+const newsLastmod = new Map(newsArticles.map(({ url, lastmod }) => [url, lastmod]));
 
 export default defineConfig({
   site: SITE,
@@ -51,7 +56,9 @@ export default defineConfig({
       // DAJC_PARTNER_PORTAL_ENABLED. See docs/PARTNER_PORTAL.md.
       filter: (page) => !/^\/(?:platform|partners|integration-ecosystem|partner-portal|investor)(?:\/|$)/.test(new URL(page).pathname),
       // On-demand public pages are not discovered automatically.
-      customPages: [`${SITE}/driving-bans`, ...publicEuOversizeArticleUrls()],
+      customPages: [`${SITE}/driving-bans`, ...newsArticles.filter(({ url }) => url.includes('/news/eu-oversize/')).map(({ url }) => url)],
+      // Search engines see when an article was published or last corrected.
+      serialize: (item) => (newsLastmod.has(item.url) ? { ...item, lastmod: newsLastmod.get(item.url) } : item),
     }),
   ],
 });

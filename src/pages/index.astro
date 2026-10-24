@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import HomeRedesign from '../components/HomeRedesign.astro';
 import NewsSection from '../components/NewsSection.astro';
 import { getCollection } from 'astro:content';
-import { isNewsEntryPublic, NEWS_PAGE_CACHE_CONTROL } from '../config/news';
+import { compareNewsEntries, isNewsEntryPublic, NEWS_PAGE_CACHE_CONTROL } from '../config/news';
 
 export const prerender = false;
 Astro.response.headers.set('Cache-Control', NEWS_PAGE_CACHE_CONTROL);
@@ -11,9 +11,7 @@ Astro.response.headers.set('Cache-Control', NEWS_PAGE_CACHE_CONTROL);
 const now = new Date();
 const euOversize = await getCollection('eu-oversize', ({ data }) => isNewsEntryPublic(data, now));
 const platform = await getCollection('platform', ({ data }) => data.status === 'published');
-const latestNews = [...euOversize, ...platform]
-  .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf())
-  .slice(0, 3);
+const latestNews = [...euOversize, ...platform].sort(compareNewsEntries).slice(0, 3);
 const hasPublishedEuOversize = euOversize.length > 0;
 ---
 <BaseLayout
