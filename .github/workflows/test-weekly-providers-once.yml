@@ -37,10 +37,10 @@ jobs:
           echo "Possible Perplexity alias visible: $CHECK_PERPLEXITY_ALIAS"
           echo "Buffer secret visible: $CHECK_BUFFER"
           echo "Existing OpenAI secret visible: $CHECK_OPENAI"
-      - name: Check Perplexity and Claude with no publication
+      - name: Re-test Perplexity Sonar only (no publication)
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           PERPLEXITY_SEARCH_MODEL: ${{ vars.PERPLEXITY_SEARCH_MODEL }}
           CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL }}
-        run: python3 scripts/smoke-weekly-providers.py
+        run: python3 -c "import runpy; runpy.run_path('scripts/smoke-weekly-providers.py')['sonar']()"
