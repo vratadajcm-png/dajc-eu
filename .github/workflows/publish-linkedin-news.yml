@@ -57,7 +57,7 @@ jobs:
         id: reserve
         if: github.event_name != 'workflow_dispatch' || inputs.dry_run == false
         env:
-          DAJC_SOCIAL_BACKEND: ${{ vars.DAJC_LINKEDIN_BACKEND || 'buffer' }}
+          DAJC_SOCIAL_BACKEND: buffer
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_SOCIAL_MODEL: ${{ vars.CLAUDE_SOCIAL_MODEL || 'claude-sonnet-5-5' }}
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
