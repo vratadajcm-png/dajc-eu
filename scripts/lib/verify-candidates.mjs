@@ -9,10 +9,10 @@
 //    freshness, target-week date overlap and no repetition of earlier editions.
 //    This deliberately repeats pre-selection so verification can never be
 //    called with weaker rules.
-// 2. Source reachability (HEAD, falling back to GET on any non-2xx HEAD).
-//    Some official government sites reject or mishandle HEAD while serving a
-//    normal GET successfully; a candidate is still never published with a
-//    genuinely dead source link.
+// 2. Source reachability (HEAD, falling back to GET when HEAD fails or times
+//    out; each with its own timeout). Some official government sites reject,
+//    mishandle or stall on HEAD while serving a normal GET successfully; a
+//    candidate is still never published with a genuinely dead source link.
 //
 // A candidate that fails any check is dropped and never reaches the model -
 // this is deliberately independent of what the model itself is instructed to
@@ -34,33 +34,32 @@ function isDocumentLikeSourceUrl(url) {
   }
 }
 
-async function checkReachable(url) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), VERIFY_TIMEOUT_MS);
+async function requestOk(url, method, { fetchFn, timeoutMs }) {
   try {
-    let res = await fetch(url, {
-      method: 'HEAD',
-      signal: controller.signal,
+    const res = await fetchFn(url, {
+      method,
+      signal: AbortSignal.timeout(timeoutMs),
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DajcOversizeVerify/1.0; +https://dajc.eu)' },
       redirect: 'follow',
     });
-    if (!res.ok) {
-      // Government/legal sites commonly return 403/405/501 (or another
-      // non-success status) to HEAD while the normal document GET is valid.
-      // Retry once with GET before declaring an official source unreachable.
-      res = await fetch(url, {
-        method: 'GET',
-        signal: controller.signal,
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DajcOversizeVerify/1.0; +https://dajc.eu)' },
-        redirect: 'follow',
-      });
-    }
+    // Only the status matters; do not download the document body.
+    await res.body?.cancel?.().catch(() => {});
     return res.ok;
   } catch {
     return false;
-  } finally {
-    clearTimeout(timer);
   }
+}
+
+/**
+ * HEAD first, then GET on any failure. Government/legal sites commonly
+ * return 403/405/501 to HEAD, or answer it far slower than GET
+ * (rijkswaterstaat.nl: HEAD 13 s, GET under 1 s, 24 October 2026). That is
+ * why each request has its own timeout: a slow HEAD must not use up the GET's
+ * time, or an official N307 notice is dropped as "unreachable".
+ */
+export async function checkReachable(url, { fetchFn = fetch, timeoutMs = VERIFY_TIMEOUT_MS } = {}) {
+  if (await requestOk(url, 'HEAD', { fetchFn, timeoutMs })) return true;
+  return requestOk(url, 'GET', { fetchFn, timeoutMs });
 }
 
 /**
