@@ -1,4 +1,4 @@
-name: One-time Buffer DAJC Channel Discovery (read-only)
+name: One-time Buffer DAJC Channel Discovery (read-only) # verify LinkedIn connection 2026-10-24
 on:
   push:
     branches:
