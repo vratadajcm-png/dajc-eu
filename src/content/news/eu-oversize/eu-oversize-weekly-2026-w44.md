@@ -50,4 +50,4 @@ No additional development meeting the Weekly's source-verification and materiali
 
 ## Next EU Oversize Weekly
 
-Friday, 30 October 2026 at 12:00 Europe/Prague (CEST).
+Friday, 30 October 2026 at 12:00 Europe/Prague (CET).
