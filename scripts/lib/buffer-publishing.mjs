@@ -43,6 +43,17 @@ export function validateBufferChannel(channel, details) {
       throw new Error('Buffer X channel is not the official DAJC @DAJCeu profile');
     }
   } else {
+    if (process.env.DAJC_LINKEDIN_TARGET === 'personal') {
+      // Temporary, explicit exception approved by the owner. Never permit
+      // arbitrary personal profiles or silently fall back from company page.
+      if (details.id !== '6adc3c32778b240e2fa9f0bc' ||
+          details.service !== 'linkedin' || details.type !== 'profile' ||
+          link !== 'https://www.linkedin.com/in/miroslav-daj%C4%8D-034a4540a' ||
+          name !== 'miroslav-dajč-034a4540a') {
+        throw new Error('LinkedIn channel is not the explicitly approved personal DAJC author');
+      }
+      return true;
+    }
     if (details.service !== 'linkedin' || details.type !== 'page' ||
         !/^https?:\/\/(?:www\.)?linkedin\.com\/company\/[a-z0-9-]+\/?$/i.test(link) ||
         !/^(dajc|dajc platform|dajc\.eu)$/.test(name)) {
