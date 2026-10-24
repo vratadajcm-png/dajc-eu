@@ -56,8 +56,9 @@ describe('X length as X counts it (first live X run, 24 October 2026)', () => {
     };
     expect(await createClaudeSocialCopy('x', platform, { apiKey: 'test', fetchFn })).toBe('Short teaser ' + longUrl);
     expect(bodies).toHaveLength(2);
-    expect(bodies[1].messages.map((m) => m.role)).toEqual(['user', 'assistant', 'user']);
-    expect(bodies[1].messages[2].content).toMatch(/X characters too long/);
+    expect(bodies[1].messages).toHaveLength(1);
+    expect(bodies[1].messages[0].content).toMatch(/YOUR PREVIOUS DRAFT: "B{250} /);
+    expect(bodies[1].messages[0].content).toMatch(/X characters too long/);
   });
 
   it('does not retry other failures and fails after one shortening attempt', async () => {
@@ -69,5 +70,21 @@ describe('X length as X counts it (first live X run, 24 October 2026)', () => {
     const tooLong = async () => { calls += 1; return reply('C'.repeat(300) + ' ' + longUrl); };
     await expect(createClaudeSocialCopy('x', platform, { apiKey: 'test', fetchFn: tooLong })).rejects.toThrow(/too long/);
     expect(calls).toBe(2);
+  });
+});
+
+describe('Claude social request budget (Sonnet 5.5 thinks by default)', () => {
+  const longUrl = 'https://www.dajc.eu/news/platform/media-partnerships-transport-intelligence-2026';
+  const platform = { url: longUrl, title: 'DAJC media partnerships', description: 'Three collaboration concepts', sections: [] };
+
+  it('asks for low effort with room for thinking, and names the stop reason of a cut-off reply', async () => {
+    let body;
+    const fetchFn = async (_endpoint, options) => {
+      body = JSON.parse(options.body);
+      return { ok: true, json: async () => ({ stop_reason: 'max_tokens', content: [] }) };
+    };
+    await expect(createClaudeSocialCopy('x', platform, { apiKey: 'test', fetchFn })).rejects.toThrow(/stop_reason: max_tokens/);
+    expect(body.output_config.effort).toBe('low');
+    expect(body.max_tokens).toBeGreaterThanOrEqual(4000);
   });
 });
