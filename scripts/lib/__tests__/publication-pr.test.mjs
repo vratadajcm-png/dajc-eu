@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { copyFileSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -53,6 +54,7 @@ describe('reviewed weekly publication', () => {
     const output = run(f, 'publish-gate-commit.mjs');
     const calls = readFileSync(f.log, 'utf8').trim().split('\n').map(JSON.parse);
     expect(calls[0].args.slice(0, 2)).toEqual(['pr', 'create']);
+    expect(calls[0].body).toContain('Waiting for human review');
     expect(calls[0].body).toContain('This run has not published the article');
     expect(calls.slice(1).map((call) => call.args)).toEqual([
       ['workflow', 'run', 'application-ci.yml', '--repo', 'example/dajc', '--ref', 'automation/weekly-2026-w43'],
@@ -61,6 +63,39 @@ describe('reviewed weekly publication', () => {
     expect(output).toContain('Article published this run: **no**');
     expect(git(f.remote, ['rev-parse', 'main']).trim()).toBe(f.main);
     expect(git(f.remote, ['diff', '--name-only', 'main', 'automation/weekly-2026-w43']).trim()).toBe('src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md');
+  });
+
+  it('opens a vetoed autonomous edition for human review instead of losing it', () => {
+    const f = fixture();
+    loadAutomationData('findings', f.root);
+    put(f.root, 'src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md', 'validated article fixture');
+    const runnerTemp = mkdtempSync(path.join(f.base, 'runner-temp-'));
+    const output = run(f, 'publish-gate-commit.mjs', { DAJC_AUTONOMOUS_WEEKLY: '1', RUNNER_TEMP: runnerTemp });
+    expect(output).toContain('::warning::Claude did not approve the edition');
+    expect(readFileSync(f.env.GITHUB_OUTPUT, 'utf8')).toContain('auto_merge=false');
+    const calls = readFileSync(f.log, 'utf8').trim().split('\n').map(JSON.parse);
+    expect(calls[0].body).toContain('Waiting for human review');
+  });
+
+  it('marks a Claude-approved edition for release but never merges it itself', () => {
+    const f = fixture();
+    loadAutomationData('findings', f.root);
+    const article = 'validated article fixture';
+    const relative = 'src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md';
+    put(f.root, relative, article);
+    const runnerTemp = mkdtempSync(path.join(f.base, 'runner-temp-'));
+    writeFileSync(path.join(runnerTemp, 'dajc-weekly-review-approved.json'), JSON.stringify({
+      articlePath: relative, targetWeek: '2026-W43', sha256: createHash('sha256').update(article).digest('hex'),
+      researchProvider: 'perplexity-search', claudeModel: 'claude-sonnet-5-5', leadCount: 1, sourceCount: 1,
+    }));
+    run(f, 'publish-gate-commit.mjs', { DAJC_AUTONOMOUS_WEEKLY: '1', RUNNER_TEMP: runnerTemp });
+    const outputs = readFileSync(f.env.GITHUB_OUTPUT, 'utf8');
+    expect(outputs).toContain('auto_merge=true');
+    expect(outputs).toContain('pr_url=https://github.com/example/dajc/pull/9001');
+    const calls = readFileSync(f.log, 'utf8').trim().split('\n').map(JSON.parse);
+    expect(calls.some((call) => call.args[0] === 'pr' && call.args[1] === 'merge')).toBe(false);
+    expect(calls[0].body).toContain('Claude approved the exact final article');
+    expect(git(f.remote, ['rev-parse', 'main']).trim()).toBe(f.main);
   });
 
   it('does not regenerate an edition already awaiting approval', () => {

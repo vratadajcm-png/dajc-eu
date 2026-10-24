@@ -59,9 +59,12 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       # Research is Perplexity Search + Claude; writing is Claude. OpenAI is
-      # not used. Protected auto-merge of a Claude-approved final edition is
-      # off unless the repository variable DAJC_WEEKLY_AUTO_MERGE is 'true'.
-      DAJC_AUTONOMOUS_WEEKLY: ${{ vars.DAJC_WEEKLY_AUTO_MERGE == 'true' && '1' || '0' }}
+      # not used. The final edition publishes autonomously (owner decision,
+      # 24 October 2026): once Claude approves it source by source and the
+      # required checks pass, the release step merges it, and the site shows
+      # it from Friday 12:00 Europe/Prague. Set the repository variable
+      # DAJC_WEEKLY_AUTO_MERGE=false to require a human merge again.
+      DAJC_AUTONOMOUS_WEEKLY: ${{ vars.DAJC_WEEKLY_AUTO_MERGE != 'false' && '1' || '0' }}
       OVERSIZE_PREVIEW: ${{ github.event.inputs.preview == 'true' && '1' || '' }}
       OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
     steps:
@@ -165,9 +168,12 @@ jobs:
         # retry for (no lead/Rest-of-Europe minimum, no padding loop).
         run: node scripts/generate-weekly-article.mjs ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }} ${{ steps.trigger.outputs.preview == 'true' && '--preview' || '' }} ${{ github.event.inputs.correction == 'true' && '--correction' || '' }}
 
-      # Needed only for protected auto-merge; a PR for human review skips it
-      # (one Claude call less).
-      - name: Claude final editorial approval for auto-merge
+      # Needed only for autonomous release; a PR for human review skips it
+      # (one Claude call less). A veto must not lose the edition: the next
+      # step still opens it for human review, and the run is marked failed.
+      - name: Claude final editorial approval for autonomous release
+        id: review
+        continue-on-error: true
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true' && env.DAJC_AUTONOMOUS_WEEKLY == '1'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -181,8 +187,45 @@ jobs:
           fi
 
       - name: Open reviewed publication PR or persist data-only refresh
+        id: gate
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true'
         run: node scripts/publish-gate-commit.mjs
+
+      # Autonomous release of a Claude-approved final edition: wait for the
+      # required checks dispatched on the PR branch, then merge within the
+      # main ruleset (no bypass). The article is public from its Friday
+      # 12:00 Europe/Prague slot. A failed check leaves the PR for a human.
+      - name: Release the approved edition after required checks
+        if: steps.gate.outputs.auto_merge == 'true'
+        timeout-minutes: 30
+        shell: bash
+        env:
+          PR_URL: ${{ steps.gate.outputs.pr_url }}
+        # The checks are the workflow_dispatch runs started by the gate step;
+        # pull_request runs on a GITHUB_TOKEN-created PR wait for approval
+        # and are not counted.
+        run: |
+          passed=0
+          for attempt in $(seq 1 60); do
+            passed=$(gh pr checks "$PR_URL" --json name,bucket \
+              --jq '[.[] | select(.bucket == "pass") | .name | select(. == "application-validate" or . == "news-validate")] | unique | length' 2>/dev/null || echo 0)
+            echo "required checks passed: ${passed:-0}/2"
+            [ "${passed:-0}" -ge 2 ] && break
+            sleep 20
+          done
+          if [ "$passed" -lt 2 ]; then
+            echo "::error::Required checks did not both pass; the edition waits for human review: $PR_URL"
+            exit 1
+          fi
+          gh pr merge "$PR_URL" --squash
+          echo "### EU Oversize Weekly released" >> "$GITHUB_STEP_SUMMARY"
+          echo "$PR_URL merged after required checks; public from its Friday 12:00 Europe/Prague slot." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Alert when Claude withheld the release
+        if: steps.review.outcome == 'failure'
+        run: |
+          echo "::error::Claude did not approve this edition (see the review step). It waits for human review: ${{ steps.gate.outputs.pr_url || 'no PR was opened' }}"
+          exit 1
 
       # A week where nothing qualifies exits the generator with success, so
       # without this step a missing edition would stay silent. Thursday runs

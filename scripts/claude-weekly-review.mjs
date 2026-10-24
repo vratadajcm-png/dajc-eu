@@ -146,7 +146,7 @@ export async function withOriginalPages(records, fetchPage = (url) => fetchTextW
 async function apiJson(url, headers, payload) {
   const response = await fetch(url, {
     method: 'POST', headers: { 'content-type': 'application/json', ...headers },
-    body: JSON.stringify(payload), signal: AbortSignal.timeout(115000)
+    body: JSON.stringify(payload), signal: AbortSignal.timeout(300000)
   });
   if (!response.ok) throw new Error('Reviewer API failed with HTTP ' + response.status + ' at ' + new URL(url).hostname);
   return response.json();
@@ -176,11 +176,13 @@ async function reviewClaude(article, evidence) {
   if (!key || !model) throw new Error('ANTHROPIC_API_KEY or CLAUDE_REVIEW_MODEL missing: autonomous release disabled');
   const r = await apiJson('https://api.anthropic.com/v1/messages',
     { 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-    { model, max_tokens: 12000, messages: [{ role: 'user', content: reviewerPrompt(article, evidence) }],
+    // Sonnet 5.5 thinks by default and thinking counts toward max_tokens; a
+    // cut-off review would veto every release (24 October 2026).
+    { model, max_tokens: 32000, messages: [{ role: 'user', content: reviewerPrompt(article, evidence) }],
       output_config: { format: { type: 'json_schema', schema: REVIEW_SCHEMA } }
     });
   const content = r.content?.find(x => x.type === 'text')?.text;
-  if (r.stop_reason !== 'end_turn' || typeof content !== 'string') throw new Error('Claude review incomplete');
+  if (r.stop_reason !== 'end_turn' || typeof content !== 'string') throw new Error('Claude review incomplete (stop_reason: ' + r.stop_reason + ')');
   return JSON.parse(content);
 }
 
