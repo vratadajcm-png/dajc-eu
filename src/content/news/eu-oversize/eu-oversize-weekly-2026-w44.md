@@ -1,0 +1,53 @@
+---
+title: "DAJC European Oversize & Special Transport Intelligence - Week of Oct 26, 2026"
+description: "The N307 Markerwaarddijk bridges in the Netherlands now have a 15-tonne gross-weight and 7.3-tonne axle-load limit, affecting heavy and abnormal transport planning."
+slug: "eu-oversize-weekly-2026-w44"
+category: "eu-oversize"
+publishedAt: 2026-10-23T10:00:00.000Z
+language: "en"
+author: "DAJC"
+status: "published"
+sources:
+  - name: "Rijkswaterstaat"
+    url: "https://www.rijkswaterstaat.nl/nieuws/archief/2026/09/n307-gewichtsbeperking-markerwaarddijk-vanaf-21-oktober-2026"
+---
+
+## Intro
+
+This edition covers verified developments relevant to heavy, abnormal and oversized road transport in Europe for the week of 26 October–1 November 2026. It focuses on changes with direct operational consequences rather than filling the report with recurring driving bans or unverified stories. One qualifying infrastructure development has been confirmed for this edition.
+
+## Lead reports
+
+### Netherlands: 15-tonne gross-weight and 7.3-tonne axle-load limits on the N307 Markerwaarddijk
+
+The Dutch road authority Rijkswaterstaat confirms that restrictions have applied since **21 October 2026** to the bridges over the Houtribsluizen near Lelystad on the N307 Markerwaarddijk (Houtribdijk). The limits are **15 tonnes for the total weight of a vehicle or vehicle combination, including its load**, and **7.3 tonnes on any single axle**. Both conditions must be met. These restrictions are especially important for heavy and exceptional-load route planning.
+
+**Category:** Infrastructure restriction  
+**Where:** N307 Markerwaarddijk / Houtribdijk, bridges over the Houtribsluizen near Lelystad, Netherlands  
+**Effective:** 21 October 2026  
+**Affected vehicles:** Any vehicle or combination exceeding 15 tonnes total actual weight, or exceeding 7.3 tonnes on an axle  
+**Impact:** The affected bridges are unavailable to heavy transport exceeding either limit. Rijkswaterstaat says the measure may remain in force for years because of structural problems with the bridges.
+
+**Recommended action:** Dispatchers should check the actual gross combination weight and individual axle loads before assigning this corridor. Rijkswaterstaat directs affected heavy traffic towards the surrounding **A6 and A7** roads; verify the entire alternative route, including any oversize permit conditions, before departure. Do not treat a suggested detour as an amendment to an issued abnormal-load permit.
+
+**Exemptions/conditions:** Passenger cars, emergency services, vans and other vehicles meeting the posted restrictions may continue to use the route. No general exemption for oversize transport is confirmed by the cited authority notice.
+
+*Official source: [Rijkswaterstaat — N307 weight restriction from 21 October 2026](https://www.rijkswaterstaat.nl/nieuws/archief/2026/09/n307-gewichtsbeperking-markerwaarddijk-vanaf-21-oktober-2026).*
+
+## Rest of Europe: verified operational roundup
+
+No additional development meeting the Weekly's source-verification and materiality standards has been confirmed for this edition. Recurring national winter-equipment and ordinary HGV driving-ban calendars are not presented as new Weekly reports.
+
+## Operator checklist
+
+- Check the N307 Markerwaarddijk against **both** the 15-tonne gross combination limit and the 7.3-tonne axle-load limit.
+- Review the A6/A7 alternatives and any applicable abnormal-load permits before dispatch; never silently change a permitted route.
+- Recheck the road authority's current notice and roadside signs before travel.
+
+## Sources
+
+- [Rijkswaterstaat — N307: weight restriction from 21 October 2026](https://www.rijkswaterstaat.nl/nieuws/archief/2026/09/n307-gewichtsbeperking-markerwaarddijk-vanaf-21-oktober-2026)
+
+## Next EU Oversize Weekly
+
+Friday, 30 October 2026 at 12:00 Europe/Prague (CEST).
