@@ -905,3 +905,12 @@ Do not turn off existing `OPENAI_API_KEY` until a paid Sonar/Claude end-to-end r
 ### Independent social activation
 
 Shipping the Sonar/Claude integration does **not** change existing company social-posting behavior. `DAJC_CLAUDE_SOCIAL_ENABLED=true` enables Claude-specific editing of X and LinkedIn copy, only after `ANTHROPIC_API_KEY` is configured, a paid smoke test passes and a spend limit has been approved. Without this flag, the original deterministic social drafts are used. Buffer is selected separately per channel: `DAJC_X_BACKEND=buffer` and `DAJC_LINKEDIN_BACKEND=buffer` only after the corresponding Buffer channel IDs, `BUFFER_API_KEY`, identity checks and explicit `DAJC_X_ENABLED` / `DAJC_LINKEDIN_ENABLED` flags have been verified. Missing any required provider identity keeps posting disabled or blocked; no fallback to personal profiles.
+
+
+## Current target: Search API → Claude (24 October 2026)
+
+The tested Perplexity endpoint is POST https://api.perplexity.ai/search, not Sonar Chat Completions (HTTP 403 in isolated tests). The web-search adapter retrieves URL leads, Claude classifies them into the canonical finding schema, and each classified URL must match a returned Search URL. Every URL is then opened and verified by verifySearchItem. Existing eligibility, scope, freshness and official-first rules apply. Claude writes only from verified findings using the existing article schema. Independent Claude final review and protected GitHub CI remain mandatory.
+
+Feature flag DAJC_SEARCH_CLAUDE_ENABLED=true selects the new pipeline. The flag is NOT enabled by merging code. Keep DAJC_SONAR_ENABLED unset. Both PERPLEXITY_API_KEY and ANTHROPIC_API_KEY are required. The classifier incurs additional Claude API usage per search group: verify paid budget and run a controlled dry-run before enabling the schedule. Any failed API or unsupported claim blocks release; existing OpenAI publishing remains available until activation.
+
+Single-source rule: all news articles live only at https://www.dajc.eu/news/. DAJC.cz contains a Czech navigation link to the English archive, not duplicate articles or a second publisher. English social teasers link only to the actual public DAJC.eu article. Any Czech teaser must disclose that the full article is in English and link to DAJC.eu. No Czech article translation or second news archive is authorized.
