@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateSocialCopy, createClaudeSocialCopy } from '../claude-social-copy.mjs';
+import { validateSocialCopy, createClaudeSocialCopy, xWeightedLength } from '../claude-social-copy.mjs';
 
 const url = 'https://www.dajc.eu/news/eu-oversize/eu-oversize-weekly-2026-w44';
 const article = { url, title: 'EU Oversize Weekly', description: 'European freight news', sections: ['Permit changes'] };
@@ -29,5 +29,45 @@ describe('channel-specific approved social editions', () => {
     expect(calls[0]).toContain('X: write a punchy, specific headline/hook');
     expect(calls[1]).toContain('LinkedIn: write a distinctive professional B2B teaser');
     expect(calls[0]).not.toEqual(calls[1]);
+  });
+});
+
+describe('X length as X counts it (first live X run, 24 October 2026)', () => {
+  const longUrl = 'https://www.dajc.eu/news/platform/media-partnerships-transport-intelligence-2026';
+  const platform = { url: longUrl, title: 'DAJC media partnerships', description: 'Three collaboration concepts', sections: [] };
+  const reply = (text) => ({ ok: true, json: async () => ({ stop_reason: 'end_turn', content: [{ type: 'text', text: JSON.stringify({ text }) }] }) });
+
+  it('counts the article link as 23 characters and emoji as 2', () => {
+    expect(xWeightedLength('Read ' + longUrl, longUrl)).toBe(5 + 23);
+    expect(xWeightedLength('🚛 ' + longUrl, longUrl)).toBe(2 + 1 + 23);
+  });
+
+  it('accepts a post that fits on X even though the long URL makes it over 260 code points', () => {
+    const text = 'A'.repeat(200) + ' ' + longUrl;
+    expect(Array.from(text).length).toBeGreaterThan(260);
+    expect(validateSocialCopy('x', platform, text)).toBe(text);
+  });
+
+  it('gives Claude the measured length once and keeps the shorter post', async () => {
+    const bodies = [];
+    const fetchFn = async (_endpoint, options) => {
+      bodies.push(JSON.parse(options.body));
+      return bodies.length === 1 ? reply('B'.repeat(250) + ' ' + longUrl) : reply('Short teaser ' + longUrl);
+    };
+    expect(await createClaudeSocialCopy('x', platform, { apiKey: 'test', fetchFn })).toBe('Short teaser ' + longUrl);
+    expect(bodies).toHaveLength(2);
+    expect(bodies[1].messages.map((m) => m.role)).toEqual(['user', 'assistant', 'user']);
+    expect(bodies[1].messages[2].content).toMatch(/X characters too long/);
+  });
+
+  it('does not retry other failures and fails after one shortening attempt', async () => {
+    let calls = 0;
+    const noLink = async () => { calls += 1; return reply('No link at all'); };
+    await expect(createClaudeSocialCopy('x', platform, { apiKey: 'test', fetchFn: noLink })).rejects.toThrow(/canonical article URL/);
+    expect(calls).toBe(1);
+    calls = 0;
+    const tooLong = async () => { calls += 1; return reply('C'.repeat(300) + ' ' + longUrl); };
+    await expect(createClaudeSocialCopy('x', platform, { apiKey: 'test', fetchFn: tooLong })).rejects.toThrow(/too long/);
+    expect(calls).toBe(2);
   });
 });
