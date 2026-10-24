@@ -19,6 +19,7 @@ try {
   for (const org of orgs.slice(0, 5)) {
     const result = await query('query { channels(input: { organizationId: ' + JSON.stringify(org.id) + ' }) { id name displayName service type externalLink isDisconnected isLocked } }');
     for (const item of result?.channels || []) {
+      if (item.service === 'linkedin') console.log('LinkedIn channel metadata: ' + JSON.stringify({ id: item.id, name: item.name, displayName: item.displayName, type: item.type, externalLink: item.externalLink, isDisconnected: item.isDisconnected, isLocked: item.isLocked }));
       for (const network of ['x', 'linkedin']) {
         try {
           validateBufferChannel(network, item);
