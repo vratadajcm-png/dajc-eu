@@ -212,3 +212,58 @@ export async function generateArticleWithSonar(args) {
 export async function generateRequiredItemsWithSonar(args) {
   return generateRequiredItemsWithOpenAI({ ...args, provider: 'perplexity' });
 }
+
+
+// Search → Claude production writer. Claude receives only already-verified
+// monitored candidates, never raw Perplexity search snippets.
+async function claudeStructured(prompt, schema, {
+  apiKey = process.env.ANTHROPIC_API_KEY,
+  model = process.env.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5',
+  fetchFn = fetch,
+} = {}) {
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY missing: Claude writer blocked');
+  const res = await fetchFn('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+    body: JSON.stringify({
+      model, max_tokens: 12000,
+      messages: [{ role: 'user', content: prompt }],
+      output_config: { format: { type: 'json_schema', schema: schema.schema } },
+    }),
+    signal: AbortSignal.timeout(115000),
+  });
+  if (!res.ok) throw new Error('Claude writer rejected request HTTP ' + res.status);
+  const data = await res.json();
+  if (data.stop_reason !== 'end_turn') throw new Error('Claude writer response incomplete');
+  const output = data.content?.find(c => c.type === 'text')?.text;
+  if (!output) throw new Error('Claude writer returned no structured output');
+  return JSON.parse(output);
+}
+
+export async function generateArticleWithClaude({
+  candidates, requiredSourceUrls = [], weekRangeLabel, targetWeekStart, targetWeekEnd,
+  apiKey, model, fetchFn,
+}) {
+  const required = new Set(requiredSourceUrls);
+  const mapped = candidates.slice(0, 60).map(c => candidatePayload(c, { required: required.has(c.sourceUrl) }));
+  return claudeStructured(
+    SYSTEM_PROMPT + '\n\nTarget publication window: ' + targetWeekStart + ' to ' + targetWeekEnd +
+    ' (' + weekRangeLabel + '). Select only verified material; do not pad counts or include recurring driving bans.' +
+    '\n\nVerified candidates:\n' + JSON.stringify(mapped),
+    ARTICLE_JSON_SCHEMA, { apiKey, model, fetchFn }
+  );
+}
+
+export async function generateRequiredItemsWithClaude({
+  candidates, targetWeekStart, targetWeekEnd, apiKey, model, fetchFn,
+}) {
+  if (!candidates?.length) return [];
+  const mapped = candidates.map(c => candidatePayload(c, { required: true, summaryChars: 1500 }));
+  const result = await claudeStructured(
+    SYSTEM_PROMPT + '\n\nTarget: ' + targetWeekStart + ' to ' + targetWeekEnd +
+    '. Write exactly one report for each named critical development, merging duplicates. No padding.' +
+    '\n\nVerified critical candidates:\n' + JSON.stringify(mapped),
+    REQUIRED_ITEMS_SCHEMA, { apiKey, model, fetchFn }
+  );
+  return Array.isArray(result.items) ? result.items : [];
+}

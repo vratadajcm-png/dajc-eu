@@ -49,9 +49,11 @@ jobs:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DAJC_SONAR_ENABLED: ${{ vars.DAJC_SONAR_ENABLED }}
+          DAJC_SEARCH_CLAUDE_ENABLED: ${{ vars.DAJC_SEARCH_CLAUDE_ENABLED }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           selected="$OPENAI_API_KEY"
-          if [ "$DAJC_SONAR_ENABLED" = "true" ]; then selected="$PERPLEXITY_API_KEY"; fi
+          if [ "$DAJC_SONAR_ENABLED" = "true" ] || [ "$DAJC_SEARCH_CLAUDE_ENABLED" = "true" ]; then selected="$PERPLEXITY_API_KEY"; fi
           if [ -z "$selected" ]; then
             echo "::error::Research API key missing for selected provider."
             exit 1

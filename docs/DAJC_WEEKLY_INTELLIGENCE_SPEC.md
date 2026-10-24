@@ -160,3 +160,11 @@ This policy does not by itself activate the new Search/Claude producer or DAJC.c
 - Both social channels may carry both languages, but only when their matching public article exists; never link a Czech teaser to an English-only article, invent a DAJC.cz slug, or send duplicate cross-language posts for one article without the configured channel policy.
 - X is brief and curiosity-building without misleading clickbait. LinkedIn is a short professional teaser focused on why the full report matters for dispatchers, drivers and transport companies. Neither post should disclose the whole article or invent facts, restrictions, dates, or claims.
 - Social posts are scheduled **after** each language's own public website article is confirmed live. Existing social-account authorization and anti-duplicate ledgers remain mandatory. Czech localization and dual-language social posting are not activated until separately implemented and verified.
+
+## 15. Final canonical publishing decision (24 October 2026)
+
+**DAJC.eu is the sole news publisher and archive.** All Weekly editions, articles, original source citations and canonical URLs live exclusively on DAJC.eu/news. DAJC.cz is a Czech-language entry site with a static visible link to the English DAJC.eu/news archive; it must not generate, duplicate, translate-and-publish or index separate Weekly articles. This decision supersedes earlier proposed dual-domain article publication and Czech full-article localization.
+
+X and company LinkedIn are acquisition channels, not independent news archives. Each posts an independently adapted, accurate teaser linking to the exact live DAJC.eu article. English posts are standard; if Czech teasers are added, explicitly disclose that the full linked article is in English. Never invent a DAJC.cz article URL or mirror content to dajc.cz.
+
+Source research: use the tested Perplexity Search API to discover candidate URLs, then Claude to classify and draft from original-source-verified records, followed by independent final editorial review and protected GitHub CI. Production activation requires end-to-end evidence and a spend budget; source failure must not silently publish unreviewed content.

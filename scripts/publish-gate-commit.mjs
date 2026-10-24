@@ -102,7 +102,7 @@ if (articleAdded && autonomousFinal) {
   const pathFromStatus = 'src/content/news/eu-oversize/' + extractArticleWeekFromStatus(articleStatusOutput).filename;
   const hash = createHash('sha256').update(readFileSync(pathFromStatus)).digest('hex');
   if (receipt.articlePath !== pathFromStatus || receipt.targetWeek !== week ||
-      receipt.sha256 !== hash || receipt.researchProvider !== 'perplexity-sonar' ||
+      receipt.sha256 !== hash || !['perplexity-sonar', 'perplexity-search'].includes(receipt.researchProvider) ||
       !receipt.claudeModel || receipt.leadCount < 1 || receipt.sourceCount < 1) {
     throw new Error('Claude review receipt missing or differs from exact article bytes');
   }

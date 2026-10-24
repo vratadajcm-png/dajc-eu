@@ -167,7 +167,7 @@ async function main() {
   const claude = await reviewClaude(article, evidence);
   if (!reviewApproved(claude, article.links)) throw new Error('Claude veto: ' + JSON.stringify(claude.blockingReasons || claude).slice(0, 2400));
   const receipt = { articlePath: p, sha256: createHash('sha256').update(raw).digest('hex'),
-    targetWeek: article.week, researchProvider: 'perplexity-sonar', claudeModel: process.env.CLAUDE_REVIEW_MODEL,
+    targetWeek: article.week, researchProvider: process.env.DAJC_SEARCH_CLAUDE_ENABLED === 'true' ? 'perplexity-search' : 'perplexity-sonar', claudeModel: process.env.CLAUDE_REVIEW_MODEL,
     leadCount: article.leadCount, restCount: article.restCount, sourceCount: article.links.length };
   if (!process.env.RUNNER_TEMP) throw new Error('RUNNER_TEMP missing; reviews passed but cannot authorize release');
   await writeFile(path.join(process.env.RUNNER_TEMP, 'dajc-weekly-review-approved.json'), JSON.stringify(receipt), { flag: 'wx', mode: 0o600 });

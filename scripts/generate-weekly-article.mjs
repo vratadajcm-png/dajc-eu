@@ -40,7 +40,7 @@ import { loadWeekFindings } from './lib/store.mjs';
 import { isoWeekLabel, isoWeekRangeLabel, isoWeekStart, isoWeekEnd } from './lib/week.mjs';
 import { selectCandidates } from './lib/select-candidates.mjs';
 import { verifyCandidates } from './lib/verify-candidates.mjs';
-import { generateArticleWithOpenAI, generateRequiredItemsWithOpenAI, generateArticleWithSonar, generateRequiredItemsWithSonar } from './lib/openai-client.mjs';
+import { generateArticleWithOpenAI, generateRequiredItemsWithOpenAI, generateArticleWithSonar, generateRequiredItemsWithSonar, generateArticleWithClaude, generateRequiredItemsWithClaude } from './lib/openai-client.mjs';
 import { generateArticleMock, generateRequiredItemsMock } from './lib/mock-generator.mjs';
 import { renderArticleMarkdown, toFrontmatterYaml } from './lib/render-article.mjs';
 import { runQualityGate, MAX_REPORTS, MAX_ROUNDUP_REPORTS } from './lib/quality-gate.mjs';
@@ -136,8 +136,9 @@ async function main() {
   // a configuration error, not something worth spending verification time
   // on first. See scripts/lib/preflight.mjs.
   const sonarEnabled = process.env.DAJC_SONAR_ENABLED === 'true';
-  const apiKey = sonarEnabled ? process.env.PERPLEXITY_API_KEY : process.env.OPENAI_API_KEY;
-  const preflight = sonarEnabled ? checkSonarKeyPreflight({ mock, apiKey }) : checkOpenAiKeyPreflight({ mock, apiKey });
+  const searchClaudeEnabled = process.env.DAJC_SEARCH_CLAUDE_ENABLED === 'true';
+  const apiKey = searchClaudeEnabled ? process.env.ANTHROPIC_API_KEY : (sonarEnabled ? process.env.PERPLEXITY_API_KEY : process.env.OPENAI_API_KEY);
+  const preflight = (sonarEnabled || searchClaudeEnabled) ? checkSonarKeyPreflight({ mock, apiKey }) : checkOpenAiKeyPreflight({ mock, apiKey });
   if (!preflight.ok) {
     await fail(preflight.reason);
     return;
@@ -275,7 +276,7 @@ async function main() {
   try {
     article = mock
       ? await generateArticleMock({ candidates: verified, weekRangeLabel })
-      : await (sonarEnabled ? generateArticleWithSonar : generateArticleWithOpenAI)({
+      : await (searchClaudeEnabled ? generateArticleWithClaude : (sonarEnabled ? generateArticleWithSonar : generateArticleWithOpenAI))({
           candidates: verified,
           requiredSourceUrls,
           weekRangeLabel,
@@ -317,7 +318,7 @@ async function main() {
     try {
       const written = mock
         ? await generateRequiredItemsMock({ groups: missing })
-        : await (sonarEnabled ? generateRequiredItemsWithSonar : generateRequiredItemsWithOpenAI)({
+        : await (searchClaudeEnabled ? generateRequiredItemsWithClaude : (sonarEnabled ? generateRequiredItemsWithSonar : generateRequiredItemsWithOpenAI))({
             candidates: missing.flatMap((group) => group.candidates),
             targetWeekStart: targetWeekStartIso,
             targetWeekEnd: targetWeekEndIso,
