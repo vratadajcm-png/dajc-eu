@@ -1,0 +1,24 @@
+name: One-time Buffer DAJC Channel Discovery (read-only)
+on:
+  push:
+    branches:
+      - test/search-claude-e2e-nonpublishing-20261024
+    paths:
+      - .github/workflows/test-buffer-discovery-once.yml
+permissions:
+  contents: read
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: List only verified DAJC company channel IDs
+        env:
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+        run: node scripts/smoke-buffer-discover.mjs
