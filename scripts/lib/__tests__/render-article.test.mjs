@@ -205,6 +205,19 @@ describe('renderArticleMarkdown', () => {
     expect(body.indexOf('### first')).toBeLessThan(body.indexOf('### second'));
   });
 
+  it('adds the country to a heading only when the title does not already lead with it', () => {
+    const base = { whatChanged: 'Change.', isDrivingBan: false, isInfrastructure: true, sourceUrl: 'https://example.test/a', sourceName: 'Source' };
+    const led = { ...base, country: 'Italy', title: 'Italy: stricter BESS derogation criteria' };
+    const plain = { ...base, country: 'Netherlands', title: 'N307 weight limit', sourceUrl: 'https://example.test/b' };
+    const roundup = { ...base, country: 'Serbia', title: 'Serbia/Croatia: Batrovci waits', sourceUrl: 'https://example.test/c' };
+    const { body } = renderArticleMarkdown(makeArticle([led, plain], { europeRoundup: [roundup] }), {
+      slug: 'eu-oversize-weekly-2026-w99', publishedAt: '2026-08-21', nextPublicationLabel: null,
+    });
+    expect(body).toContain('### Italy: stricter BESS derogation criteria\n');
+    expect(body).toContain('### N307 weight limit (Netherlands)');
+    expect(body).toContain('### Serbia/Croatia: Batrovci waits\n');
+  });
+
   it('marks a change taking effect after the covered week as outlook', () => {
     const item = {
       country: 'Austria', title: 'Escort rule change', whatChanged: 'New escort rule.', recommendedAction: 'Prepare escorts.',
