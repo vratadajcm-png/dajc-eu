@@ -1,0 +1,185 @@
+# Ask DAJC AI (Zeptejte se DAJC AI) — Phase 1
+
+DAJC Intelligence feature from master plan DAJC-PLAN-003-FULL §47 (§47.2,
+§47.3, §47.7). **Phase 1: free questions with a daily limit. Nothing is sold;
+no payments, credits, Revolut or Stripe.**
+
+**Status: built, disabled by default (`DAJC_ASK_ENABLED=false`).** Every
+`/api/ask/*` route and `/intelligence/ask` answer 404 until the flag is the
+exact string `"true"` *and* the whole configuration (database, separate keys,
+model names, prices, budget, pepper) is present. Do not enable it before the
+launch checklist below is complete.
+
+## What a question goes through
+
+| Step (§47.2) | Where | Notes |
+|---|---|---|
+| 1. Classification: country, topic, dimensions, date | `pipeline.ts`, OpenAI | Output re-validated in code (tracked jurisdictions, ISO dates). E-mail addresses and phone numbers are removed before any provider sees the question. |
+| 2. DAJC's own verified data | `own-data.ts` | Driving bans from `data/driving-bans/canonical.json` through `src/lib/driving-bans/core.mjs` (read-only). EU Oversize Weekly findings are all `unverified`, so only their official-tier URLs serve as leads. |
+| 3. Official domains when own data are missing or stale | `pipeline.ts`, Perplexity | `search_domain_filter = officialDomainsFor()` from `scripts/lib/source-policy.mjs`. The search engine receives classifier keywords, never the question. |
+| 4. Fetch and read the sources | `official-sources.ts`, `text.ts` | `fetchTextWithRetry()` from `scripts/lib/fetch-source.mjs`; a URL is used only if `isOfficialPublisher()` holds before and after redirects. PDFs are skipped in Phase 1. |
+| 5. Draft only from the sources | `prompts.ts`, OpenAI | Each statement cites one source and quotes it verbatim. Sources and the question travel in randomly delimited blocks declared as untrusted data. |
+| 6a. Deterministic check | `guard.ts` | Source from the allowed set; quote found verbatim; every number in the statement also in the quote; no digits at all for DAJC data (facts come from the template); no "you can / vám hrozí" wording; answer language = question language. A failing statement is not shown. |
+| 6b. Independent check | `prompts.ts`, Anthropic | Checks that each source contains its statement and that it is not personal advice. **Any disagreement → the whole answer is NEVÍM** (owner decision). |
+| 7. Output | `pipeline.ts`, `facts.ts` | OVĚŘENO / ČÁSTEČNĚ / NEVÍM, sources with links and check dates, the visible AI label and the `/support` link (voluntary, no benefit). |
+| 8. Human review queue | `dajc_ask.review_queue` | New official URLs only — no user, question or e-mail. Nothing is ever written to `data/`. |
+
+Levels:
+
+- **OVĚŘENO / VERIFIED** — no statement was dropped, the draft covers the
+  whole question, every asked country is answered, and DAJC data used for a
+  country are complete.
+- **ČÁSTEČNĚ / PARTIAL** — every shown statement passed both checks, but the
+  answer does not cover everything (a statement was dropped, a country is
+  missing, or DAJC coverage of the country is incomplete).
+- **NEVÍM / DON'T KNOW** — out of scope, no country, no source, no passing
+  statement, or any disagreement in the independent check.
+
+### Where OVĚŘENO is possible from DAJC data
+
+As of 25 October 2026 the canonical dataset is `PRIMARY_VERIFIED` with full
+coverage for **11 jurisdictions**: CH Switzerland, CZ Czechia, FR France,
+HR Croatia, HU Hungary, IT Italy, LI Liechtenstein, LU Luxembourg, PL Poland,
+SI Slovenia, SK Slovakia — for dates inside the reviewed window
+(1 September – 30 November 2026) on which a verified event exists.
+Other countries, and dates without a verified event, are answered from
+official websites (OVĚŘENO possible but not guaranteed). A missing event is
+never presented as "no ban".
+
+### After 30 November 2026
+
+The canonical window ends. Every driving-ban question about a later date is
+`stale` for DAJC data and goes to official domains only (Perplexity filtered
+to `officialDomainsFor()` plus the dataset's own PRIMARY source URLs). Answers
+still require a quoted official source and the independent check; expect more
+ČÁSTEČNĚ/NEVÍM and higher cost per answer until the window is moved forward
+(§47.2: the window must become rolling — a data/sweep change outside this
+feature, which only reads `data/`).
+
+## Storage (schema `dajc_ask`)
+
+Separate Postgres schema and least-privileged role `dajc_ask_app`; migrations
+in `drizzle-ask/` (config `drizzle.ask.config.ts`, own bookkeeping table, so
+it never interleaves with the portal's migrations). The schema must not be
+exposed through the Supabase Data API; `anon`/`authenticated` get nothing; RLS
+is on for every table with policies only for `dajc_ask_app`; the app can
+write measurements but cannot read them.
+
+| Table | Content | Kept |
+|---|---|---|
+| `users` | HMAC of the e-mail (never the address) | until deleted |
+| `login_tokens` | SHA-256 of one-time tokens | deleted at expiry (15 min) |
+| `sessions` | SHA-256 of session tokens | deleted at expiry (7 days) |
+| `daily_usage` | user, Prague day, count | 35 days |
+| `budget` | spent/reserved micro-EUR per month and day | indefinitely (no personal data) |
+| `metrics` | day, level, language, path, cost, latency — **no user, question or answer** | indefinitely (no personal data) |
+| `review_queue` | official URL, jurisdiction, topic, first/last day seen | until reviewed |
+| `rate_events` | HMAC of IP / e-mail per bucket | 1 day |
+
+Question and answer texts are never stored by DAJC. OpenAI is called with
+`store: false`; the providers' own retention applies (DPA to be signed).
+
+## Limits and costs
+
+- 3 questions per verified e-mail per Prague day (`DAJC_ASK_DAILY_QUERY_LIMIT`).
+  NEVÍM counts; a question is given back only after a system error.
+- Before any provider call, the worst-case cost of the whole question
+  (prompt size caps × prices, 1 search) — about €0.24 with the §47.5 prices —
+  is reserved against the monthly cap (`DAJC_ASK_MONTHLY_BUDGET_EUR=20`) and
+  the daily cap (`DAJC_ASK_DAILY_BUDGET_EUR=2`). The reservation is replaced
+  by the actual cost afterwards; a failed call is charged at its worst case.
+  When a cap cannot take another worst case the feature pauses itself
+  (HTTP 503, message on the page) until the next day/month.
+- Sign-in e-mails: 3/hour and 6/day per address, 5/hour per IP, 300/day in
+  total.
+
+## Environment variables (server only)
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `DAJC_ASK_ENABLED` | yes | exactly `true` to enable; default `false` |
+| `DAJC_ASK_DB_URL` | yes | Postgres as `dajc_ask_app` |
+| `DAJC_ASK_OPENAI_API_KEY` | yes | separate OpenAI project key |
+| `DAJC_ASK_OPENAI_CLASSIFIER_MODEL` | yes | classification model |
+| `DAJC_ASK_OPENAI_ANSWER_MODEL` | yes | answer model |
+| `DAJC_ASK_ANTHROPIC_API_KEY` | yes | separate Anthropic workspace key |
+| `DAJC_ASK_ANTHROPIC_VERIFIER_MODEL` | yes | independent check model |
+| `DAJC_ASK_PERPLEXITY_API_KEY` | yes | separate Perplexity key |
+| `DAJC_ASK_PRICING_USD` | yes | e.g. `{"classifier":{"input":0.2,"output":1.25},"answer":{"input":0.75,"output":4.5},"verifier":{"input":2,"output":10},"searchRequest":0.005}` (USD per 1M tokens; USD per search) |
+| `DAJC_ASK_USD_EUR_RATE` | yes | EUR per 1 USD, e.g. `0.92` |
+| `DAJC_ASK_MONTHLY_BUDGET_EUR` | yes | `20` |
+| `DAJC_ASK_DAILY_BUDGET_EUR` | no | `2` |
+| `DAJC_ASK_DAILY_QUERY_LIMIT` | no | `3` (default) |
+| `DAJC_ASK_EMAIL_PEPPER` | yes | ≥ 32 random characters |
+| `DAJC_ASK_EMAIL_FROM` | no | default `DAJC <team@dajc.eu>` |
+| `DAJC_ASK_EMAIL_MODE` | no | `live` to send real e-mails (uses existing `RESEND_API_KEY`) |
+| `DAJC_ASK_PUBLIC_ORIGIN` | no | origin in sign-in links, default `https://www.dajc.eu` |
+| `DAJC_ASK_MIGRATION_DB_URL` | local only | admin connection for `drizzle-kit migrate`; never in Vercel |
+
+A key equal to the article pipeline's `ANTHROPIC_API_KEY`,
+`PERPLEXITY_API_KEY` or `OPENAI_API_KEY` is rejected and keeps the feature off.
+
+## Launch checklist (all required before `DAJC_ASK_ENABLED=true`)
+
+1. **Database** — Supabase project in the EU (Frankfurt). Apply migrations as
+   an admin: `DAJC_ASK_MIGRATION_DB_URL=… npx drizzle-kit migrate --config drizzle.ask.config.ts`.
+   Then, outside the repository: `ALTER ROLE dajc_ask_app WITH LOGIN PASSWORD '<generated>';`
+   and set `DAJC_ASK_DB_URL` to that role (Supabase pooler user
+   `dajc_ask_app.<project-ref>`). Confirm `dajc_ask` is **not** in
+   Settings → API → Exposed schemas.
+2. **Keys with provider limits** — new OpenAI project, Anthropic workspace
+   and Perplexity key used only by this feature, each with its own monthly
+   spend limit at the provider (≤ the €20 cap). Verify the §47.5 prices and
+   put them into `DAJC_ASK_PRICING_USD`.
+3. **DPAs** with OpenAI, Anthropic and Perplexity; transfer assessment (USA);
+   confirm API data is not used for training and the providers' retention.
+4. **Advocate review** — information vs. legal advice boundary (zákon
+   č. 85/1996 Sb.), prompts and fixed texts, AI Act Art. 50 label, Terms and
+   Privacy texts (draft: `docs/ASK_DAJC_AI_LEGAL_DRAFT.md`).
+5. **Operator unification in Privacy and Terms** (Miroslav Dajč vs. Dajc
+   s.r.o.) and publication of the approved processing texts — owner decision.
+6. Value test on 20 real questions (§47.1), in EN, CS, SK, PL, DE.
+7. Resend: verified sender domain, `DAJC_ASK_EMAIL_MODE=live`.
+8. Set the variables in Vercel (Production), deploy, smoke-test, then
+   `DAJC_ASK_ENABLED=true`.
+
+## Measurement (owner, admin connection)
+
+```sql
+select date_trunc('month', day)::date as month,
+       count(*) filter (where level <> 'SYSTEM_ERROR')                         as answers,
+       round(100.0 * count(*) filter (where level = 'UNKNOWN')
+             / nullif(count(*) filter (where level <> 'SYSTEM_ERROR'), 0), 1)  as unknown_pct,
+       round(avg(cost_micro) filter (where level <> 'SYSTEM_ERROR') / 1e6, 4)  as avg_cost_eur,
+       round(sum(cost_micro) / 1e6, 2)                                         as total_cost_eur,
+       count(*) filter (where level = 'SYSTEM_ERROR')                          as system_errors
+from dajc_ask.metrics group by 1 order by 1;
+
+select * from dajc_ask.review_queue where status = 'NEW' order by seen_count desc, last_seen desc;
+```
+
+## Isolation from the weekly article pipeline
+
+- Own keys; the pipeline's variables are never read (tests enforce it).
+- `scripts/lib/*` and `data/*` are imported read-only and unchanged; the
+  pipeline's `searchWithPerplexitySearch()` (weekly prompt, pipeline keys) is
+  not used.
+- Runs as Vercel functions, never in GitHub Actions; no article or social
+  workflow changed. Application CI only gained an offline bundle scan
+  (`scripts/check-ask-bundle.mjs`, ≤ 30 s).
+- Tests use synthetic fixtures and fakes (no network, no keys), so weekly data
+  updates cannot break them.
+
+## Known limitations
+
+- PDFs (many legal texts) are not read in Phase 1.
+- The deterministic language check covers EN/CS/SK/PL/DE; other languages
+  rely on the classifier. Short Slovak and Czech answers can be confused;
+  the result is NEVÍM, never a wrong-language answer.
+- Perplexity accepts at most 20 domains per request; multi-country questions
+  use the first 20 official domains.
+- One request runs for at most ~50 s (internal deadline); check the Vercel
+  function duration limit of the project before launch.
+- Prompt injection is mitigated (delimited untrusted blocks, verbatim quotes,
+  official domains only, independent check), not impossible: an official page
+  could itself contain misleading text that is then quoted correctly.
