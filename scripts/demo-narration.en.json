@@ -1,0 +1,22 @@
+[
+  {
+    "title": "The dispatcher overview",
+    "image": "overview",
+    "text": "Welcome to the public DAJC demo. In this walkthrough, we will follow a transport from the overview to its documents. All the data you see is synthetic. The opening screen shows active transports and their readiness. Look for warnings about missing documents, permits and participant confirmations. The purpose of this overview is to help the dispatcher identify which transport needs attention, and decide what to resolve next."
+  },
+  {
+    "title": "One transport, one D-ID",
+    "image": "orders",
+    "text": "Open D I D Orders in the menu. Each row has its own identity, route, status and readiness indicator. Select the first example: a gas turbine travelling from Ostrava to Hamburg. Think of D I D as a shared folder for one transport. Participants, documents and changes all belong to the same assignment. This keeps the context together, instead of asking the dispatcher to reconstruct it from separate messages."
+  },
+  {
+    "title": "Readiness and missing steps",
+    "image": "detail",
+    "text": "Inside the transport, start with Command Center. Here you can review progress, planned milestones and the readiness of individual steps. Warnings highlight issues such as missing permits or an escort participant who has not yet confirmed. Check what is blocking progress and who needs to confirm the next step. A readiness percentage is not official permission to travel. The actual permits, approved route and transport conditions still apply."
+  },
+  {
+    "title": "Documents and next steps",
+    "image": "documents",
+    "text": "Finally, open the Documents tab. Compare each document status and its versions. Approved indicates a document marked as approved in this demo. Required identifies a document that is still missing. Keeping these records with the same transport helps you see what is ready and what needs attention. You can now explore the public demo yourself, using test data only. To express interest in testing from the fourth of January, twenty twenty seven, use the testing registration page on this website."
+  }
+]
