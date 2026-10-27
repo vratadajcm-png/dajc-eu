@@ -149,9 +149,9 @@ export function validateStoredProposal({ store, proposalId, rawCanonical, now = 
   const proposal = loadProposal(store, proposalId);
   if (!['IMPORTED', 'CONFLICT'].includes(proposal.state)) throw new Error(`Only IMPORTED or CONFLICT proposals are validated (state ${proposal.state})`);
   const others = listProposals(store).filter(item => item.proposal_id !== proposalId && OPEN_STATES.includes(item.state) && item.state !== 'INSUFFICIENT_EVIDENCE');
-  const result = validateProposal({ submission: proposal.submission, documents: proposal.documents, rawCanonical, openProposals: others, catalogSources });
-  proposal.findings = result.findings; proposal.diff = result.diff;
   const at = now.toISOString();
+  const result = validateProposal({ submission: proposal.submission, documents: proposal.documents, rawCanonical, openProposals: others, catalogSources, detectedAt: at });
+  proposal.findings = result.findings; proposal.diff = result.diff; proposal.changes = result.changes;
   if (result.state === proposal.state) {
     writeAtomic(proposalFile(store, proposalId), json(proposal));
     appendAudit(store, { at, actor, identity_verified: false, action: 'REVALIDATE_NO_CHANGE', proposal_id: proposalId, from: proposal.state, to: proposal.state, details: { findings: result.findings.map(f => f.code) } });
