@@ -13,6 +13,8 @@
     "lint:driving-bans": "node scripts/lint-driving-bans.mjs",
     "driving-bans:audit": "node scripts/audit-driving-bans.mjs",
     "driving-bans:sources": "node scripts/export-driving-ban-sources.mjs",
+    "driving-bans:evidence": "node scripts/driving-bans-evidence.mjs",
+    "driving-bans:evidence:demo": "node scripts/driving-bans-evidence-demo.mjs",
     "oversize:monitor": "node scripts/oversize-monitor.mjs",
     "oversize:publish": "node scripts/generate-weekly-article.mjs",
     "lint:geographic-coverage": "node scripts/audit-geographic-coverage.mjs",
