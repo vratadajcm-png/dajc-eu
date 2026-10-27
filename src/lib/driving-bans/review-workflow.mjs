@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { dajcEuropeCoverage, isTrackedJurisdiction } from '../../../config/europe-coverage.mjs';
 import { hydrateCanonical, validateCanonical, diffCanonical, isDate } from './core.mjs';
+import { checkRules, newFindings } from './rule-checks.mjs';
+import { detectChanges } from './legal-changes.mjs';
 /**
  * Review & approval workflow for manually imported Driving Bans evidence. Pure
  * functions: no file system, no network. A proposal never touches canonical.json;
@@ -128,7 +130,7 @@ const finding = (code, message, extra = {}) => ({ code, message, ...extra });
  * Deterministic validation of an imported submission against the current dataset.
  * Returns the next state and findings; it never decides legal truth.
  */
-export function validateProposal({ submission, documents, rawCanonical, openProposals = [], identities = dajcEuropeCoverage, catalogSources = [] }) {
+export function validateProposal({ submission, documents, rawCanonical, openProposals = [], identities = dajcEuropeCoverage, catalogSources = [], detectedAt = null }) {
   const insufficient = [], conflicts = [], notes = [];
   const sources = new Map(rawCanonical.sources.map(source => [source.source_id, source]));
   const added = new Map(submission.operations.filter(op => op.op === 'ADD_SOURCE').map(op => [op.source.source_id, op.source]));
@@ -166,26 +168,44 @@ export function validateProposal({ submission, documents, rawCanonical, openProp
     if (shared.length) conflicts.push(finding('CONCURRENT_PROPOSAL', `Rules ${shared.join(', ')} are also changed by open proposal ${other.proposal_id}`, { proposal_id: other.proposal_id }));
   }
 
-  let diff = [];
+  let diff = [], changes = [];
   if (!insufficient.length) {
+    let before, after;
     try {
       const candidate = applyOperations(rawCanonical, submission, Object.fromEntries(documents.map(doc => [doc.source_id, doc.sha256])));
-      const before = hydrateCanonical(rawCanonical, identities), after = hydrateCanonical(candidate, identities);
+      before = hydrateCanonical(rawCanonical, identities); after = hydrateCanonical(candidate, identities);
       validateCanonical(after, identities);
       diff = diffCanonical(before, after);
-      for (const rule of after.rules.filter(item => submission.operations.some(op => op.op === 'ADD_RULE' && op.rule.ban_id === item.ban_id))) {
-        const twin = before.rules.find(existing => existing.status === 'ACTIVE' && existing.jurisdiction === rule.jurisdiction && JSON.stringify(existing.schedule) === JSON.stringify(rule.schedule) && existing.valid_from <= rule.valid_to && rule.valid_from <= existing.valid_to && JSON.stringify(existing.roads) === JSON.stringify(rule.roads) && existing.direction === rule.direction);
-        if (twin) conflicts.push(finding('DUPLICATE_OF_ACTIVE_RULE', `${rule.ban_id} repeats active rule ${twin.ban_id}`, { ban_id: twin.ban_id }));
-      }
     } catch (error) {
       const message = String(error.message || error);
       if (message.startsWith('STALE_SEQUENCE')) conflicts.push(finding('STALE_SEQUENCE', message));
       else insufficient.push(finding('CANONICAL_VALIDATION_FAILED', message));
     }
+    if (after) {
+      for (const rule of after.rules.filter(item => submission.operations.some(op => op.op === 'ADD_RULE' && op.rule.ban_id === item.ban_id))) {
+        const twin = before.rules.find(existing => existing.status === 'ACTIVE' && existing.jurisdiction === rule.jurisdiction && JSON.stringify(existing.schedule) === JSON.stringify(rule.schedule) && existing.valid_from <= rule.valid_to && rule.valid_from <= existing.valid_to && JSON.stringify(existing.roads) === JSON.stringify(rule.roads) && existing.direction === rule.direction);
+        if (twin) conflicts.push(finding('DUPLICATE_OF_ACTIVE_RULE', `${rule.ban_id} repeats active rule ${twin.ban_id}`, { ban_id: twin.ban_id }));
+      }
+      try {
+        changes = detectChanges(before, after, { detectedAt });
+        // Semantic checks: only problems the proposal introduces count against it.
+        for (const item of newFindings(checkRules(before), checkRules(after))) {
+          const entry = finding(item.code, item.message, { ban_id: item.ban_id ?? item.ban_ids ?? null });
+          if (item.blocking_state === 'CONFLICT') conflicts.push(entry);
+          else if (item.blocking_state === 'INSUFFICIENT_EVIDENCE') insufficient.push(entry);
+          else notes.push(entry);
+        }
+      } catch (error) {
+        // Calendar expansion refuses identical events and impossible local times; both need a person.
+        const message = String(error.message || error);
+        if (/Duplicate (semantic event|event UID)/.test(message)) conflicts.push(finding('DUPLICATE_SEMANTIC_EVENT', message));
+        else insufficient.push(finding('CALENDAR_EXPANSION_FAILED', message));
+      }
+    }
   }
   if (submission.synthetic) notes.push(finding('SYNTHETIC', 'Synthetic demonstration data; never publish.'));
   const state = insufficient.length ? 'INSUFFICIENT_EVIDENCE' : conflicts.length ? 'CONFLICT' : 'VALIDATED';
-  return { state, findings: [...insufficient, ...conflicts, ...notes], diff };
+  return { state, findings: [...insufficient, ...conflicts, ...notes], diff, changes };
 }
 
 /** The candidate dataset a person reviews in a pull request. Never written over canonical.json by this module. */
@@ -207,7 +227,7 @@ export function renderReviewReportHtml(proposals, generatedAt) {
 <p>Imported ${escapeHtml(p.imported_at)} · legal verification claimed ${escapeHtml(p.submission.legal_verified_at ?? 'none')}${p.submission.synthetic ? ' · <strong>SYNTHETIC</strong>' : ''}</p>
 <h3>Evidence</h3><ul>${p.documents.map(d => `<li>${escapeHtml(d.title)} (${escapeHtml(d.kind)}, ${d.bytes} B) sha256 <code>${escapeHtml(d.sha256)}</code></li>`).join('')}${p.submission.links.map(l => `<li>Link: ${escapeHtml(l.title)} – ${escapeHtml(l.url)}</li>`).join('')}</ul>
 <h3>Findings</h3><ul>${(p.findings || []).map(f => `<li><code>${escapeHtml(f.code)}</code> ${escapeHtml(f.message)}</li>`).join('') || '<li>none</li>'}</ul>
-<h3>Changes</h3><ul>${(p.diff || []).map(c => `<li><code>${escapeHtml(c.kind)}</code> ${escapeHtml(c.ban_id || c.jurisdiction)} ${escapeHtml(c.field || '')}</li>`).join('') || '<li>none</li>'}</ul>
+<h3>Changes</h3><ul>${(p.changes || []).filter(c => c.type !== 'COVERAGE_STATUS').map(c => `<li><code>${escapeHtml(c.type)}</code> ${escapeHtml(c.ban_id || c.source_id || c.jurisdiction)} ${escapeHtml(c.field || '')}${c.legal_change ? '' : ' (no change of law)'} – ${escapeHtml(c.user_impact)}</li>`).join('') || '<li>none</li>'}</ul>
 <h3>History</h3><ol>${p.history.map(h => `<li>${escapeHtml(h.at)} ${escapeHtml(h.from ?? '–')} → ${escapeHtml(h.to)} (${escapeHtml(h.actor)}${h.identity_verified === false ? ', identity not verified' : ''})${h.reason ? ': ' + escapeHtml(h.reason) : ''}</li>`).join('')}</ol></section>`).join('\n');
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'"><meta name="robots" content="noindex"><title>DAJC Driving Bans review report</title>
 <style>body{font:14px/1.5 system-ui,sans-serif;max-width:960px;margin:2rem auto;padding:0 1rem}section{border-top:1px solid #ccc;padding:1rem 0}code{word-break:break-all}</style></head>
