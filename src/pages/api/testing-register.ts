@@ -167,7 +167,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       `Submitted: ${submittedAt}`,
       'Privacy notice acknowledged: yes',
       '',
-      'Testing starts: 4 January 2027',
+      'Testing planned for: Q3 2027 (July–September); exact start date to be confirmed',
       'Programme model: registered relevant users test the same DAJC production product while it is under active development; no separate pilot or Early Access edition.',
     ].join('\n');
 
@@ -205,7 +205,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           'Hello,',
           '',
           'Thank you for registering for DAJC Platform pre-production testing.',
-          'Testing starts on Monday, 4 January 2027.',
+          'Testing is planned for Q3 2027 (July–September). We will confirm the exact start date.',
           '',
           'Registered participants will test the same DAJC Platform production product while it is under active development. DAJC will not operate a separate pilot, Founding Pilot or Early Access product edition.',
           '',

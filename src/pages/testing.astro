@@ -2,15 +2,15 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout
-  title="DAJC Platform Testing 2027 — Register now"
-  description="Register now to participate in DAJC Platform pre-production testing from 4 January 2027. For heavy and oversized transport professionals and companies across Europe."
+  title="DAJC Platform Testing Q3 2027 — Register now"
+  description="Register now to participate in DAJC Platform pre-production testing planned for Q3 2027 (July–September). For heavy and oversized transport professionals and companies across Europe."
 >
   <main class="testing-page">
     <section class="hero" aria-labelledby="testing-title">
       <p class="eyebrow">DAJC PLATFORM TESTING · REGISTRATION OPEN</p>
       <h1 id="testing-title">Help test the production DAJC Platform while it is being built.</h1>
       <p class="lead">
-        Pre-production testing starts on <strong>Monday, 4 January 2027</strong>.
+        Pre-production testing is planned for <strong>Q3 2027 (July–September)</strong>. The exact start date will be confirmed.
         Registration is open now for relevant professionals and companies involved in heavy and oversized transport.
       </p>
       <div class="principles" aria-label="Testing programme principles">
@@ -53,12 +53,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <section class="register" id="register" aria-labelledby="register-title">
       <div class="register-copy">
         <p class="section-kicker">REGISTER NOW</p>
-        <h2 id="register-title">DAJC Platform Testing 2027</h2>
+        <h2 id="register-title">DAJC Platform Testing Q3 2027</h2>
         <p>
           Complete the registration below. Registration details are delivered to
           <a href="mailto:platform@dajc.cz">platform@dajc.cz</a>.
         </p>
-        <p class="start-date"><strong>Testing starts 4 January 2027.</strong></p>
+        <p class="start-date"><strong>Testing is planned for Q3 2027 (July–September).</strong></p>
       </div>
 
       <form id="testing-form" class="testing-form">
@@ -129,7 +129,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
         <input type="hidden" name="source" value="dajc.eu/testing" />
 
-        <button type="submit">Register for DAJC Platform Testing 2027</button>
+        <button type="submit">Register for DAJC Platform Testing Q3 2027</button>
         <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
         <p class="fallback">
           If the form is unavailable, email <a href="mailto:platform@dajc.cz?subject=DAJC%20Platform%20Testing%202027%20registration">platform@dajc.cz</a>.
@@ -180,7 +180,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         }
 
         form.reset();
-        status.textContent = 'Registration received. Thank you — DAJC Platform testing starts 4 January 2027.';
+        status.textContent = 'Registration received. Thank you — DAJC Platform testing is planned for Q3 2027 (July–September). We will confirm the exact start date.';
         status.dataset.state = 'success';
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Registration could not be sent.';
@@ -197,7 +197,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       } finally {
         if (button instanceof HTMLButtonElement) {
           button.disabled = false;
-          button.textContent = 'Register for DAJC Platform Testing 2027';
+          button.textContent = 'Register for DAJC Platform Testing Q3 2027';
         }
       }
     });
