@@ -2,6 +2,10 @@ import { dajcEuropeCoverage, geographicScopePolicy, COVERAGE_VERSION, corridorOn
 /** Pure canonical Driving Bans engine. No network, no guessed prohibitions. */
 export const VERIFICATION_STATES = ['PRIMARY_VERIFIED', 'CROSSCHECKED', 'UNVERIFIED', 'SOURCE_UNAVAILABLE'];
 export const BAN_STATES = ['HAS_BAN', 'NO_BAN', 'UNKNOWN'];
+/** Only LEGAL_DRIVING_BAN rules become public calendar events or HAS_BAN evidence; the other classes are never merged into it. */
+export const RESTRICTION_CLASSES = Object.freeze(['LEGAL_DRIVING_BAN', 'TEMPORARY_TRAFFIC_RESTRICTION', 'INFRASTRUCTURE_CONSTRAINT', 'PERMIT_CONDITION']);
+export const restrictionClassOf = rule => rule.restriction_class ?? 'LEGAL_DRIVING_BAN';
+const isLegalBan = rule => restrictionClassOf(rule) === 'LEGAL_DRIVING_BAN';
 export const SCOPE_CHECKS = ['weekend', 'holidays', 'holiday_eves', 'seasonal', 'summer_winter', 'regional', 'corridors', 'directional', 'night', 'weight_specific', 'special_calendar', 'exceptional'];
 const DAY = 86400000;
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
@@ -105,6 +109,7 @@ export function validateCanonical(data, identities) {
     }
     if (rule.geographic_migration?.region) assert(rule.regions?.includes(rule.geographic_migration.region), `Lost regional scope ${rule.ban_id}`);
     assert(VERIFICATION_STATES.includes(rule.verification_state), 'Invalid rule verification state');
+    assert(RESTRICTION_CLASSES.includes(restrictionClassOf(rule)), `Invalid restriction class ${rule.ban_id}`);
     assert(['ACTIVE','CANCELLED','SUPERSEDED'].includes(rule.status), 'Invalid rule lifecycle');
     assert(isDate(rule.valid_from) && isDate(rule.valid_to) && rule.valid_from <= rule.valid_to, `Invalid rule period ${rule.ban_id}`);
     assert(validTimezone(rule.timezone), `Invalid timezone ${rule.ban_id}`);
@@ -147,7 +152,7 @@ export function validateCanonical(data, identities) {
       assert(row.no_ban_evidence?.length || row.ban_state !== 'NO_BAN', `Missing explicit NO_BAN evidence ${row.jurisdiction}`);
       if (row.ban_state === 'NO_BAN') assert(row.no_ban_evidence.every(e => sources.get(e.source_id)?.role === 'PRIMARY' && includesWindow(e.period, data.window) && e.explicit_no_ban === true && e.finding && e.reviewed_by), `Invalid NO_BAN evidence ${row.jurisdiction}`);
     }
-    if (row.ban_state === 'HAS_BAN') assert(data.rules.some(r => r.jurisdiction === row.jurisdiction && r.status === 'ACTIVE' && r.verification_state === 'PRIMARY_VERIFIED' && r.valid_to >= data.window.from && r.valid_from <= data.window.to), `HAS_BAN without verified rule ${row.jurisdiction}`);
+    if (row.ban_state === 'HAS_BAN') assert(data.rules.some(r => r.jurisdiction === row.jurisdiction && isLegalBan(r) && r.status === 'ACTIVE' && r.verification_state === 'PRIMARY_VERIFIED' && r.valid_to >= data.window.from && r.valid_from <= data.window.to), `HAS_BAN without verified rule ${row.jurisdiction}`);
   }
   return true;
 }
@@ -156,7 +161,7 @@ export function expandRules(data, window) {
   const superseded = new Set(data.rules.filter(r => r.status === 'ACTIVE' && r.verification_state === 'PRIMARY_VERIFIED').flatMap(r => r.supersedes));
   const events = [], ids = new Set(), signatures = new Set();
   for (const rule of data.rules) {
-    if (rule.status !== 'ACTIVE' || superseded.has(rule.ban_id) || rule.verification_state !== 'PRIMARY_VERIFIED') continue;
+    if (rule.status !== 'ACTIVE' || superseded.has(rule.ban_id) || rule.verification_state !== 'PRIMARY_VERIFIED' || !isLegalBan(rule)) continue;
     const s = rule.schedule;
     const rangeFrom = shiftDate(window.from, -8), rangeTo = window.to;
     let dates = s.kind === 'dates' ? s.dates : [];
@@ -227,7 +232,7 @@ export function toIcs(view, { countries = [], type = 'all', upcoming = true } = 
 /** Every consumer uses this compatibility projection, never the retired files. */
 export function calendarRules(data) {
   const retired = new Set(data.rules.filter(r => r.verification_state === 'PRIMARY_VERIFIED' && r.status === 'ACTIVE').flatMap(r => r.supersedes));
-  return data.rules.filter(r => r.verification_state === 'PRIMARY_VERIFIED' && r.status === 'ACTIVE' && !retired.has(r.ban_id)).map(r => ({ ...r, id: r.ban_id, country: r.jurisdiction, countryName: data.jurisdictions.find(j => j.jurisdiction === r.jurisdiction)?.name || r.jurisdiction, sourceUrl: r.source_url, sourceName: r.source_authority, legalBasis: r.legal_basis, vehicleScope: r.vehicle_scope, routeScope: `${r.roads.join('; ')}; ${r.regions.join('; ')}; ${r.direction}`, exemptionNotes: r.exceptions.join('; '), restrictionTypes: r.restriction_types, lastVerified: r.verified_at.slice(0,10), kind: 'canonical-rule', suppressFromWeeklyAfter: '2026-09-01', resolve(weekStart, weekEnd) {
+  return data.rules.filter(r => r.verification_state === 'PRIMARY_VERIFIED' && r.status === 'ACTIVE' && isLegalBan(r) && !retired.has(r.ban_id)).map(r => ({ ...r, id: r.ban_id, country: r.jurisdiction, countryName: data.jurisdictions.find(j => j.jurisdiction === r.jurisdiction)?.name || r.jurisdiction, sourceUrl: r.source_url, sourceName: r.source_authority, legalBasis: r.legal_basis, vehicleScope: r.vehicle_scope, routeScope: `${r.roads.join('; ')}; ${r.regions.join('; ')}; ${r.direction}`, exemptionNotes: r.exceptions.join('; '), restrictionTypes: r.restriction_types, lastVerified: r.verified_at.slice(0,10), kind: 'canonical-rule', suppressFromWeeklyAfter: '2026-09-01', resolve(weekStart, weekEnd) {
     const from = weekStart.toISOString().slice(0,10), to = weekEnd.toISOString().slice(0,10);
     const row = data.jurisdictions.find(j => j.jurisdiction === r.jurisdiction);
     const complete = row?.coverage_complete && row.verification_state === 'PRIMARY_VERIFIED' && includesWindow(row.period, {from, to});

@@ -1,0 +1,17 @@
+{
+ "submission_version": 1,
+ "synthetic": true,
+ "submitted_by": "DAJC demo reviewer",
+ "jurisdiction": "CZ",
+ "summary": "SYNTHETIC: demonstrates how a manually supplied order becomes a reviewed candidate change.",
+ "documents": [
+  {"path": "documents/synthetic-order.txt", "source_id": "demo-synthetic-cz-order", "title": "Synthetic order DEMO/2027/1", "retrieved_from": "https://example.invalid/demo-order", "retrieved_at": "2026-10-27T10:00:00Z"}
+ ],
+ "links": [],
+ "legal_effective": {"from": "2027-01-02", "to": "2027-01-02"},
+ "legal_verified_at": "2026-10-27T10:30:00Z",
+ "operations": [
+  {"op": "ADD_SOURCE", "source": {"source_id": "demo-synthetic-cz-order", "url": "https://example.invalid/demo-order", "authority": "Synthetic demo authority", "role": "PRIMARY", "version": "DEMO/2027/1 (fictitious)", "findings": "Synthetic: 2 January 2027 13:00-22:00, >7.5t, motorways and class I roads."}},
+  {"op": "ADD_RULE", "rule": {"ban_id": "cz-demo-synthetic-2027-01-02", "profile": "cz-standing", "title": "SYNTHETIC DEMO restriction", "valid_from": "2027-01-02", "valid_to": "2027-01-02", "source_id": "demo-synthetic-cz-order", "evidence_ids": ["demo-synthetic-cz-order"], "legal_basis": "Synthetic order DEMO/2027/1, art. 1", "verified_at": "2026-10-27T10:30:00.000Z", "review_window": {"from": "2027-01-01", "to": "2027-01-31"}, "schedule": {"kind": "dates", "start_time": "13:00", "end_time": "22:00", "end_day_offset": 0, "dates": [{"date": "2027-01-02", "occurrence_id": "2027-01-02"}]}, "notes": "SYNTHETIC demonstration rule; never publish."}}
+ ]
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>SYNTHETIC authority notices (DAJC connector fixture)</title>
+    <link>https://example.invalid/notices</link>
+    <description>Synthetic fixture, not provider data.</description>
+    <item>
+      <title>Synthetic notice: heavy vehicle restriction on a bridge</title>
+      <link>https://example.invalid/notices/1</link>
+      <guid>SYN-NOTICE-1</guid>
+      <pubDate>Tue, 27 Oct 2026 07:00:00 GMT</pubDate>
+      <description>Synthetic text used only to test the connector contract.</description>
+    </item>
+  </channel>
+</rss>
