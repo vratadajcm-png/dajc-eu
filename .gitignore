@@ -20,3 +20,7 @@ src/content/news/eu-oversize/_dry-run-*.md
 
 # Reproducible CI evidence; durable migration backups live in archive/.
 artifacts/
+
+# Raw evidence documents of the Driving Bans import store stay local;
+# their SHA-256 metadata in data/driving-bans/staging/evidence/ is committed.
+data/driving-bans/staging/blobs/
