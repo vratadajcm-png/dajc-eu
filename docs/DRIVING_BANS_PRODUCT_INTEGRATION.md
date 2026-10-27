@@ -118,15 +118,33 @@ Read-only nástroje: `search_bans`, `evaluate_vehicle`, `check_route`,
 Zakázané akce: `approve_exception`, `issue_permit`, `modify_route`,
 `modify_dataset`, `declare_authorisation_to_drive`. Neznámý nástroj vyhodí chybu.
 
-`answerDrivingBansQuery`:
+Obě vstupní funkce sdílejí jedno vyhodnocení nad stejným publikovaným snapshotem.
+Liší se jen tím, kdo smí volat a které nástroje:
 
-1. ověří oprávnění `ai-assistant`,
-2. přes `canCreateDerivedIntelligence` ověří práva ke zdroji (jinak `RIGHTS_DENIED`),
-3. vrátí obálku: fakta, zdroje, platnost, verze pravidel, úplnost, varování,
-   `authority_check_required`, další krok a pevné upozornění.
+| | Bezplatné „Zeptejte se DAJC AI“ | Placená DAJC AI |
+| --- | --- | --- |
+| Funkce | `answerFreeAskQuery` | `answerDrivingBansQuery` |
+| Přístup | vlastní brána Ask: `DAJC_ASK_ENABLED`, přihlášení, denní limit | `authorizeFeature('ai-assistant')` na serveru při každém volání |
+| Placené oprávnění | nevyžaduje se a nekontroluje | povinné, organizace jen z ověřeného subjektu |
+| Nástroje | `FREE_ASK_TOOLS`: `search_bans` (bez vozidla), `explain_rule`, `list_exceptions` | všech šest |
+| Práva ke zdroji | `canCreateDerivedIntelligence` bez organizace | `canCreateDerivedIntelligence` s organizací |
 
-Když data nestačí, stav je `INSUFFICIENT_VERIFIED_DATA`. Žádný jazykový model se
-nevolá: kontrakt určuje, co smí budoucí model dostat a co smí odpovědět.
+Nástroj mimo `FREE_ASK_TOOLS` vrátí v bezplatné vrstvě `NOT_ENTITLED`.
+Porovnání s vozidlem, kontrola trasy a historie změn tak zůstávají placené.
+
+Každá odpověď nese obálku: fakta, zdroje, platnost, verze pravidel, úplnost,
+varování, `authority_check_required`, další krok a pevné upozornění.
+
+U časově vymezeného dotazu nese úplnost pro každou jurisdikci `outcome`:
+
+- `BAN_FOUND`: platí alespoň jeden ověřený právní zákaz jízdy.
+- `NO_CONFIRMED_BAN`: jurisdikce je pro publikované období ověřená v plném rozsahu
+  a žádný ověřený zákaz neplatí. Jde o výrok o registru, ne o dočasných
+  dopravních omezeních nebo podmínkách povolení.
+- `INSUFFICIENT_VERIFIED_DATA`: vše ostatní, včetně data mimo publikované období.
+  Nedostatek dat nikdy neznamená, že zákaz neexistuje.
+
+Žádný jazykový model se nevolá: kontrakt určuje, co smí model dostat a co smí odpovědět.
 
 ## Konektory (`driving-ban-connectors.ts`)
 

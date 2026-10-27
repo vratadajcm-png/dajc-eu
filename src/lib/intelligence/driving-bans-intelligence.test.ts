@@ -6,7 +6,7 @@ import { canonicalDrivingBans, getDrivingBansSnapshot } from '../../../config/dr
 import { authorizeFeature, handleEntitledRequest, isFeatureEnabled, requireSameTenant, tenantRecords, FEATURE_FLAG_ENV, DRIVING_BANS_INTELLIGENCE_RELEASED, type IntelligenceEntitlement } from './entitlements';
 import { evaluateVehicleApplicability, findRouteConflicts } from './driving-bans-relevance';
 import { legalChangeToIntelligenceChange, buildDrivingBansAlerts, buildRuleHistory, expiringRuleNotices } from './driving-bans-alerts';
-import { answerDrivingBansQuery, AI_TOOLS, AI_PROHIBITED_ACTIONS } from './driving-bans-ai-contract';
+import { answerDrivingBansQuery, answerFreeAskQuery, AI_TOOLS, AI_PROHIBITED_ACTIONS, FREE_ASK_TOOLS, type PublishedView } from './driving-bans-ai-contract';
 import { createDatex2FixtureConnector, createRssFixtureConnector, validateConnectorResult, connectorResultToSubmission, connectorResultToIntelligenceSnapshot } from './driving-ban-connectors';
 import { dajcMaintainedDrivingBansRights, intelligenceSourceRightsSchema } from './persistence-contract';
 import { intelligencePreferenceSchema } from './preferences';
@@ -185,6 +185,102 @@ describe('DAJC AI read-only contract (offline, no model)', () => {
     expect(ask('evaluate_vehicle', { jurisdiction: 'NO', at: '2026-10-25T10:00:00.000Z', vehicle: truck }).status).toBe('INSUFFICIENT_VERIFIED_DATA');
     expect(ask('explain_rule', { ban_id: 'xx-unknown-rule' }).status).toBe('INSUFFICIENT_VERIFIED_DATA');
     expect(ask('list_changes', {}).status).toBe('INSUFFICIENT_VERIFIED_DATA');
+  });
+});
+
+describe('free Ask DAJC AI and paid DAJC AI share one evaluation', () => {
+  // Synthetic published snapshot: robust against weekly data updates.
+  const base = {
+    title: 'Sunday driving ban', timezone: 'Europe/Prague', start_time: '13:00', end_time: '22:00', roads: ['Motorways'], regions: [], direction: 'Both directions',
+    weight_threshold: { operator: '>', value: 7500, unit: 'kg', applies_to: 'maximum authorised mass' }, vehicle_scope: 'Lorries over 7.5 t.', exceptions: ['Perishable goods.'],
+    restriction_types: ['general'], source_version: 'test', verified_at: '2026-10-27T11:20:00.000Z', sequence: 1,
+  };
+  const synthetic: PublishedView = {
+    dataset_version: 'synthetic', window: { from: '2026-11-01', to: '2026-12-31' },
+    jurisdictions: [
+      { jurisdiction: 'CZ', name: 'Czechia', coverage_complete: true, verification_state: 'PRIMARY_VERIFIED', ban_state: 'HAS_BAN', coverage_failures: [], last_verified: '2026-10-27T11:20:00.000Z' },
+      { jurisdiction: 'AT', name: 'Austria', coverage_complete: false, verification_state: 'PRIMARY_VERIFIED', ban_state: 'HAS_BAN', coverage_failures: ['REGIONAL_RULES_NOT_REVIEWED'], last_verified: '2026-10-27T11:20:00.000Z' },
+      { jurisdiction: 'DE', name: 'Germany', coverage_complete: false, verification_state: 'UNVERIFIED', ban_state: 'UNKNOWN', coverage_failures: ['NOT_REVIEWED'], last_verified: null },
+    ],
+    events: [
+      { ...base, uid: 'cz-sunday-2026-11-01@dajc.eu', ban_id: 'cz-sunday', jurisdiction: 'CZ', date: '2026-11-01', starts_at: '2026-11-01T12:00:00.000Z', ends_at: '2026-11-01T21:00:00.000Z', source_id: 'cz-361', source_url: 'https://www.mdcr.gov.cz/zakon', source_authority: 'Czech Ministry of Transport', legal_basis: 'Act 361/2000 §43' },
+      { ...base, uid: 'at-sunday-2026-11-01@dajc.eu', ban_id: 'at-sunday', jurisdiction: 'AT', timezone: 'Europe/Vienna', start_time: '00:00', date: '2026-11-01', starts_at: '2026-10-31T23:00:00.000Z', ends_at: '2026-11-01T21:00:00.000Z', source_id: 'at-stvo', source_url: 'https://www.ris.bka.gv.at/stvo', source_authority: 'RIS', legal_basis: 'StVO §42' },
+    ],
+  };
+  const day = (date: string) => ({ from: `${date}T00:00:00.000Z`, to: `${date}T23:00:00.000Z` });
+  const free = (tool: string, input: unknown) => answerFreeAskQuery({ tool, input, view: synthetic });
+  const paid = (tool: string, input: unknown, extra: any = {}) => answerDrivingBansQuery({ tool, input, subject: subjectA, entitlement: entitlementA, now: NOW, view: synthetic, ...ON, ...extra });
+  const outcome = (answer: any, code: string) => answer.completeness.find((row: any) => row.jurisdiction === code)?.outcome;
+
+  it('serves the free tools without any paid entitlement, while paid DAJC AI stays unreleased', () => {
+    expect(DRIVING_BANS_INTELLIGENCE_RELEASED).toBe(false);
+    const answer = free('search_bans', { jurisdictions: ['CZ'], ...day('2026-11-01') });
+    expect(answer.status).toBe('OK');
+    expect(outcome(answer, 'CZ')).toBe('BAN_FOUND');
+    expect(answer.facts.map((f: any) => f.uid)).toEqual(['cz-sunday-2026-11-01@dajc.eu']);
+    expect(answer.completeness[0]).toMatchObject({ coverage_complete: true, verification_state: 'PRIMARY_VERIFIED', last_verified: '2026-10-27T11:20:00.000Z' });
+    // The same question on the paid path needs its own server-side authorisation.
+    expect(answerDrivingBansQuery({ tool: 'search_bans', input: { jurisdictions: ['CZ'], ...day('2026-11-01') }, subject: subjectA, entitlement: entitlementA, now: NOW, view: synthetic }).status).toBe('FEATURE_DISABLED');
+    expect(paid('search_bans', { jurisdictions: ['CZ'], ...day('2026-11-01') }, { entitlement: null }).status).toBe('NOT_ENTITLED');
+    expect(paid('search_bans', { jurisdictions: ['CZ'], ...day('2026-11-01') }, { subject: null }).status).toBe('AUTHENTICATION_REQUIRED');
+    // Authorised, it evaluates exactly like the free tier: one shared evaluation.
+    const both = paid('search_bans', { jurisdictions: ['CZ'], ...day('2026-11-01') });
+    expect({ facts: both.facts, completeness: both.completeness, warnings: both.warnings }).toEqual({ facts: answer.facts, completeness: answer.completeness, warnings: answer.warnings });
+  });
+
+  it('keeps vehicle, route and history paid: the free tier cannot reach them', () => {
+    expect([...FREE_ASK_TOOLS]).toEqual(['search_bans', 'explain_rule', 'list_exceptions']);
+    expect(free('evaluate_vehicle', { jurisdiction: 'CZ', at: '2026-11-01T13:00:00.000Z', vehicle: { configuration: 'SOLO', motorVehicleMassKg: 18000 } }).status).toBe('NOT_ENTITLED');
+    expect(free('check_route', { route: { segments: [{ jurisdiction: 'CZ', roads: ['D1'], enterAt: '2026-11-01T12:00:00.000Z', exitAt: '2026-11-01T14:00:00.000Z' }] } }).status).toBe('NOT_ENTITLED');
+    expect(free('list_changes', {}).status).toBe('NOT_ENTITLED');
+    expect(() => free('search_bans', { jurisdictions: ['CZ'], ...day('2026-11-01'), vehicle: { configuration: 'SOLO' } })).toThrow();
+    for (const action of AI_PROHIBITED_ACTIONS) expect(() => free(action, {})).toThrow(/Read-only contract/);
+  });
+
+  it('isolates tenants on the paid path; the free tier carries no organisation at all', () => {
+    expect(paid('search_bans', { jurisdictions: ['CZ'], ...day('2026-11-01') }, { entitlement: { ...entitlementA, organizationId: 'org-b' } }).status).toBe('TENANT_MISMATCH');
+    expect(tenantRecords([{ organizationId: 'org-a', id: 1 }, { organizationId: 'org-b', id: 2 }], 'org-a')).toEqual([{ organizationId: 'org-a', id: 1 }]);
+    expect(JSON.stringify(free('search_bans', { jurisdictions: ['CZ'], ...day('2026-11-01') }))).not.toMatch(/org-a|organizationId/);
+    expect(() => free('search_bans', { jurisdictions: ['CZ'], ...day('2026-11-01'), organizationId: 'org-b' })).toThrow();
+  });
+
+  it('distinguishes a fully verified period without a confirmed ban from missing verification', () => {
+    const tuesday = free('search_bans', { jurisdictions: ['CZ'], ...day('2026-11-03') });
+    expect(tuesday.status).toBe('OK');
+    expect(outcome(tuesday, 'CZ')).toBe('NO_CONFIRMED_BAN');
+    expect(tuesday.facts).toEqual([]);
+    expect(tuesday.warnings.join(' ')).toMatch(/verified in full for this period.*Temporary traffic restrictions/);
+    // The same weekday in a jurisdiction that is not verified in full is never "no ban".
+    const austria = free('search_bans', { jurisdictions: ['AT'], ...day('2026-11-03') });
+    expect(austria.status).toBe('INSUFFICIENT_VERIFIED_DATA');
+    expect(outcome(austria, 'AT')).toBe('INSUFFICIENT_VERIFIED_DATA');
+    expect(austria.warnings.join(' ')).toMatch(/not evidence that there is no ban/);
+  });
+
+  it('answers incompletely verified AT and DE without guessing', () => {
+    const sunday = free('search_bans', { jurisdictions: ['AT', 'DE'], ...day('2026-11-01') });
+    expect(outcome(sunday, 'AT')).toBe('BAN_FOUND');
+    expect(outcome(sunday, 'DE')).toBe('INSUFFICIENT_VERIFIED_DATA');
+    expect(sunday.facts.map((f: any) => f.ban_id)).toEqual(['at-sunday']);
+    expect(sunday.warnings.join(' ')).toMatch(/AT: verification of the whole jurisdiction is incomplete/);
+    expect(sunday.authority_check_required).toBe(true);
+    expect(free('search_bans', { jurisdictions: ['DE'], ...day('2026-11-01') }).status).toBe('INSUFFICIENT_VERIFIED_DATA');
+  });
+
+  it('treats a date outside the published period as insufficient verified data', () => {
+    const january = free('search_bans', { jurisdictions: ['CZ'], ...day('2027-01-10') });
+    expect(january.status).toBe('INSUFFICIENT_VERIFIED_DATA');
+    expect(outcome(january, 'CZ')).toBe('INSUFFICIENT_VERIFIED_DATA');
+    // A period that only starts inside the published window is not covered either.
+    expect(outcome(free('search_bans', { jurisdictions: ['CZ'], from: '2026-12-30T00:00:00.000Z', to: '2027-01-02T00:00:00.000Z' }), 'CZ')).toBe('INSUFFICIENT_VERIFIED_DATA');
+  });
+
+  it('lists documented exceptions without deciding whether they apply', () => {
+    const answer = free('list_exceptions', { jurisdiction: 'CZ' });
+    expect(answer.facts).toEqual([{ ban_id: 'cz-sunday', title: 'Sunday driving ban', exceptions: ['Perishable goods.'], legal_basis: 'Act 361/2000 §43' }]);
+    expect(answer.warnings.join(' ')).toMatch(/listed but not evaluated/);
+    expect(answer.authority_check_required).toBe(true);
+    expect(JSON.stringify(answer)).not.toMatch(/exception_applies|exempt"|approved/);
   });
 });
 
