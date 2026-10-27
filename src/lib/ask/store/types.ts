@@ -29,7 +29,7 @@ export interface BudgetStatus {
 
 export interface MetricRow {
   day: string;
-  level: 'VERIFIED' | 'PARTIAL' | 'UNKNOWN' | 'SYSTEM_ERROR';
+  level: 'VERIFIED' | 'PARTIAL' | 'UNKNOWN' | 'INSUFFICIENT_VERIFIED_DATA' | 'SYSTEM_ERROR';
   language: string;
   path: 'own' | 'web' | 'mixed' | 'none';
   costMicro: number;

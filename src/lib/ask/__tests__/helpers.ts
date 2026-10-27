@@ -4,7 +4,8 @@
 // weekly data updates in data/.
 
 import type { AskConfig } from '../config';
-import type { CanonicalLike } from '../own-data';
+import type { DrivingBansView } from '../own-data';
+import { expandRules, publicationWindow } from '../../driving-bans/core.mjs';
 import type { FetchPage } from '../official-sources';
 import type { JsonCallParams, ModelResult, Providers } from '../providers';
 import type { Classification, DraftOutput, VerifyOutput } from '../prompts';
@@ -69,7 +70,14 @@ const RULE_BASE = {
   roads: ['Motorways', 'Class I roads'],
 };
 
-export const FIXTURE_CANONICAL: CanonicalLike = {
+interface FixtureCanonical {
+  window: { from: string; to: string };
+  sources: Array<{ source_id: string; url: string; role: string }>;
+  rules: unknown[];
+  jurisdictions: Array<{ jurisdiction: string; name: string; verification_state: string; coverage_complete: boolean; ban_state: string; source_ids: string[]; coverage_failures: string[]; last_verified: string | null }>;
+}
+
+export const FIXTURE_CANONICAL: FixtureCanonical = {
   window: { from: '2026-09-01', to: '2026-11-30' },
   sources: [
     { source_id: 'cz-law', url: 'https://www.mdcr.gov.cz/zakon-361', role: 'PRIMARY' },
@@ -105,12 +113,33 @@ export const FIXTURE_CANONICAL: CanonicalLike = {
     },
   ],
   jurisdictions: [
-    { jurisdiction: 'CZ', verification_state: 'PRIMARY_VERIFIED', coverage_complete: true, ban_state: 'HAS_BAN', source_ids: ['cz-law'] },
-    { jurisdiction: 'AT', verification_state: 'UNVERIFIED', coverage_complete: false, ban_state: 'HAS_BAN', source_ids: ['at-law', 'blog'] },
-    { jurisdiction: 'DE', verification_state: 'UNVERIFIED', coverage_complete: false, ban_state: 'UNKNOWN', source_ids: [] },
-    { jurisdiction: 'PL', verification_state: 'UNVERIFIED', coverage_complete: false, ban_state: 'UNKNOWN', source_ids: [] },
+    { jurisdiction: 'CZ', name: 'Czechia', verification_state: 'PRIMARY_VERIFIED', coverage_complete: true, ban_state: 'HAS_BAN', source_ids: ['cz-law'], coverage_failures: [], last_verified: '2026-09-26T15:25:00.000Z' },
+    { jurisdiction: 'AT', name: 'Austria', verification_state: 'UNVERIFIED', coverage_complete: false, ban_state: 'HAS_BAN', source_ids: ['at-law', 'blog'], coverage_failures: ['REGIONAL_RULES_NOT_REVIEWED'], last_verified: null },
+    { jurisdiction: 'DE', name: 'Germany', verification_state: 'UNVERIFIED', coverage_complete: false, ban_state: 'UNKNOWN', source_ids: [], coverage_failures: ['NOT_REVIEWED'], last_verified: null },
+    { jurisdiction: 'PL', name: 'Poland', verification_state: 'UNVERIFIED', coverage_complete: false, ban_state: 'UNKNOWN', source_ids: [], coverage_failures: ['NOT_REVIEWED'], last_verified: null },
   ],
 };
+
+/**
+ * The fixture published the way getDrivingBansSnapshot publishes the real
+ * registry: events of the published period (current + next month in Prague)
+ * and full coverage only while the reviewed span contains that period.
+ */
+export function fixtureView(now: Date = NOW, data: FixtureCanonical = FIXTURE_CANONICAL): DrivingBansView {
+  const window = publicationWindow(now);
+  const stale = window.from < data.window.from || window.to > data.window.to;
+  return {
+    dataset_version: 'fixture',
+    window: { from: window.from, to: window.to },
+    sources: data.sources,
+    events: expandRules(data, window),
+    jurisdictions: data.jurisdictions.map((row) => ({
+      ...row,
+      coverage_complete: !stale && row.coverage_complete,
+      verification_state: stale ? 'UNVERIFIED' : row.verification_state,
+    })),
+  } as unknown as DrivingBansView;
+}
 
 // A Sunday inside the fixture window, and "today" for the tests.
 export const SUNDAY = '2026-11-01';

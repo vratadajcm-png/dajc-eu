@@ -10,6 +10,14 @@
 //   (7) output VERIFIED / PARTIAL / UNKNOWN with sources and check dates
 //   (8) new official URLs go to a human review queue, never into data/.
 //
+// Driving bans (Driving Bans 2.0): confirmed facts come only from the published
+// registry through the shared contract (own-data.ts). A country/day the registry
+// cannot decide is INSUFFICIENT_VERIFIED_DATA ("Nedostatek ověřených dat").
+// Official pages found for it are shown only as unverified leads, never raise
+// the answer to VERIFIED, and go to the review queue, from which they enter the
+// Driving Bans review layer (scripts/driving-bans-web-leads.mjs). Other topics
+// keep their own trust rules for official websites.
+//
 // Strict rule (owner decision): if the independent check disagrees on ANY
 // statement, the whole answer is UNKNOWN. Provider failures and timeouts
 // are thrown as system errors; the service layer refunds the question.
@@ -25,8 +33,8 @@ import { t, type UiKey, type UiLang } from './i18n';
 import { detectLanguage } from './language';
 import { defaultFetchPage, fetchOfficialPage, isAllowedSourceUrl, normalizeSourceUrl, type FetchPage, type OfficialPage } from './official-sources';
 import {
-  findingLeads, isoDay, knownSourceUrls, lookupDrivingBans,
-  type CanonicalLike, type Coverage, type FindingLike, type OwnRecord, type Topic,
+  findingLeads, isoDay, knownSourceUrls, lookupDrivingBans, publishedView,
+  type DrivingBansView, type FindingLike, type JurisdictionVerification, type OwnRecord, type Topic,
 } from './own-data';
 import {
   CLASSIFICATION_SCHEMA, DRAFT_SCHEMA, MAX_STATEMENTS, TOPICS, VERIFY_SCHEMA,
@@ -36,7 +44,9 @@ import {
 import type { Providers } from './providers';
 import { selectPassages } from './text';
 
-export type Level = 'VERIFIED' | 'PARTIAL' | 'UNKNOWN';
+export type Level = 'VERIFIED' | 'PARTIAL' | 'UNKNOWN' | 'INSUFFICIENT_VERIFIED_DATA';
+/** dajc_verified: the published registry; official_web: other topics; unverified_official_lead: a driving-ban page outside the registry. */
+export type StatementBasis = 'dajc_verified' | 'official_web' | 'unverified_official_lead';
 export type UnknownReason = 'out_of_scope' | 'need_country' | 'no_sources' | 'no_claims' | 'not_supported';
 export type AnswerPath = 'own' | 'web' | 'mixed' | 'none';
 
@@ -44,11 +54,13 @@ export interface AskAnswer {
   level: Level;
   language: string;
   reason: UnknownReason | null;
-  statements: Array<{ text: string; sourceId: string }>;
+  statements: Array<{ text: string; sourceId: string; basis: StatementBasis }>;
   facts: Array<{ sourceId: string; rows: FactRow[] }>;
-  sources: Array<{ id: string; kind: 'own' | 'web'; url: string; title: string; checkedAt: string; publishedAt: string | null }>;
+  sources: Array<{ id: string; kind: 'own' | 'web'; url: string; title: string; checkedAt: string; publishedAt: string | null; verification: 'DAJC_VERIFIED' | 'OFFICIAL_WEB' | 'UNVERIFIED_LEAD' }>;
   authorities: Array<{ url: string }>;
   notices: string[];
+  /** Driving bans only: registry verification of every asked country (outcome, completeness, period, last verification). */
+  verification: JurisdictionVerification[];
   ui: {
     levelLabel: string;
     levelHelp: string;
@@ -60,6 +72,11 @@ export interface AskAnswer {
     authoritiesLabel: string;
     supportText: string;
     supportLink: string;
+    verificationLabel: string;
+    outcomeLabels: Record<JurisdictionVerification['outcome'], string>;
+    periodLabel: string;
+    lastVerifiedLabel: string;
+    unverifiedLabel: string;
   };
 }
 
@@ -81,7 +98,8 @@ export interface PipelineDeps {
   meter: CostMeter;
   fetchPage?: FetchPage;
   now?: Date;
-  canonical?: CanonicalLike;
+  /** Published Driving Bans snapshot; defaults to getDrivingBansSnapshot(now). */
+  view?: DrivingBansView;
   findings?: FindingLike[];
   deadlineMs?: number;
 }
@@ -212,15 +230,16 @@ export function excerptAround(text: string, quote: string, maxChars = LIMITS.ver
   return collapsed.slice(Math.max(0, index - pad), index + quote.length + pad);
 }
 
-function emptyAnswer(language: string, uiLang: UiLang, reason: UnknownReason, authorities: string[], notices: string[]): AskAnswer {
-  return buildAnswer({ level: 'UNKNOWN', language, uiLang, reason, statements: [], facts: [], sources: [], authorities, notices });
+function emptyAnswer(language: string, uiLang: UiLang, reason: UnknownReason, authorities: string[], notices: string[], level: Level = 'UNKNOWN', verification: JurisdictionVerification[] = []): AskAnswer {
+  return buildAnswer({ level, language, uiLang, reason, statements: [], facts: [], sources: [], authorities, notices, verification });
 }
 
-function buildAnswer({ level, language, uiLang, reason, statements, facts, sources, authorities, notices }: {
+function buildAnswer({ level, language, uiLang, reason, statements, facts, sources, authorities, notices, verification = [] }: {
   level: Level; language: string; uiLang: UiLang; reason: UnknownReason | null;
   statements: AskAnswer['statements']; facts: AskAnswer['facts']; sources: AskAnswer['sources'];
-  authorities: string[]; notices: string[];
+  authorities: string[]; notices: string[]; verification?: JurisdictionVerification[];
 }): AskAnswer {
+  const unverified = statements.some((statement) => statement.basis === 'unverified_official_lead');
   return {
     level,
     language,
@@ -230,17 +249,27 @@ function buildAnswer({ level, language, uiLang, reason, statements, facts, sourc
     sources,
     authorities: [...new Set(authorities)].slice(0, 6).map((url) => ({ url })),
     notices,
+    verification,
     ui: {
       levelLabel: t(uiLang, `level.${level}` as UiKey),
       levelHelp: t(uiLang, `levelHelp.${level}` as UiKey),
       reasonText: reason ? t(uiLang, `reason.${reason}` as UiKey) : null,
-      aiNotice: t(uiLang, 'aiNotice'),
+      aiNotice: t(uiLang, unverified ? 'aiNoticeUnverified' : 'aiNotice'),
       sourcesLabel: t(uiLang, 'sources'),
       checkedOn: t(uiLang, 'checkedOn'),
       publishedOn: t(uiLang, 'publishedOn'),
       authoritiesLabel: t(uiLang, 'authorities'),
       supportText: t(uiLang, 'support'),
       supportLink: t(uiLang, 'supportLink'),
+      verificationLabel: t(uiLang, 'verificationLabel'),
+      outcomeLabels: {
+        BAN_FOUND: t(uiLang, 'outcome.BAN_FOUND'),
+        NO_CONFIRMED_BAN: t(uiLang, 'outcome.NO_CONFIRMED_BAN'),
+        INSUFFICIENT_VERIFIED_DATA: t(uiLang, 'outcome.INSUFFICIENT_VERIFIED_DATA'),
+      },
+      periodLabel: t(uiLang, 'verificationPeriod'),
+      lastVerifiedLabel: t(uiLang, 'lastVerified'),
+      unverifiedLabel: t(uiLang, 'unverifiedLead'),
     },
   };
 }
@@ -266,22 +295,28 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
   if (!c.in_scope) return { answer: emptyAnswer(c.language, uiLang, 'out_of_scope', [], notices), path: 'none', reviewUrls: [] };
   if (c.jurisdictions.length === 0) return { answer: emptyAnswer(c.language, uiLang, 'need_country', [], notices), path: 'none', reviewUrls: [] };
 
-  // (2) Own verified data.
+  // (2) Own verified data: the published Driving Bans registry via the shared contract.
+  const drivingBan = c.topic === 'driving_ban';
+  const view = deps.view ?? publishedView(now);
   let records: OwnRecord[] = [];
-  let coverage: Record<string, Coverage> = {};
+  let verification: Record<string, JurisdictionVerification> = {};
   let ownLeads: string[] = [];
-  if (c.topic === 'driving_ban') {
-    const own = lookupDrivingBans({ jurisdictions: c.jurisdictions, dates: c.dates }, { now, ...(deps.canonical ? { data: deps.canonical } : {}) });
+  if (drivingBan) {
+    const own = lookupDrivingBans({ jurisdictions: c.jurisdictions, dates: c.dates }, { now, view });
     records = own.records.slice(0, LIMITS.ownRecords);
-    coverage = own.coverage;
+    verification = own.verification;
     ownLeads = own.leads;
   }
-  if (Object.values(coverage).includes('partial')) notices.push(t(uiLang, 'coverageNotice'));
+  const verificationList = c.jurisdictions.map((code) => verification[code]).filter(Boolean);
+  const undecided = verificationList.filter((v) => v.outcome === 'INSUFFICIENT_VERIFIED_DATA').map((v) => v.jurisdiction);
+  if (verificationList.some((v) => v.outcome === 'BAN_FOUND' && !v.coverageComplete)) notices.push(t(uiLang, 'coverageNotice'));
+  if (undecided.length > 0) notices.push(t(uiLang, 'insufficientNotice', { countries: undecided.join(', ') }));
+  // A driving-ban answer the registry cannot fully decide is never a plain "don't know".
+  const fallbackLevel: Level = undecided.length > 0 ? 'INSUFFICIENT_VERIFIED_DATA' : 'UNKNOWN';
+  const empty = (reason: UnknownReason, authorities: string[]) => emptyAnswer(c.language, uiLang, reason, authorities, notices, fallbackLevel, verificationList);
 
   // (3) Official domains, only where own data cannot answer.
-  const webJurisdictions = c.topic === 'driving_ban'
-    ? c.jurisdictions.filter((code) => coverage[code] === 'missing' || coverage[code] === 'stale')
-    : c.jurisdictions;
+  const webJurisdictions = drivingBan ? undecided : c.jurisdictions;
   const pages: OfficialPage[] = [];
   const consulted: string[] = [];
   if (webJurisdictions.length > 0) {
@@ -313,22 +348,22 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
     for (const result of fetched) if (result.ok) pages.push(result.page);
   }
 
-  const sourceById = new Map<string, PromptSource & { page?: OfficialPage; record?: OwnRecord }>();
+  const sourceById = new Map<string, PromptSource & { page?: OfficialPage; record?: OwnRecord; unverified?: boolean }>();
   for (const record of records) {
     sourceById.set(record.id, { id: record.id, kind: 'own', url: record.facts.sourceUrl, title: record.facts.restriction, text: record.text, record });
   }
   const passageTerms = [...c.search_terms, TOPIC_TERMS[c.topic]];
   pages.forEach((page, index) => {
     const id = `S${index + 1}`;
-    sourceById.set(id, { id, kind: 'web', url: page.url, title: page.title || page.host, text: selectPassages(page.text, passageTerms, LIMITS.sourceChars), page });
+    sourceById.set(id, { id, kind: 'web', url: page.url, title: page.title || page.host, text: selectPassages(page.text, passageTerms, LIMITS.sourceChars), page, unverified: drivingBan });
   });
-  const known = knownSourceUrls(deps.canonical, deps.findings);
+  const known = knownSourceUrls(view, deps.findings);
   const reviewUrls: ReviewUrl[] = pages
     .filter((page) => !known.has(page.url))
     .map((page) => ({ url: page.url, jurisdiction: jurisdictionOfUrl(page.url, webJurisdictions), topic: c.topic }));
   const authorities = [...pages.map((p) => p.url), ...consulted, ...ownLeads, ...records.map((r) => r.facts.sourceUrl).filter(isAllowedSourceUrl)];
 
-  if (sourceById.size === 0) return { answer: emptyAnswer(c.language, uiLang, 'no_sources', authorities, notices), path: 'none', reviewUrls };
+  if (sourceById.size === 0) return { answer: empty('no_sources', authorities), path: 'none', reviewUrls };
 
   // (5) Draft from the sources only.
   const sources = [...sourceById.values()];
@@ -350,7 +385,7 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
   const guardSources: GuardSource[] = sources.map((s) => ({ id: s.id, kind: s.kind, text: s.text }));
   const guard = checkClaims(claims.slice(0, MAX_STATEMENTS), guardSources, { language: c.language });
   const droppedCount = guard.dropped.length + Math.max(0, claims.length - MAX_STATEMENTS);
-  if (guard.kept.length === 0) return { answer: emptyAnswer(c.language, uiLang, 'no_claims', authorities, notices), path: consultedPath, reviewUrls };
+  if (guard.kept.length === 0) return { answer: empty('no_claims', authorities), path: consultedPath, reviewUrls };
 
   // (6b) Independent check by a model of another provider.
   const items: VerifyItem[] = guard.kept.map((claim, index) => {
@@ -375,7 +410,7 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
     const r = results.get(item.id);
     return r?.verdict === 'SUPPORTED' && r.personal_advice === false;
   });
-  if (!allSupported) return { answer: emptyAnswer(c.language, uiLang, 'not_supported', authorities, notices), path: consultedPath, reviewUrls };
+  if (!allSupported) return { answer: empty('not_supported', authorities), path: consultedPath, reviewUrls };
 
   // (7) Level and output. Facts from own data are rendered by template.
   const citedIds = [...new Set(guard.kept.map((claim) => claim.source_id))];
@@ -384,17 +419,29 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
     return source.record ? source.record.jurisdiction : jurisdictionOfUrl(source.url, c.jurisdictions);
   }));
   const everyCountryAnswered = c.jurisdictions.every((code) => answeredJurisdictions.has(code));
-  // Own data that are verified but incomplete for a country keep the answer PARTIAL.
-  const ownComplete = c.jurisdictions.every((code) => coverage[code] === undefined || coverage[code] === 'complete'
-    || (answeredJurisdictions.has(code) && coverage[code] !== 'partial'));
-  const level: Level = droppedCount === 0 && draft.json?.covers_question === true && everyCountryAnswered && ownComplete ? 'VERIFIED' : 'PARTIAL';
+  const complete = droppedCount === 0 && draft.json?.covers_question === true && everyCountryAnswered;
+  let level: Level = complete ? 'VERIFIED' : 'PARTIAL';
+  if (drivingBan) {
+    // VERIFIED only from the registry, for countries verified in full and decided on every asked day.
+    const fromRegistry = guard.kept.some((claim) => sourceById.get(claim.source_id)?.kind === 'own');
+    const registryCountries = new Set(guard.kept.map((claim) => sourceById.get(claim.source_id)?.record?.jurisdiction).filter(Boolean));
+    const registryDecides = verificationList.every((v) => v.outcome !== 'INSUFFICIENT_VERIFIED_DATA' && v.coverageComplete && registryCountries.has(v.jurisdiction));
+    level = complete && registryDecides ? 'VERIFIED' : fromRegistry ? 'PARTIAL' : 'INSUFFICIENT_VERIFIED_DATA';
+  }
+  const basisOf = (id: string): StatementBasis => {
+    const source = sourceById.get(id)!;
+    return source.kind === 'own' ? 'dajc_verified' : source.unverified ? 'unverified_official_lead' : 'official_web';
+  };
+  const citedRecords = citedIds.map((id) => sourceById.get(id)?.record).filter((r): r is OwnRecord => Boolean(r));
+  if (citedRecords.some((record) => record.facts.exceptions)) notices.push(t(uiLang, 'exceptionsNotice'));
+  if (guard.kept.some((claim) => basisOf(claim.source_id) === 'unverified_official_lead')) notices.push(t(uiLang, 'unverifiedLeadNotice'));
 
   const answer = buildAnswer({
     level,
     language: c.language,
     uiLang,
     reason: null,
-    statements: guard.kept.map((claim) => ({ text: claim.text, sourceId: claim.source_id })),
+    statements: guard.kept.map((claim) => ({ text: claim.text, sourceId: claim.source_id, basis: basisOf(claim.source_id) })),
     facts: citedIds.flatMap((id) => {
       const record = sourceById.get(id)?.record;
       return record ? [{ sourceId: id, rows: renderDrivingBanFacts(record.facts, uiLang) }] : [];
@@ -408,10 +455,12 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
         title: s.title,
         checkedAt: s.record ? s.record.facts.verified : today,
         publishedAt: s.page?.publishedAt ?? null,
+        verification: s.kind === 'own' ? 'DAJC_VERIFIED' as const : s.unverified ? 'UNVERIFIED_LEAD' as const : 'OFFICIAL_WEB' as const,
       };
     }),
-    authorities: [],
+    authorities: level === 'INSUFFICIENT_VERIFIED_DATA' ? authorities : [],
     notices,
+    verification: verificationList,
   });
   return { answer, path: pathOf(citedIds), reviewUrls };
 }

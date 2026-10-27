@@ -121,6 +121,9 @@ const otherLang = lang === 'cs' ? 'en' : 'cs';
   .answer :global(.ask-level--verified) { color: #3ecf8e; }
   .answer :global(.ask-level--partial) { color: #f5b942; }
   .answer :global(.ask-level--unknown) { color: #ff7a7a; }
+  .answer :global(.ask-level--insufficient_verified_data) { color: #ff7a7a; }
+  .answer :global(.ask-unverified) { color: #f5b942; font-size: 0.9em; }
+  .answer :global(.ask-outcome--insufficient_verified_data) { color: #f5b942; }
   .answer :global(.ask-statements li) { margin: 0.6rem 0; color: var(--dajc-white); line-height: 1.6; }
   .answer :global(.ask-facts) { display: grid; grid-template-columns: max-content 1fr; gap: 0.2rem 1rem; font-size: 13px; color: var(--dajc-muted); margin: 0.6rem 0; }
   .answer :global(.ask-facts dd) { margin: 0; }

@@ -6,17 +6,21 @@
 
 type Strings = Record<string, string>;
 
+type Outcome = 'BAN_FOUND' | 'NO_CONFIRMED_BAN' | 'INSUFFICIENT_VERIFIED_DATA';
+
 interface AnswerPayload {
-  level: 'VERIFIED' | 'PARTIAL' | 'UNKNOWN';
-  statements: Array<{ text: string; sourceId: string }>;
+  level: 'VERIFIED' | 'PARTIAL' | 'UNKNOWN' | 'INSUFFICIENT_VERIFIED_DATA';
+  statements: Array<{ text: string; sourceId: string; basis: 'dajc_verified' | 'official_web' | 'unverified_official_lead' }>;
   facts: Array<{ sourceId: string; rows: Array<{ label: string; value: string; href?: string }> }>;
-  sources: Array<{ id: string; url: string; title: string; checkedAt: string; publishedAt: string | null }>;
+  sources: Array<{ id: string; url: string; title: string; checkedAt: string; publishedAt: string | null; verification: 'DAJC_VERIFIED' | 'OFFICIAL_WEB' | 'UNVERIFIED_LEAD' }>;
   authorities: Array<{ url: string }>;
   notices: string[];
+  verification: Array<{ jurisdiction: string; outcome: Outcome; coverageComplete: boolean; lastVerified: string | null; period: { from: string; to: string } }>;
   ui: {
     levelLabel: string; levelHelp: string; reasonText: string | null; aiNotice: string;
     sourcesLabel: string; checkedOn: string; publishedOn: string; authoritiesLabel: string;
     supportText: string; supportLink: string;
+    verificationLabel: string; outcomeLabels: Record<Outcome, string>; periodLabel: string; lastVerifiedLabel: string; unverifiedLabel: string;
   };
 }
 
@@ -70,6 +74,17 @@ export function renderAnswer(container: HTMLElement, answer: AnswerPayload): voi
   if (answer.ui.reasonText) container.append(el('p', answer.ui.reasonText, 'ask-reason'));
   for (const notice of answer.notices) container.append(el('p', notice, 'ask-notice'));
 
+  if (answer.verification.length > 0) {
+    container.append(el('h3', answer.ui.verificationLabel));
+    const list = el('ul', undefined, 'ask-verification');
+    for (const row of answer.verification) {
+      const parts = [`${row.jurisdiction}: ${answer.ui.outcomeLabels[row.outcome]}`, `${answer.ui.periodLabel} ${row.period.from} – ${row.period.to}`];
+      if (row.lastVerified) parts.push(`${answer.ui.lastVerifiedLabel} ${row.lastVerified.slice(0, 10)}`);
+      list.append(el('li', parts.join(' · '), `ask-outcome ask-outcome--${row.outcome.toLowerCase()}`));
+    }
+    container.append(list);
+  }
+
   const sourceIndex = new Map(answer.sources.map((s, i) => [s.id, i + 1]));
   const factsShown = new Set<string>();
   if (answer.statements.length > 0) {
@@ -77,6 +92,7 @@ export function renderAnswer(container: HTMLElement, answer: AnswerPayload): voi
     for (const statement of answer.statements) {
       const item = el('li');
       item.append(el('span', statement.text));
+      if (statement.basis === 'unverified_official_lead') item.append(el('span', ` (${answer.ui.unverifiedLabel})`, 'ask-unverified'));
       const n = sourceIndex.get(statement.sourceId);
       if (n) item.append(el('sup', `[${n}]`));
       const facts = answer.facts.find((f) => f.sourceId === statement.sourceId);
@@ -104,13 +120,14 @@ export function renderAnswer(container: HTMLElement, answer: AnswerPayload): voi
       item.append(safeLink(source.url, source.title || source.url));
       const dates = [`${answer.ui.checkedOn} ${source.checkedAt}`];
       if (source.publishedAt) dates.push(`${answer.ui.publishedOn} ${source.publishedAt}`);
+      if (source.verification === 'UNVERIFIED_LEAD') dates.unshift(answer.ui.unverifiedLabel);
       item.append(el('span', ` (${dates.join(', ')})`, 'ask-source-date'));
       list.append(item);
     }
     container.append(list);
   }
 
-  if (answer.level === 'UNKNOWN' && answer.authorities.length > 0) {
+  if ((answer.level === 'UNKNOWN' || answer.level === 'INSUFFICIENT_VERIFIED_DATA') && answer.authorities.length > 0) {
     container.append(el('h3', answer.ui.authoritiesLabel));
     const list = el('ul', undefined, 'ask-authorities');
     for (const authority of answer.authorities) {

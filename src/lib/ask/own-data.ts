@@ -1,28 +1,38 @@
 // DAJC's own verified data, read-only (§47.2 step 2).
 //
-// Driving bans come from the canonical dataset through the same pure engine
-// as /driving-bans (src/lib/driving-bans/core.mjs). Only ACTIVE,
-// PRIMARY_VERIFIED rules expand into events, and an event is used only for
-// a date inside the reviewed window. The facts of an event (country, date,
-// local time, weight, roads, legal basis, source) are rendered by template
-// (facts.ts); the model only writes digit-free wording around them.
+// Driving bans come only from the published Driving Bans snapshot
+// (getDrivingBansSnapshot, the same data as /driving-bans, JSON and ICS) through
+// the shared contract of Driving Bans 2.0 (answerFreeAskQuery). There is no
+// second registry and no own expansion here. The free Ask never needs a paid
+// Intelligence entitlement and uses only the free tools.
 //
-// Missing events are never presented as "no ban" (the same rule as the ICS
-// feed: "Missing events are NOT evidence of no ban"); a jurisdiction without
-// a verified event, or a date outside the window, is answered from official
-// websites instead.
+// Per country and asked day the contract answers BAN_FOUND, NO_CONFIRMED_BAN
+// (the country is verified in full for the published period and no verified
+// ban applies) or INSUFFICIENT_VERIFIED_DATA. Missing data are never presented
+// as "no ban"; official websites may then be searched, but their content stays
+// an unverified lead for the Driving Bans review layer.
+//
+// The facts of an event (country, date, local time, weight, roads, legal
+// basis, source) are rendered by template (facts.ts); the model only writes
+// digit-free wording around them.
 //
 // EU Oversize Weekly findings are all `confidence: "unverified"`, so they
 // are never facts here - only official-tier finding URLs serve as leads,
 // re-fetched and checked like any search result.
 
-import { canonicalDrivingBans } from '../../../config/driving-ban-calendars/canonical.mjs';
+import { getDrivingBansSnapshot } from '../../../config/driving-ban-calendars/runtime.mjs';
 import { coverageName } from '../../../config/europe-coverage.mjs';
-import { expandRules } from '../driving-bans/core.mjs';
+import { localToUtc, shiftDate } from '../driving-bans/core.mjs';
+import { JURISDICTION_TIMEZONES } from '../driving-bans/rule-checks.mjs';
+import { answerFreeAskQuery, type JurisdictionOutcome, type PublishedView } from '../intelligence/driving-bans-ai-contract';
+import type { PublishedEvent } from '../intelligence/driving-bans-relevance';
 import { isAllowedSourceUrl } from './official-sources';
 
 export type Topic = 'driving_ban' | 'oversize_permit' | 'dimensions_weights' | 'escort' | 'road_restriction' | 'toll' | 'other';
-export type Coverage = 'complete' | 'partial' | 'missing' | 'stale';
+export type { JurisdictionOutcome };
+
+/** The published snapshot plus its sources (getDrivingBansSnapshot). */
+export type DrivingBansView = PublishedView & { sources: Array<{ source_id: string; url: string; role: string }> };
 
 export interface WeightThreshold {
   operator?: string;
@@ -33,7 +43,7 @@ export interface WeightThreshold {
   all_of?: WeightThreshold[];
 }
 
-/** Template input for one verified driving-ban event. Values stay in the dataset's wording. */
+/** Template input for one verified driving-ban record. Values stay in the dataset's wording. */
 export interface DrivingBanFacts {
   jurisdiction: string;
   country: string;
@@ -59,29 +69,29 @@ export interface OwnRecord {
   text: string;
 }
 
-export interface CanonicalLike {
-  window: { from: string; to: string };
-  sources: Array<{ source_id: string; url: string; role: string }>;
-  rules: unknown[];
-  jurisdictions: Array<{
-    jurisdiction: string;
-    verification_state: string;
-    coverage_complete: boolean;
-    ban_state: string;
-    source_ids: string[];
-  }>;
+/** Verification state of one asked country, shown with every driving-ban answer. */
+export interface JurisdictionVerification {
+  jurisdiction: string;
+  /** INSUFFICIENT_VERIFIED_DATA when any asked day is not decided by the registry. */
+  outcome: JurisdictionOutcome;
+  days: Array<{ date: string; outcome: JurisdictionOutcome }>;
+  coverageComplete: boolean;
+  verificationState: string;
+  lastVerified: string | null;
+  period: { from: string; to: string };
 }
 
 export interface OwnLookup {
   records: OwnRecord[];
-  coverage: Record<string, Coverage>;
-  /** Official URLs worth reading when own data are missing or stale. */
+  verification: Record<string, JurisdictionVerification>;
+  /** Official URLs worth reading when the registry cannot decide. */
   leads: string[];
 }
 
 const MAX_RECORDS = 12;
 const MAX_LEADS_PER_JURISDICTION = 2;
 export const MAX_RECORD_CHARS = 3000;
+export const REGISTRY_URL = 'https://www.dajc.eu/driving-bans';
 
 function formatNumber(value: number): string {
   return String(Math.round(value * 100) / 100);
@@ -99,26 +109,7 @@ export function formatWeight(w: WeightThreshold | undefined): string {
   return `${w.operator} ${formatNumber(w.value)} ${w.unit || ''}${scope}`.trim();
 }
 
-interface ExpandedEvent {
-  uid: string;
-  jurisdiction: string;
-  title: string;
-  date: string;
-  end_date: string;
-  start_time: string;
-  end_time: string;
-  timezone: string;
-  vehicle_scope: string;
-  weight_threshold: WeightThreshold;
-  roads: string[];
-  regions: string[];
-  direction?: string;
-  exceptions: string[];
-  legal_basis: string;
-  source_authority: string;
-  source_url: string;
-  verified_at: string;
-}
+type ExpandedEvent = PublishedEvent & { end_date: string };
 
 export function eventFacts(event: ExpandedEvent): DrivingBanFacts {
   return {
@@ -127,7 +118,7 @@ export function eventFacts(event: ExpandedEvent): DrivingBanFacts {
     restriction: event.title,
     localTime: `${event.date} ${event.start_time} – ${event.end_date} ${event.end_time} (${event.timezone})`,
     vehicles: event.vehicle_scope,
-    weight: formatWeight(event.weight_threshold),
+    weight: formatWeight(event.weight_threshold as WeightThreshold),
     roads: (event.roads || []).join('; '),
     regions: (event.regions || []).join('; '),
     direction: event.direction || '',
@@ -150,11 +141,36 @@ export function recordText(f: DrivingBanFacts): string {
     f.roads && `Roads: ${f.roads}.`,
     f.regions && `Regions: ${f.regions}.`,
     f.direction && `Direction: ${f.direction}.`,
-    f.exceptions && `Exceptions: ${f.exceptions.slice(0, 1200)}`,
+    f.exceptions && `Exceptions (listed, not assessed for any transport): ${f.exceptions.slice(0, 1200)}`,
     `Legal basis: ${f.legalBasis}.`,
     `Authority: ${f.authority}.`,
     `Verified by DAJC: ${f.verified}.`,
   ].filter(Boolean).join('\n').slice(0, MAX_RECORD_CHARS);
+}
+
+export const NO_CONFIRMED_BAN_FINDING = 'The DAJC registry contains no verified legal driving ban for the days listed.';
+
+/** A registry statement for a fully verified country without a verified ban on the asked days. */
+export function noConfirmedBanRecord(code: string, days: string[], timezone: string, lastVerified: string | null): OwnRecord {
+  const facts: DrivingBanFacts = {
+    jurisdiction: code,
+    country: `${coverageName(code)} (${code})`,
+    restriction: 'No verified legal driving ban in the DAJC registry',
+    localTime: `${days.join('; ')} (${timezone})`,
+    vehicles: '', weight: '', roads: '', regions: '', direction: '', exceptions: '', legalBasis: '',
+    authority: 'DAJC Driving Bans registry',
+    sourceUrl: REGISTRY_URL,
+    verified: String(lastVerified || '').slice(0, 10),
+  };
+  const text = [
+    `DAJC verified registry statement. Country: ${facts.country}.`,
+    `Finding: ${NO_CONFIRMED_BAN_FINDING}`,
+    `Days: ${facts.localTime}.`,
+    'Scope: The country is verified in full for the published period. Temporary traffic restrictions, roadworks and permit conditions are not part of the registry.',
+    `Authority: ${facts.authority}.`,
+    `Verified by DAJC: ${facts.verified}.`,
+  ].join('\n');
+  return { id: `dajc:no-confirmed-ban:${code.toLowerCase()}`, jurisdiction: code, facts, text };
 }
 
 export function isoDay(date: Date, timeZone = 'Europe/Prague'): string {
@@ -172,42 +188,76 @@ export function datesToCheck(dates: string[], now: Date): string[] {
   return Array.from({ length: 7 }, (_, i) => shift(today, i));
 }
 
+export function timezoneOf(code: string): string {
+  return (JURISDICTION_TIMEZONES as Record<string, string[]>)[code]?.[0] ?? 'Europe/Prague';
+}
+
+let cachedView: { month: string; view: DrivingBansView } | null = null;
+
+/**
+ * The published snapshot: the only source of verified driving-ban facts. The published
+ * period follows the Prague month, so one snapshot serves every question of that month.
+ */
+export function publishedView(now: Date): DrivingBansView {
+  const month = isoDay(now).slice(0, 7);
+  if (cachedView?.month !== month) cachedView = { month, view: getDrivingBansSnapshot(now) as unknown as DrivingBansView };
+  return cachedView.view;
+}
+
 export function lookupDrivingBans(
   { jurisdictions, dates }: { jurisdictions: string[]; dates: string[] },
-  { data = canonicalDrivingBans as unknown as CanonicalLike, now = new Date() }: { data?: CanonicalLike; now?: Date } = {},
+  { view, now = new Date() }: { view?: DrivingBansView; now?: Date } = {},
 ): OwnLookup {
+  const published = view ?? publishedView(now);
   const days = datesToCheck(dates, now);
   const records: OwnRecord[] = [];
-  const coverage: Record<string, Coverage> = {};
+  const verification: Record<string, JurisdictionVerification> = {};
   const leads: string[] = [];
-  // Days outside the reviewed window have no verified data at all.
-  const inside = days.filter((day) => day >= data.window.from && day <= data.window.to);
-  const someOutside = inside.length < days.length;
-  const eventsByDay = new Map(inside.map((day) => [day, expandRules(data, { from: day, to: day }) as ExpandedEvent[]]));
+  const byUid = new Map(published.events.map((event) => [event.uid, event as ExpandedEvent]));
 
   for (const code of jurisdictions) {
-    const row = data.jurisdictions.find((j) => j.jurisdiction === code);
-    const events = inside.flatMap((day) => eventsByDay.get(day)!.filter((e) => e.jurisdiction === code));
-    const unique = [...new Map(events.map((e) => [e.uid, e])).values()];
-    if (unique.length === 0) coverage[code] = someOutside ? 'stale' : 'missing';
-    else if (someOutside) coverage[code] = 'partial';
-    else coverage[code] = row?.verification_state === 'PRIMARY_VERIFIED' && row.coverage_complete ? 'complete' : 'partial';
+    const row = published.jurisdictions.find((j) => j.jurisdiction === code);
+    const timezone = timezoneOf(code);
+    const perDay = days.map((date) => {
+      const answer = answerFreeAskQuery({
+        tool: 'search_bans',
+        input: { jurisdictions: [code], from: localToUtc(date, '00:00', timezone), to: localToUtc(shiftDate(date, 1), '00:00', timezone) },
+        view: published,
+      });
+      const outcome = (answer.completeness.find((c) => c.jurisdiction === code)?.outcome ?? 'INSUFFICIENT_VERIFIED_DATA') as JurisdictionOutcome;
+      return { date, outcome, uids: answer.facts.map((fact) => String(fact.uid)) };
+    });
+    const outcomes = perDay.map((d) => d.outcome);
+    const outcome: JurisdictionOutcome = outcomes.includes('INSUFFICIENT_VERIFIED_DATA') ? 'INSUFFICIENT_VERIFIED_DATA'
+      : outcomes.includes('BAN_FOUND') ? 'BAN_FOUND' : 'NO_CONFIRMED_BAN';
+    verification[code] = {
+      jurisdiction: code,
+      outcome,
+      days: perDay.map(({ date, outcome: o }) => ({ date, outcome: o })),
+      coverageComplete: Boolean(row?.coverage_complete),
+      verificationState: row?.verification_state ?? 'UNVERIFIED',
+      lastVerified: row?.last_verified ?? null,
+      period: { from: published.window.from, to: published.window.to },
+    };
 
-    for (const event of unique) {
-      if (records.length >= MAX_RECORDS) break;
+    for (const uid of [...new Set(perDay.flatMap((d) => d.uids))]) {
+      const event = byUid.get(uid);
+      if (!event || records.length >= MAX_RECORDS) continue;
       const facts = eventFacts(event);
-      records.push({ id: `dajc:${event.uid.replace(/@.*$/, '')}`, jurisdiction: code, facts, text: recordText(facts) });
+      records.push({ id: `dajc:${uid.replace(/@.*$/, '')}`, jurisdiction: code, facts, text: recordText(facts) });
     }
+    const quiet = perDay.filter((d) => d.outcome === 'NO_CONFIRMED_BAN').map((d) => d.date);
+    if (quiet.length > 0 && records.length < MAX_RECORDS) records.push(noConfirmedBanRecord(code, quiet, timezone, row?.last_verified ?? null));
 
-    if (coverage[code] !== 'complete') {
-      const ids = new Set(row?.source_ids || []);
-      const urls = data.sources
+    if (outcome === 'INSUFFICIENT_VERIFIED_DATA') {
+      const ids = new Set((row as { source_ids?: string[] } | undefined)?.source_ids || []);
+      const urls = published.sources
         .filter((s) => ids.has(s.source_id) && s.role === 'PRIMARY' && isAllowedSourceUrl(s.url))
         .map((s) => s.url);
       leads.push(...[...new Set(urls)].slice(0, MAX_LEADS_PER_JURISDICTION));
     }
   }
-  return { records, coverage, leads };
+  return { records, verification, leads };
 }
 
 // --- EU Oversize Weekly findings as leads only --------------------------------
@@ -253,7 +303,7 @@ export function findingLeads(
   return [...new Set(urls)].slice(0, max);
 }
 
-/** URLs DAJC already holds (canonical sources and findings) - not "new" for the review queue. */
-export function knownSourceUrls(data: CanonicalLike = canonicalDrivingBans as unknown as CanonicalLike, findings: FindingLike[] = loadFindings()): Set<string> {
-  return new Set([...data.sources.map((s) => s.url), ...findings.map((f) => f.sourceUrl).filter((u): u is string => Boolean(u))]);
+/** URLs DAJC already holds (registry sources and findings) - not "new" for the review queue. */
+export function knownSourceUrls(view: Pick<DrivingBansView, 'sources'>, findings: FindingLike[] = loadFindings()): Set<string> {
+  return new Set([...view.sources.map((s) => s.url), ...findings.map((f) => f.sourceUrl).filter((u): u is string => Boolean(u))]);
 }

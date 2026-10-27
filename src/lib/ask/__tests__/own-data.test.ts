@@ -1,27 +1,50 @@
 import { describe, expect, it } from 'vitest';
-import { canonicalDrivingBans } from '../../../../config/driving-ban-calendars/canonical.mjs';
-import { datesToCheck, findingLeads, formatWeight, lookupDrivingBans, type CanonicalLike } from '../own-data';
+import { getDrivingBansSnapshot } from '../../../../config/driving-ban-calendars/runtime.mjs';
+import { datesToCheck, findingLeads, formatWeight, lookupDrivingBans, NO_CONFIRMED_BAN_FINDING, type DrivingBansView } from '../own-data';
 import { isAllowedSourceUrl } from '../official-sources';
-import { FIXTURE_CANONICAL, NOW, SUNDAY } from './helpers';
+import { fixtureView, NOW, SUNDAY } from './helpers';
 
-describe('own verified data (fixture)', () => {
-  it('uses verified events inside the reviewed window', () => {
-    const result = lookupDrivingBans({ jurisdictions: ['CZ', 'AT', 'DE'], dates: [SUNDAY] }, { data: FIXTURE_CANONICAL, now: NOW });
-    expect(result.coverage).toEqual({ CZ: 'complete', AT: 'partial', DE: 'missing' });
+const view = fixtureView();
+
+describe('own verified data from the published registry (fixture)', () => {
+  it('uses verified events of the published period through the shared contract', () => {
+    const result = lookupDrivingBans({ jurisdictions: ['CZ', 'AT', 'DE'], dates: [SUNDAY] }, { view, now: NOW });
+    expect(Object.fromEntries(Object.entries(result.verification).map(([code, v]) => [code, v.outcome]))).toEqual({ CZ: 'BAN_FOUND', AT: 'BAN_FOUND', DE: 'INSUFFICIENT_VERIFIED_DATA' });
+    expect(result.verification.AT.coverageComplete).toBe(false);
+    expect(result.verification.CZ).toMatchObject({ coverageComplete: true, verificationState: 'PRIMARY_VERIFIED', lastVerified: '2026-09-26T15:25:00.000Z', period: { from: '2026-10-01', to: '2026-11-30' } });
     expect(result.records.map((r) => r.jurisdiction)).toEqual(['CZ', 'AT']);
   });
 
-  it('never turns missing events into "no ban"', () => {
-    const result = lookupDrivingBans({ jurisdictions: ['CZ'], dates: ['2026-11-03'] }, { data: FIXTURE_CANONICAL, now: NOW });
-    expect(result.records).toHaveLength(0);
-    expect(result.coverage.CZ).toBe('missing');
+  it('states "no confirmed ban" only for a country verified in full; elsewhere missing events stay insufficient data', () => {
+    const result = lookupDrivingBans({ jurisdictions: ['CZ', 'AT', 'DE'], dates: ['2026-11-03'] }, { view, now: NOW });
+    expect(result.verification.CZ.outcome).toBe('NO_CONFIRMED_BAN');
+    expect(result.verification.AT.outcome).toBe('INSUFFICIENT_VERIFIED_DATA');
+    expect(result.verification.DE.outcome).toBe('INSUFFICIENT_VERIFIED_DATA');
+    expect(result.records).toHaveLength(1);
+    expect(result.records[0]).toMatchObject({ id: 'dajc:no-confirmed-ban:cz', jurisdiction: 'CZ' });
+    expect(result.records[0].text).toContain(NO_CONFIRMED_BAN_FINDING);
+    expect(result.records[0].text).toMatch(/Temporary traffic restrictions, roadworks and permit conditions are not part of the registry/);
   });
 
-  it('marks dates after the window (e.g. after 30 November 2026) as stale and offers only official leads', () => {
-    const result = lookupDrivingBans({ jurisdictions: ['AT'], dates: ['2026-12-06'] }, { data: FIXTURE_CANONICAL, now: NOW });
-    expect(result.coverage.AT).toBe('stale');
+  it('treats dates outside the published period as insufficient verified data and offers only official leads', () => {
+    const result = lookupDrivingBans({ jurisdictions: ['AT', 'CZ'], dates: ['2026-12-06'] }, { view, now: NOW });
+    expect(result.verification.AT.outcome).toBe('INSUFFICIENT_VERIFIED_DATA');
+    expect(result.verification.CZ.outcome).toBe('INSUFFICIENT_VERIFIED_DATA');
     expect(result.records).toHaveLength(0);
-    expect(result.leads).toEqual(['https://www.ris.bka.gv.at/stvo-42']);
+    expect(result.leads).toEqual(['https://www.ris.bka.gv.at/stvo-42', 'https://www.mdcr.gov.cz/zakon-361']);
+  });
+
+  it('is insufficient as a whole when only some asked days are decided', () => {
+    const result = lookupDrivingBans({ jurisdictions: ['CZ'], dates: [SUNDAY, '2026-12-06'] }, { view, now: NOW });
+    expect(result.verification.CZ.outcome).toBe('INSUFFICIENT_VERIFIED_DATA');
+    expect(result.verification.CZ.days).toEqual([{ date: SUNDAY, outcome: 'BAN_FOUND' }, { date: '2026-12-06', outcome: 'INSUFFICIENT_VERIFIED_DATA' }]);
+    expect(result.records.map((r) => r.id)).toEqual(['dajc:cz-sunday-2026-11-01']);
+  });
+
+  it('lists exceptions in the record without assessing them', () => {
+    const [record] = lookupDrivingBans({ jurisdictions: ['CZ'], dates: [SUNDAY] }, { view, now: NOW }).records;
+    expect(record.facts.exceptions).toBe('Perishable goods.');
+    expect(record.text).toContain('Exceptions (listed, not assessed for any transport): Perishable goods.');
   });
 
   it('checks the next seven days when the question names no date', () => {
@@ -43,25 +66,26 @@ describe('own verified data (fixture)', () => {
   });
 });
 
-describe('own verified data (real dataset, invariants only)', () => {
+describe('own verified data (real published registry, invariants only)', () => {
   // Only invariants: the weekly data updates must never break these tests.
-  const data = canonicalDrivingBans as unknown as CanonicalLike;
-  const codes = data.jurisdictions.map((j) => j.jurisdiction);
-  const insideDay = data.window.from;
+  const real = getDrivingBansSnapshot(new Date()) as unknown as DrivingBansView;
+  const codes = real.jurisdictions.map((j) => j.jurisdiction);
 
-  it('reports "complete" only for PRIMARY_VERIFIED jurisdictions with full coverage', () => {
-    const result = lookupDrivingBans({ jurisdictions: codes, dates: [insideDay] }, { data, now: NOW });
-    for (const [code, coverage] of Object.entries(result.coverage)) {
-      const row = data.jurisdictions.find((j) => j.jurisdiction === code)!;
-      if (coverage === 'complete') expect(row.verification_state === 'PRIMARY_VERIFIED' && row.coverage_complete).toBe(true);
+  it('says "no confirmed ban" only for countries verified in full', () => {
+    const result = lookupDrivingBans({ jurisdictions: codes, dates: [real.window.from] }, { view: real, now: new Date() });
+    for (const v of Object.values(result.verification)) {
+      const row = real.jurisdictions.find((j) => j.jurisdiction === v.jurisdiction)!;
+      if (v.outcome === 'NO_CONFIRMED_BAN') expect(row.coverage_complete).toBe(true);
+      if (!row.coverage_complete) expect(v.outcome).not.toBe('NO_CONFIRMED_BAN');
     }
-    for (const record of result.records) expect(record.text).toMatch(/^DAJC verified driving-ban record/);
+    for (const record of result.records) expect(record.text).toMatch(/^DAJC verified (driving-ban record|registry statement)/);
   });
 
-  it('treats any day after the window as stale', () => {
-    const after = new Date(Date.parse(`${data.window.to}T00:00:00Z`) + 2 * 86_400_000).toISOString().slice(0, 10);
-    const result = lookupDrivingBans({ jurisdictions: codes, dates: [after] }, { data, now: NOW });
-    expect(new Set(Object.values(result.coverage))).toEqual(new Set(['stale']));
+  it('treats any day after the published period as insufficient verified data', () => {
+    const after = new Date(Date.parse(`${real.window.to}T00:00:00Z`) + 2 * 86_400_000).toISOString().slice(0, 10);
+    const result = lookupDrivingBans({ jurisdictions: codes, dates: [after] }, { view: real, now: new Date() });
+    expect(new Set(Object.values(result.verification).map((v) => v.outcome))).toEqual(new Set(['INSUFFICIENT_VERIFIED_DATA']));
+    expect(result.records).toHaveLength(0);
     expect(result.leads.every(isAllowedSourceUrl)).toBe(true);
   });
 });

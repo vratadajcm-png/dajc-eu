@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { MICRO } from '../cost';
 import { askQuestion, budgetAvailable, budgetCaps, worstCaseQuestionMicro, type ServiceDeps } from '../service';
 import { MemoryAskStore } from '../store/memory';
-import { FIXTURE_CANONICAL, NOW, fakeProviders, firstOwnSourceId, ownRecordQuote, testConfig, type FakeScenario } from './helpers';
+import { fixtureView, NOW, fakeProviders, firstOwnSourceId, ownRecordQuote, testConfig, type FakeScenario } from './helpers';
 import type { JsonCallParams } from '../providers';
 
 const QUESTION = 'Is there a truck driving ban in Czechia on 1 November 2026?';
@@ -20,7 +20,7 @@ function service(scenario: FakeScenario = { draft: goodDraft }, configOverrides 
     store,
     providers,
     now: () => now,
-    pipeline: { canonical: FIXTURE_CANONICAL, findings: [] },
+    pipeline: { view: fixtureView(), findings: [] },
   };
   return { store, providers, deps };
 }

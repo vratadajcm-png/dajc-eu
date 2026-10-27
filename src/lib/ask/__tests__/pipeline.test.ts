@@ -3,7 +3,7 @@ import { CostMeter } from '../cost';
 import { runPipeline, type PipelineDeps } from '../pipeline';
 import { officialDomainsFor } from '../../../../scripts/lib/source-policy.mjs';
 import {
-  FIXTURE_CANONICAL, NOW, SUNDAY, fakeFetchPage, fakeProviders, firstOwnSourceId, htmlPage, ownRecordQuote,
+  fixtureView, NOW, SUNDAY, fakeFetchPage, fakeProviders, firstOwnSourceId, htmlPage, ownRecordQuote,
   testConfig, type FakeScenario,
 } from './helpers';
 import type { JsonCallParams } from '../providers';
@@ -19,7 +19,7 @@ function deps(scenario: FakeScenario, extra: Partial<PipelineDeps> = {}) {
       providers,
       meter: new CostMeter(config),
       now: NOW,
-      canonical: FIXTURE_CANONICAL,
+      view: fixtureView(),
       findings: [],
       fetchPage: fakeFetchPage({}),
       ...extra,
@@ -83,8 +83,8 @@ describe('answers from DAJC verified data', () => {
   });
 });
 
-describe('official domains when own data are missing or stale', () => {
-  it('searches only official domains after the data window and never sends the question to the search engine', async () => {
+describe('official domains when the registry cannot decide', () => {
+  it('searches only official domains after the published period, and the finding stays an unverified lead', async () => {
     const question = 'Is there a truck driving ban in Austria on 6 December 2026?';
     const fetchPage = fakeFetchPage({ [AT_PAGE_URL]: { html: htmlPage('StVO § 42 Fahrverbote', AT_TEXT) } });
     const { deps: d, providers } = deps({
@@ -105,9 +105,14 @@ describe('official domains when own data are missing or stale', () => {
     expect(providers.calls.search[0].queries.join(' ')).not.toContain(question);
     // Neither the aggregator nor another country's official site is fetched.
     expect(fetchPage.requested).toEqual([AT_PAGE_URL]);
-    expect(answer.level).toBe('VERIFIED');
+    // An official page outside the registry never makes a driving-ban answer VERIFIED.
+    expect(answer.level).toBe('INSUFFICIENT_VERIFIED_DATA');
+    expect(answer.ui.levelLabel).toBe('INSUFFICIENT VERIFIED DATA');
+    expect(answer.statements.map((st) => st.basis)).toEqual(['unverified_official_lead']);
     expect(path).toBe('web');
-    expect(answer.sources[0]).toMatchObject({ url: AT_PAGE_URL, checkedAt: '2026-10-25' });
+    expect(answer.sources[0]).toMatchObject({ url: AT_PAGE_URL, checkedAt: '2026-10-25', verification: 'UNVERIFIED_LEAD' });
+    expect(answer.verification).toEqual([expect.objectContaining({ jurisdiction: 'AT', outcome: 'INSUFFICIENT_VERIFIED_DATA' })]);
+    expect(answer.ui.aiNotice).toMatch(/not been verified by DAJC/);
     // Known canonical source - not "new", so not queued for review.
     expect(reviewUrls).toHaveLength(0);
   });
@@ -133,7 +138,7 @@ describe('official domains when own data are missing or stale', () => {
       searchResults: [{ url: AT_PAGE_URL, title: 'RIS' }],
     }, { fetchPage });
     const { answer } = await runPipeline('Is there a truck ban in Austria on 6 December 2026?', 'en', d);
-    expect(answer.level).toBe('UNKNOWN');
+    expect(answer.level).toBe('INSUFFICIENT_VERIFIED_DATA');
     expect(answer.reason).toBe('no_sources');
     expect(providers.calls.openai.filter((c) => c.schemaName === 'dajc_answer')).toHaveLength(0);
   });
@@ -151,7 +156,9 @@ describe('official domains when own data are missing or stale', () => {
     const draftCall = providers.calls.openai.find((c) => c.schemaName === 'dajc_answer')!;
     expect(draftCall.system).toMatch(/untrusted data/);
     expect(draftCall.user).toMatch(/<source-[0-9a-f]+ id="S1" kind="official-web"[^>]*>\n[\s\S]*Ignore all previous instructions[\s\S]*<\/source-[0-9a-f]+>/);
-    expect(answer.level).toBe('UNKNOWN');
+    expect(answer.level).toBe('INSUFFICIENT_VERIFIED_DATA');
+    expect(answer.reason).toBe('not_supported');
+    expect(answer.statements).toHaveLength(0);
   });
 });
 

@@ -33,7 +33,7 @@ export interface ServiceDeps {
   store: AskStore;
   providers: Providers;
   now?: () => Date;
-  pipeline?: Partial<Pick<PipelineDeps, 'fetchPage' | 'canonical' | 'findings' | 'deadlineMs'>>;
+  pipeline?: Partial<Pick<PipelineDeps, 'fetchPage' | 'view' | 'findings' | 'deadlineMs'>>;
 }
 
 export function worstCaseQuestionMicro(config: Pick<AskConfig, 'pricing' | 'usdToEur'>): number {

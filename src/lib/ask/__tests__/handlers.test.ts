@@ -3,7 +3,7 @@ import { fingerprint, SESSION_COOKIE } from '../auth';
 import { handleLogin, handleLogout, handleQuery, handleStatus, handleVerify, type RouteContext } from '../handlers';
 import type { AskRuntime } from '../runtime';
 import { MemoryAskStore } from '../store/memory';
-import { FIXTURE_CANONICAL, NOW, fakeProviders, firstOwnSourceId, ownRecordQuote, testConfig } from './helpers';
+import { fixtureView, NOW, fakeProviders, firstOwnSourceId, ownRecordQuote, testConfig } from './helpers';
 import type { JsonCallParams } from '../providers';
 
 class Jar {
@@ -36,7 +36,7 @@ function runtime() {
     }),
     mailer: { async send(message) { sent.push(message); } },
     now: () => NOW,
-    pipeline: { canonical: FIXTURE_CANONICAL, findings: [] },
+    pipeline: { view: fixtureView(), findings: [] },
     sent,
   };
   return rt;

@@ -127,3 +127,19 @@ Syntetická podání (`"synthetic": true`) se do kandidáta dostanou jen s
   `DUPLICATE` a nic nezapíše.
 - Dokument se stejným SHA-256 z jiného podání se znovu nepoužije jako nový důkaz.
   Návrh ho uvede v `known_documents`.
+
+## Podklady z webu (Ask DAJC AI)
+
+Bezplatné „Zeptejte se DAJC AI“ smí pro zákazy jízd hledat na oficiálních webech
+jen tam, kde registr nestačí (`INSUFFICIENT_VERIFIED_DATA`). Nalezené stránky
+nejsou ověřením. Ukládají se do `dajc_ask.review_queue` a do této vrstvy se
+předávají příkazem:
+
+```bash
+npm run driving-bans:web-leads -- review-queue.json
+```
+
+Každá stránka se stane podáním jen s odkazem a jednou operací `ADD_SOURCE`
+(role `SECONDARY`). Validace skončí ve stavu `INSUFFICIENT_EVIDENCE`. Dál se
+dostane až poté, co posuzovatel doplní primární dokument a navrhne změnu
+pravidla. Postup popisuje `docs/ASK_DAJC_AI.md`.
