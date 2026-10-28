@@ -17,7 +17,7 @@ DAJC is opening discussions on three independent directions:
 • Intelligence Report: preliminary assessment of supplied transport documents, dimensions and operational risks. Not a permit or approved route.
 • Intelligence Pro: a future tailored information service, only after reliable article publication and distribution to X and LinkedIn.
 
-These are invitations to discuss potential cooperation, not services available to order today. DAJC Platform remains in development, with pre-production testing planned from 4 January 2027.
+These are invitations to discuss potential cooperation, not services available to order today. DAJC Platform remains in development, with pre-production testing planned for Q3 2027 (July–September); the exact start date remains unconfirmed.
 
 Read the announcement: https://www.dajc.eu/news/platform/media-partnerships-transport-intelligence-2026
 
