@@ -3,15 +3,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout
   title="DAJC Platform Testing 2027 — Register now"
-  description="Register now to participate in DAJC Platform pre-production testing from 4 January 2027. For heavy and oversized transport professionals and companies across Europe."
+  description="Register now to participate in DAJC Platform pre-production testing in Q3 2027 (July–September); exact dates will be confirmed. For heavy and oversized transport professionals and companies across Europe."
 >
   <main class="testing-page">
     <section class="hero" aria-labelledby="testing-title">
       <p class="eyebrow">DAJC PLATFORM TESTING · REGISTRATION OPEN</p>
       <h1 id="testing-title">Help test the production DAJC Platform while it is being built.</h1>
       <p class="lead">
-        Pre-production testing starts on <strong>Monday, 4 January 2027</strong>.
-        Registration is open now for relevant professionals and companies involved in heavy and oversized transport.
+        Pre-production testing is planned for <strong>Q3 2027 (July–September)</strong>; the exact start date will be confirmed later.
+        Registration is open now for relevant professionals and companies involved in heavy and oversized transport. The schedule was updated on 27 October 2026.
       </p>
       <div class="principles" aria-label="Testing programme principles">
         <span>Same production product</span>
@@ -58,7 +58,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           Complete the registration below. Registration details are delivered to
           <a href="mailto:platform@dajc.cz">platform@dajc.cz</a>.
         </p>
-        <p class="start-date"><strong>Testing starts 4 January 2027.</strong></p>
+        <p class="start-date"><strong>Testing planned for Q3 2027 (July–September); exact start date to be confirmed.</strong></p>
       </div>
 
       <form id="testing-form" class="testing-form">
@@ -180,7 +180,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         }
 
         form.reset();
-        status.textContent = 'Registration received. Thank you — DAJC Platform testing starts 4 January 2027.';
+        status.textContent = 'Registration received. Thank you — DAJC Platform pre-production testing is planned for Q3 2027; the exact start date will be announced later.';
         status.dataset.state = 'success';
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Registration could not be sent.';
