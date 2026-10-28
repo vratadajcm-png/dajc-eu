@@ -1,6 +1,6 @@
 {
   "week": "2026-W44",
-  "checkedAt": "2026-10-26T11:40:50.387Z",
+  "checkedAt": "2026-10-28T11:43:57.385Z",
   "coverageVersion": "2026-10-22.50",
   "jurisdictions": [
     {
@@ -37,8 +37,8 @@
       "code": "AT",
       "name": "Austria",
       "sourceScope": "AT",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-no-material-development-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "at",
       "candidateFindings": 0
@@ -57,8 +57,8 @@
       "code": "BA",
       "name": "Bosnia and Herzegovina",
       "sourceScope": "BA",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-no-material-development-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "balkans",
       "candidateFindings": 0
@@ -67,8 +67,8 @@
       "code": "BE",
       "name": "Belgium",
       "sourceScope": "BE",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-no-material-development-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "benelux",
       "candidateFindings": 0
@@ -117,31 +117,31 @@
       "code": "CZ",
       "name": "Czechia",
       "sourceScope": "CZ",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "cz",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "DE",
       "name": "Germany",
       "sourceScope": "DE",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "de",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "DK",
       "name": "Denmark",
       "sourceScope": "DK",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-major-or-short-update-candidates-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "EE",
@@ -157,11 +157,11 @@
       "code": "ES",
       "name": "Spain",
       "sourceScope": "ES",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-major-or-short-update-candidates-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 1
+      "candidateFindings": 3
     },
     {
       "code": "FI",
@@ -177,8 +177,8 @@
       "code": "FR",
       "name": "France",
       "sourceScope": "FR",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "fr",
       "candidateFindings": 0
@@ -231,7 +231,7 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "IS",
@@ -257,8 +257,8 @@
       "code": "KZ",
       "name": "Kazakhstan (European transport scope)",
       "sourceScope": "KZ",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "east",
       "candidateFindings": 0
@@ -327,8 +327,8 @@
       "code": "ME",
       "name": "Montenegro",
       "sourceScope": "ME",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "balkans",
       "candidateFindings": 0
@@ -361,7 +361,7 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 4
+      "candidateFindings": 8
     },
     {
       "code": "NO",
@@ -397,11 +397,11 @@
       "code": "RO",
       "name": "Romania",
       "sourceScope": "RO",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
-      "candidateFindings": 0
+      "candidateFindings": 5
     },
     {
       "code": "RS",
@@ -427,8 +427,8 @@
       "code": "SE",
       "name": "Sweden",
       "sourceScope": "SE",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-no-material-development-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "nordics",
       "candidateFindings": 0
@@ -437,8 +437,8 @@
       "code": "SI",
       "name": "Slovenia",
       "sourceScope": "SI",
-      "status": "checked-major-or-short-update-candidates-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "si-hr",
       "candidateFindings": 1
@@ -467,8 +467,8 @@
       "code": "TR",
       "name": "Türkiye (European transport scope)",
       "sourceScope": "TR",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "east",
       "candidateFindings": 0
