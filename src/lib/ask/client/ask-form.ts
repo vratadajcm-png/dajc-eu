@@ -21,6 +21,7 @@ interface AnswerPayload {
     sourcesLabel: string; checkedOn: string; publishedOn: string; authoritiesLabel: string;
     supportText: string; supportLink: string;
     verificationLabel: string; outcomeLabels: Record<Outcome, string>; periodLabel: string; lastVerifiedLabel: string; unverifiedLabel: string;
+    coverageIncompleteLabel: string; nextStepLabel: string; nextStep: string | null;
   };
 }
 
@@ -79,11 +80,13 @@ export function renderAnswer(container: HTMLElement, answer: AnswerPayload): voi
     const list = el('ul', undefined, 'ask-verification');
     for (const row of answer.verification) {
       const parts = [`${row.jurisdiction}: ${answer.ui.outcomeLabels[row.outcome]}`, `${answer.ui.periodLabel} ${row.period.from} – ${row.period.to}`];
+      if (!row.coverageComplete) parts.push(answer.ui.coverageIncompleteLabel);
       if (row.lastVerified) parts.push(`${answer.ui.lastVerifiedLabel} ${row.lastVerified.slice(0, 10)}`);
       list.append(el('li', parts.join(' · '), `ask-outcome ask-outcome--${row.outcome.toLowerCase()}`));
     }
     container.append(list);
   }
+  if (answer.ui.nextStep) container.append(el('p', `${answer.ui.nextStepLabel}: ${answer.ui.nextStep}`, 'ask-next-step'));
 
   const sourceIndex = new Map(answer.sources.map((s, i) => [s.id, i + 1]));
   const factsShown = new Set<string>();

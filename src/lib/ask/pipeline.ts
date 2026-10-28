@@ -11,12 +11,15 @@
 //   (8) new official URLs go to a human review queue, never into data/.
 //
 // Driving bans (Driving Bans 2.0): confirmed facts come only from the published
-// registry through the shared contract (own-data.ts). A country/day the registry
-// cannot decide is INSUFFICIENT_VERIFIED_DATA ("Nedostatek ověřených dat").
-// Official pages found for it are shown only as unverified leads, never raise
-// the answer to VERIFIED, and go to the review queue, from which they enter the
-// Driving Bans review layer (scripts/driving-bans-web-leads.mjs). Other topics
-// keep their own trust rules for official websites.
+// registry through the shared contract (own-data.ts). The answer is VERIFIED
+// only when every asked country is verified in full and decided on every asked
+// day. Any country the registry does not fully decide makes the whole answer
+// INSUFFICIENT_VERIFIED_DATA ("Nedostatek ověřených dat"); verified facts found
+// for it are still shown as such. Official pages found for an undecided country
+// are shown only as unverified leads, never raise the answer to VERIFIED, and
+// go to the review queue, from which they enter the Driving Bans review layer
+// (scripts/driving-bans-web-leads.mjs). Other topics keep their own trust
+// rules for official websites.
 //
 // Strict rule (owner decision): if the independent check disagrees on ANY
 // statement, the whole answer is UNKNOWN. Provider failures and timeouts
@@ -77,6 +80,10 @@ export interface AskAnswer {
     periodLabel: string;
     lastVerifiedLabel: string;
     unverifiedLabel: string;
+    coverageIncompleteLabel: string;
+    nextStepLabel: string;
+    /** Driving bans only: the next check, from the contract's outcome; never an authorisation. */
+    nextStep: string | null;
   };
 }
 
@@ -234,12 +241,20 @@ function emptyAnswer(language: string, uiLang: UiLang, reason: UnknownReason, au
   return buildAnswer({ level, language, uiLang, reason, statements: [], facts: [], sources: [], authorities, notices, verification });
 }
 
+/** The recommended next check for a driving-ban answer, following the shared contract's next_step. */
+function nextStepKey(level: Level, verification: JurisdictionVerification[]): UiKey | null {
+  if (verification.length === 0) return null;
+  if (level !== 'VERIFIED' && level !== 'PARTIAL') return 'nextStep.CHECK_AUTHORITY';
+  return verification.some((v) => v.authorityCheckRequired) ? 'nextStep.CONFIRM_SOURCE' : 'nextStep.RECHECK';
+}
+
 function buildAnswer({ level, language, uiLang, reason, statements, facts, sources, authorities, notices, verification = [] }: {
   level: Level; language: string; uiLang: UiLang; reason: UnknownReason | null;
   statements: AskAnswer['statements']; facts: AskAnswer['facts']; sources: AskAnswer['sources'];
   authorities: string[]; notices: string[]; verification?: JurisdictionVerification[];
 }): AskAnswer {
   const unverified = statements.some((statement) => statement.basis === 'unverified_official_lead');
+  const nextStep = nextStepKey(level, verification);
   return {
     level,
     language,
@@ -270,6 +285,9 @@ function buildAnswer({ level, language, uiLang, reason, statements, facts, sourc
       periodLabel: t(uiLang, 'verificationPeriod'),
       lastVerifiedLabel: t(uiLang, 'lastVerified'),
       unverifiedLabel: t(uiLang, 'unverifiedLead'),
+      coverageIncompleteLabel: t(uiLang, 'coverageIncomplete'),
+      nextStepLabel: t(uiLang, 'nextStepLabel'),
+      nextStep: nextStep ? t(uiLang, nextStep) : null,
     },
   };
 }
@@ -309,10 +327,12 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
   }
   const verificationList = c.jurisdictions.map((code) => verification[code]).filter(Boolean);
   const undecided = verificationList.filter((v) => v.outcome === 'INSUFFICIENT_VERIFIED_DATA').map((v) => v.jurisdiction);
+  // The registry decides the question only for countries verified in full and decided on every asked day.
+  const registryDecides = verificationList.every((v) => v.outcome !== 'INSUFFICIENT_VERIFIED_DATA' && v.coverageComplete);
   if (verificationList.some((v) => v.outcome === 'BAN_FOUND' && !v.coverageComplete)) notices.push(t(uiLang, 'coverageNotice'));
   if (undecided.length > 0) notices.push(t(uiLang, 'insufficientNotice', { countries: undecided.join(', ') }));
   // A driving-ban answer the registry cannot fully decide is never a plain "don't know".
-  const fallbackLevel: Level = undecided.length > 0 ? 'INSUFFICIENT_VERIFIED_DATA' : 'UNKNOWN';
+  const fallbackLevel: Level = registryDecides ? 'UNKNOWN' : 'INSUFFICIENT_VERIFIED_DATA';
   const empty = (reason: UnknownReason, authorities: string[]) => emptyAnswer(c.language, uiLang, reason, authorities, notices, fallbackLevel, verificationList);
 
   // (3) Official domains, only where own data cannot answer.
@@ -357,7 +377,7 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
     const id = `S${index + 1}`;
     sourceById.set(id, { id, kind: 'web', url: page.url, title: page.title || page.host, text: selectPassages(page.text, passageTerms, LIMITS.sourceChars), page, unverified: drivingBan });
   });
-  const known = knownSourceUrls(view, deps.findings);
+  const known = knownSourceUrls(view, deps.findings, c.topic);
   const reviewUrls: ReviewUrl[] = pages
     .filter((page) => !known.has(page.url))
     .map((page) => ({ url: page.url, jurisdiction: jurisdictionOfUrl(page.url, webJurisdictions), topic: c.topic }));
@@ -422,11 +442,11 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
   const complete = droppedCount === 0 && draft.json?.covers_question === true && everyCountryAnswered;
   let level: Level = complete ? 'VERIFIED' : 'PARTIAL';
   if (drivingBan) {
-    // VERIFIED only from the registry, for countries verified in full and decided on every asked day.
-    const fromRegistry = guard.kept.some((claim) => sourceById.get(claim.source_id)?.kind === 'own');
+    // VERIFIED only from the registry, for countries verified in full and decided on every asked day;
+    // anything the registry does not fully decide is INSUFFICIENT_VERIFIED_DATA, whatever the web says.
     const registryCountries = new Set(guard.kept.map((claim) => sourceById.get(claim.source_id)?.record?.jurisdiction).filter(Boolean));
-    const registryDecides = verificationList.every((v) => v.outcome !== 'INSUFFICIENT_VERIFIED_DATA' && v.coverageComplete && registryCountries.has(v.jurisdiction));
-    level = complete && registryDecides ? 'VERIFIED' : fromRegistry ? 'PARTIAL' : 'INSUFFICIENT_VERIFIED_DATA';
+    const everyCountryFromRegistry = verificationList.every((v) => registryCountries.has(v.jurisdiction));
+    level = !registryDecides ? 'INSUFFICIENT_VERIFIED_DATA' : complete && everyCountryFromRegistry ? 'VERIFIED' : 'PARTIAL';
   }
   const basisOf = (id: string): StatementBasis => {
     const source = sourceById.get(id)!;

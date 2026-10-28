@@ -72,13 +72,14 @@ describe('answers from DAJC verified data', () => {
     expect(answer.statements).toHaveLength(0);
   });
 
-  it('is at most PARTIAL when DAJC coverage of the country is incomplete', async () => {
+  it('is INSUFFICIENT_VERIFIED_DATA when DAJC coverage of the country is incomplete, still showing the verified ban', async () => {
     const { deps: d } = deps({
       classification: { jurisdictions: ['AT'] },
       draft: ownDraft('In Austria the weekend driving ban applies on that day (Fahrverbot).'),
     });
     const { answer } = await runPipeline('Is there a truck driving ban in Austria on 1 November 2026?', 'en', d);
-    expect(answer.level).toBe('PARTIAL');
+    expect(answer.level).toBe('INSUFFICIENT_VERIFIED_DATA');
+    expect(answer.statements.map((s) => s.basis)).toEqual(['dajc_verified']);
     expect(answer.notices.join(' ')).toMatch(/do not yet cover/);
   });
 });
@@ -155,7 +156,7 @@ describe('official domains when the registry cannot decide', () => {
     const { answer } = await runPipeline('Is there a truck ban in Austria on 6 December 2026?', 'en', d);
     const draftCall = providers.calls.openai.find((c) => c.schemaName === 'dajc_answer')!;
     expect(draftCall.system).toMatch(/untrusted data/);
-    expect(draftCall.user).toMatch(/<source-[0-9a-f]+ id="S1" kind="official-web"[^>]*>\n[\s\S]*Ignore all previous instructions[\s\S]*<\/source-[0-9a-f]+>/);
+    expect(draftCall.user).toMatch(/<source-[0-9a-f]+ id="S1" kind="official-web-unverified"[^>]*>\n[\s\S]*Ignore all previous instructions[\s\S]*<\/source-[0-9a-f]+>/);
     expect(answer.level).toBe('INSUFFICIENT_VERIFIED_DATA');
     expect(answer.reason).toBe('not_supported');
     expect(answer.statements).toHaveLength(0);

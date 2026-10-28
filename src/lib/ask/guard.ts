@@ -9,8 +9,10 @@
 //   - for DAJC's own verified data it contains no digits at all, because
 //     dates, times and weights from our data are inserted by template;
 //   - it contains no personal or case-assessing wording ("you can",
-//     "vám hrozí pokuta", ...) - DAJC gives information about rules, never
-//     legal advice (§47.3, zákon č. 85/1996 Sb.).
+//     "vám hrozí pokuta", "your transport is exempt", ...) - DAJC gives
+//     information about rules, never legal advice (§47.3, zákon č. 85/1996
+//     Sb.), and never decides an exception, an authorisation to drive or a
+//     permit for a specific transport.
 // The whole answer is dropped when it is not written in the question's
 // language (checked for the languages detectLanguage() knows).
 
@@ -66,6 +68,14 @@ export const FORBIDDEN_PATTERNS: RegExp[] = [
   phrase('vous\\s+(?:pouvez|devez|risquez)'), phrase('dans\\s+votre\\s+cas'),
   phrase('lei\\s+può'), phrase('potete'), phrase('lei\\s+rischia'), phrase('nel\\s+suo\\s+caso'),
   phrase('usted\\s+puede'), phrase('puedes'), phrase('le\\s+multarán'), phrase('en\\s+su\\s+caso'),
+  // The reader's own transport ("your vehicle", "this transport"): deciding an exception,
+  // an authorisation to drive or a permit for it is never DAJC's call (Driving Bans 2.0).
+  phrase('your'), phrase('(?:this|the\\s+described|the\\s+planned)\\s+(?:transport|journey|trip|shipment|load|vehicle)'),
+  phrase('váš|vaše|vašeho|vašemu|vašem|vaši|vašich|vašim|vašimi'), phrase('(?:tuto|této|tato|tomto|tento|tohoto)\\s+(?:přeprav|jízd|náklad|vozid|kamion)\\p{L}*'),
+  phrase('vaša|vášho|vašej|vašom|vašu'), phrase('(?:túto|tejto|táto)\\s+(?:preprav|jazd|náklad|vozid)\\p{L}*'),
+  phrase('twój|twoja|twoje|twojego|twojej|twoim|pański|pańska|pańskie|pańskiego'),
+  phrase('Ihr(?:e|en|em|er|es)?\\s+(?:Fahrzeug|Lkw|LKW|Transport|Fahrt|Ladung|Route|Genehmigung|Sattelzug)', 'u'), phrase('dein(?:e|en|em|er|es)?'),
+  phrase('[Dd]ies(?:er|e|en|em)\\s+(?:Transport|Fahrt|Ladung)', 'u'),
 ];
 
 export function forbiddenPhrase(text: string): string | null {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { getDrivingBansSnapshot } from '../../../../config/driving-ban-calendars/runtime.mjs';
-import { datesToCheck, findingLeads, formatWeight, lookupDrivingBans, NO_CONFIRMED_BAN_FINDING, type DrivingBansView } from '../own-data';
+import { datesToCheck, findingLeads, formatWeight, knownSourceUrls, lookupDrivingBans, NO_CONFIRMED_BAN_FINDING, publishedView, type DrivingBansView } from '../own-data';
+import { readPublishedDrivingBans } from '../../intelligence/driving-bans-adapter';
 import { isAllowedSourceUrl } from '../official-sources';
 import { fixtureView, NOW, SUNDAY } from './helpers';
 
@@ -56,6 +57,12 @@ describe('own verified data from the published registry (fixture)', () => {
       .toBe('> 7.5 t (lorry); or any mass (tractors)');
   });
 
+  it('marks the countries the shared contract wants checked with the official source', () => {
+    const result = lookupDrivingBans({ jurisdictions: ['CZ', 'AT', 'DE'], dates: [SUNDAY] }, { view, now: NOW });
+    // CZ: verified ban with listed exceptions; AT: incomplete coverage; DE: no verified data.
+    expect(Object.fromEntries(Object.entries(result.verification).map(([code, v]) => [code, v.authorityCheckRequired]))).toEqual({ CZ: true, AT: true, DE: true });
+  });
+
   it('uses only official-tier Weekly findings as leads', () => {
     const findings = [
       { jurisdiction: 'PL', type: 'road_closure', sourceUrl: 'https://www.gov.pl/web/gddkia/closure', sourceTier: 'official', publishedAt: '2026-10-20' },
@@ -63,6 +70,24 @@ describe('own verified data from the published registry (fixture)', () => {
       { jurisdiction: 'DE', type: 'road_closure', sourceUrl: 'https://www.autobahn.de/x', sourceTier: 'official', publishedAt: '2026-10-22' },
     ];
     expect(findingLeads({ jurisdictions: ['PL'], topic: 'road_restriction' }, { findings })).toEqual(['https://www.gov.pl/web/gddkia/closure']);
+  });
+
+  it('takes no Weekly findings for driving bans: the registry is the only DAJC source', () => {
+    const findings = [{ jurisdiction: 'PL', type: 'driving_ban', sourceUrl: 'https://www.gov.pl/web/infrastruktura/zakazy', sourceTier: 'official', publishedAt: '2026-10-20' }];
+    expect(findingLeads({ jurisdictions: ['PL'], topic: 'driving_ban' }, { findings })).toEqual([]);
+    // A page known only from the Weekly is still new to the Driving Bans review layer.
+    expect(knownSourceUrls(view, findings, 'driving_ban').has(findings[0].sourceUrl)).toBe(false);
+    expect(knownSourceUrls(view, findings, 'road_restriction').has(findings[0].sourceUrl)).toBe(true);
+    expect(knownSourceUrls(view, findings, 'driving_ban').has('https://www.mdcr.gov.cz/zakon-361')).toBe(true);
+  });
+});
+
+describe('the published registry through the Driving Bans adapter', () => {
+  it('reads exactly the adapter\'s published snapshot, without a cache of its own', () => {
+    const at = new Date('2026-10-28T10:00:00Z');
+    const first = publishedView(at);
+    expect(first).toEqual(readPublishedDrivingBans(at));
+    expect(publishedView(at)).not.toBe(first);
   });
 });
 

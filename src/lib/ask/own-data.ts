@@ -1,10 +1,11 @@
 // DAJC's own verified data, read-only (§47.2 step 2).
 //
-// Driving bans come only from the published Driving Bans snapshot
-// (getDrivingBansSnapshot, the same data as /driving-bans, JSON and ICS) through
-// the shared contract of Driving Bans 2.0 (answerFreeAskQuery). There is no
-// second registry and no own expansion here. The free Ask never needs a paid
-// Intelligence entitlement and uses only the free tools.
+// Driving bans come only from the published Driving Bans snapshot, read through
+// driving-bans-adapter.ts (readPublishedDrivingBans: the same data as
+// /driving-bans, JSON and ICS) and evaluated by the shared contract of Driving
+// Bans 2.0 (answerFreeAskQuery). There is no second registry, no own expansion
+// and no cache here. The free Ask never needs a paid Intelligence entitlement
+// and uses only the free tools.
 //
 // Per country and asked day the contract answers BAN_FOUND, NO_CONFIRMED_BAN
 // (the country is verified in full for the published period and no verified
@@ -17,14 +18,21 @@
 // digit-free wording around them.
 //
 // EU Oversize Weekly findings are all `confidence: "unverified"`, so they
-// are never facts here - only official-tier finding URLs serve as leads,
-// re-fetched and checked like any search result.
+// are never facts here - only official-tier finding URLs serve as leads for
+// the other topics, re-fetched and checked like any search result. Driving
+// bans take no Weekly leads: the registry and its own primary sources are the
+// only DAJC source, official-domain search the only web path.
+//
+// Future extension, not implemented: alternative departure times or routes
+// around a ban. Any such suggestion must always be labelled as a
+// recommendation ("doporučení"), never as an authorisation to drive, a
+// decision on an exception or a change of an approved route.
 
-import { getDrivingBansSnapshot } from '../../../config/driving-ban-calendars/runtime.mjs';
 import { coverageName } from '../../../config/europe-coverage.mjs';
 import { localToUtc, shiftDate } from '../driving-bans/core.mjs';
 import { JURISDICTION_TIMEZONES } from '../driving-bans/rule-checks.mjs';
 import { answerFreeAskQuery, type JurisdictionOutcome, type PublishedView } from '../intelligence/driving-bans-ai-contract';
+import { readPublishedDrivingBans } from '../intelligence/driving-bans-adapter';
 import type { PublishedEvent } from '../intelligence/driving-bans-relevance';
 import { isAllowedSourceUrl } from './official-sources';
 
@@ -79,6 +87,8 @@ export interface JurisdictionVerification {
   verificationState: string;
   lastVerified: string | null;
   period: { from: string; to: string };
+  /** The contract asks for a check with the official source (incomplete coverage, exceptions, undecided days). */
+  authorityCheckRequired: boolean;
 }
 
 export interface OwnLookup {
@@ -192,16 +202,9 @@ export function timezoneOf(code: string): string {
   return (JURISDICTION_TIMEZONES as Record<string, string[]>)[code]?.[0] ?? 'Europe/Prague';
 }
 
-let cachedView: { month: string; view: DrivingBansView } | null = null;
-
-/**
- * The published snapshot: the only source of verified driving-ban facts. The published
- * period follows the Prague month, so one snapshot serves every question of that month.
- */
+/** The published snapshot through the Driving Bans adapter: the only source of verified driving-ban facts. */
 export function publishedView(now: Date): DrivingBansView {
-  const month = isoDay(now).slice(0, 7);
-  if (cachedView?.month !== month) cachedView = { month, view: getDrivingBansSnapshot(now) as unknown as DrivingBansView };
-  return cachedView.view;
+  return readPublishedDrivingBans(now) as unknown as DrivingBansView;
 }
 
 export function lookupDrivingBans(
@@ -225,7 +228,7 @@ export function lookupDrivingBans(
         view: published,
       });
       const outcome = (answer.completeness.find((c) => c.jurisdiction === code)?.outcome ?? 'INSUFFICIENT_VERIFIED_DATA') as JurisdictionOutcome;
-      return { date, outcome, uids: answer.facts.map((fact) => String(fact.uid)) };
+      return { date, outcome, authority: answer.authority_check_required, uids: answer.facts.map((fact) => String(fact.uid)) };
     });
     const outcomes = perDay.map((d) => d.outcome);
     const outcome: JurisdictionOutcome = outcomes.includes('INSUFFICIENT_VERIFIED_DATA') ? 'INSUFFICIENT_VERIFIED_DATA'
@@ -238,6 +241,7 @@ export function lookupDrivingBans(
       verificationState: row?.verification_state ?? 'UNVERIFIED',
       lastVerified: row?.last_verified ?? null,
       period: { from: published.window.from, to: published.window.to },
+      authorityCheckRequired: perDay.some((d) => d.authority),
     };
 
     for (const uid of [...new Set(perDay.flatMap((d) => d.uids))]) {
@@ -271,7 +275,8 @@ export interface FindingLike {
 }
 
 const TOPIC_TYPES: Record<Topic, string[]> = {
-  driving_ban: ['driving_ban'],
+  // Driving bans: the registry is the only DAJC source (see the header).
+  driving_ban: [],
   oversize_permit: ['permit_change', 'permit_system'],
   dimensions_weights: ['bridge_restriction', 'tunnel_restriction', 'operational_change', 'equipment'],
   escort: ['escort_requirement', 'police_escort'],
@@ -303,7 +308,13 @@ export function findingLeads(
   return [...new Set(urls)].slice(0, max);
 }
 
-/** URLs DAJC already holds (registry sources and findings) - not "new" for the review queue. */
-export function knownSourceUrls(view: Pick<DrivingBansView, 'sources'>, findings: FindingLike[] = loadFindings()): Set<string> {
-  return new Set([...view.sources.map((s) => s.url), ...findings.map((f) => f.sourceUrl).filter((u): u is string => Boolean(u))]);
+/**
+ * URLs DAJC already holds - not "new" for the review queue. For driving bans only the
+ * registry's own sources count: a page known only from the Weekly is still new to the
+ * Driving Bans review layer.
+ */
+export function knownSourceUrls(view: Pick<DrivingBansView, 'sources'>, findings: FindingLike[] = loadFindings(), topic?: Topic): Set<string> {
+  const registry = view.sources.map((s) => s.url);
+  if (topic === 'driving_ban') return new Set(registry);
+  return new Set([...registry, ...findings.map((f) => f.sourceUrl).filter((u): u is string => Boolean(u))]);
 }

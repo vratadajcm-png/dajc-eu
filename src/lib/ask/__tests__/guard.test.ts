@@ -70,6 +70,14 @@ describe('information about rules only - no "you can" / "you risk a fine"', () =
     'Grozi panu mandat.',
     'Możesz jechać autostradą.',
     'Vous pouvez circuler le dimanche.',
+    'Your transport of perishable goods is exempt from the ban.',
+    'The exception applies to this transport.',
+    'Vaše přeprava je ze zákazu vyjmuta.',
+    'Výjimka se na tuto přepravu vztahuje.',
+    'Na túto prepravu sa výnimka vzťahuje.',
+    'Twój pojazd jest zwolniony z zakazu.',
+    'Ihr Lkw ist vom Fahrverbot ausgenommen.',
+    'Diese Fahrt ist erlaubt.',
   ])('rejects %j', (text) => {
     expect(forbiddenPhrase(text)).not.toBeNull();
   });
@@ -80,6 +88,9 @@ describe('information about rules only - no "you can" / "you risk a fine"', () =
     'Lkw über 7,5 t dürfen sonntags nicht fahren; sie dürfen nur mit Ausnahmegenehmigung fahren.',
     'Pojazdy powyżej 12 t nie mogą poruszać się w niedziele.',
     'Za porušení zákazu stanoví zákon pokutu.',
+    'Zákaz se nevztahuje na přepravu zkazitelných potravin.',
+    'Perishable goods are listed as an exception to the Sunday ban.',
+    'Vom Fahrverbot ausgenommen sind Fahrten mit leicht verderblichen Lebensmitteln.',
   ])('keeps impersonal %j', (text) => {
     expect(forbiddenPhrase(text)).toBeNull();
   });

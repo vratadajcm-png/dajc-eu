@@ -15,11 +15,11 @@ launch checklist below is complete.
 | Step (§47.2) | Where | Notes |
 |---|---|---|
 | 1. Classification: country, topic, dimensions, date | `pipeline.ts`, OpenAI | Output re-validated in code (tracked jurisdictions, ISO dates). E-mail addresses and phone numbers are removed before any provider sees the question. |
-| 2. DAJC's own verified data | `own-data.ts` | Driving bans only from the published Driving Bans registry (`getDrivingBansSnapshot`) through the shared contract `answerFreeAskQuery` (`src/lib/intelligence/driving-bans-ai-contract.ts`). No second registry, no own rule expansion. EU Oversize Weekly findings are all `unverified`, so only their official-tier URLs serve as leads. |
+| 2. DAJC's own verified data | `own-data.ts` | Driving bans only from the published Driving Bans registry, read through `readPublishedDrivingBans()` (`src/lib/intelligence/driving-bans-adapter.ts`) and evaluated by the shared contract `answerFreeAskQuery` (`src/lib/intelligence/driving-bans-ai-contract.ts`). No second registry, no own rule expansion, no cache. EU Oversize Weekly findings are all `unverified`, so only their official-tier URLs serve as leads, and never for driving bans. |
 | 3. Official domains where DAJC data cannot answer | `pipeline.ts`, Perplexity | `search_domain_filter = officialDomainsFor()` from `scripts/lib/source-policy.mjs`. The search engine receives classifier keywords, never the question. For driving bans only countries with `INSUFFICIENT_VERIFIED_DATA` are searched, and what is found stays an unverified lead (below). |
 | 4. Fetch and read the sources | `official-sources.ts`, `text.ts` | `fetchTextWithRetry()` from `scripts/lib/fetch-source.mjs`; a URL is used only if `isOfficialPublisher()` holds before and after redirects. PDFs are skipped in Phase 1. |
 | 5. Draft only from the sources | `prompts.ts`, OpenAI | Each statement cites one source and quotes it verbatim. Sources and the question travel in randomly delimited blocks declared as untrusted data. |
-| 6a. Deterministic check | `guard.ts` | Source from the allowed set; quote found verbatim; every number in the statement also in the quote; no digits at all for DAJC data (facts come from the template); no "you can / vám hrozí" wording; answer language = question language. A failing statement is not shown. |
+| 6a. Deterministic check | `guard.ts` | Source from the allowed set; quote found verbatim; every number in the statement also in the quote; no digits at all for DAJC data (facts come from the template); no "you can / vám hrozí / your transport / tuto přepravu" wording (no decision on an exception, an authorisation or a permit for a specific transport); answer language = question language. A failing statement is not shown. |
 | 6b. Independent check | `prompts.ts`, Anthropic | Checks that each source contains its statement and that it is not personal advice. **Any disagreement → the whole answer is NEVÍM** (owner decision). |
 | 7. Output | `pipeline.ts`, `facts.ts` | OVĚŘENO / ČÁSTEČNĚ / NEVÍM / NEDOSTATEK OVĚŘENÝCH DAT, for driving bans the registry verification of every asked country, sources with links and check dates, the visible AI label and the `/support` link (voluntary, no benefit). |
 | 8. Human review queue | `dajc_ask.review_queue` | New official URLs only — no user, question or e-mail. Nothing is ever written to `data/`. Driving-ban leads are handed to the Driving Bans review layer offline (`npm run driving-bans:web-leads`). |
@@ -31,22 +31,35 @@ Levels:
   additionally: every asked country is verified in full in the registry and
   decided on every asked day, and the answer cites the registry.
 - **ČÁSTEČNĚ / PARTIAL** — every shown statement passed both checks, but the
-  answer does not cover everything (a statement was dropped, a country is
-  missing, or registry coverage of a country is incomplete or undecided).
+  answer does not cover everything (a statement was dropped or a country is
+  missing). For driving bans only when the registry itself decides every
+  asked country.
 - **NEDOSTATEK OVĚŘENÝCH DAT / INSUFFICIENT VERIFIED DATA** — driving bans
-  only: the registry cannot decide the question, and no registry statement is
-  shown. Official pages may be quoted as unverified leads. Missing information
-  never means that there is no ban.
+  only: an asked country is not verified in full or not decided on an asked
+  day. Verified registry facts that exist (e.g. a verified ban in a country
+  whose coverage is incomplete) are still shown as verified; official pages
+  may be quoted as unverified leads. Missing information never means that
+  there is no ban.
 - **NEVÍM / DON'T KNOW** — out of scope, no country, no source, no passing
   statement, or any disagreement in the independent check (for driving bans
   only when the registry itself decides every asked country).
+
+Driving-ban answers also show a next step that follows the shared contract
+(`next_step`, `authority_check_required`): check with the authority when the
+data are insufficient, confirm the restriction, exceptions and permit
+conditions with the official source when the contract asks for it, otherwise
+re-check before departure.
 
 ## Driving bans: one authoritative registry (Driving Bans 2.0)
 
 The free Ask, paid DAJC Intelligence and paid DAJC AI read the same published
 registry and the same legal verification state. Confirmed driving-ban facts
-come only from `getDrivingBansSnapshot()` — the data of `/driving-bans`, its
-JSON and ICS — through the shared contract of PR #84:
+come only from the published snapshot — the data of `/driving-bans`, its JSON
+and ICS — read through `readPublishedDrivingBans()` in
+`driving-bans-adapter.ts` and evaluated by the shared contract of PR #84.
+`npm run lint:driving-bans` fails if code in `src/lib/ask` reads canonical
+data, staging evidence or the review layer directly, or reaches the paid
+authorisation path.
 
 | | Free Ask DAJC AI | Paid DAJC AI (not released) |
 |---|---|---|
@@ -65,17 +78,33 @@ For every asked country and day the registry answers:
 - `INSUFFICIENT_VERIFIED_DATA` — anything else, including any date outside
   the published period.
 
-Each driving-ban answer lists this per country with the published period and
-the date of last verification. Exceptions are listed as published and never
-assessed for a specific transport.
+Each driving-ban answer lists this per country with the published period,
+whether the country is verified in full and the date of last verification.
+Exceptions are listed as published and never assessed for a specific
+transport.
+
+What the AI may and may not do on driving bans:
+
+- **May:** explain a verified rule, list documented exceptions, show sources
+  and verification dates, recommend the next check. Comparing a vehicle or
+  route segments with the rules is paid DAJC AI (`evaluate_vehicle`,
+  `check_route`), not part of the free Ask.
+- **May not:** confirm that a journey is authorised without sufficient data,
+  decide whether an exception applies, issue or grant a permit, change an
+  approved route, or present a web page as a completed legal review.
+- **Future extension, not implemented:** suggesting alternative departure
+  times or routes around a ban. Any such suggestion must always be labelled
+  as a recommendation ("doporučení"), never as an authorisation, a decision
+  on an exception or a change of an approved route.
 
 ### Official web findings are leads, not verification
 
 Where the registry answers `INSUFFICIENT_VERIFIED_DATA`, official domains may
 be searched. A statement quoted from such a page is marked "neověřeno DAJC",
-never raises the answer above ČÁSTEČNĚ (and only together with registry
-facts), and changes the AI label to say so. New pages go to
-`dajc_ask.review_queue` and are handed to the Driving Bans review layer:
+the model receives the page as `official-web-unverified`, the answer stays
+NEDOSTATEK OVĚŘENÝCH DAT, and the AI label says so. Pages that are not
+already among the registry's own sources go to `dajc_ask.review_queue` and are
+handed to the Driving Bans review layer:
 
 ```bash
 psql "$ADMIN_DB_URL" -At -c "select coalesce(json_agg(json_build_object('url', url, 'jurisdiction', jurisdiction, 'topic', topic, 'first_seen', first_seen)), '[]')
