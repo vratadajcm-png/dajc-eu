@@ -1,6 +1,6 @@
 ---
 title: "DAJC Invites Europe's Heavy Transport Professionals to Register for 2027 Platform Testing"
-description: "DAJC opens a public invitation for European heavy and oversized transport professionals to join pre-production testing from 4 January 2027 and outlines the separate Assistance research direction."
+description: "DAJC opens a public invitation for European heavy and oversized transport professionals to join pre-production testing planned for Q3 2027 and outlines the separate Assistance research direction."
 slug: "dajc-testing-2027-and-assistance"
 category: "platform"
 publishedAt: 2026-10-13
@@ -15,7 +15,9 @@ tags:
   - "testing 2027"
 ---
 
-**Czech Republic, 13 October 2026.** DAJC is inviting European heavy and oversized transport professionals to register for pre-production testing of the DAJC Platform, scheduled to begin on **4 January 2027**.
+**Schedule update — 27 October 2026:** Pre-production testing has been moved to **Q3 2027 (July–September)**. The originally announced 4 January 2027 date is no longer valid. Registration remains open; the exact start date will be confirmed later.
+
+**Czech Republic, 13 October 2026.** DAJC is inviting European heavy and oversized transport professionals to register for pre-production testing of the DAJC Platform, now planned for **Q3 2027 (July–September)**.
 
 Registration is already open to transport companies, owner-drivers, dispatchers, industrial shippers, escort operators, permit specialists, crane providers and other specialists who work on complex movements across national borders.
 
