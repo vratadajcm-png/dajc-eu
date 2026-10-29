@@ -129,6 +129,20 @@ Tvrdý strop běhu `DAJC_RESEARCH_RUN_BUDGET_USD` = 1,50 USD (vstup workflow), m
 nejvýše 60 požadavků. Skutečné náklady se účtují z hlášeného usage; přemýšlecí tokeny
 mohou výdaj zvýšit, strop ho nepřekročí.
 
+### Schválení vlastníka (29. 10. 2026)
+
+- Placená živá kontrola se stropem **1,50 USD** na běh: schváleno.
+- Druhý dodavatel pro nezávislou kontrolu: **Google Gemini** (vlastník přidá
+  `DAJC_RESEARCH_GEMINI_API_KEY` do `dajc-eu`).
+- Anthropic pro tyto omezené kontroly: existující klíč Weekly (`ANTHROPIC_API_KEY`) a
+  `claude-sonnet-5-5` s referenční cenou 2 / 10 USD za 1M tokenů (výchozí hodnoty ve
+  workflow, proměnné repozitáře je přepíšou). Výzkum v provozu má mít vlastní klíč.
+- Bezplatná kontrola `plan` v Actions (běh 40972192675): dostupné jen klíče Anthropic
+  (záložní klíč Weekly) a Perplexity; OpenAI, Gemini, xAI a Mistral v `dajc-eu` chybí.
+- Po nastavení výchozích hodnot (běh 40972794698): Anthropic (`claude-sonnet-5-5`) a
+  Perplexity nakonfigurované; odhad pro ně 0,55 USD. Klíč Gemini zatím chybí, placený běh
+  se proto nespustil (bez druhého dodavatele by se E2E zastavil jako nepřipravený).
+
 ### Klíče (postup pro vlastníka)
 
 Hodnoty klíčů se nikdy nekopírují do souborů ani logů. V `dajc-eu` jsou prokazatelně
