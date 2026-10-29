@@ -64,4 +64,30 @@ describe('live check harness (offline)', () => {
     expect(result.first_provider_state.blocked).toBe('MODEL_NOT_FOUND');
     expect(readFileSync('data/driving-bans/canonical.json', 'utf8')).toBe(before);
   });
+
+  it('never resends to a provider refused for credit in an earlier check of the same run', async () => {
+    const ai = createMockAiFetch({ brain: { extract: () => ({ ok: true, echo: 'DAJC' }), search: () => [] } });
+    let anthropicRequests = 0;
+    globalThis.fetch = (async (url: string, init: any) => {
+      // Recorded bake-off shape: Anthropic answers a low credit balance with HTTP 400.
+      if (String(url).includes('api.anthropic.com')) { anthropicRequests += 1; return new Response(JSON.stringify({ type: 'error', error: { type: 'invalid_request_error', message: 'Your credit balance is too low to access the Anthropic API.' } }), { status: 400 }); }
+      if (JSON.parse(init.body).model === 'dajc-nonexistent-model-check') return new Response(JSON.stringify({ error: { message: 'The model `dajc-nonexistent-model-check` does not exist', code: 'model_not_found' } }), { status: 404 });
+      return ai.fetchFn(url, init);
+    }) as typeof fetch;
+    const out = mkdtempSync(join(tmpdir(), 'dajc-live-')); dirs.push(out);
+    const summary: any = await main(['smoke,fallback', '--out', out], PROFILE_ENV);
+    expect(summary.checks).toEqual(['smoke', 'fallback']);
+    expect(summary.providers_blocked_for_run).toEqual({ anthropic: 'CREDIT_OR_BILLING' });
+    expect(anthropicRequests).toBe(1);
+    const smoke = JSON.parse(readFileSync(join(out, 'smoke.json'), 'utf8'));
+    expect(smoke.results.find((r: any) => r.provider === 'anthropic')).toMatchObject({ outcome: 'FAILED', audit: [{ error_category: 'CREDIT_OR_BILLING', http_status: 400, blocked_for_run: 'CREDIT_OR_BILLING' }] });
+    const fallback = JSON.parse(readFileSync(join(out, 'fallback.json'), 'utf8'));
+    expect(fallback.first).not.toBe('anthropic');
+    expect(fallback.second).not.toBe('anthropic');
+    // The deliberate unknown model blocks only that request, not the provider for later checks.
+    expect(fallback.first_provider_state.blocked).toBe('MODEL_NOT_FOUND');
+    expect(summary.providers_blocked_for_run[fallback.first]).toBeUndefined();
+    await expect(main(['smoke,smoke'], PROFILE_ENV)).rejects.toThrow(/Usage/);
+    await expect(main(['smoke,plan'], PROFILE_ENV)).rejects.toThrow(/Usage/);
+  });
 });

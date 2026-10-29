@@ -111,9 +111,11 @@ export function createOrchestrator({
   breakerThreshold = 3,
   breakerCooldownMs = 5 * 60_000,
   onAudit = () => {},
+  // Providers already refused earlier in the same run (id -> category), e.g. by a previous check.
+  blocked = {},
 }) {
   if (!limits) throw new Error('Explicit research limits are required');
-  const state = new Map(PROVIDER_IDS.map(id => [id, { failures: 0, openUntil: 0, blocked: null, lastCallAt: null }]));
+  const state = new Map(PROVIDER_IDS.map(id => [id, { failures: 0, openUntil: 0, blocked: blocked[id] ?? null, lastCallAt: null }]));
   const calls = [];
   let runSpent = 0, requests = 0;
 

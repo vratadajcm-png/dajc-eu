@@ -6,6 +6,7 @@
  *
  *   node scripts/driving-bans-research-live.mjs plan                 (free: configuration and budget)
  *   node scripts/driving-bans-research-live.mjs smoke|scenario|fallback|e2e|all [--out DIR]
+ *   node scripts/driving-bans-research-live.mjs smoke,fallback [--out DIR]   (several checks, one run)
  */
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -67,10 +68,18 @@ export function estimateBudget(env) {
   return { rows, total_usd_estimate: Math.round(total * 10_000) / 10_000, note: 'Estimate from list prices and generous token sizes (thinking tokens included in output); actual cost is booked from reported usage and capped by DAJC_RESEARCH_RUN_BUDGET_USD.' };
 }
 
-function orchestratorFor(env, { routes, ledger, budget }) {
+function orchestratorFor(env, { routes, ledger, budget, blocked = {} }) {
   const limits = { ...limitsFromEnv(env), runBudgetUsd: budget };
-  return createOrchestrator({ providers: createProviders({ env }), routes: { ...routesFromEnv(env), ...routes }, limits, ledger });
+  return createOrchestrator({ providers: createProviders({ env }), routes: { ...routesFromEnv(env), ...routes }, limits, ledger, blocked });
 }
+
+// Refusals tied to one model or one request; any other block (credit, key, tier, quota,
+// persistent rate limit) holds for the whole run, so later checks never resend to that provider.
+const REQUEST_SPECIFIC = new Set(['MODEL_NOT_FOUND', 'INVALID_REQUEST']);
+function carryBlocks(context, orchestrator) {
+  for (const [id, entry] of Object.entries(orchestrator.breakerState())) if (entry.blocked && !REQUEST_SPECIFIC.has(entry.blocked) && !context.blocked[id]) context.blocked[id] = entry.blocked;
+}
+const skipped = (provider, context) => ({ provider: provider.id, live_api: false, outcome: 'SKIPPED', blocked_for_run: context.blocked[provider.id], audit: [] });
 
 /** Cut one provision out of a long official text (deterministic); the full document hash stays the evidence. */
 export function sectionOf(text, section) {
@@ -98,7 +107,8 @@ export function compareWithRegistry(extraction, rule) {
 async function smoke(env, context) {
   const results = [];
   for (const provider of Object.values(createProviders({ env })).filter(p => p.configured)) {
-    const orchestrator = orchestratorFor(env, { routes: provider.id === 'perplexity' ? { discover: ['perplexity'] } : { extract: [provider.id] }, ledger: context.ledger, budget: context.remaining() });
+    if (context.blocked[provider.id]) { results.push(skipped(provider, context)); continue; }
+    const orchestrator = orchestratorFor(env, { routes: provider.id === 'perplexity' ? { discover: ['perplexity'] } : { extract: [provider.id] }, ledger: context.ledger, budget: context.remaining(), blocked: context.blocked });
     try {
       const result = provider.id === 'perplexity'
         ? await orchestrator.run('discover', { queries: ['Fahrverbot Lastkraftfahrzeuge Verordnung'], domains: ['ris.bka.gv.at'], maxResults: 3 }, { purpose: 'smoke test' })
@@ -109,6 +119,7 @@ async function smoke(env, context) {
       results.push({ provider: provider.id, live_api: true, outcome: 'FAILED', error: error.name, audit: orchestrator.calls() });
     }
     context.spend(orchestrator.spentThisRun());
+    carryBlocks(context, orchestrator);
   }
   return { check: 'smoke', results };
 }
@@ -124,7 +135,8 @@ async function scenario(env, context) {
   const window = { from: context.window.from, to: context.window.to };
   const results = [];
   for (const provider of Object.values(createProviders({ env })).filter(p => p.configured && p.id !== 'perplexity')) {
-    const orchestrator = orchestratorFor(env, { routes: { extract: [provider.id], extract_complex: [provider.id] }, ledger: context.ledger, budget: context.remaining() });
+    if (context.blocked[provider.id]) { results.push(skipped(provider, context)); continue; }
+    const orchestrator = orchestratorFor(env, { routes: { extract: [provider.id], extract_complex: [provider.id] }, ledger: context.ledger, budget: context.remaining(), blocked: context.blocked });
     try {
       const extracted = await extractRules({ orchestrator, jurisdiction: target.jurisdiction, window, document, text: section });
       const findings = extracted.ok ? extracted.extraction.rules.flatMap(r => checkExtractedRule(r, { text: section, jurisdiction: target.jurisdiction, window }).map(f => f.code)) : extracted.issues;
@@ -133,19 +145,20 @@ async function scenario(env, context) {
       results.push({ provider: provider.id, live_api: true, outcome: 'FAILED', error: error.name, audit: orchestrator.calls() });
     }
     context.spend(orchestrator.spentThisRun());
+    carryBlocks(context, orchestrator);
   }
   return { check: 'scenario', case_id: target.case_id, retrieval: { live: true, ok: true, url: fetched.final_url, sha256: fetched.sha256, bytes: fetched.byte_length, section_sha256: sha(section), section_chars: section.length }, expected: { registry_rule: rule.ban_id, schedule: rule.schedule, weight_threshold: rule.weight_threshold }, results };
 }
 
 async function fallback(env, context) {
-  const json = Object.values(createProviders({ env })).filter(p => p.configured && p.id !== 'perplexity');
-  if (json.length < 2) return { check: 'fallback', blocked: 'Needs two configured providers' };
+  const json = Object.values(createProviders({ env })).filter(p => p.configured && p.id !== 'perplexity' && !context.blocked[p.id]);
+  if (json.length < 2) return { check: 'fallback', blocked: 'Needs two configured providers that are not blocked in this run' };
   const [first, second] = json;
   // A real request with a model ID that does not exist: the provider's own refusal drives the failover.
   const invalid = 'dajc-nonexistent-model-check';
   const pricing = JSON.parse(env.DAJC_RESEARCH_PRICING_USD || '{}');
   const testEnv = { ...env, [`${PROVIDER_CATALOG[first.id].modelEnv}_EXTRACT`]: invalid, DAJC_RESEARCH_PRICING_USD: JSON.stringify({ ...pricing, [first.id]: { ...(pricing[first.id] ?? {}), models: { ...(pricing[first.id]?.models ?? {}), [invalid]: { input: 0, output: 0 } } } }) };
-  const orchestrator = orchestratorFor(testEnv, { routes: { extract: [first.id, second.id] }, ledger: context.ledger, budget: context.remaining() });
+  const orchestrator = orchestratorFor(testEnv, { routes: { extract: [first.id, second.id] }, ledger: context.ledger, budget: context.remaining(), blocked: context.blocked });
   const request = { system: 'Return JSON only, matching the schema.', user: 'Return {"ok": true, "echo": "DAJC"} exactly.', schema: SMOKE_SCHEMA, schemaName: 'dajc_smoke', maxOutputTokens: ESTIMATE.fallback.output };
   const outcomes = [];
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -153,6 +166,7 @@ async function fallback(env, context) {
     catch (error) { outcomes.push({ error: error.name }); }
   }
   context.spend(orchestrator.spentThisRun());
+  carryBlocks(context, orchestrator);
   const calls = orchestrator.calls();
   return { check: 'fallback', live_api: true, first: first.id, second: second.id, outcomes, first_provider_requests: calls.filter(call => call.provider === first.id).length, first_provider_state: orchestrator.breakerState()[first.id], audit: calls };
 }
@@ -167,7 +181,7 @@ async function e2e(env, context) {
     const parsed = JSON.parse(official.bytes.toString('utf8'));
     officialHits = [].concat(parsed?.OgdSearchResult?.OgdDocumentResults?.OgdDocumentReference ?? []).map(ref => ({ id: ref.Data.Metadaten.Technisch.ID, paragraph: ref.Data.Metadaten.Landesrecht?.LrKons?.ArtikelParagraphAnlage, html: [].concat(ref.Data.Dokumentliste.ContentReference).flatMap(c => [].concat(c.Urls.ContentUrl)).find(u => u.DataType === 'Html')?.Url })).filter(hit => hit.html);
   }
-  const orchestrator = createOrchestrator({ providers: createProviders({ env }), routes: routesFromEnv(env), limits: { ...limitsFromEnv(env), runBudgetUsd: context.remaining() }, ledger: context.ledger });
+  const orchestrator = createOrchestrator({ providers: createProviders({ env }), routes: routesFromEnv(env), limits: { ...limitsFromEnv(env), runBudgetUsd: context.remaining() }, ledger: context.ledger, blocked: context.blocked });
   let searchHits = [];
   try { searchHits = (await orchestrator.run('discover', { queries: target.search_queries, domains: target.search_domains, maxResults: 10 }, { purpose: 'E2E discovery', subject: target.jurisdiction })).results.map(hit => hit.url); }
   catch (error) { searchHits = [`search not run: ${error.name}`]; }
@@ -176,6 +190,7 @@ async function e2e(env, context) {
   const store = openResearchStore(join(context.out, 'research-store'));
   const report = await runResearch({ jurisdictions: [target.jurisdiction], mode: 'urgent', window: { from: context.window.from, to: context.window.to }, now: new Date(), rawCanonical: context.rawCanonical, snapshot: getDrivingBansSnapshot(new Date()), catalogEntries: [], authorityDomains: officialAuthorityDomains, orchestrator, store, fetchDocument: (url, allowed) => safeFetch(url, { allowedHosts: allowed }), leadUrls: leads, maxDocuments: leads.length, useSearch: false });
   context.spend(orchestrator.spentThisRun());
+  carryBlocks(context, orchestrator);
   return {
     check: 'e2e', jurisdiction: target.jurisdiction, document: target.title,
     steps: { discovery: { official_ris_ogd: { live: true, ok: official.ok, hits: officialHits.length }, perplexity: { live: !String(searchHits[0] ?? '').startsWith('search not run'), hits: searchHits } }, retrieval: report.source_retrieval, extraction_and_check: report.ai_analysis, independent_check: report.independent_check, deterministic_validation: 'existing review workflow as a dry run (no API)', legal_verification: report.legal_verification },
@@ -191,7 +206,8 @@ export async function main(argv = process.argv.slice(2), rawEnv = process.env) {
   const env = researchEnvironment(rawEnv);
   const readiness = researchReadiness(rawEnv);
   if (command === 'plan') return { readiness: { enabled: readiness.enabled, blockers: readiness.blockers, providers: readiness.providers.map(({ id, configured, missing }) => ({ id, configured, missing })), routes: readiness.routes, model_profile: readiness.model_profile.selected }, budget: estimateBudget(env), targets: LIVE_TARGETS };
-  if (!['smoke', 'scenario', 'fallback', 'e2e', 'all'].includes(command)) throw new Error('Usage: driving-bans-research-live.mjs plan|smoke|scenario|fallback|e2e|all [--out DIR]');
+  const names = command === 'all' ? Object.keys(CHECKS) : String(command ?? '').split(',');
+  if (!names.length || !names.every(name => Object.hasOwn(CHECKS, name)) || new Set(names).size !== names.length) throw new Error('Usage: driving-bans-research-live.mjs plan|smoke|scenario|fallback|e2e|all|<check,check> [--out DIR]');
   if (!readiness.enabled) return { status: 'DISABLED', blockers: readiness.blockers };
   const canonicalPath = resolve('data/driving-bans/canonical.json');
   const before = readFileSync(canonicalPath, 'utf8');
@@ -199,15 +215,15 @@ export async function main(argv = process.argv.slice(2), rawEnv = process.env) {
   mkdirSync(out, { recursive: true });
   const limits = limitsFromEnv(env);
   let spent = 0;
-  const context = { out, rawCanonical: JSON.parse(before), window: publicationWindow(new Date()), ledger: createLedger({ file: join(out, 'ledger.json') }), remaining: () => Math.max(0, limits.runBudgetUsd - spent), spend: usd => { spent += usd; } };
+  const context = { out, rawCanonical: JSON.parse(before), window: publicationWindow(new Date()), ledger: createLedger({ file: join(out, 'ledger.json') }), remaining: () => Math.max(0, limits.runBudgetUsd - spent), spend: usd => { spent += usd; }, blocked: {} };
   const results = [];
-  for (const name of command === 'all' ? Object.keys(CHECKS) : [command]) {
+  for (const name of names) {
     const result = await CHECKS[name](env, context);
     results.push(result);
     writeFileSync(join(out, `${name}.json`), JSON.stringify(result, null, 2) + '\n');
   }
   const unchanged = readFileSync(canonicalPath, 'utf8') === before;
-  const summary = { generated_at: new Date().toISOString(), checks: results.map(r => r.check), total_cost_usd: Math.round(spent * 1e6) / 1e6, run_budget_usd: limits.runBudgetUsd, canonical_unchanged: unchanged, promoted: false, note: 'live_api marks calls that reached a provider; retrieval, validation, change detection and proposals are deterministic code.' };
+  const summary = { generated_at: new Date().toISOString(), checks: results.map(r => r.check), total_cost_usd: Math.round(spent * 1e6) / 1e6, run_budget_usd: limits.runBudgetUsd, providers_blocked_for_run: context.blocked, canonical_unchanged: unchanged, promoted: false, note: 'live_api marks calls that reached a provider; retrieval, validation, change detection and proposals are deterministic code.' };
   writeFileSync(join(out, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
   if (!unchanged) throw new Error('canonical.json changed during a live check');
   return summary;
