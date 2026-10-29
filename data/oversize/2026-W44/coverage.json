@@ -1,6 +1,6 @@
 {
   "week": "2026-W44",
-  "checkedAt": "2026-10-28T11:43:57.385Z",
+  "checkedAt": "2026-10-29T10:01:36.953Z",
   "coverageVersion": "2026-10-22.50",
   "jurisdictions": [
     {
@@ -37,8 +37,8 @@
       "code": "AT",
       "name": "Austria",
       "sourceScope": "AT",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "at",
       "candidateFindings": 0
@@ -67,8 +67,8 @@
       "code": "BE",
       "name": "Belgium",
       "sourceScope": "BE",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "benelux",
       "candidateFindings": 0
@@ -121,14 +121,14 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "cz",
-      "candidateFindings": 5
+      "candidateFindings": 7
     },
     {
       "code": "DE",
       "name": "Germany",
       "sourceScope": "DE",
-      "status": "checked-major-or-short-update-candidates-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "de",
       "candidateFindings": 2
@@ -161,7 +161,7 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 3
+      "candidateFindings": 4
     },
     {
       "code": "FI",
@@ -247,18 +247,18 @@
       "code": "IT",
       "name": "Italy",
       "sourceScope": "IT",
-      "status": "checked-major-or-short-update-candidates-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "it",
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "KZ",
       "name": "Kazakhstan (European transport scope)",
       "sourceScope": "KZ",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-no-material-development-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "east",
       "candidateFindings": 0
@@ -327,11 +327,11 @@
       "code": "ME",
       "name": "Montenegro",
       "sourceScope": "ME",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-major-or-short-update-candidates-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "balkans",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "MK",
@@ -361,7 +361,7 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 8
+      "candidateFindings": 9
     },
     {
       "code": "NO",
@@ -377,8 +377,8 @@
       "code": "PL",
       "name": "Poland",
       "sourceScope": "PL",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-no-material-development-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "pl",
       "candidateFindings": 0
@@ -417,8 +417,8 @@
       "code": "RU",
       "name": "Russia (European transport scope)",
       "sourceScope": "RU",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-no-material-development-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "east",
       "candidateFindings": 0
@@ -437,11 +437,11 @@
       "code": "SI",
       "name": "Slovenia",
       "sourceScope": "SI",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-major-or-short-update-candidates-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "si-hr",
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "SK",
@@ -467,8 +467,8 @@
       "code": "TR",
       "name": "Türkiye (European transport scope)",
       "sourceScope": "TR",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-no-material-development-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "east",
       "candidateFindings": 0
