@@ -29,7 +29,8 @@ const ruleSchema = obj({
   regions: arr(s), roads: arr(s), direction: ns,
   vehicle_scope: s,
   weight_combinator: { type: 'string', enum: ['single', 'any_of', 'all_of'] },
-  weight_conditions: arr(obj({ operator: { type: 'string', enum: ['>', '>=', '<', '<=', '=', 'any'] }, value: { type: ['number', 'null'] }, unit: { type: ['string', 'null'], enum: ['kg', 'm', 'axles', null] }, applies_to: s })),
+  // No null inside enum (Gemini enums take strings or numbers only; Anthropic rejects complex enum types).
+  weight_conditions: arr(obj({ operator: { type: 'string', enum: ['>', '>=', '<', '<=', '=', 'any'] }, value: { type: ['number', 'null'] }, unit: { anyOf: [{ type: 'string', enum: ['kg', 'm', 'axles'] }, { type: 'null' }] }, applies_to: s })),
   schedule: obj({ kind: { type: 'string', enum: ['weekly', 'dates', 'daily'] }, weekdays: arr({ type: 'integer' }), dates: arr(s), start_time: s, end_time: s, end_day_offset: { type: 'integer' } }),
   valid_from: ns, valid_to: ns, open_ended: { type: 'boolean' },
   timezone: ns,
@@ -95,7 +96,7 @@ export async function extractRules({ orchestrator, jurisdiction, window, documen
   const nonce = newNonce();
   const request = {
     system: extractionSystemPrompt(jurisdiction), user: extractionUserPrompt({ jurisdiction, window, document, text, nonce }),
-    schema: EXTRACTION_SCHEMA, schemaName: 'driving_ban_extraction', maxOutputTokens: 8_000,
+    schema: EXTRACTION_SCHEMA, schemaName: 'driving_ban_extraction', maxOutputTokens: 12_000,
     ...(text === null ? { document: { mediaType: 'application/pdf', base64: document.bytes.toString('base64') } } : {}),
   };
   const result = await orchestrator.run('extract', request, { purpose: 'legal rule extraction', subject: `${jurisdiction}:${document.sha256.slice(0, 12)}`, dataClass: 'public-legal', excludeVendors, needsPdf: text === null });

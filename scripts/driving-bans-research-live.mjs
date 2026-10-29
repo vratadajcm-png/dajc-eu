@@ -35,7 +35,8 @@ export const LIVE_TARGETS = Object.freeze({
   },
 });
 /** Reference prices (USD) and token sizes used for the pre-approval estimate; real costs come from reported usage. */
-export const ESTIMATE = Object.freeze({ smoke: { input: 400, output: 1024 }, scenario: { input: 4_000, output: 6_000 }, fallback: { input: 400, output: 1024 }, e2e_extraction: { input: 3_500, output: 8_000 }, e2e_check: { input: 5_000, output: 6_000 }, search_request: 0.005 });
+// Output sizes match the request limits (adaptive thinking counts towards them on Claude).
+export const ESTIMATE = Object.freeze({ smoke: { input: 400, output: 2_048 }, scenario: { input: 4_000, output: 12_000 }, fallback: { input: 400, output: 2_048 }, e2e_extraction: { input: 3_500, output: 12_000 }, e2e_check: { input: 5_000, output: 8_000 }, search_request: 0.005 });
 
 const E2E_DOCUMENTS = 3;
 const SMOKE_SCHEMA = { type: 'object', additionalProperties: false, required: ['ok', 'echo'], properties: { ok: { type: 'boolean' }, echo: { type: 'string' } } };

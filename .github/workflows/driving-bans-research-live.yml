@@ -60,11 +60,13 @@ jobs:
           DAJC_RESEARCH_RUN_BUDGET_USD: ${{ inputs.run_budget_usd || vars.DAJC_RESEARCH_LIVE_RUN_BUDGET_USD || '1.50' }}
           DAJC_RESEARCH_MONTHLY_BUDGET_USD: ${{ vars.DAJC_RESEARCH_MONTHLY_BUDGET_USD || '5' }}
           DAJC_RESEARCH_MAX_REQUESTS_PER_RUN: '60'
-          # Models and prices without evidence in the bake-off must be set explicitly (no defaults).
-          DAJC_RESEARCH_ANTHROPIC_MODEL: ${{ vars.DAJC_RESEARCH_ANTHROPIC_MODEL }}
-          DAJC_RESEARCH_ANTHROPIC_EFFORT: ${{ vars.DAJC_RESEARCH_ANTHROPIC_EFFORT }}
+          # Anthropic is not benchmarked (bake-off key without credit), so the profile does not pick it.
+          # For these capped checks the owner approved (2026-10-29) Claude Sonnet 5.5 at the bake-off
+          # reference price of 2 / 10 USD per 1M tokens; repository variables override both.
+          DAJC_RESEARCH_ANTHROPIC_MODEL: ${{ vars.DAJC_RESEARCH_ANTHROPIC_MODEL || 'claude-sonnet-5-5' }}
+          DAJC_RESEARCH_ANTHROPIC_EFFORT: ${{ vars.DAJC_RESEARCH_ANTHROPIC_EFFORT || 'medium' }}
           DAJC_RESEARCH_MISTRAL_MODEL: ${{ vars.DAJC_RESEARCH_MISTRAL_MODEL }}
-          DAJC_RESEARCH_PRICING_USD: ${{ vars.DAJC_RESEARCH_PRICING_USD }}
+          DAJC_RESEARCH_PRICING_USD: ${{ vars.DAJC_RESEARCH_PRICING_USD || '{"anthropic":{"input":2,"output":10}}' }}
           # Dedicated research keys first; the existing Weekly keys of this repository only as an
           # explicit fallback for these capped checks. Values never appear in logs or artifacts.
           DAJC_RESEARCH_ANTHROPIC_API_KEY: ${{ secrets.DAJC_RESEARCH_ANTHROPIC_API_KEY || secrets.ANTHROPIC_API_KEY }}
