@@ -45,6 +45,8 @@ permissions:
   contents: write
   pull-requests: write
   actions: write
+  # Lets the release step read the PR's required checks.
+  checks: read
 
 concurrency:
   group: oversize-weekly-publish
@@ -189,37 +191,51 @@ jobs:
       - name: Open reviewed publication PR or persist data-only refresh
         id: gate
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true'
+        env:
+          # Optional owner fine-grained token (this repository only; Contents:
+          # read, Pull requests: read and write). A PR it opens runs its CI at
+          # once; a PR opened by github-actions[bot] waits for workflow approval.
+          DAJC_WEEKLY_PR_TOKEN: ${{ secrets.DAJC_WEEKLY_PR_TOKEN }}
         run: node scripts/publish-gate-commit.mjs
 
-      # Autonomous release of a Claude-approved final edition: wait for the
-      # required checks dispatched on the PR branch, then merge within the
-      # main ruleset (no bypass). The article is public from its Friday
-      # 12:00 Europe/Prague slot. A failed check leaves the PR for a human.
+      # Autonomous release of a Claude-approved final edition: merge within
+      # the main ruleset (no bypass) as soon as it allows it. The ruleset
+      # counts only the PR's pull_request CI, which GitHub holds for approval
+      # on a PR opened by github-actions[bot] (W45, 29 October 2026), so an
+      # unattended release needs the PR opened with DAJC_WEEKLY_PR_TOKEN.
+      # The article is public from its Friday 12:00 Europe/Prague slot. A
+      # failed check leaves the PR for a human.
       - name: Release the approved edition after required checks
         if: steps.gate.outputs.auto_merge == 'true'
         timeout-minutes: 30
         shell: bash
         env:
           PR_URL: ${{ steps.gate.outputs.pr_url }}
-        # The checks are the workflow_dispatch runs started by the gate step;
-        # pull_request runs on a GITHUB_TOKEN-created PR wait for approval
-        # and are not counted.
+          UNATTENDED: ${{ steps.gate.outputs.unattended }}
         run: |
-          passed=0
-          for attempt in $(seq 1 60); do
-            passed=$(gh pr checks "$PR_URL" --json name,bucket \
-              --jq '[.[] | select(.bucket == "pass") | .name | select(. == "application-validate" or . == "news-validate")] | unique | length' 2>/dev/null || echo 0)
-            echo "required checks passed: ${passed:-0}/2"
-            [ "${passed:-0}" -ge 2 ] && break
-            sleep 20
-          done
-          if [ "$passed" -lt 2 ]; then
-            echo "::error::Required checks did not both pass; the edition waits for human review: $PR_URL"
+          if [ "$UNATTENDED" != "true" ]; then
+            echo "::error::Claude approved this edition, but GitHub holds the CI of a PR opened by github-actions[bot] until a user with write access approves it. Approve the pending workflows on $PR_URL and merge it, or add the DAJC_WEEKLY_PR_TOKEN secret so the edition is released unattended."
             exit 1
           fi
-          gh pr merge "$PR_URL" --squash
-          echo "### EU Oversize Weekly released" >> "$GITHUB_STEP_SUMMARY"
-          echo "$PR_URL merged after required checks; public from its Friday 12:00 Europe/Prague slot." >> "$GITHUB_STEP_SUMMARY"
+          for attempt in $(seq 1 50); do
+            if result=$(gh pr merge "$PR_URL" --squash 2>&1); then
+              echo "$result"
+              echo "### EU Oversize Weekly released" >> "$GITHUB_STEP_SUMMARY"
+              echo "$PR_URL merged after required checks; public from its Friday 12:00 Europe/Prague slot." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "attempt $attempt: not mergeable yet: $(printf '%s' "$result" | tr '\n' ' ' | cut -c1-300)"
+            # gh exits non-zero while checks are pending; the count is still printed.
+            failed=$(gh pr checks "$PR_URL" --required --json bucket \
+              --jq '[.[] | select(.bucket == "fail" or .bucket == "cancel")] | length' 2>/dev/null || true)
+            if [ "${failed:-0}" != "0" ]; then
+              echo "::error::A required check failed; the edition waits for human review: $PR_URL"
+              exit 1
+            fi
+            sleep 30
+          done
+          echo "::error::The ruleset did not allow the merge within 25 minutes; the edition waits for human review: $PR_URL"
+          exit 1
 
       - name: Alert when Claude withheld the release
         if: steps.review.outcome == 'failure'
