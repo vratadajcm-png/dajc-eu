@@ -143,7 +143,9 @@ xAI a Mistral jsou jen v `dajc-ai-bakeoff` a do jiného repozitáře se nepřen�
    použije klíče Weekly).
 3. Pro Anthropic nastavte proměnné `DAJC_RESEARCH_ANTHROPIC_MODEL` (např. `claude-sonnet-5-5`)
    a cenu v `DAJC_RESEARCH_PRICING_USD` (profil ho bez smoke testu nevybere).
-4. Přidejte štítek `research-live-check` na PR #88.
+4. Přidejte štítek `research-live-plan` na PR #88 (zdarma: ověří, které klíče, modely a ceny
+   workflow skutečně vidí, jen podle názvů, a spočítá rozpočet).
+5. Po kontrole plánu přidejte štítek `research-live-check` (placený běh se stropem).
 
 ## 7. Akceptační podmínky
 

@@ -7,8 +7,10 @@ name: Driving Bans research live check
 # promoted, approved, merged or published, and canonical.json is checked unchanged.
 #
 # Runs ONLY when the owner approves a run: by adding the label "research-live-check" to a
-# pull request of this repository, or by a manual dispatch once merged. Never on push or
-# on a schedule. Costs are capped by the run budget below and booked from reported usage.
+# pull request of this repository (paid checks), or "research-live-plan" (free: shows which
+# keys, models and prices are configured, by name only, and the budget estimate), or by a
+# manual dispatch once merged. Never on push or on a schedule. Costs are capped by the run
+# budget below and booked from reported usage.
 
 on:
   pull_request:
@@ -35,7 +37,7 @@ concurrency:
 
 jobs:
   live:
-    if: github.event_name == 'workflow_dispatch' || (github.event.label.name == 'research-live-check' && github.event.pull_request.head.repo.full_name == github.repository)
+    if: github.event_name == 'workflow_dispatch' || ((github.event.label.name == 'research-live-check' || github.event.label.name == 'research-live-plan') && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -72,7 +74,7 @@ jobs:
           DAJC_RESEARCH_XAI_API_KEY: ${{ secrets.DAJC_RESEARCH_XAI_API_KEY }}
           DAJC_RESEARCH_MISTRAL_API_KEY: ${{ secrets.DAJC_RESEARCH_MISTRAL_API_KEY }}
           # Passed as data, never interpolated into the shell; the script accepts known check names only.
-          LIVE_CHECK: ${{ inputs.check || 'all' }}
+          LIVE_CHECK: ${{ inputs.check || (github.event.label.name == 'research-live-plan' && 'plan') || 'all' }}
         run: node scripts/driving-bans-research-live.mjs "$LIVE_CHECK" --out artifacts/driving-bans/research-live
 
       - name: canonical.json unchanged
