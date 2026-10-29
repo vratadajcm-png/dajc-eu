@@ -180,8 +180,8 @@ git(['push', 'origin', `HEAD:refs/heads/${branch}`]);
 // (W45, 29 October 2026). A PR opened with the owner's DAJC_WEEKLY_PR_TOKEN
 // runs its CI at once, so the release step can merge it unattended. Without
 // the token, or if GitHub rejects it, the bot opens the PR and both trusted CI
-// workflows are dispatched on the exact content branch
-// as an early signal for the human reviewer.
+// workflows are dispatched on the content branch as an early signal for the
+// human reviewer.
 const prToken = process.env.DAJC_WEEKLY_PR_TOKEN || '';
 const temporary = mkdtempSync(path.join(tmpdir(), 'dajc-publication-pr-'));
 try {
