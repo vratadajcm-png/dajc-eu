@@ -149,10 +149,14 @@ export function registerProductionDrivingBanTests(test, a) {
     const oct = at(new Date('2026-10-01T08:00:00Z'));
     a.equal(oct.jurisdictions.filter(j => j.coverage_complete).length, 11, 'DE downgraded by open Laender low-water scope (1 Oct 2026)');
     a.ok(oct.jurisdictions.every(j => !j.coverage_failures.includes('ACTIVE_WINDOW_NOT_REVERIFIED')));
+    // The 27 Oct 2026 priority review extended the reviewed span to 31 Dec 2026.
     const nov = at(new Date('2026-11-01T08:00:00Z'));
-    a.equal(nov.jurisdictions.filter(j => j.coverage_complete).length, 0);
-    a.ok(nov.jurisdictions.every(j => j.ban_state !== 'NO_BAN' && j.coverage_failures.includes('ACTIVE_WINDOW_NOT_REVERIFIED')));
-    a.ok(!nov.events.some(e => e.date > '2026-11-30'), 'no extrapolation beyond the reviewed span');
+    a.equal(nov.jurisdictions.filter(j => j.coverage_complete).length, 11);
+    a.ok(nov.jurisdictions.every(j => !j.coverage_failures.includes('ACTIVE_WINDOW_NOT_REVERIFIED')));
+    const dec = at(new Date('2026-12-01T08:00:00Z'));
+    a.equal(dec.jurisdictions.filter(j => j.coverage_complete).length, 0);
+    a.ok(dec.jurisdictions.every(j => j.ban_state !== 'NO_BAN' && j.coverage_failures.includes('ACTIVE_WINDOW_NOT_REVERIFIED')));
+    a.ok(!dec.events.some(e => e.date > '2026-12-31'), 'no extrapolation beyond the reviewed span');
   });
   test('1 Oct 2026 rollover: Oct-Nov window stays verified (11 full, 0 NO_BAN), no ACTIVE_WINDOW_NOT_REVERIFIED', () => {
     const v = at(new Date('2026-10-01T08:30:00Z'));
@@ -177,5 +181,55 @@ export function registerProductionDrivingBanTests(test, a) {
     a.ok(de.coverage_failures.includes('SAARLAND_LOW_WATER_EXTENSION_STATUS_NOT_PRIMARY_VERIFIED'));
     a.ok(one(v, 'de-sunday', '2026-10-04') && one(v, 'de-holiday-2026-10-03', '2026-10-03'));
     a.ok(one(v, 'de-sunday', '2026-10-04').exceptions.some(x => /North Rhine-Westphalia/.test(x)));
+  });
+  // 27 Oct 2026 priority review of November-December 2026 (data/driving-bans/source-reviews/2026-10-27-nov-dec.json).
+  const NOVDEC = new Date('2026-11-01T08:00:00Z');
+  test('27 Oct 2026 — Christmas edge cases follow the exact legal text', () => {
+    const v = at(NOVDEC);
+    a.ok(one(v, 'ch-holidays-2026-12', '2026-12-25'));
+    a.ok(!v.events.some(e => e.jurisdiction === 'CH' && e.date === '2026-12-26' && e.start_time === '00:00'), 'CH: 26 Dec is no ban day when Christmas is a Friday');
+    a.deepEqual(ev(v, 'pl-holidays-2026-12').map(e => [e.date, e.start_time, e.end_time]), [['2026-12-25', '08:00', '22:00'], ['2026-12-26', '08:00', '22:00']]);
+    a.ok(!v.events.some(e => e.jurisdiction === 'PL' && e.date === '2026-12-24'), 'PL: 24 Dec is a day off but not a ban day, and has no eve ban');
+    a.deepEqual(v.events.filter(e => e.jurisdiction === 'SK' && e.date >= '2026-12-24').map(e => e.date), ['2026-12-27'], 'SK: the Christmas rest block ends on Sunday');
+    a.deepEqual(ev(v, 'hr-holiday-eve-2026-12-24').map(e => [e.start_time, e.end_time]), [['15:00', '23:00']]);
+    a.deepEqual(ev(v, 'hr-holiday-last-day-sunday-2026-12-27').map(e => [e.date, e.start_time]), [['2026-12-27', '12:00']]);
+    a.deepEqual(ev(v, 'it-sundays-holidays-dec-2026').map(e => e.date), ['2026-12-06', '2026-12-08', '2026-12-13', '2026-12-20', '2026-12-25', '2026-12-26', '2026-12-27']);
+    a.deepEqual(ev(v, 'cz-holidays-2026-christmas').map(e => e.date), ['2026-12-24', '2026-12-25', '2026-12-26']);
+    a.deepEqual(ev(v, 'lu-germany-christmas-2026').map(e => e.date), ['2026-12-24', '2026-12-25']);
+    a.deepEqual(ev(v, 'lu-france-christmas-2026').map(e => e.date), ['2026-12-24']);
+  });
+  test('27 Oct 2026 — Hungary: continuous ban from 24 Dec 22:00 to 27 Dec 22:00', () => {
+    const v = at(NOVDEC);
+    const hu = v.events.filter(e => e.jurisdiction === 'HU' && e.ends_at > '2026-12-24T00:00:00Z' && e.starts_at < '2026-12-28T00:00:00Z').sort((x, y) => x.starts_at.localeCompare(y.starts_at));
+    a.equal(hu[0].starts_at, '2026-12-24T21:00:00.000Z');
+    a.equal(hu.at(-1).ends_at, '2026-12-27T21:00:00.000Z');
+    for (let i = 1; i < hu.length; i++) a.ok(hu[i].starts_at <= hu[i - 1].ends_at, 'no gap in the holiday block');
+  });
+  test('27 Oct 2026 — LI, LU and AT standing rules no longer stop at the 31 Oct published window', () => {
+    const v = at(NOVDEC);
+    for (const [id, date] of [['li-night', '2026-12-15'], ['li-sunday', '2026-11-08'], ['lu-france-weekend', '2026-12-05'], ['lu-germany-weekend', '2026-11-14'], ['at-saturday', '2026-11-07'], ['at-sunday', '2026-12-27'], ['at-night', '2026-12-31']]) a.ok(one(v, id, date), `${id} ${date}`);
+    a.ok(one(v, 'li-holidays-2026-12', '2026-12-08') && one(v, 'at-holidays-2026-12', '2026-12-08'));
+    const holidayNight = one(v, 'at-igl-a12-winter-holiday-2026-12', '2026-12-08');
+    a.equal(holidayNight.start_time, '23:00');
+    a.ok(!one(v, 'at-igl-a12-winter-weekday-2026', '2026-12-08'), 'A12 holiday nights start at 23:00, not 20:00');
+    a.ok(one(v, 'at-saturday', '2026-12-12').exceptions.some(x => /last two Saturdays before 24 December/.test(x)));
+  });
+  test('27 Oct 2026 — Germany: 25-26 Dec published, jurisdiction stays fail-closed on low-water exemptions', () => {
+    const v = at(NOVDEC);
+    a.deepEqual(ev(v, 'de-holiday-2026-12-25-26').map(e => e.date), ['2026-12-25', '2026-12-26']);
+    const de = v.jurisdictions.find(j => j.jurisdiction === 'DE');
+    a.equal(de.coverage_complete, false);
+    a.ok(de.coverage_failures.includes('LOW_WATER_EXEMPTIONS_AFTER_2026_10_31_NOT_PRIMARY_CONFIRMED'));
+  });
+  test('27 Oct 2026 — unreviewed jurisdictions publish nothing in December and say why', () => {
+    const v = at(NOVDEC);
+    const reviewed = new Set(['CH', 'CZ', 'FR', 'HR', 'HU', 'IT', 'LI', 'LU', 'PL', 'SI', 'SK', 'AT', 'DE']);
+    a.ok(!v.events.some(e => !reviewed.has(e.jurisdiction) && e.date >= '2026-12-01'));
+    for (const j of v.jurisdictions.filter(row => !reviewed.has(row.jurisdiction))) a.ok(j.coverage_failures.includes('NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED'), j.jurisdiction);
+    const log = JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-10-27-nov-dec.json', import.meta.url), 'utf8'));
+    a.equal(log.full_registry_sweep, false);
+    a.deepEqual(log.coverage_matrix.map(row => row.jurisdiction), coverage.map(([code]) => code));
+    const sources = new Map(current.sources.map(s => [s.source_id, s]));
+    for (const r of log.retrievals.filter(row => row.source_id)) a.equal(sources.get(r.source_id)?.content_sha256, r.sha256, r.source_id);
   });
 }

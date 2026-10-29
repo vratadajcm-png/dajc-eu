@@ -210,9 +210,10 @@ export function snapshot(data, identities, now = new Date()) {
 }
 const esc = value => String(value ?? '').replaceAll('\\','\\\\').replaceAll('\r','').replaceAll('\n','\\n').replaceAll(';','\\;').replaceAll(',','\\,');
 const stamp = value => value.replaceAll('-','').replaceAll(':','').replace(/\.\d{3}Z$/, 'Z');
+const utf8Length = c => { const cp = c.codePointAt(0); return cp < 0x80 ? 1 : cp < 0x800 ? 2 : cp < 0x10000 ? 3 : 4; };
 export function foldLine(line) {
   let out = '', length = 0;
-  for (const c of line) { const bytes = new TextEncoder().encode(c).length; if (length + bytes > 75) { out += '\r\n '; length = 1; } out += c; length += bytes; }
+  for (const c of line) { const bytes = utf8Length(c); if (length + bytes > 75) { out += '\r\n '; length = 1; } out += c; length += bytes; }
   return out;
 }
 export function toIcs(view, { countries = [], type = 'all', upcoming = true } = {}) {
