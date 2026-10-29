@@ -1,8 +1,9 @@
 # Driving Bans research – AI benchmark, diagnostika API a živé ověření
 
 > **Stav:** benchmark je zanalyzovaný, adaptéry jsou opravené a otestované proti
-> zaznamenaným chybám. **Živé ověření zatím neproběhlo**: v `dajc-eu` chybí klíč
-> druhého dodavatele a placené volání čeká na schválení rozpočtu (níže).
+> zaznamenaným chybám. Vlastník schválil placenou kontrolu se stropem 1,50 USD a druhého
+> dodavatele Google Gemini. **Živé ověření zatím neproběhlo**: v `dajc-eu` chybí secret
+> `DAJC_RESEARCH_GEMINI_API_KEY` (níže).
 
 ## 1. Zdroj
 
@@ -169,7 +170,7 @@ xAI a Mistral jsou jen v `dajc-ai-bakeoff` a do jiného repozitáře se nepřen�
 | 2 | příčiny Anthropic, Gemini, Mistral | identifikováno; Anthropic a Mistral jsou blokery účtu |
 | 3 | opravené adaptéry mají testy | splněno |
 | 4 | benchmark použitelný v orchestrátoru | splněno (opt-in profil, předběžný) |
-| 5 | živý E2E se dvěma nezávislými poskytovateli | **nesplněno**: chybí klíč druhého dodavatele v `dajc-eu` a schválení rozpočtu |
+| 5 | živý E2E se dvěma nezávislými poskytovateli | **nesplněno**: rozpočet schválen, chybí secret `DAJC_RESEARCH_GEMINI_API_KEY` v `dajc-eu` |
 | 6 | deterministická validace výstupu | připraveno v E2E; živě neprovedeno |
 | 7 | návrh před lidským schválením | připraveno v E2E; živě neprovedeno |
 | 8 | registr beze změny | splněno (testy, lint, kontrola ve workflow) |
