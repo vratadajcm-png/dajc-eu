@@ -68,13 +68,13 @@ describe('provider adapters (recorded-shape fixtures; no live API call)', () => 
     const ai = createMockAiFetch({ brain: emptyBrain, failures: { openai: { status: 401, remaining: 1 }, anthropic: { status: 503, remaining: 1 } } });
     const providers = createProviders({ env: testEnv(), fetchFn: ai.fetchFn });
     const unauthorised = await providers.openai.json(request).catch(error => error);
-    expect([unauthorised.message, unauthorised.retryable]).toEqual(['openai: HTTP 401', false]);
+    expect([unauthorised.message, unauthorised.category, unauthorised.retryable, unauthorised.blockProvider]).toEqual(['openai: AUTHENTICATION (HTTP 401)', 'AUTHENTICATION', false, true]);
     const overloaded = await providers.anthropic.json(request).catch(error => error);
-    expect([overloaded.message, overloaded.retryable]).toEqual(['anthropic: HTTP 503', true]);
+    expect([overloaded.message, overloaded.category, overloaded.retryable, overloaded.blockProvider]).toEqual(['anthropic: OVERLOADED (HTTP 503)', 'OVERLOADED', true, false]);
     expect(`${unauthorised.message} ${overloaded.message}`).not.toMatch(/prompt|test-key/);
     const off = createProvider('xai', { env: {}, fetchFn: ai.fetchFn });
     const calls = ai.log.length;
-    await expect(off.json(request)).rejects.toThrow(/not configured/);
+    await expect(off.json(request)).rejects.toThrow(/NOT_CONFIGURED/);
     expect(ai.log.length).toBe(calls);
   });
 });
@@ -234,6 +234,14 @@ describe('deterministic checks of an extraction', () => {
     expect(codes(rule, null)).toContain('QUOTES_NOT_MACHINE_VERIFIABLE');
     expect(codes({ ...rule, valid_from: null, valid_to: null, open_ended: false })).toContain('VALIDITY_MISSING');
     expect(checkExtractedRule({ ...rule, timezone: null, roads: [] }, { text, jurisdiction: 'RU', window: WINDOW }).map(item => item.code)).toEqual(expect.arrayContaining(['TIMEZONE_AMBIGUOUS', 'CORRIDOR_SCOPE_MISSING']));
+  });
+
+  it('rejects a mass in the wrong unit and a ban claim the document does not make', () => {
+    // 7.5 written as kg: a tonne figure in the wrong unit, even though "7,5" could appear in a quote.
+    expect(codes(extractedRule({ weight_conditions: [{ operator: '>', value: 12, unit: 'kg', applies_to: 'MAM of lorry' }] }))).toContain('WEIGHT_UNIT_SUSPECT');
+    // A model asserting a Sunday ban that this measure does not state cannot quote it.
+    const invented = extractedRule({ schedule: { kind: 'weekly', weekdays: [0], dates: [], start_time: '13:00', end_time: '22:00', end_day_offset: 0 }, evidence: [...extractedRule().evidence.filter((item: any) => !['schedule_dates', 'start_time', 'end_time'].includes(item.field)), { field: 'schedule_days', quote: 'v neděli od 13:00 do 22:00 hodin', provision: null, page: null }, { field: 'start_time', quote: 'v neděli od 13:00 do 22:00 hodin', provision: null, page: null }, { field: 'end_time', quote: 'v neděli od 13:00 do 22:00 hodin', provision: null, page: null }] });
+    expect(codes(invented)).toEqual(expect.arrayContaining(['QUOTE_NOT_IN_DOCUMENT', 'MISSING_EVIDENCE']));
   });
 
   it('drafts an UNVERIFIED canonical rule and never fills a missing value', () => {

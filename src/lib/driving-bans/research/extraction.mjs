@@ -156,6 +156,8 @@ export function checkExtractedRule(rule, { text, jurisdiction, window }) {
   for (const leaf of rule.weight_conditions) {
     if (leaf.operator === 'any') { if (leaf.value !== null || leaf.unit !== null) findings.push(finding('WEIGHT_INCONSISTENT', 'INSUFFICIENT_EVIDENCE', 'A category criterion carries a number')); continue; }
     if (leaf.value === null || leaf.unit === null || !(leaf.value > 0)) { findings.push(finding('WEIGHT_INCOMPLETE', 'INSUFFICIENT_EVIDENCE', `Criterion "${leaf.applies_to}" has no stated value and unit`)); continue; }
+    // 7.5 "kg" is a tonne figure in the wrong unit; no goods-vehicle mass criterion lies outside 1-100 t.
+    if (leaf.unit === 'kg' && (leaf.value < 1000 || leaf.value > 100_000)) { findings.push(finding('WEIGHT_UNIT_SUSPECT', 'INSUFFICIENT_EVIDENCE', `${leaf.value} kg looks like a unit error (tonnes given as kg?)`, { field: 'weight' })); continue; }
     const stated = numbersIn(quoteText('weight'));
     const ok = leaf.unit === 'kg' ? stated.some(n => n === leaf.value || Math.abs(n * 1000 - leaf.value) < 0.5) : stated.some(n => n === leaf.value);
     if (doc !== null && !ok) findings.push(finding('VALUE_NOT_IN_QUOTE', 'INSUFFICIENT_EVIDENCE', `${leaf.value} ${leaf.unit} does not appear in the weight quotes`, { field: 'weight' }));

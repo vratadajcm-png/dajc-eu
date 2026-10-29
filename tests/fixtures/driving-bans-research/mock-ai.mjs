@@ -45,9 +45,11 @@ export function supportAll(extraction) {
 /**
  * brain.extract({ provider, key, document, user }) and brain.verify({ provider, key, extraction }) return the
  * model JSON; brain.search({ queries, domains }) returns search results. key is the FIXTURE-KEY of the document.
- * failures: { anthropic: { status: 503, remaining: 3 } } makes a provider fail that many times.
+ * failures: { anthropic: { status: 503, remaining: 3, body?, headers?, throws? } } makes a provider fail that many
+ * times, with the given error body and headers (recorded bake-off shapes), or throw a fetch error (e.g. TimeoutError).
+ * transform(provider, response) may alter a successful vendor response (e.g. a truncated answer).
  */
-export function createMockAiFetch({ brain, failures = {} }) {
+export function createMockAiFetch({ brain, failures = {}, transform = (provider, response) => response }) {
   const log = [];
   const fetchFn = async (url, init) => {
     const provider = HOSTS[new URL(url).hostname];
@@ -56,8 +58,9 @@ export function createMockAiFetch({ brain, failures = {} }) {
     const failure = failures[provider];
     if (failure && failure.remaining > 0) {
       failure.remaining -= 1;
-      log.push({ provider, url, headers: init.headers, body, failed: failure.status ?? 503 });
-      return new Response('{"error":"upstream said: your prompt was ... and key test-key"}', { status: failure.status ?? 503 });
+      log.push({ provider, url, headers: init.headers, body, failed: failure.status ?? failure.throws ?? 503 });
+      if (failure.throws) throw Object.assign(new Error('fetch failed'), { name: failure.throws });
+      return new Response(JSON.stringify(failure.body ?? { error: 'upstream said: your prompt was ... and key test-key' }), { status: failure.status ?? 503, headers: failure.headers ?? {} });
     }
     if (provider === 'perplexity') {
       log.push({ provider, url, headers: init.headers, body, task: 'search' });
@@ -71,7 +74,8 @@ export function createMockAiFetch({ brain, failures = {} }) {
     const output = task === 'verify'
       ? (brain.verify?.({ provider, key, extraction: JSON.parse(between(user, 'EXTRACTION')), user }) ?? supportAll(JSON.parse(between(user, 'EXTRACTION'))))
       : brain.extract({ provider, key, document, user, pdf });
-    return Response.json(wrap(provider, body.model ?? `${provider}-test`, JSON.stringify(output)));
+    const model = body.model ?? new URL(url).pathname.split('/models/')[1]?.split(':')[0] ?? `${provider}-test`;
+    return Response.json(transform(provider, wrap(provider, model, JSON.stringify(output))));
   };
   return { fetchFn, log };
 }
