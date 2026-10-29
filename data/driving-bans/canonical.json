@@ -1,9 +1,9 @@
 {
  "schema_version": 1,
- "dataset_version": "2026-10-01.r3-fr-de-delta.geo50",
+ "dataset_version": "2026-10-27.r4-nov-dec-priority.geo50",
  "window": {
   "from": "2026-09-01",
-  "to": "2026-11-30"
+  "to": "2026-12-31"
  },
  "coverage_authority": "config/europe-coverage.mjs",
  "jurisdiction_reviews": {
@@ -11,7 +11,7 @@
    "verification_state": "UNVERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": false,
-   "last_checked": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-27T11:20:00.000Z",
    "last_verified": null,
    "source_ids": [
     "at-stvo42",
@@ -32,7 +32,8 @@
    "coverage_failures": [
     "AT_LAENDER_SECONDARY_ROAD_ORDERS_NOT_ENUMERATED",
     "AT_TYROL_SECTORAL_BAN_GOODS_LIST_NOT_ENCODED",
-    "EXCEPTIONAL_TRANSPORT_PERMIT_REGIME_NOT_REVIEWED"
+    "EXCEPTIONAL_TRANSPORT_PERMIT_REGIME_NOT_REVIEWED",
+    "AT_LUEG_A10_ROUTE_ORDINANCES_NOT_REVIEWED_FOR_DECEMBER_2026"
    ],
    "scope_checks": {
     "weekend": {
@@ -128,14 +129,25 @@
      "note": "Special-transport permit conditions (KFG §101(5)) are permit-specific; not reviewed."
     }
    },
-   "notes": "Corrected in this sweep: missing 26 October national-holiday ban; Tyrol A12 IG-L night ban (summer and winter regime) added."
+   "notes": "Corrected in this sweep: missing 26 October national-holiday ban; Tyrol A12 IG-L night ban (summer and winter regime) added. Review 2026-10-27: §42 StVO (BGBl. I 17/2026), Feiertagsruhegesetz, IG-L A12 §3 and BGBl II 77/2026 re-read via RIS open data; weekend, holiday, night and A12 winter rules extended through 31 Dec. The weekend/night rules had published windows ending 31 Oct.",
+   "review_log": [
+    {
+     "review_id": "2026-10-27.r4-nov-dec-priority",
+     "reviewed_at": "2026-10-27T11:20:00.000Z",
+     "period": {
+      "from": "2026-11-01",
+      "to": "2026-12-31"
+     },
+     "scope": "INDIVIDUAL_RULES_ONLY"
+    }
+   ]
   },
   "LI": {
    "verification_state": "PRIMARY_VERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": true,
-   "last_checked": "2026-09-26T15:25:00.000Z",
-   "last_verified": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-27T11:20:00.000Z",
+   "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
     "li-vrv",
     "trafficban-li"
@@ -155,7 +167,7 @@
      "evidence_ids": [
       "li-vrv"
      ],
-     "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 1 Nov (Sunday), 8, 25 and 26 Dec."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
@@ -228,14 +240,25 @@
      "note": "Art. 90(2)(d): exceptional vehicles/transports need a Sunday/night permit."
     }
    },
-   "notes": "Corrected in this sweep: missing 8 September (Maria Geburt) holiday ban."
+   "notes": "Corrected in this sweep: missing 8 September (Maria Geburt) holiday ban. Review 2026-10-27: published windows of the night and Sunday rules ended on 31 Oct although Art. 89 has no seasonal end; extended through 31 Dec after re-reading version 58.",
+   "review_log": [
+    {
+     "review_id": "2026-10-27.r4-nov-dec-priority",
+     "reviewed_at": "2026-10-27T11:20:00.000Z",
+     "period": {
+      "from": "2026-11-01",
+      "to": "2026-12-31"
+     },
+     "scope": "FULL_SCOPE_PRIMARY"
+    }
+   ]
   },
   "LU": {
    "verification_state": "PRIMARY_VERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": true,
-   "last_checked": "2026-09-26T15:25:00.000Z",
-   "last_verified": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-27T11:20:00.000Z",
+   "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
     "lu-police"
    ],
@@ -254,7 +277,7 @@
      "evidence_ids": [
       "lu-police"
      ],
-     "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 1 Nov (Sunday), 11 Nov (FR-bound), 25 Dec (both), 26 Dec (DE-bound)."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
@@ -327,7 +350,18 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": "November window added: France-bound Armistice Day (10-11 Nov)."
+   "notes": "November window added: France-bound Armistice Day (10-11 Nov). Review 2026-10-27: the weekend rules had a published window ending 31 Oct although the restriction applies all year; extended through 31 Dec.",
+   "review_log": [
+    {
+     "review_id": "2026-10-27.r4-nov-dec-priority",
+     "reviewed_at": "2026-10-27T11:20:00.000Z",
+     "period": {
+      "from": "2026-11-01",
+      "to": "2026-12-31"
+     },
+     "scope": "FULL_SCOPE_PRIMARY"
+    }
+   ]
   },
   "ME": {
    "verification_state": "UNVERIFIED",
@@ -342,7 +376,8 @@
    "no_ban_evidence": [],
    "coverage_failures": [
     "ME_STATUTORY_WEEKEND_HOLIDAY_REGIME_NOT_REVIEWED",
-    "ME_NOVEMBER_ORDERS_NOT_YET_KNOWN"
+    "ME_NOVEMBER_ORDERS_NOT_YET_KNOWN",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -432,7 +467,8 @@
    "coverage_failures": [
     "BG_FINAL_2026_ANNUAL_ORDER_TEXT_NOT_RETRIEVED",
     "BG_ADHOC_WEEKEND_ORDERS_ANNOUNCED_AT_SHORT_NOTICE",
-    "BG_HEAT_RESTRICTIONS_CONDITION_TRIGGERED"
+    "BG_HEAT_RESTRICTIONS_CONDITION_TRIGGERED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -522,7 +558,8 @@
    "no_ban_evidence": [],
    "coverage_failures": [
     "ES_ANNEX_V_EXCEPTIONAL_ADR_RESTRICTIONS_NOT_EVENT_ENCODED",
-    "ES_REGIONAL_HOLIDAY_VARIANTS_NOT_ENCODED"
+    "ES_REGIONAL_HOLIDAY_VARIANTS_NOT_ENCODED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -615,7 +652,7 @@
    "verification_state": "UNVERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": false,
-   "last_checked": "2026-10-01T08:30:00.000Z",
+   "last_checked": "2026-10-27T11:20:00.000Z",
    "last_verified": null,
    "source_ids": [
     "de-stvo30",
@@ -633,7 +670,8 @@
    "coverage_failures": [
     "RP_GST_AND_44T_EASING_POST_SEP30_SCOPE_NOT_EXPLICITLY_RECONFIRMED",
     "SAARLAND_LOW_WATER_EXTENSION_STATUS_NOT_PRIMARY_VERIFIED",
-    "OTHER_LAENDER_LOW_WATER_EXCEPTION_AND_EXCEPTIONAL_TRANSPORT_SCOPE_NOT_FULLY_REVIEWED"
+    "OTHER_LAENDER_LOW_WATER_EXCEPTION_AND_EXCEPTIONAL_TRANSPORT_SCOPE_NOT_FULLY_REVIEWED",
+    "LOW_WATER_EXEMPTIONS_AFTER_2026_10_31_NOT_PRIMARY_CONFIRMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -728,14 +766,25 @@
      "note": "Temporary Länder low-water exemptions (Sep/Oct 2026) only partly primary-verified: BW, RP, NRW through 31 Oct and BE/BB ended 30 Sep are verified; Saarland and other Länder, and RP GST/44t scope after 30 Sep, are open."
     }
    },
-   "notes": "Federal §30 StVO Sunday/holiday ban remains primary verified and published. Germany is downgraded from full PRIMARY_VERIFIED because temporary Länder low-water exemptions (targeted review 30 Sep, NRW rechecked 1 Oct 2026) are not fully verified. Exemptions do not remove the ban for other traffic."
+   "notes": "Federal §30 StVO Sunday/holiday ban remains primary verified and published. Germany is downgraded from full PRIMARY_VERIFIED because temporary Länder low-water exemptions (targeted review 30 Sep, NRW rechecked 1 Oct 2026) are not fully verified. Exemptions do not remove the ban for other traffic. Review 2026-10-27: §30 StVO re-read; 25-26 Dec added. No official extension of the Länder low-water exemptions beyond 31 Oct was found (secondary search only), so exemption scope for November-December remains open.",
+   "review_log": [
+    {
+     "review_id": "2026-10-27.r4-nov-dec-priority",
+     "reviewed_at": "2026-10-27T11:20:00.000Z",
+     "period": {
+      "from": "2026-11-01",
+      "to": "2026-12-31"
+     },
+     "scope": "INDIVIDUAL_RULES_ONLY"
+    }
+   ]
   },
   "FR": {
    "verification_state": "PRIMARY_VERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": true,
-   "last_checked": "2026-10-01T08:30:00.000Z",
-   "last_verified": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-27T11:20:00.000Z",
+   "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
     "fr-arrete-2021",
     "fr-arrete-2026",
@@ -757,7 +806,7 @@
      "evidence_ids": [
       "fr-arrete-2021"
      ],
-     "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 11 Nov and 25 Dec (eve 22:00 to day 22:00); 1 Nov is a Sunday."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
@@ -831,14 +880,25 @@
      "note": "Convois exceptionnels: additionally prohibited from Saturday/eve 12:00 to Monday/day-after 06:00 (Bison Futé; permit conditions prevail). Not encoded as separate events. Temporary hydrocarbon-delivery derogation until 12 Oct 2026 10:00 (NOR TRAT2625304A) encoded as an exception; ban events unchanged."
     }
    },
-   "notes": "Metropolitan France. Overseas territories are outside active monitoring and do not inherit metropolitan rules."
+   "notes": "Metropolitan France. Overseas territories are outside active monitoring and do not inherit metropolitan rules.",
+   "review_log": [
+    {
+     "review_id": "2026-10-27.r4-nov-dec-priority",
+     "reviewed_at": "2026-10-27T11:20:00.000Z",
+     "period": {
+      "from": "2026-11-01",
+      "to": "2026-12-31"
+     },
+     "scope": "FULL_SCOPE_PRIMARY"
+    }
+   ]
   },
   "IT": {
    "verification_state": "PRIMARY_VERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": true,
-   "last_checked": "2026-09-26T15:25:00.000Z",
-   "last_verified": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-27T11:20:00.000Z",
+   "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
     "it-calendar-asti",
     "it-dm-2026"
@@ -860,7 +920,7 @@
       "it-calendar-asti",
       "it-dm-2026"
      ],
-     "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: December calendar: 6, 8, 13, 20, 25, 26, 27 Dec 09:00-22:00."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
@@ -941,14 +1001,25 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": "San Marino and Vatican traffic is assimilated to domestic Italian traffic under art.3(4); those jurisdictions are reviewed separately."
+   "notes": "San Marino and Vatican traffic is assimilated to domestic Italian traffic under art.3(4); those jurisdictions are reviewed separately.",
+   "review_log": [
+    {
+     "review_id": "2026-10-27.r4-nov-dec-priority",
+     "reviewed_at": "2026-10-27T11:20:00.000Z",
+     "period": {
+      "from": "2026-11-01",
+      "to": "2026-12-31"
+     },
+     "scope": "FULL_SCOPE_PRIMARY"
+    }
+   ]
   },
   "CH": {
    "verification_state": "PRIMARY_VERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": true,
-   "last_checked": "2026-09-26T15:25:00.000Z",
-   "last_verified": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-27T11:20:00.000Z",
+   "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
     "ch-vrv"
    ],
@@ -967,7 +1038,7 @@
      "evidence_ids": [
       "ch-vrv"
      ],
-     "note": "No Art.91 federal holiday falls in Sep-Nov."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 25 Dec (Fri) is a ban day; 26 Dec 2026 is not (Art. 91(1) Monday/Friday rule)."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
@@ -1040,14 +1111,25 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": ""
+   "notes": "",
+   "review_log": [
+    {
+     "review_id": "2026-10-27.r4-nov-dec-priority",
+     "reviewed_at": "2026-10-27T11:20:00.000Z",
+     "period": {
+      "from": "2026-11-01",
+      "to": "2026-12-31"
+     },
+     "scope": "FULL_SCOPE_PRIMARY"
+    }
+   ]
   },
   "CZ": {
    "verification_state": "PRIMARY_VERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": true,
-   "last_checked": "2026-09-26T15:25:00.000Z",
-   "last_verified": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-27T11:20:00.000Z",
+   "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
     "cz-361",
     "cz-245"
@@ -1069,7 +1151,7 @@
       "cz-361",
       "cz-245"
      ],
-     "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 17 Nov, 24, 25 and 26 Dec are days of rest (13:00-22:00)."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
@@ -1149,14 +1231,25 @@
      "note": "§43(1) covers special vehicles >7.5t. §43(2) (special/animal-drawn vehicles wider than 600 mm on class I roads, 15 Apr-30 Sep) concerns non-HGV special vehicles and is not encoded."
     }
    },
-   "notes": ""
+   "notes": "",
+   "review_log": [
+    {
+     "review_id": "2026-10-27.r4-nov-dec-priority",
+     "reviewed_at": "2026-10-27T11:20:00.000Z",
+     "period": {
+      "from": "2026-11-01",
+      "to": "2026-12-31"
+     },
+     "scope": "FULL_SCOPE_PRIMARY"
+    }
+   ]
   },
   "SK": {
    "verification_state": "PRIMARY_VERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": true,
-   "last_checked": "2026-09-26T15:25:00.000Z",
-   "last_verified": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-27T11:20:00.000Z",
+   "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
     "sk-8",
     "sk-241"
@@ -1177,7 +1270,7 @@
      "evidence_ids": [
       "sk-241"
      ],
-     "note": "2026: 1 Sep, 15 Sep, 28 Oct and 17 Nov are not days of rest; 1 Nov is a Sunday. No extra holiday events."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: Christmas block 24-27 Dec ends on Sunday 27 Dec; no extra ban day outside the Sunday rule."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
@@ -1240,7 +1333,7 @@
       "sk-8",
       "sk-241"
      ],
-     "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
+     "note": "§39(4)-(5): permanent restriction for goods vehicles/combinations >12t on class III roads except listed local access; not a time-based ban and outside the motorway/expressway/class I scope of §39(1)."
     },
     "special_calendar": {
      "state": "PRIMARY_VERIFIED",
@@ -1259,17 +1352,29 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": "Regression guard: do not re-add 1 Sep / 15 Sep / 28 Oct / 17 Nov bans for 2026."
+   "notes": "Regression guard: do not re-add 1 Sep / 15 Sep / 28 Oct / 17 Nov bans for 2026.",
+   "review_log": [
+    {
+     "review_id": "2026-10-27.r4-nov-dec-priority",
+     "reviewed_at": "2026-10-27T11:20:00.000Z",
+     "period": {
+      "from": "2026-11-01",
+      "to": "2026-12-31"
+     },
+     "scope": "FULL_SCOPE_PRIMARY"
+    }
+   ]
   },
   "PL": {
    "verification_state": "PRIMARY_VERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": true,
-   "last_checked": "2026-09-26T15:25:00.000Z",
-   "last_verified": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-27T11:20:00.000Z",
+   "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
     "pl-2423",
-    "pl-1110"
+    "pl-1110",
+    "pl-holidays-2025"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [],
@@ -1285,15 +1390,17 @@
      "state": "PRIMARY_VERIFIED",
      "evidence_ids": [
       "pl-2423",
-      "pl-1110"
+      "pl-1110",
+      "pl-holidays-2025"
      ],
-     "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 1 and 11 Nov, 25 and 26 Dec; 24 Dec is not a ban day."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
      "evidence_ids": [
       "pl-2423",
-      "pl-1110"
+      "pl-1110",
+      "pl-holidays-2025"
      ],
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     },
@@ -1369,14 +1476,25 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": ""
+   "notes": "",
+   "review_log": [
+    {
+     "review_id": "2026-10-27.r4-nov-dec-priority",
+     "reviewed_at": "2026-10-27T11:20:00.000Z",
+     "period": {
+      "from": "2026-11-01",
+      "to": "2026-12-31"
+     },
+     "scope": "FULL_SCOPE_PRIMARY"
+    }
+   ]
   },
   "HU": {
    "verification_state": "PRIMARY_VERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": true,
-   "last_checked": "2026-09-26T15:25:00.000Z",
-   "last_verified": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-27T11:20:00.000Z",
+   "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
     "hu-190",
     "hu-mt"
@@ -1398,7 +1516,7 @@
       "hu-190",
       "hu-mt"
      ],
-     "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 1 Nov (Sunday), 25 and 26 Dec (continuous 24 Dec 22:00 to 27 Dec 22:00); 24 Dec is not a public holiday."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
@@ -1480,18 +1598,32 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": ""
+   "notes": "",
+   "review_log": [
+    {
+     "review_id": "2026-10-27.r4-nov-dec-priority",
+     "reviewed_at": "2026-10-27T11:20:00.000Z",
+     "period": {
+      "from": "2026-11-01",
+      "to": "2026-12-31"
+     },
+     "scope": "FULL_SCOPE_PRIMARY"
+    }
+   ]
   },
   "SI": {
    "verification_state": "PRIMARY_VERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": true,
-   "last_checked": "2026-09-26T15:25:00.000Z",
-   "last_verified": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-27T11:20:00.000Z",
+   "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
     "si-odredba-2011",
     "si-odredba-2021",
-    "si-promet"
+    "si-promet",
+    "si-odredba-2025",
+    "si-zpdpd",
+    "si-zpdpd-i"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [],
@@ -1510,16 +1642,20 @@
      "evidence_ids": [
       "si-odredba-2011",
       "si-odredba-2021",
-      "si-promet"
+      "si-promet",
+      "si-zpdpd",
+      "si-zpdpd-i"
      ],
-     "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 1 Nov (Sunday), 25 and 26 Dec."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
      "evidence_ids": [
       "si-odredba-2011",
       "si-odredba-2021",
-      "si-promet"
+      "si-promet",
+      "si-zpdpd",
+      "si-zpdpd-i"
      ],
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     },
@@ -1553,9 +1689,10 @@
      "evidence_ids": [
       "si-odredba-2011",
       "si-odredba-2021",
-      "si-promet"
+      "si-promet",
+      "si-odredba-2025"
      ],
-     "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
+     "note": "Art. 5.a (Uradni list RS 67/2025): dynamic, section- and time-limited HGV restrictions on motorways/expressways during congestion, announced live by the motorway operator; not a calendar ban and not enumerated by DAJC. promet.si was unreachable on 2026-10-27; the December review relies on the gazette texts."
     },
     "directional": {
      "state": "PRIMARY_VERIFIED",
@@ -1596,22 +1733,35 @@
     "exceptional": {
      "state": "PRIMARY_VERIFIED",
      "evidence_ids": [
-      "si-odredba-2011"
+      "si-odredba-2011",
+      "si-odredba-2025"
      ],
      "note": "Art.5 winter-condition ban also covers exceptional transports; 5.a congestion measures (2025)."
     }
    },
-   "notes": ""
+   "notes": "",
+   "review_log": [
+    {
+     "review_id": "2026-10-27.r4-nov-dec-priority",
+     "reviewed_at": "2026-10-27T11:20:00.000Z",
+     "period": {
+      "from": "2026-11-01",
+      "to": "2026-12-31"
+     },
+     "scope": "FULL_SCOPE_PRIMARY"
+    }
+   ]
   },
   "HR": {
    "verification_state": "PRIMARY_VERIFIED",
    "ban_state": "HAS_BAN",
    "coverage_complete": true,
-   "last_checked": "2026-09-26T15:25:00.000Z",
-   "last_verified": "2026-09-26T15:25:00.000Z",
+   "last_checked": "2026-10-27T11:20:00.000Z",
+   "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
     "hr-naredba",
-    "hr-hak"
+    "hr-hak",
+    "hr-blagdani"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [],
@@ -1626,14 +1776,16 @@
     "holidays": {
      "state": "PRIMARY_VERIFIED",
      "evidence_ids": [
-      "hr-naredba"
+      "hr-naredba",
+      "hr-blagdani"
      ],
-     "note": "Holidays in window: 1 Nov (Sunday) and 18 Nov."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 18 Nov, 25 and 26 Dec; Christmas last-day restriction moves to Sunday 27 Dec."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
      "evidence_ids": [
-      "hr-naredba"
+      "hr-naredba",
+      "hr-blagdani"
      ],
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     },
@@ -1701,7 +1853,18 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": "Holiday dates follow the Croatian holidays act (1 Nov, 18 Nov); point II Sunday/Monday rule applied."
+   "notes": "Holiday dates follow the Croatian holidays act (1 Nov, 18 Nov); point II Sunday/Monday rule applied.",
+   "review_log": [
+    {
+     "review_id": "2026-10-27.r4-nov-dec-priority",
+     "reviewed_at": "2026-10-27T11:20:00.000Z",
+     "period": {
+      "from": "2026-11-01",
+      "to": "2026-12-31"
+     },
+     "scope": "FULL_SCOPE_PRIMARY"
+    }
+   ]
   },
   "PT": {
    "verification_state": "UNVERIFIED",
@@ -1715,7 +1878,8 @@
    "no_ban_evidence": [],
    "coverage_failures": [
     "PT_NATIONAL_HOLIDAY_PERIOD_RESTRICTIONS_NOT_REVIEWED",
-    "PT_ADR_RESTRICTIONS_NOT_REVIEWED"
+    "PT_ADR_RESTRICTIONS_NOT_REVIEWED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -1797,7 +1961,8 @@
    "no_ban_evidence": [],
    "coverage_failures": [
     "GR_PERMANENT_2017_DECISION_B3769_NETWORK_NOT_REVIEWED",
-    "GR_EXCEPTIONAL_TRANSPORT_REGIME_NOT_REVIEWED"
+    "GR_EXCEPTIONAL_TRANSPORT_REGIME_NOT_REVIEWED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -1892,7 +2057,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -1967,7 +2133,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -2042,7 +2209,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -2117,7 +2285,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -2192,7 +2361,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -2267,7 +2437,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -2342,7 +2513,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -2417,7 +2589,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -2492,7 +2665,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -2567,7 +2741,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -2642,7 +2817,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -2717,7 +2893,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -2792,7 +2969,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -2867,7 +3045,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -2942,7 +3121,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3017,7 +3197,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3092,7 +3273,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3167,7 +3349,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3242,7 +3425,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3317,7 +3501,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3392,7 +3577,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3467,7 +3653,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3542,7 +3729,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3617,7 +3805,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3695,7 +3884,8 @@
    "no_ban_evidence": [],
    "coverage_failures": [
     "RO_CNAIR_HOLIDAY_ORDERS_PRIMARY_TEXT_NOT_RETRIEVED",
-    "RO_HEAT_RESTRICTIONS_CONDITION_TRIGGERED"
+    "RO_HEAT_RESTRICTIONS_CONDITION_TRIGGERED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3770,7 +3960,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3845,7 +4036,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3920,7 +4112,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -3995,7 +4188,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -4070,7 +4264,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -4145,7 +4340,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -4220,7 +4416,8 @@
    "source_ids": [],
    "no_ban_evidence": [],
    "coverage_failures": [
-    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED"
+    "FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED",
+    "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED"
    ],
    "scope_checks": {
     "weekend": {
@@ -4343,10 +4540,11 @@
    "url": "https://police.public.lu/en/legislation/code-de-la-route/routiers-poids-lourds1.html",
    "authority": "Luxembourg Police Grand-Ducale",
    "role": "PRIMARY",
-   "version": "Retrieved 2026-09-26; Grand-Ducal regulation of 19 July 1997",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Retrieved 2026-10-27 (page last updated 31/07/2025); Grand-Ducal regulation of 19 July 1997",
+   "checked_at": "2026-10-27T11:05:15.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Germany-bound holidays in window: 3 Oct, 1 Nov. France-bound: 1 Nov, 11 Nov. From 21:30 (FR) / 23:30 (DE) Saturday or holiday eve to 21:45 Sunday/holiday. Exceptions: live animals, perishables, flowers, press, removals, event material, harvest."
+   "findings": "Germany-bound holidays in window: 3 Oct, 1 Nov. France-bound: 1 Nov, 11 Nov. From 21:30 (FR) / 23:30 (DE) Saturday or holiday eve to 21:45 Sunday/holiday. Exceptions: live animals, perishables, flowers, press, removals, event material, harvest. | Review 2026-10-27.r4-nov-dec-priority: Restrictions apply all year. Christmas Day (25 Dec) for France- and Germany-bound transit; Boxing Day (26 Dec) for Germany-bound transit only; from 21:30 (FR) / 23:30 (DE) on the eve to 21:45 on the day.",
+   "content_sha256": "1d16698371545a4ac22164e5655a404013f2b7b51e497ae7f865a26f58722b1a"
   },
   {
    "source_id": "me-police",
@@ -4475,50 +4673,55 @@
    "url": "https://www.ris.bka.gv.at/NormDokument.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10011336&Paragraf=42",
    "authority": "RIS / StVO 1960 section 42",
    "role": "PRIMARY",
-   "version": "Consolidated text retrieved 2026-09-26",
-   "checked_at": "2026-09-26T15:25:00.000Z",
-   "retrieval_method": "direct-retrieval",
-   "findings": "§42(1)-(2): Saturday 15-24, Sundays and statutory public holidays 00-22; >7.5t goods/articulated/self-propelled; trailer combos where truck or trailer >3.5t. §42(6): night 22-05 >7.5t (low-noise exceptions)."
+   "version": "StVO 1960 §42 as last amended by BGBl. I Nr. 17/2026, in force 24.04.2026",
+   "checked_at": "2026-10-27T11:14:31.000Z",
+   "retrieval_method": "official open-data/ELI retrieval: https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40276972/NOR40276972.html",
+   "findings": "§42(1)-(2): Saturday 15-24, Sundays and statutory public holidays 00-22; >7.5t goods/articulated/self-propelled; trailer combos where truck or trailer >3.5t. §42(6): night 22-05 >7.5t (low-noise exceptions). | Review 2026-10-27.r4-nov-dec-priority: §42(1)-(2): Saturdays 15:00-24:00, Sundays and statutory holidays 00:00-22:00; §42(3): exempt journeys incl. journeys within built-up areas on the last two Saturdays before 24 December; §42(6): night 22:00-05:00 >7.5t (low-noise exception).",
+   "content_sha256": "5cad29b8320aa9f6d0c72828832a604c1ce4c6151d5d37fd16ece5444de260cd"
   },
   {
    "source_id": "at-ftrg",
    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008168",
    "authority": "RIS / Feiertagsruhegesetz 1957 section 1",
    "role": "PRIMARY",
-   "version": "Fassung vom 26.09.2026",
-   "checked_at": "2026-09-26T15:25:00.000Z",
-   "retrieval_method": "official-legal-text via rendering fetch; direct curl returned 503",
-   "findings": "Statutory public holidays in the window: 26 October (Nationalfeiertag, Monday 2026) and 1 November (Allerheiligen, Sunday 2026)."
+   "version": "Feiertagsruhegesetz 1957 §1, last updated 22.03.2019",
+   "checked_at": "2026-10-27T11:15:07.000Z",
+   "retrieval_method": "official open-data/ELI retrieval: https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40213432/NOR40213432.html",
+   "findings": "Statutory public holidays in the window: 26 October (Nationalfeiertag, Monday 2026) and 1 November (Allerheiligen, Sunday 2026). | Review 2026-10-27.r4-nov-dec-priority: Holidays in the window: 1 November (Sunday), 8 December (Tuesday), 25 December (Friday), 26 December (Saturday).",
+   "content_sha256": "e551cca9b81143b058eb0b1fc469dd144e37c565eb1bef5553087e434493e35e"
   },
   {
    "source_id": "at-igl-a12",
    "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=LrT&Gesetzesnummer=20000313",
    "authority": "RIS / Tyrol LGBl. 64/2010 as amended to 141/2021 (IG-L A12 night ban)",
    "role": "PRIMARY",
-   "version": "Fassung vom 26.09.2026",
-   "checked_at": "2026-09-26T15:25:00.000Z",
-   "retrieval_method": "direct-retrieval",
-   "findings": "A12 km 6.35 Langkampfen - km 90.00 Zirl, both directions, >7.5t: 1 May-31 Oct weekdays 22-05, Sun/holidays 23-05; 1 Nov-30 Apr weekdays 20-05, Sun/holidays 23-05. Exceptions incl. Euro VI with IG-L marking under zone conditions, perishables, rail terminals Hall/Woergl."
+   "version": "Tyrol IG-L A12 ordinance §3 (in RIS since 20.11.2020), retrieved via RIS open data 2026-10-27",
+   "checked_at": "2026-10-27T11:15:06.000Z",
+   "retrieval_method": "official open-data/ELI retrieval: https://ogd.ris.bka.gv.at/Dokumente/Landesnormen/LTI40045051/LTI40045051.html",
+   "findings": "A12 km 6.35 Langkampfen - km 90.00 Zirl, both directions, >7.5t: 1 May-31 Oct weekdays 22-05, Sun/holidays 23-05; 1 Nov-30 Apr weekdays 20-05, Sun/holidays 23-05. Exceptions incl. Euro VI with IG-L marking under zone conditions, perishables, rail terminals Hall/Woergl. | Review 2026-10-27.r4-nov-dec-priority: §3(1)(b) 1 Nov-30 Apr: working days 20:00-05:00, Sundays and statutory holidays 23:00-05:00 (8, 25 and 26 Dec 2026 are holidays).",
+   "content_sha256": "c4e7344565c5e97a48a57a731872ec5f5f2bdff602e25edfccee2be555c8267e"
   },
   {
    "source_id": "at-cal",
    "url": "https://www.ris.bka.gv.at/eli/bgbl/ii/2026/77/P1/NOR40276924",
    "authority": "RIS / Fahrverbotskalender 2026 section 1",
    "role": "PRIMARY",
-   "version": "BGBl II 77/2026, retrieved 2026-09-26",
-   "checked_at": "2026-09-26T15:25:00.000Z",
-   "retrieval_method": "direct-retrieval",
-   "findings": "Only 3 October 00-15 (A12/A13 Germany-bound) falls in Sep-Nov after 5 September; no November entries."
+   "version": "BGBl II 77/2026 section 1, retrieved via RIS open data 2026-10-27",
+   "checked_at": "2026-10-27T11:15:27.000Z",
+   "retrieval_method": "official open-data/ELI retrieval: https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40276924/NOR40276924.html",
+   "findings": "Only 3 October 00-15 (A12/A13 Germany-bound) falls in Sep-Nov after 5 September; no November entries. | Review 2026-10-27.r4-nov-dec-priority: No November or December 2026 dates.",
+   "content_sha256": "e8144933a442837a3f76999a7c581298f422e300fa8f529174314225b6d752f0"
   },
   {
    "source_id": "li-vrv",
    "url": "https://www.gesetze.li/konso/pdf/1978019000?version=58",
    "authority": "Lilex / Verkehrsregelnverordnung (VRV) LR 741.11 Art. 89-91a",
    "role": "PRIMARY",
-   "version": "Consolidated version 58, Fassung 01.09.2025",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Consolidated version 58, Fassung 01.09.2025 (latest; versions 59+ not published at retrieval)",
+   "checked_at": "2026-10-27T11:04:50.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Art. 89: Sunday ban on all Sundays and holidays incl. Maria Geburt (8 Sep) and Allerheiligen (1 Nov); night ban 22-05; heavy motor vehicles, commercial tractors/work vehicles, articulated >5t, trailers >3.5t. Art. 89a exceptions; Art. 90 permits (incl. exceptional transports)."
+   "findings": "Art. 89: Sunday ban on all Sundays and holidays incl. Maria Geburt (8 Sep) and Allerheiligen (1 Nov); night ban 22-05; heavy motor vehicles, commercial tractors/work vehicles, articulated >5t, trailers >3.5t. Art. 89a exceptions; Art. 90 permits (incl. exceptional transports). | Review 2026-10-27.r4-nov-dec-priority: Art. 89(1)-(2): Sunday ban on all Sundays and on Allerheiligen (1 Nov), Maria Empfängnis (8 Dec), Weihnachten (25 Dec) and St. Stefanstag (26 Dec); night ban 22:00-05:00 every night, without seasonal end.",
+   "content_sha256": "49ef8358e20da609567e8676567a90c7a1a43134a7268065c205308d84ad1191"
   },
   {
    "source_id": "bg-api-2026-09-16",
@@ -4545,10 +4748,11 @@
    "url": "https://www.gesetze-im-internet.de/stvo_2013/__30.html",
    "authority": "Gesetze im Internet (BMJ) / StVO section 30",
    "role": "PRIMARY",
-   "version": "Consolidated text retrieved 2026-09-26",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Consolidated text retrieved 2026-10-27",
+   "checked_at": "2026-10-27T11:02:24.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "§30(3): Sundays and holidays 00-22, trucks >7.5t and trailers behind trucks, commercial goods carriage incl. empty runs. §30(4) holidays in window: 3 Oct nationwide; 31 Oct in BB, HB, HH, MV, NI, SN, ST, SH, TH; 1 Nov in BW, BY, NW, RP, SL."
+   "findings": "§30(3): Sundays and holidays 00-22, trucks >7.5t and trailers behind trucks, commercial goods carriage incl. empty runs. §30(4) holidays in window: 3 Oct nationwide; 31 Oct in BB, HB, HH, MV, NI, SN, ST, SH, TH; 1 Nov in BW, BY, NW, RP, SL. | Review 2026-10-27.r4-nov-dec-priority: §30(3)-(4): 25 and 26 December (1. und 2. Weihnachtstag) are nationwide ban days 00:00-22:00; no other §30(4) holiday falls in 2-30 Nov or Dec 2026 (1 Nov is a Sunday).",
+   "content_sha256": "7fb4b1b15a0a387073faefd92362a68ad5c601232b9459eb37eac7dad30a683d"
   },
   {
    "source_id": "de-ferienreisev",
@@ -4565,30 +4769,33 @@
    "url": "https://www.bison-fute.gouv.fr/IMG/pdf/Arrete_joe_20210424_0097_0037.pdf",
    "authority": "Journal officiel / Arrêté du 16 avril 2021 (TRAT2031119A)",
    "role": "PRIMARY",
-   "version": "JO 24 April 2021, texte 37 (official PDF via Bison Futé)",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "JO 24 April 2021, texte 37 (official PDF via Bison Futé), retrieved 2026-10-27",
+   "checked_at": "2026-10-27T11:03:21.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Art.1: >7.5t GVW goods vehicles banned Saturday/holiday-eve 22:00 to Sunday/holiday 22:00 on the whole network. Art.3 Ile-de-France motorway sections. Art.4 exemptions."
+   "findings": "Art.1: >7.5t GVW goods vehicles banned Saturday/holiday-eve 22:00 to Sunday/holiday 22:00 on the whole network. Art.3 Ile-de-France motorway sections. Art.4 exemptions. | Review 2026-10-27.r4-nov-dec-priority: Art. 1: Christmas 2026 ban from Thursday 24 Dec 22:00 to Friday 25 Dec 22:00. Art. 3 II: Île-de-France holiday-eve 16:00-22:00 (24 Dec), holiday 22:00-24:00 both directions (25 Dec), day after holiday 06:00-10:00 province-Paris (26 Dec).",
+   "content_sha256": "7e9a0a0c19f06e8721367681c9289c03eac6be1181d023237a9a22acf954d26c"
   },
   {
    "source_id": "fr-arrete-2026",
    "url": "https://www.bison-fute.gouv.fr/IMG/pdf/joe_arrete_interdictions_complementaires_TRM_2026.pdf",
    "authority": "Journal officiel / Arrêté du 26 décembre 2025 (interdictions complémentaires 2026)",
    "role": "PRIMARY",
-   "version": "Official PDF via Bison Futé",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Arrêté du 26 décembre 2025, NOR TRAT2529272A, JO 8 January 2026 (official PDF via Bison Futé)",
+   "checked_at": "2026-10-27T11:03:22.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Complementary Saturdays 2026: winter AURA 7,14,21,28 Feb and 7 Mar; summer 11,18,25 Jul, 1 and 8 Aug. None in Sep-Nov 2026."
+   "findings": "Complementary Saturdays 2026: winter AURA 7,14,21,28 Feb and 7 Mar; summer 11,18,25 Jul, 1 and 8 Aug. None in Sep-Nov 2026. | Review 2026-10-27.r4-nov-dec-priority: Complementary Saturdays 2026 are only 7-28 Feb, 7 Mar (AURA winter) and 11 Jul-8 Aug; none in November-December 2026.",
+   "content_sha256": "ba7ed529d2dafb414bfbc12c8aa2238730ed6f7be883ee68894fa7b40525db54"
   },
   {
    "source_id": "fr-bison-fute",
    "url": "https://www.bison-fute.gouv.fr/regime-general,10852.html",
    "authority": "Bison Futé (official French traffic information service)",
    "role": "PRIMARY",
-   "version": "Retrieved 2026-09-26",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Retrieved 2026-10-27",
+   "checked_at": "2026-10-27T11:03:23.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Exceptional convoys prohibited Saturday/holiday eve 12:00 to Monday/day after 06:00 and during goods-vehicle ban periods."
+   "findings": "Exceptional convoys prohibited Saturday/holiday eve 12:00 to Monday/day after 06:00 and during goods-vehicle ban periods. | Review 2026-10-27.r4-nov-dec-priority: Exceptional-convoy restriction Saturday/holiday-eve 12:00 to Monday/day-after 06:00 unchanged; 2026 complementary calendar lists no winter dates after 7 March.",
+   "content_sha256": "cc87ad7b588d020041fbd777c20214c7e40b81f628b09afe9bf28a8dd6c59b29"
   },
   {
    "source_id": "it-dm-2026",
@@ -4605,120 +4812,132 @@
    "url": "https://prefettura.interno.gov.it/sites/default/files/26/2025-12/calendario-circolazione-anno-2026_firmato.pdf",
    "authority": "Prefettura di Asti (Ministry of the Interior) - Allegato A of the 2026 decree",
    "role": "PRIMARY",
-   "version": "Signed publication, retrieved 2026-09-26",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Signed publication of DM 12 December 2025 n. 325 calendar, retrieved 2026-10-27",
+   "checked_at": "2026-10-27T11:04:39.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "September Sundays 6,13,20,27: 07:00-22:00. October Sundays 4,11,18,25 and November Sundays 1,8,15,22,29: 09:00-22:00."
+   "findings": "September Sundays 6,13,20,27: 07:00-22:00. October Sundays 4,11,18,25 and November Sundays 1,8,15,22,29: 09:00-22:00. | Review 2026-10-27.r4-nov-dec-priority: Art. 2 December 2026: 6, 8, 13, 20, 25, 26 and 27 December, 09:00-22:00. Art. 12 extra ADR class 1/7 restrictions apply only 23 May-6 Sep 2026.",
+   "content_sha256": "c9b15eed82e1adc047af7e70d26976064aba48bfce88aa8c032f4cfa618118fd"
   },
   {
    "source_id": "ch-vrv",
    "url": "https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1962/1364_1409_1420/20261001/de/html/fedlex-data-admin-ch-eli-cc-1962-1364_1409_1420-20261001-de-html.html",
    "authority": "Fedlex / Verkehrsregelnverordnung (VRV, SR 741.11) Art. 91-92",
    "role": "PRIMARY",
-   "version": "Stand am 1. Oktober 2026 (Art. 91 identical to 1 July 2026 consolidation)",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Stand am 1. Oktober 2026; no later consolidation published at retrieval (20261101/20261201/20270101 paths do not exist)",
+   "checked_at": "2026-10-27T11:02:42.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Art.91: Sunday ban all Sundays + federal list (Neujahr, Karfreitag, Ostermontag, Auffahrt, Pfingstmontag, 1 Aug, Weihnachten, 26 Dec) - none in Sep-Nov; night 22-05; heavy motor vehicles (>3.5t), commercial tractors, articulated >5t, trailers >3.5t."
+   "findings": "Art.91: Sunday ban all Sundays + federal list (Neujahr, Karfreitag, Ostermontag, Auffahrt, Pfingstmontag, 1 Aug, Weihnachten, 26 Dec) - none in Sep-Nov; night 22-05; heavy motor vehicles (>3.5t), commercial tractors, articulated >5t, trailers >3.5t. | Review 2026-10-27.r4-nov-dec-priority: Art. 91(1): Sunday ban also on 25 December; 26 December only when Christmas is not a Monday or Friday. 25 Dec 2026 is a Friday, so 26 Dec 2026 is NOT a ban day. Art. 91(2) night 22:00-05:00 unchanged.",
+   "content_sha256": "d8772688f6736f3fd393c14e5cc4bafe0609f081717369345db25cd290544139"
   },
   {
    "source_id": "cz-361",
    "url": "https://www.zakonyprolidi.cz/cs/2000-361",
    "authority": "Act 361/2000 Sb. section 43 (consolidated text, Zakony pro lidi)",
    "role": "PRIMARY",
-   "version": "Current consolidation retrieved 2026-09-26",
-   "checked_at": "2026-09-26T15:25:00.000Z",
-   "retrieval_method": "consolidated-legal-database (official e-Sbirka not machine-readable here)",
-   "findings": "§43(1): motorways and class I roads, N/special vehicles >7.5t and >3.5t with trailer: Sundays and days of rest 13-22; Fridays 17-21 and Saturdays 07-13 only 1 Jul-31 Aug."
+   "version": "Aktualni zneni 01.01.2026-31.12.2026 (verze 63)",
+   "checked_at": "2026-10-27T11:02:25.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "§43(1): motorways and class I roads, N/special vehicles >7.5t and >3.5t with trailer: Sundays and days of rest 13-22; Fridays 17-21 and Saturdays 07-13 only 1 Jul-31 Aug. | Review 2026-10-27.r4-nov-dec-priority: §43(1)(a) Sundays and days of rest 13:00-22:00 unchanged through 31 Dec 2026; §43(1)(b)-(c) and §43(2) are summer-only.",
+   "content_sha256": "11ecd18b9321a3db7fe26f6d5a8cd2d7901cb3d00143ea81b481d172397ef2dc"
   },
   {
    "source_id": "cz-245",
    "url": "https://www.zakonyprolidi.cz/cs/2000-245",
    "authority": "Act 245/2000 Sb. on public holidays (consolidated text)",
    "role": "PRIMARY",
-   "version": "Aktualni zneni 13.05.2026",
-   "checked_at": "2026-09-26T15:25:00.000Z",
-   "retrieval_method": "consolidated-legal-database",
-   "findings": "State holidays in window: 28 Sep, 28 Oct, 17 Nov; all are days of rest (§3)."
+   "version": "Aktualni zneni 13.05.2026 (verze 12)",
+   "checked_at": "2026-10-27T11:02:25.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "State holidays in window: 28 Sep, 28 Oct, 17 Nov; all are days of rest (§3). | Review 2026-10-27.r4-nov-dec-priority: §2-§3: 24, 25 and 26 December are days of rest; 17 November remains a state holiday.",
+   "content_sha256": "c774fc26330edf08c06f34c669c2d9521f0ea057e0008407b74ce95bc9a2f19d"
   },
   {
    "source_id": "sk-8",
    "url": "https://static.slov-lex.sk/static/SK/ZZ/2009/8/20261001.html",
    "authority": "Slov-Lex / Act 8/2009 Z.z. section 39",
    "role": "PRIMARY",
-   "version": "Consolidations 2026-09-01 and 2026-10-01 (identical §39)",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Consolidations 2026-10-01 and 2026-12-01 compared: §39 identical; the 2027-01-01 change only touches §39(7)",
+   "checked_at": "2026-10-27T11:09:47.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "§39(1): motorways, expressways, class I roads; >7.5t and >3.5t with trailer; Sundays and last day of rest 06-22; July-August first day of rest and Saturday 09-19."
+   "findings": "§39(1): motorways, expressways, class I roads; >7.5t and >3.5t with trailer; Sundays and last day of rest 06-22; July-August first day of rest and Saturday 09-19. | Review 2026-10-27.r4-nov-dec-priority: §39(1)(b) Sundays and the last day of rest 06:00-22:00; §39(1)(a) first-day-of-rest ban only 1 Jul-31 Aug. Footnote 23 refers to §2 of Act 241/1993, under which Sundays are days of rest, so the Christmas block 24-27 Dec ends on Sunday 27 Dec and creates no extra ban day. §39(4): permanent >12t restriction on class III roads (not a calendar ban).",
+   "content_sha256": "43b227ae8a4cb33bbd655fe90a338830f9811a0debae1219c26d60082604a776"
   },
   {
    "source_id": "sk-241",
    "url": "https://static.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
    "authority": "Slov-Lex / Act 241/1993 Z.z. on public holidays",
    "role": "PRIMARY",
-   "version": "Consolidation effective 2025-11-01",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Consolidation effective 2025-11-01 (latest)",
+   "checked_at": "2026-10-27T11:11:14.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "§2(3): 1 Sep, 28 Oct and 17 Nov are NOT days of rest. §4b: in 2026 15 Sep and 8 May are NOT days of rest. Only 1 Nov (Sunday) in window."
+   "findings": "§2(3): 1 Sep, 28 Oct and 17 Nov are NOT days of rest. §4b: in 2026 15 Sep and 8 May are NOT days of rest. Only 1 Nov (Sunday) in window. | Review 2026-10-27.r4-nov-dec-priority: §2(2): Sundays and 24, 25, 26 December are days of rest; §4b removes only 15 Sep and 8 May for 2026.",
+   "content_sha256": "be3fbebd14b56cea186469b48568f12a767e55c4b9b197770e19847f103db908"
   },
   {
    "source_id": "pl-2423",
    "url": "https://isap.sejm.gov.pl/isap.nsf/download.xsp/WDU20230002423/O/D20232423.pdf",
    "authority": "ISAP / Dz.U. 2023 poz. 2423 (consolidated regulation of 31 July 2007)",
    "role": "PRIMARY",
-   "version": "Consolidated text",
-   "checked_at": "2026-09-26T15:25:00.000Z",
-   "retrieval_method": "direct-retrieval",
-   "findings": ">12t (buses excluded): holidays 08-22 incl. 1 Nov and 11 Nov; eve 18-22; school-holiday Fri/Sat/Sun regime ends the last Sunday before the school year."
+   "version": "Consolidated text Dz.U. 2023 poz. 2423, only later amendment Dz.U. 2026 poz. 1110 (exemptions)",
+   "checked_at": "2026-10-27T11:05:39.000Z",
+   "retrieval_method": "official open-data/ELI retrieval: https://api.sejm.gov.pl/eli/acts/DU/2023/2423/text.pdf",
+   "findings": ">12t (buses excluded): holidays 08-22 incl. 1 Nov and 11 Nov; eve 18-22; school-holiday Fri/Sat/Sun regime ends the last Sunday before the school year. | Review 2026-10-27.r4-nov-dec-priority: §2(1) closed list: 25 and 26 December 08:00-22:00; 24 December is NOT listed. §2(2) eve 18:00-22:00 only before the days in §2(1)(b)-(j), so there is no eve restriction before 1 January or 25/26 December.",
+   "content_sha256": "9721dda73d1b45b6300f3e636b9db37504908cd8d4c54c2f5092b6bdb3f5457a"
   },
   {
    "source_id": "pl-1110",
    "url": "https://api.sejm.gov.pl/eli/acts/DU/2026/1110/text.pdf",
    "authority": "Dz.U. 2026 poz. 1110 (amendment of 17 Aug 2026, in force 21 Aug 2026)",
    "role": "PRIMARY",
-   "version": "Official ELI text",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Dz.U. 2026 poz. 1110, in force 2026-08-21",
+   "checked_at": "2026-10-27T11:05:42.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Adds exemptions (foreign/civil military equipment carriage, driver training/exams); no change to dates or hours."
+   "findings": "Adds exemptions (foreign/civil military equipment carriage, driver training/exams); no change to dates or hours. | Review 2026-10-27.r4-nov-dec-priority: Adds §3(1)(7)-(9) exemptions only; §2 dates and hours unchanged.",
+   "content_sha256": "9d42c6528bcd6b1d08055ba7c1a7de218193bf9110ef6cc967244d6501032d39"
   },
   {
    "source_id": "hu-190",
    "url": "https://njt.jog.gov.hu/jogszabaly/2008-190-20-22",
    "authority": "Nemzeti Jogszabálytár / Govt. Decree 190/2008 (VII.29.)",
    "role": "PRIMARY",
-   "version": "Consolidated state 2025.01.01, retrieved 2026-09-26",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Consolidated state 2025.01.01 (in force), retrieved 2026-10-27",
+   "checked_at": "2026-10-27T11:03:53.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "§2(1)(b) Sep 1-Jun 30: from 22:00 the day before to 22:00 on Sundays and public holidays, >7.5t. §2(3): from 4 Nov to 1 Mar not applicable to international-traffic trucks of at least environmental class 7 (EURO 3)."
+   "findings": "§2(1)(b) Sep 1-Jun 30: from 22:00 the day before to 22:00 on Sundays and public holidays, >7.5t. §2(3): from 4 Nov to 1 Mar not applicable to international-traffic trucks of at least environmental class 7 (EURO 3). | Review 2026-10-27.r4-nov-dec-priority: §2(1)(b) and §2(2): 25 Dec (Fri) and 26 Dec (Sat) are public holidays; the ban runs from 24 Dec 22:00 continuously to Sunday 27 Dec 22:00. §2(3): from 4 Nov to 1 Mar not applicable to international-traffic trucks of environmental class >= 7 (EURO 3).",
+   "content_sha256": "4b3cd0e4d19d508dcbbf769e9549feb1b96601c85d4a0c84b74ccb93d681b313"
   },
   {
    "source_id": "hu-mt",
    "url": "https://njt.jog.gov.hu/jogszabaly/2012-1-00-00",
    "authority": "Nemzeti Jogszabálytár / Labour Code (Act I of 2012) §102(1)",
    "role": "PRIMARY",
-   "version": "Retrieved 2026-09-26",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Mt. §102(1), retrieved 2026-10-27",
+   "checked_at": "2026-10-27T11:03:56.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Public holidays in window: 23 October, 1 November."
+   "findings": "Public holidays in window: 23 October, 1 November. | Review 2026-10-27.r4-nov-dec-priority: Public holidays (munkaszüneti nap) in the window: 1 November, 25 and 26 December; 24 December is not a public holiday.",
+   "content_sha256": "cd04286e7d9402ec86808ac24554704faacf1df1c3936b6afd22a9d623f96bc2"
   },
   {
    "source_id": "si-odredba-2011",
    "url": "https://www.uradni-list.si/glasilo-uradni-list-rs/vsebina/105152",
    "authority": "Uradni list RS 75/2011 - Odredba o omejitvi prometa na cestah v RS",
    "role": "PRIMARY",
-   "version": "Original text",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Original text (Uradni list RS 75/2011), retrieved 2026-10-27",
+   "checked_at": "2026-10-27T11:06:15.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Art.2: Sundays and non-working days on Art.4 roads; tourist season Saturdays 08-13 (06-16 on Art.4 points 11-14 and 22). Art.5 winter-condition bans. Art.6 exemptions."
+   "findings": "Art.2: Sundays and non-working days on Art.4 roads; tourist season Saturdays 08-13 (06-16 on Art.4 points 11-14 and 22). Art.5 winter-condition bans. Art.6 exemptions. | Review 2026-10-27.r4-nov-dec-priority: Art. 2(1): Sundays and non-working days; art. 4 roads; art. 5 winter-condition bans.",
+   "content_sha256": "1db66dd3933455810074166f5eaafcd9ea409f103a0ff5a0df31cdb174a255ca"
   },
   {
    "source_id": "si-odredba-2021",
    "url": "https://www.uradni-list.si/_pdf/2021/Ur/u2021195.pdf",
    "authority": "Uradni list RS 195/2021 (No. 3894)",
    "role": "PRIMARY",
-   "version": "Amendment in force 15 days after 15 Dec 2021",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Amendment Uradni list RS 195/2021",
+   "checked_at": "2026-10-27T11:06:20.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Changes \"do 21. ure\" to \"do 22. ure\" in Art.2(1); adds exemptions."
+   "findings": "Changes \"do 21. ure\" to \"do 22. ure\" in Art.2(1); adds exemptions. | Review 2026-10-27.r4-nov-dec-priority: Sunday/non-working-day end time 22:00.",
+   "content_sha256": "82610c38e1bfb7c8014eaf9c066e97d3d6ec806c6955c1dadb9a3fbe496bfb4d"
   },
   {
    "source_id": "si-promet",
@@ -4735,20 +4954,22 @@
    "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2009_06_64_1440.html",
    "authority": "Narodne novine 64/2009 - Naredba o ograničenju prometa na cestama",
    "role": "PRIMARY",
-   "version": "Official gazette text; republished unchanged by HAK 2026",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Official gazette text (NN 64/2009), retrieved 2026-10-27",
+   "checked_at": "2026-10-27T11:11:46.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Point I roads (D8 Bakar-Dubrovnik-Karasovici and others): 15 Jun-15 Sep Sat 04-14, Sun 12-23; Good Friday and holiday eves 15-23, last holiday day 14-23; Sunday/Monday holiday -> Friday before 15-23. Point III: D2 Varazdin-Dubrava Krizovljanska Sundays 06-22."
+   "findings": "Point I roads (D8 Bakar-Dubrovnik-Karasovici and others): 15 Jun-15 Sep Sat 04-14, Sun 12-23; Good Friday and holiday eves 15-23, last holiday day 14-23; Sunday/Monday holiday -> Friday before 15-23. Point III: D2 Varazdin-Dubrava Krizovljanska Sundays 06-22. | Review 2026-10-27.r4-nov-dec-priority: Point II: holiday eves 15:00-23:00; when the (last) holiday day is a Friday or Saturday the last-day restriction applies on Sunday 12:00-23:00. Christmas 2026: 24 Dec 15:00-23:00 and Sunday 27 Dec 12:00-23:00 on the point I roads.",
+   "content_sha256": "726e9c2dbfd692918f759b40813766e3a73c1071215831e894b4e0777d3e5024"
   },
   {
    "source_id": "hr-hak",
    "url": "https://www.hak.hr/info/korisne-informacije/zabrane-za-teretna-vozila/",
    "authority": "HAK (Croatian Auto Club)",
    "role": "SECONDARY",
-   "version": "Retrieved 2026-09-26",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "version": "Retrieved 2026-10-27",
+   "checked_at": "2026-10-27T11:11:47.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Reproduces the Naredba and the permanent Pravilnik route-use restrictions for >7.5t."
+   "findings": "Reproduces the Naredba and the permanent Pravilnik route-use restrictions for >7.5t. | Review 2026-10-27.r4-nov-dec-priority: Republishes the 2009 Naredba unchanged; no separate 2026 holiday order listed.",
+   "content_sha256": "7fb7cbb5afa03c17cc75a82cd4838133119c91a2a9c992a8a66d8dcf0066b458"
   },
   {
    "source_id": "pt-dl-155a-2026",
@@ -4869,6 +5090,61 @@
    "checked_at": "2026-10-01T08:30:00.000Z",
    "retrieval_method": "official-content-review",
    "findings": "Art. 1: the circulation bans of the arrêté of 16 April 2021 (articles 1, 2 and 3, incl. Île-de-France) for goods vehicles >7.5t are lifted, until Monday 12 October 2026 10:00, exclusively for vehicles carrying hydrocarbon products serving service stations; empty return is authorised nationwide. Art. 2: supporting documents must be on board or immediately accessible if digital."
+  },
+  {
+   "source_id": "hr-blagdani",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+   "authority": "Narodne novine (official gazette of Croatia)",
+   "role": "PRIMARY",
+   "version": "NN 110/2019; the only amendment NN 72/2025 adds a memorial day (art. 2), not a holiday",
+   "checked_at": "2026-10-27T11:12:19.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Review 2026-10-27.r4-nov-dec-priority: Art. 1: holidays include 1 November, 18 November, 25 December (Božić) and 26 December (Sveti Stjepan).",
+   "content_sha256": "a14685cb090ee1f5adfb9f861f81592284ddb7c1e30e020a0877eb7d85397061"
+  },
+  {
+   "source_id": "pl-holidays-2025",
+   "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text.pdf",
+   "authority": "Dziennik Ustaw (ELI, Sejm)",
+   "role": "PRIMARY",
+   "version": "Dz.U. 2025 poz. 296, consolidated Act on days off, incl. Dz.U. 2024 poz. 1965 in force 2025-02-01",
+   "checked_at": "2026-10-27T11:05:41.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Review 2026-10-27.r4-nov-dec-priority: Art. 1: 24 December (Wigilia) is a statutory day off since 2025, but the ban regulation lists its ban days explicitly and does not include it.",
+   "content_sha256": "50ce5df0f79a4d0f2e3a045b03acaac6ede826ab3b667f421d06854795c2deff"
+  },
+  {
+   "source_id": "si-odredba-2025",
+   "url": "https://www.uradni-list.si/glasilo-uradni-list-rs/vsebina/2025-01-2415/odredba-o-dopolnitvi-odredbe-o-omejitvi-prometa-na-cestah-v-republiki-sloveniji",
+   "authority": "Uradni list RS",
+   "role": "PRIMARY",
+   "version": "Uradni list RS 67/2025, in force 30.08.2025",
+   "checked_at": "2026-10-27T11:06:54.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Review 2026-10-27.r4-nov-dec-priority: New art. 5.a: time- and section-limited HGV restrictions on motorways/expressways during congestion, announced by the motorway operator. Dynamic measure, not a calendar ban.",
+   "content_sha256": "f6e5f13bf0a7f3e9fa60f0a5e1ffa67480ddc38f4c2eebab5d31d9e8132ee1c8"
+  },
+  {
+   "source_id": "si-zpdpd",
+   "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf",
+   "authority": "Uradni list RS",
+   "role": "PRIMARY",
+   "version": "ZPDPD-UPB1, Uradni list RS 112/2005 (official consolidated text)",
+   "checked_at": "2026-10-27T11:09:16.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Review 2026-10-27.r4-nov-dec-priority: Art. 1: 26 December is a holiday and a non-working day; art. 2: 25 December (božič) is a non-working day.",
+   "content_sha256": "f708f61b149a334b4dfe1eb9bcd1ff09c9e4ef8995fe91ce8a03d170bd07ceed"
+  },
+  {
+   "source_id": "si-zpdpd-i",
+   "url": "https://pisrs.si/api/uradni-list/objava/u20261567.pdf",
+   "authority": "Uradni list RS (PISRS)",
+   "role": "PRIMARY",
+   "version": "ZPDPD-I, Uradni list RS 1567/2026 of 2 Oct 2026",
+   "checked_at": "2026-10-27T11:09:25.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Review 2026-10-27.r4-nov-dec-priority: Adds 7 August as a holiday that is not a non-working day; 25 and 26 December unchanged.",
+   "content_sha256": "e9b77caa3961e54775dd00485f6a71ede2e7661c275be7b81ee9927a58775a76"
   }
  ],
  "rule_profiles": {
@@ -5003,10 +5279,10 @@
   },
   "at-night": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -5045,21 +5321,22 @@
   },
   "at-weekend": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
-   "sequence": 0,
+   "sequence": 1,
    "restriction_types": [
     "general",
     "exceptional"
    ],
    "supersedes": [],
    "exceptions": [
-    "StVO §42(3) exempt journeys (e.g. slaughter animals, post/periodicals, breakdown/towing, emergency, road maintenance, refuse, scheduled line services, showmen, lighting/sound crews, urgent military, humanitarian, self-propelled agricultural machinery).",
-    "Section 42(4)-(5) exemptions (e.g. perishable foods, combined transport terminals) apply only under their exact conditions."
+    "StVO §42(2a): journeys exclusively to/from airports, or combined transport within 65 km of the designated terminals and ports.",
+    "StVO §42(3): listed journeys (e.g. slaughter animals, post/periodicals, beverage supply in excursion areas, urgent repairs, towing/breakdown, disaster and road-maintenance operations, refuse, scheduled line services, showmen, lighting/sound crews, urgent military, humanitarian, self-propelled agricultural machinery) and journeys within built-up areas on the last two Saturdays before 24 December (12 and 19 December 2026).",
+    "StVO §42(3a): fresh perishable foods listed in the paragraph and related empty or return runs, with waybill/loading list on board."
    ],
    "regions": [],
    "direction": "Both directions unless the road scope states otherwise",
@@ -5098,10 +5375,10 @@
   },
   "li-standing": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -5159,10 +5436,10 @@
   },
   "lu-transit": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -5322,10 +5599,10 @@
   },
   "at-igl": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -5366,10 +5643,10 @@
   },
   "de-sunday": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-10-01T08:30:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 1,
@@ -5426,10 +5703,10 @@
   },
   "fr-general": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-10-01T08:30:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 1,
@@ -5469,10 +5746,10 @@
   },
   "fr-idf": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-10-01T08:30:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 1,
@@ -5517,10 +5794,10 @@
   },
   "it-calendar": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -5558,10 +5835,10 @@
   },
   "ch-standing": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -5618,10 +5895,10 @@
   },
   "cz-standing": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -5670,10 +5947,10 @@
   },
   "sk-standing": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -5722,10 +5999,10 @@
   },
   "pl-standing": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -5742,7 +6019,8 @@
    "source_id": "pl-2423",
    "evidence_ids": [
     "pl-2423",
-    "pl-1110"
+    "pl-1110",
+    "pl-holidays-2025"
    ],
    "legal_basis": "Regulation of 31 July 2007 §2 (Dz.U. 2023 poz. 2423, as amended by Dz.U. 2026 poz. 1110)",
    "vehicle_scope": "Vehicles and combinations with MAM >12t (buses excluded).",
@@ -5762,10 +6040,10 @@
   },
   "hu-standing": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -5803,10 +6081,10 @@
   },
   "si-standing": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -5824,7 +6102,10 @@
    "evidence_ids": [
     "si-odredba-2011",
     "si-odredba-2021",
-    "si-promet"
+    "si-promet",
+    "si-odredba-2025",
+    "si-zpdpd",
+    "si-zpdpd-i"
    ],
    "legal_basis": "Odredba (UL RS 75/11, 195/21, 67/25) Art. 2",
    "vehicle_scope": "Goods vehicles and combinations with MAM >7,500 kg.",
@@ -5844,10 +6125,10 @@
   },
   "hr-season": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -5863,7 +6144,8 @@
    "timezone": "Europe/Zagreb",
    "source_id": "hr-naredba",
    "evidence_ids": [
-    "hr-naredba"
+    "hr-naredba",
+    "hr-blagdani"
    ],
    "legal_basis": "Naredba NN 64/2009 point II",
    "vehicle_scope": "Goods vehicles >7.5t or longer than 14 m, tractors, work machines, slow vehicles (<40 km/h) and driver-training vehicles.",
@@ -5902,10 +6184,10 @@
   },
   "hr-d2": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-10-27T11:20:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -5921,7 +6203,8 @@
    "timezone": "Europe/Zagreb",
    "source_id": "hr-naredba",
    "evidence_ids": [
-    "hr-naredba"
+    "hr-naredba",
+    "hr-blagdani"
    ],
    "legal_basis": "Naredba NN 64/2009 point III",
    "vehicle_scope": "Goods vehicles >7.5t with or without trailer.",
@@ -6215,7 +6498,7 @@
    "profile": "at-night",
    "title": "Night driving restriction",
    "valid_from": "2026-08-31",
-   "valid_to": "2026-10-31",
+   "valid_to": "2026-12-31",
    "schedule": {
     "kind": "daily",
     "start_time": "22:00",
@@ -6225,15 +6508,16 @@
    "validity_note": "Published verified window, not the commencement/expiry of the standing law.",
    "review_window": {
     "from": "2026-08-31",
-    "to": "2026-10-31"
-   }
+    "to": "2026-12-31"
+   },
+   "sequence": 1
   },
   {
    "ban_id": "at-saturday",
    "profile": "at-weekend",
    "title": "Saturday driving restriction",
    "valid_from": "2026-09-01",
-   "valid_to": "2026-10-31",
+   "valid_to": "2026-12-31",
    "schedule": {
     "kind": "weekly",
     "start_time": "15:00",
@@ -6243,14 +6527,15 @@
      6
     ]
    },
-   "validity_note": "Published verified window, not legal commencement/expiry."
+   "validity_note": "Published verified window, not legal commencement/expiry.",
+   "sequence": 2
   },
   {
    "ban_id": "at-sunday",
    "profile": "at-weekend",
    "title": "Sunday driving restriction",
    "valid_from": "2026-09-01",
-   "valid_to": "2026-10-31",
+   "valid_to": "2026-12-31",
    "schedule": {
     "kind": "weekly",
     "start_time": "00:00",
@@ -6260,14 +6545,15 @@
      0
     ]
    },
-   "validity_note": "Published verified window. Holiday enumeration is not certified complete."
+   "validity_note": "Published verified window. Holiday enumeration is not certified complete.",
+   "sequence": 2
   },
   {
    "ban_id": "li-night",
    "profile": "li-standing",
    "title": "Night driving restriction",
    "valid_from": "2026-08-31",
-   "valid_to": "2026-10-31",
+   "valid_to": "2026-12-31",
    "schedule": {
     "kind": "daily",
     "start_time": "22:00",
@@ -6277,15 +6563,16 @@
    "validity_note": "Published verified window, not legal commencement/expiry.",
    "review_window": {
     "from": "2026-08-31",
-    "to": "2026-10-31"
-   }
+    "to": "2026-12-31"
+   },
+   "sequence": 1
   },
   {
    "ban_id": "li-sunday",
    "profile": "li-standing",
    "title": "Sunday driving restriction",
    "valid_from": "2026-09-01",
-   "valid_to": "2026-10-31",
+   "valid_to": "2026-12-31",
    "schedule": {
     "kind": "weekly",
     "start_time": "00:00",
@@ -6295,14 +6582,15 @@
      0
     ]
    },
-   "validity_note": "Published verified window. Separate public-holiday coverage remains incomplete."
+   "validity_note": "Published verified window. Separate public-holiday coverage remains incomplete.",
+   "sequence": 1
   },
   {
    "ban_id": "lu-france-weekend",
    "profile": "lu-transit",
    "title": "France-bound weekend transit restriction",
    "valid_from": "2026-09-01",
-   "valid_to": "2026-10-31",
+   "valid_to": "2026-12-31",
    "schedule": {
     "kind": "weekly",
     "start_time": "21:30",
@@ -6312,14 +6600,15 @@
      6
     ]
    },
-   "direction": "Transit toward France"
+   "direction": "Transit toward France",
+   "sequence": 1
   },
   {
    "ban_id": "lu-germany-weekend",
    "profile": "lu-transit",
    "title": "Germany-bound weekend transit restriction",
    "valid_from": "2026-09-01",
-   "valid_to": "2026-10-31",
+   "valid_to": "2026-12-31",
    "schedule": {
     "kind": "weekly",
     "start_time": "23:30",
@@ -6329,7 +6618,8 @@
      6
     ]
    },
-   "direction": "Transit toward Germany"
+   "direction": "Transit toward Germany",
+   "sequence": 1
   },
   {
    "ban_id": "lu-germany-unity-2026",
@@ -6852,6 +7142,37 @@
    "notes": "26 October is a statutory public holiday (Monday in 2026). 1 November falls on a Sunday and is covered by the Sunday rule."
   },
   {
+   "ban_id": "at-holidays-2026-12",
+   "profile": "at-weekend",
+   "title": "Public-holiday restriction (8, 25 and 26 December)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-26",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "00:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     },
+     {
+      "date": "2026-12-25",
+      "occurrence_id": "2026-12-25"
+     },
+     {
+      "date": "2026-12-26",
+      "occurrence_id": "2026-12-26"
+     }
+    ]
+   },
+   "roads": [
+    "Austrian road network"
+   ],
+   "notes": "Feiertagsruhegesetz §1. On Saturday 26 December the Saturday 15:00-24:00 rule applies as well."
+  },
+  {
    "ban_id": "at-igl-a12-summer-weekday-2026",
    "profile": "at-igl",
    "title": "Tyrol A12 IG-L night ban (summer regime, weekday nights)",
@@ -6928,7 +7249,18 @@
      4,
      5,
      6
+    ],
+    "excluded_dates": [
+     "2026-12-08",
+     "2026-12-25",
+     "2026-12-26"
     ]
+   },
+   "sequence": 1,
+   "notes": "Statutory holidays are excluded from the working-day 20:00 start; see the holiday-night rule.",
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-12-31"
    }
   },
   {
@@ -6944,6 +7276,33 @@
     "end_day_offset": 1,
     "weekdays": [
      0
+    ]
+   }
+  },
+  {
+   "ban_id": "at-igl-a12-winter-holiday-2026-12",
+   "profile": "at-igl",
+   "title": "Tyrol A12 IG-L night ban (winter regime, public holiday nights)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-27",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "23:00",
+    "end_time": "05:00",
+    "end_day_offset": 1,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     },
+     {
+      "date": "2026-12-25",
+      "occurrence_id": "2026-12-25"
+     },
+     {
+      "date": "2026-12-26",
+      "occurrence_id": "2026-12-26"
+     }
     ]
    }
   },
@@ -6968,6 +7327,34 @@
    "notes": "VRV Art. 89(1) holiday. 1 November (Allerheiligen) falls on a Sunday and is covered by the Sunday rule."
   },
   {
+   "ban_id": "li-holidays-2026-12",
+   "profile": "li-standing",
+   "title": "Public-holiday driving restriction (8, 25 and 26 December)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-26",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "00:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     },
+     {
+      "date": "2026-12-25",
+      "occurrence_id": "2026-12-25"
+     },
+     {
+      "date": "2026-12-26",
+      "occurrence_id": "2026-12-26"
+     }
+    ]
+   },
+   "notes": "VRV Art. 89(1): Maria Empfängnis, Weihnachten, St. Stefanstag."
+  },
+  {
    "ban_id": "lu-france-armistice-2026",
    "profile": "lu-transit",
    "title": "France-bound transit restriction for Armistice Day",
@@ -6986,6 +7373,50 @@
     ]
    },
    "direction": "Transit toward France"
+  },
+  {
+   "ban_id": "lu-france-christmas-2026",
+   "profile": "lu-transit",
+   "title": "France-bound transit restriction for Christmas Day",
+   "valid_from": "2026-12-24",
+   "valid_to": "2026-12-25",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "21:30",
+    "end_time": "21:45",
+    "end_day_offset": 1,
+    "dates": [
+     {
+      "date": "2026-12-24",
+      "occurrence_id": "2026-12-24"
+     }
+    ]
+   },
+   "direction": "Transit toward France"
+  },
+  {
+   "ban_id": "lu-germany-christmas-2026",
+   "profile": "lu-transit",
+   "title": "Germany-bound transit restriction for Christmas Day and Boxing Day",
+   "valid_from": "2026-12-24",
+   "valid_to": "2026-12-26",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "23:30",
+    "end_time": "21:45",
+    "end_day_offset": 1,
+    "dates": [
+     {
+      "date": "2026-12-24",
+      "occurrence_id": "2026-12-24"
+     },
+     {
+      "date": "2026-12-25",
+      "occurrence_id": "2026-12-25"
+     }
+    ]
+   },
+   "direction": "Transit toward Germany"
   },
   {
    "ban_id": "bg-holiday-2026-09-18",
@@ -7107,6 +7538,34 @@
    "notes": "Applies only within the listed Laender. 1 November (Allerheiligen, BW/BY/NW/RP/SL) falls on a Sunday in 2026."
   },
   {
+   "ban_id": "de-holiday-2026-12-25-26",
+   "profile": "de-sunday",
+   "title": "Public-holiday driving ban (1st and 2nd Christmas Day)",
+   "valid_from": "2026-12-25",
+   "valid_to": "2026-12-26",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "00:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-25",
+      "occurrence_id": "2026-12-25"
+     },
+     {
+      "date": "2026-12-26",
+      "occurrence_id": "2026-12-26"
+     }
+    ]
+   },
+   "roads": [
+    "German road network"
+   ],
+   "regions": [],
+   "notes": "StVO §30(4): nationwide holidays."
+  },
+  {
    "ban_id": "fr-weekend",
    "profile": "fr-general",
    "title": "Weekend driving ban (Saturday 22:00 - Sunday 22:00)",
@@ -7141,6 +7600,26 @@
     ]
    },
    "notes": "Holiday eve 22:00 to holiday 22:00. 1 November falls on a Sunday."
+  },
+  {
+   "ban_id": "fr-holiday-2026-12-25",
+   "profile": "fr-general",
+   "title": "Public-holiday driving ban (Christmas Day)",
+   "valid_from": "2026-12-24",
+   "valid_to": "2026-12-25",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "22:00",
+    "end_time": "22:00",
+    "end_day_offset": 1,
+    "dates": [
+     {
+      "date": "2026-12-24",
+      "occurrence_id": "2026-12-24"
+     }
+    ]
+   },
+   "notes": "Holiday eve 22:00 to holiday 22:00. The weekend ban follows from Saturday 26 December 22:00."
   },
   {
    "ban_id": "fr-idf-out-friday",
@@ -7222,6 +7701,27 @@
    "legal_basis": "Arrêté du 16 avril 2021, art. 3 II a) veilles de jours fériés"
   },
   {
+   "ban_id": "fr-idf-out-eve-2026-12",
+   "profile": "fr-idf",
+   "title": "Ile-de-France Paris-province holiday-eve restriction (Christmas Eve)",
+   "valid_from": "2026-12-24",
+   "valid_to": "2026-12-24",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-24",
+      "occurrence_id": "2026-12-24"
+     }
+    ]
+   },
+   "direction": "Paris to province",
+   "legal_basis": "Arrêté du 16 avril 2021, art. 3 II a) veilles de jours fériés"
+  },
+  {
    "ban_id": "fr-idf-out-holiday-2026",
    "profile": "fr-idf",
    "title": "Ile-de-France Paris-province holiday evening restriction",
@@ -7241,6 +7741,28 @@
    },
    "direction": "Paris to province",
    "legal_basis": "Arrêté du 16 avril 2021, art. 3 II a) jours fériés"
+  },
+  {
+   "ban_id": "fr-idf-out-holiday-2026-12",
+   "profile": "fr-idf",
+   "title": "Ile-de-France Paris-province holiday-evening restriction (Christmas Day)",
+   "valid_from": "2026-12-25",
+   "valid_to": "2026-12-25",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "22:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-25",
+      "occurrence_id": "2026-12-25"
+     }
+    ]
+   },
+   "direction": "Paris to province",
+   "legal_basis": "Arrêté du 16 avril 2021, art. 3 II a) dimanches ou jours fériés",
+   "notes": "25 December 2026 is also a Friday, so the Friday 16:00-21:00 restriction applies as well."
   },
   {
    "ban_id": "fr-idf-in-sunday",
@@ -7300,6 +7822,27 @@
    "legal_basis": "Arrêté du 16 avril 2021, art. 3 II b) jours fériés"
   },
   {
+   "ban_id": "fr-idf-in-holiday-2026-12",
+   "profile": "fr-idf",
+   "title": "Ile-de-France province-Paris holiday-evening restriction (Christmas Day)",
+   "valid_from": "2026-12-25",
+   "valid_to": "2026-12-25",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "22:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-25",
+      "occurrence_id": "2026-12-25"
+     }
+    ]
+   },
+   "direction": "Province to Paris",
+   "legal_basis": "Arrêté du 16 avril 2021, art. 3 II b) dimanches ou jours fériés"
+  },
+  {
    "ban_id": "fr-idf-in-after-holiday-2026",
    "profile": "fr-idf",
    "title": "Ile-de-France province-Paris day-after-holiday restriction",
@@ -7314,6 +7857,27 @@
      {
       "date": "2026-11-12",
       "occurrence_id": "2026-11-12"
+     }
+    ]
+   },
+   "direction": "Province to Paris",
+   "legal_basis": "Arrêté du 16 avril 2021, art. 3 II b) lendemains de jours fériés"
+  },
+  {
+   "ban_id": "fr-idf-in-after-holiday-2026-12",
+   "profile": "fr-idf",
+   "title": "Ile-de-France province-Paris day-after-holiday restriction (26 December)",
+   "valid_from": "2026-12-26",
+   "valid_to": "2026-12-26",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "06:00",
+    "end_time": "10:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-26",
+      "occurrence_id": "2026-12-26"
      }
     ]
    },
@@ -7403,6 +7967,49 @@
    }
   },
   {
+   "ban_id": "it-sundays-holidays-dec-2026",
+   "profile": "it-calendar",
+   "title": "Sunday/holiday driving ban (December hours)",
+   "valid_from": "2026-12-06",
+   "valid_to": "2026-12-27",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "09:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-06",
+      "occurrence_id": "2026-12-06"
+     },
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     },
+     {
+      "date": "2026-12-13",
+      "occurrence_id": "2026-12-13"
+     },
+     {
+      "date": "2026-12-20",
+      "occurrence_id": "2026-12-20"
+     },
+     {
+      "date": "2026-12-25",
+      "occurrence_id": "2026-12-25"
+     },
+     {
+      "date": "2026-12-26",
+      "occurrence_id": "2026-12-26"
+     },
+     {
+      "date": "2026-12-27",
+      "occurrence_id": "2026-12-27"
+     }
+    ]
+   }
+  },
+  {
    "ban_id": "ch-night",
    "profile": "ch-standing",
    "title": "Night driving ban",
@@ -7430,6 +8037,26 @@
      0
     ]
    }
+  },
+  {
+   "ban_id": "ch-holidays-2026-12",
+   "profile": "ch-standing",
+   "title": "Public-holiday driving ban (Christmas Day)",
+   "valid_from": "2026-12-25",
+   "valid_to": "2026-12-25",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "00:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-25",
+      "occurrence_id": "2026-12-25"
+     }
+    ]
+   },
+   "notes": "VRV Art. 91(1). 26 December 2026 is not a ban day because Christmas falls on a Friday."
   },
   {
    "ban_id": "cz-sunday",
@@ -7473,6 +8100,34 @@
      }
     ]
    }
+  },
+  {
+   "ban_id": "cz-holidays-2026-christmas",
+   "profile": "cz-standing",
+   "title": "Public-holiday driving ban (Christmas)",
+   "valid_from": "2026-12-24",
+   "valid_to": "2026-12-26",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "13:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-24",
+      "occurrence_id": "2026-12-24"
+     },
+     {
+      "date": "2026-12-25",
+      "occurrence_id": "2026-12-25"
+     },
+     {
+      "date": "2026-12-26",
+      "occurrence_id": "2026-12-26"
+     }
+    ]
+   },
+   "notes": "24, 25 and 26 December are days of rest under Act 245/2000 §2-§3."
   },
   {
    "ban_id": "sk-sunday",
@@ -7537,6 +8192,30 @@
    }
   },
   {
+   "ban_id": "pl-holidays-2026-12",
+   "profile": "pl-standing",
+   "title": "Public-holiday driving ban >12t (Christmas)",
+   "valid_from": "2026-12-25",
+   "valid_to": "2026-12-26",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-25",
+      "occurrence_id": "2026-12-25"
+     },
+     {
+      "date": "2026-12-26",
+      "occurrence_id": "2026-12-26"
+     }
+    ]
+   },
+   "notes": "§2(1)(k)-(l). 24 December is a statutory day off since 2025 but is not a ban day; no eve restriction before 25 December (§2(2) covers only §2(1)(b)-(j))."
+  },
+  {
    "ban_id": "hu-weekend",
    "profile": "hu-standing",
    "title": "Weekend driving ban (Saturday 22:00 - Sunday 22:00)",
@@ -7570,6 +8249,26 @@
      }
     ]
    }
+  },
+  {
+   "ban_id": "hu-holiday-2026-12-25-26",
+   "profile": "hu-standing",
+   "title": "Public-holiday driving ban (25-26 December)",
+   "valid_from": "2026-12-24",
+   "valid_to": "2026-12-26",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "22:00",
+    "end_time": "22:00",
+    "end_day_offset": 2,
+    "dates": [
+     {
+      "date": "2026-12-24",
+      "occurrence_id": "2026-12-24"
+     }
+    ]
+   },
+   "notes": "Govt. Decree 190/2008 §2(1)(b) and §2(2): from 24 December 22:00; the Saturday-Sunday rule continues it to Sunday 27 December 22:00. §2(3) EURO 3+ international-traffic exemption applies (4 Nov-1 Mar)."
   },
   {
    "ban_id": "si-sunday",
@@ -7606,6 +8305,30 @@
     ]
    },
    "notes": "1 November falls on a Sunday."
+  },
+  {
+   "ban_id": "si-holidays-2026-12",
+   "profile": "si-standing",
+   "title": "Non-working-day driving ban (25 and 26 December)",
+   "valid_from": "2026-12-25",
+   "valid_to": "2026-12-26",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-25",
+      "occurrence_id": "2026-12-25"
+     },
+     {
+      "date": "2026-12-26",
+      "occurrence_id": "2026-12-26"
+     }
+    ]
+   },
+   "notes": "ZPDPD art. 1-2: božič and dan samostojnosti in enotnosti are non-working days."
   },
   {
    "ban_id": "si-season-saturday-2026-09-05",
@@ -7733,6 +8456,46 @@
      }
     ]
    }
+  },
+  {
+   "ban_id": "hr-holiday-eve-2026-12-24",
+   "profile": "hr-season",
+   "title": "Holiday-eve restriction (coastal roads, Christmas Eve)",
+   "valid_from": "2026-12-24",
+   "valid_to": "2026-12-24",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "15:00",
+    "end_time": "23:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-24",
+      "occurrence_id": "2026-12-24"
+     }
+    ]
+   },
+   "notes": "Naredba point II: eve of Christmas (25 December)."
+  },
+  {
+   "ban_id": "hr-holiday-last-day-sunday-2026-12-27",
+   "profile": "hr-season",
+   "title": "Last-holiday-day restriction moved to Sunday (coastal roads, Christmas)",
+   "valid_from": "2026-12-27",
+   "valid_to": "2026-12-27",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "12:00",
+    "end_time": "23:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-27",
+      "occurrence_id": "2026-12-27"
+     }
+    ]
+   },
+   "notes": "Naredba point II: the last holiday day (26 December) is a Saturday, so the restriction applies on Sunday 27 December 12:00-23:00."
   },
   {
    "ban_id": "hr-d2-sunday",
@@ -10515,5 +11278,35 @@
    "legal_basis": "ΦΕΚ Β΄ 912/2026 B7(b)"
   }
  ],
- "coverage_version": "2026-10-22.50"
+ "coverage_version": "2026-10-22.50",
+ "review_log": [
+  {
+   "review_id": "2026-10-27.r4-nov-dec-priority",
+   "reviewed_at": "2026-10-27T11:20:00.000Z",
+   "kind": "PRIORITY_PRIMARY_REVIEW",
+   "full_registry_sweep": false,
+   "period": {
+    "from": "2026-11-01",
+    "to": "2026-12-31"
+   },
+   "full_scope_jurisdictions": [
+    "CH",
+    "CZ",
+    "FR",
+    "HR",
+    "HU",
+    "IT",
+    "LI",
+    "LU",
+    "PL",
+    "SI",
+    "SK"
+   ],
+   "individual_rule_jurisdictions": [
+    "AT",
+    "DE"
+   ],
+   "evidence_log": "data/driving-bans/source-reviews/2026-10-27-nov-dec.json"
+  }
+ ]
 }
