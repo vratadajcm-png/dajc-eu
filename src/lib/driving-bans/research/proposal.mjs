@@ -86,8 +86,12 @@ const hostOf = url => new URL(url).hostname.replace(/^www\./, '');
  */
 export function buildOperations({ drafts, extracted, document, target, rawCanonical, window, known }) {
   const operations = [], findings = [];
-  const sourceId = known?.origin === 'REGISTRY' ? known.source_id : `${target.jurisdiction.toLowerCase()}-ai-src-${sha(document.final_url).slice(0, 10)}`;
+  // A URL the registry already holds keeps its identity and role: a SECONDARY page never becomes PRIMARY here.
+  const sameUrl = url => { try { const a = new URL(url); a.hash = ''; return a.href; } catch { return url; } };
+  const registered = rawCanonical.sources.find(source => [document.url, document.final_url].filter(Boolean).map(sameUrl).includes(sameUrl(source.url)));
+  const sourceId = registered?.source_id ?? (known?.origin === 'REGISTRY' ? known.source_id : `${target.jurisdiction.toLowerCase()}-ai-src-${sha(document.final_url).slice(0, 10)}`);
   const sourceExists = rawCanonical.sources.some(source => source.source_id === sourceId);
+  if (registered && registered.role !== 'PRIMARY') findings.push(finding('SOURCE_NOT_PRIMARY', 'INSUFFICIENT_EVIDENCE', `The registry records ${registered.source_id} as ${registered.role}; it cannot back a verified rule`, { source_id: registered.source_id }));
   const usedRules = new Set();
   for (const [index, draft] of drafts.entries()) {
     const rule = { ...draft, source_id: sourceId, evidence_ids: [sourceId] };

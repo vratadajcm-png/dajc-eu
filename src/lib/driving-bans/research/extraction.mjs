@@ -13,7 +13,7 @@ import { normalizeForQuote, wrapUntrusted } from './documents.mjs';
  * Nothing missing is filled in: a gap stays a gap and blocks the draft.
  */
 
-export const EXTRACTION_PROMPT_VERSION = 'dbx-1';
+export const EXTRACTION_PROMPT_VERSION = 'dbx-2';
 export const EVIDENCE_FIELDS = Object.freeze(['title', 'vehicle_scope', 'weight', 'schedule_days', 'schedule_dates', 'start_time', 'end_time', 'validity', 'roads', 'regions', 'direction', 'exceptions', 'adr', 'exceptional_transport', 'legal_basis', 'relation', 'cancellation', 'timezone']);
 const DECISIVE = ['vehicle_scope', 'weight', 'start_time', 'end_time', 'legal_basis'];
 const s = { type: 'string' };
@@ -75,7 +75,7 @@ export function extractionSystemPrompt(jurisdiction) {
     '3. Never invent a value. If a time, mass, date, road, validity or exception condition is not stated, use null or an empty list and describe the gap in missing_or_unclear.',
     '4. For every rule give evidence quotes copied character for character from the document (at most 300 characters each, no ellipsis inside a quote): vehicle_scope, weight, schedule_days or schedule_dates, start_time, end_time and legal_basis always; roads, exceptions, validity, relation and cancellation whenever you state them.',
     '5. Masses in kg, lengths in m. Keep maximum authorised mass and actual mass apart exactly as the document does. Write applies_to in English and name the measure, e.g. "MAM of lorry", "MAM of vehicle or combination", "actual mass", "MAM of lorry towing a trailer", "length", "height", "axles". A category without a mass threshold uses operator "any" with value and unit null. Write roads as numbers (e.g. "D1", "A12") or as English road classes (e.g. "Motorways", "Class I roads"); quotes stay in the document language.',
-    '6. Times as HH:MM, 24-hour local time; 24:00 for midnight at the end of a day; end_day_offset is how many days after the start day the ban ends. weekdays: 0 = Sunday ... 6 = Saturday. Dates as YYYY-MM-DD.',
+    '6. Times as HH:MM, 24-hour local time; 24:00 for midnight at the end of a day; end_day_offset is how many days after the start day the ban ends. weekdays: 0 = Sunday ... 6 = Saturday. Dates as YYYY-MM-DD. A prohibition the document states without any hours or days applies at all times: kind daily, 00:00 to 24:00, and quote the prohibition itself as schedule_days evidence.',
     '7. Copy each exception with its complete legal conditions; never drop a condition. Exceptions are listed, never applied.',
     '8. relation REPEALS only when the document explicitly repeals or cancels a rule; quote it as cancellation evidence.',
     '9. Use LEGAL_DRIVING_BAN only for a binding legal ban. Traffic reports, roadworks and operational notices are TEMPORARY_TRAFFIC_RESTRICTION or INFRASTRUCTURE_CONSTRAINT.',
@@ -166,8 +166,14 @@ export function checkExtractedRule(rule, { text, jurisdiction, window }) {
   if (rule.weight_combinator === 'single' && rule.weight_conditions.length > 1) findings.push(finding('WEIGHT_INCONSISTENT', 'INSUFFICIENT_EVIDENCE', 'Several criteria without any_of/all_of'));
 
   const { schedule } = rule;
+  // A ban without stated hours applies at all times (e.g. a route order): daily 00:00-24:00, no hours to find in a quote.
+  const continuous = schedule.kind === 'daily' && schedule.start_time === '00:00' && schedule.end_time === '24:00' && schedule.end_day_offset === 0;
+  if (continuous) {
+    if (!has('schedule_days')) findings.push(finding('MISSING_EVIDENCE', 'INSUFFICIENT_EVIDENCE', 'A continuous ban needs the quoted prohibition as schedule_days evidence', { field: 'schedule_days' }));
+    findings.push(finding('CONTINUOUS_RESTRICTION', 'NOTE', 'No hours are stated: drafted as applying at all times; confirm that the order has no time limits'));
+  }
   if (!isTime(schedule.start_time) || !isEndTime(schedule.end_time)) findings.push(finding('INVALID_TIME', 'INSUFFICIENT_EVIDENCE', `Invalid time ${schedule.start_time}-${schedule.end_time}`));
-  else if (doc !== null) {
+  else if (doc !== null && !continuous) {
     if (!timeInQuote(schedule.start_time, `${quoteText('start_time')} ${quoteText('schedule_days')} ${quoteText('schedule_dates')}`)) findings.push(finding('TIME_NOT_IN_QUOTE', 'INSUFFICIENT_EVIDENCE', `Start ${schedule.start_time} does not appear in its quotes`, { field: 'start_time' }));
     if (!timeInQuote(schedule.end_time, `${quoteText('end_time')} ${quoteText('schedule_days')} ${quoteText('schedule_dates')}`)) findings.push(finding('TIME_NOT_IN_QUOTE', 'INSUFFICIENT_EVIDENCE', `End ${schedule.end_time} does not appear in its quotes`, { field: 'end_time' }));
   }

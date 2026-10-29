@@ -175,6 +175,19 @@ describe('conflict and insufficient-evidence branches (scenarios 4, 5, 9, 21)', 
     expect(prompt.user.match(/<<<END UNTRUSTED DOCUMENT [0-9a-f]{24}>>>/g)).toHaveLength(1);
   });
 
+  it('keeps the identity and role of a URL the registry already holds: a SECONDARY page never backs a verified rule', async () => {
+    const draftUrl = 'https://www.bta.bg/bg/news/bulgaria/oficial-messages/1005565-api-pri-ofitsialni-praznitsi-prez-2026-g-v-pikovite-chasove-se-predvizhda-vrem';
+    const body = DOCUMENTS.measure.replace('FIXTURE-KEY: cz-new-rule', 'FIXTURE-KEY: bg-draft');
+    const rule = extractedRule({ timezone: 'Europe/Sofia', roads: ['D1'] });
+    const context = setup({ pages: { [draftUrl]: html(body) }, brain: scripted({ 'bg-draft': extraction([rule]) }) });
+    const report = await context.run(['BG'], { mode: 'urgent', leadUrls: [draftUrl], maxDocuments: 1 });
+    const draft = loadDraft(context.store, docOutcome(report, draftUrl).draft_id);
+    expect(draft.document.source_id).toBe('bg-api-2026-draft');
+    expect(draft.submission.operations.some((op: any) => op.op === 'ADD_SOURCE')).toBe(false);
+    expect(draft.findings.map((f: any) => f.code)).toContain('SOURCE_NOT_PRIMARY');
+    expect(draft.state).toBe('INSUFFICIENT_EVIDENCE');
+  });
+
   it('holds a PDF for a person: quotes cannot be machine-checked', async () => {
     const pdf = { body: Buffer.from('%PDF-1.7\nFIXTURE-KEY: cz-new-rule\n'), type: 'application/pdf' };
     const context = setup({ pages: { [URLS.measure]: pdf }, brain: scripted({}, { extract: () => extraction([extractedRule()]) }) });

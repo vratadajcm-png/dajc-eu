@@ -1,6 +1,8 @@
 # Driving Bans – AI vyhledávání a ověřování podkladů
 
-> **Stav: implementováno, ve výchozím stavu vypnuto, živě neověřeno.**
+> **Stav: implementováno, ve výchozím stavu vypnuto, živě neověřeno.** Analýza AI bake-off,
+> diagnostika chyb API, profil výběru modelů a postup živého ověření:
+> [`DRIVING_BANS_RESEARCH_BENCHMARK.md`](DRIVING_BANS_RESEARCH_BENCHMARK.md).
 > V repozitáři ani v tomto prostředí nejsou klíče žádného AI poskytovatele.
 > Všechny testy běží proti syntetickým přípravkům (`tests/fixtures/driving-bans-research/`).
 > Úspěšný build ani syntetický test nejsou důkazem fungující živé integrace.
