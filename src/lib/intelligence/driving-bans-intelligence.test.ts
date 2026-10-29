@@ -153,7 +153,10 @@ describe('DAJC AI read-only contract (offline, no model)', () => {
   it('answers the example questions with facts, sources, validity, versions, completeness and warnings', () => {
     // "Mohu s touto soupravou projet Rakouskem v neděli?"
     const austria = ask('evaluate_vehicle', { jurisdiction: 'AT', at: '2026-10-25T10:00:00.000Z', vehicle: truck });
-    expect(austria.status).toBe('OK');
+    // AT is not verified in full: the verified ban is BAN_FOUND, the answer as a whole is not decided.
+    expect(austria.status).toBe('INSUFFICIENT_VERIFIED_DATA');
+    expect(austria.completeness[0].outcome).toBe('BAN_FOUND');
+    expect(austria.warnings.join(' ')).toMatch(/AT: a verified ban applies, but the coverage of the whole jurisdiction is not confirmed/);
     expect(austria.facts.some((f: any) => f.ban_id === 'at-sunday')).toBe(true);
     expect(austria.sources.length).toBeGreaterThan(0);
     expect(austria.validity).toEqual(view.window);
