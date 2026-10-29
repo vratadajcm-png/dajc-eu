@@ -12,5 +12,6 @@ pro publikaci zůstává `../canonical.json`.
 | `proposals/` | návrhy změn se stavem a historií |
 | `candidates/` | kandidátní dataset a diff po stavu `READY_FOR_CANONICAL_UPDATE` |
 | `audit-log.jsonl` | auditní log, každý záznam nese hash předchozího |
+| `research/` | AI výzkum (`npm run driving-bans:research`): návrhy `drafts/`, reporty běhů `runs/`, metadata dokumentů `documents/`, cache extrakcí `cache/`, `ledger.json` s náklady a vlastní `audit-log.jsonl`; surové dokumenty `research/blobs/` se **necommitují**. Návrh vstoupí do schvalování jen přes `promote` člověkem. |
 
 Postup a pravidla: `docs/DRIVING_BANS_EVIDENCE_IMPORT.md`.
