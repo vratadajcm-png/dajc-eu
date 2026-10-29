@@ -1,4 +1,5 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { isDate } from '../core.mjs';
 import { importSubmission, validateStoredProposal } from '../evidence-store.mjs';
@@ -35,15 +36,20 @@ export function promoteDraft({ researchStore, draftId, evidenceStore, reviewer, 
   });
   const submission = { ...draft.submission, submitted_by: `${reviewer.trim()} (human legal verification of AI research draft ${draftId})`, legal_verified_at: legalVerifiedAt, operations, summary: `${draft.submission.summary} Promoted by ${reviewer.trim()}: ${reason.trim()}`.slice(0, 4000) };
 
-  // The import root holds exactly the submission and its content-addressed document.
-  const root = join(resolve(evidenceStore), '..', 'research-import', draftId);
-  const docFile = join(root, draft.document.path);
-  mkdirSync(dirname(docFile), { recursive: true });
-  writeFileSync(docFile, researchStore.readBytes(`blobs/${draft.document.sha256}`));
-  const submissionFile = join(root, 'submission.json');
-  writeFileSync(submissionFile, JSON.stringify(submission, null, 1) + '\n');
-
-  const imported = importSubmission({ submissionFile, root, store: resolve(evidenceStore), now, actor: reviewer.trim() });
+  // A throwaway import root outside the repository holds exactly the submission and its
+  // content-addressed document; the import copies the document into the evidence store.
+  const root = mkdtempSync(join(tmpdir(), `dajc-research-import-${draftId}-`));
+  let imported;
+  try {
+    const docFile = join(root, draft.document.path);
+    mkdirSync(dirname(docFile), { recursive: true });
+    writeFileSync(docFile, researchStore.readBytes(`blobs/${draft.document.sha256}`));
+    const submissionFile = join(root, 'submission.json');
+    writeFileSync(submissionFile, JSON.stringify(submission, null, 1) + '\n');
+    imported = importSubmission({ submissionFile, root, store: resolve(evidenceStore), now, actor: reviewer.trim() });
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
   const proposal = imported.status === 'DUPLICATE' ? null : validateStoredProposal({ store: resolve(evidenceStore), proposalId: imported.proposal_id, rawCanonical, now, catalogSources });
   const at = now.toISOString();
   draft.history.push({ at, from: draft.state, to: 'PROMOTED', actor: reviewer.trim(), identity_verified: false, action: 'PROMOTE', reason: reason.trim(), proposal_id: imported.proposal_id });
