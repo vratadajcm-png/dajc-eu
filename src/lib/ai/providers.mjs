@@ -98,6 +98,7 @@ const tokens = value => Number(value) || 0;
  *   json({ system, user, schema, schemaName, maxOutputTokens, document? }) -> { json, usage, model }
  *   search({ queries, domains, maxResults }) -> { results, usage }
  * `document` is { mediaType: 'application/pdf', base64 } for native PDF reading.
+ * @returns {Record<string, any>}
  */
 export function createProvider(id, { env = process.env, fetchFn = fetch, timeoutMs = 90_000 } = {}) {
   const spec = PROVIDER_CATALOG[id];
@@ -170,7 +171,10 @@ export function createProvider(id, { env = process.env, fetchFn = fetch, timeout
   };
 }
 
-/** All six adapters; unconfigured ones exist but refuse every call. */
+/**
+ * All six adapters; unconfigured ones exist but refuse every call.
+ * @returns {Record<string, any>}
+ */
 export function createProviders(options = {}) {
   return Object.fromEntries(PROVIDER_IDS.map(id => [id, createProvider(id, options)]));
 }

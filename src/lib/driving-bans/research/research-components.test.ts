@@ -239,7 +239,7 @@ describe('deterministic checks of an extraction', () => {
   it('drafts an UNVERIFIED canonical rule and never fills a missing value', () => {
     const draft = draftRuleOf(extractedRule(), { jurisdiction: 'CZ', window: WINDOW, sourceId: 'cz-test' });
     expect(draft).toMatchObject({ verification_state: 'UNVERIFIED', status: 'ACTIVE', timezone: 'Europe/Prague', weight_threshold: { operator: '>', value: 12000, unit: 'kg' }, schedule: { kind: 'dates', dates: [{ date: '2026-11-14', occurrence_id: '2026-11-14' }] } });
-    expect(draft.verified_at).toBeUndefined();
+    expect(draft).not.toHaveProperty('verified_at');
     expect(draftRuleOf(extractedRule({ weight_conditions: [{ operator: '>', value: null, unit: 'kg', applies_to: 'x' }] }), { jurisdiction: 'CZ', window: WINDOW, sourceId: 's' })).toBeNull();
     expect(draftRuleOf(extractedRule({ timezone: null }), { jurisdiction: 'ES', window: WINDOW, sourceId: 's' })).toBeNull();
     expect(supportAll([{ rule_index: 0 }]).overall).toBe('CONSISTENT');

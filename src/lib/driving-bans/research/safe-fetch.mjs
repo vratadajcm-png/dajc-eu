@@ -121,8 +121,11 @@ const header = (headers, name) => { const value = headers?.[name] ?? headers?.[n
  * Fetch one document. Returns { ok: true, ... } with bytes and SHA-256, or
  * { ok: false, availability: 'SOURCE_UNAVAILABLE' | 'REJECTED', code }.
  * An unavailable source is reported as such and never means a cancelled ban.
+ * @param {string} rawUrl
+ * @param {{ allowedHosts: string[], resolve?: (hostname: string) => Promise<Array<{ address: string, family: number }>>, transport?: (url: URL, options: { address: string, family: number, timeoutMs: number, maxBytes: number, headers: Record<string, string> }) => Promise<{ status: number, headers: Record<string, any>, body: Buffer }>, clock?: () => Date, limits?: { maxBytes: number, timeoutMs: number, maxRedirects: number } }} options
+ * @returns {Promise<any>}
  */
-export async function safeFetch(rawUrl, { allowedHosts, resolve = systemResolve, transport = httpsTransport, clock = () => new Date(), limits = FETCH_LIMITS } = {}) {
+export async function safeFetch(rawUrl, { allowedHosts, resolve = systemResolve, transport = httpsTransport, clock = () => new Date(), limits = FETCH_LIMITS }) {
   const redirects = [];
   let current;
   try { current = checkUrl(rawUrl, allowedHosts); } catch (error) { return { ok: false, url: rawUrl, availability: 'REJECTED', code: error.code, message: error.message }; }

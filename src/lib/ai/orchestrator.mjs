@@ -29,7 +29,10 @@ export class NoProviderError extends Error {
   constructor(task, reasons) { super(`No provider available for ${task}: ${reasons.join('; ') || 'none configured'}`); this.name = 'NoProviderError'; this.reasons = reasons; }
 }
 
-/** DAJC_RESEARCH_ROUTE_EXTRACT="anthropic,openai" etc.; unknown ids are dropped. */
+/**
+ * DAJC_RESEARCH_ROUTE_EXTRACT="anthropic,openai" etc.; unknown ids are dropped.
+ * @returns {{ discover: string[], extract: string[], verify: string[] }}
+ */
 export function routesFromEnv(env = process.env) {
   return Object.fromEntries(RESEARCH_TASKS.map(task => {
     const raw = env[`DAJC_RESEARCH_ROUTE_${task.toUpperCase()}`];
