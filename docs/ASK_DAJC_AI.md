@@ -18,7 +18,7 @@ public entry point for visitors who may later use Ask DAJC AI. Do not rename it
 to "DAJC AI", replace its FAQ content or create a second floating chat widget.
 
 When someone opens the FAQ, the browser makes a read-only same-origin GET to
-`/api/guide/ai-availability`. This route always returns HTTP 200 with only
+`/api/guide/availability`. This route always returns HTTP 200 with only
 `{ "available": false | true }`, `no-store` and `noindex`. The server derives
 the boolean from the **existing** `getAskConfig()` gate (exact
 `DAJC_ASK_ENABLED=true` plus complete validated settings); no public variable
