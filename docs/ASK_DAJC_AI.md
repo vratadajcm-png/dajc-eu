@@ -10,6 +10,41 @@ exact string `"true"` *and* the whole configuration (database, separate keys,
 model names, prices, budget, pepper) is present. Do not enable it before the
 launch checklist below is complete.
 
+## Public entry point: existing Ask DAJC · FAQ
+
+The current floating **Ask DAJC · FAQ** guide on DAJC.eu keeps its original
+name, position, static questions and contact actions. It is the sole existing
+public entry point for visitors who may later use Ask DAJC AI. Do not rename it
+to "DAJC AI", replace its FAQ content or create a second floating chat widget.
+
+When someone opens the FAQ, the browser makes a read-only same-origin GET to
+`/api/guide/ai-availability`. This route always returns HTTP 200 with only
+`{ "available": false | true }`, `no-store` and `noindex`. The server derives
+the boolean from the **existing** `getAskConfig()` gate (exact
+`DAJC_ASK_ENABLED=true` plus complete validated settings); no public variable
+or API secret is sent to the browser. The probe neither authenticates anyone
+nor calls an AI provider or consumes the Ask budget.
+
+- **Disabled/incomplete configuration:** only existing prepared FAQ answers
+  and contact options appear, plus a plain-language note that AI is not
+  available yet. No link to the gated page is shown; there is no customer-facing
+  404.
+- **Enabled with validated configuration:** the same FAQ panel reveals a link
+  to the existing `/intelligence/ask` page. The browser checks availability
+  again before navigation. That page retains its separate email sign-in,
+  consent/limits, AI disclosures and server-side authorization.
+- **Failure of the read-only availability request:** fail closed and keep FAQ
+  usable without the AI link.
+- **No early launch:** this UI change does not change `DAJC_ASK_ENABLED`, costs,
+  the feature release decision, user entitlements, Privacy/Terms or release
+  gates. In particular, it does not authorize customer access prior to the
+  owner's approved launch and legal review.
+
+The unchanged deny-by-default rule still applies to **all** `/api/ask/*`
+endpoints and to `/intelligence/ask`; they remain 404 while disabled. The
+new availability route is under `/api/guide/` specifically to avoid weakening
+that requirement.
+
 ## What a question goes through
 
 | Step (§47.2) | Where | Notes |
