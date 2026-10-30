@@ -1,0 +1,561 @@
+{
+  "generated_by": "scripts/ai-benchmark-consolidate.mjs",
+  "source": {
+    "repository": "vratadajcm-png/dajc-ai-bakeoff",
+    "original": {
+      "run_id": 40188865922,
+      "run_attempt": 2,
+      "commit": "e1908fb97088c140bbcaacfd7fa6efad429f3dd0",
+      "artifact_id": 12597935710,
+      "artifact_sha256": "7d7b0f21483f591d840c6a852cd840ab73484b51db5b69e01b058727e4358427",
+      "artifact_expires_at": "2026-11-24T11:47:41Z"
+    },
+    "recovery": {
+      "run_id": 40222610637,
+      "run_attempt": 1,
+      "commit": "427375dc2ebbd5e28b179d7205bb7dd837f78d8b",
+      "artifact_id": 12610263812,
+      "artifact_sha256": "a6754dd897d7b43f82d0d5368d98ba637e75ee9495f9622575bd669caebf5528",
+      "artifact_expires_at": "2026-11-24T19:03:02Z"
+    },
+    "test_set": {
+      "cases": 26,
+      "reference_date": "2026-10-25",
+      "categories": {
+        "fact": 14,
+        "scope": 3,
+        "unknown": 4,
+        "advice_trap": 2,
+        "injection": 1,
+        "false_premise": 2
+      }
+    }
+  },
+  "method": [
+    "One row per model and case: the recovery run replaced only API errors of the original run, so no case is counted twice.",
+    "Scoring is the bake-off's own; this file only classifies its fields. CORRECT = pass; INCORRECT = wrong status or forbidden content; INCOMPLETE = expected fact or source missing; UNVERIFIED_CLAIM = only a claim without an allowed source; INVALID_OUTPUT = unparseable JSON.",
+    "API error classes come from the recorded HTTP status line. NOT_SENT_* rows were stopped by the recovery guard after a blocking error and never reached the provider.",
+    "Costs are reference estimates from the configured prices, not invoices. Latency is the mean over answers completed in the original run; recovered answers include a 15 s pacing pause.",
+    "In the recovery run a 429 was retried inside one logged request up to 4 times (waits 30, 60, 120 s); the HTTP counts are logged responses, not every attempt.",
+    "The test measures grounded question answering over a given registry extract (closest to explaining approved data). It does not measure document retrieval, legal extraction or verification."
+  ],
+  "models": [
+    {
+      "provider": "openai",
+      "model": "gpt-6-luna",
+      "reported_models": [
+        "gpt-6-luna"
+      ],
+      "original_run": {
+        "cases": 26,
+        "correct": 20,
+        "api_errors": 0
+      },
+      "recovery_run": {
+        "retried_cases": 0,
+        "recovered_answers": 0
+      },
+      "consolidated": {
+        "cases": 26,
+        "completed_answers": 26,
+        "correct": 20,
+        "correct_rate_of_completed": 0.769,
+        "classes": {
+          "CORRECT": 20,
+          "INCOMPLETE": 1,
+          "INCORRECT": 5
+        },
+        "unverified_claims_total": 0,
+        "unknown_handled": "4/4",
+        "traps_handled": "2/5"
+      },
+      "requests": {
+        "sent_with_http_response": 26,
+        "http_status": {
+          "200": 26
+        },
+        "not_sent_local_guard": 0
+      },
+      "tokens": {
+        "avg_input_per_answer": 25066,
+        "avg_output_per_answer": 272
+      },
+      "latency_ms": {
+        "avg_completed_original_run": 3018,
+        "recovered_answers_include_pacing": false
+      },
+      "cost_usd_reference_estimate": 0.06869,
+      "finish_reasons": {
+        "stop": 26
+      }
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.4-mini",
+      "reported_models": [
+        "gpt-5.4-mini-2026-03-17"
+      ],
+      "original_run": {
+        "cases": 26,
+        "correct": 19,
+        "api_errors": 0
+      },
+      "recovery_run": {
+        "retried_cases": 0,
+        "recovered_answers": 0
+      },
+      "consolidated": {
+        "cases": 26,
+        "completed_answers": 26,
+        "correct": 19,
+        "correct_rate_of_completed": 0.731,
+        "classes": {
+          "CORRECT": 19,
+          "UNVERIFIED_CLAIM": 3,
+          "INCORRECT": 2,
+          "INCOMPLETE": 2
+        },
+        "unverified_claims_total": 4,
+        "unknown_handled": "1/4",
+        "traps_handled": "2/5"
+      },
+      "requests": {
+        "sent_with_http_response": 26,
+        "http_status": {
+          "200": 26
+        },
+        "not_sent_local_guard": 0
+      },
+      "tokens": {
+        "avg_input_per_answer": 25066,
+        "avg_output_per_answer": 346
+      },
+      "latency_ms": {
+        "avg_completed_original_run": 2842,
+        "recovered_answers_include_pacing": false
+      },
+      "cost_usd_reference_estimate": 0.52926,
+      "finish_reasons": {
+        "stop": 26
+      }
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-6-sol",
+      "reported_models": [
+        "gpt-6-sol"
+      ],
+      "original_run": {
+        "cases": 26,
+        "correct": 24,
+        "api_errors": 0
+      },
+      "recovery_run": {
+        "retried_cases": 0,
+        "recovered_answers": 0
+      },
+      "consolidated": {
+        "cases": 26,
+        "completed_answers": 26,
+        "correct": 24,
+        "correct_rate_of_completed": 0.923,
+        "classes": {
+          "CORRECT": 24,
+          "INCORRECT": 2
+        },
+        "unverified_claims_total": 0,
+        "unknown_handled": "4/4",
+        "traps_handled": "3/5"
+      },
+      "requests": {
+        "sent_with_http_response": 26,
+        "http_status": {
+          "200": 26
+        },
+        "not_sent_local_guard": 0
+      },
+      "tokens": {
+        "avg_input_per_answer": 25066,
+        "avg_output_per_answer": 219
+      },
+      "latency_ms": {
+        "avg_completed_original_run": 2660,
+        "recovered_answers_include_pacing": false
+      },
+      "cost_usd_reference_estimate": 1.36035,
+      "finish_reasons": {
+        "stop": 26
+      }
+    },
+    {
+      "provider": "anthropic",
+      "model": "claude-haiku-5-5",
+      "reported_models": [],
+      "original_run": {
+        "cases": 26,
+        "correct": 0,
+        "api_errors": 26
+      },
+      "recovery_run": {
+        "retried_cases": 26,
+        "recovered_answers": 0
+      },
+      "consolidated": {
+        "cases": 26,
+        "completed_answers": 0,
+        "correct": 0,
+        "correct_rate_of_completed": null,
+        "classes": {
+          "API_CREDIT_OR_BILLING": 1,
+          "NOT_SENT_PROVIDER_BLOCKED": 25
+        },
+        "unverified_claims_total": 0,
+        "unknown_handled": "0/4",
+        "traps_handled": "0/5"
+      },
+      "requests": {
+        "sent_with_http_response": 27,
+        "http_status": {
+          "400": 27
+        },
+        "not_sent_local_guard": 25
+      },
+      "tokens": {
+        "avg_input_per_answer": null,
+        "avg_output_per_answer": null
+      },
+      "latency_ms": {
+        "avg_completed_original_run": null,
+        "recovered_answers_include_pacing": false
+      },
+      "cost_usd_reference_estimate": 0,
+      "finish_reasons": {}
+    },
+    {
+      "provider": "anthropic",
+      "model": "claude-sonnet-5-5",
+      "reported_models": [],
+      "original_run": {
+        "cases": 26,
+        "correct": 0,
+        "api_errors": 26
+      },
+      "recovery_run": {
+        "retried_cases": 26,
+        "recovered_answers": 0
+      },
+      "consolidated": {
+        "cases": 26,
+        "completed_answers": 0,
+        "correct": 0,
+        "correct_rate_of_completed": null,
+        "classes": {
+          "API_CREDIT_OR_BILLING": 1,
+          "NOT_SENT_PROVIDER_BLOCKED": 25
+        },
+        "unverified_claims_total": 0,
+        "unknown_handled": "0/4",
+        "traps_handled": "0/5"
+      },
+      "requests": {
+        "sent_with_http_response": 27,
+        "http_status": {
+          "400": 27
+        },
+        "not_sent_local_guard": 25
+      },
+      "tokens": {
+        "avg_input_per_answer": null,
+        "avg_output_per_answer": null
+      },
+      "latency_ms": {
+        "avg_completed_original_run": null,
+        "recovered_answers_include_pacing": false
+      },
+      "cost_usd_reference_estimate": 0,
+      "finish_reasons": {}
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.5-flash-lite",
+      "reported_models": [
+        "gemini-3.5-flash-lite"
+      ],
+      "original_run": {
+        "cases": 26,
+        "correct": 9,
+        "api_errors": 17
+      },
+      "recovery_run": {
+        "retried_cases": 17,
+        "recovered_answers": 17
+      },
+      "consolidated": {
+        "cases": 26,
+        "completed_answers": 26,
+        "correct": 22,
+        "correct_rate_of_completed": 0.846,
+        "classes": {
+          "CORRECT": 22,
+          "INCOMPLETE": 1,
+          "INCORRECT": 3
+        },
+        "unverified_claims_total": 0,
+        "unknown_handled": "4/4",
+        "traps_handled": "2/5"
+      },
+      "requests": {
+        "sent_with_http_response": 43,
+        "http_status": {
+          "200": 26,
+          "429": 17
+        },
+        "not_sent_local_guard": 0
+      },
+      "tokens": {
+        "avg_input_per_answer": 29428,
+        "avg_output_per_answer": 255
+      },
+      "latency_ms": {
+        "avg_completed_original_run": 1510,
+        "recovered_answers_include_pacing": true
+      },
+      "cost_usd_reference_estimate": 0.24609,
+      "finish_reasons": {
+        "STOP": 26
+      }
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.5-flash",
+      "reported_models": [
+        "gemini-3.6-flash"
+      ],
+      "original_run": {
+        "cases": 26,
+        "correct": 6,
+        "api_errors": 20
+      },
+      "recovery_run": {
+        "retried_cases": 20,
+        "recovered_answers": 15
+      },
+      "consolidated": {
+        "cases": 26,
+        "completed_answers": 21,
+        "correct": 19,
+        "correct_rate_of_completed": 0.905,
+        "classes": {
+          "CORRECT": 19,
+          "INCOMPLETE": 1,
+          "API_OVERLOADED": 5,
+          "INCORRECT": 1
+        },
+        "unverified_claims_total": 0,
+        "unknown_handled": "2/4",
+        "traps_handled": "3/5"
+      },
+      "requests": {
+        "sent_with_http_response": 46,
+        "http_status": {
+          "200": 21,
+          "429": 20,
+          "503": 5
+        },
+        "not_sent_local_guard": 0
+      },
+      "tokens": {
+        "avg_input_per_answer": 29429,
+        "avg_output_per_answer": 296
+      },
+      "latency_ms": {
+        "avg_completed_original_run": 7714,
+        "recovered_answers_include_pacing": true
+      },
+      "cost_usd_reference_estimate": 0.98292,
+      "finish_reasons": {
+        "STOP": 21
+      }
+    },
+    {
+      "provider": "grok",
+      "model": "grok-4.7",
+      "reported_models": [
+        "grok-4.7"
+      ],
+      "original_run": {
+        "cases": 26,
+        "correct": 21,
+        "api_errors": 0
+      },
+      "recovery_run": {
+        "retried_cases": 0,
+        "recovered_answers": 0
+      },
+      "consolidated": {
+        "cases": 26,
+        "completed_answers": 26,
+        "correct": 21,
+        "correct_rate_of_completed": 0.808,
+        "classes": {
+          "CORRECT": 21,
+          "INCORRECT": 5
+        },
+        "unverified_claims_total": 0,
+        "unknown_handled": "4/4",
+        "traps_handled": "2/5"
+      },
+      "requests": {
+        "sent_with_http_response": 26,
+        "http_status": {
+          "200": 26
+        },
+        "not_sent_local_guard": 0
+      },
+      "tokens": {
+        "avg_input_per_answer": 29805,
+        "avg_output_per_answer": 429
+      },
+      "latency_ms": {
+        "avg_completed_original_run": 9663,
+        "recovered_answers_include_pacing": false
+      },
+      "cost_usd_reference_estimate": 1.61677,
+      "finish_reasons": {
+        "stop": 26
+      }
+    },
+    {
+      "provider": "mistral",
+      "model": "mistral-small-2603",
+      "reported_models": [],
+      "original_run": {
+        "cases": 26,
+        "correct": 0,
+        "api_errors": 26
+      },
+      "recovery_run": {
+        "retried_cases": 26,
+        "recovered_answers": 0
+      },
+      "consolidated": {
+        "cases": 26,
+        "completed_answers": 0,
+        "correct": 0,
+        "correct_rate_of_completed": null,
+        "classes": {
+          "API_RATE_LIMIT": 1,
+          "NOT_SENT_RATE_LIMIT_DEFERRED": 25
+        },
+        "unverified_claims_total": 0,
+        "unknown_handled": "0/4",
+        "traps_handled": "0/5"
+      },
+      "requests": {
+        "sent_with_http_response": 27,
+        "http_status": {
+          "429": 27
+        },
+        "not_sent_local_guard": 25
+      },
+      "tokens": {
+        "avg_input_per_answer": null,
+        "avg_output_per_answer": null
+      },
+      "latency_ms": {
+        "avg_completed_original_run": null,
+        "recovered_answers_include_pacing": false
+      },
+      "cost_usd_reference_estimate": 0,
+      "finish_reasons": {}
+    },
+    {
+      "provider": "mistral",
+      "model": "mistral-large-2512",
+      "reported_models": [],
+      "original_run": {
+        "cases": 26,
+        "correct": 0,
+        "api_errors": 26
+      },
+      "recovery_run": {
+        "retried_cases": 26,
+        "recovered_answers": 0
+      },
+      "consolidated": {
+        "cases": 26,
+        "completed_answers": 0,
+        "correct": 0,
+        "correct_rate_of_completed": null,
+        "classes": {
+          "API_MODEL_NOT_IN_SUBSCRIPTION_TIER": 1,
+          "NOT_SENT_PROVIDER_BLOCKED": 25
+        },
+        "unverified_claims_total": 0,
+        "unknown_handled": "0/4",
+        "traps_handled": "0/5"
+      },
+      "requests": {
+        "sent_with_http_response": 27,
+        "http_status": {
+          "403": 27
+        },
+        "not_sent_local_guard": 25
+      },
+      "tokens": {
+        "avg_input_per_answer": null,
+        "avg_output_per_answer": null
+      },
+      "latency_ms": {
+        "avg_completed_original_run": null,
+        "recovered_answers_include_pacing": false
+      },
+      "cost_usd_reference_estimate": 0,
+      "finish_reasons": {}
+    },
+    {
+      "provider": "mistral",
+      "model": "mistral-medium-3-5",
+      "reported_models": [],
+      "original_run": {
+        "cases": 26,
+        "correct": 0,
+        "api_errors": 26
+      },
+      "recovery_run": {
+        "retried_cases": 26,
+        "recovered_answers": 0
+      },
+      "consolidated": {
+        "cases": 26,
+        "completed_answers": 0,
+        "correct": 0,
+        "correct_rate_of_completed": null,
+        "classes": {
+          "API_RATE_LIMIT": 1,
+          "NOT_SENT_RATE_LIMIT_DEFERRED": 25
+        },
+        "unverified_claims_total": 0,
+        "unknown_handled": "0/4",
+        "traps_handled": "0/5"
+      },
+      "requests": {
+        "sent_with_http_response": 27,
+        "http_status": {
+          "429": 27
+        },
+        "not_sent_local_guard": 25
+      },
+      "tokens": {
+        "avg_input_per_answer": null,
+        "avg_output_per_answer": null
+      },
+      "latency_ms": {
+        "avg_completed_original_run": null,
+        "recovered_answers_include_pacing": false
+      },
+      "cost_usd_reference_estimate": 0,
+      "finish_reasons": {}
+    }
+  ]
+}

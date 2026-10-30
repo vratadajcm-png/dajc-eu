@@ -12,6 +12,8 @@
     "test": "vitest run",
     "lint:driving-bans": "node scripts/lint-driving-bans.mjs",
     "driving-bans:audit": "node scripts/audit-driving-bans.mjs",
+    "driving-bans:research": "node scripts/driving-bans-research.mjs",
+    "driving-bans:research:demo": "node scripts/driving-bans-research.mjs demo",
     "driving-bans:sources": "node scripts/export-driving-ban-sources.mjs",
     "driving-bans:evidence": "node scripts/driving-bans-evidence.mjs",
     "driving-bans:evidence:demo": "node scripts/driving-bans-evidence-demo.mjs",

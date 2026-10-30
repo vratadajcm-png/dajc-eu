@@ -152,6 +152,17 @@ export function resolveDrivingBanRegistrySnapshot(args: {
   };
 }
 
+/**
+ * The published Driving Bans snapshot (getDrivingBansSnapshot): the same data as
+ * /driving-bans, JSON and ICS, with the per-jurisdiction verification state and the
+ * published period. It is the one read path for consumers that answer from verified
+ * data through driving-bans-ai-contract (free Ask DAJC AI, paid DAJC AI). Read-only
+ * and uncached: every call reflects the registry as published.
+ */
+export function readPublishedDrivingBans(now: Date = new Date()) {
+  return getDrivingBansSnapshot(now);
+}
+
 export class DrivingBansRegistryAdapter implements IntelligenceSourceAdapter {
   readonly sourceId = 'dajc-driving-bans-registry';
   readonly rights = dajcMaintainedDrivingBansRights;

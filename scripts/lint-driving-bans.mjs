@@ -14,7 +14,12 @@ for (const file of ['src/pages/driving-bans.astro','src/pages/api/driving-bans.i
 }
 // Intelligence and AI contracts stay unreleased: no public page or API route may import them.
 for (const file of execFileSync('git',['ls-files','src/pages'],{encoding:'utf8'}).split('\n').filter(name=>/\.(astro|ts|mjs|js)$/.test(name))) {
-  assert(!/from\s+['"][^'"]*(?:driving-bans-relevance|driving-bans-ai-contract|driving-ban-connectors|driving-bans-alerts|intelligence\/entitlements)/.test(readFileSync(file,'utf8')),`${file}: unreleased Driving Bans Intelligence contract imported by a public route`);
+  assert(!/from\s+['"][^'"]*(?:driving-bans-relevance|driving-bans-ai-contract|driving-bans-query|driving-bans-intelligence-api|driving-ban-connectors|driving-bans-alerts|intelligence\/entitlements|driving-bans\/research\/|lib\/ai\/)/.test(readFileSync(file,'utf8')),`${file}: unreleased Driving Bans Intelligence, research or AI module imported by a public route`);
+}
+// Research prepares drafts only: syntax of every research module, and none writes the canonical dataset.
+for (const file of ['src/lib/ai/providers.mjs','src/lib/ai/orchestrator.mjs','src/lib/ai/model-profile.mjs','scripts/ai-benchmark-consolidate.mjs','scripts/driving-bans-research-live.mjs','scripts/ai-lab-live-evidence.mjs','src/lib/driving-bans/research/safe-fetch.mjs','src/lib/driving-bans/research/documents.mjs','src/lib/driving-bans/research/discovery.mjs','src/lib/driving-bans/research/extraction.mjs','src/lib/driving-bans/research/cross-check.mjs','src/lib/driving-bans/research/proposal.mjs','src/lib/driving-bans/research/pipeline.mjs','src/lib/driving-bans/research/promote.mjs','src/lib/driving-bans/research/config.mjs','scripts/driving-bans-research.mjs']) execFileSync(process.execPath,['--check',file],{stdio:'inherit'});
+for (const file of execFileSync('git',['ls-files','src/lib/driving-bans/research','src/lib/ai','scripts/driving-bans-research.mjs','scripts/driving-bans-research-live.mjs'],{encoding:'utf8'}).split('\n').filter(name=>/\.mjs$/.test(name))) {
+  assert(!/(?:writeFileSync|appendFileSync|renameSync|copyFileSync)\([^)]*canonical/i.test(readFileSync(file,'utf8')),`${file}: research must never write canonical.json`);
 }
 assert.equal(getDrivingBansSnapshot().jurisdictions.length,dajcCoverageCount);
 console.log('Driving Bans scoped lint: syntax, production provenance, canonical consumer boundaries PASS');

@@ -20,6 +20,9 @@ export const DRIVING_BANS_INTELLIGENCE_FEATURES = [
   'history',
   'organisation-preferences',
   'ai-assistant',
+  // The Intelligence Driving Bans query module itself (search, rules, exceptions, sources).
+  // It is also the module switch: no Intelligence Driving Bans tool runs without it.
+  'driving-bans-query',
 ] as const;
 export type DrivingBansIntelligenceFeature = (typeof DRIVING_BANS_INTELLIGENCE_FEATURES)[number];
 
@@ -30,6 +33,7 @@ export const FEATURE_FLAG_ENV: Record<DrivingBansIntelligenceFeature, string> = 
   history: 'DAJC_INTELLIGENCE_HISTORY_ENABLED',
   'organisation-preferences': 'DAJC_INTELLIGENCE_PREFERENCES_ENABLED',
   'ai-assistant': 'DAJC_AI_DRIVING_BANS_ENABLED',
+  'driving-bans-query': 'DAJC_INTELLIGENCE_BANS_ENABLED',
 };
 
 /**
