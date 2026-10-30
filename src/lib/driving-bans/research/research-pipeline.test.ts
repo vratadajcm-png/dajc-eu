@@ -255,6 +255,22 @@ describe('conflict and insufficient-evidence branches (scenarios 4, 5, 9, 21)', 
     expect(context.orchestrator.calls().find((call: any) => call.purpose === 'legal rule extraction (escalated)')).toMatchObject({ provider: 'openai', complex: true });
   });
 
+  it('asks one further vendor when the independent second extraction fails the checks itself', async () => {
+    const env = testEnv({ DAJC_RESEARCH_ROUTE_EXTRACT: 'openai,gemini,xai', DAJC_RESEARCH_ROUTE_VERIFY: 'gemini,xai' });
+    const unitError = extractedRule({ weight_conditions: [{ operator: '>', value: 12, unit: 'kg', applies_to: 'MAM of lorry' }] });
+    const context = setup({ env, pages: { [URLS.measure]: html(DOCUMENTS.measure) }, brain: scripted({}, { extract: ({ provider }) => extraction([provider === 'gemini' ? unitError : extractedRule()]) }) });
+    const draft = loadDraft(context.store, docOutcome(await context.run(['CZ'], { mode: 'urgent', leadUrls: [URLS.measure], maxDocuments: 1 }), URLS.measure).draft_id);
+    expect(draft.state).toBe('REVIEW_REQUIRED');
+    expect(draft.second_extraction).toMatchObject({ provider: 'xai', agreed: true });
+    expect(draft.findings.find((f: any) => f.code === 'SECOND_EXTRACTION_RETRIED')).toMatchObject({ blocking_state: 'NOTE', first_model: 'test-gemini', retry_model: 'test-grok' });
+    expect(context.ai.log.filter(item => item.task === 'extract').map(item => item.provider)).toEqual(['openai', 'gemini', 'xai']);
+    // Without a further vendor the failed second reading still counts as a disagreement.
+    const alone = setup({ env: testEnv({ DAJC_RESEARCH_ROUTE_EXTRACT: 'openai,gemini', DAJC_RESEARCH_ROUTE_VERIFY: 'gemini' }), pages: { [URLS.measure]: html(DOCUMENTS.measure) }, brain: scripted({}, { extract: ({ provider }) => extraction([provider === 'gemini' ? unitError : extractedRule()]) }) });
+    const conflict = loadDraft(alone.store, docOutcome(await alone.run(['CZ'], { mode: 'urgent', leadUrls: [URLS.measure], maxDocuments: 1 }), URLS.measure).draft_id);
+    expect(conflict.state).toBe('CONFLICT');
+    expect(conflict.findings.find((f: any) => f.code === 'SECOND_EXTRACTION_RETRIED').message).toMatch(/no further vendor/);
+  });
+
   it('keeps the first extraction when the stronger model does no better, and never pays twice for the same model', async () => {
     const weak = extractedRule();
     weak.evidence = weak.evidence.filter((item: any) => item.field !== 'legal_basis');

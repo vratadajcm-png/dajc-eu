@@ -130,6 +130,16 @@ async function analyseDocument({ item, fetched, target, window, rawCanonical, ca
       const risky = operations.some(op => op.op === 'ADD_RULE' || op.op === 'CANCEL_RULE' || (op.op === 'AMEND_RULE' && ['weight_threshold', 'schedule', 'roads'].some(key => key in op.changes)));
       if (risky) {
         dual = await dualExtraction({ orchestrator, jurisdiction: target.jurisdiction, window, document, text, first: extraction, excludeVendors: [first.vendor] });
+        // A second reading that fails the deterministic checks itself (live check 2026-10-30: 7.5 t as 7.5 kg)
+        // confirms nothing; one further vendor reads the document. If that one fails too, the disagreement stands.
+        if (dual.ok && blocking(checkRules(dual.extraction.rules)) === 'INSUFFICIENT_EVIDENCE') {
+          let retry = null;
+          try { retry = await dualExtraction({ orchestrator, jurisdiction: target.jurisdiction, window, document, text, first: extraction, excludeVendors: [first.vendor, dual.vendor] }); }
+          catch (error) { if (error.name === 'BudgetExceededError') throw error; }
+          const passes = Boolean(retry?.ok && !blocking(checkRules(retry.extraction.rules)));
+          findings.push({ code: 'SECOND_EXTRACTION_RETRIED', blocking_state: 'NOTE', message: `The second extraction by ${dual.model} failed the deterministic checks; ${retry?.ok ? `${retry.model} read the document ${passes ? 'and its extraction is compared' : 'but failed them too'}` : 'no further vendor could read it'}`, first_model: dual.model, retry_model: retry?.model ?? null });
+          if (passes) dual = retry;
+        }
         findings.push(...dual.findings);
       }
     } catch (error) {
