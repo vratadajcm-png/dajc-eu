@@ -4,7 +4,7 @@ import { guideAiAvailabilityResponse, isGuideAiAvailable } from '../guide-entry'
 import { FULL_ENV } from './helpers';
 
 const guide = readFileSync(new URL('../../../components/DAJCGuide.astro', import.meta.url), 'utf8');
-const route = readFileSync(new URL('../../../pages/api/guide/ai-availability.ts', import.meta.url), 'utf8');
+const route = readFileSync(new URL('../../../pages/api/guide/availability.ts', import.meta.url), 'utf8');
 
 describe('Ask DAJC · FAQ is the entry point to DAJC AI', () => {
   it('preserves the existing public widget name and prepared FAQ answers', () => {
