@@ -24,10 +24,13 @@ export const MODEL_PROFILE = profileData;
 export const BENCHMARK_EVIDENCE = evidenceData;
 export const LIVE_EVIDENCE = liveData;
 
+// Evidence records the repository name at run time; links use the AI Lab's current name.
+const labRepository = live => (live.source.repository === profileData.ai_lab.former_repository ? profileData.ai_lab.repository : live.source.repository);
+
 /** AI Lab live-check summary of one model, or null when the AI Lab has not run it. */
 export function liveEvidenceFor(provider, model, live = LIVE_EVIDENCE) {
   const row = live.models.find(item => item.provider === provider && item.model === model);
-  return row ? { calls: row.calls, ok: row.ok, failed_by_category: row.failed_by_category, extraction: row.extraction, used_in_review_required_draft: row.used_in_review_required_draft, source: live.source.repository } : null;
+  return row ? { calls: row.calls, ok: row.ok, failed_by_category: row.failed_by_category, extraction: row.extraction, used_in_review_required_draft: row.used_in_review_required_draft, source: labRepository(live) } : null;
 }
 
 /**
@@ -38,7 +41,7 @@ export function providerApiStatus(live = LIVE_EVIDENCE) {
   return Object.fromEntries(PROVIDER_IDS.map(id => {
     const item = live.providers.find(row => row.provider === id);
     const state = !item ? { status: 'NOT_TESTED' } : item.last_account_block ? { status: 'ACCOUNT_BLOCKED', category: item.last_account_block.category, run_id: item.last_account_block.run_id } : item.last_smoke?.outcome === 'OK' ? { status: 'OK', run_id: item.last_smoke.run_id } : { status: 'UNVERIFIED', run_id: item.last_smoke?.run_id ?? null };
-    return [id, { ...state, keys: live.source.repository }];
+    return [id, { ...state, keys: labRepository(live) }];
   }));
 }
 
@@ -113,7 +116,7 @@ export function recommendModels(options = {}) {
     // The approved Driving Bans strategy: a stronger second reading when the ordinary extraction fails the checks.
     escalation: complex && primary && complex.model !== primary.model ? { when: 'ordinary extraction fails the deterministic checks', model: complex.model, provider: complex.provider } : null,
     api_status: providerApiStatus(options.live ?? LIVE_EVIDENCE),
-    live_evidence: { source: (options.live ?? LIVE_EVIDENCE).source, runs: (options.live ?? LIVE_EVIDENCE).totals.runs, cost_usd: (options.live ?? LIVE_EVIDENCE).totals.cost_usd },
+    live_evidence: { source: { ...(options.live ?? LIVE_EVIDENCE).source, repository: labRepository(options.live ?? LIVE_EVIDENCE), repository_at_run_time: (options.live ?? LIVE_EVIDENCE).source.repository }, runs: (options.live ?? LIVE_EVIDENCE).totals.runs, cost_usd: (options.live ?? LIVE_EVIDENCE).totals.cost_usd },
     caution: 'Provisional: the bake-off measured grounded answering, not extraction from legal documents. AI Lab live checks add direct but small evidence (see live per model); a person decides on changes to the strategy.',
   };
 }

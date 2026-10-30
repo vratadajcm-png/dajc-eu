@@ -1,5 +1,5 @@
 /**
- * Consolidates the DAJC AI bake-off (vratadajcm-png/dajc-ai-bakeoff) original live run and
+ * Consolidates the DAJC AI bake-off (DAJC AI Lab, vratadajcm-png/dajc-ai-lab; named dajc-ai-bakeoff at the time) original live run and
  * its recovery run into one sanitised evidence file for the research model profile.
  * Input: the two downloaded artifacts (untrusted data, read only). Output: counts, classes,
  * tokens, latency and reference cost per model; no answers, prompts, keys or error bodies.

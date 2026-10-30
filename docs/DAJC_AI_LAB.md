@@ -8,13 +8,13 @@ ověřené výsledky, doporučené modelové konfigurace a metadata.
 
 | | |
 | --- | --- |
-| Současný název | `vratadajcm-png/dajc-ai-bakeoff` (soukromý) |
-| Plánovaný název | `vratadajcm-png/dajc-ai-lab` |
-| Stav přejmenování | **čeká na vlastníka** (viz níže). Nástroje této integrace repozitář přejmenovat neumí a kopie se jako náhrada nevytváří. |
+| Název | `vratadajcm-png/dajc-ai-lab` (soukromý), https://github.com/vratadajcm-png/dajc-ai-lab |
+| Dřívější název | `vratadajcm-png/dajc-ai-bakeoff`, přejmenováno vlastníkem 30. 10. 2026 (stejné ID repozitáře 1433088106) |
+| Zachováno | historie, větve, PR #1, tři workflow, artefakty běhů, Secrets (ověřeno bezplatným během plánu) |
 | README | aktualizované commitem `11e30da` (DAJC AI Lab a vztah k DAJC.eu) |
 
-Odkazy v dajc-eu míří na současný název, protože jen ten je dnes funkční. Po přejmenování
-GitHub staré adresy přesměruje, ale konfigurace se upraví podle seznamu níže.
+Konfigurace a odkazy v dajc-eu používají nový název. GitHub staré adresy přesměrovává,
+ale nic v dajc-eu na přesměrování nespoléhá.
 
 ## Rozdělení odpovědností
 
@@ -51,7 +51,7 @@ zákaznické funkce a nesdílí klíče. Totéž hlídá `config/ai-research-mod
 - **dajc-eu → AI Lab:** žádný automatický přístup a žádný token mezi repozitáři.
   - Oprávněná osoba stáhne artefakt běhu a spustí převod:
     ```bash
-    node scripts/ai-lab-live-evidence.mjs --repository vratadajcm-png/dajc-ai-bakeoff \
+    node scripts/ai-lab-live-evidence.mjs --repository vratadajcm-png/dajc-ai-lab \
       --run <RUN_ID>=<rozbalený artefakt>@<commit dajc-eu> [--run …] \
       --out data/ai-benchmark/live-checks-2026-10.json
     ```
@@ -79,20 +79,19 @@ zákaznické funkce a nesdílí klíče. Totéž hlídá `config/ai-research-mod
   - lidské schválení.
 - Placené běhy jen ručně, se stropem 1,50 USD na běh a nejvýše 60 požadavky. Žádný plán ani pravidelný placený běh.
 
-## Přejmenování: krok vlastníka
+## Přejmenování (30. 10. 2026)
 
-1. GitHub → `vratadajcm-png/dajc-ai-bakeoff` → **Settings → General → Repository name**, napište `dajc-ai-lab` a zvolte **Rename**.
-2. Viditelnost zůstane soukromá. Historie, větve, PR, Actions, artefakty i Secrets se přejmenováním nemění.
-
-Po přejmenování (může udělat Claude):
+Vlastník repozitář přejmenoval v Settings → General → Repository name. Pak se upravilo:
 
 | Kde | Změna |
 | --- | --- |
-| `config/ai-research-models.json` | `ai_lab.repository` na `vratadajcm-png/dajc-ai-lab`, `rename_status` na datum |
-| `docs/DAJC_AI_LAB.md`, `docs/DRIVING_BANS_RESEARCH_BENCHMARK.md` | odkazy na repozitář a běhy živých testů |
+| `config/ai-research-models.json` | `ai_lab.repository` = `vratadajcm-png/dajc-ai-lab`, `former_repository`, `renamed_on`, zdroj cen |
+| `src/lib/ai/model-profile.mjs` | zdroj živých důkazů a klíčů se uvádí pod novým názvem (název v době běhu zůstává v `repository_at_run_time`) |
+| `docs/DAJC_AI_LAB.md`, `docs/DRIVING_BANS_RESEARCH_BENCHMARK.md`, komentáře skriptů | odkazy na repozitář a běhy |
 | popis PR #88 a PR #1 v AI Lab | odkazy |
 | lokální klony | `git remote set-url origin https://github.com/vratadajcm-png/dajc-ai-lab` |
-| sezení Claude Code | připojit repozitář pod novým názvem |
+
+Lokální klon nebo jiné sezení, které repozitář znalo pod starým názvem, si ho připojí pod novým.
 
 Historické názvy zůstávají, protože označují skutečné původní testy:
 - `data/ai-benchmark/bakeoff-2026-10-25.json`, profil `bakeoff-2026-10-25` a `source.repository` v souboru živých důkazů;

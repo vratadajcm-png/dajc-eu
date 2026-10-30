@@ -2,20 +2,20 @@
 
 > **Stav:** benchmark je zanalyzovaný a adaptéry jsou opravené a otestované proti
 > zaznamenaným chybám. Živé ověření proběhlo 29.–30. 10. 2026 ve čtyřech bězích s klíči
-> `dajc-ai-bakeoff` (celkem 0,36 USD ze schváleného stropu 1,50 USD na běh). Poslední E2E
+> DAJC AI Lab `dajc-ai-lab`, tehdy `dajc-ai-bakeoff` (celkem 0,36 USD ze schváleného stropu 1,50 USD na běh). Poslední E2E
 > skončil návrhem `REVIEW_REQUIRED` po extrakci, nezávislé kontrole a druhé extrakci
 > u tří různých dodavatelů (oddíl 6). Nic se nepovýšilo a `canonical.json` je beze změny.
 
 ## 1. Zdroj
 
-DAJC AI bake-off (`vratadajcm-png/dajc-ai-bakeoff`), 26 otázek v 10 jazycích nad
+DAJC AI bake-off v DAJC AI Lab (`vratadajcm-png/dajc-ai-lab`, v době běhu `dajc-ai-bakeoff`), 26 otázek v 10 jazycích nad
 výtahem z registru (fakta, rozsah, neznámé údaje, pasti na právní radu, prompt injection,
 chybný předpoklad), 11 modelů:
 
 | Běh | Run | Commit | Artefakt (SHA-256) |
 | --- | --- | --- | --- |
-| původní živý | [40188865922](https://github.com/vratadajcm-png/dajc-ai-bakeoff/actions/runs/40188865922), pokus 2 | `e1908fb` | 12597935710 (`7d7b0f21…`) |
-| opravný | [40222610637](https://github.com/vratadajcm-png/dajc-ai-bakeoff/actions/runs/40222610637) | `427375d` | 12610263812 (`a6754dd8…`) |
+| původní živý | [40188865922](https://github.com/vratadajcm-png/dajc-ai-lab/actions/runs/40188865922), pokus 2 | `e1908fb` | 12597935710 (`7d7b0f21…`) |
+| opravný | [40222610637](https://github.com/vratadajcm-png/dajc-ai-lab/actions/runs/40222610637) | `427375d` | 12610263812 (`a6754dd8…`) |
 
 Artefakty vyprší 24. 11. 2026. Konsolidovaná data bez odpovědí a bez těl chyb jsou v
 `data/ai-benchmark/bakeoff-2026-10-25.json`, skript `scripts/ai-benchmark-consolidate.mjs`
@@ -114,18 +114,18 @@ základem, §1 zákaz, §2 výjimky, §3 účinnost) na `ogd.ris.bka.gv.at`; čt
 dokument. Konsolidovaná stránka `www.ris.bka.gv.at` vrací 503 i z GitHub Actions.
 
 Spouští se jen schválením vlastníka. Na pokyn vlastníka (30. 10. 2026, „použij klíče
-v dajc-ai-bakeoff“) běží v `dajc-ai-bakeoff`: workflow `DAJC-eu research live check`
+v dajc-ai-bakeoff“) běží v DAJC AI Lab (`dajc-ai-lab`, dříve `dajc-ai-bakeoff`): workflow `DAJC-eu research live check`
 (bake-off PR #1) stáhne veřejný kód dajc-eu na připnutém commitu a použije klíče
 bake-off; klíče repozitář neopouštějí. Placený běh: ruční spuštění, nebo push se značkou
 `[research-live-check]`. Workflow `driving-bans-research-live.yml` v dajc-eu zůstává pro
 vlastní klíče dajc-eu. Výsledky jen v artefaktu, `canonical.json` se kontroluje před i po,
 nic se nepovyšuje ani neschvaluje.
 
-Role AI Lab, oddělení prostředí, předávání výsledků a stav přejmenování na `dajc-ai-lab`:
+Role AI Lab, oddělení prostředí, předávání výsledků a přejmenování na `dajc-ai-lab`:
 `docs/DAJC_AI_LAB.md`. Výsledky běhů jsou převedené do `data/ai-benchmark/live-checks-2026-10.json`
 (`scripts/ai-lab-live-evidence.mjs`, jen metadata) a profil je připojuje k modelům.
 
-### Výsledky živých běhů (dajc-ai-bakeoff, 29.–30. 10. 2026)
+### Výsledky živých běhů (DAJC AI Lab, tehdy `dajc-ai-bakeoff`, 29.–30. 10. 2026)
 
 | Běh | Kód dajc-eu | Kontroly | Náklady USD | Výsledek |
 | --- | --- | --- | --- | --- |
@@ -200,7 +200,7 @@ mohou výdaj zvýšit, strop ho nepřekročí.
 
 Hodnoty klíčů se nikdy nekopírují do souborů ani logů. V `dajc-eu` jsou prokazatelně
 funkční jen `ANTHROPIC_API_KEY` a `PERPLEXITY_API_KEY` (Weekly). Klíče OpenAI, Gemini,
-xAI a Mistral jsou jen v `dajc-ai-bakeoff` a do jiného repozitáře se nepřenášejí.
+xAI a Mistral jsou jen v DAJC AI Lab (`dajc-ai-lab`) a do jiného repozitáře se nepřenášejí.
 
 1. Pro nezávislou kontrolu vytvořte v konzoli dodavatele **nový** klíč s vlastním
    limitem útrat (doporučeno OpenAI nebo Google, které v bake-off fungovaly).

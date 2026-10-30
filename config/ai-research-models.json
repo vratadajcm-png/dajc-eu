@@ -4,12 +4,12 @@
   "evidence_file": "data/ai-benchmark/bakeoff-2026-10-25.json",
   "evidence_scope": "Grounded question answering over a registry extract: 26 cases in 10 languages, with unknown, advice-trap, injection and false-premise cases. Direct evidence for explaining approved data; indirect evidence for legal extraction and verification; no evidence for document retrieval or PDF reading.",
   "activation": "Used only when DAJC_RESEARCH_MODEL_PROFILE equals profile_id. Explicit DAJC_RESEARCH_* model, price, route and interval settings always win. Keys are never part of the profile.",
-  "price_source": "vratadajcm-png/dajc-ai-bakeoff run-profile.json, list prices verified 2026-10-25; USD per 1M tokens; reference estimates, not invoices.",
+  "price_source": "vratadajcm-png/dajc-ai-lab run-profile.json, list prices verified 2026-10-25; USD per 1M tokens; reference estimates, not invoices.",
   "ai_lab": {
     "name": "DAJC AI Lab – Multi-Model Research & Testing",
-    "repository": "vratadajcm-png/dajc-ai-bakeoff",
-    "planned_repository": "vratadajcm-png/dajc-ai-lab",
-    "rename_status": "pending owner action: Settings > General > Repository name",
+    "repository": "vratadajcm-png/dajc-ai-lab",
+    "former_repository": "vratadajcm-png/dajc-ai-bakeoff",
+    "renamed_on": "2026-10-30",
     "live_evidence_file": "data/ai-benchmark/live-checks-2026-10.json",
     "provides": ["benchmark results", "live-check evidence", "recommended model configuration"],
     "never": ["writes canonical.json", "approves legal changes", "activates customer features", "shares API keys"]

@@ -61,13 +61,15 @@ describe('DAJC AI Lab live evidence import', () => {
 
 describe('model catalog with AI Lab evidence', () => {
   it('records the AI Lab, its live runs and the account state of all six providers', () => {
-    expect(MODEL_PROFILE.ai_lab).toMatchObject({ name: 'DAJC AI Lab – Multi-Model Research & Testing', planned_repository: 'vratadajcm-png/dajc-ai-lab', live_evidence_file: 'data/ai-benchmark/live-checks-2026-10.json' });
-    expect(MODEL_PROFILE.ai_lab.repository).toBe(LIVE_EVIDENCE.source.repository);
+    expect(MODEL_PROFILE.ai_lab).toMatchObject({ name: 'DAJC AI Lab – Multi-Model Research & Testing', repository: 'vratadajcm-png/dajc-ai-lab', former_repository: 'vratadajcm-png/dajc-ai-bakeoff', live_evidence_file: 'data/ai-benchmark/live-checks-2026-10.json' });
+    // The evidence keeps the name the repository had when the runs happened; links use the current name.
+    expect(LIVE_EVIDENCE.source.repository).toBe(MODEL_PROFILE.ai_lab.former_repository);
+    expect(recommendModels().live_evidence.source).toMatchObject({ repository: 'vratadajcm-png/dajc-ai-lab', repository_at_run_time: 'vratadajcm-png/dajc-ai-bakeoff' });
     expect(LIVE_EVIDENCE.totals).toMatchObject({ runs: 4, canonical_unchanged: true, promoted: false });
     expect(LIVE_EVIDENCE.totals.cost_usd).toBeLessThan(1.5);
     const status = providerApiStatus();
     expect(Object.keys(status).sort()).toEqual([...PROVIDER_IDS].sort());
-    expect(status).toMatchObject({ anthropic: { status: 'ACCOUNT_BLOCKED', category: 'CREDIT_OR_BILLING' }, mistral: { status: 'ACCOUNT_BLOCKED' }, openai: { status: 'OK' }, gemini: { status: 'OK' }, xai: { status: 'OK' }, perplexity: { status: 'NOT_TESTED' } });
+    expect(status).toMatchObject({ anthropic: { status: 'ACCOUNT_BLOCKED', category: 'CREDIT_OR_BILLING', keys: 'vratadajcm-png/dajc-ai-lab' }, mistral: { status: 'ACCOUNT_BLOCKED' }, openai: { status: 'OK' }, gemini: { status: 'OK' }, xai: { status: 'OK' }, perplexity: { status: 'NOT_TESTED' } });
   });
 
   it('keeps the approved strategy: Flash-Lite first, GPT-6 Sol for complex documents and second readings, the check at another vendor', () => {
@@ -76,7 +78,7 @@ describe('model catalog with AI Lab evidence', () => {
     expect(recommendation.extract_complex.model).toBe('gpt-6-sol');
     expect(recommendation.escalation).toMatchObject({ model: 'gpt-6-sol', when: expect.stringMatching(/fails the deterministic checks/) });
     expect(recommendation.verify.vendor).not.toBe(recommendation.extract.vendor);
-    expect(recommendation.extract.live).toMatchObject({ source: LIVE_EVIDENCE.source.repository });
+    expect(recommendation.extract.live).toMatchObject({ source: 'vratadajcm-png/dajc-ai-lab' });
     expect(liveEvidenceFor('openai', 'gpt-6-sol')!.used_in_review_required_draft).toBeGreaterThan(0);
   });
 

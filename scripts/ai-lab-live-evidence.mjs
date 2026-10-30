@@ -10,7 +10,7 @@
  * extracted rules or provider messages. Anything that looks like a credential stops the
  * import, so a key that slipped into an artifact can never reach the public repository.
  *
- *   node scripts/ai-lab-live-evidence.mjs --repository vratadajcm-png/dajc-ai-bakeoff \
+ *   node scripts/ai-lab-live-evidence.mjs --repository vratadajcm-png/dajc-ai-lab \
  *     --run 40974550043=DIR@19e69f4 [--run ...] --out data/ai-benchmark/live-checks-2026-10.json
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
