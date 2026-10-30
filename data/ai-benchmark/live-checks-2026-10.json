@@ -1,0 +1,1217 @@
+{
+ "evidence_version": 1,
+ "source": {
+  "lab": "DAJC AI Lab – Multi-Model Research & Testing",
+  "repository": "vratadajcm-png/dajc-ai-bakeoff",
+  "workflow": ".github/workflows/dajc-eu-research-live.yml",
+  "import": "scripts/ai-lab-live-evidence.mjs"
+ },
+ "scope": "Capped live checks of the Driving Bans research integration: provider smoke tests, failover with a real API error, the bake-off reference case cz-sun on the live Czech act and one E2E research run on an official Austrian order. API failures are account or request facts, never model quality.",
+ "totals": {
+  "runs": 4,
+  "cost_usd": 0.361189,
+  "canonical_unchanged": true,
+  "promoted": false
+ },
+ "providers": [
+  {
+   "provider": "anthropic",
+   "last_smoke": {
+    "run_id": "40974550043",
+    "outcome": "FAILED"
+   },
+   "last_account_block": {
+    "run_id": "40974550043",
+    "category": "CREDIT_OR_BILLING"
+   }
+  },
+  {
+   "provider": "gemini",
+   "last_smoke": {
+    "run_id": "40995210487",
+    "outcome": "OK"
+   },
+   "last_account_block": null
+  },
+  {
+   "provider": "mistral",
+   "last_smoke": {
+    "run_id": "40974550043",
+    "outcome": "FAILED"
+   },
+   "last_account_block": {
+    "run_id": "40974550043",
+    "category": "RATE_LIMIT_PERSISTENT"
+   }
+  },
+  {
+   "provider": "openai",
+   "last_smoke": {
+    "run_id": "40995210487",
+    "outcome": "OK"
+   },
+   "last_account_block": null
+  },
+  {
+   "provider": "xai",
+   "last_smoke": {
+    "run_id": "40995210487",
+    "outcome": "OK"
+   },
+   "last_account_block": null
+  }
+ ],
+ "models": [
+  {
+   "provider": "anthropic",
+   "model": "claude-sonnet-5-5",
+   "calls": 1,
+   "ok": 0,
+   "failed_by_category": {
+    "CREDIT_OR_BILLING": 1
+   },
+   "cost_usd": 0,
+   "extraction": {
+    "readings": 0,
+    "schema_valid": 0,
+    "registry_match": 0,
+    "without_blocking_findings": 0
+   },
+   "used_in_review_required_draft": 0
+  },
+  {
+   "provider": "gemini",
+   "model": "gemini-3.5-flash-lite",
+   "calls": 13,
+   "ok": 13,
+   "failed_by_category": {},
+   "cost_usd": 0.075661,
+   "extraction": {
+    "readings": 2,
+    "schema_valid": 2,
+    "registry_match": 2,
+    "without_blocking_findings": 0
+   },
+   "used_in_review_required_draft": 1
+  },
+  {
+   "provider": "mistral",
+   "model": "mistral-small-2603",
+   "calls": 1,
+   "ok": 0,
+   "failed_by_category": {
+    "RATE_LIMIT": 1
+   },
+   "cost_usd": 0,
+   "extraction": {
+    "readings": 0,
+    "schema_valid": 0,
+    "registry_match": 0,
+    "without_blocking_findings": 0
+   },
+   "used_in_review_required_draft": 0
+  },
+  {
+   "provider": "openai",
+   "model": "gpt-6-sol",
+   "calls": 6,
+   "ok": 5,
+   "failed_by_category": {
+    "INCOMPLETE_RESPONSE": 1
+   },
+   "cost_usd": 0.136312,
+   "extraction": {
+    "readings": 1,
+    "schema_valid": 1,
+    "registry_match": 1,
+    "without_blocking_findings": 0
+   },
+   "used_in_review_required_draft": 1
+  },
+  {
+   "provider": "xai",
+   "model": "grok-4.7",
+   "calls": 9,
+   "ok": 9,
+   "failed_by_category": {},
+   "cost_usd": 0.149216,
+   "extraction": {
+    "readings": 2,
+    "schema_valid": 2,
+    "registry_match": 1,
+    "without_blocking_findings": 0
+   },
+   "used_in_review_required_draft": 1
+  }
+ ],
+ "runs": [
+  {
+   "run_id": "40974550043",
+   "dajc_eu_commit": "19e69f4",
+   "generated_at": "2026-10-29T23:43:13.841Z",
+   "checks": [
+    "smoke",
+    "scenario",
+    "fallback",
+    "e2e"
+   ],
+   "cost_usd": 0.096058,
+   "run_budget_usd": 1.5,
+   "providers_blocked_for_run": {
+    "anthropic": "CREDIT_OR_BILLING",
+    "mistral": "RATE_LIMIT_PERSISTENT"
+   },
+   "canonical_unchanged": true,
+   "promoted": false,
+   "smoke": [
+    {
+     "provider": "anthropic",
+     "outcome": "FAILED",
+     "served_model": null,
+     "blocked_for_run": "CREDIT_OR_BILLING"
+    },
+    {
+     "provider": "openai",
+     "outcome": "OK",
+     "served_model": "gpt-6-sol",
+     "blocked_for_run": null
+    },
+    {
+     "provider": "xai",
+     "outcome": "OK",
+     "served_model": "grok-4.7",
+     "blocked_for_run": null
+    },
+    {
+     "provider": "gemini",
+     "outcome": "OK",
+     "served_model": "gemini-3.5-flash-lite",
+     "blocked_for_run": null
+    },
+    {
+     "provider": "mistral",
+     "outcome": "FAILED",
+     "served_model": null,
+     "blocked_for_run": "RATE_LIMIT_PERSISTENT"
+    }
+   ],
+   "scenario": {
+    "case_id": "cz-sun",
+    "retrieval_ok": true,
+    "results": [
+     {
+      "provider": "anthropic",
+      "outcome": "SKIPPED",
+      "served_model": null,
+      "schema_valid": null,
+      "rules": null,
+      "registry_match": null,
+      "blocking_findings": null,
+      "finding_codes": []
+     },
+     {
+      "provider": "openai",
+      "outcome": "FAILED",
+      "served_model": null,
+      "schema_valid": null,
+      "rules": null,
+      "registry_match": null,
+      "blocking_findings": null,
+      "finding_codes": []
+     },
+     {
+      "provider": "xai",
+      "outcome": "OK",
+      "served_model": "grok-4.7",
+      "schema_valid": true,
+      "rules": 3,
+      "registry_match": false,
+      "blocking_findings": 2,
+      "finding_codes": [
+       "MISSING_EVIDENCE",
+       "QUOTE_TOO_SHORT"
+      ]
+     },
+     {
+      "provider": "gemini",
+      "outcome": "OK",
+      "served_model": "gemini-3.5-flash-lite",
+      "schema_valid": true,
+      "rules": 2,
+      "registry_match": true,
+      "blocking_findings": 4,
+      "finding_codes": [
+       "MISSING_EVIDENCE",
+       "QUOTE_NOT_IN_DOCUMENT",
+       "QUOTE_TOO_SHORT",
+       "VALUE_NOT_IN_QUOTE"
+      ]
+     },
+     {
+      "provider": "mistral",
+      "outcome": "SKIPPED",
+      "served_model": null,
+      "schema_valid": null,
+      "rules": null,
+      "registry_match": null,
+      "blocking_findings": null,
+      "finding_codes": []
+     }
+    ]
+   },
+   "fallback": {
+    "first": "openai",
+    "second": "xai",
+    "first_provider_requests": 1,
+    "first_provider_blocked": "MODEL_NOT_FOUND",
+    "served_by": [
+     "xai",
+     "xai"
+    ]
+   },
+   "e2e": {
+    "jurisdiction": "AT",
+    "retrieval": {
+     "discovered": 3,
+     "retrieved": 2,
+     "unavailable": 1
+    },
+    "independent_check": {
+     "performed": 0,
+     "agreed": 0,
+     "disagreed": 0,
+     "not_available": 2
+    },
+    "drafts": [
+     {
+      "draft_id": "rdraft-abf5d83a8eb49e7e",
+      "jurisdiction": "AT",
+      "state": "INSUFFICIENT_EVIDENCE",
+      "phases": [
+       "DISCOVERED",
+       "DOCUMENT_RETRIEVED",
+       "AI_EXTRACTED"
+      ],
+      "document": {
+       "kind": "HTML_SNAPSHOT",
+       "parts": 1
+      },
+      "extraction": {
+       "provider": "gemini",
+       "model": "gemini-3.5-flash-lite",
+       "escalated_from": null
+      },
+      "cross_check": null,
+      "second_extraction": null,
+      "blocking_findings": [
+       "MISSING_EVIDENCE",
+       "QUOTE_TOO_SHORT"
+      ],
+      "notes": [
+       "CONTINUOUS_RESTRICTION",
+       "INDEPENDENT_CHECK_SKIPPED"
+      ]
+     },
+     {
+      "draft_id": "rdraft-d671421d4634fd34",
+      "jurisdiction": "AT",
+      "state": "INSUFFICIENT_EVIDENCE",
+      "phases": [
+       "DISCOVERED",
+       "DOCUMENT_RETRIEVED",
+       "AI_EXTRACTED"
+      ],
+      "document": {
+       "kind": "HTML_SNAPSHOT",
+       "parts": 1
+      },
+      "extraction": {
+       "provider": "gemini",
+       "model": "gemini-3.5-flash-lite",
+       "escalated_from": null
+      },
+      "cross_check": null,
+      "second_extraction": null,
+      "blocking_findings": [
+       "MISSING_EVIDENCE"
+      ],
+      "notes": [
+       "CONTINUOUS_RESTRICTION",
+       "INDEPENDENT_CHECK_SKIPPED"
+      ]
+     }
+    ]
+   },
+   "calls": [
+    {
+     "check": "smoke",
+     "task": "extract",
+     "purpose": "smoke test",
+     "provider": "anthropic",
+     "requested_model": "claude-sonnet-5-5",
+     "served_model": null,
+     "complex": false,
+     "outcome": "FAILED",
+     "error_category": "CREDIT_OR_BILLING",
+     "http_status": 400,
+     "provider_code": "invalid_request_error",
+     "attempts": null,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "cost_usd": 0,
+     "latency_ms": null
+    },
+    {
+     "check": "smoke",
+     "task": "extract",
+     "purpose": "smoke test",
+     "provider": "openai",
+     "requested_model": "gpt-6-sol",
+     "served_model": "gpt-6-sol",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 64,
+     "output_tokens": 20,
+     "cost_usd": 0.000328,
+     "latency_ms": 2775
+    },
+    {
+     "check": "smoke",
+     "task": "extract",
+     "purpose": "smoke test",
+     "provider": "xai",
+     "requested_model": "grok-4.7",
+     "served_model": "grok-4.7",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 1330,
+     "output_tokens": 12,
+     "cost_usd": 0.002732,
+     "latency_ms": 1607
+    },
+    {
+     "check": "smoke",
+     "task": "extract",
+     "purpose": "smoke test",
+     "provider": "gemini",
+     "requested_model": "gemini-3.5-flash-lite",
+     "served_model": "gemini-3.5-flash-lite",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 24,
+     "output_tokens": 12,
+     "cost_usd": 0.000037,
+     "latency_ms": 9261
+    },
+    {
+     "check": "smoke",
+     "task": "extract",
+     "purpose": "smoke test",
+     "provider": "mistral",
+     "requested_model": "mistral-small-2603",
+     "served_model": null,
+     "complex": false,
+     "outcome": "FAILED",
+     "error_category": "RATE_LIMIT",
+     "http_status": 429,
+     "provider_code": "rate_limited:1300",
+     "attempts": null,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "cost_usd": 0,
+     "latency_ms": null
+    },
+    {
+     "check": "scenario",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "openai",
+     "requested_model": "gpt-6-sol",
+     "served_model": null,
+     "complex": false,
+     "outcome": "FAILED",
+     "error_category": "INCOMPLETE_RESPONSE",
+     "http_status": null,
+     "provider_code": "max_output_tokens",
+     "attempts": null,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "cost_usd": 0,
+     "latency_ms": null
+    },
+    {
+     "check": "scenario",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "xai",
+     "requested_model": "grok-4.7",
+     "served_model": "grok-4.7",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 4877,
+     "output_tokens": 9408,
+     "cost_usd": 0.066202,
+     "latency_ms": 113119
+    },
+    {
+     "check": "scenario",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "gemini",
+     "requested_model": "gemini-3.5-flash-lite",
+     "served_model": "gemini-3.5-flash-lite",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 2886,
+     "output_tokens": 5335,
+     "cost_usd": 0.014203,
+     "latency_ms": 11809
+    },
+    {
+     "check": "fallback",
+     "task": "extract",
+     "purpose": "fallback check",
+     "provider": "openai",
+     "requested_model": "dajc-nonexistent-model-check",
+     "served_model": null,
+     "complex": false,
+     "outcome": "FAILED",
+     "error_category": "MODEL_NOT_FOUND",
+     "http_status": 404,
+     "provider_code": "model_not_found",
+     "attempts": null,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "cost_usd": 0,
+     "latency_ms": null
+    },
+    {
+     "check": "fallback",
+     "task": "extract",
+     "purpose": "fallback check",
+     "provider": "xai",
+     "requested_model": "grok-4.7",
+     "served_model": "grok-4.7",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 1330,
+     "output_tokens": 12,
+     "cost_usd": 0.002732,
+     "latency_ms": 1367
+    },
+    {
+     "check": "fallback",
+     "task": "extract",
+     "purpose": "fallback check",
+     "provider": "xai",
+     "requested_model": "grok-4.7",
+     "served_model": "grok-4.7",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 1330,
+     "output_tokens": 12,
+     "cost_usd": 0.002732,
+     "latency_ms": 1331
+    },
+    {
+     "check": "e2e",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "gemini",
+     "requested_model": "gemini-3.5-flash-lite",
+     "served_model": "gemini-3.5-flash-lite",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 1058,
+     "output_tokens": 977,
+     "cost_usd": 0.00276,
+     "latency_ms": 2664
+    },
+    {
+     "check": "e2e",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "gemini",
+     "requested_model": "gemini-3.5-flash-lite",
+     "served_model": "gemini-3.5-flash-lite",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 1247,
+     "output_tokens": 1583,
+     "cost_usd": 0.004332,
+     "latency_ms": 3608
+    }
+   ]
+  },
+  {
+   "run_id": "40995210487",
+   "dajc_eu_commit": "2674975",
+   "generated_at": "2026-10-30T03:06:43.974Z",
+   "checks": [
+    "smoke",
+    "scenario",
+    "fallback",
+    "e2e"
+   ],
+   "cost_usd": 0.181457,
+   "run_budget_usd": 1.5,
+   "providers_blocked_for_run": {},
+   "canonical_unchanged": true,
+   "promoted": false,
+   "smoke": [
+    {
+     "provider": "openai",
+     "outcome": "OK",
+     "served_model": "gpt-6-sol",
+     "blocked_for_run": null
+    },
+    {
+     "provider": "xai",
+     "outcome": "OK",
+     "served_model": "grok-4.7",
+     "blocked_for_run": null
+    },
+    {
+     "provider": "gemini",
+     "outcome": "OK",
+     "served_model": "gemini-3.5-flash-lite",
+     "blocked_for_run": null
+    }
+   ],
+   "scenario": {
+    "case_id": "cz-sun",
+    "retrieval_ok": true,
+    "results": [
+     {
+      "provider": "openai",
+      "outcome": "OK",
+      "served_model": "gpt-6-sol",
+      "schema_valid": true,
+      "rules": 3,
+      "registry_match": true,
+      "blocking_findings": 1,
+      "finding_codes": [
+       "MISSING_EVIDENCE"
+      ]
+     },
+     {
+      "provider": "xai",
+      "outcome": "OK",
+      "served_model": "grok-4.7",
+      "schema_valid": true,
+      "rules": 3,
+      "registry_match": true,
+      "blocking_findings": 9,
+      "finding_codes": [
+       "MISSING_EVIDENCE",
+       "QUOTE_TOO_SHORT",
+       "VALIDITY_MISSING"
+      ]
+     },
+     {
+      "provider": "gemini",
+      "outcome": "OK",
+      "served_model": "gemini-3.5-flash-lite",
+      "schema_valid": true,
+      "rules": 3,
+      "registry_match": true,
+      "blocking_findings": 14,
+      "finding_codes": [
+       "INVALID_SCHEDULE",
+       "MISSING_EVIDENCE",
+       "QUOTE_NOT_IN_DOCUMENT",
+       "QUOTE_TOO_SHORT"
+      ]
+     }
+    ]
+   },
+   "fallback": {
+    "first": "openai",
+    "second": "xai",
+    "first_provider_requests": 1,
+    "first_provider_blocked": "MODEL_NOT_FOUND",
+    "served_by": [
+     "xai",
+     "xai"
+    ]
+   },
+   "e2e": {
+    "jurisdiction": "AT",
+    "retrieval": {
+     "discovered": 2,
+     "retrieved": 1,
+     "unavailable": 1
+    },
+    "independent_check": {
+     "performed": 0,
+     "agreed": 0,
+     "disagreed": 0,
+     "skipped_failed_validation": 1,
+     "not_available": 0
+    },
+    "drafts": [
+     {
+      "draft_id": "rdraft-eef1674142112d05",
+      "jurisdiction": "AT",
+      "state": "INSUFFICIENT_EVIDENCE",
+      "phases": [
+       "DISCOVERED",
+       "DOCUMENT_RETRIEVED",
+       "AI_EXTRACTED"
+      ],
+      "document": {
+       "kind": "TEXT_EXCERPT",
+       "parts": 4
+      },
+      "extraction": {
+       "provider": "gemini",
+       "model": "gemini-3.5-flash-lite",
+       "escalated_from": null
+      },
+      "cross_check": null,
+      "second_extraction": null,
+      "blocking_findings": [
+       "MISSING_EVIDENCE",
+       "QUOTE_NOT_IN_DOCUMENT",
+       "REVIEW_WORKFLOW_INSUFFICIENT_EVIDENCE",
+       "WEIGHT_UNIT_SUSPECT"
+      ],
+      "notes": [
+       "CONTINUOUS_RESTRICTION",
+       "INDEPENDENT_CHECK_SKIPPED",
+       "WEIGHT_UNIT_SUSPECT"
+      ]
+     }
+    ]
+   },
+   "calls": [
+    {
+     "check": "smoke",
+     "task": "extract",
+     "purpose": "smoke test",
+     "provider": "openai",
+     "requested_model": "gpt-6-sol",
+     "served_model": "gpt-6-sol",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 64,
+     "output_tokens": 20,
+     "cost_usd": 0.000328,
+     "latency_ms": 2225
+    },
+    {
+     "check": "smoke",
+     "task": "extract",
+     "purpose": "smoke test",
+     "provider": "xai",
+     "requested_model": "grok-4.7",
+     "served_model": "grok-4.7",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 1330,
+     "output_tokens": 12,
+     "cost_usd": 0.002732,
+     "latency_ms": 3991
+    },
+    {
+     "check": "smoke",
+     "task": "extract",
+     "purpose": "smoke test",
+     "provider": "gemini",
+     "requested_model": "gemini-3.5-flash-lite",
+     "served_model": "gemini-3.5-flash-lite",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 24,
+     "output_tokens": 12,
+     "cost_usd": 0.000037,
+     "latency_ms": 780
+    },
+    {
+     "check": "scenario",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "openai",
+     "requested_model": "gpt-6-sol",
+     "served_model": "gpt-6-sol",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 3456,
+     "output_tokens": 9115,
+     "cost_usd": 0.098062,
+     "latency_ms": 43881
+    },
+    {
+     "check": "scenario",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "xai",
+     "requested_model": "grok-4.7",
+     "served_model": "grok-4.7",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 4890,
+     "output_tokens": 6273,
+     "cost_usd": 0.047418,
+     "latency_ms": 89869
+    },
+    {
+     "check": "scenario",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "gemini",
+     "requested_model": "gemini-3.5-flash-lite",
+     "served_model": "gemini-3.5-flash-lite",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 2882,
+     "output_tokens": 8739,
+     "cost_usd": 0.022712,
+     "latency_ms": 18152
+    },
+    {
+     "check": "fallback",
+     "task": "extract",
+     "purpose": "fallback check",
+     "provider": "openai",
+     "requested_model": "dajc-nonexistent-model-check",
+     "served_model": null,
+     "complex": false,
+     "outcome": "FAILED",
+     "error_category": "MODEL_NOT_FOUND",
+     "http_status": 404,
+     "provider_code": "model_not_found",
+     "attempts": 1,
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "cost_usd": 0,
+     "latency_ms": null
+    },
+    {
+     "check": "fallback",
+     "task": "extract",
+     "purpose": "fallback check",
+     "provider": "xai",
+     "requested_model": "grok-4.7",
+     "served_model": "grok-4.7",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 1330,
+     "output_tokens": 12,
+     "cost_usd": 0.002732,
+     "latency_ms": 1439
+    },
+    {
+     "check": "fallback",
+     "task": "extract",
+     "purpose": "fallback check",
+     "provider": "xai",
+     "requested_model": "grok-4.7",
+     "served_model": "grok-4.7",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 1330,
+     "output_tokens": 12,
+     "cost_usd": 0.002732,
+     "latency_ms": 1753
+    },
+    {
+     "check": "e2e",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "gemini",
+     "requested_model": "gemini-3.5-flash-lite",
+     "served_model": "gemini-3.5-flash-lite",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 2321,
+     "output_tokens": 1603,
+     "cost_usd": 0.004704,
+     "latency_ms": 3816
+    }
+   ]
+  },
+  {
+   "run_id": "40996196243",
+   "dajc_eu_commit": "4efe9b6",
+   "generated_at": "2026-10-30T03:15:09.365Z",
+   "checks": [
+    "e2e"
+   ],
+   "cost_usd": 0.031456,
+   "run_budget_usd": 1.5,
+   "providers_blocked_for_run": {},
+   "canonical_unchanged": true,
+   "promoted": false,
+   "smoke": null,
+   "scenario": null,
+   "fallback": null,
+   "e2e": {
+    "jurisdiction": "AT",
+    "retrieval": {
+     "discovered": 2,
+     "retrieved": 1,
+     "unavailable": 1
+    },
+    "independent_check": {
+     "performed": 1,
+     "agreed": 0,
+     "disagreed": 1,
+     "skipped_failed_validation": 0,
+     "not_available": 0
+    },
+    "drafts": [
+     {
+      "draft_id": "rdraft-0c581dbeff9088e6",
+      "jurisdiction": "AT",
+      "state": "CONFLICT",
+      "phases": [
+       "DISCOVERED",
+       "DOCUMENT_RETRIEVED",
+       "AI_EXTRACTED"
+      ],
+      "document": {
+       "kind": "TEXT_EXCERPT",
+       "parts": 4
+      },
+      "extraction": {
+       "provider": "openai",
+       "model": "gpt-6-sol",
+       "escalated_from": "gemini-3.5-flash-lite"
+      },
+      "cross_check": {
+       "provider": "gemini",
+       "model": "gemini-3.5-flash-lite",
+       "overall": "CONSISTENT",
+       "ok": false
+      },
+      "second_extraction": {
+       "provider": "gemini",
+       "model": "gemini-3.5-flash-lite",
+       "agreed": false
+      },
+      "blocking_findings": [
+       "AI_DISAGREEMENT",
+       "MISSING_CONDITION"
+      ],
+      "notes": [
+       "CONTINUOUS_RESTRICTION",
+       "ESCALATED_EXTRACTION"
+      ]
+     }
+    ]
+   },
+   "calls": [
+    {
+     "check": "e2e",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "gemini",
+     "requested_model": "gemini-3.5-flash-lite",
+     "served_model": "gemini-3.5-flash-lite",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 2323,
+     "output_tokens": 1501,
+     "cost_usd": 0.004449,
+     "latency_ms": 3802
+    },
+    {
+     "check": "e2e",
+     "task": "extract",
+     "purpose": "legal rule extraction (escalated)",
+     "provider": "openai",
+     "requested_model": "gpt-6-sol",
+     "served_model": "gpt-6-sol",
+     "complex": true,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 2587,
+     "output_tokens": 1363,
+     "cost_usd": 0.018804,
+     "latency_ms": 8435
+    },
+    {
+     "check": "e2e",
+     "task": "verify",
+     "purpose": "independent check of extraction",
+     "provider": "gemini",
+     "requested_model": "gemini-3.5-flash-lite",
+     "served_model": "gemini-3.5-flash-lite",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 2356,
+     "output_tokens": 1203,
+     "cost_usd": 0.003714,
+     "latency_ms": 2988
+    },
+    {
+     "check": "e2e",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "gemini",
+     "requested_model": "gemini-3.5-flash-lite",
+     "served_model": "gemini-3.5-flash-lite",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 2321,
+     "output_tokens": 1517,
+     "cost_usd": 0.004489,
+     "latency_ms": 26065
+    }
+   ]
+  },
+  {
+   "run_id": "40996822080",
+   "dajc_eu_commit": "b7ee2de",
+   "generated_at": "2026-10-30T03:21:57.456Z",
+   "checks": [
+    "e2e"
+   ],
+   "cost_usd": 0.052218,
+   "run_budget_usd": 1.5,
+   "providers_blocked_for_run": {},
+   "canonical_unchanged": true,
+   "promoted": false,
+   "smoke": null,
+   "scenario": null,
+   "fallback": null,
+   "e2e": {
+    "jurisdiction": "AT",
+    "retrieval": {
+     "discovered": 2,
+     "retrieved": 1,
+     "unavailable": 1
+    },
+    "independent_check": {
+     "performed": 1,
+     "agreed": 1,
+     "disagreed": 0,
+     "skipped_failed_validation": 0,
+     "not_available": 0
+    },
+    "drafts": [
+     {
+      "draft_id": "rdraft-93abe3cdae4da399",
+      "jurisdiction": "AT",
+      "state": "REVIEW_REQUIRED",
+      "phases": [
+       "DISCOVERED",
+       "DOCUMENT_RETRIEVED",
+       "AI_EXTRACTED",
+       "AI_CROSS_CHECKED",
+       "DETERMINISTICALLY_VALIDATED",
+       "REVIEW_REQUIRED"
+      ],
+      "document": {
+       "kind": "TEXT_EXCERPT",
+       "parts": 4
+      },
+      "extraction": {
+       "provider": "openai",
+       "model": "gpt-6-sol",
+       "escalated_from": "gemini-3.5-flash-lite"
+      },
+      "cross_check": {
+       "provider": "gemini",
+       "model": "gemini-3.5-flash-lite",
+       "overall": "CONSISTENT",
+       "ok": true
+      },
+      "second_extraction": {
+       "provider": "xai",
+       "model": "grok-4.7",
+       "agreed": true
+      },
+      "blocking_findings": [],
+      "notes": [
+       "CHECK_FOUND_NO_HOURS",
+       "CONTINUOUS_RESTRICTION",
+       "ESCALATED_EXTRACTION",
+       "SECOND_EXTRACTION_RETRIED"
+      ]
+     }
+    ]
+   },
+   "calls": [
+    {
+     "check": "e2e",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "gemini",
+     "requested_model": "gemini-3.5-flash-lite",
+     "served_model": "gemini-3.5-flash-lite",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 2386,
+     "output_tokens": 1809,
+     "cost_usd": 0.005238,
+     "latency_ms": 4217
+    },
+    {
+     "check": "e2e",
+     "task": "extract",
+     "purpose": "legal rule extraction (escalated)",
+     "provider": "openai",
+     "requested_model": "gpt-6-sol",
+     "served_model": "gpt-6-sol",
+     "complex": true,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 2640,
+     "output_tokens": 1351,
+     "cost_usd": 0.01879,
+     "latency_ms": 10947
+    },
+    {
+     "check": "e2e",
+     "task": "verify",
+     "purpose": "independent check of extraction",
+     "provider": "gemini",
+     "requested_model": "gemini-3.5-flash-lite",
+     "served_model": "gemini-3.5-flash-lite",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 2411,
+     "output_tokens": 1183,
+     "cost_usd": 0.003681,
+     "latency_ms": 2992
+    },
+    {
+     "check": "e2e",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "gemini",
+     "requested_model": "gemini-3.5-flash-lite",
+     "served_model": "gemini-3.5-flash-lite",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 2384,
+     "output_tokens": 1836,
+     "cost_usd": 0.005305,
+     "latency_ms": 6400
+    },
+    {
+     "check": "e2e",
+     "task": "extract",
+     "purpose": "legal rule extraction",
+     "provider": "xai",
+     "requested_model": "grok-4.7",
+     "served_model": "grok-4.7",
+     "complex": false,
+     "outcome": "OK",
+     "error_category": null,
+     "http_status": null,
+     "provider_code": null,
+     "attempts": 1,
+     "input_tokens": 4265,
+     "output_tokens": 1779,
+     "cost_usd": 0.019204,
+     "latency_ms": 35422
+    }
+   ]
+  }
+ ]
+}

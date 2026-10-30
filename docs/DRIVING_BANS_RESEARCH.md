@@ -38,6 +38,8 @@ mají stejný význam jako v `review-workflow.mjs`.
 | --- | --- |
 | `src/lib/ai/providers.mjs` | adaptéry šesti poskytovatelů nad `fetch`, bez SDK |
 | `src/lib/ai/orchestrator.mjs` | směrování úloh, nezávislost kontroly, rozpočet, retry, circuit breaker, ledger, audit |
+| `src/lib/ai/model-profile.mjs` | výběr modelů z benchmarku; živé důkazy a stav účtů z DAJC AI Lab (`docs/DAJC_AI_LAB.md`) |
+| `scripts/ai-lab-live-evidence.mjs` | převod artefaktů živých testů AI Lab na metadata pro katalog (bez citací a klíčů) |
 | `src/lib/driving-bans/research/safe-fetch.mjs` | stahování bez SSRF |
 | `src/lib/driving-bans/research/documents.mjs` | text a metadata dokumentu, obalení nedůvěryhodného textu, hledání vložených instrukcí |
 | `src/lib/driving-bans/research/discovery.mjs` | výchozí zdroje a dotazy na jurisdikci |

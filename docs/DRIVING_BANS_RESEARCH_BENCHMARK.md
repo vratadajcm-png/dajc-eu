@@ -121,6 +121,10 @@ bake-off; klíče repozitář neopouštějí. Placený běh: ruční spuštění
 vlastní klíče dajc-eu. Výsledky jen v artefaktu, `canonical.json` se kontroluje před i po,
 nic se nepovyšuje ani neschvaluje.
 
+Role AI Lab, oddělení prostředí, předávání výsledků a stav přejmenování na `dajc-ai-lab`:
+`docs/DAJC_AI_LAB.md`. Výsledky běhů jsou převedené do `data/ai-benchmark/live-checks-2026-10.json`
+(`scripts/ai-lab-live-evidence.mjs`, jen metadata) a profil je připojuje k modelům.
+
 ### Výsledky živých běhů (dajc-ai-bakeoff, 29.–30. 10. 2026)
 
 | Běh | Kód dajc-eu | Kontroly | Náklady USD | Výsledek |

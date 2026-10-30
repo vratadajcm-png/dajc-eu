@@ -1,6 +1,7 @@
 import profileData from '../../../config/ai-research-models.json' with { type: 'json' };
 import evidenceData from '../../../data/ai-benchmark/bakeoff-2026-10-25.json' with { type: 'json' };
-import { PROVIDER_CATALOG, PRICING_ENV, REASONING_OPTIONS, parsePricing } from './providers.mjs';
+import liveData from '../../../data/ai-benchmark/live-checks-2026-10.json' with { type: 'json' };
+import { PROVIDER_CATALOG, PROVIDER_IDS, PRICING_ENV, REASONING_OPTIONS, parsePricing } from './providers.mjs';
 
 /**
  * Model selection from measured evidence (config/ai-research-models.json over the
@@ -9,6 +10,11 @@ import { PROVIDER_CATALOG, PRICING_ENV, REASONING_OPTIONS, parsePricing } from '
  * the bake-off. A model with API errors only is NOT_BENCHMARKED, never "zero quality",
  * and is not selected by the profile until a smoke test passes. The bake-off measured
  * grounded answering, so extraction and verification scores are provisional.
+ *
+ * Live checks run in DAJC AI Lab (config ai_lab, scripts/ai-lab-live-evidence.mjs) are
+ * attached per model and per provider as direct evidence: extraction readings and the API
+ * state of each account. They inform people and the recommendation's notes; they never turn
+ * an API failure into a quality score, and they do not change the approved strategy.
  */
 
 export const PROFILE_TASKS = Object.freeze(['extract', 'verify', 'conflicts', 'explain']);
@@ -16,20 +22,40 @@ const EVIDENCE_LEVEL = { explain: 'BENCHMARK_DIRECT', extract: 'BENCHMARK_INDIRE
 
 export const MODEL_PROFILE = profileData;
 export const BENCHMARK_EVIDENCE = evidenceData;
+export const LIVE_EVIDENCE = liveData;
+
+/** AI Lab live-check summary of one model, or null when the AI Lab has not run it. */
+export function liveEvidenceFor(provider, model, live = LIVE_EVIDENCE) {
+  const row = live.models.find(item => item.provider === provider && item.model === model);
+  return row ? { calls: row.calls, ok: row.ok, failed_by_category: row.failed_by_category, extraction: row.extraction, used_in_review_required_draft: row.used_in_review_required_draft, source: live.source.repository } : null;
+}
+
+/**
+ * Account state per provider from the latest AI Lab live checks, for the AI Lab's own keys:
+ * availability, not quality. Another environment (dajc-eu, production) has its own keys.
+ */
+export function providerApiStatus(live = LIVE_EVIDENCE) {
+  return Object.fromEntries(PROVIDER_IDS.map(id => {
+    const item = live.providers.find(row => row.provider === id);
+    const state = !item ? { status: 'NOT_TESTED' } : item.last_account_block ? { status: 'ACCOUNT_BLOCKED', category: item.last_account_block.category, run_id: item.last_account_block.run_id } : item.last_smoke?.outcome === 'OK' ? { status: 'OK', run_id: item.last_smoke.run_id } : { status: 'UNVERIFIED', run_id: item.last_smoke?.run_id ?? null };
+    return [id, { ...state, keys: live.source.repository }];
+  }));
+}
 
 /**
  * Measured components per candidate, or the reason it cannot be ranked.
  * @returns {Array<Record<string, any>>}
  */
-export function candidateEvidence({ profile = MODEL_PROFILE, evidence = BENCHMARK_EVIDENCE } = {}) {
+export function candidateEvidence({ profile = MODEL_PROFILE, evidence = BENCHMARK_EVIDENCE, live = LIVE_EVIDENCE } = {}) {
   return profile.candidates.map(candidate => {
     const measured = evidence.models.find(row => row.provider === (candidate.provider === 'xai' ? 'grok' : candidate.provider) && row.model === candidate.model);
     const completed = measured?.consolidated.completed_answers ?? 0;
+    const liveRow = liveEvidenceFor(candidate.provider, candidate.model, live);
     if (candidate.excluded_until_smoke_test || !measured || completed < profile.minimum_completed_answers) {
-      return { ...candidate, status: 'NOT_BENCHMARKED', reason: candidate.excluded_until_smoke_test ?? `Only ${completed} completed answers`, measured: measured ? { completed, cases: measured.consolidated.cases, classes: measured.consolidated.classes } : null };
+      return { ...candidate, status: 'NOT_BENCHMARKED', reason: candidate.excluded_until_smoke_test ?? `Only ${completed} completed answers`, measured: measured ? { completed, cases: measured.consolidated.cases, classes: measured.consolidated.classes } : null, live: liveRow };
     }
     return {
-      ...candidate, status: 'RANKED',
+      ...candidate, status: 'RANKED', live: liveRow,
       measured: {
         completed, cases: measured.consolidated.cases,
         quality: measured.consolidated.correct_rate_of_completed,
@@ -60,9 +86,9 @@ export function rankModels(task, options = {}) {
     const m = item.measured;
     const components = { quality: m.quality, reliability: m.reliability, cost: +(m.cost_per_answer_usd / maxCost).toFixed(3), latency: +(m.latency_ms / maxLatency).toFixed(3), unverified: m.unverified_claim_rate };
     const score = weights.quality * components.quality + weights.reliability * components.reliability - weights.cost * components.cost - weights.latency * components.latency - weights.unverified_claim_penalty * components.unverified;
-    return { provider: item.provider, model: item.model, vendor: PROVIDER_CATALOG[item.provider].vendor, score: +score.toFixed(3), components, evidence_level: EVIDENCE_LEVEL[task], ...(item.min_interval_ms ? { min_interval_ms: item.min_interval_ms } : {}), ...(item.served_as ? { served_as: item.served_as } : {}) };
+    return { provider: item.provider, model: item.model, vendor: PROVIDER_CATALOG[item.provider].vendor, score: +score.toFixed(3), components, evidence_level: EVIDENCE_LEVEL[task], live: item.live, ...(item.min_interval_ms ? { min_interval_ms: item.min_interval_ms } : {}), ...(item.served_as ? { served_as: item.served_as } : {}) };
   }).sort((a, b) => b.score - a.score);
-  return [...scored, ...all.filter(item => item.status !== 'RANKED').map(item => ({ provider: item.provider, model: item.model, vendor: PROVIDER_CATALOG[item.provider].vendor, score: null, status: 'NOT_BENCHMARKED', reason: item.reason }))];
+  return [...scored, ...all.filter(item => item.status !== 'RANKED').map(item => ({ provider: item.provider, model: item.model, vendor: PROVIDER_CATALOG[item.provider].vendor, score: null, status: 'NOT_BENCHMARKED', reason: item.reason, live: item.live }))];
 }
 
 /** Strength for complex documents: measured quality weighted by reliability, so an unreliable model never wins on quality alone. */
@@ -84,7 +110,11 @@ export function recommendModels(options = {}) {
     extract: primary, extract_complex: complex, verify: check, explain: rankModels('explain', options).find(item => item.score !== null) ?? null,
     discover: { provider: 'perplexity', evidence: (options.profile ?? MODEL_PROFILE).search.evidence },
     not_benchmarked: rankModels('extract', options).filter(item => item.score === null).map(({ provider, model, reason }) => ({ provider, model, reason })),
-    caution: 'Provisional: the bake-off measured grounded answering, not extraction from legal documents. Confirm with the live scenario check before relying on it.',
+    // The approved Driving Bans strategy: a stronger second reading when the ordinary extraction fails the checks.
+    escalation: complex && primary && complex.model !== primary.model ? { when: 'ordinary extraction fails the deterministic checks', model: complex.model, provider: complex.provider } : null,
+    api_status: providerApiStatus(options.live ?? LIVE_EVIDENCE),
+    live_evidence: { source: (options.live ?? LIVE_EVIDENCE).source, runs: (options.live ?? LIVE_EVIDENCE).totals.runs, cost_usd: (options.live ?? LIVE_EVIDENCE).totals.cost_usd },
+    caution: 'Provisional: the bake-off measured grounded answering, not extraction from legal documents. AI Lab live checks add direct but small evidence (see live per model); a person decides on changes to the strategy.',
   };
 }
 
