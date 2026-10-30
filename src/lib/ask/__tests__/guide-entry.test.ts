@@ -18,7 +18,7 @@ describe('Ask DAJC · FAQ is the entry point to DAJC AI', () => {
     expect(guide).toMatch(/data-guide-ai-link href="\/intelligence\/ask" hidden/);
     expect(guide).toMatch(/fetch\('\/api\/guide\/ai-availability', \{ cache: 'no-store', credentials: 'same-origin' \}\)/);
     expect(guide).toMatch(/event\.preventDefault\(\)/);
-    expect(guide).toMatch(/if \(await refreshAiEntry\(\)\) window\.location\.assign\(aiLink\.href\)/);
+    expect(guide).toMatch(/if \(aiLink && await refreshAiEntry\(\)\) window\.location\.assign\(aiLink\.href\)/);
     expect(guide).toMatch(/\.dajc-guide__ai-entry a\[hidden\]/);
     expect(guide).toContain('This FAQ is not a live chat.');
   });
@@ -51,8 +51,11 @@ describe('Ask DAJC · FAQ is the entry point to DAJC AI', () => {
     expect(await res.json()).toEqual({ available: true });
   });
 
-  it('never exposes configuration, user data or an Ask endpoint from the public gate', () => {
-    const text = JSON.stringify(guideAiAvailabilityResponse({}));
+  it('never exposes configuration, user data or an Ask endpoint from the public gate', async () => {
+    const response = guideAiAvailabilityResponse(FULL_ENV);
+    const text = await response.text();
+    expect(text).toBe('{"available":true}');
+    expect(text).not.toContain(FULL_ENV.DAJC_ASK_EMAIL_PEPPER);
     expect(text).not.toMatch(/apiKey|pepper|organisation|customer/i);
     expect(route).toContain('export const prerender = false');
     expect(route).toContain('guideAiAvailabilityResponse()');
