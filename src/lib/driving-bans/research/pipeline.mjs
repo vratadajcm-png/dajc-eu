@@ -5,8 +5,8 @@ import { dajcCoverageCount } from '../../../../config/europe-coverage.mjs';
 import { appendAudit } from '../evidence-store.mjs';
 import { stableStringify } from '../review-workflow.mjs';
 import { researchTarget, discoverDocuments } from './discovery.mjs';
-import { composeDocumentParts, documentText, scanForInstructions } from './documents.mjs';
-import { checkExtractedRule, draftRuleOf, extractRules, EXTRACTION_PROMPT_VERSION } from './extraction.mjs';
+import { composeDocumentParts, documentText, identifyLanguage, scanForInstructions } from './documents.mjs';
+import { checkExtractedRule, draftRuleOf, extractRules, legalEffectOf, EXTRACTION_PROMPT_VERSION } from './extraction.mjs';
 import { crossCheck, dualExtraction } from './cross-check.mjs';
 import { buildOperations, documentPath, draftSubmission, sourceConflicts } from './proposal.mjs';
 
@@ -72,7 +72,9 @@ const dryRunFindings = dryRun => [
 async function analyseDocument({ item, fetched, target, window, rawCanonical, catalogSources, orchestrator, store, runId, now, synthetic }) {
   const phases = ['DISCOVERED', 'DOCUMENT_RETRIEVED'];
   const { text, metadata } = documentText(fetched);
-  const document = { url: item.url, final_url: fetched.final_url, sha256: fetched.sha256, byte_length: fetched.byte_length, kind: fetched.kind, content_type: fetched.content_type, retrieved_at: fetched.retrieved_at, last_modified: fetched.last_modified, etag: fetched.etag, parts: fetched.parts ?? null, title: metadata.title ?? item.title ?? fetched.title ?? null, language: metadata.language, eli: metadata.eli, published: metadata.published, modified: metadata.modified, version: metadata.eli?.version ?? metadata.modified ?? null, authority: item.authority, origin: item.origin, source_id: item.source_id, licence: item.licence ?? null, rights: item.rights ?? null, bytes: fetched.bytes };
+  // Language and type of the document; the language decides whether extraction counts as complex.
+  const language = identifyLanguage(text, metadata.language);
+  const document = { url: item.url, final_url: fetched.final_url, sha256: fetched.sha256, byte_length: fetched.byte_length, kind: fetched.kind, content_type: fetched.content_type, retrieved_at: fetched.retrieved_at, last_modified: fetched.last_modified, etag: fetched.etag, parts: fetched.parts ?? null, title: metadata.title ?? item.title ?? fetched.title ?? null, language: language.language, language_source: language.source, eli: metadata.eli, published: metadata.published, modified: metadata.modified, version: metadata.eli?.version ?? metadata.modified ?? null, authority: item.authority, origin: item.origin, source_id: item.source_id, licence: item.licence ?? null, rights: item.rights ?? null, bytes: fetched.bytes };
   const injection = text ? scanForInstructions(text) : [];
   const findings = injection.length ? [{ code: 'UNTRUSTED_INSTRUCTIONS_IN_DOCUMENT', blocking_state: 'CONFLICT', message: 'The document contains instruction-like text addressed to an AI; it was treated as data only', excerpts: injection.slice(0, 3) }] : [];
 
@@ -90,7 +92,7 @@ async function analyseDocument({ item, fetched, target, window, rawCanonical, ca
   // Live checks (29-30 Oct 2026): the cheap model misquoted and wrote 7.5 t as 7.5 kg where the
   // strongest model did not. A cheap extraction that fails the deterministic checks is read again
   // once on the stronger route; the extraction with fewer blocking findings is kept.
-  const strongerRoute = !first.cached && !first.complex && blocking(ruleFindings) === 'INSUFFICIENT_EVIDENCE' ? orchestrator.next?.('extract', { escalate: true, needsPdf: text === null }) : null;
+  const strongerRoute = !first.cached && !first.complex && blocking(ruleFindings) === 'INSUFFICIENT_EVIDENCE' ? orchestrator.next?.('extract', { escalate: true, needsPdf: text === null, language: document.language }) : null;
   // Compared with the model requested, not the one served (a provider may route an ID to a newer model).
   if (strongerRoute && (strongerRoute.provider !== first.provider || strongerRoute.model !== (first.requested_model ?? first.model))) {
     let stronger = null;
@@ -148,11 +150,14 @@ async function analyseDocument({ item, fetched, target, window, rawCanonical, ca
     }
   }
 
+  // Legal effect (commencement, expiry) apart from the published window of the drafted rules.
+  const legalEffect = legalEffectOf(usable.map(entry => entry.rule));
+  if (!legalEffect.legal_effective && legalEffect.per_rule.length) findings.push({ code: 'LEGAL_EFFECT_PER_RULE', blocking_state: 'NOTE', message: 'The rules state no common commencement and expiry; the reviewer confirms the legal effect of each rule', per_rule: legalEffect.per_rule });
   const summary = `AI research draft for ${target.jurisdiction} from ${document.final_url}: ${operations.filter(op => op.op !== 'ADD_SOURCE').map(op => `${op.op} ${op.ban_id ?? op.rule?.ban_id}`).join(', ') || 'no rule operation'}. Not legally verified.`;
   let submission = null, dryRun = null;
   if (operations.length) {
     try {
-      ({ submission, dryRun } = draftSubmission({ target, document, operations, sourceId, summary, rawCanonical, catalogSources, detectedAt: now.toISOString(), synthetic }));
+      ({ submission, dryRun } = draftSubmission({ target, document, operations, sourceId, summary, rawCanonical, catalogSources, detectedAt: now.toISOString(), synthetic, legalEffective: legalEffect.legal_effective }));
       findings.push(...dryRunFindings(dryRun));
     } catch (error) {
       findings.push({ code: 'SUBMISSION_INVALID', blocking_state: 'INSUFFICIENT_EVIDENCE', message: String(error.message || error).slice(0, 500) });
@@ -170,6 +175,9 @@ async function analyseDocument({ item, fetched, target, window, rawCanonical, ca
     cross_check: check && { provider: check.provider, vendor: check.vendor, model: check.model, overall: check.overall ?? null, ok: check.ok },
     second_extraction: dual && { provider: dual.provider, vendor: dual.vendor, model: dual.model, agreed: !dual.findings.length },
     findings, submission, dry_run: dryRun,
+    legal_effect: { stated_by_document: legalEffect.legal_effective, per_rule: legalEffect.per_rule, published_window: { from: window.from, to: window.to }, confirmed: false },
+    // What the person confirms when promoting (promoteDraft): nothing here is confirmed by AI.
+    review_checklist: ['Legal effect (commencement and expiry) read in the primary text, apart from the published window', 'Every exception and its conditions complete as the primary text states them', 'Roads, sections, vehicle scope and weight as the primary text states them'],
     legal_verification: { status: 'NOT_PERFORMED', note: 'AI drafts and agreement between models are not legal verification. A person must read the primary text and promote or reject this draft.' },
     history: [{ at, from: null, to: state, actor: 'dajc-research-ai', identity_verified: false, action: 'DRAFT' }],
   };

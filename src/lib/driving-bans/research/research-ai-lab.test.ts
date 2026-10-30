@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { aggregate, assertNoCredentials, buildLiveEvidence, main, runEvidence } from '../../../../scripts/ai-lab-live-evidence.mjs';
-import { LIVE_EVIDENCE, MODEL_PROFILE, applyModelProfile, liveEvidenceFor, providerApiStatus, rankModels, recommendModels } from '../../ai/model-profile.mjs';
+import { BENCHMARK_EVIDENCE, LIVE_EVIDENCE, MODEL_PROFILE, PROFILE_TASKS, applyModelProfile, liveEvidenceFor, modelCatalog, policyAssignments, proposePolicyUpdate, providerApiStatus, rankModels, recommendModels } from '../../ai/model-profile.mjs';
 import { PROVIDER_IDS } from '../../ai/providers.mjs';
 
 // SYNTHETIC artifacts in the shape of the AI Lab workflow "DAJC-eu research live check" (no API calls here).
@@ -93,5 +93,63 @@ describe('model catalog with AI Lab evidence', () => {
     const env = applyModelProfile({ DAJC_RESEARCH_MODEL_PROFILE: MODEL_PROFILE.profile_id, DAJC_RESEARCH_OPENAI_API_KEY: 'k', DAJC_RESEARCH_GEMINI_API_KEY: 'k' });
     expect(env).toMatchObject({ DAJC_RESEARCH_GEMINI_MODEL: 'gemini-3.5-flash-lite', DAJC_RESEARCH_OPENAI_MODEL: 'gpt-6-sol', DAJC_RESEARCH_OPENAI_REASONING_EFFORT: 'none' });
     expect(env.DAJC_RESEARCH_ROUTE_EXTRACT_COMPLEX).toMatch(/^openai,/);
+  });
+});
+
+describe('approved model policy', () => {
+  const KEYS = { DAJC_RESEARCH_MODEL_PROFILE: MODEL_PROFILE.profile_id, DAJC_RESEARCH_OPENAI_API_KEY: 'k', DAJC_RESEARCH_GEMINI_API_KEY: 'k', DAJC_RESEARCH_XAI_API_KEY: 'k' };
+
+  it('resolves the owner-approved strategy with an evidence level per role', () => {
+    const policy = policyAssignments();
+    expect(policy.extract.map((e: any) => e.model)).toEqual(['gemini-3.5-flash-lite', 'gpt-6-sol', 'grok-4.7']);
+    expect(policy.extract_complex[0]).toMatchObject({ model: 'gpt-6-sol', level: 'LIVE_EXTRACTION_VERIFIED', eligible: true });
+    expect(policy.explain[0]).toMatchObject({ model: 'gpt-6-luna', level: 'BENCHMARK_DIRECT', eligible: true });
+    // Gemini checked the escalated extraction in the REVIEW_REQUIRED live run; its own first reading failed, so it is not live-verified for extraction.
+    const catalog = modelCatalog();
+    const lite = catalog.find((c: any) => c.model === 'gemini-3.5-flash-lite')!;
+    expect(lite.tasks).toMatchObject({ verify: 'LIVE_EXTRACTION_VERIFIED', extract: 'BENCHMARK_INDIRECT', extract_complex: 'BENCHMARK_INDIRECT' });
+    expect(lite).toMatchObject({ last_verified: '2026-10-30', policy_roles: ['extract', 'extract_complex', 'verify'], source: { lab: 'vratadajcm-png/dajc-ai-lab' } });
+    for (const model of ['claude-sonnet-5-5', 'mistral-small-2603']) {
+      const entry = catalog.find((c: any) => c.model === model)!;
+      expect(Object.values(entry.tasks).every(level => level === 'UNAVAILABLE')).toBe(true);
+      expect(entry.excluded_reason).toBeTruthy();
+    }
+    const recommendation = recommendModels();
+    expect(recommendation).toMatchObject({ policy_id: MODEL_PROFILE.policy.policy_id, discover: { provider: 'perplexity' }, conflicts: { engine: expect.stringMatching(/^deterministic/) }, explain: { model: 'gpt-6-luna' }, explain_escalation: { model: 'gpt-6-sol' } });
+    expect(MODEL_PROFILE.policy.tasks.articles.service).toMatch(/Weekly/);
+  });
+
+  // Scenario 22: new AI Lab evidence becomes a proposal for the owner; the policy and the applied settings stay as they are.
+  it('turns new AI Lab evidence into a proposal only, never into a setting', () => {
+    const policyBefore = JSON.stringify(MODEL_PROFILE.policy);
+    const envBefore = applyModelProfile(KEYS);
+    const live = structuredClone(LIVE_EVIDENCE);
+    (live.runs as any[]).push({ run_id: 'synthetic', generated_at: '2026-11-02T03:00:00Z', calls: [], e2e: { drafts: [{ draft_id: 'rdraft-synthetic', state: 'REVIEW_REQUIRED', extraction: { provider: 'openai', model: 'gpt-5.4-mini', escalated_from: null }, cross_check: { provider: 'xai', model: 'grok-4.7' }, second_extraction: null }] } });
+    const update = proposePolicyUpdate({ live });
+    expect(update.applied).toBe(false);
+    expect(update.proposals).toEqual(expect.arrayContaining([expect.objectContaining({ role: 'extract', kind: 'CANDIDATE_FOR_POLICY', model: 'openai/gpt-5.4-mini', level: 'LIVE_EXTRACTION_VERIFIED', note: expect.stringMatching(/approved by the owner/) })]));
+    expect(JSON.stringify(MODEL_PROFILE.policy)).toBe(policyBefore);
+    expect(recommendModels({ live }).extract.model).toBe('gemini-3.5-flash-lite');
+    expect(applyModelProfile(KEYS, { live })).toEqual(envBefore);
+    expect(Object.values(applyModelProfile(KEYS, { live }))).not.toContain('gpt-5.4-mini');
+  });
+
+  // Scenario 24: a top score in an unrelated benchmark gives no eligibility, even when someone lists the model in the policy.
+  it('never uses a model for extraction because of a high score in an unrelated test', () => {
+    const profile = structuredClone(MODEL_PROFILE);
+    (profile.candidates.find((c: any) => c.model === 'gemini-3.5-flash') as any).evidence_category = 'general-chat-arena';
+    profile.policy.tasks.extract.primary = 'gemini/gemini-3.5-flash';
+    const evidence = structuredClone(BENCHMARK_EVIDENCE);
+    evidence.models.find((m: any) => m.model === 'gemini-3.5-flash')!.consolidated.correct_rate_of_completed = 1;
+    for (const task of PROFILE_TASKS) {
+      const row = rankModels(task, { profile, evidence }).find((item: any) => item.model === 'gemini-3.5-flash')!;
+      expect(row).toMatchObject({ score: null, evidence_level: 'NOT_BENCHMARKED', reason: expect.stringMatching(/general-chat-arena benchmark says nothing about/) });
+    }
+    expect(policyAssignments({ profile, evidence }).extract[0]).toMatchObject({ model: 'gemini-3.5-flash', eligible: false, level: 'NOT_BENCHMARKED' });
+    expect(proposePolicyUpdate({ profile, evidence }).proposals).toEqual(expect.arrayContaining([expect.objectContaining({ role: 'extract', kind: 'POLICY_MODEL_NOT_ELIGIBLE', model: 'gemini/gemini-3.5-flash' })]));
+    expect(recommendModels({ profile, evidence }).extract.model).not.toBe('gemini-3.5-flash');
+    const env = applyModelProfile(KEYS, { profile, evidence });
+    expect(Object.values(env)).not.toContain('gemini-3.5-flash');
+    expect(env.DAJC_RESEARCH_GEMINI_MODEL).toBe('gemini-3.5-flash-lite');
   });
 });

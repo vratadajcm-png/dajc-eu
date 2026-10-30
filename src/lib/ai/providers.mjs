@@ -105,7 +105,7 @@ export function parsePricing(raw) {
   return out;
 }
 
-const TASK_SUFFIXES = ['EXTRACT', 'VERIFY'];
+const TASK_SUFFIXES = ['EXTRACT', 'VERIFY', 'EXPLAIN'];
 /** Model for a task: <P>_MODEL_<TASK>_COMPLEX for complex documents, then <P>_MODEL_<TASK>, then <P>_MODEL. */
 export function modelFor(env, id, task = null, complex = false) {
   const base = PROVIDER_CATALOG[id].modelEnv;

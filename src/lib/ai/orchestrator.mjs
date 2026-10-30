@@ -7,27 +7,59 @@ import { PROVIDER_CATALOG, PROVIDER_IDS, ProviderError } from './providers.mjs';
  * - routing by task with configurable priorities (DAJC_RESEARCH_ROUTE_<TASK>);
  * - an independent check always runs at a different vendor than the extraction;
  * - a cheaper model for ordinary documents and an optional stronger one for complex
- *   documents (PDF or large input, DAJC_RESEARCH_<P>_MODEL_<TASK>_COMPLEX);
+ *   documents (PDF, large input, a document language without tested extraction, or an
+ *   escalation; DAJC_RESEARCH_<P>_MODEL_<TASK>_COMPLEX);
+ * - explanations of verified registry data (task explain) through the same routes, limits
+ *   and audit, under the module of the product that asks;
  * - optional preference for the cheaper eligible model (DAJC_RESEARCH_PREFER_LOWER_COST);
  * - a provider that refused for credit, tier, key, model or a malformed request is
  *   blocked for the rest of the run and never sent the same request again;
  * - rate limits are paced with the provider's retry delay (capped), transient errors
  *   retried with exponential backoff, a circuit breaker per provider, then failover;
  * - request limits and a budget per run and per month, booked per module, from actual usage;
- * - an audit entry per call (provider, model, tokens, cost, outcome; never a prompt or key).
+ * - an audit entry per call (task class, provider, model, language, tokens, cost, outcome;
+ *   never a prompt or key).
  * Exhausting the budget stops the work; it never produces a guessed result.
  */
 
-export const RESEARCH_TASKS = Object.freeze(['discover', 'extract', 'verify']);
+export const RESEARCH_TASKS = Object.freeze(['discover', 'extract', 'verify', 'explain']);
 export const DEFAULT_ROUTES = Object.freeze({
   discover: ['perplexity'],
   extract: ['anthropic', 'openai', 'gemini', 'mistral', 'xai'],
-  // Complex documents (PDF or large input) may follow their own provider order.
+  // Complex documents (PDF, large input, untested language, escalation) may follow their own provider order.
   extract_complex: ['anthropic', 'openai', 'gemini', 'mistral', 'xai'],
   verify: ['openai', 'gemini', 'mistral', 'xai', 'anthropic'],
+  explain: ['openai', 'gemini', 'xai', 'anthropic', 'mistral'],
 });
-/** Only public legal and official documents may go to an AI provider from research. */
-export const DATA_CLASSES = Object.freeze(['public-legal', 'customer']);
+
+/**
+ * The task classes of the DAJC AI model policy mapped onto the orchestrator tasks.
+ * CHANGE_ANALYSIS has no AI task of its own: the deterministic engine decides and the
+ * independent check (verify) is its only AI supplement.
+ */
+export const TASK_CLASSES = Object.freeze({
+  DISCOVERY: Object.freeze({ task: 'discover' }),
+  EXTRACT_STANDARD: Object.freeze({ task: 'extract', complex: false }),
+  EXTRACT_COMPLEX: Object.freeze({ task: 'extract', complex: true }),
+  INDEPENDENT_VERIFICATION: Object.freeze({ task: 'verify' }),
+  CHANGE_ANALYSIS: Object.freeze({ task: null, engine: 'deterministic (checkRules, detectChanges, sourceConflicts)', ai_supplement: 'verify' }),
+  EXPLAIN_VERIFIED_DATA: Object.freeze({ task: 'explain' }),
+});
+/** Task class of one orchestrator call. */
+export function taskClassOf(task, complex = false) {
+  if (task === 'extract') return complex ? 'EXTRACT_COMPLEX' : 'EXTRACT_STANDARD';
+  return Object.entries(TASK_CLASSES).find(([, spec]) => spec.task === task)?.[0] ?? null;
+}
+
+/**
+ * Data that may go to an AI provider: public legal and official documents for research,
+ * verified registry data for explanations. Customer data (vehicles, routes, organisations,
+ * tenants) never goes to a provider from these tasks.
+ */
+export const DATA_CLASSES = Object.freeze(['public-legal', 'verified-registry', 'customer']);
+export const TASK_DATA_CLASSES = Object.freeze({ discover: ['public-legal'], extract: ['public-legal'], verify: ['public-legal'], explain: ['verified-registry'] });
+// Tasks that read a legal document, where the document language counts.
+const DOCUMENT_TASKS = ['extract', 'verify'];
 
 export class BudgetExceededError extends Error {
   constructor(message) { super(message); this.name = 'BudgetExceededError'; }
@@ -39,13 +71,13 @@ export class NoProviderError extends Error {
 /**
  * DAJC_RESEARCH_ROUTE_EXTRACT="anthropic,openai" etc.; unknown ids are dropped.
  * DAJC_RESEARCH_ROUTE_EXTRACT_COMPLEX defaults to the extraction route.
- * @returns {{ discover: string[], extract: string[], extract_complex: string[], verify: string[] }}
+ * @returns {{ discover: string[], extract: string[], extract_complex: string[], verify: string[], explain: string[] }}
  */
 export function routesFromEnv(env = process.env) {
   const parse = name => { const raw = env[`DAJC_RESEARCH_ROUTE_${name.toUpperCase()}`]; const list = raw ? raw.split(',').map(value => value.trim()).filter(value => PROVIDER_IDS.includes(value)) : []; return list.length ? [...new Set(list)] : null; };
   const routes = Object.fromEntries(RESEARCH_TASKS.map(task => [task, parse(task) ?? [...DEFAULT_ROUTES[task]]]));
   const configuredExtract = parse('extract');
-  return { discover: routes.discover, extract: routes.extract, extract_complex: parse('extract_complex') ?? (configuredExtract ? [...configuredExtract] : [...DEFAULT_ROUTES.extract_complex]), verify: routes.verify };
+  return { discover: routes.discover, extract: routes.extract, extract_complex: parse('extract_complex') ?? (configuredExtract ? [...configuredExtract] : [...DEFAULT_ROUTES.extract_complex]), verify: routes.verify, explain: routes.explain };
 }
 
 const positive = (value, fallback) => { const parsed = Number(value); return value !== undefined && value !== '' && Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback; };
@@ -59,6 +91,8 @@ export function limitsFromEnv(env = process.env) {
     maxRetryWaitMs: Math.floor(positive(env.DAJC_RESEARCH_MAX_RETRY_WAIT_MS, 120_000)),
     minIntervalMs: Object.fromEntries(PROVIDER_IDS.map(id => [id, Math.floor(positive(env[`DAJC_RESEARCH_${id.toUpperCase()}_MIN_INTERVAL_MS`], 0))])),
     preferLowerCost: env.DAJC_RESEARCH_PREFER_LOWER_COST === 'true',
+    // Document languages with tested extraction (e.g. "cs,de"); any other language counts as complex. Unset: no language criterion.
+    testedLanguages: env.DAJC_RESEARCH_TESTED_LANGUAGES ? env.DAJC_RESEARCH_TESTED_LANGUAGES.split(',').map(value => value.trim().toLowerCase()).filter(Boolean) : null,
   };
 }
 
@@ -123,6 +157,18 @@ export function createOrchestrator({
   const breakerOpen = id => state.get(id).openUntil > clock().getTime();
   const priceOf = (provider, task, complex) => typeof provider.priceFor === 'function' ? provider.priceFor(task, complex) : provider.price;
 
+  // Why a call goes to the stronger route: a PDF, a long input, a document language without tested extraction, an escalation.
+  function complexityOf(task, { pdf = false, estimatedInput = 0, meta = {} }) {
+    if (task === 'discover') return [];
+    const reasons = [];
+    if (pdf) reasons.push('PDF');
+    if (estimatedInput > limits.complexInputTokens) reasons.push('LONG_INPUT');
+    // Only calls about a document state its language (null when unknown); a smoke test states none.
+    if (DOCUMENT_TASKS.includes(task) && limits.testedLanguages?.length && meta.language !== undefined && !limits.testedLanguages.includes(meta.language)) reasons.push('UNTESTED_LANGUAGE');
+    if (meta.escalate === true) reasons.push('ESCALATION');
+    return reasons;
+  }
+
   function candidates(task, { excludeVendors = [], needsPdf = false, dataClass, complex }) {
     if (!DATA_CLASSES.includes(dataClass)) throw new Error(`Unknown data class ${dataClass}`);
     const reasons = [];
@@ -131,8 +177,8 @@ export function createOrchestrator({
       const provider = providers[id];
       const spec = PROVIDER_CATALOG[id];
       if (!provider?.configured) { reasons.push(`${id}: not configured`); continue; }
-      // Customer data (vehicles, routes, organisations) never goes to a research provider.
-      if (dataClass !== 'public-legal') { reasons.push(`${id}: data class ${dataClass} not allowed for research`); continue; }
+      // Customer data (vehicles, routes, organisations, tenants) never goes to a provider.
+      if (!TASK_DATA_CLASSES[task].includes(dataClass)) { reasons.push(`${id}: data class ${dataClass} not allowed for ${task === 'explain' ? 'explanations' : 'research'}`); continue; }
       if (state.get(id).blocked) { reasons.push(`${id}: blocked for this run (${state.get(id).blocked})`); continue; }
       if (excludeVendors.includes(spec.vendor)) { reasons.push(`${id}: same vendor as the checked step`); continue; }
       if (needsPdf && !spec.capabilities.includes('pdf')) { reasons.push(`${id}: no PDF input`); continue; }
@@ -192,16 +238,18 @@ export function createOrchestrator({
 
   /**
    * Run one task at the first eligible provider; fail over on errors.
-   * request: provider request; meta: { purpose, subject, dataClass, excludeVendors, needsPdf }.
+   * request: provider request; meta: { purpose, subject, dataClass, excludeVendors, needsPdf, language, escalate }.
    */
   async function run(task, request, meta = {}) {
     if (!RESEARCH_TASKS.includes(task)) throw new Error(`Unknown research task ${task}`);
-    const dataClass = meta.dataClass ?? 'public-legal';
+    const dataClass = meta.dataClass ?? (task === 'explain' ? 'verified-registry' : 'public-legal');
     // A PDF is estimated at one token per 20 bytes, deliberately on the high side.
     const estimatedInput = task === 'discover' ? 0 : estimateTokens(request.system) + estimateTokens(request.user) + (request.document ? Math.ceil(request.document.base64.length * 0.75 / 20) : 0);
     if (task !== 'discover' && estimatedInput > limits.maxInputTokensPerCall) throw new BudgetExceededError(`Input of about ${estimatedInput} tokens exceeds the per-call limit ${limits.maxInputTokensPerCall}`);
-    // A PDF, a long text or an escalation after a failed cheaper extraction goes to the stronger route.
-    const complex = task !== 'discover' && (Boolean(request.document) || estimatedInput > limits.complexInputTokens || meta.escalate === true);
+    // A PDF, a long text, an untested document language or an escalation after a failed cheaper extraction goes to the stronger route.
+    const complexReasons = complexityOf(task, { pdf: Boolean(request.document), estimatedInput, meta });
+    const complex = complexReasons.length > 0;
+    const context = { task_class: taskClassOf(task, complex), complex_reasons: complexReasons, language: task === 'discover' ? null : meta.language ?? null };
     const { eligible, reasons } = candidates(task, { excludeVendors: meta.excludeVendors ?? [], needsPdf: meta.needsPdf ?? false, dataClass, complex });
     const failures = [...reasons];
     let budgetBlocked = false, callFailed = false;
@@ -220,8 +268,8 @@ export function createOrchestrator({
         const cost = costOf(price, usage);
         runSpent = round(runSpent + cost);
         ledger.book({ module, provider: provider.id, task, costUsd: cost, inputTokens: usage.inputTokens, outputTokens: usage.outputTokens });
-        audit({ task, purpose: meta.purpose ?? null, subject: meta.subject ?? null, provider: provider.id, vendor: provider.vendor, requested_model: requestedModel, model: result.model ?? requestedModel, complex, outcome: 'OK', attempts, latency_ms: latencyMs, waited_ms: waitedMs, input_tokens: usage.inputTokens ?? 0, output_tokens: usage.outputTokens ?? 0, cost_usd: cost, request_sha256: hash(JSON.stringify(request.queries ?? [request.system, request.user, request.document?.base64?.length ?? 0])) });
-        return { ...result, provider: provider.id, vendor: provider.vendor, model: result.model ?? requestedModel, requested_model: requestedModel, cost_usd: cost, attempts, complex };
+        audit({ task, ...context, purpose: meta.purpose ?? null, subject: meta.subject ?? null, provider: provider.id, vendor: provider.vendor, requested_model: requestedModel, model: result.model ?? requestedModel, complex, outcome: 'OK', attempts, latency_ms: latencyMs, waited_ms: waitedMs, input_tokens: usage.inputTokens ?? 0, output_tokens: usage.outputTokens ?? 0, cost_usd: cost, request_sha256: hash(JSON.stringify(request.queries ?? [request.system, request.user, request.document?.base64?.length ?? 0])) });
+        return { ...result, provider: provider.id, vendor: provider.vendor, model: result.model ?? requestedModel, requested_model: requestedModel, cost_usd: cost, attempts, complex, complex_reasons: complexReasons, task_class: context.task_class };
       } catch (error) {
         callFailed = true;
         const known = error instanceof ProviderError;
@@ -232,7 +280,7 @@ export function createOrchestrator({
           runSpent = round(runSpent + cost);
           ledger.book({ module, provider: provider.id, task, costUsd: cost, inputTokens: usage.inputTokens, outputTokens: usage.outputTokens });
         }
-        audit({ task, purpose: meta.purpose ?? null, subject: meta.subject ?? null, provider: provider.id, vendor: provider.vendor, requested_model: requestedModel, model: null, complex, outcome: 'FAILED', error_category: known ? error.category : 'INTERNAL', http_status: known ? error.status : null, provider_code: known ? error.code : null, attempts: known ? error.attempts ?? 1 : null, blocked_for_run: state.get(provider.id).blocked, input_tokens: usage?.inputTokens ?? 0, output_tokens: usage?.outputTokens ?? 0, cost_usd: cost });
+        audit({ task, ...context, purpose: meta.purpose ?? null, subject: meta.subject ?? null, provider: provider.id, vendor: provider.vendor, requested_model: requestedModel, model: null, complex, outcome: 'FAILED', error_category: known ? error.category : 'INTERNAL', http_status: known ? error.status : null, provider_code: known ? error.code : null, attempts: known ? error.attempts ?? 1 : null, blocked_for_run: state.get(provider.id).blocked, input_tokens: usage?.inputTokens ?? 0, output_tokens: usage?.outputTokens ?? 0, cost_usd: cost });
         failures.push(`${provider.id}: ${known ? error.message : 'internal error'}`);
       }
     }
@@ -242,8 +290,8 @@ export function createOrchestrator({
 
   /** The provider and model a task would go to first, without calling it (e.g. before an escalation). */
   function next(task, meta = {}) {
-    const complex = task !== 'discover' && (meta.needsPdf === true || meta.escalate === true);
-    const [provider] = candidates(task, { excludeVendors: meta.excludeVendors ?? [], needsPdf: meta.needsPdf ?? false, dataClass: meta.dataClass ?? 'public-legal', complex }).eligible;
+    const complex = complexityOf(task, { pdf: meta.needsPdf === true, meta }).length > 0;
+    const [provider] = candidates(task, { excludeVendors: meta.excludeVendors ?? [], needsPdf: meta.needsPdf ?? false, dataClass: meta.dataClass ?? (task === 'explain' ? 'verified-registry' : 'public-legal'), complex }).eligible;
     return provider ? { provider: provider.id, model: task === 'discover' ? null : typeof provider.modelFor === 'function' ? provider.modelFor(task, complex) : provider.model } : null;
   }
 

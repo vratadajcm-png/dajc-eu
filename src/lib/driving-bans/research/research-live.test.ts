@@ -20,7 +20,6 @@ describe('live check harness (offline)', () => {
     const plan: any = await main(['plan'], PROFILE_ENV);
     expect(plan.readiness.enabled).toBe(true);
     expect(plan.budget.total_usd_estimate).toBeGreaterThan(0);
-    expect(plan.budget.total_usd_estimate).toBeLessThan(1.5);
     // Extraction and the independent check at two vendors, plus the stronger second reading when the first fails the checks.
     const [extractor, checker, stronger] = plan.budget.rows.e2e;
     expect(extractor.provider).not.toBe(checker.provider);
@@ -28,6 +27,10 @@ describe('live check harness (offline)', () => {
     expect(stronger.model).not.toBe(extractor.model);
     expect(JSON.stringify(plan)).not.toMatch(/test-key/);
     expect(estimateBudget(researchEnvironment({})).total_usd_estimate).toBe(0);
+    // The AI Lab setup (three keyed vendors, profile models and list prices) stays under the 1.50 USD run cap.
+    const lab = await main(['plan'], { DAJC_DRIVING_BANS_RESEARCH_ENABLED: 'true', DAJC_RESEARCH_MODEL_PROFILE: 'bakeoff-2026-10-25', DAJC_RESEARCH_RUN_BUDGET_USD: '1.50', DAJC_RESEARCH_OPENAI_API_KEY: 'k', DAJC_RESEARCH_GEMINI_API_KEY: 'k', DAJC_RESEARCH_XAI_API_KEY: 'k' }) as any;
+    expect(lab.budget.rows.e2e.map((row: any) => [row.provider, row.model])).toEqual([['gemini', 'gemini-3.5-flash-lite'], ['xai', 'grok-4.7'], ['openai', 'gpt-6-sol']]);
+    expect(lab.budget.total_usd_estimate).toBeLessThan(1.5);
   });
 
   it('refuses every paid check while research is off', async () => {

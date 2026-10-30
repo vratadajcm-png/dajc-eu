@@ -65,7 +65,7 @@ describe('research run: official documents to drafts (scenarios 1, 2, 6, 7)', ()
     expect(draft.cross_check).toMatchObject({ provider: 'openai', ok: true });
     expect(draft.second_extraction).toMatchObject({ provider: 'openai', agreed: true });
     expect(draft.legal_verification.status).toBe('NOT_PERFORMED');
-    expect(draft.document).toMatchObject({ final_url: URLS.measure, kind: 'HTML_SNAPSHOT', language: 'cs', modified: '2026-10-30' });
+    expect(draft.document).toMatchObject({ final_url: URLS.measure, kind: 'HTML_SNAPSHOT', language: 'cs', language_source: 'declared', modified: '2026-10-30' });
     expect(draft.document.sha256).toMatch(/^[0-9a-f]{64}$/);
     expect(context.store.exists(`blobs/${draft.document.sha256}`)).toBe(true);
   });
@@ -387,9 +387,27 @@ describe('human approval and the canonical registry (scenario 22)', () => {
     const base = { researchStore: context.store, draftId: id, evidenceStore, rawCanonical, now: NOW };
     expect(() => promoteDraft({ ...base, reviewer: 'Reviewer', reason: 'Read the measure', legalVerifiedAt: 'yesterday', reviewWindow: WINDOW } as any)).toThrow(/legal_verified_at/);
     expect(() => promoteDraft({ ...base, reviewer: 'Reviewer', reason: 'Read the measure', legalVerifiedAt: '2026-11-03T07:00:00Z', reviewWindow: WINDOW })).toThrow(/not in the future/);
-    const promoted = promoteDraft({ ...base, reviewer: 'Reviewer', reason: 'Read the measure in full', legalVerifiedAt: '2026-11-02T07:30:00Z', reviewWindow: WINDOW });
+    // The person confirms the legal effect and complete exceptions; AI confirms neither.
+    const drafted = loadDraft(context.store, id);
+    expect(drafted.legal_effect).toMatchObject({ stated_by_document: { from: '2026-11-14', to: '2026-11-14' }, confirmed: false });
+    expect(drafted.submission.legal_effective).toEqual({ from: '2026-11-14', to: '2026-11-14' });
+    const human = { legalEffective: { from: '2026-11-14', to: '2026-11-14' }, exceptionsComplete: true };
+    expect(() => promoteDraft({ ...base, reviewer: 'Reviewer', reason: 'Read the measure', legalVerifiedAt: '2026-11-02T07:30:00Z', reviewWindow: WINDOW } as any)).toThrow(/Confirm the legal effect/);
+    expect(() => promoteDraft({ ...base, reviewer: 'Reviewer', reason: 'Read the measure', legalVerifiedAt: '2026-11-02T07:30:00Z', reviewWindow: WINDOW, confirmations: { ...human, exceptionsComplete: false } })).toThrow(/every exception/);
+    expect(loadDraft(context.store, id).state).toBe('REVIEW_REQUIRED');
+    const promoted = promoteDraft({ ...base, reviewer: 'Reviewer', reason: 'Read the measure in full', legalVerifiedAt: '2026-11-02T07:30:00Z', reviewWindow: WINDOW, confirmations: human });
     expect(promoted).toMatchObject({ import_status: 'IMPORTED', proposal_state: 'REVIEW_REQUIRED' });
-    expect(loadDraft(context.store, id).state).toBe('PROMOTED');
+    expect(loadDraft(context.store, id)).toMatchObject({ state: 'PROMOTED', promotion: { legal_effective_confirmed: human.legalEffective, exceptions_complete_confirmed: true }, legal_effect: { confirmed: true } });
+    // A draft that mixes the legal effect with the published window (the shape of the Fernpass draft
+    // rdraft-93abe3cdae4da399: valid_from 2010-01-01, valid_to 2026-11-30, legal_effective null) is refused.
+    const mixed = structuredClone(drafted);
+    mixed.draft_id = 'rdraft-0000000000f0e2a5';
+    const mixedRule = mixed.submission.operations.find((op: any) => op.op === 'ADD_RULE');
+    Object.assign(mixedRule.rule, { valid_from: '2010-01-01', valid_to: '2026-11-30' });
+    mixed.submission.legal_effective = null;
+    context.store.writeJson('drafts/rdraft-0000000000f0e2a5.json', mixed);
+    expect(() => promoteDraft({ ...base, draftId: 'rdraft-0000000000f0e2a5', reviewer: 'Reviewer', reason: 'Read the order', legalVerifiedAt: '2026-11-02T07:30:00Z', reviewWindow: WINDOW, confirmations: { legalEffective: { from: '2010-01-01', to: null }, exceptionsComplete: true } })).toThrow(/valid_from 2010-01-01\)?.*mixes the legal effect with the published window/);
+    expect(loadDraft(context.store, 'rdraft-0000000000f0e2a5').state).toBe('REVIEW_REQUIRED');
     // The existing automaton: a person approves, the candidate dataset is prepared, nothing is published.
     decideProposal({ store: evidenceStore, proposalId: promoted.proposal_id, action: 'APPROVE', reviewer: 'Second reviewer', reason: 'Checked against the measure', now: NOW });
     const ready = prepareStoredProposal({ store: evidenceStore, proposalId: promoted.proposal_id, rawCanonical, now: NOW });

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { createProvider, createProviders, parsePricing, providerStatus, PROVIDER_IDS } from '../../ai/providers.mjs';
-import { createLedger, createOrchestrator, DEFAULT_ROUTES, limitsFromEnv, routesFromEnv, BudgetExceededError, NoProviderError } from '../../ai/orchestrator.mjs';
+import { createLedger, createOrchestrator, DEFAULT_ROUTES, limitsFromEnv, routesFromEnv, taskClassOf, BudgetExceededError, NoProviderError, TASK_CLASSES, TASK_DATA_CLASSES } from '../../ai/orchestrator.mjs';
 import { checkUrl, hostAllowed, isPublicAddress, safeFetch } from './safe-fetch.mjs';
-import { htmlToText, scanForInstructions, wrapUntrusted, documentText } from './documents.mjs';
-import { checkExtractedRule, numbersIn, timeInQuote, draftRuleOf, EXTRACTION_SCHEMA } from './extraction.mjs';
+import { htmlToText, identifyLanguage, scanForInstructions, wrapUntrusted, documentText } from './documents.mjs';
+import { checkExtractedRule, numbersIn, timeInQuote, draftRuleOf, legalEffectOf, EXTRACTION_SCHEMA } from './extraction.mjs';
 import { researchReadiness } from './config.mjs';
 import { createMockAiFetch, testEnv, supportAll } from '../../../../tests/fixtures/driving-bans-research/mock-ai.mjs';
 import { DOCUMENTS, extractedRule, extraction } from '../../../../tests/fixtures/driving-bans-research/cz-scenarios.mjs';
@@ -94,6 +94,25 @@ describe('orchestrator', () => {
     expect((await routed.run('extract', request)).provider).toBe('mistral');
     const cheap = orchestratorFor(testEnv({ DAJC_RESEARCH_PREFER_LOWER_COST: 'true' }), ai);
     expect((await cheap.run('extract', request)).provider).toBe('mistral');
+  });
+
+  it('maps the policy task classes onto the existing tasks; explanations take verified registry data only', async () => {
+    expect(Object.keys(TASK_CLASSES)).toEqual(['DISCOVERY', 'EXTRACT_STANDARD', 'EXTRACT_COMPLEX', 'INDEPENDENT_VERIFICATION', 'CHANGE_ANALYSIS', 'EXPLAIN_VERIFIED_DATA']);
+    expect([taskClassOf('discover'), taskClassOf('extract'), taskClassOf('extract', true), taskClassOf('verify'), taskClassOf('explain')]).toEqual(['DISCOVERY', 'EXTRACT_STANDARD', 'EXTRACT_COMPLEX', 'INDEPENDENT_VERIFICATION', 'EXPLAIN_VERIFIED_DATA']);
+    // Change analysis stays deterministic; AI only supplements it through the independent check.
+    expect(TASK_CLASSES.CHANGE_ANALYSIS).toMatchObject({ task: null, ai_supplement: 'verify' });
+    expect(Object.values(TASK_DATA_CLASSES).some(classes => classes.includes('customer'))).toBe(false);
+    const ai = createMockAiFetch({ brain: { extract: () => ({ answer: 'ok' }) } });
+    const orchestrator = orchestratorFor(testEnv({ DAJC_RESEARCH_OPENAI_MODEL_EXPLAIN: 'test-gpt-explain', DAJC_RESEARCH_PRICING_USD: JSON.stringify({ openai: { input: 2, output: 8, models: { 'test-gpt-explain': { input: 1, output: 4 } } } }) }), ai, { module: 'dajc-ai-explain' });
+    const explained = await orchestrator.run('explain', request);
+    expect([explained.provider, explained.requested_model, explained.task_class]).toEqual(['openai', 'test-gpt-explain', 'EXPLAIN_VERIFIED_DATA']);
+    expect(orchestrator.calls().at(-1)).toMatchObject({ module: 'dajc-ai-explain', task: 'explain', task_class: 'EXPLAIN_VERIFIED_DATA' });
+    const before = ai.log.length;
+    // Customer data never goes to a provider, and research documents are not an explanation input.
+    await expect(orchestrator.run('explain', request, { dataClass: 'customer' })).rejects.toBeInstanceOf(NoProviderError);
+    await expect(orchestrator.run('explain', request, { dataClass: 'public-legal' })).rejects.toThrow(/not allowed for explanations/);
+    await expect(orchestrator.run('extract', request, { dataClass: 'verified-registry' })).rejects.toThrow(/not allowed for research/);
+    expect(ai.log.length).toBe(before);
   });
 
   it('16: retries with backoff, opens the circuit and fails over when a provider is down', async () => {
@@ -202,6 +221,14 @@ describe('documents and untrusted text', () => {
     expect(documentText(fetched).metadata).toMatchObject({ language: 'cs', modified: '2026-10-30' });
   });
 
+  it('identifies the document language: declared first, then clear function words, else unknown', () => {
+    expect(identifyLanguage('x', 'de-AT')).toEqual({ language: 'de', source: 'declared' });
+    expect(identifyLanguage(htmlToText(DOCUMENTS.measure), null)).toEqual({ language: 'cs', source: 'detected' });
+    expect(identifyLanguage('Das Fahrverbot gilt für Lastkraftwagen mit einem höchsten zulässigen Gesamtgewicht von mehr als 7,5 t auf der B 179 und auf der Strecke, die nicht im Ziel- und Quellverkehr der Gemeinden liegt.', null)).toEqual({ language: 'de', source: 'detected' });
+    expect(identifyLanguage('Η απαγόρευση κυκλοφορίας ισχύει για φορτηγά', null)).toEqual({ language: null, source: null });
+    expect(identifyLanguage('B 179 7,5 t', null).language).toBeNull();
+  });
+
   it('21: flags instruction-like text and neutralises forged markers', () => {
     const text = htmlToText(DOCUMENTS.injection);
     expect(scanForInstructions(text).length).toBeGreaterThanOrEqual(2);
@@ -251,5 +278,18 @@ describe('deterministic checks of an extraction', () => {
     expect(draftRuleOf(extractedRule({ weight_conditions: [{ operator: '>', value: null, unit: 'kg', applies_to: 'x' }] }), { jurisdiction: 'CZ', window: WINDOW, sourceId: 's' })).toBeNull();
     expect(draftRuleOf(extractedRule({ timezone: null }), { jurisdiction: 'ES', window: WINDOW, sourceId: 's' })).toBeNull();
     expect(supportAll([{ rule_index: 0 }]).overall).toBe('CONSISTENT');
+  });
+
+  it('16: keeps the legal effect apart from the published window (Fernpass, live check 2026-10-30)', () => {
+    // The Tyrol B 179 order is standing law since 2010: the draft rule covers the reviewed period only, the legal effect goes to the submission.
+    const standing = extractedRule({ schedule: { kind: 'weekly', weekdays: ['SAT', 'SUN'], dates: [], start_time: '00:00', end_time: '24:00', end_day_offset: 0 }, valid_from: '2010-01-01', valid_to: null, open_ended: true });
+    const draft = draftRuleOf(standing, { jurisdiction: 'CZ', window: WINDOW, sourceId: 's' })!;
+    expect([draft.valid_from, draft.valid_to]).toEqual([WINDOW.from, WINDOW.to]);
+    expect(draft.validity_note).toMatch(/^Published verified window 2026-11-01 to 2026-12-31, not the legal effect\. Legal effect stated by the document: from 2010-01-01, no expiry stated \(standing law\); a person confirms it before promotion\.$/);
+    expect(legalEffectOf([standing])).toMatchObject({ legal_effective: { from: '2010-01-01', to: null } });
+    // A one-day measure inside the period needs no note; rules with different effect leave the date to the reviewer.
+    expect(draftRuleOf(extractedRule(), { jurisdiction: 'CZ', window: WINDOW, sourceId: 's' })).not.toHaveProperty('validity_note');
+    expect(legalEffectOf([extractedRule(), standing]).legal_effective).toBeNull();
+    expect(legalEffectOf([extractedRule({ valid_from: null, valid_to: null, open_ended: true })]).legal_effective).toBeNull();
   });
 });

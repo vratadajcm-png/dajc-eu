@@ -26,7 +26,7 @@ const { values, positionals } = parseArgs({ allowPositionals: true, options: {
   store: { type: 'string', default: 'data/driving-bans/staging/research' }, 'evidence-store': { type: 'string', default: 'data/driving-bans/staging' },
   jurisdictions: { type: 'string', default: 'all' }, mode: { type: 'string', default: 'full' }, url: { type: 'string', multiple: true, default: [] },
   'max-documents': { type: 'string', default: '6' }, 'no-search': { type: 'boolean', default: false }, 'initial-repair': { type: 'boolean', default: false },
-  clock: { type: 'string' }, reviewer: { type: 'string' }, reason: { type: 'string' }, 'legal-verified-at': { type: 'string' }, 'review-from': { type: 'string' }, 'review-to': { type: 'string' },
+  clock: { type: 'string' }, reviewer: { type: 'string' }, reason: { type: 'string' }, 'legal-verified-at': { type: 'string' }, 'review-from': { type: 'string' }, 'review-to': { type: 'string' }, 'legal-effective-from': { type: 'string' }, 'legal-effective-to': { type: 'string' }, 'exceptions-complete': { type: 'boolean' },
 } });
 const [command, target] = positionals;
 const now = values.clock ? new Date(values.clock) : new Date();
@@ -67,7 +67,7 @@ async function demo() {
   const report = await runResearch({ jurisdictions: ['CZ'], mode: 'urgent', window: { from: '2026-11-01', to: '2026-12-31' }, now: clock, rawCanonical: rawCanonical(), snapshot: getDrivingBansSnapshot(clock), catalogEntries: [], authorityDomains: officialAuthorityDomains, orchestrator, fetchDocument: web.fetchDocument, store: research, leadUrls: [URLS.measure], maxDocuments: 1, useSearch: false, synthetic: true });
   const evidenceStore = join(research.root, 'evidence-demo');
   const draft = report.drafts[0];
-  const promoted = draft?.state === 'REVIEW_REQUIRED' ? promoteDraft({ researchStore: research, draftId: draft.draft_id, evidenceStore, reviewer: 'DAJC demo reviewer', reason: 'Synthetic walkthrough', legalVerifiedAt: '2026-11-02T07:30:00Z', reviewWindow: { from: '2026-11-01', to: '2026-12-31' }, rawCanonical: rawCanonical(), now: clock }) : null;
+  const promoted = draft?.state === 'REVIEW_REQUIRED' ? promoteDraft({ researchStore: research, draftId: draft.draft_id, evidenceStore, reviewer: 'DAJC demo reviewer', reason: 'Synthetic walkthrough', legalVerifiedAt: '2026-11-02T07:30:00Z', reviewWindow: { from: '2026-11-01', to: '2026-12-31' }, confirmations: { legalEffective: { from: '2026-11-14', to: '2026-11-14' }, exceptionsComplete: true }, rawCanonical: rawCanonical(), now: clock }) : null;
   print({ synthetic: true, note: 'Scripted providers and fixture pages: no network, no keys, no live API test.', statement: report.statement, drafts: report.drafts, independent_check: report.independent_check, calls: report.calls.map(call => `${call.task}:${call.provider}:${call.outcome}`), promoted, canonical_unchanged: readFileSync(CANONICAL, 'utf8') === canonicalBefore, store: research.root });
   if (readFileSync(CANONICAL, 'utf8') !== canonicalBefore) process.exitCode = 1;
 }
@@ -78,10 +78,10 @@ switch (command) {
   case 'list': print(listDrafts(store()).map(brief)); break;
   case 'show': print(loadDraft(store(), target)); break;
   case 'reject': print(brief(rejectDraft({ researchStore: store(), draftId: target, reviewer: values.reviewer, reason: values.reason, now }))); break;
-  case 'promote': print(promoteDraft({ researchStore: store(), draftId: target, evidenceStore: resolve(values['evidence-store']), reviewer: values.reviewer, reason: values.reason, legalVerifiedAt: values['legal-verified-at'], reviewWindow: { from: values['review-from'], to: values['review-to'] }, rawCanonical: rawCanonical(), catalogSources: drivingBanSourceCatalog.entries, now })); break;
+  case 'promote': print(promoteDraft({ researchStore: store(), draftId: target, evidenceStore: resolve(values['evidence-store']), reviewer: values.reviewer, reason: values.reason, legalVerifiedAt: values['legal-verified-at'], reviewWindow: { from: values['review-from'], to: values['review-to'] }, confirmations: { legalEffective: { from: values['legal-effective-from'], to: values['legal-effective-to'] ?? null }, exceptionsComplete: values['exceptions-complete'] === true }, rawCanonical: rawCanonical(), catalogSources: drivingBanSourceCatalog.entries, now })); break;
   case 'verify-log': { const result = verifyAuditLog(store().root); print(result); if (!result.ok) process.exitCode = 1; break; }
   case 'demo': await demo(); break;
   default:
-    console.error('Usage: driving-bans-research.mjs <status | run [--jurisdictions all|AT,DE] [--mode full|urgent --url URL] [--no-search] [--max-documents N] | list | show ID | reject ID --reviewer L --reason R | promote ID --reviewer L --reason R --legal-verified-at ISO --review-from DATE --review-to DATE [--evidence-store DIR] | verify-log | demo> [--store DIR]');
+    console.error('Usage: driving-bans-research.mjs <status | run [--jurisdictions all|AT,DE] [--mode full|urgent --url URL] [--no-search] [--max-documents N] | list | show ID | reject ID --reviewer L --reason R | promote ID --reviewer L --reason R --legal-verified-at ISO --review-from DATE --review-to DATE --legal-effective-from DATE [--legal-effective-to DATE] --exceptions-complete [--evidence-store DIR] | verify-log | demo> [--store DIR]');
     process.exitCode = 2;
 }

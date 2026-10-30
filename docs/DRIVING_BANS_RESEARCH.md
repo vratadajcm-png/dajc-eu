@@ -74,9 +74,31 @@ resp. za požadavek; čísla jsou jen příklad, platí ceník dodavatele).
 
 ## Orchestrace
 
-- Pořadí podle úlohy: `DAJC_RESEARCH_ROUTE_DISCOVER`, `_EXTRACT`, `_VERIFY`
+- Jeden orchestrátor (`src/lib/ai/orchestrator.mjs`) pro všechny třídy úloh politiky modelů
+  (`TASK_CLASSES`), mapované na existující úlohy:
+
+  | Třída | Úloha orchestrátoru |
+  | --- | --- |
+  | `DISCOVERY` | `discover` |
+  | `EXTRACT_STANDARD` | `extract` |
+  | `EXTRACT_COMPLEX` | `extract` se silnější trasou (`_EXTRACT_COMPLEX`) |
+  | `INDEPENDENT_VERIFICATION` | `verify` u jiného dodavatele |
+  | `CHANGE_ANALYSIS` | bez vlastní AI úlohy: rozhoduje deterministický engine (`checkRules`, `detectChanges`, `sourceConflicts`), AI jen jako nezávislá kontrola |
+  | `EXPLAIN_VERIFIED_DATA` | `explain` (vysvětlení ověřených odpovědí pro DAJC AI a Intelligence) |
+
+  Auditní záznam každého volání nese `task_class`, `complex_reasons` a `language`.
+- Pořadí podle úlohy: `DAJC_RESEARCH_ROUTE_DISCOVER`, `_EXTRACT`, `_EXTRACT_COMPLEX`, `_VERIFY`, `_EXPLAIN`
   (id oddělená čárkou). Výchozí: hledání `perplexity`; extrakce
-  `anthropic, openai, gemini, mistral, xai`; kontrola `openai, gemini, mistral, xai, anthropic`.
+  `anthropic, openai, gemini, mistral, xai`; kontrola `openai, gemini, mistral, xai, anthropic`;
+  vysvětlení `openai, gemini, xai, anthropic, mistral`. Profil `bakeoff-2026-10-25` je přepíše
+  podle schválené politiky (`config/ai-research-models.json`, `policy`).
+- Silnější trasa (`complex_reasons`): PDF, dlouhý vstup (`DAJC_RESEARCH_COMPLEX_INPUT_TOKENS`),
+  eskalace po neúspěšné extrakci a **jazyk dokumentu**. Jazyk určí `identifyLanguage`
+  (deklarovaný `html lang`/`Content-Language`, jinak funkční slova a typická písmena textu);
+  návrh ho ukládá v `document.language` a `document.language_source`. Dokument v jazyce bez
+  živě otestované extrakce, nebo v neurčeném jazyce, jde na silnější trasu (`UNTESTED_LANGUAGE`).
+  Otestované jazyky: `DAJC_RESEARCH_TESTED_LANGUAGES`, z politiky `cs,de` (živé běhy AI Lab:
+  cz-sun a Tyrolsko B 179). Bez nastavení se kritérium neuplatní; smoke testy jazyk neuvádějí.
 - Kontrola vždy běží u **jiného dodavatele** než extrakce. Rizikové změny
   (nové pravidlo, zrušení, změna hmotnosti, rozvrhu nebo silnic) dostanou navíc
   druhou nezávislou extrakci a porovnání pole po poli.
@@ -102,8 +124,9 @@ resp. za požadavek; čísla jsou jen příklad, platí ceník dodavatele).
   tam drží `RUN_BUDGET` a limity nastavené přímo u poskytovatelů.
 - Každé volání má auditní záznam: poskytovatel, model, tokeny, cena, výsledek,
   SHA-256 požadavku. Nikdy prompt ani klíč.
-- Výzkum posílá poskytovatelům jen veřejné právní dokumenty (`dataClass: public-legal`).
-  Data zákazníků (vozidla, trasy, organizace) orchestrátor výzkumu odmítne.
+- Výzkum posílá poskytovatelům jen veřejné právní dokumenty (`dataClass: public-legal`),
+  vysvětlení jen ověřená data registru (`verified-registry`). Data zákazníků (vozidla, trasy,
+  organizace, tenanti) orchestrátor odmítne u každé úlohy (`TASK_DATA_CLASSES`).
 
 ## Získávání dokumentů a bezpečnost
 
@@ -161,6 +184,16 @@ Kontroly (`checkExtractedRule`):
 - u PDF nejde citace ověřit strojově (text se lokálně nevytahuje) → vždy
   `QUOTES_NOT_MACHINE_VERIFIABLE` a `INSUFFICIENT_EVIDENCE`; přednost mají HTML/ELI verze předpisů.
 
+Platnost a právní účinnost jsou oddělené (`draftRuleOf`, `legalEffectOf`):
+
+- `valid_from`/`valid_to` navrženého pravidla jsou zveřejněné ověřené období (konvence registru,
+  `validity_note`), omezené na posuzované období. Účinnost před ním nebo trvalá platnost se do
+  nich nepřenáší.
+- Účinnost, kterou dokument uvádí (začátek, konec nebo „bez konce“), dostane podání v
+  `legal_effective` a návrh v `legal_effect`; pravidlo ji popíše v `validity_note`.
+- Liší-li se účinnost mezi pravidly, `legal_effective` zůstane `null` a návrh nese
+  `LEGAL_EFFECT_PER_RULE`: účinnost potvrdí posuzovatel u každého pravidla.
+
 Pak běží existující validace (`validateProposal`: kanonické schéma, duplicity,
 souběžné návrhy, sémantické kontroly `checkRules`, klasifikace `detectChanges`).
 Kvůli suchému běhu dostane podání dočasně čas získání místo `legal_verified_at`;
@@ -186,7 +219,8 @@ npm run driving-bans:research -- list
 npm run driving-bans:research -- show rdraft-…
 # po přečtení primárního textu:
 npm run driving-bans:research -- promote rdraft-… --reviewer "Jméno" --reason "…" \
-  --legal-verified-at 2026-11-05T09:30:00Z --review-from 2026-11-01 --review-to 2026-12-31
+  --legal-verified-at 2026-11-05T09:30:00Z --review-from 2026-11-01 --review-to 2026-12-31 \
+  --legal-effective-from 2010-01-01 [--legal-effective-to 2027-06-30] --exceptions-complete
 npm run driving-bans:research -- reject rdraft-… --reviewer "Jméno" --reason "…"
 # dál existující příkazy:
 npm run driving-bans:evidence -- approve prop-… --reviewer "…" --reason "…"
@@ -194,8 +228,15 @@ npm run driving-bans:evidence -- prepare prop-…
 ```
 
 `promote` přijme jen návrh `REVIEW_REQUIRED`, `legal_verified_at` nesmí být v
-budoucnu. Teprve tím dostanou pravidla `PRIMARY_VERIFIED`, `verified_at` a
-`review_window`. `prepare` zapíše kandidátní dataset do `staging/candidates/`.
+budoucnu. Posuzovatel musí navíc potvrdit to, co AI potvrdit nesmí (`review_checklist` návrhu):
+
+- právní účinnost přečtenou v primárním textu (`--legal-effective-from`/`-to`, do podání jako
+  `legal_effective`), odděleně od zveřejněného období;
+- úplnost výjimek a jejich podmínek (`--exceptions-complete`).
+
+Návrh, jehož pravidlo má platnost mimo posuzované období, mísí účinnost se zveřejněným obdobím
+a `promote` ho odmítne. Je nutné ho opravit nebo dokument prozkoumat znovu.
+Teprve tím dostanou pravidla `PRIMARY_VERIFIED`, `verified_at` a `review_window`. `prepare` zapíše kandidátní dataset do `staging/candidates/`.
 Do `canonical.json` ho přenese člověk samostatným publikačním PR, který projde
 `lint:driving-bans`, `typecheck`, `test`, `build` a `driving-bans:audit`.
 Štítek posuzovatele není důkaz identity; tím je schválení PR na GitHubu.
@@ -244,6 +285,35 @@ popisuje vyřazené soubory (`config/driving-ban-calendars/index.mjs`,
 `public-holidays.mjs`, `validYear`). Před spuštěním ji vlastník musí přepsat na
 `canonical.json` a kontrolní vrstvu, jinak bude pracovat se starou strukturou.
 
+### Fernpass (Tyrolsko, B 179) – návrh `rdraft-93abe3cdae4da399`
+
+- Návrh vznikl v živém E2E AI Lab (běh 40996822080, artefakt AI Lab, ne úložiště dajc-eu) a zůstává
+  `REVIEW_REQUIRED`, čeká na člověka. Nic nebylo povýšeno, schváleno ani zapsáno.
+- Vznikl kódem před oddělením účinnosti: pravidlo má `valid_from 2010-01-01` (účinnost nařízení),
+  `valid_to 2026-11-30` (konec posuzovaného období) a podání `legal_effective: null`.
+- `promote` ho v této podobě odmítne. Před povýšením je potřeba:
+  - návrh vytvořit znovu tímto kódem: pravidlo dostane zveřejněné období, `validity_note`
+    a `legal_effective {from: 2010-01-01, to: null}`. Nový návrh má nové ID a starý se zamítne
+    (`reject`);
+  - v primárním textu (RIS) ověřit datum účinnosti a úplnost výjimek (cíl/zdroj, místní doprava
+    a další podmínky) a potvrdit je při `promote`.
+- Nový placený běh k tomu bez nového schválení vlastníka nespouštím.
+
+### Vysvětlení pro DAJC AI a Intelligence (`src/lib/intelligence/driving-bans-ai-explain.ts`)
+
+- `explainVerifiedAnswer` vysvětlí ověřenou odpověď dotazové služby (`answerDrivingBansQuery`)
+  přes stejný orchestrátor a politiku (třída `EXPLAIN_VERIFIED_DATA`).
+- Modely: GPT-6 Luna, při nejistotě nebo složitosti GPT-6 Sol, jen když to dovolí přístupová
+  politika volajícího (`allowStrongerModel`) a rozpočet.
+- Přístup se ověřuje na serveru při každém volání (feature `ai-assistant`, vlastní organizace).
+- K modelu jdou jen data registru: u vozidla jen stav vyhodnocení, nikdy organizace, uživatel,
+  hodnoty vozidla ani trasa.
+- Deterministický stav, výsledky, zdroje a upozornění zůstávají beze změny. Vysvětlení, které
+  cituje neznámé pravidlo nebo zdroj, nebo tvrdí oprávnění k jízdě, výjimku či povolení, se zahodí.
+- Vlastní klíče, rozpočet a modul ledgeru (`DAJC_AI_*`, `dajc-ai-explain`), oddělené od výzkumu.
+- Není připojeno na žádnou cestu ani vydáno (`DRIVING_BANS_INTELLIGENCE_RELEASED = false`).
+  Bezplatné Ask DAJC AI (PR #78) ho nepoužívá a nezíská z něj placený přístup.
+
 ## Zbývající omezení
 
 - Živě ověřeno 29.–30. 10. 2026 (`docs/DRIVING_BANS_RESEARCH_BENCHMARK.md`, oddíl 6):
@@ -287,6 +357,38 @@ popisuje vyřazené soubory (`config/driving-ban-calendars/index.mjs`,
 | 20 | PR #78 a JSON/ICS | sloučení s PR #78 bez konfliktu + všechny jeho testy; `coverage-api.test.ts`, `production.test.ts` |
 | 21 | manipulace instrukcemi | `research-components` 21, `research-pipeline` 21 |
 | 22 | žádný zápis do canonical.json | `research-pipeline` 22, lint |
+
+### Scénáře integrace modelů z AI Lab (zadání 30. 10. 2026)
+
+Všechny testy jsou offline se skriptovanými poskytovateli (syntetické), nejde o živé API testy.
+Živé důkazy jsou jen čtyři běhy AI Lab v `data/ai-benchmark/live-checks-2026-10.json`.
+
+| # | Scénář | Test |
+| --- | --- | --- |
+| 1 | Gemini pro jednoduchý dokument | `research-model-profile` „drives the orchestrator“ (běžný a německý dokument → Flash-Lite) |
+| 2 | GPT-6 Sol pro složitý dokument | totéž (PDF, francouzský a neurčený jazyk → Sol, `UNTESTED_LANGUAGE`) |
+| 3 | 7,5 t vs. 7,5 kg | `research-components` „rejects a mass in the wrong unit“, `research-pipeline` druhé čtení |
+| 4 | silnější model po selhání validace | `research-pipeline` „reads a document again on the stronger route“ |
+| 5 | kontrola jiným poskytovatelem | `research-components` „routes by task…“, `research-pipeline` 16 |
+| 6 | neověřené citace | `research-components` „requires verbatim quotes…“ |
+| 7 | neexistující model ID | `research-provider-errors` „blocks … an unknown model“, `research-live` failover |
+| 8 | nedostupný poskytovatel | `research-components` 16, `research-provider-errors` timeouty |
+| 9 | rate limit | `research-provider-errors` „paces a token-rate 429“, „stops a provider whose rate limit persists“ |
+| 10 | vyčerpání rozpočtu | `research-components` 17, `research-pipeline` 17, `driving-bans-ai-explain` 10 |
+| 11 | duplicitní dokument | `research-pipeline` 18 |
+| 12 | změna právního pravidla | `research-pipeline` 1/6, 4, 8; `legal-changes.test.ts` |
+| 13 | jen metadata | `research-pipeline` 7, `legal-changes` „never treats … metadata as a change of law“ |
+| 14 | neúplná jurisdikce | `driving-bans-query` 10, `driving-bans-intelligence` „answers incompletely verified AT and DE“ |
+| 15 | chybějící parametr vozidla | `driving-bans-intelligence` „stays UNDETERMINED when data is missing“, `driving-bans-query` 15 |
+| 16 | datum mimo zveřejněné období | `driving-bans-query` 11; oddělení účinnosti: `research-components` 16 (Fernpass), `research-pipeline` 22 |
+| 17 | izolace tenantů | `driving-bans-query` 19, `driving-bans-ai-explain` 17/23 |
+| 18 | kompatibilita s Ask DAJC AI | `driving-bans-ai-explain` 18, `driving-bans-query` „shares the evaluation with free Ask“, sloučení s PR #78 |
+| 19 | veřejné JSON/ICS API | `coverage-api.test.ts`, `driving-bans-feed.test.ts`, `production.test.ts` |
+| 20 | neměnnost canonical.json | `research-pipeline` 22, `research-live` (`canonical_unchanged`), `lint:driving-bans` |
+| 21 | prompt injection | `research-components` 21, `research-pipeline` 21 |
+| 22 | změna profilu z AI Lab | `research-ai-lab` „turns new AI Lab evidence into a proposal only“ |
+| 23 | zákaz aktivace nevydaných funkcí | `driving-bans-intelligence` „keeps every paid feature off by default“, `driving-bans-ai-explain` 17/23 |
+| 24 | nerelevantní benchmark | `research-ai-lab` „never uses a model for extraction because of a high score in an unrelated test“ |
 
 `npm run driving-bans:research:demo` projde celý tok synteticky (bez sítě a klíčů)
 a ověří, že se `canonical.json` nezměnil.

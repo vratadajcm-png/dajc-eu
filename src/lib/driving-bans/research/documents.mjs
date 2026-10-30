@@ -47,6 +47,37 @@ export function htmlMetadata(html) {
   };
 }
 
+// Frequent function words of the official languages of tracked jurisdictions (Latin script).
+const LANGUAGE_WORDS = {
+  cs: 'a je se na pro nebo podle které který jsou také až od do', sk: 'a je sa na pre alebo podľa ktoré ktorý sú tiež až od do',
+  de: 'der die und das von für mit nicht auf ist den im des zu', fr: 'le la les des et du pour est dans par sur une aux', it: 'il di che della per sono dei nel delle gli alle è',
+  es: 'el los las de que del por para con una y en', pt: 'os das dos não para com uma em pelo ao à que', nl: 'de het van een en voor op niet zijn met dat te',
+  pl: 'i w z na się nie do oraz jest dla od lub', hu: 'a az és hogy nem egy is vagy szerint között', sl: 'in je za na se ali ki od do so',
+  hr: 'i je za na se ili od do su koji prema', ro: 'și de în la cu pentru din care sau este', en: 'the and of to for is in on with by or',
+  da: 'og af til er for med på ikke den det', sv: 'och av till är för med på inte den det som', no: 'og av til er for med på ikke som den',
+  fi: 'ja on ei tai että kanssa mukaan joka', et: 'ja on ei või ning kui mis see', lv: 'un ir par no uz ar vai kas līdz', lt: 'ir yra iki dėl su arba kad nuo', tr: 've bir bu ile için olan veya göre',
+};
+// Letters that set a language apart from its neighbours (č, š, ž or ä alone would not).
+const LANGUAGE_LETTERS = { cs: 'řěů', sk: 'ľĺŕô', de: 'ßü', pl: 'łąęśźżń', hu: 'őű', ro: 'șțăâ', tr: 'ğış', lt: 'ėųį', lv: 'āēīļņķģ', da: 'æø', no: 'æø', sv: 'å', pt: 'ãõ', es: 'ñ', hr: 'đ' };
+const LANGUAGE_SETS = Object.entries(LANGUAGE_WORDS).map(([code, words]) => [code, new Set(words.split(' ')), new Set(LANGUAGE_LETTERS[code] ?? '')]);
+
+/**
+ * Language of a document: the one it declares (html lang, Content-Language), else the
+ * function words and distinctive letters of its text when one language clearly leads; null
+ * when unclear (other scripts, too little text), which the orchestrator treats as untested.
+ * @returns {{ language: string | null, source: 'declared' | 'detected' | null }}
+ */
+export function identifyLanguage(text, declared = null) {
+  const stated = typeof declared === 'string' ? /^([a-z]{2,3})(?:[-_][a-z0-9]+)?$/i.exec(declared.split(',')[0].trim())?.[1]?.toLowerCase() : null;
+  if (stated) return { language: stated, source: 'declared' };
+  const sample = String(text ?? '').slice(0, 20_000).toLowerCase();
+  const words = sample.match(/\p{L}+/gu) ?? [];
+  const score = (set, letters) => words.reduce((sum, word) => sum + (set.has(word) ? 1 : 0), 0) + [...sample].reduce((sum, char) => sum + (letters.has(char) ? 1 : 0), 0);
+  const scores = LANGUAGE_SETS.map(([code, set, letters]) => [code, score(set, letters)]).sort((a, b) => b[1] - a[1]);
+  const [[code, top], [, second]] = scores;
+  return top >= 5 && top >= second * 1.5 ? { language: code, source: 'detected' } : { language: null, source: null };
+}
+
 /** Phrases by which a document would try to steer a model. Flagged, never obeyed. */
 const INJECTION_PATTERNS = [
   /ignore (?:all |any |the )?(?:previous|prior|above|earlier) (?:instructions|rules|prompts)/i,

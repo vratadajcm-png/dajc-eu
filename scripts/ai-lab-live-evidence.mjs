@@ -9,6 +9,8 @@
  * costs, latencies, finding codes and draft states. No prompts, document text, quotes,
  * extracted rules or provider messages. Anything that looks like a credential stops the
  * import, so a key that slipped into an artifact can never reach the public repository.
+ * The command line also prints what the evidence would change in the approved model policy,
+ * as proposals for the owner (proposePolicyUpdate); nothing is applied.
  *
  *   node scripts/ai-lab-live-evidence.mjs --repository vratadajcm-png/dajc-ai-lab \
  *     --run 40974550043=DIR@19e69f4 [--run ...] --out data/ai-benchmark/live-checks-2026-10.json
@@ -157,5 +159,7 @@ export function main(argv = process.argv.slice(2)) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const evidence = main();
-  console.log(JSON.stringify({ runs: evidence.totals.runs, cost_usd: evidence.totals.cost_usd, models: evidence.models.length, providers: evidence.providers.map(p => `${p.provider}:${p.last_account_block?.category ?? p.last_smoke?.outcome ?? 'n/a'}`) }));
+  // What the new evidence would change in the approved model policy: proposals for the owner, never applied.
+  const { proposePolicyUpdate } = await import('../src/lib/ai/model-profile.mjs');
+  console.log(JSON.stringify({ runs: evidence.totals.runs, cost_usd: evidence.totals.cost_usd, models: evidence.models.length, providers: evidence.providers.map(p => `${p.provider}:${p.last_account_block?.category ?? p.last_smoke?.outcome ?? 'n/a'}`), policy_proposals: proposePolicyUpdate({ live: evidence }) }, null, 1));
 }

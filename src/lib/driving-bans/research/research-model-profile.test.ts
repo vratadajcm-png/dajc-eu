@@ -91,6 +91,15 @@ describe('opt-in model profile', () => {
     expect([ordinary.provider, ordinary.requested_model]).toEqual(['gemini', 'gemini-3.5-flash-lite']);
     expect([complex.provider, complex.requested_model]).toEqual(['openai', 'gpt-6-sol']);
     expect([check.provider, check.requested_model]).toEqual(['openai', 'gpt-6-luna']);
+    // Criterion 6: a document in a language without live-tested extraction (or of unknown language) takes the complex route.
+    expect(env.DAJC_RESEARCH_TESTED_LANGUAGES).toBe('cs,de');
+    const german = await orchestrator.run('extract', request, { language: 'de' });
+    const french = await orchestrator.run('extract', request, { language: 'fr' });
+    const unknown = await orchestrator.run('extract', request, { language: null });
+    expect([german.requested_model, german.task_class]).toEqual(['gemini-3.5-flash-lite', 'EXTRACT_STANDARD']);
+    expect([french.requested_model, french.task_class, french.complex_reasons]).toEqual(['gpt-6-sol', 'EXTRACT_COMPLEX', ['UNTESTED_LANGUAGE']]);
+    expect(unknown.complex_reasons).toEqual(['UNTESTED_LANGUAGE']);
+    expect(orchestrator.calls().find((call: any) => call.language === 'fr')).toMatchObject({ task_class: 'EXTRACT_COMPLEX', complex_reasons: ['UNTESTED_LANGUAGE'], provider: 'openai' });
     expect(researchReadiness({ ...PROFILE, ...KEYS, DAJC_DRIVING_BANS_RESEARCH_ENABLED: 'true', DAJC_RESEARCH_RUN_BUDGET_USD: '2', DAJC_RESEARCH_MONTHLY_BUDGET_USD: '5' })).toMatchObject({ enabled: true, model_profile: { selected: 'bakeoff-2026-10-25' } });
   });
 });

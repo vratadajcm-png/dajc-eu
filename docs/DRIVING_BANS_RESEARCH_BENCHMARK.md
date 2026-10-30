@@ -86,7 +86,15 @@ z dokončených), spolehlivosti (dokončené/26), ceny, latence a podílu neově
 Modely jen s chybami API jsou `NOT_BENCHMARKED` a profil je nevybere, dokud neprojdou smoke testem.
 Profil nastavuje i parametry, se kterými bake-off měřil: OpenAI `reasoning: none`, Grok `low`.
 
-**Předběžné doporučení** (benchmark měřil odpovídání nad daty, ne extrakci z dokumentů):
+Od 30. 10. 2026 vybírá modely schválená politika `dajc-ai-2026-10-30` (`policy` v témže souboru,
+`docs/DAJC_AI_LAB.md`). Profil už nesestavuje pořadí ze skóre: model slouží jen v roli, kterou mu
+politika dává a pro kterou má způsobilou úroveň důkazu. Nová evidence vytvoří jen návrh
+(`proposePolicyUpdate`). Rozdíl proti tabulce níže:
+- nezávislá kontrola běžné extrakce (Flash-Lite) je teď Grok 4.7 (Gemini / Grok podle zadání);
+- vysvětlení je GPT-6 Luna, při nejistotě GPT-6 Sol. Flash-Lite má pro vysvětlení vyšší skóre
+  (přímý důkaz) a dostane jen návrh `CANDIDATE_FOR_POLICY` k rozhodnutí vlastníka.
+
+**Předběžné doporučení z 25. 10. 2026** (benchmark měřil odpovídání nad daty, ne extrakci z dokumentů):
 
 | Úloha | Doporučení | Důkaz |
 | --- | --- | --- |

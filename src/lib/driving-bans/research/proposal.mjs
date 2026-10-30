@@ -141,11 +141,12 @@ export const documentPath = document => `documents/${document.sha256}.${EXT[docu
  * retrieval time in place of legal_verified_at only to reach the canonical checks;
  * the stored draft keeps legal_verified_at null.
  */
-export function draftSubmission({ target, document, operations, sourceId, summary, rawCanonical, catalogSources = [], detectedAt, synthetic = false }) {
+export function draftSubmission({ target, document, operations, sourceId, summary, rawCanonical, catalogSources = [], detectedAt, synthetic = false, legalEffective = null }) {
   const submission = parseSubmission({
     submission_version: 1, synthetic, submitted_by: 'dajc-research-ai (draft; not a legal verification)', jurisdiction: target.jurisdiction, region: null,
     summary: summary.slice(0, 4000), documents: [{ path: documentPath(document), source_id: sourceId, title: (document.title || document.final_url).slice(0, 300), retrieved_from: document.final_url, retrieved_at: document.retrieved_at }],
-    links: [], legal_effective: null, legal_verified_at: null, operations, supersedes_submission: null,
+    // The legal effect as the document states it (AI-extracted); promotion needs a person to confirm it.
+    links: [], legal_effective: legalEffective, legal_verified_at: null, operations, supersedes_submission: null,
   });
   const dryRun = validateProposal({ submission: { ...submission, legal_verified_at: document.retrieved_at }, documents: [{ path: documentPath(document), source_id: sourceId, sha256: document.sha256, kind: document.kind, bytes: document.byte_length }], rawCanonical, openProposals: [], identities: dajcEuropeCoverage, catalogSources, detectedAt });
   return { submission, dryRun: { state: dryRun.state, findings: dryRun.findings, changes: dryRun.changes.filter(change => change.type !== 'COVERAGE_STATUS').map(({ change_id, type, legal_change, jurisdiction, ban_id, field, user_impact }) => ({ change_id, type, legal_change, jurisdiction, ban_id, field, user_impact })), placeholder_legal_verified_at: true } };

@@ -34,6 +34,7 @@ zákaznické funkce a nesdílí klíče. Totéž hlídá `config/ai-research-mod
 | --- | --- | --- |
 | AI Lab | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `XAI_API_KEY`, `MISTRAL_API_KEY` | experimenty, benchmarky, živé testy |
 | dajc-eu | `DAJC_RESEARCH_*` (zatím nenastavené) a klíče Weekly `ANTHROPIC_API_KEY`, `PERPLEXITY_API_KEY` | interní výzkumná integrace, Weekly |
+| DAJC AI / Intelligence (vysvětlení) | `DAJC_AI_*` (zatím nenastavené: klíče, `DAJC_AI_RUN_BUDGET_USD`, `DAJC_AI_MONTHLY_BUDGET_USD`, `DAJC_AI_MODEL_PROFILE`) | vlastní rozpočet a ledger `dajc-ai-explain`; bez nich se nic neodešle |
 | produkce | samostatné, zatím nezřízené | řízené prostředí s vlastním schválením |
 
 - Hodnoty klíčů se nikdy nekopírují mezi repozitáři, do souborů, artefaktů ani logů.
@@ -60,9 +61,29 @@ zákaznické funkce a nesdílí klíče. Totéž hlídá `config/ai-research-mod
   - Prompty, text dokumentů, citace, extrahovaná pravidla ani zprávy poskytovatelů se nepřevádějí.
   - Cokoli, co vypadá jako klíč, import zastaví.
 
-## Modelový katalog
+## Modelový katalog a schválená politika
 
-- Jedna vrstva poskytovatelů a jeden orchestrátor (`src/lib/ai/`). Katalog obsahuje 6 poskytovatelů: OpenAI, Anthropic, Google Gemini, xAI Grok, Mistral AI a Perplexity AI.
+- Jedna vrstva poskytovatelů a jeden orchestrátor (`src/lib/ai/`) pro Driving Bans Research, DAJC AI a Intelligence. Katalog obsahuje 6 poskytovatelů: OpenAI, Anthropic, Google Gemini, xAI Grok, Mistral AI a Perplexity AI.
+- Politika `dajc-ai-2026-10-30` (`config/ai-research-models.json`, `policy`), schválená vlastníkem zadáním z 30. 10. 2026:
+
+  | Úloha (třída) | Primární | Záloha / eskalace |
+  | --- | --- | --- |
+  | Discovery (`DISCOVERY`) | Perplexity Search | oficiální zdroje registru, úřední domény, leady |
+  | Běžná extrakce (`EXTRACT_STANDARD`) | Gemini 3.5 Flash-Lite | GPT-6 Sol; druhé čtení Grok 4.7 |
+  | Složitá extrakce (`EXTRACT_COMPLEX`) | GPT-6 Sol | Flash-Lite, Grok 4.7 |
+  | Nezávislá kontrola (`INDEPENDENT_VERIFICATION`) | první způsobilý z Flash-Lite, Grok 4.7, GPT-6 Luna u jiného dodavatele než extrakce | další z nich |
+  | Konflikty (`CHANGE_ANALYSIS`) | deterministický engine | nezávislá kontrola jako doplněk |
+  | Vysvětlení (`EXPLAIN_VERIFIED_DATA`) | GPT-6 Luna | GPT-6 Sol při složitosti nebo nejistotě |
+  | Odborné články | stávající Claude pipeline Weekly | mimo orchestrátor |
+
+- Úrovně důkazů pro každý model a úlohu (`evidenceLevel`, `modelCatalog`):
+  - `LIVE_EXTRACTION_VERIFIED`: model v této roli v živém běhu AI Lab, jehož návrh prošel všemi kontrolami;
+  - `BENCHMARK_DIRECT`, `BENCHMARK_INDIRECT`: bake-off (zodpovídání nad registrem) je přímý důkaz pro vysvětlení a nepřímý pro extrakci a kontrolu;
+  - `API_SMOKE_ONLY`, `NOT_BENCHMARKED`;
+  - `UNAVAILABLE`: odmítnutí účtem nebo tarifem, ne kvalita (Anthropic, Mistral).
+- Model smí sloužit jen v roli, pro kterou má úroveň z `eligible_levels`. Skóre z nesouvisejícího testu nedává žádnou úroveň ani skóre (`benchmark_relevance`).
+- Katalog uvádí ke každému modelu poskytovatele, model ID, skutečně obsloužené ID, úlohy s úrovní důkazu, benchmark, latenci, cenu za milion tokenů, datum posledního ověření, stav API, zdroj a důvod vyřazení.
+- Jazyky s živě otestovanou extrakcí: `cs`, `de` (`policy.tested_languages`). Dokument v jiném nebo neurčeném jazyce jde na silnější trasu.
 - Výběr podle profilu `bakeoff-2026-10-25` (`config/ai-research-models.json`) zohledňuje:
   - přesnost, spolehlivost API, cenu a latenci;
   - vhodnost pro úlohu;
@@ -77,7 +98,17 @@ zákaznické funkce a nesdílí klíče. Totéž hlídá `config/ai-research-mod
   - nezávislá kontrola jiným dodavatelem;
   - deterministické ověření;
   - lidské schválení.
-- Placené běhy jen ručně, se stropem 1,50 USD na běh a nejvýše 60 požadavky. Žádný plán ani pravidelný placený běh.
+- Placené běhy jen ručně, se stropem 1,50 USD na běh, 5 USD měsíčně a nejvýše 60 požadavky. Žádný plán ani pravidelný placený běh.
+
+### Aktualizace z AI Lab (nic se neaplikuje samo)
+
+1. Původ a schéma: oprávněná osoba převede stažený artefakt skriptem `ai-lab-live-evidence.mjs`. Zůstanou jen metadata a cokoli, co vypadá jako klíč, import zastaví.
+2. Validace výsledků: převod započítá jen dokončené odpovědi. Chyby API zůstanou třídami chyb, ne kvalitou.
+3. Návrh: skript vypíše `policy_proposals` (`proposePolicyUpdate`, vždy `applied: false`):
+   - `CANDIDATE_FOR_POLICY`: model mimo politiku se silnějším důkazem;
+   - `POLICY_MODEL_NOT_ELIGIBLE`: model politiky ztratil způsobilý důkaz.
+4. Testy: změna jde do dajc-eu jen pull requestem se všemi kontrolami.
+5. Schválení: politiku mění jen vlastníkem schválený PR (`policy.change_control`). Nový výsledek ani dobré skóre samy model neaktivují.
 
 ## Přejmenování (30. 10. 2026)
 

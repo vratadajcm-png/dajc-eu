@@ -15,6 +15,44 @@
     "never": ["writes canonical.json", "approves legal changes", "activates customer features", "shares API keys"]
   },
   "minimum_completed_answers": 20,
+  "evidence_category": "grounded-qa-registry",
+  "benchmark_relevance": {
+    "grounded-qa-registry": { "explain": "BENCHMARK_DIRECT", "extract": "BENCHMARK_INDIRECT", "extract_complex": "BENCHMARK_INDIRECT", "verify": "BENCHMARK_INDIRECT", "conflicts": "BENCHMARK_INDIRECT" }
+  },
+  "evidence_levels": {
+    "LIVE_EXTRACTION_VERIFIED": "Used in this role in a live AI Lab run whose draft passed every check and reached human review.",
+    "BENCHMARK_DIRECT": "Benchmark of this very task.",
+    "BENCHMARK_INDIRECT": "Benchmark of a related task (grounded answering over registry data); provisional for this task.",
+    "API_SMOKE_ONLY": "The API answered a live smoke test; nothing about quality.",
+    "NOT_BENCHMARKED": "No completed answers or no evidence relevant to this task.",
+    "UNAVAILABLE": "The account or tier refused requests in the AI Lab, or the model is excluded until a smoke test passes; not a quality result."
+  },
+  "policy": {
+    "policy_id": "dajc-ai-2026-10-30",
+    "approved_by": "owner (DAJC AI Lab integration brief of 2026-10-30)",
+    "approved_on": "2026-10-30",
+    "change_control": "Only a reviewed pull request approved by the owner changes this policy. AI Lab results produce proposals (proposePolicyUpdate); a score never activates a model by itself.",
+    "eligible_levels": {
+      "extract": ["LIVE_EXTRACTION_VERIFIED", "BENCHMARK_INDIRECT"],
+      "extract_complex": ["LIVE_EXTRACTION_VERIFIED", "BENCHMARK_INDIRECT"],
+      "verify": ["LIVE_EXTRACTION_VERIFIED", "BENCHMARK_INDIRECT"],
+      "explain": ["BENCHMARK_DIRECT", "LIVE_EXTRACTION_VERIFIED"]
+    },
+    "tested_languages": {
+      "languages": ["cs", "de"],
+      "evidence": "AI Lab live extractions from official documents: cs (cz-sun, Czech act, registry rule matched; runs 40974550043, 40995210487), de (Tyrol B 179 order, REVIEW_REQUIRED draft; run 40996822080).",
+      "rule": "A document in any other language, or of unknown language, goes to the complex route (DAJC_RESEARCH_TESTED_LANGUAGES)."
+    },
+    "tasks": {
+      "discover": { "task_class": "DISCOVERY", "service": "perplexity", "fallback": "official registry sources, authority domains and leads (deterministic retrieval)" },
+      "extract": { "task_class": "EXTRACT_STANDARD", "primary": "gemini/gemini-3.5-flash-lite", "escalation": "openai/gpt-6-sol", "second_reading": ["xai/grok-4.7"] },
+      "extract_complex": { "task_class": "EXTRACT_COMPLEX", "primary": "openai/gpt-6-sol", "fallback": ["gemini/gemini-3.5-flash-lite", "xai/grok-4.7"] },
+      "verify": { "task_class": "INDEPENDENT_VERIFICATION", "rule": "another vendor than the extraction that is used", "candidates": ["gemini/gemini-3.5-flash-lite", "xai/grok-4.7", "openai/gpt-6-luna"] },
+      "conflicts": { "task_class": "CHANGE_ANALYSIS", "engine": "deterministic: checkRules, detectChanges, sourceConflicts", "ai_supplement": "the independent check" },
+      "explain": { "task_class": "EXPLAIN_VERIFIED_DATA", "primary": "openai/gpt-6-luna", "escalation": "openai/gpt-6-sol" },
+      "articles": { "task_class": "EXPERT_ARTICLES", "service": "the existing Claude pipeline of the Weekly, outside this orchestrator" }
+    }
+  },
   "weights": {
     "extract": { "quality": 0.55, "reliability": 0.25, "cost": 0.1, "latency": 0.1, "unverified_claim_penalty": 0.5 },
     "verify": { "quality": 0.45, "reliability": 0.25, "cost": 0.2, "latency": 0.1, "unverified_claim_penalty": 0.5 },

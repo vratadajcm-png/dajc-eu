@@ -99,9 +99,23 @@ export async function extractRules({ orchestrator, jurisdiction, window, documen
     schema: EXTRACTION_SCHEMA, schemaName: 'driving_ban_extraction', maxOutputTokens: 12_000,
     ...(text === null ? { document: { mediaType: 'application/pdf', base64: document.bytes.toString('base64') } } : {}),
   };
-  const result = await orchestrator.run('extract', request, { purpose: escalate ? 'legal rule extraction (escalated)' : 'legal rule extraction', subject: `${jurisdiction}:${document.sha256.slice(0, 12)}`, dataClass: 'public-legal', excludeVendors, needsPdf: text === null, escalate });
+  const result = await orchestrator.run('extract', request, { purpose: escalate ? 'legal rule extraction (escalated)' : 'legal rule extraction', subject: `${jurisdiction}:${document.sha256.slice(0, 12)}`, dataClass: 'public-legal', excludeVendors, needsPdf: text === null, escalate, language: document.language ?? null });
   const parsed = extractionZ.safeParse(result.json);
-  return { ok: parsed.success, extraction: parsed.success ? parsed.data : null, issues: parsed.success ? [] : parsed.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).slice(0, 20), provider: result.provider, vendor: result.vendor, model: result.model, requested_model: result.requested_model ?? result.model, cost_usd: result.cost_usd, complex: Boolean(result.complex) };
+  return { ok: parsed.success, extraction: parsed.success ? parsed.data : null, issues: parsed.success ? [] : parsed.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).slice(0, 20), provider: result.provider, vendor: result.vendor, model: result.model, requested_model: result.requested_model ?? result.model, cost_usd: result.cost_usd, complex: Boolean(result.complex), complex_reasons: result.complex_reasons ?? [] };
+}
+
+/**
+ * Legal effect of the extracted rules (commencement and expiry as the document states them) for the
+ * submission's legal_effective; null when no rule states a commencement or the rules differ (the
+ * reviewer then confirms it per rule). Repeals carry their own effective_from.
+ * @returns {{ legal_effective: { from: string, to: string | null } | null, per_rule: Array<{ rule_index: number, from: string | null, to: string | null, open_ended: boolean }> }}
+ */
+export function legalEffectOf(rules) {
+  const perRule = rules.map((rule, index) => ({ rule, index })).filter(({ rule }) => rule.relation.type !== 'REPEALS').map(({ rule, index }) => ({ rule_index: index, from: rule.valid_from, to: rule.valid_to, open_ended: rule.open_ended }));
+  const signatures = new Set(perRule.map(item => `${item.from}|${item.to}`));
+  const [first] = perRule;
+  const valid = first?.from && isDate(first.from) && (first.to === null || (isDate(first.to) && first.from <= first.to));
+  return { legal_effective: signatures.size === 1 && valid ? { from: first.from, to: first.to } : null, per_rule: perRule };
 }
 
 /** Numbers stated in a quote, decimal comma or point; "7.500" is read both as 7.5 and 7500. */
@@ -219,10 +233,18 @@ export function draftRuleOf(rule, { jurisdiction, window, sourceId }) {
   const schedule = { kind: rule.schedule.kind, start_time: rule.schedule.start_time, end_time: rule.schedule.end_time, end_day_offset: rule.schedule.end_day_offset, excluded_dates: [] };
   if (rule.schedule.kind === 'weekly') schedule.weekdays = [...rule.schedule.weekdays].sort();
   if (rule.schedule.kind === 'dates') schedule.dates = [...new Set(rule.schedule.dates)].sort().map(date => ({ date, occurrence_id: date }));
-  const validFrom = rule.valid_from ?? (rule.open_ended ? window.from : null);
+  // valid_from/valid_to of a registry rule are the published verified window (validity_note), never the
+  // legal effect: a standing law in force since 2010 is published for the reviewed period only. The legal
+  // effect the document states goes to the submission (legalEffectOf) and is confirmed by a person.
+  const repeal = rule.relation.type === 'REPEALS';
+  const clampFrom = date => (date && date < window.from ? window.from : date);
+  const clampTo = date => (date && date > window.to ? window.to : date);
   // A repeal only needs its effective date: the draft is used to find the repealed registry rule.
-  const validTo = rule.valid_to ?? (rule.open_ended ? window.to : rule.relation.type === 'REPEALS' ? rule.valid_from : null);
+  const validFrom = repeal ? rule.valid_from : clampFrom(rule.valid_from) ?? (rule.open_ended ? window.from : null);
+  const validTo = repeal ? rule.valid_to ?? rule.valid_from : clampTo(rule.valid_to) ?? (rule.open_ended ? window.to : null);
   if (!validFrom || !validTo) return null;
+  const separated = !repeal && (validFrom !== rule.valid_from || validTo !== rule.valid_to);
+  const legalText = `${rule.valid_from ? `from ${rule.valid_from}` : 'commencement not stated'}, ${rule.valid_to ? `until ${rule.valid_to}` : rule.open_ended ? 'no expiry stated (standing law)' : 'expiry not stated'}`;
   const core = { jurisdiction, schedule, weight, roads: rule.roads, regions: rule.regions, legal_basis: rule.legal_basis };
   return {
     ban_id: `${jurisdiction.toLowerCase()}-ai-${sha(core).slice(0, 10)}`,
@@ -237,6 +259,7 @@ export function draftRuleOf(rule, { jurisdiction, window, sourceId }) {
     exceptions: rule.exceptions.map(item => item.conditions ? `${item.text} Conditions: ${item.conditions}` : item.text),
     roads: rule.roads, regions: rule.regions, direction: rule.direction ?? 'Not stated in the source document',
     legal_basis: rule.legal_basis, schedule,
+    ...(separated ? { validity_note: `Published verified window ${validFrom} to ${validTo}, not the legal effect. Legal effect stated by the document: ${legalText}; a person confirms it before promotion.` } : {}),
     // No run id here: the same document must yield the same draft in every run.
     notes: `AI-extracted draft; not legally verified.${!rule.valid_to && rule.open_ended ? ' Validity is bounded to the reviewed period; the document states permanent effect.' : ''}`,
   };
