@@ -5,7 +5,7 @@ import { dajcCoverageCount } from '../../../../config/europe-coverage.mjs';
 import { appendAudit } from '../evidence-store.mjs';
 import { stableStringify } from '../review-workflow.mjs';
 import { researchTarget, discoverDocuments } from './discovery.mjs';
-import { documentText, scanForInstructions } from './documents.mjs';
+import { composeDocumentParts, documentText, scanForInstructions } from './documents.mjs';
 import { checkExtractedRule, draftRuleOf, extractRules, EXTRACTION_PROMPT_VERSION } from './extraction.mjs';
 import { crossCheck, dualExtraction } from './cross-check.mjs';
 import { buildOperations, documentPath, draftSubmission, sourceConflicts } from './proposal.mjs';
@@ -72,7 +72,7 @@ const dryRunFindings = dryRun => [
 async function analyseDocument({ item, fetched, target, window, rawCanonical, catalogSources, orchestrator, store, runId, now, synthetic }) {
   const phases = ['DISCOVERED', 'DOCUMENT_RETRIEVED'];
   const { text, metadata } = documentText(fetched);
-  const document = { url: item.url, final_url: fetched.final_url, sha256: fetched.sha256, byte_length: fetched.byte_length, kind: fetched.kind, content_type: fetched.content_type, retrieved_at: fetched.retrieved_at, last_modified: fetched.last_modified, etag: fetched.etag, title: metadata.title ?? item.title ?? null, language: metadata.language, eli: metadata.eli, published: metadata.published, modified: metadata.modified, version: metadata.eli?.version ?? metadata.modified ?? null, authority: item.authority, origin: item.origin, source_id: item.source_id, licence: item.licence ?? null, rights: item.rights ?? null, bytes: fetched.bytes };
+  const document = { url: item.url, final_url: fetched.final_url, sha256: fetched.sha256, byte_length: fetched.byte_length, kind: fetched.kind, content_type: fetched.content_type, retrieved_at: fetched.retrieved_at, last_modified: fetched.last_modified, etag: fetched.etag, parts: fetched.parts ?? null, title: metadata.title ?? item.title ?? fetched.title ?? null, language: metadata.language, eli: metadata.eli, published: metadata.published, modified: metadata.modified, version: metadata.eli?.version ?? metadata.modified ?? null, authority: item.authority, origin: item.origin, source_id: item.source_id, licence: item.licence ?? null, rights: item.rights ?? null, bytes: fetched.bytes };
   const injection = text ? scanForInstructions(text) : [];
   const findings = injection.length ? [{ code: 'UNTRUSTED_INSTRUCTIONS_IN_DOCUMENT', blocking_state: 'CONFLICT', message: 'The document contains instruction-like text addressed to an AI; it was treated as data only', excerpts: injection.slice(0, 3) }] : [];
 
@@ -153,6 +153,18 @@ async function analyseDocument({ item, fetched, target, window, rawCanonical, ca
   return { outcome: 'DRAFTED', draft_id: draftId, state, findings, extraction_meta: extractionMeta };
 }
 
+/** Every part of a multi-document act, or the first part that failed; each part is stored as retrieved. */
+async function fetchParts(item, allowedHosts, fetchDocument, store) {
+  const parts = [];
+  for (const url of item.parts) {
+    const part = await fetchDocument(url, allowedHosts);
+    if (!part.ok) return { ...part, part_url: url };
+    parts.push(part);
+  }
+  for (const part of parts) store.writeOnce(`blobs/${part.sha256}`, part.bytes);
+  return composeDocumentParts(parts) ?? { ok: false, url: item.url, availability: 'REJECTED', code: 'PARTS_WITHOUT_TEXT' };
+}
+
 /**
  * One research run over the requested jurisdictions. fetchDocument(url, allowedHosts)
  * is safeFetch in production and a fixture transport in tests.
@@ -164,7 +176,7 @@ export async function runResearch({ jurisdictions, mode = 'full', window, now = 
     technical: { status: 'COMPLETED', errors: [] },
     source_retrieval: { discovered: 0, retrieved: 0, unchanged: 0, unavailable: [], rejected: [], discarded_non_official: 0 },
     ai_analysis: { status: 'OK', documents_analyzed: 0, cached: 0, not_analyzed: 0, blocked_reason: null },
-    independent_check: { performed: 0, agreed: 0, disagreed: 0, not_available: 0 },
+    independent_check: { performed: 0, agreed: 0, disagreed: 0, skipped_failed_validation: 0, not_available: 0 },
     legal_verification: { status: 'NOT_PERFORMED_BY_AI', drafts_awaiting_human_review: 0, note: 'Research prepares drafts only. Legal verification and publication need a person and an approved pull request.' },
     registry_completeness: null,
     per_jurisdiction: [], drafts: [], calls: [],
@@ -182,18 +194,18 @@ export async function runResearch({ jurisdictions, mode = 'full', window, now = 
     report.source_retrieval.discovered += discovered.items.length;
     report.source_retrieval.discarded_non_official += discovered.discarded.length;
     for (const item of discovered.items) {
-      const fetched = await fetchDocument(item.url, target.allowedHosts);
+      const fetched = item.parts ? await fetchParts(item, target.allowedHosts, fetchDocument, store) : await fetchDocument(item.url, target.allowedHosts);
       const entry = { url: item.url, origin: item.origin };
       row.documents.push(entry);
       if (!fetched.ok) {
         entry.outcome = fetched.availability === 'REJECTED' ? 'REJECTED_BY_FETCH_POLICY' : 'SOURCE_UNAVAILABLE';
         entry.code = fetched.code;
-        (entry.outcome === 'SOURCE_UNAVAILABLE' ? report.source_retrieval.unavailable : report.source_retrieval.rejected).push({ jurisdiction: code, url: item.url, code: fetched.code, http_status: fetched.http_status ?? null, ...(item.origin === 'REGISTRY' ? { registry_source_id: item.source_id, note: 'Publication trust needs review; the ban is NOT cancelled.' } : {}) });
+        (entry.outcome === 'SOURCE_UNAVAILABLE' ? report.source_retrieval.unavailable : report.source_retrieval.rejected).push({ jurisdiction: code, url: item.url, ...(fetched.part_url ? { part_url: fetched.part_url } : {}), code: fetched.code, http_status: fetched.http_status ?? null, ...(item.origin === 'REGISTRY' ? { registry_source_id: item.source_id, note: 'Publication trust needs review; the ban is NOT cancelled.' } : {}) });
         continue;
       }
       report.source_retrieval.retrieved += 1;
       store.writeOnce(`blobs/${fetched.sha256}`, fetched.bytes);
-      store.writeOnce(`documents/${fetched.sha256}.json`, JSON.stringify({ sha256: fetched.sha256, url: item.url, final_url: fetched.final_url, kind: fetched.kind, content_type: fetched.content_type, bytes: fetched.byte_length, first_retrieved_at: fetched.retrieved_at, last_modified: fetched.last_modified, etag: fetched.etag, jurisdiction: code, authority: item.authority ?? null, origin: item.origin, availability: 'REACHABLE', licence: item.licence ?? null, rights: item.rights ?? null }, null, 1) + '\n');
+      store.writeOnce(`documents/${fetched.sha256}.json`, JSON.stringify({ sha256: fetched.sha256, url: item.url, final_url: fetched.final_url, kind: fetched.kind, content_type: fetched.content_type, bytes: fetched.byte_length, ...(fetched.parts ? { parts: fetched.parts } : {}), first_retrieved_at: fetched.retrieved_at, last_modified: fetched.last_modified, etag: fetched.etag, jurisdiction: code, authority: item.authority ?? null, origin: item.origin, availability: 'REACHABLE', licence: item.licence ?? null, rights: item.rights ?? null }, null, 1) + '\n');
       if (item.content_sha256 && item.content_sha256 === fetched.sha256) { entry.outcome = 'UNCHANGED_SOURCE'; report.source_retrieval.unchanged += 1; continue; }
       if (aiBlocked) { entry.outcome = aiBlocked === 'BUDGET_EXHAUSTED' ? 'NOT_ANALYZED_BUDGET' : 'NOT_ANALYZED_NO_PROVIDER'; report.ai_analysis.not_analyzed += 1; continue; }
       try {
@@ -227,7 +239,7 @@ export async function runResearch({ jurisdictions, mode = 'full', window, now = 
   report.drafts = finalDrafts.map(draft => ({ draft_id: draft.draft_id, jurisdiction: draft.jurisdiction, state: draft.state, operations: (draft.submission?.operations ?? []).map(op => `${op.op} ${op.ban_id ?? op.rule?.ban_id ?? op.source?.source_id}`), findings: draft.findings.filter(f => f.blocking_state !== 'NOTE').map(f => f.code) }));
   report.legal_verification.drafts_awaiting_human_review = finalDrafts.filter(draft => draft.state === 'REVIEW_REQUIRED').length;
   for (const draft of finalDrafts) {
-    if (!draft.cross_check) { report.independent_check.not_available += 1; continue; }
+    if (!draft.cross_check) { report.independent_check[draft.findings.some(f => f.code === 'INDEPENDENT_CHECK_SKIPPED') ? 'skipped_failed_validation' : 'not_available'] += 1; continue; }
     report.independent_check.performed += 1;
     if (draft.cross_check.ok && draft.second_extraction?.agreed !== false) report.independent_check.agreed += 1; else report.independent_check.disagreed += 1;
   }

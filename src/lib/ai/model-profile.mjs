@@ -1,6 +1,6 @@
 import profileData from '../../../config/ai-research-models.json' with { type: 'json' };
 import evidenceData from '../../../data/ai-benchmark/bakeoff-2026-10-25.json' with { type: 'json' };
-import { PROVIDER_CATALOG, PRICING_ENV, parsePricing } from './providers.mjs';
+import { PROVIDER_CATALOG, PRICING_ENV, REASONING_OPTIONS, parsePricing } from './providers.mjs';
 
 /**
  * Model selection from measured evidence (config/ai-research-models.json over the
@@ -117,8 +117,10 @@ export function applyModelProfile(env, options = {}) {
     const interval = Math.max(0, ...own.map(item => item.min_interval_ms ?? 0));
     const intervalKey = `DAJC_RESEARCH_${id.toUpperCase()}_MIN_INTERVAL_MS`;
     if (interval && !env[intervalKey]) out[intervalKey] = String(interval);
+    // The reasoning setting the bake-off measured (OpenAI none, Grok low); one setting per provider.
     const reasoning = profile.candidates.find(c => c.provider === id && c.model === ordinary.model)?.reasoning_effort;
-    if (reasoning && id === 'xai' && !env.DAJC_RESEARCH_XAI_REASONING_EFFORT) out.DAJC_RESEARCH_XAI_REASONING_EFFORT = reasoning;
+    const option = REASONING_OPTIONS[id];
+    if (reasoning && option?.values.includes(reasoning) && !env[option.env]) out[option.env] = reasoning;
   }
   if (hasKey('perplexity') && !pricing.perplexity) pricing.perplexity = { request: profile.search.price_per_request };
   out[PRICING_ENV] = JSON.stringify(pricing);

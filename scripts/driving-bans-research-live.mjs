@@ -39,7 +39,7 @@ export const LIVE_TARGETS = Object.freeze({
 // Output sizes match the request limits (adaptive thinking counts towards them on Claude).
 export const ESTIMATE = Object.freeze({ smoke: { input: 400, output: 2_048 }, scenario: { input: 4_000, output: 12_000 }, fallback: { input: 400, output: 2_048 }, e2e_extraction: { input: 3_500, output: 12_000 }, e2e_check: { input: 5_000, output: 8_000 }, search_request: 0.005 });
 
-const E2E_DOCUMENTS = 3;
+const E2E_DOCUMENTS = 2;
 const SMOKE_SCHEMA = { type: 'object', additionalProperties: false, required: ['ok', 'echo'], properties: { ok: { type: 'boolean' }, echo: { type: 'string' } } };
 const sha = value => createHash('sha256').update(value).digest('hex');
 
@@ -60,7 +60,7 @@ export function estimateBudget(env) {
     smoke: json.map(p => ({ provider: p.id, model: p.modelFor(null), usd: cost(p, ESTIMATE.smoke) })),
     scenario: json.map(p => ({ provider: p.id, model: p.modelFor('extract'), usd: cost(p, ESTIMATE.scenario, 'extract') })),
     fallback: json.slice(1, 2).map(p => ({ provider: p.id, model: p.modelFor('extract'), usd: cost(p, ESTIMATE.fallback, 'extract') })),
-    // Up to three documents (consolidated page, § 1, § 2), each extracted, extracted again by another vendor and checked.
+    // Up to two documents (consolidated page, the order assembled from its RIS parts), each extracted, extracted again by another vendor and checked.
     e2e: e2eProviders(env, json).map((p, index) => ({ provider: p.id, model: p.modelFor(index ? 'verify' : 'extract'), usd: E2E_DOCUMENTS * (index ? cost(p, ESTIMATE.e2e_check, 'verify') + cost(p, ESTIMATE.e2e_extraction, 'extract') : cost(p, ESTIMATE.e2e_extraction, 'extract')) })),
     search: providers.perplexity.configured ? [{ provider: 'perplexity', usd: 3 * (providers.perplexity.priceFor()?.request ?? ESTIMATE.search_request) }] : [],
   };
@@ -139,8 +139,9 @@ async function scenario(env, context) {
     const orchestrator = orchestratorFor(env, { routes: { extract: [provider.id], extract_complex: [provider.id] }, ledger: context.ledger, budget: context.remaining(), blocked: context.blocked });
     try {
       const extracted = await extractRules({ orchestrator, jurisdiction: target.jurisdiction, window, document, text: section });
-      const findings = extracted.ok ? extracted.extraction.rules.flatMap(r => checkExtractedRule(r, { text: section, jurisdiction: target.jurisdiction, window }).map(f => f.code)) : extracted.issues;
-      results.push({ provider: provider.id, live_api: true, requested_model: orchestrator.calls().at(-1)?.requested_model ?? null, served_model: extracted.model, schema_valid: extracted.ok, rules: extracted.ok ? extracted.extraction.rules.length : 0, registry_comparison: extracted.ok ? compareWithRegistry(extracted.extraction, rule) : null, deterministic_findings: [...new Set(findings)], cost_usd: extracted.cost_usd, audit: orchestrator.calls() });
+      const findings = extracted.ok ? extracted.extraction.rules.flatMap((r, index) => checkExtractedRule(r, { text: section, jurisdiction: target.jurisdiction, window }).map(f => ({ rule_index: index, code: f.code, field: f.field ?? null, blocking_state: f.blocking_state, message: f.message }))) : extracted.issues.map(message => ({ code: 'EXTRACTION_OUTPUT_INVALID', message }));
+      // The extracted rules with their quotes stay in the artifact, so a person can see why a check failed.
+      results.push({ provider: provider.id, live_api: true, requested_model: orchestrator.calls().at(-1)?.requested_model ?? null, served_model: extracted.model, schema_valid: extracted.ok, rules: extracted.ok ? extracted.extraction.rules.length : 0, registry_comparison: extracted.ok ? compareWithRegistry(extracted.extraction, rule) : null, deterministic_findings: [...new Set(findings.map(f => f.code))], findings, extraction: extracted.ok ? extracted.extraction.rules : null, cost_usd: extracted.cost_usd, audit: orchestrator.calls() });
     } catch (error) {
       results.push({ provider: provider.id, live_api: true, outcome: 'FAILED', error: error.name, audit: orchestrator.calls() });
     }
@@ -179,21 +180,25 @@ async function e2e(env, context) {
   let officialHits = [];
   if (official.ok) {
     const parsed = JSON.parse(official.bytes.toString('utf8'));
-    officialHits = [].concat(parsed?.OgdSearchResult?.OgdDocumentResults?.OgdDocumentReference ?? []).map(ref => ({ id: ref.Data.Metadaten.Technisch.ID, paragraph: ref.Data.Metadaten.Landesrecht?.LrKons?.ArtikelParagraphAnlage, html: [].concat(ref.Data.Dokumentliste.ContentReference).flatMap(c => [].concat(c.Urls.ContentUrl)).find(u => u.DataType === 'Html')?.Url })).filter(hit => hit.html);
+    officialHits = [].concat(parsed?.OgdSearchResult?.OgdDocumentResults?.OgdDocumentReference ?? []).map(ref => ({ id: ref.Data.Metadaten.Technisch.ID, act: ref.Data.Metadaten.Landesrecht?.LrKons?.Gesetzesnummer ?? null, paragraph: ref.Data.Metadaten.Landesrecht?.LrKons?.ArtikelParagraphAnlage, html: [].concat(ref.Data.Dokumentliste.ContentReference).flatMap(c => [].concat(c.Urls.ContentUrl)).find(u => u.DataType === 'Html')?.Url })).filter(hit => hit.html);
   }
   const orchestrator = createOrchestrator({ providers: createProviders({ env }), routes: routesFromEnv(env), limits: { ...limitsFromEnv(env), runBudgetUsd: context.remaining() }, ledger: context.ledger, blocked: context.blocked });
   let searchHits = [];
   try { searchHits = (await orchestrator.run('discover', { queries: target.search_queries, domains: target.search_domains, maxResults: 10 }, { purpose: 'E2E discovery', subject: target.jurisdiction })).results.map(hit => hit.url); }
   catch (error) { searchHits = [`search not run: ${error.name}`]; }
-  // The operative provision (§ 1) and the exceptions (§ 2) are separate RIS documents; the consolidated page is tried first.
-  const leads = [...new Set([...target.leads, ...officialHits.filter(hit => ['§ 1', '§ 2'].includes(hit.paragraph)).map(hit => hit.html)])];
+  // RIS publishes the preamble and every paragraph of the order as separate documents (§ 1 the ban, § 2 its
+  // exceptions, § 3 its entry into force); they are read as one act, in the published order. The consolidated
+  // page is tried first.
+  const acts = new Map();
+  for (const hit of officialHits) acts.set(hit.act ?? hit.id, [...(acts.get(hit.act ?? hit.id) ?? []), hit.html]);
+  const leads = [...target.leads, ...[...acts.values()].map(parts => ({ url: parts[0], parts, title: target.title }))];
   const store = openResearchStore(join(context.out, 'research-store'));
   const report = await runResearch({ jurisdictions: [target.jurisdiction], mode: 'urgent', window: { from: context.window.from, to: context.window.to }, now: new Date(), rawCanonical: context.rawCanonical, snapshot: getDrivingBansSnapshot(new Date()), catalogEntries: [], authorityDomains: officialAuthorityDomains, orchestrator, store, fetchDocument: (url, allowed) => safeFetch(url, { allowedHosts: allowed }), leadUrls: leads, maxDocuments: leads.length, useSearch: false });
   context.spend(orchestrator.spentThisRun());
   carryBlocks(context, orchestrator);
   return {
     check: 'e2e', jurisdiction: target.jurisdiction, document: target.title,
-    steps: { discovery: { official_ris_ogd: { live: true, ok: official.ok, hits: officialHits.length }, perplexity: { live: !String(searchHits[0] ?? '').startsWith('search not run'), hits: searchHits } }, retrieval: report.source_retrieval, extraction_and_check: report.ai_analysis, independent_check: report.independent_check, deterministic_validation: 'existing review workflow as a dry run (no API)', legal_verification: report.legal_verification },
+    steps: { discovery: { official_ris_ogd: { live: true, ok: official.ok, hits: officialHits.length, acts: [...acts.entries()].map(([act, parts]) => ({ act, parts })) }, perplexity: { live: !String(searchHits[0] ?? '').startsWith('search not run'), hits: searchHits } }, retrieval: report.source_retrieval, extraction_and_check: report.ai_analysis, independent_check: report.independent_check, deterministic_validation: 'existing review workflow as a dry run (no API)', legal_verification: report.legal_verification },
     drafts: report.drafts, statement: report.statement, report_file: join('research-store', 'runs', `${report.run_id}.json`), audit: orchestrator.calls(),
   };
 }

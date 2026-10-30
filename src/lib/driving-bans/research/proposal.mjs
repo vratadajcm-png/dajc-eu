@@ -128,7 +128,7 @@ export function buildOperations({ drafts, extracted, document, target, rawCanoni
     }
   }
   if (operations.length && !sourceExists) {
-    operations.unshift({ op: 'ADD_SOURCE', source: { source_id: sourceId, url: document.final_url, authority: (document.authority || hostOf(document.final_url)).slice(0, 300), role: 'PRIMARY', version: (document.version || `retrieved ${document.retrieved_at} sha256:${document.sha256.slice(0, 16)}`).slice(0, 500), findings: `Official document retrieved by DAJC research (${document.kind}). AI-extracted draft, not legally verified.` } });
+    operations.unshift({ op: 'ADD_SOURCE', source: { source_id: sourceId, url: document.final_url, authority: (document.authority || hostOf(document.final_url)).slice(0, 300), role: 'PRIMARY', version: (document.version || `retrieved ${document.retrieved_at} sha256:${document.sha256.slice(0, 16)}`).slice(0, 500), findings: `Official document retrieved by DAJC research (${document.kind}${document.parts ? `: ${document.parts.length} official parts of one act, ${document.parts.map(part => `${part.final_url} sha256:${part.sha256.slice(0, 16)}`).join('; ')}` : ''}). AI-extracted draft, not legally verified.`.slice(0, 2000) } });
   }
   return { operations, findings, sourceId };
 }

@@ -4,6 +4,7 @@
  * wrapUntrusted() with a per-call nonce, and suspicious instruction-like
  * passages are flagged for the reviewer (they stay in the evidence as found).
  */
+import { createHash } from 'node:crypto';
 
 export const MAX_TEXT_CHARS = 300_000;
 
@@ -78,6 +79,26 @@ export function documentText(fetched) {
   }
   const text = fetched.kind === 'XML_DATA' ? decodeEntities(raw.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim() : raw;
   return { text: text.slice(0, MAX_TEXT_CHARS), metadata: { title: null, language: fetched.content_language ?? null, eli: null, published: null, modified: fetched.last_modified ?? null } };
+}
+
+/**
+ * One act published as several official documents (RIS publishes the preamble and each
+ * paragraph of a Land order separately): their texts in publication order, each headed by
+ * its URL and SHA-256, read and quote-checked as one TEXT_EXCERPT so that the operative
+ * provision, its exceptions and its entry into force are seen together. Every part stays
+ * stored as retrieved. Null when a part has no text (PDF).
+ */
+export function composeDocumentParts(parts) {
+  const texts = parts.map(part => documentText(part));
+  if (!parts.length || texts.some(item => item.text === null)) return null;
+  const text = parts.map((part, index) => `[Part ${index + 1} of ${parts.length}: ${part.final_url} sha256:${part.sha256}]\n${texts[index].text}`).join('\n\n').slice(0, MAX_TEXT_CHARS);
+  const bytes = Buffer.from(text, 'utf8');
+  return {
+    ok: true, kind: 'TEXT_EXCERPT', content_type: 'text/plain; charset=utf-8', charset: 'utf-8', bytes, byte_length: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex'),
+    url: parts[0].url, final_url: parts[0].final_url, retrieved_at: parts.map(part => part.retrieved_at).sort().at(-1), last_modified: null, etag: null,
+    content_language: texts[0].metadata.language ?? null, title: texts[0].metadata.title ?? null,
+    parts: parts.map(part => ({ url: part.url, final_url: part.final_url, sha256: part.sha256, kind: part.kind, byte_length: part.byte_length, retrieved_at: part.retrieved_at })),
+  };
 }
 
 /** Normalised form for verbatim quote checks: Unicode NFKC, unified quotes and dashes, collapsed whitespace, case folded. */

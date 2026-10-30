@@ -67,7 +67,13 @@ export async function discoverDocuments(target, { orchestrator = null, window, m
     if (!hostAllowed(hostOf(url) ?? '', target.allowedHosts)) { discarded.push({ url, reason: 'NOT_AN_ALLOWED_OFFICIAL_HOST' }); return; }
     if (items.length < maxDocuments) items.push({ ...item, url, state: 'DISCOVERED' });
   };
-  for (const url of leadUrls) add({ url, origin: 'LEAD', role: 'PRIMARY', source_id: null, authority: null });
+  // A lead is a URL, or { url, parts, title } for one act published as several official documents.
+  for (const lead of leadUrls) {
+    if (typeof lead === 'string') { add({ url: lead, origin: 'LEAD', role: 'PRIMARY', source_id: null, authority: null }); continue; }
+    const parts = (lead.parts ?? []).map(stripFragment);
+    if (!parts.length || !parts.every(url => hostAllowed(hostOf(url) ?? '', target.allowedHosts))) { discarded.push({ url: lead.url, reason: 'NOT_AN_ALLOWED_OFFICIAL_HOST' }); continue; }
+    add({ url: lead.url ?? parts[0], parts, title: lead.title ?? null, origin: 'LEAD', role: 'PRIMARY', source_id: null, authority: null });
+  }
   for (const item of target.known) add(item);
   if (useSearch && orchestrator && items.length < maxDocuments) {
     try {

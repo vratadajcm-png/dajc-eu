@@ -145,6 +145,20 @@ describe('answers that are not results', () => {
     }
   });
 
+  it('books the reported usage of a truncated answer: it was billed (live check 2026-10-29: gpt-6-sol)', async () => {
+    const env = testEnv({ DAJC_RESEARCH_ROUTE_EXTRACT: 'openai,mistral' });
+    const { orchestrator } = setup({ env, transform: (p: string, r: any) => p === 'openai' ? { ...r, status: 'incomplete', incomplete_details: { reason: 'max_output_tokens' }, usage: { input_tokens: 5_000, output_tokens: 12_000 } } : r });
+    const served = await orchestrator.run('extract', request);
+    // openai 2 / 8 USD per 1M tokens in the test prices: 5000 * 2 + 12000 * 8 = 0.106 USD.
+    expect(orchestrator.calls()[0]).toMatchObject({ provider: 'openai', outcome: 'FAILED', error_category: 'INCOMPLETE_RESPONSE', attempts: 1, input_tokens: 5_000, output_tokens: 12_000, cost_usd: 0.106 });
+    expect(orchestrator.spentThisRun()).toBeCloseTo(0.106 + served.cost_usd, 6);
+    expect(orchestrator.ledger.spentThisMonth('driving-bans-research')).toBeCloseTo(orchestrator.spentThisRun(), 6);
+    const broken = setup({ transform: (p: string, r: any) => p === 'anthropic' ? { ...r, content: [{ type: 'text', text: 'not json' }] } : r });
+    await broken.orchestrator.run('extract', request);
+    expect(broken.orchestrator.calls()[0]).toMatchObject({ provider: 'anthropic', error_category: 'INVALID_RESPONSE', input_tokens: 1200, output_tokens: 600 });
+    expect(broken.orchestrator.calls()[0].cost_usd).toBeGreaterThan(0);
+  });
+
   it('treats invalid JSON and refusals as failures of that provider only', async () => {
     const broken = setup({ transform: (p: string, r: any) => p === 'anthropic' ? { ...r, content: [{ type: 'text', text: 'Sure! Here is the data: {' }] } : r });
     expect((await broken.orchestrator.run('extract', request)).provider).toBe('openai');

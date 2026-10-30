@@ -62,8 +62,12 @@ describe('opt-in model profile', () => {
       DAJC_RESEARCH_GEMINI_MODEL: 'gemini-3.5-flash-lite', DAJC_RESEARCH_GEMINI_MIN_INTERVAL_MS: '15000',
       DAJC_RESEARCH_OPENAI_MODEL: 'gpt-6-sol', DAJC_RESEARCH_OPENAI_MODEL_VERIFY: 'gpt-6-luna',
       DAJC_RESEARCH_ROUTE_EXTRACT_COMPLEX: expect.stringMatching(/^openai,/),
+      // The reasoning setting the bake-off measured, so the ranking holds for what is called.
+      DAJC_RESEARCH_OPENAI_REASONING_EFFORT: 'none',
     });
     expect(env.DAJC_RESEARCH_XAI_MODEL).toBeUndefined();
+    expect(env.DAJC_RESEARCH_XAI_REASONING_EFFORT).toBeUndefined();
+    expect(applyModelProfile({ ...PROFILE, ...KEYS, DAJC_RESEARCH_OPENAI_REASONING_EFFORT: 'low' }).DAJC_RESEARCH_OPENAI_REASONING_EFFORT).toBe('low');
     expect(env.DAJC_RESEARCH_ANTHROPIC_MODEL).toBeUndefined();
     const status = providerStatus(env);
     expect(status.filter(item => item.configured).map(item => item.id).sort()).toEqual(['gemini', 'openai', 'perplexity']);

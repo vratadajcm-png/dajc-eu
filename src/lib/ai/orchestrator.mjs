@@ -160,8 +160,9 @@ export function createOrchestrator({
   }
 
   async function attempt(provider, task, request) {
-    let lastError, waited = 0;
+    let lastError, waited = 0, attempts = 0;
     for (let tryNo = 0; tryNo <= maxRetries; tryNo++) {
+      attempts = tryNo + 1;
       try {
         await pace(provider.id);
         const started = clock().getTime();
@@ -185,6 +186,7 @@ export function createOrchestrator({
     const breaker = state.get(provider.id);
     breaker.failures += 1;
     if (breaker.failures >= breakerThreshold) breaker.openUntil = clock().getTime() + breakerCooldownMs;
+    if (lastError instanceof ProviderError) lastError.attempts = attempts;
     throw lastError;
   }
 
@@ -222,7 +224,14 @@ export function createOrchestrator({
       } catch (error) {
         callFailed = true;
         const known = error instanceof ProviderError;
-        audit({ task, purpose: meta.purpose ?? null, subject: meta.subject ?? null, provider: provider.id, vendor: provider.vendor, requested_model: requestedModel, model: null, complex, outcome: 'FAILED', error_category: known ? error.category : 'INTERNAL', http_status: known ? error.status : null, provider_code: known ? error.code : null, blocked_for_run: state.get(provider.id).blocked, cost_usd: 0 });
+        // A truncated, refused or malformed answer was still generated and billed: book its reported usage.
+        const usage = known && error.usage ? error.usage : null;
+        const cost = usage ? costOf(price, usage) ?? 0 : 0;
+        if (usage) {
+          runSpent = round(runSpent + cost);
+          ledger.book({ module, provider: provider.id, task, costUsd: cost, inputTokens: usage.inputTokens, outputTokens: usage.outputTokens });
+        }
+        audit({ task, purpose: meta.purpose ?? null, subject: meta.subject ?? null, provider: provider.id, vendor: provider.vendor, requested_model: requestedModel, model: null, complex, outcome: 'FAILED', error_category: known ? error.category : 'INTERNAL', http_status: known ? error.status : null, provider_code: known ? error.code : null, attempts: known ? error.attempts ?? 1 : null, blocked_for_run: state.get(provider.id).blocked, input_tokens: usage?.inputTokens ?? 0, output_tokens: usage?.outputTokens ?? 0, cost_usd: cost });
         failures.push(`${provider.id}: ${known ? error.message : 'internal error'}`);
       }
     }

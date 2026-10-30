@@ -188,6 +188,45 @@ describe('conflict and insufficient-evidence branches (scenarios 4, 5, 9, 21)', 
     expect(draft.state).toBe('INSUFFICIENT_EVIDENCE');
   });
 
+  it('reads one act published as several official documents as one text: rule, exceptions and entry into force together', async () => {
+    // RIS publishes each paragraph of a Land order separately; the rule (part 1) and its exceptions and validity (part 2) only make sense together.
+    const [head, tail] = DOCUMENTS.measure.split('<p>Opatření nabývá');
+    const parts = ['https://www.mdcr.gov.cz/synteticke-opatreni/2026-11-14/cast-1', 'https://www.mdcr.gov.cz/synteticke-opatreni/2026-11-14/cast-2'];
+    const pages = { [parts[0]]: html(`${head}</main></body></html>`), [parts[1]]: html(`<!doctype html><html lang="cs"><body><main><p>Opatření nabývá${tail}`) };
+    const context = setup({ pages, brain: scripted({ 'cz-new-rule': extraction([extractedRule()]) }) });
+    const report = await context.run(['CZ'], { mode: 'urgent', leadUrls: [{ url: parts[0], parts, title: 'Opatření TEST-1/2026' }], maxDocuments: 1 });
+    const entry = docOutcome(report, parts[0]);
+    expect(entry).toMatchObject({ outcome: 'DRAFTED', state: 'REVIEW_REQUIRED' });
+    const draft = loadDraft(context.store, entry.draft_id);
+    expect(draft.document).toMatchObject({ kind: 'TEXT_EXCERPT', final_url: parts[0] });
+    expect(draft.document.parts.map((part: any) => part.final_url)).toEqual(parts);
+    // Quotes from both parts are verified against the combined text; nothing is missing.
+    expect(draft.findings.filter((f: any) => f.blocking_state !== 'NOTE')).toEqual([]);
+    expect(draft.submission.operations[0].source.findings).toContain('2 official parts of one act');
+    for (const part of draft.document.parts) expect(context.store.exists(`blobs/${part.sha256}`)).toBe(true);
+    expect(context.store.exists(`blobs/${draft.document.sha256}`)).toBe(true);
+    // One prompt carries both parts (the second extraction is the independent one for a new rule).
+    const prompt = context.ai.log.find(item => item.task === 'extract')!;
+    expect(prompt.user).toContain(`[Part 1 of 2: ${parts[0]}`);
+    expect(prompt.user).toContain(`[Part 2 of 2: ${parts[1]}`);
+    expect(prompt.user).toContain('Opatření nabývá účinnosti dne 14. 11. 2026');
+    expect(report.independent_check).toMatchObject({ performed: 1, skipped_failed_validation: 0, not_available: 0 });
+
+    const missing = setup({ pages: { [parts[0]]: pages[parts[0]], [parts[1]]: { status: 503, body: 'down' } }, brain: scripted({ 'cz-new-rule': extraction([extractedRule()]) }) });
+    const unavailable = await missing.run(['CZ'], { mode: 'urgent', leadUrls: [{ url: parts[0], parts }], maxDocuments: 1 });
+    expect(docOutcome(unavailable, parts[0])).toMatchObject({ outcome: 'SOURCE_UNAVAILABLE' });
+    expect(unavailable.source_retrieval.unavailable).toEqual([expect.objectContaining({ url: parts[0], part_url: parts[1], http_status: 503 })]);
+    expect(missing.ai.log).toHaveLength(0);
+  });
+
+  it('counts a check skipped after failed validation apart from a check that was not available', async () => {
+    const weak = extractedRule();
+    weak.evidence = weak.evidence.filter((item: any) => item.field !== 'legal_basis');
+    const context = setup({ pages: { [URLS.measure]: html(DOCUMENTS.measure) }, brain: scripted({ 'cz-new-rule': extraction([weak]) }) });
+    const report = await context.run(['CZ'], { mode: 'urgent', leadUrls: [URLS.measure], maxDocuments: 1 });
+    expect(report.independent_check).toMatchObject({ performed: 0, skipped_failed_validation: 1, not_available: 0 });
+  });
+
   it('holds a PDF for a person: quotes cannot be machine-checked', async () => {
     const pdf = { body: Buffer.from('%PDF-1.7\nFIXTURE-KEY: cz-new-rule\n'), type: 'application/pdf' };
     const context = setup({ pages: { [URLS.measure]: pdf }, brain: scripted({}, { extract: () => extraction([extractedRule()]) }) });

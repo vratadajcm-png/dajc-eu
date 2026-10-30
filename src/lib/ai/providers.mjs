@@ -30,7 +30,7 @@ export const PROVIDER_CATALOG = Object.freeze({
 export const PRICING_ENV = 'DAJC_RESEARCH_PRICING_USD';
 
 /** Optional reasoning settings, validated; an invalid value leaves the provider unconfigured. */
-const REASONING_OPTIONS = Object.freeze({
+export const REASONING_OPTIONS = Object.freeze({
   anthropic: { env: 'DAJC_RESEARCH_ANTHROPIC_EFFORT', values: ['low', 'medium', 'high', 'xhigh', 'max'] },
   openai: { env: 'DAJC_RESEARCH_OPENAI_REASONING_EFFORT', values: ['none', 'minimal', 'low', 'medium', 'high', 'xhigh'] },
   xai: { env: 'DAJC_RESEARCH_XAI_REASONING_EFFORT', values: ['low', 'medium', 'high'] },
@@ -61,8 +61,8 @@ export const ERROR_CATEGORIES = Object.freeze({
 });
 
 export class ProviderError extends Error {
-  /** @param {string} provider @param {string} category @param {{ status?: number|null, code?: string|null, retryAfterMs?: number|null, detail?: string }} [info] */
-  constructor(provider, category, { status = null, code = null, retryAfterMs = null, detail = '' } = {}) {
+  /** @param {string} provider @param {string} category @param {{ status?: number|null, code?: string|null, retryAfterMs?: number|null, detail?: string, usage?: { inputTokens: number, outputTokens: number }|null }} [info] */
+  constructor(provider, category, { status = null, code = null, retryAfterMs = null, detail = '', usage = null } = {}) {
     const spec = ERROR_CATEGORIES[category] ?? ERROR_CATEGORIES.INVALID_RESPONSE;
     super(`${provider}: ${category}${status ? ` (HTTP ${status}${code ? `, ${code}` : ''})` : code ? ` (${code})` : ''}${detail ? ` ${detail}` : ''}`);
     this.name = 'ProviderError';
@@ -73,6 +73,9 @@ export class ProviderError extends Error {
     this.retryable = spec.retryable;
     this.blockProvider = spec.block;
     this.retryAfterMs = retryAfterMs;
+    // Tokens of an answer that was received but is not usable (truncated, refused, malformed): billed all the same.
+    this.usage = usage;
+    this.attempts = 1;
   }
 }
 
@@ -256,20 +259,22 @@ export function createProvider(id, { env = process.env, fetchFn = fetch, timeout
     async anthropic({ model, system, user, schema, maxOutputTokens, document }) {
       const content = [...(document ? [{ type: 'document', source: { type: 'base64', media_type: document.mediaType, data: document.base64 } }] : []), { type: 'text', text: user }];
       const response = await postJson(fetchFn, id, 'https://api.anthropic.com/v1/messages', { 'x-api-key': key, 'anthropic-version': '2023-06-01' }, { model, max_tokens: maxOutputTokens, system, messages: [{ role: 'user', content }], output_config: { ...(reasoning ? { effort: reasoning } : {}), format: { type: 'json_schema', schema } } }, timeoutMs);
+      const usage = { inputTokens: tokens(response?.usage?.input_tokens), outputTokens: tokens(response?.usage?.output_tokens) };
       // A refusal or a truncated answer is not a result.
-      if (response?.stop_reason === 'max_tokens') throw new ProviderError(id, 'INCOMPLETE_RESPONSE', { code: 'max_tokens' });
-      if (response?.stop_reason === 'refusal') throw new ProviderError(id, 'REFUSAL', { code: 'refusal' });
-      if (response?.stop_reason !== 'end_turn') throw new ProviderError(id, 'INVALID_RESPONSE', { code: safeCode(response?.stop_reason) ?? 'stop_reason' });
-      return { text: (response.content || []).find(block => block?.type === 'text')?.text, usage: { inputTokens: tokens(response.usage?.input_tokens), outputTokens: tokens(response.usage?.output_tokens) }, model: response.model || model };
+      if (response?.stop_reason === 'max_tokens') throw new ProviderError(id, 'INCOMPLETE_RESPONSE', { code: 'max_tokens', usage });
+      if (response?.stop_reason === 'refusal') throw new ProviderError(id, 'REFUSAL', { code: 'refusal', usage });
+      if (response?.stop_reason !== 'end_turn') throw new ProviderError(id, 'INVALID_RESPONSE', { code: safeCode(response?.stop_reason) ?? 'stop_reason', usage });
+      return { text: (response.content || []).find(block => block?.type === 'text')?.text, usage, model: response.model || model };
     },
     async openai({ model, system, user, schema, schemaName, maxOutputTokens, document }) {
       const content = [{ type: 'input_text', text: user }, ...(document ? [{ type: 'input_file', filename: 'document.pdf', file_data: `data:${document.mediaType};base64,${document.base64}` }] : [])];
       const response = await postJson(fetchFn, id, 'https://api.openai.com/v1/responses', { authorization: `Bearer ${key}` }, { model, store: false, max_output_tokens: maxOutputTokens, ...(reasoning ? { reasoning: { effort: reasoning } } : {}), input: [{ role: 'system', content: system }, { role: 'user', content }], text: { format: { type: 'json_schema', name: schemaName, schema, strict: true } } }, timeoutMs);
-      if (response?.status === 'incomplete') throw new ProviderError(id, 'INCOMPLETE_RESPONSE', { code: safeCode(response.incomplete_details?.reason) ?? 'incomplete' });
-      if (response?.status !== 'completed') throw new ProviderError(id, 'INVALID_RESPONSE', { code: safeCode(response?.status) ?? 'status' });
+      const usage = { inputTokens: tokens(response?.usage?.input_tokens), outputTokens: tokens(response?.usage?.output_tokens) };
+      if (response?.status === 'incomplete') throw new ProviderError(id, 'INCOMPLETE_RESPONSE', { code: safeCode(response.incomplete_details?.reason) ?? 'incomplete', usage });
+      if (response?.status !== 'completed') throw new ProviderError(id, 'INVALID_RESPONSE', { code: safeCode(response?.status) ?? 'status', usage });
       const parts = (response.output || []).filter(item => item?.type === 'message').flatMap(item => item.content || []);
-      if (parts.some(part => part?.type === 'refusal')) throw new ProviderError(id, 'REFUSAL', { code: 'refusal' });
-      return { text: parts.find(part => part?.type === 'output_text')?.text, usage: { inputTokens: tokens(response.usage?.input_tokens), outputTokens: tokens(response.usage?.output_tokens) }, model: response.model || model };
+      if (parts.some(part => part?.type === 'refusal')) throw new ProviderError(id, 'REFUSAL', { code: 'refusal', usage });
+      return { text: parts.find(part => part?.type === 'output_text')?.text, usage, model: response.model || model };
     },
     async xai(args) { return chatCompletions('https://api.x.ai/v1/chat/completions', args, reasoning ? { reasoning_effort: reasoning } : {}); },
     async mistral(args) { return chatCompletions('https://api.mistral.ai/v1/chat/completions', args, {}); },
@@ -278,12 +283,13 @@ export function createProvider(id, { env = process.env, fetchFn = fetch, timeout
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
       // No sampling override: the bake-off omitted temperature for Gemini 3.x for API compatibility.
       const response = await postJson(fetchFn, id, url, { 'x-goog-api-key': key }, { systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts }], generationConfig: { responseMimeType: 'application/json', responseJsonSchema: schema, maxOutputTokens } }, timeoutMs);
-      if (response?.promptFeedback?.blockReason) throw new ProviderError(id, 'REFUSAL', { code: safeCode(response.promptFeedback.blockReason) });
+      const usage = { inputTokens: tokens(response?.usageMetadata?.promptTokenCount), outputTokens: tokens(response?.usageMetadata?.candidatesTokenCount) + tokens(response?.usageMetadata?.thoughtsTokenCount) };
+      if (response?.promptFeedback?.blockReason) throw new ProviderError(id, 'REFUSAL', { code: safeCode(response.promptFeedback.blockReason), usage });
       const candidate = response?.candidates?.[0];
-      if (candidate?.finishReason === 'MAX_TOKENS') throw new ProviderError(id, 'INCOMPLETE_RESPONSE', { code: 'MAX_TOKENS' });
-      if (GEMINI_REFUSALS.has(candidate?.finishReason)) throw new ProviderError(id, 'REFUSAL', { code: candidate.finishReason });
-      if (candidate?.finishReason !== 'STOP') throw new ProviderError(id, 'INVALID_RESPONSE', { code: safeCode(candidate?.finishReason) ?? 'finishReason' });
-      return { text: (candidate.content?.parts || []).filter(part => !part?.thought).map(part => part?.text || '').join(''), usage: { inputTokens: tokens(response.usageMetadata?.promptTokenCount), outputTokens: tokens(response.usageMetadata?.candidatesTokenCount) + tokens(response.usageMetadata?.thoughtsTokenCount) }, model: response.modelVersion || model };
+      if (candidate?.finishReason === 'MAX_TOKENS') throw new ProviderError(id, 'INCOMPLETE_RESPONSE', { code: 'MAX_TOKENS', usage });
+      if (GEMINI_REFUSALS.has(candidate?.finishReason)) throw new ProviderError(id, 'REFUSAL', { code: candidate.finishReason, usage });
+      if (candidate?.finishReason !== 'STOP') throw new ProviderError(id, 'INVALID_RESPONSE', { code: safeCode(candidate?.finishReason) ?? 'finishReason', usage });
+      return { text: (candidate.content?.parts || []).filter(part => !part?.thought).map(part => part?.text || '').join(''), usage, model: response.modelVersion || model };
     },
   };
 
@@ -291,10 +297,11 @@ export function createProvider(id, { env = process.env, fetchFn = fetch, timeout
   async function chatCompletions(url, { model, system, user, schema, schemaName, maxOutputTokens }, extra) {
     const response = await postJson(fetchFn, id, url, { authorization: `Bearer ${key}` }, { model, max_tokens: maxOutputTokens, ...extra, messages: [{ role: 'system', content: system }, { role: 'user', content: user }], response_format: { type: 'json_schema', json_schema: { name: schemaName, schema, strict: true } } }, timeoutMs);
     const choice = response?.choices?.[0];
-    if (choice?.finish_reason === 'length') throw new ProviderError(id, 'INCOMPLETE_RESPONSE', { code: 'length' });
-    if (choice?.finish_reason === 'content_filter') throw new ProviderError(id, 'REFUSAL', { code: 'content_filter' });
-    if (choice?.finish_reason !== 'stop') throw new ProviderError(id, 'INVALID_RESPONSE', { code: safeCode(choice?.finish_reason) ?? 'finish_reason' });
-    return { text: choice.message?.content, usage: { inputTokens: tokens(response.usage?.prompt_tokens), outputTokens: tokens(response.usage?.completion_tokens) }, model: response.model || model };
+    const usage = { inputTokens: tokens(response?.usage?.prompt_tokens), outputTokens: tokens(response?.usage?.completion_tokens) };
+    if (choice?.finish_reason === 'length') throw new ProviderError(id, 'INCOMPLETE_RESPONSE', { code: 'length', usage });
+    if (choice?.finish_reason === 'content_filter') throw new ProviderError(id, 'REFUSAL', { code: 'content_filter', usage });
+    if (choice?.finish_reason !== 'stop') throw new ProviderError(id, 'INVALID_RESPONSE', { code: safeCode(choice?.finish_reason) ?? 'finish_reason', usage });
+    return { text: choice.message?.content, usage, model: response.model || model };
   }
 
   return {
@@ -305,7 +312,9 @@ export function createProvider(id, { env = process.env, fetchFn = fetch, timeout
       const model = modelFor(env, id, request.task ?? null, Boolean(request.complex));
       if (!priceFor(pricing, id, model, modelFor(env, id))) throw new ProviderError(id, 'NOT_CONFIGURED', { detail: `(no price for the ${request.task ?? 'default'} model)` });
       const result = await call[id]({ ...request, model });
-      return { json: parseModelJson(id, result.text), usage: result.usage, model: result.model, requestedModel: model };
+      let json;
+      try { json = parseModelJson(id, result.text); } catch (error) { if (error instanceof ProviderError) error.usage = result.usage; throw error; }
+      return { json, usage: result.usage, model: result.model, requestedModel: model };
     },
   };
 }
