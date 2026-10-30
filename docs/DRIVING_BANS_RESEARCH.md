@@ -78,6 +78,14 @@ resp. za požadavek; čísla jsou jen příklad, platí ceník dodavatele).
 - Kontrola vždy běží u **jiného dodavatele** než extrakce. Rizikové změny
   (nové pravidlo, zrušení, změna hmotnosti, rozvrhu nebo silnic) dostanou navíc
   druhou nezávislou extrakci a porovnání pole po poli.
+- Druhé čtení: extrakce, která neprojde deterministickými kontrolami, se jednou přečte
+  znovu silnější trasou (`_EXTRACT_COMPLEX`) a použije se ta s méně blokujícími nálezy
+  (`ESCALATED_EXTRACTION`). Druhé volání téhož modelu nikdy nevznikne. Druhá nezávislá
+  extrakce, která sama neprojde kontrolami, nic nepotvrzuje: přečte ji ještě jeden další
+  dodavatel (`SECOND_EXTRACTION_RETRIED`); neprojde-li ani ten, rozpor platí.
+- Nezávislá kontrola: rozpor je jen `CONTRADICTED`, nebo `NOT_FOUND`/`UNCLEAR` u pole,
+  které extrakce cituje. Nenalezené hodiny u zákazu bez hodin (nepřetržitý zákaz) jsou
+  poznámka `CHECK_FOUND_NO_HOURS`, potvrzuje je člověk.
 - `DAJC_RESEARCH_PREFER_LOWER_COST=true` seřadí povolené poskytovatele podle ceny.
   „Dostatečně kvalitní“ určuje vlastník tím, koho do pořadí zařadí.
 - Retry s exponenciálním backoffem jen u dočasných chyb (408, 429, 5xx, 529, síť),
@@ -85,7 +93,8 @@ resp. za požadavek; čísla jsou jen příklad, platí ceník dodavatele).
 - Limity: `DAJC_RESEARCH_RUN_BUDGET_USD`, `DAJC_RESEARCH_MONTHLY_BUDGET_USD`,
   `DAJC_RESEARCH_MAX_REQUESTS_PER_RUN`, `DAJC_RESEARCH_MAX_INPUT_TOKENS_PER_CALL`.
   Před každým voláním se odhadne cena; nevejde-li se, běh AI práci zastaví
-  (`BUDGET_EXHAUSTED`) a nic nehádá.
+  (`BUDGET_EXHAUSTED`) a nic nehádá. Useknutá, odmítnutá nebo poškozená odpověď se
+  účtuje podle hlášeného usage: poskytovatel ji fakturuje.
 - Náklady se účtují po modulech a poskytovatelích v `ledger.json` výzkumného
   úložiště. V GitHub Actions se ledger mezi běhy nepřenáší; skutečný měsíční strop
   tam drží `RUN_BUDGET` a limity nastavené přímo u poskytovatelů.
@@ -108,6 +117,11 @@ resp. za požadavek; čísla jsou jen příklad, platí ceník dodavatele).
   typ, jazyk, `Last-Modified`/ETag, ELI metadata a verze (je-li v HTML), stav
   dostupnosti, licence a práva ze Source Registry. Ustanovení a strana jsou u
   každé citace (`provision`, `page`).
+- Předpis vydaný v několika oficiálních dokumentech (RIS vydává preambuli a každý
+  paragraf zemského nařízení zvlášť) je jeden lead `{ url, parts, title }`: části se
+  stáhnou stejně bezpečně, každá se uloží se svým SHA-256 a čtou se jako jeden
+  `TEXT_EXCERPT` (zákaz, výjimky a účinnost dohromady). Selže-li jedna část, je celek
+  `SOURCE_UNAVAILABLE` s `part_url`.
 - Nedostupný zdroj je `SOURCE_UNAVAILABLE` a report u zdroje z registru říká
   „publication trust needs review; the ban is NOT cancelled“. Nikdy z toho nevznikne zrušení.
 - DATEX II, RSS a jiná provozní data nevytvoří právní zákaz: konektory (PR 84)
@@ -230,8 +244,12 @@ popisuje vyřazené soubory (`config/driving-ban-calendars/index.mjs`,
 
 ## Zbývající omezení
 
-- Žádný poskytovatel nebyl volán živě; formáty požadavků odpovídají veřejné
-  dokumentaci dodavatelů, ale nejsou ověřené proti skutečným API.
+- Živě ověřeno 29.–30. 10. 2026 (`docs/DRIVING_BANS_RESEARCH_BENCHMARK.md`, oddíl 6):
+  OpenAI, Gemini a xAI; Anthropic a Mistral jen jako zablokované účty. Perplexity
+  a Anthropic s klíčem Weekly zatím v tomto modulu živě volány nebyly.
+- Opakované sezónní pravidlo (např. letní soboty 1. 7.–31. 8.) nejde ve schématu
+  extrakce vyjádřit jednoznačně: modely ho kódovaly jako celoroční týdenní pravidlo
+  nebo jako data bez dat. Takové návrhy neprojdou kontrolami a řeší je člověk.
 - PDF citace nejdou ověřit strojově; takové návrhy zůstávají `INSUFFICIENT_EVIDENCE`
   a vyžadují ruční kontrolu nebo HTML verzi předpisu.
 - Import (PR 82) přijímá textové dokumenty jen v UTF-8; stránka v jiné znakové sadě

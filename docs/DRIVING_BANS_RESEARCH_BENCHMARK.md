@@ -1,9 +1,10 @@
 # Driving Bans research – AI benchmark, diagnostika API a živé ověření
 
-> **Stav:** benchmark je zanalyzovaný, adaptéry jsou opravené a otestované proti
-> zaznamenaným chybám. Vlastník schválil placenou kontrolu se stropem 1,50 USD a druhého
-> dodavatele Google Gemini. **Živé ověření zatím neproběhlo**: v `dajc-eu` chybí secret
-> `DAJC_RESEARCH_GEMINI_API_KEY` (níže).
+> **Stav:** benchmark je zanalyzovaný a adaptéry jsou opravené a otestované proti
+> zaznamenaným chybám. Živé ověření proběhlo 29.–30. 10. 2026 ve čtyřech bězích s klíči
+> `dajc-ai-bakeoff` (celkem 0,36 USD ze schváleného stropu 1,50 USD na běh). Poslední E2E
+> skončil návrhem `REVIEW_REQUIRED` po extrakci, nezávislé kontrole a druhé extrakci
+> u tří různých dodavatelů (oddíl 6). Nic se nepovýšilo a `canonical.json` je beze změny.
 
 ## 1. Zdroj
 
@@ -83,6 +84,7 @@ Zapíná se `DAJC_RESEARCH_MODEL_PROFILE=bakeoff-2026-10-25`; explicitní nastav
 vyhrává, klíče profil nikdy nedoplňuje. Pořadí podle úlohy z kvality (podíl správných
 z dokončených), spolehlivosti (dokončené/26), ceny, latence a podílu neověřených tvrzení.
 Modely jen s chybami API jsou `NOT_BENCHMARKED` a profil je nevybere, dokud neprojdou smoke testem.
+Profil nastavuje i parametry, se kterými bake-off měřil: OpenAI `reasoning: none`, Grok `low`.
 
 **Předběžné doporučení** (benchmark měřil odpovídání nad daty, ne extrakci z dokumentů):
 
@@ -91,6 +93,7 @@ Modely jen s chybami API jsou `NOT_BENCHMARKED` a profil je nevybere, dokud nepr
 | vyhledávání | Perplexity Search (oficiální domény) | živě ve Weekly 29. 10. 2026; mimo bake-off |
 | extrakce, běžný dokument | Gemini 3.5 Flash-Lite, rozestup 15 s | nepřímý (22/26, 0,009 USD/odpověď) |
 | extrakce, složitý dokument / PDF | GPT-6 Sol | nepřímý (24/26, nejvyšší kvalita × spolehlivost) |
+| druhé čtení, když běžná extrakce neprojde kontrolami | GPT-6 Sol (trasa `_EXTRACT_COMPLEX`) | živě: Flash-Lite 7,5 t jako 7,5 kg, Sol správně (běhy 40996196243, 40996822080) |
 | nezávislá kontrola | jiný dodavatel: GPT-6 Luna nebo Gemini Flash-Lite | nepřímý |
 | rozpoznání konfliktů | deterministické (`checkRules`, `sourceConflicts`) + kontrola | – |
 | vysvětlení schválených dat | Gemini 3.5 Flash-Lite / GPT-6 Luna | přímý |
@@ -106,17 +109,62 @@ Modely jen s chybami API jsou `NOT_BENCHMARKED` a profil je nevybere, dokud nepr
 | `fallback` | skutečný požadavek s neexistujícím modelem u prvního poskytovatele → `MODEL_NOT_FOUND`, zablokování, převzetí druhým | ano |
 | `e2e` | AT: nařízení Tyrolska LGBl. Nr. 95/2009 „B 179 Fernpass-Straße, Fahrverbot für Lastkraftfahrzeuge“ (v registru chybí; odpovídá `AT_LAENDER_SECONDARY_ROAD_ORDERS_NOT_ENUMERATED`): oficiální vyhledávání RIS OGD + Perplexity → bezpečné stažení (konsolidované znění, OGD §1 a §2) → extrakce → nezávislá kontrola → deterministická validace → detekce změn → návrh `REVIEW_REQUIRED` | ano (vyhledávání, extrakce, kontrola); ostatní kroky deterministické |
 
-Bezplatně ověřeno z tohoto prostředí 29. 10. 2026: RIS OGD vyhledávání najde 4 části
-nařízení (Gesetzesnummer 20000096), HTML §1–§3 na `ogd.ris.bka.gv.at` vrací 200;
-konsolidovaná stránka `www.ris.bka.gv.at` vrací z IP proxy prostředí 503 „Security Check“
-(z GitHub Actions neověřeno). Zákon 361/2000 Sb. na zakonyprolidi.cz vrací 200, §43
-obsahuje 13.00–22.00, 7 500 kg a 3 500 kg s přípojným vozidlem.
+RIS OGD vyhledávání najde 4 části nařízení (Gesetzesnummer 20000096: preambule s právním
+základem, §1 zákaz, §2 výjimky, §3 účinnost) na `ogd.ris.bka.gv.at`; čtou se jako jeden
+dokument. Konsolidovaná stránka `www.ris.bka.gv.at` vrací 503 i z GitHub Actions.
 
-Spouští se jen schválením vlastníka: štítek `research-live-check` na PR nebo ruční
-spuštění workflow `Driving Bans research live check` po sloučení. Výsledky jen v artefaktu,
-`canonical.json` se kontroluje před i po, nic se nepovyšuje ani neschvaluje.
+Spouští se jen schválením vlastníka. Na pokyn vlastníka (30. 10. 2026, „použij klíče
+v dajc-ai-bakeoff“) běží v `dajc-ai-bakeoff`: workflow `DAJC-eu research live check`
+(bake-off PR #1) stáhne veřejný kód dajc-eu na připnutém commitu a použije klíče
+bake-off; klíče repozitář neopouštějí. Placený běh: ruční spuštění, nebo push se značkou
+`[research-live-check]`. Workflow `driving-bans-research-live.yml` v dajc-eu zůstává pro
+vlastní klíče dajc-eu. Výsledky jen v artefaktu, `canonical.json` se kontroluje před i po,
+nic se nepovyšuje ani neschvaluje.
 
-### Rozpočet ke schválení (odhad z ceníku, pokud budou nastaveni všichni poskytovatelé)
+### Výsledky živých běhů (dajc-ai-bakeoff, 29.–30. 10. 2026)
+
+| Běh | Kód dajc-eu | Kontroly | Náklady USD | Výsledek |
+| --- | --- | --- | --- | --- |
+| 40974550043 | 19e69f4 | všechny | 0,096 | smoke OK u OpenAI, xAI, Gemini; Anthropic 400 kredit a Mistral 429 (kód 1300) zablokovány po 1 požadavku; E2E: §1 a §2 čteny zvlášť, oba návrhy `INSUFFICIENT_EVIDENCE` |
+| 40995210487 | 2674975 | všechny (bez klíčů Anthropic a Mistral) | 0,181 | cz-sun: časy a hmotnosti `cz-sunday` shodně u všech tří modelů; E2E: 4 části jako jeden dokument, Flash-Lite 7,5 t jako 7,5 kg → `INSUFFICIENT_EVIDENCE` |
+| 40996196243 | 4efe9b6 | E2E | 0,031 | druhé čtení GPT-6 Sol, kontrola Gemini, druhá extrakce Gemini → `CONFLICT` (chybějící úsek silnice, 7,5 kg ve druhé extrakci a dva falešné důvody kontroly) |
+| 40996822080 | b7ee2de | E2E | 0,052 | **`REVIEW_REQUIRED`**: extrakce GPT-6 Sol (po neúspěšné Flash-Lite), nezávislá kontrola Gemini `CONSISTENT`, druhá extrakce Grok 4.7 shodná (po neúspěšné Flash-Lite), validátor PR #82 `VALIDATED` |
+
+Podrobnosti po kontrolách:
+
+- **smoke**: OpenAI `gpt-6-sol`, xAI `grok-4.7`, Gemini `gemini-3.5-flash-lite` vrátily
+  platný strukturovaný JSON. Anthropic (klíč bake-off) `CREDIT_OR_BILLING` 400 a Mistral
+  `RATE_LIMIT` 429 kód 1300 byly zablokovány pro celý běh, další kontroly je přeskočily.
+- **failover**: skutečný 404 `model_not_found` u OpenAI, 1 požadavek, převzetí xAI;
+  druhé volání už OpenAI neposlalo.
+- **cz-sun** (§43 zákona 361/2000 Sb. z zakonyprolidi.cz): všechny tři modely vrátily
+  neděli 13:00–22:00, >7 500 kg a >3 500 kg s přívěsem (shoda s `cz-sunday`). Žádná
+  extrakce neprošla kontrolami bez nálezu: GPT-6 Sol 1 chybějící citace platnosti, Grok
+  krátká citace právního základu a chybějící platnost, Flash-Lite citace mimo text
+  a neplatná data. Letní soboty a pátky (1. 7.–31. 8.) modely kódovaly nejednotně
+  (otevřené týdenní pravidlo nebo data bez dat): schéma extrakce opakované sezónní
+  pravidlo jednoznačně nevyjádří (otevřený bod).
+- **E2E Fernpass** (běh 40996822080), návrh `rdraft-93abe3cdae4da399`:
+  `ADD_SOURCE` (RIS OGD, 4 části se SHA-256) a `ADD_RULE`: B 179 km 0.00–47.957
+  (Nassereith–Vils), >7 500 kg, nepřetržitě od 1. 1. 2010, obě výjimky §2, právní základ
+  §43 odst. 1 písm. b bod 1 StVO; všechny citace ověřené. Fáze `DISCOVERED →
+  DOCUMENT_RETRIEVED → AI_EXTRACTED → AI_CROSS_CHECKED → DETERMINISTICALLY_VALIDATED →
+  REVIEW_REQUIRED`. Nepovýšeno: rozhodne člověk po přečtení nařízení.
+
+Co živé běhy našly a co se opravilo (všechno s testy):
+
+| Nález | Oprava |
+| --- | --- |
+| zablokovaný poskytovatel by dostal požadavek v každé další kontrole | blokace platí pro celý běh |
+| useknutá odpověď OpenAI zaúčtována 0 USD, ač je placená | usage nepoužitelných odpovědí se účtuje |
+| OpenAI voláno s jiným reasoning než v bake-off | profil nastaví `none` |
+| RIS: zákaz, výjimky a účinnost ve třech dokumentech | části jednoho předpisu se čtou jako celek |
+| Flash-Lite: 7,5 t jako 7,5 kg, převyprávěné citace | druhé čtení silnějším modelem; chyba jednotky zachycena deterministicky |
+| druhá extrakce Flash-Lite se stejnou chybou | další dodavatel přečte dokument znovu |
+| kontrola hlásila „hodiny nenalezeny“ u nepřetržitého zákazu a hodnotila neuvedená pole | rozpor jen u skutečného rozporu, poznámka pro člověka |
+| úsek silnice (km) chyběl ve struktuře pravidla | zadání extrakce `dbx-3` žádá úsek; běh 40996822080 ho uvedl |
+
+### Rozpočet (odhad z ceníku před schválením; skutečné náklady viz tabulka běhů)
 
 | Kontrola | Odhad USD |
 | --- | --- |
@@ -170,9 +218,9 @@ xAI a Mistral jsou jen v `dajc-ai-bakeoff` a do jiného repozitáře se nepřen�
 | 2 | příčiny Anthropic, Gemini, Mistral | identifikováno; Anthropic a Mistral jsou blokery účtu |
 | 3 | opravené adaptéry mají testy | splněno |
 | 4 | benchmark použitelný v orchestrátoru | splněno (opt-in profil, předběžný) |
-| 5 | živý E2E se dvěma nezávislými poskytovateli | **nesplněno**: rozpočet schválen, chybí secret `DAJC_RESEARCH_GEMINI_API_KEY` v `dajc-eu` |
-| 6 | deterministická validace výstupu | připraveno v E2E; živě neprovedeno |
-| 7 | návrh před lidským schválením | připraveno v E2E; živě neprovedeno |
+| 5 | živý E2E se dvěma nezávislými poskytovateli | splněno: běh 40996822080, oficiální zdroj RIS OGD, extrakce OpenAI, kontrola Google, druhá extrakce xAI |
+| 6 | deterministická validace výstupu | splněno živě: zachytila 7,5 kg, citace mimo text a chybějící důkazy; validátor PR #82 `VALIDATED` |
+| 7 | návrh před lidským schválením | splněno: `rdraft-93abe3cdae4da399` ve stavu `REVIEW_REQUIRED`, nic nepovýšeno |
 | 8 | registr beze změny | splněno (testy, lint, kontrola ve workflow) |
 | 9 | kompatibilita s PR #78 a #80–#84 | splněno (sloučení bez konfliktu, testy) |
 | 10 | žádná produkční ani placená funkce aktivována | splněno |
