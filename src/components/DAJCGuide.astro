@@ -6,7 +6,7 @@
     type="button"
     aria-expanded="false"
     aria-controls="dajc-guide-panel"
-    title="Open frequently asked questions and email contact options"
+    title="Open DAJC FAQ and, when available, DAJC AI"
   >
     <span class="dajc-guide__dot" aria-hidden="true"></span>
     Ask DAJC · FAQ
@@ -22,9 +22,16 @@
     </div>
 
     <p class="dajc-guide__intro">
-      This opens a list of prepared answers about DAJC. Choose a question below, or use Contact DAJC
-      to open your email app. This is not a live chat.
+      Find prepared answers below, or contact DAJC directly. This FAQ is not a live chat.
+      When DAJC AI is available, you can open its separate question page here.
     </p>
+
+    <div class="dajc-guide__ai-entry" aria-label="DAJC AI entry">
+      <p data-guide-ai-status role="status">
+        DAJC AI is not available yet. The FAQ and contact options remain available below.
+      </p>
+      <a data-guide-ai-link href="/intelligence/ask" hidden>Open DAJC AI questions</a>
+    </div>
 
     <div class="dajc-guide__questions" role="list" aria-label="Common questions">
       <button type="button" data-guide-question="what-is-dajc">What is DAJC?</button>
@@ -49,8 +56,9 @@
     </div>
 
     <p class="dajc-guide__privacy">
-      DAJC Guide does not send your questions to a chatbot, store a conversation or access DAJC Platform,
-      D-ID, customer or partner data.
+      FAQ choices do not send questions to AI, store conversations or access DAJC Platform,
+      D-ID, customer or partner data. If you open DAJC AI when it becomes available,
+      that separate service has its own sign-in, limits and privacy information.
     </p>
   </section>
 </div>
@@ -61,6 +69,26 @@
   const panel = root?.querySelector<HTMLElement>('.dajc-guide__panel');
   const close = root?.querySelector<HTMLButtonElement>('.dajc-guide__close');
   const answer = root?.querySelector<HTMLElement>('[data-guide-answer]');
+  const aiStatus = root?.querySelector<HTMLElement>('[data-guide-ai-status]');
+  const aiLink = root?.querySelector<HTMLAnchorElement>('[data-guide-ai-link]');
+
+  // The public, read-only availability route returns HTTP 200 even while Ask is disabled.
+  // Do not expose a link to the gated /intelligence/ask page unless it is ready.
+  const refreshAiEntry = async (): Promise<boolean> => {
+    if (!aiStatus || !aiLink) return false;
+    aiLink.hidden = true;
+    aiStatus.hidden = false;
+    try {
+      const response = await fetch('/api/guide/ai-availability', { cache: 'no-store', credentials: 'same-origin' });
+      const body = response.ok ? await response.json() : null;
+      const ready = body?.available === true;
+      aiLink.hidden = !ready;
+      aiStatus.hidden = ready;
+      return ready;
+    } catch {
+      return false;
+    }
+  };
 
   const answers: Record<string, string> = {
     'what-is-dajc':
@@ -85,8 +113,16 @@
     if (!trigger || !panel) return;
     trigger.setAttribute('aria-expanded', String(open));
     panel.hidden = !open;
-    if (open) close?.focus();
+    if (open) {
+      close?.focus();
+      void refreshAiEntry();
+    }
   };
+
+  aiLink?.addEventListener('click', async (event) => {
+    event.preventDefault();
+    if (await refreshAiEntry()) window.location.assign(aiLink.href);
+  });
 
   trigger?.addEventListener('click', () => setOpen(trigger.getAttribute('aria-expanded') !== 'true'));
   close?.addEventListener('click', () => {
@@ -217,6 +253,41 @@
     color: var(--dajc-muted);
     font-size: 13px;
     line-height: 1.6;
+  }
+
+  .dajc-guide__ai-entry {
+    margin: 0.9rem 0 1rem;
+    padding: 0.8rem;
+    border: 1px solid var(--dajc-line);
+    border-radius: 7px;
+    background: rgba(0, 38, 92, 0.14);
+  }
+
+  .dajc-guide__ai-entry p {
+    margin: 0;
+    color: var(--dajc-muted);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .dajc-guide__ai-entry a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.65rem;
+    border: 1px solid var(--dajc-orange);
+    border-radius: 7px;
+    color: var(--dajc-orange);
+    text-align: center;
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+  }
+
+  .dajc-guide__ai-entry a[hidden],
+  .dajc-guide__ai-entry p[hidden] {
+    display: none;
   }
 
   .dajc-guide__questions {
