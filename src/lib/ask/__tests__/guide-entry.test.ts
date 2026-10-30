@@ -4,7 +4,7 @@ import { guideAiAvailabilityResponse, isGuideAiAvailable } from '../guide-entry'
 import { FULL_ENV } from './helpers';
 
 const guide = readFileSync(new URL('../../../components/DAJCGuide.astro', import.meta.url), 'utf8');
-const route = readFileSync(new URL('../../../pages/api/guide/availability.ts', import.meta.url), 'utf8');
+const route = readFileSync(new URL('../../../pages/api/guide/ready.ts', import.meta.url), 'utf8');
 
 describe('Ask DAJC · FAQ is the entry point to DAJC AI', () => {
   it('preserves the existing public widget name and prepared FAQ answers', () => {
@@ -16,7 +16,7 @@ describe('Ask DAJC · FAQ is the entry point to DAJC AI', () => {
 
   it('hides the AI link by default and checks availability before navigation', () => {
     expect(guide).toMatch(/data-guide-ai-link href="\/intelligence\/ask" hidden/);
-    expect(guide).toMatch(/fetch\('\/api\/guide\/availability', \{ cache: 'no-store', credentials: 'same-origin' \}\)/);
+    expect(guide).toMatch(/fetch\('\/api\/guide\/ready', \{ cache: 'no-store', credentials: 'same-origin' \}\)/);
     expect(guide).toMatch(/event\.preventDefault\(\)/);
     expect(guide).toMatch(/if \(aiLink && await refreshAiEntry\(\)\) window\.location\.assign\(aiLink\.href\)/);
     expect(guide).toMatch(/\.dajc-guide__ai-entry a\[hidden\]/);
