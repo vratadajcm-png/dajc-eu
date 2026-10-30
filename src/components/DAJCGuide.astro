@@ -79,7 +79,7 @@
     aiLink.hidden = true;
     aiStatus.hidden = false;
     try {
-      const response = await fetch('/api/guide/ai-availability', { cache: 'no-store', credentials: 'same-origin' });
+      const response = await fetch('/api/guide/availability', { cache: 'no-store', credentials: 'same-origin' });
       const body = response.ok ? await response.json() : null;
       const ready = body?.available === true;
       aiLink.hidden = !ready;
