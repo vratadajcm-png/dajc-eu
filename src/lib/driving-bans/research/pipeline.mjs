@@ -77,19 +77,34 @@ async function analyseDocument({ item, fetched, target, window, rawCanonical, ca
   const findings = injection.length ? [{ code: 'UNTRUSTED_INSTRUCTIONS_IN_DOCUMENT', blocking_state: 'CONFLICT', message: 'The document contains instruction-like text addressed to an AI; it was treated as data only', excerpts: injection.slice(0, 3) }] : [];
 
   const cacheKey = `cache/${sha([fetched.sha256, target.jurisdiction, window, EXTRACTION_PROMPT_VERSION])}.json`;
+  const checkRules = rules => rules.flatMap((rule, index) => checkExtractedRule(rule, { text, jurisdiction: target.jurisdiction, window }).map(item => ({ ...item, rule_index: index })));
+  const blockingCount = list => list.filter(item => item.blocking_state !== 'NOTE').length;
   let first;
   if (store.exists(cacheKey)) first = { ...store.readJson(cacheKey), cached: true };
-  else {
-    first = await extractRules({ orchestrator, jurisdiction: target.jurisdiction, window, document, text });
-    if (first.ok) store.writeJson(cacheKey, { ok: true, extraction: first.extraction, provider: first.provider, vendor: first.vendor, model: first.model, prompt_version: EXTRACTION_PROMPT_VERSION });
-  }
+  else first = await extractRules({ orchestrator, jurisdiction: target.jurisdiction, window, document, text });
   if (!first.ok) return { outcome: 'EXTRACTION_INVALID', findings: [...findings, { code: 'EXTRACTION_OUTPUT_INVALID', blocking_state: 'INSUFFICIENT_EVIDENCE', message: first.issues.join('; ') }] };
   phases.push('AI_EXTRACTED');
+  if (first.extraction.document_relevance === 'NOT_RELEVANT' || !first.extraction.rules.length) return { outcome: 'NOT_RELEVANT', findings, extraction_meta: { provider: first.provider, model: first.model, cached: Boolean(first.cached) } };
+
+  let ruleFindings = checkRules(first.extraction.rules);
+  // Live checks (29-30 Oct 2026): the cheap model misquoted and wrote 7.5 t as 7.5 kg where the
+  // strongest model did not. A cheap extraction that fails the deterministic checks is read again
+  // once on the stronger route; the extraction with fewer blocking findings is kept.
+  const strongerRoute = !first.cached && !first.complex && blocking(ruleFindings) === 'INSUFFICIENT_EVIDENCE' ? orchestrator.next?.('extract', { escalate: true, needsPdf: text === null }) : null;
+  // Compared with the model requested, not the one served (a provider may route an ID to a newer model).
+  if (strongerRoute && (strongerRoute.provider !== first.provider || strongerRoute.model !== (first.requested_model ?? first.model))) {
+    let stronger = null;
+    try { stronger = await extractRules({ orchestrator, jurisdiction: target.jurisdiction, window, document, text, escalate: true }); }
+    catch (error) { if (error.name === 'BudgetExceededError') throw error; }
+    const usable = Boolean(stronger?.ok && stronger.extraction.rules.length);
+    const strongerFindings = usable ? checkRules(stronger.extraction.rules) : null;
+    const adopted = usable && blockingCount(strongerFindings) < blockingCount(ruleFindings);
+    findings.push({ code: 'ESCALATED_EXTRACTION', blocking_state: 'NOTE', message: `${first.model} failed the deterministic checks (${[...new Set(ruleFindings.filter(f => f.blocking_state !== 'NOTE').map(f => f.code))].join(', ')}); ${usable ? `${stronger.model} read the document again and ${adopted ? 'its extraction is used' : 'did no better, so the first extraction is kept'}` : 'no stronger model could read it again'}`, first_model: first.model, stronger_model: stronger?.model ?? null });
+    if (adopted) { first = { ...stronger, escalated_from: first.model }; ruleFindings = strongerFindings; }
+  }
+  if (!first.cached) store.writeJson(cacheKey, { ok: true, extraction: first.extraction, provider: first.provider, vendor: first.vendor, model: first.model, complex: Boolean(first.complex), escalated_from: first.escalated_from ?? null, prompt_version: EXTRACTION_PROMPT_VERSION });
   const extraction = first.extraction;
   if (extraction.instructions_found_in_document) findings.push({ code: 'PROMPT_INJECTION_SUSPECTED', blocking_state: 'CONFLICT', message: 'The extraction model reports instructions inside the document' });
-  if (extraction.document_relevance === 'NOT_RELEVANT' || !extraction.rules.length) return { outcome: 'NOT_RELEVANT', findings, extraction_meta: { provider: first.provider, model: first.model, cached: Boolean(first.cached) } };
-
-  const ruleFindings = extraction.rules.flatMap((rule, index) => checkExtractedRule(rule, { text, jurisdiction: target.jurisdiction, window }).map(item => ({ ...item, rule_index: index })));
   const drafts = extraction.rules.map(rule => draftRuleOf(rule, { jurisdiction: target.jurisdiction, window, sourceId: item.source_id ?? 'pending' }));
   drafts.forEach((draft, index) => { if (!draft) ruleFindings.push({ code: 'DRAFT_NOT_BUILDABLE', blocking_state: 'INSUFFICIENT_EVIDENCE', message: 'Missing criterion, timezone or validity: no registry rule can be drafted without inventing a value', rule_index: index }); });
   const usable = drafts.map((draft, index) => ({ draft, rule: extraction.rules[index] })).filter(entry => entry.draft);
@@ -97,7 +112,7 @@ async function analyseDocument({ item, fetched, target, window, rawCanonical, ca
   const known = target.known.find(source => source.url === item.url || source.url === fetched.final_url) ?? null;
   const { operations, findings: comparison, sourceId } = buildOperations({ drafts: usable.map(entry => entry.draft), extracted: usable.map(entry => entry.rule), document, target, rawCanonical, window, known });
   findings.push(...ruleFindings, ...comparison);
-  const extractionMeta = { provider: first.provider, vendor: first.vendor, model: first.model, prompt_version: EXTRACTION_PROMPT_VERSION, cached: Boolean(first.cached) };
+  const extractionMeta = { provider: first.provider, vendor: first.vendor, model: first.model, escalated_from: first.escalated_from ?? null, prompt_version: EXTRACTION_PROMPT_VERSION, cached: Boolean(first.cached) };
   if (!operations.length && !blocking(ruleFindings)) return { outcome: 'NO_CHANGE', findings, extraction_meta: extractionMeta, document };
   // The same document with the same operations was drafted before: nothing new, no further AI cost.
   const draftId = `rdraft-${sha({ jurisdiction: target.jurisdiction, document: fetched.sha256, operations }).slice(0, 16)}`;

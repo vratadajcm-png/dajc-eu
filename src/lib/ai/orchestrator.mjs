@@ -200,7 +200,8 @@ export function createOrchestrator({
     // A PDF is estimated at one token per 20 bytes, deliberately on the high side.
     const estimatedInput = task === 'discover' ? 0 : estimateTokens(request.system) + estimateTokens(request.user) + (request.document ? Math.ceil(request.document.base64.length * 0.75 / 20) : 0);
     if (task !== 'discover' && estimatedInput > limits.maxInputTokensPerCall) throw new BudgetExceededError(`Input of about ${estimatedInput} tokens exceeds the per-call limit ${limits.maxInputTokensPerCall}`);
-    const complex = task !== 'discover' && (Boolean(request.document) || estimatedInput > limits.complexInputTokens);
+    // A PDF, a long text or an escalation after a failed cheaper extraction goes to the stronger route.
+    const complex = task !== 'discover' && (Boolean(request.document) || estimatedInput > limits.complexInputTokens || meta.escalate === true);
     const { eligible, reasons } = candidates(task, { excludeVendors: meta.excludeVendors ?? [], needsPdf: meta.needsPdf ?? false, dataClass, complex });
     const failures = [...reasons];
     let budgetBlocked = false, callFailed = false;
@@ -220,7 +221,7 @@ export function createOrchestrator({
         runSpent = round(runSpent + cost);
         ledger.book({ module, provider: provider.id, task, costUsd: cost, inputTokens: usage.inputTokens, outputTokens: usage.outputTokens });
         audit({ task, purpose: meta.purpose ?? null, subject: meta.subject ?? null, provider: provider.id, vendor: provider.vendor, requested_model: requestedModel, model: result.model ?? requestedModel, complex, outcome: 'OK', attempts, latency_ms: latencyMs, waited_ms: waitedMs, input_tokens: usage.inputTokens ?? 0, output_tokens: usage.outputTokens ?? 0, cost_usd: cost, request_sha256: hash(JSON.stringify(request.queries ?? [request.system, request.user, request.document?.base64?.length ?? 0])) });
-        return { ...result, provider: provider.id, vendor: provider.vendor, model: result.model ?? requestedModel, requested_model: requestedModel, cost_usd: cost, attempts };
+        return { ...result, provider: provider.id, vendor: provider.vendor, model: result.model ?? requestedModel, requested_model: requestedModel, cost_usd: cost, attempts, complex };
       } catch (error) {
         callFailed = true;
         const known = error instanceof ProviderError;
@@ -239,8 +240,16 @@ export function createOrchestrator({
     throw new NoProviderError(task, failures);
   }
 
+  /** The provider and model a task would go to first, without calling it (e.g. before an escalation). */
+  function next(task, meta = {}) {
+    const complex = task !== 'discover' && (meta.needsPdf === true || meta.escalate === true);
+    const [provider] = candidates(task, { excludeVendors: meta.excludeVendors ?? [], needsPdf: meta.needsPdf ?? false, dataClass: meta.dataClass ?? 'public-legal', complex }).eligible;
+    return provider ? { provider: provider.id, model: task === 'discover' ? null : typeof provider.modelFor === 'function' ? provider.modelFor(task, complex) : provider.model } : null;
+  }
+
   return {
     run,
+    next,
     calls: () => calls.slice(),
     spentThisRun: () => runSpent,
     remainingBudget: () => round(Math.max(0, remaining())),

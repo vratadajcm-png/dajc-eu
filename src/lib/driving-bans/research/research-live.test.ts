@@ -21,8 +21,11 @@ describe('live check harness (offline)', () => {
     expect(plan.readiness.enabled).toBe(true);
     expect(plan.budget.total_usd_estimate).toBeGreaterThan(0);
     expect(plan.budget.total_usd_estimate).toBeLessThan(1.5);
-    expect(plan.budget.rows.e2e.map((row: any) => row.provider)).toHaveLength(2);
-    expect(new Set(plan.budget.rows.e2e.map((row: any) => row.provider)).size).toBe(2);
+    // Extraction and the independent check at two vendors, plus the stronger second reading when the first fails the checks.
+    const [extractor, checker, stronger] = plan.budget.rows.e2e;
+    expect(extractor.provider).not.toBe(checker.provider);
+    expect(stronger).toMatchObject({ only_if: 'first extraction fails the checks' });
+    expect(stronger.model).not.toBe(extractor.model);
     expect(JSON.stringify(plan)).not.toMatch(/test-key/);
     expect(estimateBudget(researchEnvironment({})).total_usd_estimate).toBe(0);
   });

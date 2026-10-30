@@ -219,6 +219,38 @@ describe('conflict and insufficient-evidence branches (scenarios 4, 5, 9, 21)', 
     expect(missing.ai.log).toHaveLength(0);
   });
 
+  it('reads a document again on the stronger route once when the cheap extraction fails the checks (live check 2026-10-30)', async () => {
+    const env = testEnv({ DAJC_RESEARCH_ROUTE_EXTRACT: 'gemini,openai', DAJC_RESEARCH_ROUTE_EXTRACT_COMPLEX: 'openai,gemini', DAJC_RESEARCH_ROUTE_VERIFY: 'gemini,xai' });
+    // The cheap model writes 12 t as 12 kg (the unit error Gemini Flash-Lite made on the Tyrol order).
+    const cheap = extractedRule({ weight_conditions: [{ operator: '>', value: 12, unit: 'kg', applies_to: 'MAM of lorry' }] });
+    // Only its first reading is wrong; the independent second extraction (also Gemini) reads it right.
+    let geminiCalls = 0;
+    const context = setup({ env, pages: { [URLS.measure]: html(DOCUMENTS.measure) }, brain: scripted({}, { extract: ({ provider }) => extraction([provider === 'gemini' && geminiCalls++ === 0 ? cheap : extractedRule()]) }) });
+    const report = await context.run(['CZ'], { mode: 'urgent', leadUrls: [URLS.measure], maxDocuments: 1 });
+    const draft = loadDraft(context.store, docOutcome(report, URLS.measure).draft_id);
+    expect(draft.state).toBe('REVIEW_REQUIRED');
+    expect(draft.extraction).toMatchObject({ provider: 'openai', escalated_from: 'test-gemini' });
+    expect(draft.findings.find((f: any) => f.code === 'ESCALATED_EXTRACTION')).toMatchObject({ blocking_state: 'NOTE', first_model: 'test-gemini', stronger_model: 'test-gpt' });
+    // The independent check runs at another vendor than the extraction that is used.
+    expect(draft.cross_check).toMatchObject({ provider: 'gemini', ok: true });
+    expect(context.ai.log.filter(item => item.task === 'extract').map(item => item.provider)).toEqual(['gemini', 'openai', 'gemini']);
+    expect(context.orchestrator.calls().find((call: any) => call.purpose === 'legal rule extraction (escalated)')).toMatchObject({ provider: 'openai', complex: true });
+  });
+
+  it('keeps the first extraction when the stronger model does no better, and never pays twice for the same model', async () => {
+    const weak = extractedRule();
+    weak.evidence = weak.evidence.filter((item: any) => item.field !== 'legal_basis');
+    const env = testEnv({ DAJC_RESEARCH_ROUTE_EXTRACT: 'gemini,openai', DAJC_RESEARCH_ROUTE_EXTRACT_COMPLEX: 'openai,gemini' });
+    const both = setup({ env, pages: { [URLS.measure]: html(DOCUMENTS.measure) }, brain: scripted({ 'cz-new-rule': extraction([weak]) }) });
+    const report = await both.run(['CZ'], { mode: 'urgent', leadUrls: [URLS.measure], maxDocuments: 1 });
+    const draft = loadDraft(both.store, docOutcome(report, URLS.measure).draft_id);
+    expect(draft).toMatchObject({ state: 'INSUFFICIENT_EVIDENCE', extraction: { provider: 'gemini', escalated_from: null } });
+    expect(draft.findings.find((f: any) => f.code === 'ESCALATED_EXTRACTION').message).toMatch(/did no better/);
+    const same = setup({ env: testEnv({ DAJC_RESEARCH_ROUTE_EXTRACT: 'gemini', DAJC_RESEARCH_ROUTE_EXTRACT_COMPLEX: 'gemini' }), pages: { [URLS.measure]: html(DOCUMENTS.measure) }, brain: scripted({ 'cz-new-rule': extraction([weak]) }) });
+    await same.run(['CZ'], { mode: 'urgent', leadUrls: [URLS.measure], maxDocuments: 1 });
+    expect(same.ai.log.filter(item => item.task === 'extract')).toHaveLength(1);
+  });
+
   it('counts a check skipped after failed validation apart from a check that was not available', async () => {
     const weak = extractedRule();
     weak.evidence = weak.evidence.filter((item: any) => item.field !== 'legal_basis');

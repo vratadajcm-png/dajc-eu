@@ -43,6 +43,14 @@ const E2E_DOCUMENTS = 2;
 const SMOKE_SCHEMA = { type: 'object', additionalProperties: false, required: ['ok', 'echo'], properties: { ok: { type: 'boolean' }, echo: { type: 'string' } } };
 const sha = value => createHash('sha256').update(value).digest('hex');
 
+/** The provider of the stronger route, when it is another model than the ordinary extraction. */
+function strongerReader(env, json) {
+  const routes = routesFromEnv(env);
+  const extractor = routes.extract.map(id => json.find(p => p.id === id)).find(Boolean);
+  const strong = (routes.extract_complex ?? routes.extract).map(id => json.find(p => p.id === id)).find(Boolean);
+  return strong && extractor && (strong.id !== extractor.id || strong.modelFor('extract', true) !== extractor.modelFor('extract')) ? [strong] : [];
+}
+
 /** The extractor and the independent checker the routes would pick (another vendor). */
 function e2eProviders(env, json) {
   const routes = routesFromEnv(env);
@@ -61,7 +69,11 @@ export function estimateBudget(env) {
     scenario: json.map(p => ({ provider: p.id, model: p.modelFor('extract'), usd: cost(p, ESTIMATE.scenario, 'extract') })),
     fallback: json.slice(1, 2).map(p => ({ provider: p.id, model: p.modelFor('extract'), usd: cost(p, ESTIMATE.fallback, 'extract') })),
     // Up to two documents (consolidated page, the order assembled from its RIS parts), each extracted, extracted again by another vendor and checked.
-    e2e: e2eProviders(env, json).map((p, index) => ({ provider: p.id, model: p.modelFor(index ? 'verify' : 'extract'), usd: E2E_DOCUMENTS * (index ? cost(p, ESTIMATE.e2e_check, 'verify') + cost(p, ESTIMATE.e2e_extraction, 'extract') : cost(p, ESTIMATE.e2e_extraction, 'extract')) })),
+    e2e: [
+      ...e2eProviders(env, json).map((p, index) => ({ provider: p.id, model: p.modelFor(index ? 'verify' : 'extract'), usd: E2E_DOCUMENTS * (index ? cost(p, ESTIMATE.e2e_check, 'verify') + cost(p, ESTIMATE.e2e_extraction, 'extract') : cost(p, ESTIMATE.e2e_extraction, 'extract')) })),
+      // A second reading on the stronger route, only when the first extraction fails the deterministic checks.
+      ...strongerReader(env, json).map(p => ({ provider: p.id, model: p.modelFor('extract', true), usd: E2E_DOCUMENTS * cost(p, ESTIMATE.e2e_extraction, 'extract', true), only_if: 'first extraction fails the checks' })),
+    ],
     search: providers.perplexity.configured ? [{ provider: 'perplexity', usd: 3 * (providers.perplexity.priceFor()?.request ?? ESTIMATE.search_request) }] : [],
   };
   const total = Object.values(rows).flat().reduce((sum, row) => sum + (row.usd ?? 0), 0);

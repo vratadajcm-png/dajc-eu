@@ -92,16 +92,16 @@ export function extractionUserPrompt({ jurisdiction, window, document, text, non
 export const newNonce = () => randomBytes(12).toString('hex');
 
 /** Ask the orchestrator for one extraction. excludeVendors forces an independent second extraction. */
-export async function extractRules({ orchestrator, jurisdiction, window, document, text, excludeVendors = [] }) {
+export async function extractRules({ orchestrator, jurisdiction, window, document, text, excludeVendors = [], escalate = false }) {
   const nonce = newNonce();
   const request = {
     system: extractionSystemPrompt(jurisdiction), user: extractionUserPrompt({ jurisdiction, window, document, text, nonce }),
     schema: EXTRACTION_SCHEMA, schemaName: 'driving_ban_extraction', maxOutputTokens: 12_000,
     ...(text === null ? { document: { mediaType: 'application/pdf', base64: document.bytes.toString('base64') } } : {}),
   };
-  const result = await orchestrator.run('extract', request, { purpose: 'legal rule extraction', subject: `${jurisdiction}:${document.sha256.slice(0, 12)}`, dataClass: 'public-legal', excludeVendors, needsPdf: text === null });
+  const result = await orchestrator.run('extract', request, { purpose: escalate ? 'legal rule extraction (escalated)' : 'legal rule extraction', subject: `${jurisdiction}:${document.sha256.slice(0, 12)}`, dataClass: 'public-legal', excludeVendors, needsPdf: text === null, escalate });
   const parsed = extractionZ.safeParse(result.json);
-  return { ok: parsed.success, extraction: parsed.success ? parsed.data : null, issues: parsed.success ? [] : parsed.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).slice(0, 20), provider: result.provider, vendor: result.vendor, model: result.model, cost_usd: result.cost_usd };
+  return { ok: parsed.success, extraction: parsed.success ? parsed.data : null, issues: parsed.success ? [] : parsed.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).slice(0, 20), provider: result.provider, vendor: result.vendor, model: result.model, requested_model: result.requested_model ?? result.model, cost_usd: result.cost_usd, complex: Boolean(result.complex) };
 }
 
 /** Numbers stated in a quote, decimal comma or point; "7.500" is read both as 7.5 and 7500. */

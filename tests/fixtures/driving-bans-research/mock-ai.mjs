@@ -43,7 +43,7 @@ export function supportAll(extraction) {
 }
 
 /**
- * brain.extract({ provider, key, document, user }) and brain.verify({ provider, key, extraction }) return the
+ * brain.extract({ provider, key, document, user, model }) and brain.verify({ provider, key, extraction }) return the
  * model JSON; brain.search({ queries, domains }) returns search results. key is the FIXTURE-KEY of the document.
  * failures: { anthropic: { status: 503, remaining: 3, body?, headers?, throws? } } makes a provider fail that many
  * times, with the given error body and headers (recorded bake-off shapes), or throw a fetch error (e.g. TimeoutError).
@@ -70,11 +70,11 @@ export function createMockAiFetch({ brain, failures = {}, transform = (provider,
     const task = /independent check/.test(system) ? 'verify' : 'extract';
     const document = between(user, 'DOCUMENT');
     const key = /FIXTURE-KEY: ([a-z0-9-]+)/.exec(document ?? user)?.[1] ?? null;
-    log.push({ provider, url, headers: init.headers, body, task, key, pdf, user });
+    const model = body.model ?? new URL(url).pathname.split('/models/')[1]?.split(':')[0] ?? `${provider}-test`;
+    log.push({ provider, url, headers: init.headers, body, task, key, pdf, user, model });
     const output = task === 'verify'
       ? (brain.verify?.({ provider, key, extraction: JSON.parse(between(user, 'EXTRACTION')), user }) ?? supportAll(JSON.parse(between(user, 'EXTRACTION'))))
-      : brain.extract({ provider, key, document, user, pdf });
-    const model = body.model ?? new URL(url).pathname.split('/models/')[1]?.split(':')[0] ?? `${provider}-test`;
+      : brain.extract({ provider, key, document, user, pdf, model });
     return Response.json(transform(provider, wrap(provider, model, JSON.stringify(output))));
   };
   return { fetchFn, log };
