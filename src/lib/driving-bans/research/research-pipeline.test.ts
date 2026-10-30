@@ -148,6 +148,24 @@ describe('conflict and insufficient-evidence branches (scenarios 4, 5, 9, 21)', 
     expect(draft.findings.find((f: any) => f.code === 'AI_DISAGREEMENT').verifier_quote_found).toBe(true);
   });
 
+  it('a check that finds no hours for a ban at all times, or rates a field the extraction does not state, is no conflict (live check 2026-10-30)', async () => {
+    const continuous = extractedRule({ schedule: { kind: 'daily', weekdays: [], dates: [], start_time: '00:00', end_time: '24:00', end_day_offset: 0 } });
+    continuous.evidence = [...continuous.evidence.filter((item: any) => !['schedule_dates', 'start_time', 'end_time'].includes(item.field)), ...['schedule_days', 'start_time', 'end_time'].map(field => ({ field, quote: 'zakazuje jízda nákladních automobilů o největší povolené hmotnosti převyšující 12 000 kg', provision: null, page: null }))];
+    // Verdicts in the shape Gemini returned on the Tyrol order: NOT_FOUND for days and hours ("24/7 continuous ban") and for cancellation.
+    const verdicts = (extra: any[]) => ({ extraction: rules }: any) => ({ rules: rules.map((rule: any) => ({ rule_index: rule.rule_index, verdicts: [...['vehicle_scope', 'weight', 'legal_basis', 'roads', 'validity', 'exceptions'].map(field => ({ field, verdict: 'SUPPORTED', quote: null, note: null })), ...extra], missing_conditions: [] })), omitted_rules: [], overall: 'CONSISTENT', instructions_found_in_document: false });
+    const notFound = ['schedule_days', 'start_time', 'end_time', 'cancellation'].map(field => ({ field, verdict: 'NOT_FOUND', quote: null, note: 'Document does not specify hours, it is a 24/7 continuous ban.' }));
+    const agreed = setup({ pages: { [URLS.measure]: html(DOCUMENTS.measure) }, brain: scripted({ 'cz-new-rule': extraction([continuous]) }, { verify: verdicts(notFound) }) });
+    const draft = loadDraft(agreed.store, docOutcome(await agreed.run(['CZ'], { mode: 'urgent', leadUrls: [URLS.measure], maxDocuments: 1 }), URLS.measure).draft_id);
+    expect(draft.state).toBe('REVIEW_REQUIRED');
+    expect(draft.findings.filter((f: any) => f.code === 'CHECK_FOUND_NO_HOURS')).toEqual([expect.objectContaining({ blocking_state: 'NOTE', rule_index: 0 })]);
+    expect(draft.findings.map((f: any) => f.code)).toEqual(expect.arrayContaining(['CONTINUOUS_RESTRICTION']));
+    // Hours the document does state still contradict a ban drafted for all times.
+    const contradicted = setup({ pages: { [URLS.measure]: html(DOCUMENTS.measure) }, brain: scripted({ 'cz-new-rule': extraction([continuous]) }, { verify: verdicts([{ field: 'start_time', verdict: 'CONTRADICTED', quote: 'od 08:00 do 13:00 hodin', note: 'The ban runs 08:00-13:00' }]) }) });
+    const conflict = loadDraft(contradicted.store, docOutcome(await contradicted.run(['CZ'], { mode: 'urgent', leadUrls: [URLS.measure], maxDocuments: 1 }), URLS.measure).draft_id);
+    expect(conflict.state).toBe('CONFLICT');
+    expect(conflict.findings.find((f: any) => f.code === 'AI_DISAGREEMENT')).toMatchObject({ field: 'start_time', verifier_quote_found: true });
+  });
+
   it('9: missing evidence gives INSUFFICIENT_EVIDENCE, skips the paid check, and cannot be promoted', async () => {
     const weak = extractedRule();
     weak.evidence = weak.evidence.filter((item: any) => item.field !== 'legal_basis');

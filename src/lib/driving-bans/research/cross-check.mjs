@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { coverageName } from '../../../../config/europe-coverage.mjs';
 import { normalizeForQuote, wrapUntrusted } from './documents.mjs';
-import { EVIDENCE_FIELDS, extractRules, newNonce, weightThresholdOf } from './extraction.mjs';
+import { EVIDENCE_FIELDS, extractRules, isContinuous, newNonce, weightThresholdOf } from './extraction.mjs';
 
 /**
  * Independent check of an extraction against the original document, always by a
@@ -31,6 +31,7 @@ const verifyZ = z.object({
 }).strict();
 
 const DECISIVE = new Set(['vehicle_scope', 'weight', 'schedule_days', 'schedule_dates', 'start_time', 'end_time', 'legal_basis', 'exceptions', 'roads', 'validity', 'cancellation']);
+const HOURS_AND_DAYS = new Set(['schedule_days', 'schedule_dates', 'start_time', 'end_time']);
 
 export function verifierSystemPrompt() {
   return [
@@ -56,11 +57,20 @@ export async function crossCheck({ orchestrator, jurisdiction, window, document,
   const doc = text === null ? null : normalizeForQuote(text);
   const findings = [];
   if (report.instructions_found_in_document) findings.push({ code: 'PROMPT_INJECTION_SUSPECTED', blocking_state: 'CONFLICT', message: 'The verifier reports instructions inside the document or extraction' });
-  for (const [index] of extraction.rules.entries()) {
+  for (const [index, rule] of extraction.rules.entries()) {
     const row = report.rules.find(item => item.rule_index === index);
     if (!row) { findings.push({ code: 'RULE_NOT_CHECKED', blocking_state: 'INSUFFICIENT_EVIDENCE', message: `Rule ${index} was not checked`, rule_index: index }); continue; }
+    // Fields the extraction states are the ones it quotes. A field it does not state cannot be "not found";
+    // a contradiction still counts everywhere (live check 2026-10-30: "cancellation NOT_FOUND" on a rule without one).
+    const stated = new Set(rule.evidence.map(item => item.field));
     for (const verdict of row.verdicts) {
       if (!DECISIVE.has(verdict.field) || verdict.verdict === 'SUPPORTED') continue;
+      if (verdict.verdict !== 'CONTRADICTED' && !stated.has(verdict.field)) continue;
+      // A ban drafted for all times because the document states no hours: the check finding no hours or days agrees.
+      if (verdict.verdict === 'NOT_FOUND' && HOURS_AND_DAYS.has(verdict.field) && isContinuous(rule.schedule)) {
+        if (!findings.some(item => item.code === 'CHECK_FOUND_NO_HOURS' && item.rule_index === index)) findings.push({ code: 'CHECK_FOUND_NO_HOURS', blocking_state: 'NOTE', message: 'The independent check found no hours or days either, as for a ban at all times; a person confirms that the order has no time limits', rule_index: index });
+        continue;
+      }
       // A disagreement counts even when its quote cannot be confirmed: doubt never passes.
       const quoted = verdict.quote && doc !== null ? doc.includes(normalizeForQuote(verdict.quote)) : null;
       findings.push({ code: 'AI_DISAGREEMENT', blocking_state: 'CONFLICT', message: `Independent check: ${verdict.field} ${verdict.verdict}${verdict.note ? ` (${verdict.note.slice(0, 200)})` : ''}`, rule_index: index, field: verdict.field, verifier_quote_found: quoted });

@@ -13,7 +13,7 @@ import { normalizeForQuote, wrapUntrusted } from './documents.mjs';
  * Nothing missing is filled in: a gap stays a gap and blocks the draft.
  */
 
-export const EXTRACTION_PROMPT_VERSION = 'dbx-2';
+export const EXTRACTION_PROMPT_VERSION = 'dbx-3';
 export const EVIDENCE_FIELDS = Object.freeze(['title', 'vehicle_scope', 'weight', 'schedule_days', 'schedule_dates', 'start_time', 'end_time', 'validity', 'roads', 'regions', 'direction', 'exceptions', 'adr', 'exceptional_transport', 'legal_basis', 'relation', 'cancellation', 'timezone']);
 const DECISIVE = ['vehicle_scope', 'weight', 'start_time', 'end_time', 'legal_basis'];
 const s = { type: 'string' };
@@ -75,7 +75,7 @@ export function extractionSystemPrompt(jurisdiction) {
     `2. Extract only driving bans and traffic restrictions for goods vehicles that this document itself states for ${coverageName(jurisdiction)} (${jurisdiction}).${corridor} Do not use outside knowledge to add, complete or correct anything.`,
     '3. Never invent a value. If a time, mass, date, road, validity or exception condition is not stated, use null or an empty list and describe the gap in missing_or_unclear.',
     '4. For every rule give evidence quotes copied character for character from the document (at most 300 characters each, no ellipsis inside a quote): vehicle_scope, weight, schedule_days or schedule_dates, start_time, end_time and legal_basis always; roads, exceptions, validity, relation and cancellation whenever you state them.',
-    '5. Masses in kg, lengths in m. Keep maximum authorised mass and actual mass apart exactly as the document does. Write applies_to in English and name the measure, e.g. "MAM of lorry", "MAM of vehicle or combination", "actual mass", "MAM of lorry towing a trailer", "length", "height", "axles". A category without a mass threshold uses operator "any" with value and unit null. Write roads as numbers (e.g. "D1", "A12") or as English road classes (e.g. "Motorways", "Class I roads"); quotes stay in the document language.',
+    '5. Masses in kg, lengths in m. Keep maximum authorised mass and actual mass apart exactly as the document does. Write applies_to in English and name the measure, e.g. "MAM of lorry", "MAM of vehicle or combination", "actual mass", "MAM of lorry towing a trailer", "length", "height", "axles". A category without a mass threshold uses operator "any" with value and unit null. Write roads as numbers (e.g. "D1", "A12") or as English road classes (e.g. "Motorways", "Class I roads"); when the document limits a rule to a section, write the section into that road entry (e.g. "B 179 km 0.00-47.957 (Nassereith-Vils)") and quote it as roads evidence; quotes stay in the document language.',
     '6. Times as HH:MM, 24-hour local time; 24:00 for midnight at the end of a day; end_day_offset is how many days after the start day the ban ends. weekdays: 0 = Sunday ... 6 = Saturday. Dates as YYYY-MM-DD. A prohibition the document states without any hours or days applies at all times: kind daily, 00:00 to 24:00, and quote the prohibition itself as schedule_days evidence.',
     '7. Copy each exception with its complete legal conditions; never drop a condition. Exceptions are listed, never applied.',
     '8. relation REPEALS only when the document explicitly repeals or cancels a rule; quote it as cancellation evidence.',
@@ -136,6 +136,9 @@ const isEndTime = value => isTime(value) || value === '24:00';
  * Deterministic checks of one extracted rule against the document text.
  * text === null (PDF) means quotes cannot be checked here: the rule is held for a person.
  */
+/** A ban the document states without hours or days: drafted as daily 00:00-24:00. */
+export const isContinuous = schedule => schedule.kind === 'daily' && schedule.start_time === '00:00' && schedule.end_time === '24:00' && schedule.end_day_offset === 0;
+
 export function checkExtractedRule(rule, { text, jurisdiction, window }) {
   const findings = [];
   const doc = text === null ? null : normalizeForQuote(text);
@@ -168,7 +171,7 @@ export function checkExtractedRule(rule, { text, jurisdiction, window }) {
 
   const { schedule } = rule;
   // A ban without stated hours applies at all times (e.g. a route order): daily 00:00-24:00, no hours to find in a quote.
-  const continuous = schedule.kind === 'daily' && schedule.start_time === '00:00' && schedule.end_time === '24:00' && schedule.end_day_offset === 0;
+  const continuous = isContinuous(schedule);
   if (continuous) {
     if (!has('schedule_days')) findings.push(finding('MISSING_EVIDENCE', 'INSUFFICIENT_EVIDENCE', 'A continuous ban needs the quoted prohibition as schedule_days evidence', { field: 'schedule_days' }));
     findings.push(finding('CONTINUOUS_RESTRICTION', 'NOTE', 'No hours are stated: drafted as applying at all times; confirm that the order has no time limits'));
