@@ -121,7 +121,7 @@
 
   aiLink?.addEventListener('click', async (event) => {
     event.preventDefault();
-    if (await refreshAiEntry()) window.location.assign(aiLink.href);
+    if (aiLink && await refreshAiEntry()) window.location.assign(aiLink.href);
   });
 
   trigger?.addEventListener('click', () => setOpen(trigger.getAttribute('aria-expanded') !== 'true'));
