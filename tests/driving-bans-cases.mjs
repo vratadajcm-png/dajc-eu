@@ -7,7 +7,8 @@ const maintained = hydrateCanonical(JSON.parse(readFileSync(new URL('./fixtures/
 const drivingBanCalendars = calendarRules(maintained);
 const CLOCK = new Date('2026-09-26T13:50:05Z');
 const fresh = () => structuredClone(maintained);
-const render = data => snapshot(data, coverage, CLOCK);
+// The immutable 2026 fixture is rendered from its first valid day so historical legal examples remain testable.
+const render = data => snapshot(data, coverage, new Date('2026-09-01T10:00:00Z'));
 const unfolded = text => text.replace(/\r\n[ \t]/g,'');
 const uids = text => [...unfolded(text).matchAll(/^UID:(.+)$/gm)].map(m => m[1].trim());
 function syntheticNoBan(data, code = 'AL') {
@@ -21,7 +22,7 @@ function syntheticNoBan(data, code = 'AL') {
 export function registerDrivingBanTests(test, a) {
   test('exact authoritative central registry identities and active window records',()=>{
     const v=render(fresh()); a.equal(v.jurisdictions.length,coverage.length); a.deepEqual(v.jurisdictions.map(j=>[j.jurisdiction,j.name]),coverage);
-    a.equal(new Set(v.jurisdictions.map(j=>j.jurisdiction)).size,coverage.length); a.ok(v.jurisdictions.every(j=>j.period.from==='2026-09-01' && j.period.to==='2026-10-31'));
+    a.equal(new Set(v.jurisdictions.map(j=>j.jurisdiction)).size,coverage.length); a.ok(v.jurisdictions.every(j=>j.period.from==='2026-09-01' && j.period.to==='2027-09-01'));
   });
   test('current production dataset remains valid as independent releases evolve',()=>{a.equal(validateCanonical(current,coverage),true);const v=getDrivingBansSnapshot();a.equal(v.jurisdictions.length,coverage.length);a.deepEqual(uids(toIcs(v)).sort(),v.upcoming_events.map(e=>e.uid).sort());});
   test('duplicate semantic event with a different ID is rejected',()=>{const d=fresh();const copy=structuredClone(d.rules[0]);copy.ban_id='duplicate-different-id';d.rules.push(copy);a.throws(()=>render(d),/Duplicate semantic/);});
@@ -31,8 +32,8 @@ export function registerDrivingBanTests(test, a) {
   test('NO_BAN without PRIMARY_VERIFIED is rejected',()=>{const d=fresh();d.jurisdictions[1].ban_state='NO_BAN';a.throws(()=>validateCanonical(d,coverage));});
   test('NO_BAN needs primary evidence for all twelve scopes and the whole window',()=>{const d=fresh();const r=syntheticNoBan(d);r.scope_checks.night.evidence_ids=[];a.throws(()=>validateCanonical(d,coverage));});
   test('NO_BAN partial-period evidence is rejected',()=>{const d=fresh();const r=syntheticNoBan(d);r.no_ban_evidence[0].period={from:'2026-09-01',to:'2026-09-30'};a.throws(()=>validateCanonical(d,coverage));});
-  test('valid synthetic NO_BAN is explicit but never creates an ICS event',()=>{const d=fresh();syntheticNoBan(d);const v=render(d);a.equal(v.jurisdictions.find(j=>j.jurisdiction==='AL').ban_state,'NO_BAN');a.equal(uids(toIcs(v,{countries:['AL']})).length,0);});
-  test('NO_BAN conflicting with a verified prohibition is rejected',()=>{const d=fresh();syntheticNoBan(d,'AT');a.throws(()=>render(d));});
+  test('synthetic short-window NO_BAN is withdrawn across an unreviewed year',()=>{const d=fresh();syntheticNoBan(d);const v=render(d);a.equal(v.jurisdictions.find(j=>j.jurisdiction==='AL').ban_state,'UNKNOWN');a.equal(uids(toIcs(v,{countries:['AL']})).length,0);});
+  test('synthetic NO_BAN conflicting with a published prohibition never yields NO_BAN',()=>{const d=fresh();syntheticNoBan(d,'AT');const v=render(d);a.equal(v.jurisdictions.find(j=>j.jurisdiction==='AT').ban_state,'HAS_BAN');});
   test('UNKNOWN jurisdiction yields a valid empty ICS, not fake events',()=>{const v=render(fresh());const s=toIcs(v,{countries:['AL']});a.ok(s.includes('BEGIN:VCALENDAR'));a.equal(uids(s).length,0);a.ok(s.includes('X-DAJC-COVERAGE-COMPLETE:FALSE'));});
   test('HAS_BAN requires source and valid period',()=>{for(const field of ['source_url','valid_to']){const d=fresh();d.rules[0][field]='';a.throws(()=>validateCanonical(d,coverage));}});
   test('SOURCE_UNAVAILABLE never becomes NO_BAN and withdraws unsupported events',()=>{const d=invalidateSources(fresh(),['li-asv'],CLOCK.toISOString());const v=render(d);const r=v.jurisdictions.find(j=>j.jurisdiction==='LI');a.equal(r.verification_state,'SOURCE_UNAVAILABLE');a.equal(r.ban_state,'UNKNOWN');a.equal(v.events.filter(e=>e.jurisdiction==='LI').length,0);});
@@ -63,7 +64,7 @@ export function registerDrivingBanTests(test, a) {
   test('ICS physical lines respect RFC 75 octets and CRLF',()=>{const d=fresh();d.rules[0].title='Žluťoučký '.repeat(30);const s=toIcs(render(d),{upcoming:false});a.ok(s.endsWith('\r\n'));a.ok(s.split('\r\n').every(line=>Buffer.byteLength(line)<=75));});
   test('JSON/config/ICS share exactly the same maintained occurrences',()=>{const v=render(fresh());const projected=[];for(let day=new Date('2026-08-31T00:00:00Z');day<=new Date('2026-10-31T00:00:00Z');day=new Date(day.getTime()+604800000)){for(const rule of drivingBanCalendars){for(const e of rule.resolve(day,new Date(day.getTime()+518400000)).occurrences){if(v.events.some(x=>x.uid===e.uid))projected.push(e.uid);}}}a.deepEqual([...new Set(projected)].sort(),v.events.map(e=>e.uid).sort());});
   test('page and public endpoints import the single canonical entrypoint',()=>{for(const file of ['src/pages/driving-bans.astro','src/pages/api/driving-bans.ics.ts','src/pages/api/driving-bans.json.ts']){const s=readFileSync(new URL('../'+file,import.meta.url),'utf8');a.match(s,/getDrivingBansSnapshot/);a.ok(!s.includes('requestedCodes'));}for(const file of ['runtime.mjs','index.mjs'])a.match(readFileSync(new URL('../config/driving-ban-calendars/'+file,import.meta.url),'utf8'),/canonical.mjs/);});
-  test('calendar month rollover handles Prague midnight, year end and leap years',()=>{a.deepEqual(publicationWindow(new Date('2026-09-30T22:01:00Z')),{from:'2026-10-01',to:'2026-11-30',timezone:'Europe/Prague'});a.equal(publicationWindow(new Date('2026-12-15')).to,'2027-01-31');a.equal(publicationWindow(new Date('2028-01-15')).to,'2028-02-29');a.equal(isDate('2026-02-29'),false);});
+  test('rolling annual planning window handles Prague midnight, year end and leap years',()=>{a.deepEqual(publicationWindow(new Date('2026-09-30T22:01:00Z')),{from:'2026-10-01',to:'2027-10-01',timezone:'Europe/Prague'});a.equal(publicationWindow(new Date('2026-12-15T12:00:00Z')).to,'2027-12-15');a.equal(publicationWindow(new Date('2028-02-29T12:00:00Z')).to,'2029-02-28');a.equal(isDate('2026-02-29'),false);});
   test('old NO_BAN never rolls forward as verified',()=>{const d=fresh();syntheticNoBan(d);const v=snapshot(d,coverage,new Date('2026-10-01T12:00:00Z'));const j=v.jurisdictions.find(j=>j.jurisdiction==='AL');a.equal(j.ban_state,'UNKNOWN');a.equal(j.verification_state,'UNVERIFIED');a.equal(j.coverage_complete,false);});
   test('unreviewed future months contain no extrapolated occurrences',()=>{const v=snapshot(fresh(),coverage,new Date('2026-12-01T12:00:00Z'));a.equal(v.events.length,0);a.equal(v.jurisdictions.filter(j=>j.ban_state==='UNKNOWN').length,coverage.length);});
   test('scheduled full sweep is Thursday-only and includes the complete registry',()=>{a.equal(assertSweepRequest({mode:'full'},maintained,new Date('2026-10-01T08:00:00Z')).length,coverage.length);a.throws(()=>assertSweepRequest({mode:'full'},maintained,CLOCK),/Thursday/);});
