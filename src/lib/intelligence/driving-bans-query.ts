@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { isTrackedJurisdiction } from '../../../config/europe-coverage.mjs';
 import { localToUtc, shiftDate } from '../driving-bans/core.mjs';
 import { readPublishedDrivingBans } from './driving-bans-adapter';
-import { evaluateVehicleApplicability, findRouteConflicts, routeQuerySchema, vehicleQuerySchema, type PublishedEvent } from './driving-bans-relevance';
+import { evaluateVehicleApplicability, findRouteConflicts, isVerifiedForPeriod, routeQuerySchema, vehicleQuerySchema, type PublishedEvent } from './driving-bans-relevance';
 
 /**
  * The one Driving Bans query service (owner: the Driving Bans module). Deterministic,
@@ -42,7 +42,7 @@ export const queryInputSchemas = {
 } as const;
 const freeSearchSchema = queryInputSchemas.search_bans.omit({ vehicle: true });
 
-type JurisdictionRow = { jurisdiction: string; name: string; coverage_complete: boolean; verification_state: string; ban_state: string; coverage_failures: string[]; last_verified?: string | null; source_ids?: string[] };
+type JurisdictionRow = { jurisdiction: string; name: string; coverage_complete: boolean; verification_state: string; ban_state: string; coverage_failures: string[]; last_verified?: string | null; source_ids?: string[]; monthly_coverage?: Array<{ from: string; to: string; coverage_complete: boolean }> };
 type SourceRow = { source_id: string; url: string; authority: string; role: string; version: string; checked_at?: string | null; content_sha256?: string | null };
 /** The published snapshot (getDrivingBansSnapshot): window is the published period in Europe/Prague. */
 export type PublishedView = { events: PublishedEvent[]; jurisdictions: JurisdictionRow[]; window: { from: string; to: string }; dataset_version: string; sources?: SourceRow[] };
@@ -102,9 +102,9 @@ function insidePublishedPeriod(view: PublishedView, from: string, to: string): b
 }
 
 /** Outcome for one jurisdiction and period, given the verified events that apply to the question. */
-function outcomeOf(row: JurisdictionRow | undefined, applying: number, inside: boolean): JurisdictionOutcome {
+function outcomeOf(row: JurisdictionRow | undefined, applying: number, inside: boolean, covered: boolean): JurisdictionOutcome {
   if (applying > 0) return 'BAN_FOUND';
-  return row?.coverage_complete && inside ? 'NO_CONFIRMED_BAN' : 'INSUFFICIENT_VERIFIED_DATA';
+  return row && covered && inside ? 'NO_CONFIRMED_BAN' : 'INSUFFICIENT_VERIFIED_DATA';
 }
 
 /**
@@ -114,8 +114,8 @@ function outcomeOf(row: JurisdictionRow | undefined, applying: number, inside: b
  * INSUFFICIENT_VERIFIED_DATA because further restrictions may exist there. The free Ask
  * pipeline (PR #78, registryDecides) applies the same rule.
  */
-function overallStatus(outcomes: Record<string, JurisdictionOutcome>, rows: (code: string) => JurisdictionRow | undefined, undetermined: boolean): QueryStatus {
-  const decided = Object.entries(outcomes).every(([code, outcome]) => outcome !== 'INSUFFICIENT_VERIFIED_DATA' && rows(code)?.coverage_complete === true);
+function overallStatus(outcomes: Record<string, JurisdictionOutcome>, covered: Record<string, boolean>, undetermined: boolean): QueryStatus {
+  const decided = Object.entries(outcomes).every(([code, outcome]) => outcome !== 'INSUFFICIENT_VERIFIED_DATA' && covered[code] === true);
   return decided && !undetermined ? 'OK' : 'INSUFFICIENT_VERIFIED_DATA';
 }
 
@@ -138,7 +138,8 @@ export function evaluateDrivingBansQuery<Tool extends string>(args: { tool: Tool
     const events = view.events.filter(e => input.jurisdictions.includes(e.jurisdiction) && e.ends_at > input.from && e.starts_at < input.to);
     const evaluated = events.map(e => ({ event: e, vehicle: input.vehicle ? evaluateVehicleApplicability(e, input.vehicle) : null })).filter(item => item.vehicle?.status !== 'DOES_NOT_APPLY');
     const inside = insidePublishedPeriod(view, input.from, input.to);
-    const outcomes = Object.fromEntries(input.jurisdictions.map(code => [code, outcomeOf(row(code), evaluated.filter(item => item.event.jurisdiction === code).length, inside)])) as Record<string, JurisdictionOutcome>;
+    const covered = Object.fromEntries(input.jurisdictions.map(code => [code, inside && isVerifiedForPeriod(row(code), input.from, input.to)])) as Record<string, boolean>;
+    const outcomes = Object.fromEntries(input.jurisdictions.map(code => [code, outcomeOf(row(code), evaluated.filter(item => item.event.jurisdiction === code).length, inside, covered[code])])) as Record<string, JurisdictionOutcome>;
     const undecided = input.jurisdictions.filter(code => outcomes[code] === 'INSUFFICIENT_VERIFIED_DATA');
     const undetermined = evaluated.some(item => item.vehicle?.status === 'UNDETERMINED');
     const warnings = [
@@ -147,14 +148,17 @@ export function evaluateDrivingBansQuery<Tool extends string>(args: { tool: Tool
       ...(Object.values(outcomes).includes('NO_CONFIRMED_BAN') ? [NO_CONFIRMED_BAN_WARNING] : []),
       ...(undetermined ? [UNDETERMINED_WARNING] : []),
     ];
-    return envelope(tool, view, evaluated.map(item => item.event), evaluated.map(item => ({ ...factOf(item.event), vehicle: item.vehicle })), input.jurisdictions, warnings, disclaimer, overallStatus(outcomes, row, undetermined), undetermined, outcomes);
+    return envelope(tool, view, evaluated.map(item => item.event), evaluated.map(item => ({ ...factOf(item.event), vehicle: item.vehicle })), input.jurisdictions, warnings, disclaimer, overallStatus(outcomes, covered, undetermined), undetermined, outcomes);
   }
   if (tool === 'evaluate_vehicle') {
     const input = queryInputSchemas.evaluate_vehicle.parse(rawInput);
     const events = view.events.filter(e => e.jurisdiction === input.jurisdiction && e.starts_at <= input.at && e.ends_at > input.at);
     const evaluated = events.map(e => ({ event: e, vehicle: evaluateVehicleApplicability(e, input.vehicle) }));
     const applies = evaluated.filter(item => item.vehicle.status !== 'DOES_NOT_APPLY');
-    const outcome = outcomeOf(row(input.jurisdiction), applies.length, insidePublishedPeriod(view, input.at, input.at));
+    const atEnd = new Date(Date.parse(input.at) + 1000).toISOString();
+    const inside = insidePublishedPeriod(view, input.at, atEnd);
+    const covered = { [input.jurisdiction]: inside && isVerifiedForPeriod(row(input.jurisdiction), input.at, atEnd) };
+    const outcome = outcomeOf(row(input.jurisdiction), applies.length, inside, covered[input.jurisdiction]);
     const undetermined = applies.some(item => item.vehicle.status === 'UNDETERMINED');
     const warnings = [
       ...(outcome === 'INSUFFICIENT_VERIFIED_DATA' ? [`${input.jurisdiction}: no verified ban applies at ${input.at} for this vehicle, but coverage does not prove that none exists.`] : []),
@@ -163,7 +167,7 @@ export function evaluateDrivingBansQuery<Tool extends string>(args: { tool: Tool
       ...(undetermined ? [UNDETERMINED_WARNING] : []),
     ];
     const outcomes = { [input.jurisdiction]: outcome };
-    return envelope(tool, view, applies.map(item => item.event), applies.map(item => ({ ...factOf(item.event), vehicle: item.vehicle })), [input.jurisdiction], warnings, disclaimer, overallStatus(outcomes, row, undetermined), undetermined, outcomes);
+    return envelope(tool, view, applies.map(item => item.event), applies.map(item => ({ ...factOf(item.event), vehicle: item.vehicle })), [input.jurisdiction], warnings, disclaimer, overallStatus(outcomes, covered, undetermined), undetermined, outcomes);
   }
   if (tool === 'check_route') {
     const input = queryInputSchemas.check_route.parse(rawInput);

@@ -148,7 +148,7 @@ describe('approved geographic scope and data preservation', () => {
 
   it('exports official web review tasks for the central registry without claiming a fresh complete sweep', () => {
     const plan = buildDrivingBanVerificationPlan(new Date('2026-12-22T10:00:00Z'));
-    expect(plan.window).toMatchObject({from:'2026-12-01',to:'2027-01-31'});
+    expect(plan.window).toMatchObject({from:'2026-12-22',to:'2027-12-22'});
     expect(plan.jurisdictions.map(row=>row.jurisdiction)).toEqual(expected);
     for (const code of ['AT','DE','ES','BE','UK','PT']) expect(plan.jurisdictions.find(row=>row.jurisdiction===code).official_source_seeds.length).toBeGreaterThan(0);
     for (const code of ['KZ','RU','TR']) expect(plan.jurisdictions.find(row=>row.jurisdiction===code).road_classes).toEqual(['motorway','main_road']);

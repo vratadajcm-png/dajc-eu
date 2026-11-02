@@ -85,7 +85,7 @@ describe('research run: official documents to drafts (scenarios 1, 2, 6, 7)', ()
     expect(report.ai_analysis).toMatchObject({ status: 'OK', documents_analyzed: 2 });
     expect(report.independent_check).toMatchObject({ performed: 1, agreed: 1, disagreed: 0 });
     expect(report.legal_verification).toMatchObject({ status: 'NOT_PERFORMED_BY_AI', drafts_awaiting_human_review: 1 });
-    expect(report.registry_completeness).toMatchObject({ tracked: 50, coverage_complete: 11 });
+    expect(report.registry_completeness).toMatchObject({ tracked: 50, coverage_complete: 0 }); // the future full-year horizon is not yet legally reviewed
     expect(report.statement).toMatch(/1 of 1 requested jurisdictions processed \(50 tracked\).*not a legal verification/);
     expect(report.calls.every((call: any) => !('user' in call) && !('system' in call))).toBe(true);
     expect(report.cost_usd).toBeGreaterThan(0);
@@ -352,7 +352,7 @@ describe('outage, budget and repeated runs (scenarios 16, 17, 18)', () => {
     expect(docOutcome(report, URLS.measure).outcome).toBe('NOT_ANALYZED_BUDGET');
     expect(report.drafts).toEqual([]);
     expect(report.technical.status).toBe('COMPLETED_WITH_AI_STOPPED');
-    expect(report.registry_completeness.coverage_complete).toBe(11);
+    expect(report.registry_completeness.coverage_complete).toBe(0); // AI cannot fill gaps in unissued future law
     expect(report.jurisdictions_processed).toBe(2);
     expect(context.ai.log.length).toBe(0);
   });

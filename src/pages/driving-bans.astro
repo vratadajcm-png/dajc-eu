@@ -17,7 +17,7 @@ type Weight = { any_of?: Weight[]; all_of?: Weight[]; operator?: string; value?:
 const weightText = (w: Weight): string => w.any_of ? w.any_of.map(weightText).join(label(' OR ', ' NEBO ')) : w.all_of ? w.all_of.map(weightText).join(label(' AND ', ' A ')) : w.operator === 'any' ? `${w.applies_to} (${label('any mass', 'bez hmotnostní hranice')})` : `${w.applies_to} ${w.operator} ${w.unit === 'kg' ? `${(w.value ?? 0) / 1000} t` : `${w.value} ${w.unit}`}`;
 const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO_BAN' ? label('No driving bans', 'Bez zákazu') : j.ban_state === 'HAS_BAN' ? label(`${j.event_count} verified events in this period`, `${j.event_count} ověřených událostí v období`) + (j.coverage_complete ? '' : label(' · review incomplete', ' · ověření neúplné')) : label('Verification in progress', 'Ověření probíhá');
 ---
-<BaseLayout title={title} description={`Verified HGV restrictions and explicit verification status for all ${tracked} DAJC jurisdictions. Current and next calendar month.`}>
+<BaseLayout title={title} description={`Verified HGV restrictions and explicit verification status for all ${tracked} DAJC jurisdictions. Rolling 12-month planning horizon.`}>
   <section class="bans-page" data-window={view.window.from}>
     <header>
       <p class="eyebrow">DAJC INTELLIGENCE</p>
@@ -29,7 +29,7 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
     <aside class="notice" role="note">
       <strong>{label(`${tracked} tracked jurisdictions does not mean ${tracked} verified jurisdictions.`, `${tracked} sledovaných jurisdikcí neznamená ${tracked} ověřených jurisdikcí.`)}</strong>
       <p>{label('Verified individual bans can be available while the full country review is incomplete. Missing events never mean unrestricted travel. “No driving bans” is shown only after a complete primary-source review of this entire period.', 'Jednotlivé zákazy mohou být ověřené, i když celková kontrola země není dokončena. Chybějící události nikdy neznamenají volný průjezd. „Bez zákazu“ se zobrazí pouze po úplném ověření celého období z primárních zdrojů.')}</p>
-      <p>{label('Scheduled full review: Thursday. Urgent changes may trigger a targeted recheck. Always confirm the current official source and your transport permit before departure.', 'Plánovaná úplná kontrola: čtvrtek. Naléhavá změna může vyvolat cílené ověření. Před jízdou vždy zkontrolujte aktuální úřední zdroj a své povolení.')}</p>
+      <p>{label('The rolling 12-month calendar is checked weekly on Thursday; future annual decrees may not yet have been published. Urgent changes may trigger a targeted recheck. Always confirm the current official source and your transport permit before departure.', 'Klouzavý dvanáctiměsíční kalendář se kontroluje každý čtvrtek; budoucí roční předpisy ještě nemusely vyjít. Naléhavá změna může vyvolat cílené ověření. Před jízdou vždy zkontrolujte aktuální úřední zdroj a své povolení.')}</p>
     </aside>
     <p class="stats">{tracked} / {tracked} {label('tracked', 'sledováno')} · {banStateText('HAS_BAN', cs)}: {count('HAS_BAN')} · {banStateText('NO_BAN', cs)}: {count('NO_BAN')} · {banStateText('UNKNOWN', cs)}: {count('UNKNOWN')} · {view.jurisdictions.filter(j => j.coverage_complete).length} / {tracked} {label('fully verified', 'úplně ověřeno')}</p>
     <form id="ban-filters" class="controls">
@@ -48,6 +48,7 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
         <summary><strong>{j.name}</strong> <span class="code">{j.jurisdiction}</span> <span class="status">{statusText(j)}</span></summary>
         <div class="country-body">
           <p>{label('Period', 'Období')}: {j.period.from} — {j.period.to}. <strong>{verificationStateText(j.verification_state, cs)}</strong></p>
+          <p>{label('Verified month portions', 'Ověřené části měsíců')}: {j.monthly_coverage.filter(m => m.coverage_complete).length} / {j.monthly_coverage.length}. {label('A future period awaiting publication or review is not NO_BAN.', 'Budoucí období čekající na vydání předpisu nebo ověření neznamená bez zákazu.')}</p>
           <p>{label('Last checked', 'Poslední kontrola')}: {format(j.last_checked)} · {label('Full-period verification', 'Ověření celého období')}: {format(j.last_verified)}</p>
           {!j.coverage_complete && <p class="notice">{label('Full jurisdiction verification is incomplete. Additional restrictions may exist; do not interpret missing events as “no ban”.', 'Ověření celé jurisdikce není dokončeno. Mohou existovat další omezení; chybějící události neznamenají „Bez zákazu“.')}</p>}
           {j.coverage_failures.length > 0 && <div class="small"><p>{label('Open review items', 'Otevřené body ověření')}:</p><ul>{openItemTexts(j.coverage_failures, cs).map(text => <li>{text}</li>)}</ul></div>}

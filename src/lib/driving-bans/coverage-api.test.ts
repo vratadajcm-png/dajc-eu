@@ -6,13 +6,13 @@ import { getDrivingBansSnapshot } from '../../../config/driving-ban-calendars/ru
 
 afterEach(() => vi.useRealTimers());
 describe('actual JSON and ICS route contract', () => {
-  it('exports the same current+next-month registry, verified events and UTC times', async () => {
+  it('exports the same rolling 12-month registry, verified events and UTC times', async () => {
     vi.useFakeTimers(); vi.setSystemTime(new Date('2026-10-22T10:00:00Z'));
     const response = await jsonGet({} as any);
     const json = await response.json();
     expect(json).toEqual(getDrivingBansSnapshot());
     expect(json.jurisdictions.map((row: any) => row.jurisdiction)).toEqual(dajcEuropeCoverage.map(([code])=>code));
-    expect(json.window).toMatchObject({from:'2026-10-01',to:'2026-11-30'});
+    expect(json.window).toMatchObject({from:'2026-10-22',to:'2027-10-22'});
     for (const history of [false,true]) {
       const response = await icsGet({request:new Request(`https://example.test/api/driving-bans.ics${history?'?history=1':''}`)} as any);
       const ics = (await response.text()).replace(/\r\n[ \t]/g,'');
