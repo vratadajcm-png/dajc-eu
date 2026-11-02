@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { isTrackedJurisdiction } from '../../../config/europe-coverage.mjs';
+import { localToUtc, shiftDate } from '../driving-bans/core.mjs';
 
 /**
  * Vehicle-aware and route-aware evaluation of published Driving Bans events for
@@ -129,14 +130,34 @@ const GENERIC = /\b(network|whole|entire|all public roads|all roads)\b/i;
 const roadToken = (value: string) => value.toUpperCase().replace(/[\s-]/g, '');
 const roadIds = (text: string) => (text.match(/\b(?:[A-Z]{1,3}[- ]?\d{1,4}[A-Z]?)\b/g) || []).map(roadToken);
 
-type JurisdictionView = { jurisdiction: string; coverage_complete: boolean; verification_state: string; ban_state: string };
+export type JurisdictionView = { jurisdiction: string; coverage_complete: boolean; verification_state: string; ban_state: string; monthly_coverage?: Array<{ from: string; to: string; coverage_complete: boolean }> };
+
+/** Legal completeness is scoped to the exact requested UTC interval, not the whole planning year.
+ * Each monthly segment is backed by the canonical reviewed span; gaps always fail closed.
+ */
+export function isVerifiedForPeriod(row: JurisdictionView | null | undefined, from: string, to: string): boolean {
+  if (!row || !Number.isFinite(Date.parse(from)) || !Number.isFinite(Date.parse(to)) || from >= to) return false;
+  if (!row.monthly_coverage) return row.coverage_complete;
+  let coveredThrough = Date.parse(from);
+  const end = Date.parse(to);
+  for (const segment of row.monthly_coverage) {
+    if (!segment.coverage_complete) continue;
+    const startMs = Date.parse(localToUtc(segment.from, '00:00', 'Europe/Prague'));
+    const endMs = Date.parse(localToUtc(shiftDate(segment.to, 1), '00:00', 'Europe/Prague'));
+    if (startMs > coveredThrough) break;
+    if (endMs > coveredThrough) coveredThrough = endMs;
+    if (coveredThrough >= end) return true;
+  }
+  return false;
+}
+
 export function findRouteConflicts(view: { events: PublishedEvent[]; jurisdictions: JurisdictionView[]; window: { from: string; to: string } }, input: RouteQuery, vehicleInput?: VehicleQuery) {
   const route = routeQuerySchema.parse(input);
   const conflicts: Array<Record<string, unknown>> = [];
   const gaps: Array<Record<string, unknown>> = [];
   route.segments.forEach((segment, index) => {
     const coverage = view.jurisdictions.find(row => row.jurisdiction === segment.jurisdiction);
-    if (!coverage?.coverage_complete) gaps.push({ segment: index, jurisdiction: segment.jurisdiction, verification_state: coverage?.verification_state ?? 'UNVERIFIED', reason: 'Jurisdiction coverage is not completely verified; missing events are not evidence of no ban.' });
+    if (!isVerifiedForPeriod(coverage, segment.enterAt, segment.exitAt)) gaps.push({ segment: index, jurisdiction: segment.jurisdiction, verification_state: coverage?.verification_state ?? 'UNVERIFIED', reason: 'Jurisdiction coverage is not completely verified for this segment; missing events are not evidence of no ban.' });
     if (segment.enterAt.slice(0, 10) < view.window.from || segment.exitAt.slice(0, 10) > view.window.to) gaps.push({ segment: index, jurisdiction: segment.jurisdiction, reason: `Segment time is outside the published window ${view.window.from}-${view.window.to}.` });
     const wanted = new Set(segment.roads.flatMap(roadIds));
     for (const event of view.events) {
