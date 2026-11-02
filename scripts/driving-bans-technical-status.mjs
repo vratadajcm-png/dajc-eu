@@ -20,6 +20,8 @@ const recentEnough = typeof age === 'number' && Number.isFinite(age) && age >= 0
 const stale = !reviewedSpanOk || !recentEnough;
 const result = {
   mode: 'technical_only',
+  technical_check: 'TECHNICAL_CHECK_COMPLETE',
+  legal_review: 'NOT_PERFORMED',
   technical_validation: 'passed',
   legal_review_performed: false,
   legal_freshness: stale ? 'stale_or_unconfirmed' : 'age_window_only_not_legally_rechecked',
