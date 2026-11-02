@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SYNTHETIC FIXTURE for the DAJC connector contract. Not provider data. -->
+<d2LogicalModel xmlns="http://datex2.eu/schema/2/2_0" modelBaseVersion="2">
+  <payloadPublication lang="en">
+    <publicationTime>2026-10-27T08:00:00Z</publicationTime>
+    <situation id="SYN-SIT-1">
+      <situationRecord id="SYN-REC-1" version="3">
+        <situationRecordCreationTime>2026-10-26T12:00:00Z</situationRecordCreationTime>
+        <validity>
+          <validityTimeSpecification>
+            <overallStartTime>2026-11-02T06:00:00Z</overallStartTime>
+            <overallEndTime>2026-11-06T18:00:00Z</overallEndTime>
+          </validityTimeSpecification>
+        </validity>
+        <groupOfLocations><roadNumber>M1</roadNumber></groupOfLocations>
+        <vehicleCharacteristics>
+          <grossWeightCharacteristic>
+            <comparisonOperator>greaterThan</comparisonOperator>
+            <grossVehicleWeight>12.0</grossVehicleWeight>
+          </grossWeightCharacteristic>
+        </vehicleCharacteristics>
+        <generalPublicComment><comment><values><value lang="en">Synthetic road works restriction for heavy vehicles</value></values></comment></generalPublicComment>
+      </situationRecord>
+    </situation>
+  </payloadPublication>
+</d2LogicalModel>

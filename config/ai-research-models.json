@@ -1,0 +1,82 @@
+{
+  "profile_id": "bakeoff-2026-10-25",
+  "status": "provisional",
+  "evidence_file": "data/ai-benchmark/bakeoff-2026-10-25.json",
+  "evidence_scope": "Grounded question answering over a registry extract: 26 cases in 10 languages, with unknown, advice-trap, injection and false-premise cases. Direct evidence for explaining approved data; indirect evidence for legal extraction and verification; no evidence for document retrieval or PDF reading.",
+  "activation": "Used only when DAJC_RESEARCH_MODEL_PROFILE equals profile_id. Explicit DAJC_RESEARCH_* model, price, route and interval settings always win. Keys are never part of the profile.",
+  "price_source": "vratadajcm-png/dajc-ai-lab run-profile.json, list prices verified 2026-10-25; USD per 1M tokens; reference estimates, not invoices.",
+  "ai_lab": {
+    "name": "DAJC AI Lab – Multi-Model Research & Testing",
+    "repository": "vratadajcm-png/dajc-ai-lab",
+    "former_repository": "vratadajcm-png/dajc-ai-bakeoff",
+    "renamed_on": "2026-10-30",
+    "live_evidence_file": "data/ai-benchmark/live-checks-2026-10.json",
+    "provides": ["benchmark results", "live-check evidence", "recommended model configuration"],
+    "never": ["writes canonical.json", "approves legal changes", "activates customer features", "shares API keys"]
+  },
+  "minimum_completed_answers": 20,
+  "evidence_category": "grounded-qa-registry",
+  "benchmark_relevance": {
+    "grounded-qa-registry": { "explain": "BENCHMARK_DIRECT", "extract": "BENCHMARK_INDIRECT", "extract_complex": "BENCHMARK_INDIRECT", "verify": "BENCHMARK_INDIRECT", "conflicts": "BENCHMARK_INDIRECT" }
+  },
+  "evidence_levels": {
+    "LIVE_EXTRACTION_VERIFIED": "Used in this role in a live AI Lab run whose draft passed every check and reached human review.",
+    "BENCHMARK_DIRECT": "Benchmark of this very task.",
+    "BENCHMARK_INDIRECT": "Benchmark of a related task (grounded answering over registry data); provisional for this task.",
+    "API_SMOKE_ONLY": "The API answered a live smoke test; nothing about quality.",
+    "NOT_BENCHMARKED": "No completed answers or no evidence relevant to this task.",
+    "UNAVAILABLE": "The account or tier refused requests in the AI Lab, or the model is excluded until a smoke test passes; not a quality result."
+  },
+  "policy": {
+    "policy_id": "dajc-ai-2026-10-30",
+    "approved_by": "owner (DAJC AI Lab integration brief of 2026-10-30)",
+    "approved_on": "2026-10-30",
+    "change_control": "Only a reviewed pull request approved by the owner changes this policy. AI Lab results produce proposals (proposePolicyUpdate); a score never activates a model by itself.",
+    "eligible_levels": {
+      "extract": ["LIVE_EXTRACTION_VERIFIED", "BENCHMARK_INDIRECT"],
+      "extract_complex": ["LIVE_EXTRACTION_VERIFIED", "BENCHMARK_INDIRECT"],
+      "verify": ["LIVE_EXTRACTION_VERIFIED", "BENCHMARK_INDIRECT"],
+      "explain": ["BENCHMARK_DIRECT", "LIVE_EXTRACTION_VERIFIED"]
+    },
+    "tested_languages": {
+      "languages": ["cs", "de"],
+      "evidence": "AI Lab live extractions from official documents: cs (cz-sun, Czech act, registry rule matched; runs 40974550043, 40995210487), de (Tyrol B 179 order, REVIEW_REQUIRED draft; run 40996822080).",
+      "rule": "A document in any other language, or of unknown language, goes to the complex route (DAJC_RESEARCH_TESTED_LANGUAGES)."
+    },
+    "tasks": {
+      "discover": { "task_class": "DISCOVERY", "service": "perplexity", "fallback": "official registry sources, authority domains and leads (deterministic retrieval)" },
+      "extract": { "task_class": "EXTRACT_STANDARD", "primary": "gemini/gemini-3.5-flash-lite", "escalation": "openai/gpt-6-sol", "second_reading": ["xai/grok-4.7"] },
+      "extract_complex": { "task_class": "EXTRACT_COMPLEX", "primary": "openai/gpt-6-sol", "fallback": ["gemini/gemini-3.5-flash-lite", "xai/grok-4.7"] },
+      "verify": { "task_class": "INDEPENDENT_VERIFICATION", "rule": "another vendor than the extraction that is used", "candidates": ["gemini/gemini-3.5-flash-lite", "xai/grok-4.7", "openai/gpt-6-luna"] },
+      "conflicts": { "task_class": "CHANGE_ANALYSIS", "engine": "deterministic: checkRules, detectChanges, sourceConflicts", "ai_supplement": "the independent check" },
+      "explain": { "task_class": "EXPLAIN_VERIFIED_DATA", "primary": "openai/gpt-6-luna", "escalation": "openai/gpt-6-sol" },
+      "articles": { "task_class": "EXPERT_ARTICLES", "service": "the existing Claude pipeline of the Weekly, outside this orchestrator" }
+    }
+  },
+  "weights": {
+    "extract": { "quality": 0.55, "reliability": 0.25, "cost": 0.1, "latency": 0.1, "unverified_claim_penalty": 0.5 },
+    "verify": { "quality": 0.45, "reliability": 0.25, "cost": 0.2, "latency": 0.1, "unverified_claim_penalty": 0.5 },
+    "conflicts": { "quality": 0.45, "reliability": 0.25, "cost": 0.2, "latency": 0.1, "unverified_claim_penalty": 0.5 },
+    "explain": { "quality": 0.5, "reliability": 0.2, "cost": 0.2, "latency": 0.1, "unverified_claim_penalty": 0.5 }
+  },
+  "candidates": [
+    { "provider": "openai", "model": "gpt-6-sol", "input": 2, "output": 10, "reasoning_effort": "none" },
+    { "provider": "openai", "model": "gpt-6-luna", "input": 0.1, "output": 0.5, "reasoning_effort": "none" },
+    { "provider": "openai", "model": "gpt-5.4-mini", "input": 0.75, "output": 4.5, "reasoning_effort": "none" },
+    { "provider": "gemini", "model": "gemini-3.5-flash-lite", "input": 0.3, "output": 2.5, "min_interval_ms": 15000, "note": "Needed pacing: 9/26 answers unpaced, 26/26 with a 15 s interval." },
+    { "provider": "gemini", "model": "gemini-3.5-flash", "served_as": "gemini-3.6-flash", "input": 1.5, "output": 9, "min_interval_ms": 15000, "price_status": "user reference rate, not current billing", "note": "Google routes this ID to Gemini 3.6 Flash; 5 of 26 cases stayed at HTTP 503 high demand." },
+    { "provider": "xai", "model": "grok-4.7", "input": 2, "output": 6, "reasoning_effort": "low" },
+    { "provider": "anthropic", "model": "claude-sonnet-5-5", "input": 2, "output": 10, "excluded_until_smoke_test": "Bake-off key had no credit (HTTP 400). The dajc-eu key served claude-sonnet-5-5 and claude-haiku-5-5 with output_config.format in the Weekly on 2026-10-29, but no case of this test set was answered." },
+    { "provider": "anthropic", "model": "claude-haiku-5-5", "input": 0.1, "output": 0.5, "excluded_until_smoke_test": "Bake-off key had no credit (HTTP 400); not benchmarked." },
+    { "provider": "mistral", "model": "mistral-small-2603", "input": 0.15, "output": 0.6, "excluded_until_smoke_test": "HTTP 429 rate_limited from the first request, also with 15-120 s waits: tier limit; check Mistral console limits." },
+    { "provider": "mistral", "model": "mistral-medium-3-5", "input": 1.5, "output": 7.5, "excluded_until_smoke_test": "HTTP 429 rate_limited from the first request: tier limit." },
+    { "provider": "mistral", "model": "mistral-large-2512", "input": 0.5, "output": 1.5, "excluded_until_smoke_test": "HTTP 403 tier_not_allowed: model not in the subscription tier." }
+  ],
+  "search": { "provider": "perplexity", "price_per_request": 0.005, "evidence": "Perplexity Search served the dajc-eu Weekly discovery on 2026-10-29 (Final data refresh step); not part of the bake-off. Price is a reference, check the contract." },
+  "data_terms": [
+    "Research sends only public legal documents (data class public-legal); customer vehicles, routes and organisations never go to a research provider.",
+    "OpenAI requests use store: false.",
+    "Gemini: check the Gemini API Additional Terms for the tier in use; content sent on unpaid tiers may be used by Google to improve products.",
+    "Mistral is the EU-seated option; currently blocked by the account tier."
+  ]
+}
