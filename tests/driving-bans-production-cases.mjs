@@ -95,7 +95,7 @@ export function registerProductionDrivingBanTests(test, a) {
     a.ok(!es.some(e => e.ban_id.startsWith('es-annex2-oct-2026-')), 'legacy rows superseded');
     const nov = at(new Date('2026-10-01T08:00:00Z')).events.filter(e => e.jurisdiction === 'ES');
     a.ok(nov.some(e => e.date === '2026-11-28' && e.roads[0].startsWith('CV-383')));
-    a.ok(!nov.some(e => ['2026-11-20', '2026-11-21', '2026-11-22'].includes(e.date)));
+    a.ok(!nov.some(e => e.ban_id.startsWith('es-a2-') && ['2026-11-20', '2026-11-21', '2026-11-22'].includes(e.date)), 'no Annex II row on the original GP dates');
     a.equal(current.rules.filter(r => r.ban_id.startsWith('es-annex2-oct-2026-')).every(r => r.status === 'SUPERSEDED'), true);
   });
   test('regression Sep 2026 — Bulgaria: >12t Independence Day 18 Sep outbound and 22 Sep toward Sofia', () => {
@@ -229,6 +229,33 @@ export function registerProductionDrivingBanTests(test, a) {
     const log = JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-10-27-nov-dec.json', import.meta.url), 'utf8'));
     a.equal(log.full_registry_sweep, false);
     a.deepEqual(log.coverage_matrix.map(row => row.jurisdiction), coverage.map(([code]) => code));
+    const sources = new Map(current.sources.map(s => [s.source_id, s]));
+    for (const r of log.retrievals.filter(row => row.source_id)) a.equal(sources.get(r.source_id)?.content_sha256, r.sha256, r.source_id);
+  });
+  // 2 Nov 2026 targeted review of ES and DE (data/driving-bans/source-reviews/2026-11-02-es-de.json).
+  test('2 Nov 2026 — Spain: Annex VII, Catalonia and Basque Country November rows; ES stays fail-closed', () => {
+    const v = at(NOVDEC);
+    const basque = ev(v, 'es-bas-a2-2026-11-11-cross-border');
+    a.equal(basque.length, 1);
+    a.equal(basque[0].starts_at, '2026-11-10T21:00:00.000Z');
+    a.equal(basque[0].ends_at, '2026-11-11T21:00:00.000Z');
+    a.ok(/cross-border transport only/.test(basque[0].vehicle_scope));
+    a.deepEqual(ev(v, 'es-cat-n-ii-630-682-saturdays').map(e => e.date), ['2026-11-07', '2026-11-14', '2026-11-21', '2026-11-28']);
+    a.deepEqual(ev(v, 'es-cat-n-ii-630-682-sundays').map(e => [e.date, e.start_time, e.end_time]), ['01', '08', '15', '22', '29'].map(d => [`2026-11-${d}`, '17:00', '22:00']));
+    a.deepEqual(ev(v, 'es-cat-pyrenees-winter-saturdays-2026-11-12').map(e => e.date), ['2026-11-28']);
+    a.equal(ev(v, 'es-a7-n-340-957-997-mma-7500').length, 30);
+    a.deepEqual(one(v, 'es-a7-n-232-446-330-axles-4', '2026-11-15').weight_threshold, {operator: '>=', value: 4, unit: 'axles', applies_to: 'number of axles of the goods vehicle / combination'});
+    a.equal(one(v, 'es-cat-gt26t-n-ii-n-240-n-340-permanent', '2026-11-15').weight_threshold.value, 26000);
+    a.ok(!v.events.some(e => e.jurisdiction === 'ES' && e.date >= '2026-12-01'), 'December 2026 not reviewed for ES');
+    const es = v.jurisdictions.find(j => j.jurisdiction === 'ES');
+    a.equal(es.coverage_complete, false);
+    a.equal(es.scope_checks.corridors.state, 'UNVERIFIED');
+    a.ok(es.coverage_failures.includes('ES_DECEMBER_2026_ANNEX_II_AND_REGIONAL_ROWS_NOT_ENCODED'));
+    const de = v.jurisdictions.find(j => j.jurisdiction === 'DE');
+    a.equal(de.coverage_complete, false);
+    a.ok(de.coverage_failures.includes('LOW_WATER_EXEMPTIONS_AFTER_2026_10_31_NOT_PRIMARY_CONFIRMED'));
+    const log = JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-11-02-es-de.json', import.meta.url), 'utf8'));
+    a.equal(log.full_registry_sweep, false);
     const sources = new Map(current.sources.map(s => [s.source_id, s]));
     for (const r of log.retrievals.filter(row => row.source_id)) a.equal(sources.get(r.source_id)?.content_sha256, r.sha256, r.source_id);
   });
