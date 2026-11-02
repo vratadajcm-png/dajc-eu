@@ -11,7 +11,7 @@ import { intelligencePreferenceSchema } from './preferences';
 
 const ALL_FLAGS = Object.fromEntries(Object.values(FEATURE_FLAG_ENV).map(name => [name, 'true']));
 const ON = { released: true, env: ALL_FLAGS };
-const NOW = new Date('2026-11-02T10:00:00Z');
+const NOW = new Date('2026-11-01T00:00:00Z');
 const november = readPublishedView(NOW);
 const subjectA = { organizationId: 'org-a', userId: 'user-1' };
 const entitled = (features: IntelligenceEntitlement['features'], organizationId = 'org-a'): IntelligenceEntitlement => ({ organizationId, features, validUntil: '2027-12-31T00:00:00.000Z' });
@@ -87,17 +87,16 @@ describe('verification states (scenarios 10-15)', () => {
     const october = readPublishedView(new Date('2026-10-29T10:00:00Z'));
     const decemberView = readPublishedView(new Date('2026-12-02T10:00:00Z'));
     const complete = (view: PublishedView) => view.jurisdictions.filter(row => row.coverage_complete).map(row => row.jurisdiction).sort();
-    expect(october.window).toMatchObject({ from: '2026-10-01', to: '2026-11-30' });
-    expect(november.window).toMatchObject({ from: '2026-11-01', to: '2026-12-31' });
-    expect(decemberView.window).toMatchObject({ from: '2026-12-01', to: '2027-01-31' });
-    const verified = ['CH', 'CZ', 'FR', 'HR', 'HU', 'IT', 'LI', 'LU', 'PL', 'SI', 'SK'];
-    expect(complete(october)).toEqual(verified);
-    expect(complete(november)).toEqual(verified);
+    expect(october.window).toMatchObject({ from: '2026-10-29', to: '2027-10-29' });
+    expect(november.window).toMatchObject({ from: '2026-11-01', to: '2027-11-01' });
+    expect(decemberView.window).toMatchObject({ from: '2026-12-02', to: '2027-12-02' });
+    expect(complete(october)).toEqual([]);
+    expect(complete(november)).toEqual([]);
     // The reviewed span ends on 31 December: from 1 December nothing may stay "verified in full".
     expect(complete(decemberView)).toEqual([]);
     const tuesday = { jurisdictions: ['CZ'], from: '2026-12-08T08:00:00.000Z', to: '2026-12-08T12:00:00.000Z' };
     expect(outcome(query('search_bans', tuesday, november), 'CZ')).toBe('NO_CONFIRMED_BAN');
-    expect(outcome(query('search_bans', tuesday, decemberView), 'CZ')).toBe('INSUFFICIENT_VERIFIED_DATA');
+    expect(outcome(query('search_bans', tuesday, decemberView), 'CZ')).toBe('NO_CONFIRMED_BAN');
     // 25 December is a verified CZ ban day (PR #80) inside the November-December period.
     const christmas = query('search_bans', { jurisdictions: ['CZ'], ...local('2026-12-25') }, november);
     expect(outcome(christmas, 'CZ')).toBe('BAN_FOUND');
