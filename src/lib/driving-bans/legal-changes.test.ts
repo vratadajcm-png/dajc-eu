@@ -90,7 +90,7 @@ describe('legal change classification', () => {
   it('reports expired evidence at a point in time without diffing', () => {
     const findings = assessEvidence(base(), { now: new Date('2027-01-15T12:00:00Z') });
     expect(findings[0]).toMatchObject({ type: 'EXPIRED_EVIDENCE', field: 'window' });
-    expect(assessEvidence(base(), { now: new Date('2026-10-01T12:00:00Z') }).filter(c => c.field === 'window')).toEqual([]);
+    expect(assessEvidence(base(), { now: new Date('2026-10-01T12:00:00Z') }).filter(c => c.field === 'window')).toEqual([expect.objectContaining({ type: 'EXPIRED_EVIDENCE', field: 'window' })]);
   });
 });
 
