@@ -11,7 +11,9 @@ socialPublish: true
 tags: ["media partnerships", "heavy transport", "intelligence", "research"]
 ---
 
-As DAJC Platform progresses towards pre-production testing in January 2027, we are exploring three ways to collaborate with the European heavy and oversized transport community **separately from the Platform and its future integration ecosystem**.
+**Schedule update — 27 October 2026:** DAJC Platform pre-production testing is now planned for **Q3 2027 (July–September)**, not January 2027. The exact start date will be confirmed later.
+
+As DAJC Platform progresses towards pre-production testing in Q3 2027, we are exploring three ways to collaborate with the European heavy and oversized transport community **separately from the Platform and its future integration ecosystem**.
 
 ## DAJC Media Partnerships — sponsored editorial
 
