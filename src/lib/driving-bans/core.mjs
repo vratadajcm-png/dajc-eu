@@ -220,7 +220,7 @@ export function snapshot(data, identities, now = new Date()) {
     assert(!(canKeepNoBan && rules.length), `NO_BAN conflicts with an actual ban ${row.jurisdiction}`);
     const failures = [...row.coverage_failures];
     if (staleWindow) failures.push('ACTIVE_WINDOW_NOT_REVERIFIED');
-    return { ...row, period: { from: window.from, to: window.to }, monthly_coverage, ban_state: rules.length ? 'HAS_BAN' : canKeepNoBan ? 'NO_BAN' : 'UNKNOWN', verification_state: staleWindow ? 'UNVERIFIED' : row.verification_state, coverage_complete: !staleWindow && row.coverage_complete, coverage_failures: [...new Set(failures)], event_count: rules.length, last_verified: row.last_verified };
+    return { ...row, period: { from: window.from, to: window.to }, monthly_coverage, ban_state: rules.length ? 'HAS_BAN' : canKeepNoBan ? 'NO_BAN' : 'UNKNOWN', verification_state: row.verification_state === 'SOURCE_UNAVAILABLE' ? 'SOURCE_UNAVAILABLE' : staleWindow ? 'UNVERIFIED' : row.verification_state, coverage_complete: !staleWindow && row.coverage_complete, coverage_failures: [...new Set(failures)], event_count: rules.length, last_verified: row.last_verified };
   });
   return { schema_version: 1, coverage_version: COVERAGE_VERSION, geographic_scope: geographicScopePolicy, dataset_version: data.dataset_version, generated_at: now.toISOString(), window, jurisdictions, events, upcoming_events: events.filter(e => e.ends_at > now.toISOString()), sources: data.sources, complete: jurisdictions.every(r => r.coverage_complete) };
 }
