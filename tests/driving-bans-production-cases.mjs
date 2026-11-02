@@ -125,7 +125,7 @@ export function registerProductionDrivingBanTests(test, a) {
     const v = at();
     a.equal(ev(v, 'de-sunday').filter(e => e.date <= '2026-10-31').length, 8); a.ok(one(v, 'de-holiday-2026-10-03', '2026-10-03'));
     a.deepEqual(one(v, 'de-holiday-2026-10-31', '2026-10-31').regions.length, 9);
-    a.deepEqual(ev(v, 'cz-holidays-2026-autumn').map(e => e.date), ['2026-09-28', '2026-10-28']);
+    a.deepEqual(ev(v, 'cz-holidays-2026-autumn').map(e => e.date), ['2026-09-28', '2026-10-28', '2026-11-17']);
     const hu = one(v, 'hu-holiday-2026-10-23', '2026-10-22'); a.equal(hu.end_date, '2026-10-23'); a.equal(hours(hu), 24);
     a.equal(one(v, 'it-sundays-september-2026', '2026-09-06').start_time, '07:00'); a.equal(one(v, 'it-sundays-oct-nov-2026', '2026-10-04').start_time, '09:00');
     a.deepEqual(ev(v, 'hr-summer-sunday-2026').map(e => e.date), ['2026-09-06', '2026-09-13']);
@@ -173,7 +173,7 @@ export function registerProductionDrivingBanTests(test, a) {
   });
   test('1 Oct 2026 rollover: year horizon keeps known bans but no unverified-year NO_BAN', () => {
     const v = at(new Date('2026-10-01T08:30:00Z'));
-    a.deepEqual(v.window, {from: '2026-10-01', to: '2026-11-30', timezone: 'Europe/Prague'});
+    a.deepEqual(v.window, {from: '2026-10-01', to: '2027-10-01', timezone: 'Europe/Prague'});
     a.equal(v.jurisdictions.length, coverage.length);
     a.equal(v.jurisdictions.filter(j => j.verification_state === 'PRIMARY_VERIFIED').length, 0);
     a.equal(v.jurisdictions.filter(j => j.ban_state === 'NO_BAN').length, 0);
