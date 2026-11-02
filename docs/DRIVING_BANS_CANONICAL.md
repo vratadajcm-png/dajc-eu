@@ -34,6 +34,16 @@ FR: Arrêté du 24 septembre 2026 (NOR TRAT2625304A, JORF 25 September) lifts th
 
 DE: temporary Länder low-water exemptions (targeted review 30 September, NRW rechecked 1 October): BW, RP and NRW through 31 October; BE/BB ended 30 September; RP GST/44t easing not restated after 30 September; Saarland only secondarily reported. Federal §30 StVO events stay published; DE is downgraded from full PRIMARY_VERIFIED with explicit `coverage_failures`.
 
+## Priority review of 27 October 2026 (dataset 2026-10-27.r4-nov-dec-priority.geo50)
+
+Reviewed span extended to 1 September-31 December 2026 for the November-December public window. Not a full-registry sweep (`review_log[].full_registry_sweep: false`). Evidence log with URL, HTTP status, SHA-256 and retrieval time per document: `data/driving-bans/source-reviews/2026-10-27-nov-dec.json`; human summary and the 50-jurisdiction matrix: `DRIVING_BANS_NOV_DEC_2026_REVIEW.md`.
+
+Full-scope primary review through 31 December: CH, CZ, FR, HR, HU, IT, LI, LU, PL, SI, SK (11 complete at 1 November). Individual rules only, jurisdiction stays incomplete: AT (StVO §42 in the BGBl. I 17/2026 version, holidays, night, A12 IG-L winter regime) and DE (§30 StVO 25-26 December; Länder low-water exemptions after 31 October unconfirmed). The other 37 identities carry `NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED` and publish no December events because their rules keep a 30 November review window.
+
+Legal edge cases encoded from the text: CH 26 December is no ban day when Christmas is a Friday (VRV Art. 91(1)); PL 24 December is a day off since 2025 but not a ban day and has no eve restriction; SK Sundays are days of rest, so the 24-27 December block ends on Sunday; HU bans continuously from 24 December 22:00 to 27 December 22:00; HR moves the last-holiday-day restriction to Sunday 27 December 12:00-23:00; A12 holiday nights start at 23:00.
+
+Corrected defects: LI, LU and AT weekend/night rules had published windows ending 31 October although the law applies all year; extended with an increased `sequence`. AT weekend exceptions updated to the current §42(2a), (3) and (3a). Sources now carry `content_sha256` of the retrieved document.
+
 ## Thursday operation and urgent exceptions
 
 The existing DAJC Daily Intelligence automation owns the semantic review. Its HGV branch is Thursday-only, Europe/Prague; other daily DAJC topics are unchanged. Each Thursday it must read all identities from the shared registry, determine the full two-month window, review current primary legislation/amendments and relevant secondary sources, update canonical reviews/rules with evidence, compare old/new states, run all quality gates, prepare supported changes for review; publishing and deployment require explicit approval. Outside Thursday only a sourced urgent recheck of one already-published jurisdiction/rule is allowed.

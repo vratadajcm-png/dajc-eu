@@ -1,0 +1,1211 @@
+{
+ "review_id": "2026-10-27.r4-nov-dec-priority",
+ "reviewed_at": "2026-10-27T11:20:00.000Z",
+ "kind": "PRIORITY_PRIMARY_REVIEW",
+ "full_registry_sweep": false,
+ "calendar_rules_updated": true,
+ "dataset_version": "2026-10-27.r4-nov-dec-priority.geo50",
+ "reviewed_span": {
+  "from": "2026-09-01",
+  "to": "2026-12-31"
+ },
+ "period": {
+  "from": "2026-11-01",
+  "to": "2026-12-31"
+ },
+ "method": "Official legal texts and authority pages retrieved directly (or through the official open-data/ELI interface where the web front end blocked automated access). Each retrieved document is identified by SHA-256. No secondary source was used to create or remove a ban. Bot checks were not bypassed.",
+ "retrievals": [
+  {
+   "name": "ch-vrv",
+   "url": "https://www.fedlex.admin.ch/eli/cc/1962/1364_1409_1420/de",
+   "http_status": 200,
+   "bytes": 77151,
+   "sha256": "39d0c4d52bf6c1140a7d5b1848e1a625375891aecc22869089e1361f1fd8b3be",
+   "retrieved_at": "2026-10-27T11:02:23Z",
+   "use": "not used: fedlex application shell without the legal text"
+  },
+  {
+   "name": "de-stvo30",
+   "source_id": "de-stvo30",
+   "url": "https://www.gesetze-im-internet.de/stvo_2013/__30.html",
+   "http_status": 200,
+   "bytes": 8760,
+   "sha256": "7fb4b1b15a0a387073faefd92362a68ad5c601232b9459eb37eac7dad30a683d",
+   "retrieved_at": "2026-10-27T11:02:24Z",
+   "use": "evidence"
+  },
+  {
+   "name": "cz-361",
+   "source_id": "cz-361",
+   "url": "https://www.zakonyprolidi.cz/cs/2000-361",
+   "http_status": 200,
+   "bytes": 650520,
+   "sha256": "11ecd18b9321a3db7fe26f6d5a8cd2d7901cb3d00143ea81b481d172397ef2dc",
+   "retrieved_at": "2026-10-27T11:02:25Z",
+   "use": "evidence"
+  },
+  {
+   "name": "cz-245",
+   "source_id": "cz-245",
+   "url": "https://www.zakonyprolidi.cz/cs/2000-245",
+   "http_status": 200,
+   "bytes": 49037,
+   "sha256": "c774fc26330edf08c06f34c669c2d9521f0ea057e0008407b74ce95bc9a2f19d",
+   "retrieved_at": "2026-10-27T11:02:25Z",
+   "use": "evidence"
+  },
+  {
+   "name": "ch-vrv-20261001",
+   "source_id": "ch-vrv",
+   "url": "https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1962/1364_1409_1420/20261001/de/html/fedlex-data-admin-ch-eli-cc-1962-1364_1409_1420-20261001-de-html.html",
+   "http_status": 200,
+   "bytes": 368964,
+   "sha256": "d8772688f6736f3fd393c14e5cc4bafe0609f081717369345db25cd290544139",
+   "retrieved_at": "2026-10-27T11:02:42Z",
+   "use": "evidence"
+  },
+  {
+   "name": "ch-vrv-20261101",
+   "url": "https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1962/1364_1409_1420/20261101/de/html/fedlex-data-admin-ch-eli-cc-1962-1364_1409_1420-20261101-de-html.html",
+   "http_status": 200,
+   "bytes": 9148,
+   "sha256": "67ef6948509ab1827f885d4e4890d72fdd864e8d0e7ea1c41de2deffdd6dc8b6",
+   "retrieved_at": "2026-10-27T11:02:50Z",
+   "use": "probe: no consolidation published (soft 404)"
+  },
+  {
+   "name": "ch-vrv-20261201",
+   "url": "https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1962/1364_1409_1420/20261201/de/html/fedlex-data-admin-ch-eli-cc-1962-1364_1409_1420-20261201-de-html.html",
+   "http_status": 200,
+   "bytes": 9148,
+   "sha256": "67ef6948509ab1827f885d4e4890d72fdd864e8d0e7ea1c41de2deffdd6dc8b6",
+   "retrieved_at": "2026-10-27T11:02:50Z",
+   "use": "probe: no consolidation published (soft 404)"
+  },
+  {
+   "name": "ch-vrv-20270101",
+   "url": "https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1962/1364_1409_1420/20270101/de/html/fedlex-data-admin-ch-eli-cc-1962-1364_1409_1420-20270101-de-html.html",
+   "http_status": 200,
+   "bytes": 9148,
+   "sha256": "67ef6948509ab1827f885d4e4890d72fdd864e8d0e7ea1c41de2deffdd6dc8b6",
+   "retrieved_at": "2026-10-27T11:02:51Z",
+   "use": "probe: no consolidation published (soft 404)"
+  },
+  {
+   "name": "fr-arrete-2021",
+   "source_id": "fr-arrete-2021",
+   "url": "https://www.bison-fute.gouv.fr/IMG/pdf/Arrete_joe_20210424_0097_0037.pdf",
+   "http_status": 200,
+   "bytes": 182436,
+   "sha256": "7e9a0a0c19f06e8721367681c9289c03eac6be1181d023237a9a22acf954d26c",
+   "retrieved_at": "2026-10-27T11:03:21Z",
+   "use": "evidence"
+  },
+  {
+   "name": "fr-arrete-2026",
+   "source_id": "fr-arrete-2026",
+   "url": "https://www.bison-fute.gouv.fr/IMG/pdf/joe_arrete_interdictions_complementaires_TRM_2026.pdf",
+   "http_status": 200,
+   "bytes": 145747,
+   "sha256": "ba7ed529d2dafb414bfbc12c8aa2238730ed6f7be883ee68894fa7b40525db54",
+   "retrieved_at": "2026-10-27T11:03:22Z",
+   "use": "evidence"
+  },
+  {
+   "name": "fr-regime-general",
+   "source_id": "fr-bison-fute",
+   "url": "https://www.bison-fute.gouv.fr/regime-general,10852.html",
+   "http_status": 200,
+   "bytes": 60309,
+   "sha256": "cc87ad7b588d020041fbd777c20214c7e40b81f628b09afe9bf28a8dd6c59b29",
+   "retrieved_at": "2026-10-27T11:03:23Z",
+   "use": "evidence"
+  },
+  {
+   "name": "hu-190",
+   "source_id": "hu-190",
+   "url": "https://njt.jog.gov.hu/jogszabaly/2008-190-20-22",
+   "http_status": 200,
+   "bytes": 84858,
+   "sha256": "4b3cd0e4d19d508dcbbf769e9549feb1b96601c85d4a0c84b74ccb93d681b313",
+   "retrieved_at": "2026-10-27T11:03:53Z",
+   "use": "evidence"
+  },
+  {
+   "name": "hu-mt",
+   "source_id": "hu-mt",
+   "url": "https://njt.jog.gov.hu/jogszabaly/2012-1-00-00",
+   "http_status": 200,
+   "bytes": 766190,
+   "sha256": "cd04286e7d9402ec86808ac24554704faacf1df1c3936b6afd22a9d623f96bc2",
+   "retrieved_at": "2026-10-27T11:03:56Z",
+   "use": "evidence"
+  },
+  {
+   "name": "it-calendar-asti",
+   "source_id": "it-calendar-asti",
+   "url": "https://prefettura.interno.gov.it/sites/default/files/26/2025-12/calendario-circolazione-anno-2026_firmato.pdf",
+   "http_status": 200,
+   "bytes": 599655,
+   "sha256": "c9b15eed82e1adc047af7e70d26976064aba48bfce88aa8c032f4cfa618118fd",
+   "retrieved_at": "2026-10-27T11:04:39Z",
+   "use": "evidence"
+  },
+  {
+   "name": "li-vrv-v58",
+   "source_id": "li-vrv",
+   "url": "https://www.gesetze.li/konso/pdf/1978019000?version=58",
+   "http_status": 200,
+   "bytes": 679727,
+   "sha256": "49ef8358e20da609567e8676567a90c7a1a43134a7268065c205308d84ad1191",
+   "retrieved_at": "2026-10-27T11:04:50Z",
+   "use": "evidence"
+  },
+  {
+   "name": "lu-police",
+   "source_id": "lu-police",
+   "url": "https://police.public.lu/en/legislation/code-de-la-route/routiers-poids-lourds1.html",
+   "http_status": 200,
+   "bytes": 64134,
+   "sha256": "1d16698371545a4ac22164e5655a404013f2b7b51e497ae7f865a26f58722b1a",
+   "retrieved_at": "2026-10-27T11:05:15Z",
+   "use": "evidence"
+  },
+  {
+   "name": "pl-2423",
+   "source_id": "pl-2423",
+   "url": "https://api.sejm.gov.pl/eli/acts/DU/2023/2423/text.pdf",
+   "http_status": 200,
+   "bytes": 209905,
+   "sha256": "9721dda73d1b45b6300f3e636b9db37504908cd8d4c54c2f5092b6bdb3f5457a",
+   "retrieved_at": "2026-10-27T11:05:39Z",
+   "use": "evidence"
+  },
+  {
+   "name": "pl-holidays-2025-296",
+   "source_id": "pl-holidays-2025",
+   "url": "https://api.sejm.gov.pl/eli/acts/DU/2025/296/text.pdf",
+   "http_status": 200,
+   "bytes": 205582,
+   "sha256": "50ce5df0f79a4d0f2e3a045b03acaac6ede826ab3b667f421d06854795c2deff",
+   "retrieved_at": "2026-10-27T11:05:41Z",
+   "use": "evidence"
+  },
+  {
+   "name": "pl-1110",
+   "source_id": "pl-1110",
+   "url": "https://api.sejm.gov.pl/eli/acts/DU/2026/1110/text.pdf",
+   "http_status": 200,
+   "bytes": 159231,
+   "sha256": "9d42c6528bcd6b1d08055ba7c1a7de218193bf9110ef6cc967244d6501032d39",
+   "retrieved_at": "2026-10-27T11:05:42Z",
+   "use": "evidence"
+  },
+  {
+   "name": "si-promet",
+   "url": "https://www.promet.si/sl/splosne-omejitve",
+   "http_status": 0,
+   "bytes": 0,
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "retrieved_at": "2026-10-27T11:06:13Z",
+   "use": "failed: connection could not be established; not used"
+  },
+  {
+   "name": "si-odredba-2011",
+   "source_id": "si-odredba-2011",
+   "url": "https://www.uradni-list.si/glasilo-uradni-list-rs/vsebina/105152",
+   "http_status": 200,
+   "bytes": 98483,
+   "sha256": "1db66dd3933455810074166f5eaafcd9ea409f103a0ff5a0df31cdb174a255ca",
+   "retrieved_at": "2026-10-27T11:06:15Z",
+   "use": "evidence"
+  },
+  {
+   "name": "si-odredba-2021",
+   "source_id": "si-odredba-2021",
+   "url": "https://www.uradni-list.si/_pdf/2021/Ur/u2021195.pdf",
+   "http_status": 200,
+   "bytes": 4052375,
+   "sha256": "82610c38e1bfb7c8014eaf9c066e97d3d6ec806c6955c1dadb9a3fbe496bfb4d",
+   "retrieved_at": "2026-10-27T11:06:20Z",
+   "use": "evidence"
+  },
+  {
+   "name": "si-odredba-2025",
+   "source_id": "si-odredba-2025",
+   "url": "https://www.uradni-list.si/glasilo-uradni-list-rs/vsebina/2025-01-2415/odredba-o-dopolnitvi-odredbe-o-omejitvi-prometa-na-cestah-v-republiki-sloveniji",
+   "http_status": 200,
+   "bytes": 81296,
+   "sha256": "f6e5f13bf0a7f3e9fa60f0a5e1ffa67480ddc38f4c2eebab5d31d9e8132ee1c8",
+   "retrieved_at": "2026-10-27T11:06:54Z",
+   "use": "evidence"
+  },
+  {
+   "name": "si-zpdpd-f-2024",
+   "url": "https://www.uradni-list.si/glasilo-uradni-list-rs/vsebina/2024-01-2871/zakon-o-spremembi-zakona-o-praznikih-in-dela-prostih-dnevih-v-republiki-sloveniji-zpdpd-f",
+   "http_status": 200,
+   "bytes": 80961,
+   "sha256": "2c0dc4d89ec29345f5926f1230fe774ddaeeda01a0c38e05a13a1cf36fdac290",
+   "retrieved_at": "2026-10-27T11:08:15Z",
+   "use": "supporting: 2024 wording-only amendment"
+  },
+  {
+   "name": "si-zpdpd-upb1-2005",
+   "source_id": "si-zpdpd",
+   "url": "https://www.uradni-list.si/_pdf/2005/Ur/u2005112.pdf",
+   "http_status": 200,
+   "bytes": 1838816,
+   "sha256": "f708f61b149a334b4dfe1eb9bcd1ff09c9e4ef8995fe91ce8a03d170bd07ceed",
+   "retrieved_at": "2026-10-27T11:09:16Z",
+   "use": "evidence"
+  },
+  {
+   "name": "si-zpdpd-i-2026",
+   "source_id": "si-zpdpd-i",
+   "url": "https://pisrs.si/api/uradni-list/objava/u20261567.pdf",
+   "http_status": 200,
+   "bytes": 154413,
+   "sha256": "e9b77caa3961e54775dd00485f6a71ede2e7661c275be7b81ee9927a58775a76",
+   "retrieved_at": "2026-10-27T11:09:25Z",
+   "use": "evidence"
+  },
+  {
+   "name": "sk-8-current",
+   "source_id": "sk-8",
+   "url": "https://static.slov-lex.sk/static/SK/ZZ/2009/8/20261001.html",
+   "http_status": 200,
+   "bytes": 2093451,
+   "sha256": "43b227ae8a4cb33bbd655fe90a338830f9811a0debae1219c26d60082604a776",
+   "retrieved_at": "2026-10-27T11:09:47Z",
+   "use": "evidence"
+  },
+  {
+   "name": "sk-8-20261201",
+   "url": "https://static.slov-lex.sk/static/SK/ZZ/2009/8/20261201.html",
+   "http_status": 200,
+   "bytes": 2095900,
+   "sha256": "6acd9bcd45bda7da68972aac7ce684b9fc9b83ee5d3838c403eaa0315a335892",
+   "retrieved_at": "2026-10-27T11:10:07Z",
+   "use": "comparison: §39 identical to the 2026-10-01 consolidation"
+  },
+  {
+   "name": "sk-8-20270101",
+   "url": "https://static.slov-lex.sk/static/SK/ZZ/2009/8/20270101.html",
+   "http_status": 200,
+   "bytes": 2095828,
+   "sha256": "a7f23168dca8e11126d2fe71ff238569ce0ae2111cf3521a1af9dc165197cd56",
+   "retrieved_at": "2026-10-27T11:10:11Z",
+   "use": "comparison: 2027 change touches §39(7) only"
+  },
+  {
+   "name": "sk-241-index",
+   "url": "https://static.slov-lex.sk/static/SK/ZZ/1993/241/",
+   "http_status": 200,
+   "bytes": 10851,
+   "sha256": "50b80fd9c660a2e1315ab4cad28e90427c63038a9dec8751427dc24f144894d4",
+   "retrieved_at": "2026-10-27T11:11:06Z",
+   "use": "supporting: version index, latest consolidation 2025-11-01"
+  },
+  {
+   "name": "sk-241",
+   "source_id": "sk-241",
+   "url": "https://static.slov-lex.sk/static/SK/ZZ/1993/241/20251101.html",
+   "http_status": 200,
+   "bytes": 45740,
+   "sha256": "be3fbebd14b56cea186469b48568f12a767e55c4b9b197770e19847f103db908",
+   "retrieved_at": "2026-10-27T11:11:14Z",
+   "use": "evidence"
+  },
+  {
+   "name": "hr-naredba",
+   "source_id": "hr-naredba",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2009_06_64_1440.html",
+   "http_status": 200,
+   "bytes": 30460,
+   "sha256": "726e9c2dbfd692918f759b40813766e3a73c1071215831e894b4e0777d3e5024",
+   "retrieved_at": "2026-10-27T11:11:46Z",
+   "use": "evidence"
+  },
+  {
+   "name": "hr-hak",
+   "source_id": "hr-hak",
+   "url": "https://www.hak.hr/info/korisne-informacije/zabrane-za-teretna-vozila/",
+   "http_status": 200,
+   "bytes": 45915,
+   "sha256": "7fb7cbb5afa03c17cc75a82cd4838133119c91a2a9c992a8a66d8dcf0066b458",
+   "retrieved_at": "2026-10-27T11:11:47Z",
+   "use": "evidence"
+  },
+  {
+   "name": "hr-blagdani-2019",
+   "source_id": "hr-blagdani",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+   "http_status": 200,
+   "bytes": 65703,
+   "sha256": "a14685cb090ee1f5adfb9f861f81592284ddb7c1e30e020a0877eb7d85397061",
+   "retrieved_at": "2026-10-27T11:12:19Z",
+   "use": "evidence"
+  },
+  {
+   "name": "at-stvo42",
+   "url": "https://www.ris.bka.gv.at/NormDokument.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10011336&Paragraf=42",
+   "http_status": 503,
+   "bytes": 30760,
+   "sha256": "95741b645c7c0ffe51a38c42989646bf6abc5dc784054b8639b1a8663138fa62",
+   "retrieved_at": "2026-10-27T11:13:40Z",
+   "use": "failed: RIS web returned a bot check (HTTP 503); not bypassed"
+  },
+  {
+   "name": "at-ftrg",
+   "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008168",
+   "http_status": 503,
+   "bytes": 30734,
+   "sha256": "c1c2e0788a00c198e7cfcc644385aa0af2a4ca606e2ebfa605400b8652983f2b",
+   "retrieved_at": "2026-10-27T11:13:41Z",
+   "use": "failed: RIS web bot check (HTTP 503)"
+  },
+  {
+   "name": "at-igl-a12",
+   "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=LrT&Gesetzesnummer=20000313",
+   "http_status": 503,
+   "bytes": 30716,
+   "sha256": "543ed33088bcbb350a791094bb1157bbb6edc8f499bcaec811868cf2dd8e999b",
+   "retrieved_at": "2026-10-27T11:13:42Z",
+   "use": "failed: RIS web bot check (HTTP 503)"
+  },
+  {
+   "name": "at-stvo42-ogd",
+   "source_id": "at-stvo42",
+   "url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40276972/NOR40276972.html",
+   "http_status": 200,
+   "bytes": 57113,
+   "sha256": "5cad29b8320aa9f6d0c72828832a604c1ce4c6151d5d37fd16ece5444de260cd",
+   "retrieved_at": "2026-10-27T11:14:31Z",
+   "use": "evidence (RIS open data)"
+  },
+  {
+   "name": "at-igl-a12-LTI40029970",
+   "url": "https://ogd.ris.bka.gv.at/Dokumente/Landesnormen/LTI40029970/LTI40029970.html",
+   "http_status": 200,
+   "bytes": 42465,
+   "sha256": "63ef83ee986b598c277d72904426dcb2ae4cf3c9d0d0141c1a24866190b27486",
+   "retrieved_at": "2026-10-27T11:14:59Z",
+   "use": "supporting: §1 objective"
+  },
+  {
+   "name": "at-igl-a12-LTI40038091",
+   "url": "https://ogd.ris.bka.gv.at/Dokumente/Landesnormen/LTI40038091/LTI40038091.html",
+   "http_status": 200,
+   "bytes": 42483,
+   "sha256": "9ecc8bee7de05b4390362faae5c608e603b06b16c1aaa9ad2708cdffdf2e2920",
+   "retrieved_at": "2026-10-27T11:15:00Z",
+   "use": "supporting: §2 area"
+  },
+  {
+   "name": "at-igl-a12-s3",
+   "source_id": "at-igl-a12",
+   "url": "https://ogd.ris.bka.gv.at/Dokumente/Landesnormen/LTI40045051/LTI40045051.html",
+   "http_status": 200,
+   "bytes": 45208,
+   "sha256": "c4e7344565c5e97a48a57a731872ec5f5f2bdff602e25edfccee2be555c8267e",
+   "retrieved_at": "2026-10-27T11:15:06Z",
+   "use": "evidence (RIS open data)"
+  },
+  {
+   "name": "at-ftrg-s1",
+   "source_id": "at-ftrg",
+   "url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40213432/NOR40213432.html",
+   "http_status": 200,
+   "bytes": 44418,
+   "sha256": "e551cca9b81143b058eb0b1fc469dd144e37c565eb1bef5553087e434493e35e",
+   "retrieved_at": "2026-10-27T11:15:07Z",
+   "use": "evidence (RIS open data)"
+  },
+  {
+   "name": "at-calendar-2026",
+   "source_id": "at-cal",
+   "url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40276924/NOR40276924.html",
+   "http_status": 200,
+   "bytes": 47200,
+   "sha256": "e8144933a442837a3f76999a7c581298f422e300fa8f529174314225b6d752f0",
+   "retrieved_at": "2026-10-27T11:15:27Z",
+   "use": "evidence (RIS open data)"
+  }
+ ],
+ "coverage_matrix": [
+  {
+   "jurisdiction": "AD",
+   "name": "Andorra",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "AL",
+   "name": "Albania",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "AM",
+   "name": "Armenia",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "AT",
+   "name": "Austria",
+   "review_result": "INDIVIDUAL_RULES_VERIFIED_JURISDICTION_INCOMPLETE",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 144,
+   "december_events": 73,
+   "findings": [
+    "StVO §42 (BGBl. I 17/2026), Feiertagsruhegesetz §1, IG-L A12 §3 and BGBl II 77/2026 via RIS open data: Saturday, Sunday/holiday (8, 25, 26 Dec), night and A12 winter rules extended through 31 Dec; A12 holiday nights start at 23:00.",
+    "Defect corrected: weekend and night rules had a published window ending 31 Oct."
+   ],
+   "open_items": [
+    "Länder secondary-road orders",
+    "Tyrol sectoral ban goods list",
+    "Lueg/A10 route ordinances for December",
+    "exceptional-transport permit regime"
+   ]
+  },
+  {
+   "jurisdiction": "AZ",
+   "name": "Azerbaijan",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "BA",
+   "name": "Bosnia and Herzegovina",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "BE",
+   "name": "Belgium",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "BG",
+   "name": "Bulgaria",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "BY",
+   "name": "Belarus",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "CH",
+   "name": "Switzerland",
+   "review_result": "FULL_SCOPE_PRIMARY_VERIFIED",
+   "verification_state_nov_dec": "PRIMARY_VERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": true,
+   "events_nov_dec": 72,
+   "december_events": 36,
+   "findings": [
+    "VRV Art. 91 (Stand 1 Oct 2026, no later consolidation published): 25 Dec ban 00:00-24:00; 26 Dec 2026 is not a ban day because Christmas is a Friday; Sunday and 22:00-05:00 night bans continue."
+   ],
+   "open_items": []
+  },
+  {
+   "jurisdiction": "CY",
+   "name": "Cyprus",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "CZ",
+   "name": "Czechia",
+   "review_result": "FULL_SCOPE_PRIMARY_VERIFIED",
+   "verification_state_nov_dec": "PRIMARY_VERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": true,
+   "events_nov_dec": 13,
+   "december_events": 7,
+   "findings": [
+    "Act 361/2000 §43(1)(a) (version 63, valid to 31 Dec 2026) with Act 245/2000: 24, 25 and 26 Dec 13:00-22:00 in addition to Sundays."
+   ],
+   "open_items": []
+  },
+  {
+   "jurisdiction": "DE",
+   "name": "Germany",
+   "review_result": "INDIVIDUAL_RULES_VERIFIED_JURISDICTION_INCOMPLETE",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 11,
+   "december_events": 6,
+   "findings": [
+    "StVO §30(3)-(4): 25 and 26 Dec nationwide 00:00-22:00 added; Sunday ban continues."
+   ],
+   "open_items": [
+    "Länder low-water exemptions after 31 Oct 2026 (no official extension found)",
+    "exceptional-transport scope of the exemptions"
+   ]
+  },
+  {
+   "jurisdiction": "DK",
+   "name": "Denmark",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "EE",
+   "name": "Estonia",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "ES",
+   "name": "Spain",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 44,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "FI",
+   "name": "Finland",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "FR",
+   "name": "France",
+   "review_result": "FULL_SCOPE_PRIMARY_VERIFIED",
+   "verification_state_nov_dec": "PRIMARY_VERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": true,
+   "events_nov_dec": 62,
+   "december_events": 29,
+   "findings": [
+    "Arrêté 16 April 2021 art. 1: 24 Dec 22:00 to 25 Dec 22:00. Art. 3 Île-de-France: 24 Dec 16:00-22:00 outbound, 25 Dec 22:00-24:00 both directions, 26 Dec 06:00-10:00 inbound.",
+    "Complementary 2026 arrêté: no winter Saturdays after 7 March 2026."
+   ],
+   "open_items": []
+  },
+  {
+   "jurisdiction": "GE",
+   "name": "Georgia",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "GR",
+   "name": "Greece",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "HR",
+   "name": "Croatia",
+   "review_result": "FULL_SCOPE_PRIMARY_VERIFIED",
+   "verification_state_nov_dec": "PRIMARY_VERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": true,
+   "events_nov_dec": 14,
+   "december_events": 6,
+   "findings": [
+    "Naredba NN 64/2009 point II with NN 110/2019: 24 Dec 15:00-23:00; the last holiday day (26 Dec) is a Saturday, so the restriction applies on Sunday 27 Dec 12:00-23:00. D2 Sunday ban continues."
+   ],
+   "open_items": []
+  },
+  {
+   "jurisdiction": "HU",
+   "name": "Hungary",
+   "review_result": "FULL_SCOPE_PRIMARY_VERIFIED",
+   "verification_state_nov_dec": "PRIMARY_VERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": true,
+   "events_nov_dec": 10,
+   "december_events": 5,
+   "findings": [
+    "Decree 190/2008 §2(1)(b) and §2(2): continuous ban from 24 Dec 22:00 to 27 Dec 22:00; §2(3) EURO 3+ international-traffic exemption from 4 Nov to 1 Mar. 24 Dec is not a public holiday (Mt. §102)."
+   ],
+   "open_items": []
+  },
+  {
+   "jurisdiction": "IE",
+   "name": "Ireland",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "IS",
+   "name": "Iceland",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "IT",
+   "name": "Italy",
+   "review_result": "FULL_SCOPE_PRIMARY_VERIFIED",
+   "verification_state_nov_dec": "PRIMARY_VERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": true,
+   "events_nov_dec": 12,
+   "december_events": 7,
+   "findings": [
+    "DM 12 Dec 2025 n. 325 calendar: 6, 8, 13, 20, 25, 26 and 27 Dec 09:00-22:00."
+   ],
+   "open_items": []
+  },
+  {
+   "jurisdiction": "KZ",
+   "name": "Kazakhstan (European transport scope)",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "LI",
+   "name": "Liechtenstein",
+   "review_result": "FULL_SCOPE_PRIMARY_VERIFIED",
+   "verification_state_nov_dec": "PRIMARY_VERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": true,
+   "events_nov_dec": 74,
+   "december_events": 38,
+   "findings": [
+    "VRV Art. 89 (version 58): Sunday ban also on 8, 25 and 26 Dec; night ban 22:00-05:00 all year.",
+    "Defect corrected: night and Sunday rules had a published window ending 31 Oct, so November showed no LI events despite full coverage."
+   ],
+   "open_items": []
+  },
+  {
+   "jurisdiction": "LT",
+   "name": "Lithuania",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "LU",
+   "name": "Luxembourg",
+   "review_result": "FULL_SCOPE_PRIMARY_VERIFIED",
+   "verification_state_nov_dec": "PRIMARY_VERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": true,
+   "events_nov_dec": 22,
+   "december_events": 11,
+   "findings": [
+    "Police guidance on the Grand-Ducal regulation of 19 July 1997: all-year weekend rules; 25 Dec FR- and DE-bound, 26 Dec DE-bound.",
+    "Defect corrected: weekend rules had a published window ending 31 Oct."
+   ],
+   "open_items": []
+  },
+  {
+   "jurisdiction": "LV",
+   "name": "Latvia",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "MC",
+   "name": "Monaco",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "MD",
+   "name": "Moldova",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "ME",
+   "name": "Montenegro",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "MK",
+   "name": "North Macedonia",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "MT",
+   "name": "Malta",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "NL",
+   "name": "Netherlands",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "NO",
+   "name": "Norway",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "PL",
+   "name": "Poland",
+   "review_result": "FULL_SCOPE_PRIMARY_VERIFIED",
+   "verification_state_nov_dec": "PRIMARY_VERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": true,
+   "events_nov_dec": 5,
+   "december_events": 2,
+   "findings": [
+    "Ban regulation §2 (Dz.U. 2023 poz. 2423, amended only by 2026 poz. 1110): 25 and 26 Dec 08:00-22:00 for >12t. 24 Dec is a day off since 2025 but is not listed; no eve ban before Christmas."
+   ],
+   "open_items": []
+  },
+  {
+   "jurisdiction": "PT",
+   "name": "Portugal",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 21,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "RO",
+   "name": "Romania",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "RS",
+   "name": "Serbia",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "RU",
+   "name": "Russia (European transport scope)",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "SE",
+   "name": "Sweden",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "SI",
+   "name": "Slovenia",
+   "review_result": "FULL_SCOPE_PRIMARY_VERIFIED",
+   "verification_state_nov_dec": "PRIMARY_VERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": true,
+   "events_nov_dec": 11,
+   "december_events": 6,
+   "findings": [
+    "Odredba (UL 75/2011, 195/2021, 67/2025) with ZPDPD: 25 and 26 Dec 08:00-22:00. Art. 5.a (2025) adds dynamic congestion restrictions on motorways that cannot be enumerated in advance."
+   ],
+   "open_items": [
+    "Art. 5.a dynamic congestion restrictions are announced live, not enumerated"
+   ]
+  },
+  {
+   "jurisdiction": "SK",
+   "name": "Slovakia",
+   "review_result": "FULL_SCOPE_PRIMARY_VERIFIED",
+   "verification_state_nov_dec": "PRIMARY_VERIFIED",
+   "ban_state_nov_dec": "HAS_BAN",
+   "coverage_complete_nov_dec": true,
+   "events_nov_dec": 9,
+   "december_events": 4,
+   "findings": [
+    "Act 8/2009 §39 (identical in the 1 Oct and 1 Dec 2026 consolidations) with Act 241/1993 §2: Sundays are days of rest, so the 24-27 Dec block ends on Sunday 27 Dec; only the Sunday rule applies."
+   ],
+   "open_items": [
+    "§39(4) permanent >12t class III road restriction is recorded as a note, not as calendar events"
+   ]
+  },
+  {
+   "jurisdiction": "SM",
+   "name": "San Marino",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "TR",
+   "name": "Türkiye (European transport scope)",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "UA",
+   "name": "Ukraine",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "UK",
+   "name": "United Kingdom",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  },
+  {
+   "jurisdiction": "XK",
+   "name": "Kosovo",
+   "review_result": "NOT_REVIEWED",
+   "verification_state_nov_dec": "UNVERIFIED",
+   "ban_state_nov_dec": "UNKNOWN",
+   "coverage_complete_nov_dec": false,
+   "events_nov_dec": 0,
+   "december_events": 0,
+   "findings": [],
+   "open_items": [
+    "November-December 2026 primary review not performed"
+   ]
+  }
+ ],
+ "summary": {
+  "full_scope_verified": [
+   "CH",
+   "CZ",
+   "FR",
+   "HR",
+   "HU",
+   "IT",
+   "LI",
+   "LU",
+   "PL",
+   "SI",
+   "SK"
+  ],
+  "individual_rules_only": [
+   "AT",
+   "DE"
+  ],
+  "not_reviewed": [
+   "AD",
+   "AL",
+   "AM",
+   "AZ",
+   "BA",
+   "BE",
+   "BG",
+   "BY",
+   "CY",
+   "DK",
+   "EE",
+   "ES",
+   "FI",
+   "GE",
+   "GR",
+   "IE",
+   "IS",
+   "KZ",
+   "LT",
+   "LV",
+   "MC",
+   "MD",
+   "ME",
+   "MK",
+   "MT",
+   "NL",
+   "NO",
+   "PT",
+   "RO",
+   "RS",
+   "RU",
+   "SE",
+   "SM",
+   "TR",
+   "UA",
+   "UK",
+   "XK"
+  ]
+ }
+}

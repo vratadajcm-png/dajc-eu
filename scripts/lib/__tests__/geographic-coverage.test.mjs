@@ -8,7 +8,7 @@ import { dajcEuropeCoverage, dajcCoverageCodes, resolveCoverageScope } from '../
 import { oversizeSources } from '../../../config/oversize-sources/index.mjs';
 import { canonicalDrivingBans } from '../../../config/driving-ban-calendars/runtime.mjs';
 import { buildDrivingBanVerificationPlan, targetedSourceReview } from '../../../config/driving-ban-calendars/verification.mjs';
-import { hydrateCanonical, expandRules, validateCanonical, snapshot, assertSweepRequest, SCOPE_CHECKS } from '../../../src/lib/driving-bans/core.mjs';
+import { hydrateCanonical, expandRules, validateCanonical, snapshot, assertSweepRequest, shiftDate, SCOPE_CHECKS } from '../../../src/lib/driving-bans/core.mjs';
 import { migrateCanonicalCoverage } from '../geographic-migration.mjs';
 import { scopeFinding, scopeMonitoringDocument } from '../geographic-scope.mjs';
 import { SEARCH_GROUPS, buildClassifierPrompt, searchGroup, verifySearchItem } from '../web-search.mjs';
@@ -20,6 +20,7 @@ const expected = 'AD AL AM AT AZ BA BE BG BY CH CY CZ DE DK EE ES FI FR GE GR HR
 const originalRoot = new URL('../../../archive/geographic-coverage-20261022/original/', import.meta.url);
 const original = JSON.parse(readFileSync(new URL('data/driving-bans/canonical.json', originalRoot), 'utf8'));
 const active = JSON.parse(readFileSync(new URL('../../../data/driving-bans/canonical.json', import.meta.url), 'utf8'));
+const migrated = migrateCanonicalCoverage(original).data;
 const fullRules = data => data.rules.map(rule => ({ ...data.rule_profiles[rule.profile], ...rule }));
 const hash = value => createHash('sha256').update(value).digest('hex');
 
@@ -34,21 +35,29 @@ describe('approved geographic scope and data preservation', () => {
   });
 
   it('preserves every original rule, legal field, verification date and event UID', () => {
-    expect(active.rules).toEqual(original.rules);
-    expect(active.rule_profiles).toEqual(original.rule_profiles);
-    expect(active.window).toEqual(original.window);
+    // The migration itself must be a pure reorganization of the archived registry.
+    expect(migrated.rules).toEqual(original.rules);
+    expect(migrated.rule_profiles).toEqual(original.rule_profiles);
+    expect(migrated.window).toEqual(original.window);
     for (const code of expected) {
       const prior = structuredClone(original.jurisdiction_reviews[code]);
       if (code === 'FR') prior.notes = prior.notes.replace('Overseas departments are separate DAJC jurisdictions.', 'Overseas territories are outside active monitoring and do not inherit metropolitan rules.');
       if (code === 'ES') prior.scope_checks.regional.note = prior.scope_checks.regional.note.replace('Catalonia and Basque Country run their own calendars (separate DAJC jurisdictions)', 'Catalonia and Basque Country run their own calendars within ES, with separate regional applicability');
-      expect(active.jurisdiction_reviews[code]).toEqual(prior);
+      expect(migrated.jurisdiction_reviews[code]).toEqual(prior);
     }
     const old = { ...original, rules: fullRules(original).map(rule => {
       const source = original.sources.find(s => s.source_id === rule.source_id);
       return { ...rule, source_url: source.url, source_authority: source.authority, source_version: rule.source_version || source.version };
     }) };
-    expect(expandRules(canonicalDrivingBans, original.window)).toEqual(expandRules(old, original.window));
-    expect(active.rules.length).toBe(182);
+    expect(expandRules(hydrateCanonical(migrated, dajcEuropeCoverage), original.window)).toEqual(expandRules(old, original.window));
+    expect(migrated.rules.length).toBe(182);
+  });
+
+  it('never deletes a migrated rule identity in later legal reviews', () => {
+    // Later reviews may add, correct, cancel or supersede rules, but every archived identity stays traceable.
+    const live = new Set(active.rules.map(rule => rule.ban_id));
+    expect(original.rules.map(rule => rule.ban_id).filter(id => !live.has(id))).toEqual([]);
+    expect(migrateCanonicalCoverage(active).data).toEqual(active);
   });
 
   it('verifies all bytes in the pre-migration backup manifest', () => {
@@ -58,7 +67,7 @@ describe('approved geographic scope and data preservation', () => {
 
   it('is idempotent and removes all non-tracked jurisdiction reviews and unused sources', () => {
     const result = migrateCanonicalCoverage(original);
-    expect(result.data).toEqual(active);
+    expect(result.data).toEqual(migrated);
     expect(migrateCanonicalCoverage(result.data).data).toEqual(result.data);
     expect(Object.keys(result.removedReviews)).toHaveLength(54);
     expect(result.removedRules).toEqual([]);
@@ -107,7 +116,9 @@ describe('approved geographic scope and data preservation', () => {
     expect(scopeFinding(result.finding)).toEqual(result);
     expect(scopeFinding({country:'United Kingdom',jurisdictionId:'JE'}).ok).toBe(false);
     expect(scopeFinding({country:'United Kingdom',region:'Jersey'}).ok).toBe(false);
-    const view = snapshot(canonicalDrivingBans,dajcEuropeCoverage,new Date('2027-01-01T12:00:00Z'));
+    // More than a month after the reviewed span ends, no carry-in event can exist.
+    const beyond = new Date(`${shiftDate(canonicalDrivingBans.window.to, 32)}T12:00:00Z`);
+    const view = snapshot(canonicalDrivingBans,dajcEuropeCoverage,beyond);
     expect(view.jurisdictions.every(row => row.ban_state === 'UNKNOWN')).toBe(true);
   });
 
@@ -172,9 +183,11 @@ describe('approved geographic scope and data preservation', () => {
   it('compares the archived registry without losing rule history or pretending freshness', () => {
     const root = mkdtempSync(join(tmpdir(),'dajc-geo-audit-'));
     try {
-      const output = execFileSync(process.execPath, ['scripts/audit-driving-bans.mjs', '--clock', '2026-10-22T10:00:00Z', '--previous', 'archive/geographic-coverage-20261022/original/data/driving-bans/canonical.json', '--output', root], {encoding:'utf8'});
+      // Clock after the latest recorded review, so the run cannot borrow freshness from the future.
+      const output = execFileSync(process.execPath, ['scripts/audit-driving-bans.mjs', '--clock', '2026-11-10T10:00:00Z', '--previous', 'archive/geographic-coverage-20261022/original/data/driving-bans/canonical.json', '--output', root], {encoding:'utf8'});
       const summary = JSON.parse(output);
-      expect(summary.changes).toEqual([]);
+      expect(summary.changes.filter(change => change.kind === 'REMOVED_RECORD_REQUIRES_REVIEW')).toEqual([]);
+      expect(summary.changes.every(change => expected.includes(change.jurisdiction))).toBe(true);
       expect(summary.geographic_changes.removed_jurisdictions).toHaveLength(54);
       expect(summary.external_source_review_performed).toBe(false);
       expect(summary.selected_jurisdictions).toEqual(expected);
