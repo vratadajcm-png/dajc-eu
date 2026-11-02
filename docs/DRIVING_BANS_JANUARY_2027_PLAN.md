@@ -51,7 +51,7 @@ Kandidátní data v posledním sloupci pochází ze zadání jednorázové úloh
 | --- | --- | --- | --- |
 | CH | VRV čl. 91 | dny zákazu v lednu, noční zákaz | 1. 1. |
 | CZ | zákon 361/2000 § 43, zákon 245/2000 | svátky v lednu, čas 13–22 h | 1. 1. |
-| FR | arrêté 16. 4. 2021 | přechod roku od 22 h předvečera, víkendy, roční zimní kalendář (pokud se týká ledna), Île-de-France | 31. 12. 22 h – 1. 1. 22 h |
+| FR | arrêté 16. 4. 2021; doplňkový roční výnos 2026 (z 26. 12. 2025, JO 8. 1. 2026) | přechod roku od 22 h předvečera, víkendy, Île-de-France; **doplňkový výnos na rok 2027** | 31. 12. 22 h – 1. 1. 22 h |
 | HR | Naredba NN 64/2009, NN 110/2019 | zda jsou lednové svátky dny omezení | – |
 | HU | vládní nařízení 190/2008 | přechod roku, výjimka EURO 3+ (v registru 4. 11. 2026 – 1. 3. 2027) | 1. 1. |
 | IT | DM 12. 12. 2025 č. 325 (jen rok 2026) | **vyžaduje kalendářní dekret na rok 2027** | – |
@@ -61,9 +61,31 @@ Kandidátní data v posledním sloupci pochází ze zadání jednorázové úloh
 | SI | Odredba UL 75/2011, 195/2021, 67/2025 | svátky a dny pracovního volna | 1. 1., 2. 1. |
 | SK | zákon 8/2009 § 39, zákon 241/1993 | dny pracovního klidu | 1. 1., 6. 1. |
 
-**Blokující závislost IT:** dekret pro rok 2026 byl podepsán 12. 12. 2025. Pokud
-dekret pro rok 2027 nevyjde do 25. 11., Itálie bude od 1. 12. neúplná. Zobrazí se
-jako „ověření probíhá“, ne jako „bez zákazu“.
+### Roční předpisy IT a FR (stav 2. 11. 2026)
+
+- **IT:** všechny zákazy stanoví roční dekret MIT. Dekret na rok 2027 ke 2. 11.
+  nevyšel. Kalendář 2027 na webu Autostrade uvádí, že zákazy ještě nejsou zadané.
+  Dekret na rok 2026 (č. 325) byl podepsán 12. 12. 2025 a v úředním věstníku (GU)
+  vyšel 31. 12. 2025.
+- **FR:** obecný režim stanoví trvalý výnos z roku 2021. Doplňkové dny (v roce 2026
+  zimní soboty v AURA v únoru a březnu a letní soboty) stanoví roční výnos. Výnos
+  na rok 2026 je z 26. 12. 2025 a v úředním věstníku (JO) vyšel 8. 1. 2026.
+
+**Důsledek:** jurisdikce je úplná jen při ověřeném celém období (prosinec +
+leden). IT a FR proto budou od 1. 12. nejspíš „ověření probíhá“, dopředu do vydání
+předpisů na rok 2027 (podle loňska v polovině až na konci prosince, u FR možná až
+v lednu). Z kategorie A lze k 1. 12. realisticky udržet **9 zemí** (CH, CZ, HR,
+HU, LI, LU, PL, SI, SK).
+
+U FR lze leden ověřit z trvalého výnosu, pokud vlastník (případně právník)
+potvrdí výklad: dokud doplňkový výnos na rok 2027 nevyjde, žádné doplňkové dny
+neplatí. U IT takový výklad možný není, bez dekretu žádný lednový kalendář
+neexistuje.
+
+**Návrh k rozhodnutí (bez implementace):** u jurisdikcí s ročním předpisem
+zobrazovat aktuální měsíc jako ověřený a příští jako „čeká na úřední publikaci“,
+místo toho, aby celá země spadla do „ověření probíhá“. Jde o změnu produktu
+a kontraktu, ne o úpravu dat.
 
 ## Kategorie B – AT a DE: dokončit otevřené body a přidat leden
 
@@ -135,6 +157,8 @@ Země, které nestihneme, zůstanou fail-closed: „ověření probíhá“.
 
 1. Schválit pořadí a vlny D1–D3, včetně toho, že D2 a D3 budou v lednu „ověření
    probíhá“.
-2. Postup u Itálie, pokud dekret 2027 vyjde po 25. 11.
+2. Postup u Itálie a Francie, dokud nevyjdou roční předpisy na rok 2027: přijmout
+   „ověření probíhá“, nebo změnit zobrazení (viz „Roční předpisy IT a FR“). U FR
+   také výklad, že bez doplňkového výnosu nejsou doplňkové dny.
 3. Výklad prodloužení předpisů ES (zejména Baskicko a lednová data).
 4. ~~Vypnout jednorázovou úlohu z 15. 12. 2026.~~ Provedeno 2. 11., tento plán ji nahrazuje.
