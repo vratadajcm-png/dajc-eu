@@ -1,6 +1,6 @@
 # Driving Bans – plán ověření ledna 2027 (50 jurisdikcí)
 
-Stav: návrh ke schválení · Sestaveno 2. 11. 2026 z datasetu PR #80
+Stav: schváleno vlastníkem 2. 11. 2026 · Sestaveno 2. 11. 2026 z datasetu PR #80
 (`2026-10-27.r4-nov-dec-priority.geo50`) · Nic se tímto dokumentem nemění v registru.
 
 ## Proč a do kdy
@@ -137,4 +137,4 @@ Země, které nestihneme, zůstanou fail-closed: „ověření probíhá“.
    probíhá“.
 2. Postup u Itálie, pokud dekret 2027 vyjde po 25. 11.
 3. Výklad prodloužení předpisů ES (zejména Baskicko a lednová data).
-4. Vypnout jednorázovou úlohu z 15. 12. 2026. Tento plán ji nahrazuje.
+4. ~~Vypnout jednorázovou úlohu z 15. 12. 2026.~~ Provedeno 2. 11., tento plán ji nahrazuje.

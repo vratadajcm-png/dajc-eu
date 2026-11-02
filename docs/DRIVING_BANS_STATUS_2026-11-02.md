@@ -1,10 +1,10 @@
 # Driving Bans – skutečný stav k 2. 11. 2026 a ruční ověření DE a ES
 
-Datum kontroly: 2. 11. 2026, 15:05–15:25 UTC · `main` = `5f7311d` · Bez změny
-`data/driving-bans/canonical.json`, bez merge, bez změny naplánovaných úloh.
+Datum kontroly: 2. 11. 2026, 15:05–15:25 UTC · `main` = `5f7311d` · Bez merge.
 
-Tento dokument je auditní stopa ruční kontroly. Nálezy jsou **návrhy ke schválení**,
-nic z nich zatím není v registru.
+Tento dokument je auditní stopa ruční kontroly. Vlastník 2. 11. schválil
+doporučení. Změny registru pro ES a DE jsou v tomto PR (oddíl 9) a platí až po
+sloučení. Úpravy naplánovaných úloh jsou v oddílu 6.
 
 ## 1. Stav k 2. 11. 2026
 
@@ -108,13 +108,15 @@ změny. Výjimky se týkají jen přeprav souvisejících s nízkou hladinou vod
 země o prodloužení po 31. 10. jsme nenašli. Registr nesmí výjimku po 31. 10. uvádět
 jako platnou.
 
-Návrh ke schválení (neprovedeno):
+Provedeno v tomto PR (oddíl 9):
 
-- doplnit zdroj `de-vmk-2026-10-beschluss-8-6` (PRIMARY, doporučení),
-- ponechat `LOW_WATER_EXEMPTIONS_AFTER_2026_10_31_NOT_PRIMARY_CONFIRMED`
-  a doplnit poznámku o návrhu VMK do 20. 12. a zprávě o výnosu NRW,
-- vyžádat si text výnosu NRW od MUNV nebo okresní vlády. BW a RP znovu zkontrolovat
-  v denní rutině.
+- doplněn zdroj `de-vmk-2026-10-beschluss-8-6` (PRIMARY, doporučení),
+- ponechán `LOW_WATER_EXEMPTIONS_AFTER_2026_10_31_NOT_PRIMARY_CONFIRMED`,
+  doplněna poznámka o návrhu VMK do 20. 12. a zprávě o výnosu NRW,
+- žádné pravidlo DE se nemění.
+
+Další krok: vyžádat si text výnosu NRW od MUNV nebo okresní vlády. BW a RP znovu
+zkontrolovat v denní rutině.
 
 ## 5. ES – listopad 2026
 
@@ -132,11 +134,12 @@ Návrh ke schválení (neprovedeno):
   opakovaná omezení (pátky 4.–18. 12., neděle 6.–27. 12., N-230 a A-8) a prosincové
   tabulky (4., 5., 6., 8., 24. a 31. 12.) v registru zatím nejsou.
 
-### 5.2 Mezery v registru (návrhy nových pravidel, neprovedeno)
+### 5.2 Mezery v registru (doplněno v tomto PR pro listopad)
 
-Tyto omezení platí podle primárních textů, ale v registru chybí. ES je proto
-správně neúplné. Hodnota `corridors: PRIMARY_VERIFIED` u ES je ale v rozporu
-s bodem A níže a měla by se změnit na `UNVERIFIED`.
+Tato omezení platí podle primárních textů, ale v registru chyběla. Po schválení
+vlastníka jsou doplněna pro listopad 2026 (oddíl 9). Hodnota
+`corridors: PRIMARY_VERIFIED` u ES byla v rozporu s bodem A níže, proto je nyní
+`UNVERIFIED`.
 
 **A. Celoroční omezení – příloha VII DGT (každý den 0–24 h, oba směry)**
 
@@ -174,7 +177,8 @@ Rozsah: vozidla nad 7,5 t (bod 3.1). Výjimky podle přílohy IV.
 
 Omezení z 11. 11. je nejbližší konkrétní zákaz na hlavní tranzitní trase
 Španělsko–Francie, který registr nezná. Protože ES je neúplné, web ho nevydává za
-„bez zákazu“. Doplnění ale vyžaduje schválení vlastníka.
+„bez zákazu“. Po schválení vlastníka je doplněné v tomto PR (oddíl 9) a na webu
+se objeví po sloučení.
 
 ### 5.3 Příloha V (ADR a zvláštní přepravy)
 
@@ -186,9 +190,14 @@ nepoužije.
 **Závěr ES:** celostátní listopad (příloha II) je ověřený a odpovídá registru.
 Úplnost ES brání příloha VII, Katalánsko, Baskicko, příloha V a prosinec.
 
-## 6. Rutiny a souběžné zápisy do `canonical.json` (jen návrh)
+## 6. Rutiny a souběžné zápisy do `canonical.json`
 
-Rutiny nejsou součástí repozitáře a tento dokument je nemění.
+Rutiny nejsou součástí repozitáře. Po schválení vlastníka 2. 11. (15:39 UTC):
+
+- do čtvrteční i denní rutiny vložen krok 4a „Single writer for the registry“
+  a pokyny pro RIS OGD a Saarland (text níže, ve verzi, která nepočítá PR nesoucí
+  commity už sloučené do `main`),
+- jednorázová úloha z 15. 12. vypnuta (ne smazána).
 
 ### Riziko ve čtvrtek 5. 11.
 
@@ -203,15 +212,20 @@ Možnosti pro vlastníka:
 1. sloučit #80 před 5. 11. 05:47 UTC (doporučeno), nebo
 2. čtvrteční úlohu na 5. 11. dočasně vypnout.
 
-### Pravidlo jednoho zapisujícího (návrh textu do obou rutin)
-
-Vložit jako nový krok před úpravu registru:
+### Pravidlo jednoho zapisujícího (vloženo do obou rutin jako krok 4a)
 
 > Before editing data/driving-bans/canonical.json, list the open pull requests in
-> vratadajcm-png/dajc-eu that modify data/driving-bans/canonical.json. If any is
-> open, do not edit canonical.json. Record your findings only as evidence in the
-> report (and, once the evidence pipeline is merged, as a staging submission),
-> name the blocking pull request, and report DELIVERY_BLOCKED_BY_OPEN_REGISTRY_PR.
+> vratadajcm-png/dajc-eu and check for each whether it changes that file relative
+> to current main (git diff --quiet origin/main...<head> -- …; a PR that only
+> carries commits already merged into main does not count). If any open pull
+> request changes it, do not edit canonical.json and do not open a registry PR:
+> keep your findings as evidence in the report, name the blocking pull request(s)
+> and report DELIVERY_BLOCKED_BY_OPEN_REGISTRY_PR. If you cannot list open pull
+> requests, do not edit canonical.json either.
+
+Porovnání vůči `main` (`origin/main...<head>`) je nutné kvůli #88. Ten nese commit
+#80 a po jeho sloučení by jinak rutiny blokoval natrvalo. Dokud je otevřený #80
+nebo tento PR, rutiny registr neupraví.
 
 Technická pojistka k samostatnému schválení:
 
@@ -249,7 +263,7 @@ bězích a čtvrteční běh nechat jen sloučit výsledky. O sémantice čtvrte
 - Spustí se 15. 12., tedy 14 dní **po** termínu 1. 12., kdy se snapshot přepne na
   prosinec a leden.
 
-Doporučení: úlohu vypnout a nahradit plánem
+Úloha je od 2. 11. vypnutá (ne smazaná). Nahrazuje ji plán
 `docs/DRIVING_BANS_JANUARY_2027_PLAN.md`. Seznam kandidátních svátků 2027 z jejího
 zadání je v plánu převzatý jako neověřený vstup.
 
@@ -286,12 +300,47 @@ Sekundární vodítko (nepoužito jako důkaz): dpa-AFX přes ARIVA, 23. 10. 202
 „NRW: Lkw-Sonntagsfahrverbot bleibt fast bis Jahresende ausgesetzt“,
 https://www.ariva.de/news/nrw-lkw-sonntagsfahrverbot-bleibt-fast-bis-jahresende-12179879
 
-## 8. Rozhodnutí vlastníka
+## 8. Rozhodnutí vlastníka (2. 11. 2026: schváleno vše)
 
-1. Sloučit #80, ideálně před čtvrtkem 5. 11. 05:47 UTC, nebo na ten den vypnout
-   čtvrteční úlohu.
-2. Schválit návrhy z oddílů 4 a 5.2 k doplnění do registru. Bez schválení se nic
-   nemění. Nejbližší dotčené datum je 11. 11. (Baskicko).
-3. Vložit pravidlo jednoho zapisujícího do obou rutin (oddíl 6).
-4. Vypnout nebo nahradit jednorázovou úlohu z 15. 12.
-5. Schválit plán ledna 2027 (`docs/DRIVING_BANS_JANUARY_2027_PLAN.md`).
+| Bod | Stav |
+| --- | --- |
+| 1. Sloučit #80 před čtvrtkem 5. 11. 05:47 UTC | čeká na sloučení vlastníkem |
+| 2. Doplnit ES a DE do registru | v tomto PR (oddíl 9), platí po sloučení |
+| 3. Pravidlo jednoho zapisujícího v rutinách | provedeno |
+| 4. Vypnout úlohu z 15. 12. | provedeno |
+| 5. Plán ledna 2027 | schválen, práce začala |
+
+## 9. Změny registru v tomto PR
+
+Dataset `2026-11-02.r5-es-de-targeted.geo50`, záznam důkazů
+`data/driving-bans/source-reviews/2026-11-02-es-de.json`. PR nese commit #80.
+Do `main` patří až po #80, nebo spolu s ním.
+
+- **Nové zdroje (6):** `es-boe-2026-11-02`, `es-cat-isp-300-2026`,
+  `es-cat-isp-1933-2026`, `es-cat-sct-2026`, `es-bas-2026`,
+  `de-vmk-2026-10-beschluss-8-6`, každý s SHA-256.
+- **Nová pravidla ES (11):**
+  - 4 × příloha VII (každý den),
+  - Katalánsko: N-II soboty a neděle, Pyreneje 28. 11., zákaz nad 26 t,
+    C-153 Olot,
+  - Baskicko: 1. 11. a 10.–11. 11. (přeshraniční doprava).
+
+  Všechna jsou zveřejněna jen pro ověřené období 1.–30. 11. Žádné existující
+  pravidlo se nemění (audit vůči #80: 11 × `NEW_RULE`).
+- **ES zůstává neúplné:**
+  - `corridors` je `UNVERIFIED`,
+  - přibyly 4 důvody v `coverage_failures`,
+  - prosinec ES nezveřejňuje.
+- **DE:** nový zdroj a poznámka, pravidla beze změny.
+- **`last_checked`:** u ES a DE nastaveno na 2. 11., stejně jako u AT a DE v #80.
+  Audit počítá stáří kontroly z nejnovějšího `last_checked`. **Pokud se tento PR
+  sloučí před čtvrtkem 5. 11., projde čtvrteční kontrola čerstvosti, i když nejde
+  o úplnou kontrolu všech 50 jurisdikcí.** Rozlišení je v `review_log`
+  (`full_registry_sweep: false`). O sémantice brány dál rozhoduje vlastník
+  (varianta A nebo B).
+- **Testy:**
+  - test ES z #80 zúžen na řádky přílohy II, protože 20.–22. 11. nyní legitimně
+    platí celoroční pravidla. Záměr „žádný řádek Velké ceny na původní data“ zůstává.
+  - pevné hodiny testu archivního auditu posunuty z 10. 11. na 12. 11., aby dál
+    ležely víc než 8 dní po poslední zaznamenané kontrole. Podmínka „> 8“ zůstává.
+  - nový test „2 Nov 2026 — Spain“.

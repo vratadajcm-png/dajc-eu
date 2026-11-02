@@ -184,7 +184,7 @@ describe('approved geographic scope and data preservation', () => {
     const root = mkdtempSync(join(tmpdir(),'dajc-geo-audit-'));
     try {
       // Clock after the latest recorded review, so the run cannot borrow freshness from the future.
-      const output = execFileSync(process.execPath, ['scripts/audit-driving-bans.mjs', '--clock', '2026-11-10T10:00:00Z', '--previous', 'archive/geographic-coverage-20261022/original/data/driving-bans/canonical.json', '--output', root], {encoding:'utf8'});
+      const output = execFileSync(process.execPath, ['scripts/audit-driving-bans.mjs', '--clock', '2026-11-12T10:00:00Z', '--previous', 'archive/geographic-coverage-20261022/original/data/driving-bans/canonical.json', '--output', root], {encoding:'utf8'});
       const summary = JSON.parse(output);
       expect(summary.changes.filter(change => change.kind === 'REMOVED_RECORD_REQUIRES_REVIEW')).toEqual([]);
       expect(summary.changes.every(change => expected.includes(change.jurisdiction))).toBe(true);
