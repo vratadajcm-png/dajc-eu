@@ -23,6 +23,19 @@ export function registerProductionDrivingBanTests(test, a) {
     }
     a.equal(validateCanonical(current, coverage), true);
   });
+  test('rolling year exposes verified near-term month portions without pretending future laws are known', () => {
+    const v = at(new Date('2026-11-02T12:00:00Z'));
+    a.deepEqual(v.window, {from: '2026-11-02', to: '2027-11-02', timezone: 'Europe/Prague'});
+    const cz = v.jurisdictions.find(j => j.jurisdiction === 'CZ');
+    a.equal(cz.coverage_complete, false, 'full 12-month legal coverage has not been verified');
+    a.deepEqual(cz.monthly_coverage.slice(0, 3).map(m => [m.from, m.to, m.coverage_complete]), [
+      ['2026-11-02', '2026-11-30', true],
+      ['2026-12-01', '2026-12-31', true],
+      ['2027-01-01', '2027-01-31', false],
+    ]);
+    a.ok(v.events.every(e => e.date <= '2026-12-31'), 'unknown future law must not create extrapolated events');
+    a.equal(v.jurisdictions.filter(j => j.ban_state === 'NO_BAN').length, 0);
+  });
   test('production: NO_BAN only with complete PRIMARY_VERIFIED evidence; UNVERIFIED/UNKNOWN never NO_BAN', () => {
     for (const j of at().jurisdictions) {
       if (j.ban_state === 'NO_BAN') {
