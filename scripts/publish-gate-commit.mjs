@@ -174,20 +174,42 @@ git(['commit', '-m', decision.message]);
 git(['push', 'origin', `HEAD:refs/heads/${branch}`]);
 
 // A standard PR respects the main rules; this script never approves or
-// merges it. GITHUB_TOKEN-created PR checks need workflow approval before
-// starting, so dispatch both trusted CI workflows on the exact content branch.
+// merges it. GitHub holds the pull_request CI of a PR opened by
+// github-actions[bot] until a user with write access approves it, and the
+// main ruleset counts only that CI: workflow_dispatch runs never satisfy it
+// (W45, 29 October 2026). A PR opened with the owner's DAJC_WEEKLY_PR_TOKEN
+// runs its CI at once, so the release step can merge it unattended. Without
+// the token, or if GitHub rejects it, the bot opens the PR and both trusted CI
+// workflows are dispatched on the content branch as an early signal for the
+// human reviewer.
+const prToken = process.env.DAJC_WEEKLY_PR_TOKEN || '';
 const temporary = mkdtempSync(path.join(tmpdir(), 'dajc-publication-pr-'));
 try {
   const bodyFile = path.join(temporary, 'body.md');
-  writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\n${autoMerge ? 'Claude approved the exact final article. The workflow merges it once application-validate and news-validate pass; the site shows it from its Friday 12:00 Europe/Prague slot. ' : 'Waiting for human review: merge to publish. This run has not published the article. '}Only approved article/data paths are changed.\n`);
-  const prUrl = execFileSync('gh', ['pr', 'create', '--repo', repository, '--base', 'main', '--head', branch, '--title', decision.message, '--body-file', bodyFile], { encoding: 'utf8' }).trim();
-  summary(`### EU Oversize Weekly - prepared\n\n${prUrl}\n\n${autoMerge ? 'Claude-approved: the release step merges it after required CI.' : 'Opened for human review: merge to publish. Article published this run: **no**.'}`);
-  for (const workflow of ['application-ci.yml', 'news-ci.yml']) execFileSync('gh', ['workflow', 'run', workflow, '--repo', repository, '--ref', branch], { stdio: 'inherit' });
+  const openPr = (env, releasedUnattended) => {
+    writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\n${releasedUnattended ? 'Claude approved the exact final article. The workflow merges it once application-validate and news-validate pass; the site shows it from its Friday 12:00 Europe/Prague slot. ' : autoMerge ? 'Claude approved the exact final article. Waiting for human review: approve the pending workflows, then merge to publish. This run has not published the article. ' : 'Waiting for human review: merge to publish. This run has not published the article. '}Only approved article/data paths are changed.\n`);
+    return execFileSync('gh', ['pr', 'create', '--repo', repository, '--base', 'main', '--head', branch, '--title', decision.message, '--body-file', bodyFile], { encoding: 'utf8', env }).trim();
+  };
+  let prUrl = '';
+  let unattended = false;
+  if (prToken) {
+    try {
+      prUrl = openPr({ ...process.env, GH_TOKEN: prToken }, autoMerge);
+      unattended = autoMerge;
+    } catch {
+      console.log('::warning::DAJC_WEEKLY_PR_TOKEN could not open the PR (expired or missing permission); opening it with the job token for human review.');
+    }
+  }
+  if (!prUrl) {
+    prUrl = openPr(process.env, false);
+    for (const workflow of ['application-ci.yml', 'news-ci.yml']) execFileSync('gh', ['workflow', 'run', workflow, '--repo', repository, '--ref', branch], { stdio: 'inherit' });
+  }
+  summary(`### EU Oversize Weekly - prepared\n\n${prUrl}\n\n${unattended ? 'Claude-approved: the release step merges it after required CI.' : autoMerge ? 'Claude-approved, but opened by github-actions[bot]: approve the pending workflows and merge to publish. Article published this run: **no**.' : 'Opened for human review: merge to publish. Article published this run: **no**.'}`);
   // The workflow's release step merges an approved edition once the required
   // checks pass, within the main ruleset (owner decision, 24 October 2026:
   // the Weekly publishes autonomously every Friday at 12:00).
   if (process.env.GITHUB_OUTPUT) {
-    appendFileSync(process.env.GITHUB_OUTPUT, `pr_url=${prUrl}\nauto_merge=${autoMerge ? 'true' : 'false'}\n`);
+    appendFileSync(process.env.GITHUB_OUTPUT, `pr_url=${prUrl}\nauto_merge=${autoMerge ? 'true' : 'false'}\nunattended=${unattended ? 'true' : 'false'}\n`);
   }
 } finally {
   rmSync(temporary, { recursive: true, force: true });

@@ -369,9 +369,11 @@ The pipeline is split instead:
    `publishedAt` = the Friday 12:00 Europe/Prague instant as a UTC timestamp
    (e.g. `2026-09-25T10:00:00.000Z`, CET/CEST handled by
    `publicationSlotFor()` in `scripts/lib/next-publication.mjs`). It opens a
-   PR, explicitly dispatches CI and waits for review. Approve and merge the
-   PR before Friday noon for the usual scheduled release; only that merge
-   deploys the article to production. The findings behind the edition are
+   PR. A Claude-approved edition is merged by the workflow once the PR's
+   required CI passes, unattended when the PR is opened with
+   `DAJC_WEEKLY_PR_TOKEN`; any other PR, and every PR without that token,
+   waits for the owner to approve its pending workflows and merge it before
+   Friday noon. Only that merge deploys the article to production. The findings behind the edition are
    saved on `automation/oversize-data` as well, so closing a rejected PR does
    not lose them. After the slot (Friday 13:37 CEST / 12:37 CET, Saturday) the
    watchdog fails while the edition PR, including a `-retry-<run>` PR, is
@@ -618,6 +620,7 @@ matches what `scripts/lib/article-writer.mjs` expects the schema to be.
 |---|---|---|
 | `PERPLEXITY_API_KEY` | `daily-oversize-monitor.yml`, `publish-weekly-oversize.yml` | Perplexity Search API discovery in the monitor and the final data refresh. |
 | `ANTHROPIC_API_KEY` | `daily-oversize-monitor.yml`, `publish-weekly-oversize.yml`, social workflows | Claude classification of Search leads, writing the edition, the final review and social copy. |
+| `DAJC_WEEKLY_PR_TOKEN` (optional) | `publish-weekly-oversize.yml` | Owner fine-grained token for this repository only: *Contents: read-only*, *Pull requests: read and write*. Opens the edition PR so its CI runs without workflow approval and the Friday edition is released unattended. See [MAIN_PROTECTION.md](MAIN_PROTECTION.md). |
 
 Optional repository variables: `CLAUDE_CLASSIFIER_MODEL` (default
 `claude-haiku-5-5`), `CLAUDE_REVIEW_MODEL` (default `claude-sonnet-5-5`) and
@@ -634,8 +637,8 @@ GitHub integration (deploys automatically on push to `main`), which is
 unrelated to these workflows and is not configured here.
 
 GitHub Actions must be allowed to create PRs in repository settings. The
-weekly workflows use the standard job token for PR creation and explicit
-CI dispatch; no separate personal token or main bypass is required. See
+weekly workflows use the standard job token, and `DAJC_WEEKLY_PR_TOKEN` only
+to open the edition PR; there is no main bypass. See
 [MAIN_PROTECTION.md](MAIN_PROTECTION.md) before enabling main protection.
 
 ### Run the workflows manually
@@ -945,7 +948,7 @@ Shipping the Sonar/Claude integration does **not** change existing company socia
 
 The tested Perplexity endpoint is POST https://api.perplexity.ai/search, not Sonar Chat Completions (HTTP 403 in isolated tests). The web-search adapter retrieves URL leads, Claude classifies them into the canonical finding schema, and each classified URL must match a returned Search URL. Every URL is then opened and verified by verifySearchItem. Existing eligibility, scope, freshness and official-first rules apply. Claude writes only from verified findings using the existing article schema. Independent Claude final review and protected GitHub CI remain mandatory.
 
-This is the only research and writing path; there are no provider flags. OpenAI and Perplexity Sonar were removed on 24 October 2026 (owner decision, lowest cost), after the 24 October Search → Claude run had prepared an edition end to end. Both PERPLEXITY_API_KEY and ANTHROPIC_API_KEY are required. The classifier runs on Claude Haiku at low effort (CLAUDE_CLASSIFIER_MODEL). Any failed API or unsupported claim blocks release. Protected auto-merge stays off unless DAJC_WEEKLY_AUTO_MERGE=true.
+This is the only research and writing path; there are no provider flags. OpenAI and Perplexity Sonar were removed on 24 October 2026 (owner decision, lowest cost), after the 24 October Search → Claude run had prepared an edition end to end. Both PERPLEXITY_API_KEY and ANTHROPIC_API_KEY are required. The classifier runs on Claude Haiku at low effort (CLAUDE_CLASSIFIER_MODEL). Any failed API or unsupported claim blocks release. The autonomous release is on unless DAJC_WEEKLY_AUTO_MERGE=false, and unattended only with DAJC_WEEKLY_PR_TOKEN.
 
 Single-source rule: all news articles live only at https://www.dajc.eu/news/. DAJC.cz contains a Czech navigation link to the English archive, not duplicate articles or a second publisher. English social teasers link only to the actual public DAJC.eu article. Any Czech teaser must disclose that the full article is in English and link to DAJC.eu. No Czech article translation or second news archive is authorized.
 

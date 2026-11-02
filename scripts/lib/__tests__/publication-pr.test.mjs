@@ -37,7 +37,7 @@ function fixture() {
   const bin = path.join(base, 'bin');
   mkdirSync(bin);
   const log = path.join(base, 'gh.jsonl');
-  writeFileSync(path.join(bin, 'gh'), `#!${process.execPath}\nimport { appendFileSync, readFileSync } from 'node:fs';\nconst args = process.argv.slice(2);\nconst bodyIndex = args.indexOf('--body-file');\nappendFileSync(process.env.GH_TEST_LOG, JSON.stringify({args, body: bodyIndex < 0 ? null : readFileSync(args[bodyIndex + 1], 'utf8')}) + '\\n');\nif(args[0] === 'pr' && args[1] === 'create') console.log('https://github.com/example/dajc/pull/9001');\nif(args[0] === 'pr' && args[1] === 'list') console.log(process.env.GH_TEST_PULLS || (process.env.GH_TEST_PENDING === '1' ? '[{"url":"https://github.com/example/dajc/pull/9001","headRefName":"automation/weekly-2026-w43"}]' : '[]'));\n`, { mode: 0o755 });
+  writeFileSync(path.join(bin, 'gh'), `#!${process.execPath}\nimport { appendFileSync, readFileSync } from 'node:fs';\nconst args = process.argv.slice(2);\nconst bodyIndex = args.indexOf('--body-file');\nappendFileSync(process.env.GH_TEST_LOG, JSON.stringify({args, token: process.env.GH_TOKEN, body: bodyIndex < 0 ? null : readFileSync(args[bodyIndex + 1], 'utf8')}) + '\\n');\nif(args[0] === 'pr' && args[1] === 'create') { if (process.env.GH_TOKEN === 'expired-owner-token') process.exit(1); console.log('https://github.com/example/dajc/pull/9001'); }\nif(args[0] === 'pr' && args[1] === 'list') console.log(process.env.GH_TEST_PULLS || (process.env.GH_TEST_PENDING === '1' ? '[{"url":"https://github.com/example/dajc/pull/9001","headRefName":"automation/weekly-2026-w43"}]' : '[]'));\n`, { mode: 0o755 });
   const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, GH_TOKEN: 'synthetic-test-token', GITHUB_REPOSITORY: 'example/dajc', GH_TEST_LOG: log, GITHUB_ACTIONS: 'true', GITHUB_OUTPUT: path.join(base, 'outputs'), GITHUB_STEP_SUMMARY: path.join(base, 'summary'), OVERSIZE_NOW: '2026-10-15T10:00:00Z', OVERSIZE_CORRECTION: '', OVERSIZE_PREVIEW: '' };
   return { base, root, remote, main, env, log };
 }
@@ -77,8 +77,7 @@ describe('reviewed weekly publication', () => {
     expect(calls[0].body).toContain('Waiting for human review');
   });
 
-  it('marks a Claude-approved edition for release but never merges it itself', () => {
-    const f = fixture();
+  function approvedEdition(f) {
     loadAutomationData('findings', f.root);
     const article = 'validated article fixture';
     const relative = 'src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md';
@@ -88,13 +87,53 @@ describe('reviewed weekly publication', () => {
       articlePath: relative, targetWeek: '2026-W43', sha256: createHash('sha256').update(article).digest('hex'),
       researchProvider: 'perplexity-search', claudeModel: 'claude-sonnet-5-5', leadCount: 1, sourceCount: 1,
     }));
-    run(f, 'publish-gate-commit.mjs', { DAJC_AUTONOMOUS_WEEKLY: '1', RUNNER_TEMP: runnerTemp });
+    return runnerTemp;
+  }
+
+  it('opens a Claude-approved edition with the owner token so its CI runs and the release step can merge it', () => {
+    const f = fixture();
+    const runnerTemp = approvedEdition(f);
+    run(f, 'publish-gate-commit.mjs', { DAJC_AUTONOMOUS_WEEKLY: '1', RUNNER_TEMP: runnerTemp, DAJC_WEEKLY_PR_TOKEN: 'synthetic-owner-token' });
     const outputs = readFileSync(f.env.GITHUB_OUTPUT, 'utf8');
     expect(outputs).toContain('auto_merge=true');
+    expect(outputs).toContain('unattended=true');
     expect(outputs).toContain('pr_url=https://github.com/example/dajc/pull/9001');
     const calls = readFileSync(f.log, 'utf8').trim().split('\n').map(JSON.parse);
+    const create = calls.find((call) => call.args[0] === 'pr' && call.args[1] === 'create');
+    expect(create.token).toBe('synthetic-owner-token');
+    expect(create.body).toContain('The workflow merges it once application-validate and news-validate pass');
+    // The PR's own pull_request CI is what the ruleset counts.
+    expect(calls.some((call) => call.args[0] === 'workflow')).toBe(false);
     expect(calls.some((call) => call.args[0] === 'pr' && call.args[1] === 'merge')).toBe(false);
+    expect(git(f.remote, ['rev-parse', 'main']).trim()).toBe(f.main);
+  });
+
+  it('falls back to a bot PR for human review when the owner token is rejected', () => {
+    const f = fixture();
+    const runnerTemp = approvedEdition(f);
+    const output = run(f, 'publish-gate-commit.mjs', { DAJC_AUTONOMOUS_WEEKLY: '1', RUNNER_TEMP: runnerTemp, DAJC_WEEKLY_PR_TOKEN: 'expired-owner-token' });
+    expect(output).toContain('::warning::DAJC_WEEKLY_PR_TOKEN could not open the PR');
+    expect(readFileSync(f.env.GITHUB_OUTPUT, 'utf8')).toContain('unattended=false');
+    const calls = readFileSync(f.log, 'utf8').trim().split('\n').map(JSON.parse);
+    const opened = calls.filter((call) => call.args[0] === 'pr' && call.args[1] === 'create');
+    expect(opened.map((call) => call.token)).toEqual(['expired-owner-token', 'synthetic-test-token']);
+    expect(opened[1].body).toContain('approve the pending workflows, then merge to publish');
+    expect(calls.filter((call) => call.args[0] === 'workflow').map((call) => call.args[2])).toEqual(['application-ci.yml', 'news-ci.yml']);
+  });
+
+  it('leaves a Claude-approved edition for a human when the bot must open the PR (W45)', () => {
+    const f = fixture();
+    const runnerTemp = approvedEdition(f);
+    const output = run(f, 'publish-gate-commit.mjs', { DAJC_AUTONOMOUS_WEEKLY: '1', RUNNER_TEMP: runnerTemp });
+    const outputs = readFileSync(f.env.GITHUB_OUTPUT, 'utf8');
+    expect(outputs).toContain('auto_merge=true');
+    expect(outputs).toContain('unattended=false');
+    const calls = readFileSync(f.log, 'utf8').trim().split('\n').map(JSON.parse);
+    expect(calls[0].token).toBe('synthetic-test-token');
     expect(calls[0].body).toContain('Claude approved the exact final article');
+    expect(calls[0].body).toContain('approve the pending workflows, then merge to publish');
+    expect(calls.slice(1).map((call) => call.args[2])).toEqual(['application-ci.yml', 'news-ci.yml']);
+    expect(output).toContain('Article published this run: **no**');
     expect(git(f.remote, ['rev-parse', 'main']).trim()).toBe(f.main);
   });
 

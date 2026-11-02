@@ -1,7 +1,7 @@
 # Main protection and publication automation
 
 Code and public articles reach `main` only through protected PRs with required CI.
-The owner reviews code, security, workflow and correction changes. The normal final EU Oversize Weekly article is released autonomously (owner decision, 24 October 2026): after the source-grounded checks and SHA-bound Claude approval, the publishing workflow merges it once the required CI passes. `DAJC_WEEKLY_AUTO_MERGE=false` switches this off. Neither `GITHUB_TOKEN` nor a publication bot bypasses main.
+The owner reviews code, security, workflow and correction changes. The normal final EU Oversize Weekly article is released autonomously (owner decision, 24 October 2026): after the source-grounded checks and SHA-bound Claude approval, the publishing workflow merges it once the required CI passes. That is unattended only when the PR is opened with the owner's `DAJC_WEEKLY_PR_TOKEN` (see below); otherwise the owner approves the pending workflows and merges. `DAJC_WEEKLY_AUTO_MERGE=false` switches this off. Neither `GITHUB_TOKEN` nor a publication bot bypasses main.
 
 ## Applied protection — 13 October 2026
 
@@ -64,12 +64,25 @@ Apply after this change is merged and the new CI check names exist:
    main rule. A matching rule for every branch would also block durable
    data reservations and must not be substituted for the main-only rule.
 
-The weekly automation opens a PR and explicitly dispatches Application CI
-and News Pipeline CI on that content branch. GitHub places `pull_request`
-runs created using `GITHUB_TOKEN` in an approval-required state; explicit
-`workflow_dispatch` starts these trusted checks without waiting for that
-separate workflow-approval banner.
-It never submits an approving review. Since 24 October 2026 it merges a Claude-approved final edition itself once the required checks pass (no ruleset bypass); every other PR, including a vetoed edition, waits for a human.
+The weekly automation opens a PR for each edition. Since June 2026 GitHub
+holds the `pull_request` CI of a PR opened by `github-actions[bot]` until a
+user with write access approves it, and the ruleset counts only that CI:
+passing `workflow_dispatch` runs of the same jobs leave the required checks
+"expected" (W45, 29 October 2026). Two ways out:
+
+- **Unattended (recommended):** add the repository secret
+  `DAJC_WEEKLY_PR_TOKEN`, a fine-grained personal access token of the owner
+  limited to `vratadajcm-png/dajc-eu` with *Contents: read-only* and *Pull
+  requests: read and write*. The gate opens the PR with it, so the PR's CI
+  starts at once and the release step merges a Claude-approved edition
+  within the ruleset. The token is used only for `gh pr create`; pushes and
+  the merge use the job token.
+- **Without the token:** the gate dispatches Application CI and News
+  Pipeline CI on the content branch as an early signal, and the release step
+  fails with a notice. The owner approves the pending workflows on the PR
+  (or re-runs them) and merges it.
+
+The automation never submits an approving review. Since 24 October 2026 it merges a Claude-approved final edition itself once the required checks pass (no ruleset bypass); every other PR, including a vetoed edition, waits for a human.
 Scheduled retries see the open PR and skip before making additional AI calls.
 A prepared PR is reported as **awaiting review**, never as a published article.
 
@@ -104,7 +117,7 @@ References: [GitHub protected branches](https://docs.github.com/en/repositories/
 
 ## Sonar / Claude guarded release and Buffer social setup (23 October 2026)
 
-The final weekly editorial article uses the Perplexity Search API for research, Claude for classification and writing, and Claude for final source-by-source approval (OpenAI and Sonar removed 24 October 2026). Since 24 October 2026 the final Weekly is released autonomously unless `DAJC_WEEKLY_AUTO_MERGE=false`: a SHA-256 approval receipt is checked immediately before the publication PR is created, and the workflow merges the PR only after `application-validate` and `news-validate` pass. A Claude veto leaves the PR for human review. There is **no ruleset bypass** and no autonomous merge for code, infrastructure, security policies, previews or manually corrected past articles.
+The final weekly editorial article uses the Perplexity Search API for research, Claude for classification and writing, and Claude for final source-by-source approval (OpenAI and Sonar removed 24 October 2026). Since 24 October 2026 the final Weekly is released autonomously unless `DAJC_WEEKLY_AUTO_MERGE=false`: a SHA-256 approval receipt is checked immediately before the publication PR is created, and the workflow merges the PR only after `application-validate` and `news-validate` pass on the PR itself (unattended with `DAJC_WEEKLY_PR_TOKEN`). A Claude veto leaves the PR for human review. There is **no ruleset bypass** and no autonomous merge for code, infrastructure, security policies, previews or manually corrected past articles.
 
 The independent watchdog delegates to the canonical workflow; it cannot create a parallel publisher. READY deployment is not a public article until checked on the live DAJC.eu URL.
 
