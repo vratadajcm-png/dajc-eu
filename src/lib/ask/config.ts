@@ -8,9 +8,10 @@
 // price or budget leaves the feature off: without them neither the daily
 // limit nor the monthly cost cap could be enforced.
 //
-// Keys are separate from the weekly article pipeline (§47.2). The pipeline's
-// variables are only compared here, never read for use, so a copied key is
-// rejected instead of silently sharing the pipeline's quota.
+// Keys are separate from the weekly article pipeline (§47.2) and from Driving
+// Bans research (DAJC_RESEARCH_*: no question of a user reaches the research
+// models). Those variables are only compared here, never read for use, so a
+// copied key is rejected instead of silently sharing their quota.
 
 export type AskEnv = Record<string, string | undefined>;
 
@@ -56,10 +57,13 @@ const DEFAULT_EMAIL_FROM = 'DAJC <team@dajc.eu>';
 const DEFAULT_PUBLIC_ORIGIN = 'https://www.dajc.eu';
 
 // Compared only - see the header comment.
-const PIPELINE_KEYS: Array<[ask: string, pipeline: string]> = [
+const SEPARATE_KEYS: Array<[ask: string, other: string]> = [
   ['DAJC_ASK_OPENAI_API_KEY', 'OPENAI_API_KEY'],
   ['DAJC_ASK_ANTHROPIC_API_KEY', 'ANTHROPIC_API_KEY'],
   ['DAJC_ASK_PERPLEXITY_API_KEY', 'PERPLEXITY_API_KEY'],
+  ['DAJC_ASK_OPENAI_API_KEY', 'DAJC_RESEARCH_OPENAI_API_KEY'],
+  ['DAJC_ASK_ANTHROPIC_API_KEY', 'DAJC_RESEARCH_ANTHROPIC_API_KEY'],
+  ['DAJC_ASK_PERPLEXITY_API_KEY', 'DAJC_RESEARCH_PERPLEXITY_API_KEY'],
 ];
 
 const REQUIRED = [
@@ -140,8 +144,8 @@ export function readAskConfig(env: AskEnv = process.env): AskConfigResult {
   for (const name of REQUIRED) {
     if (!env[name]?.trim()) problems.push(`${name} is missing`);
   }
-  for (const [ask, pipeline] of PIPELINE_KEYS) {
-    if (env[ask] && env[ask] === env[pipeline]) problems.push(`${ask} must be a separate key from the article pipeline's ${pipeline}`);
+  for (const [ask, other] of SEPARATE_KEYS) {
+    if (env[ask] && env[ask] === env[other]) problems.push(`${ask} must be a separate key from ${other}`);
   }
 
   const pricing = parsePricing(env.DAJC_ASK_PRICING_USD);

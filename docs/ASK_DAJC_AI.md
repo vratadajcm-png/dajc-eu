@@ -56,7 +56,9 @@ The free Ask, paid DAJC Intelligence and paid DAJC AI read the same published
 registry and the same legal verification state. Confirmed driving-ban facts
 come only from the published snapshot — the data of `/driving-bans`, its JSON
 and ICS — read through `readPublishedDrivingBans()` in
-`driving-bans-adapter.ts` and evaluated by the shared contract of PR #84.
+`driving-bans-adapter.ts` and evaluated by the shared contract
+(`driving-bans-ai-contract.ts` over the Driving Bans query service
+`driving-bans-query.ts`, the same evaluation DAJC Intelligence uses).
 `npm run lint:driving-bans` fails if code in `src/lib/ask` reads canonical
 data, staging evidence or the review layer directly, or reaches the paid
 authorisation path.
@@ -71,15 +73,20 @@ authorisation path.
 For every asked country and day the registry answers:
 
 - `BAN_FOUND` — verified legal driving ban; facts rendered by template;
-- `NO_CONFIRMED_BAN` — the country is verified in full for the published
-  period (current and next month, Prague time) and no verified ban applies.
-  Shown as a registry statement that also says temporary restrictions,
-  roadworks and permit conditions are not part of the registry;
-- `INSUFFICIENT_VERIFIED_DATA` — anything else, including any date outside
-  the published period.
+- `NO_CONFIRMED_BAN` — the country is verified in full for that day and no
+  verified ban applies. Shown as a registry statement that also says
+  temporary restrictions, roadworks and permit conditions are not part of
+  the registry;
+- `INSUFFICIENT_VERIFIED_DATA` — anything else, including a day of the
+  published year outside the verified months and any date after it.
 
-Each driving-ban answer lists this per country with the published period,
-whether the country is verified in full and the date of last verification.
+The published snapshot spans a rolling year from today (Prague time) and is
+verified month by month (`monthly_coverage`). Whether a country is verified
+in full is therefore taken from the contract for the asked days (its answer
+status), never from the whole-window row, which stays incomplete until the
+whole year is reviewed. Each driving-ban answer lists per country the outcome,
+the period assessed (the asked days), whether the country is verified in full
+for it and the date of last verification.
 Exceptions are listed as published and never assessed for a specific
 transport.
 
@@ -184,7 +191,10 @@ Question and answer texts are never stored by DAJC. OpenAI is called with
 | `DAJC_ASK_MIGRATION_DB_URL` | local only | admin connection for `drizzle-kit migrate`; never in Vercel |
 
 A key equal to the article pipeline's `ANTHROPIC_API_KEY`,
-`PERPLEXITY_API_KEY` or `OPENAI_API_KEY` is rejected and keeps the feature off.
+`PERPLEXITY_API_KEY` or `OPENAI_API_KEY`, or to Driving Bans research's
+`DAJC_RESEARCH_ANTHROPIC_API_KEY`, `DAJC_RESEARCH_PERPLEXITY_API_KEY` or
+`DAJC_RESEARCH_OPENAI_API_KEY`, is rejected and keeps the feature off. No
+question of a user ever reaches the research models.
 
 ## Launch checklist (all required before `DAJC_ASK_ENABLED=true`)
 

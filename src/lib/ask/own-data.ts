@@ -8,8 +8,11 @@
 // and uses only the free tools.
 //
 // Per country and asked day the contract answers BAN_FOUND, NO_CONFIRMED_BAN
-// (the country is verified in full for the published period and no verified
-// ban applies) or INSUFFICIENT_VERIFIED_DATA. Missing data are never presented
+// (the country is verified in full for that day and no verified ban applies)
+// or INSUFFICIENT_VERIFIED_DATA. The published snapshot spans a rolling year
+// and is verified month by month (monthly_coverage), so whether a country is
+// verified in full is always taken from the contract for the asked days, never
+// from the whole-window row. Missing data are never presented
 // as "no ban"; official websites may then be searched, but their content stays
 // an unverified lead for the Driving Bans review layer.
 //
@@ -83,9 +86,11 @@ export interface JurisdictionVerification {
   /** INSUFFICIENT_VERIFIED_DATA when any asked day is not decided by the registry. */
   outcome: JurisdictionOutcome;
   days: Array<{ date: string; outcome: JurisdictionOutcome }>;
+  /** Verified in full for every asked day (the contract's monthly coverage), not for the whole published year. */
   coverageComplete: boolean;
   verificationState: string;
   lastVerified: string | null;
+  /** The period assessed: the first to the last asked day. */
   period: { from: string; to: string };
   /** The contract asks for a check with the official source (incomplete coverage, exceptions, undecided days). */
   authorityCheckRequired: boolean;
@@ -176,7 +181,7 @@ export function noConfirmedBanRecord(code: string, days: string[], timezone: str
     `DAJC verified registry statement. Country: ${facts.country}.`,
     `Finding: ${NO_CONFIRMED_BAN_FINDING}`,
     `Days: ${facts.localTime}.`,
-    'Scope: The country is verified in full for the published period. Temporary traffic restrictions, roadworks and permit conditions are not part of the registry.',
+    'Scope: The country is verified in full for the days listed. Temporary traffic restrictions, roadworks and permit conditions are not part of the registry.',
     `Authority: ${facts.authority}.`,
     `Verified by DAJC: ${facts.verified}.`,
   ].join('\n');
@@ -228,8 +233,10 @@ export function lookupDrivingBans(
         view: published,
       });
       const outcome = (answer.completeness.find((c) => c.jurisdiction === code)?.outcome ?? 'INSUFFICIENT_VERIFIED_DATA') as JurisdictionOutcome;
-      return { date, outcome, authority: answer.authority_check_required, uids: answer.facts.map((fact) => String(fact.uid)) };
+      // OK only when the country is decided and verified in full for this day.
+      return { date, outcome, decided: answer.status === 'OK', authority: answer.authority_check_required, uids: answer.facts.map((fact) => String(fact.uid)) };
     });
+    const covered = perDay.every((d) => d.decided);
     const outcomes = perDay.map((d) => d.outcome);
     const outcome: JurisdictionOutcome = outcomes.includes('INSUFFICIENT_VERIFIED_DATA') ? 'INSUFFICIENT_VERIFIED_DATA'
       : outcomes.includes('BAN_FOUND') ? 'BAN_FOUND' : 'NO_CONFIRMED_BAN';
@@ -237,10 +244,10 @@ export function lookupDrivingBans(
       jurisdiction: code,
       outcome,
       days: perDay.map(({ date, outcome: o }) => ({ date, outcome: o })),
-      coverageComplete: Boolean(row?.coverage_complete),
-      verificationState: row?.verification_state ?? 'UNVERIFIED',
+      coverageComplete: covered,
+      verificationState: covered ? 'PRIMARY_VERIFIED' : row?.verification_state ?? 'UNVERIFIED',
       lastVerified: row?.last_verified ?? null,
-      period: { from: published.window.from, to: published.window.to },
+      period: { from: days[0], to: days[days.length - 1] },
       authorityCheckRequired: perDay.some((d) => d.authority),
     };
 

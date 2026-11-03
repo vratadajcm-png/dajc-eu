@@ -68,6 +68,16 @@ describe('Ask DAJC AI is off by default', () => {
     expect(!result.ok && result.problems.join(' ')).toMatch(/separate key/);
   });
 
+  it.each([
+    ['DAJC_ASK_OPENAI_API_KEY', 'DAJC_RESEARCH_OPENAI_API_KEY'],
+    ['DAJC_ASK_ANTHROPIC_API_KEY', 'DAJC_RESEARCH_ANTHROPIC_API_KEY'],
+    ['DAJC_ASK_PERPLEXITY_API_KEY', 'DAJC_RESEARCH_PERPLEXITY_API_KEY'],
+  ])('rejects %s copied from Driving Bans research (%s)', (ask, research) => {
+    const result = readAskConfig({ ...FULL_ENV, [research]: FULL_ENV[ask] });
+    expect(result.ok).toBe(false);
+    expect(!result.ok && result.problems.join(' ')).toContain(`${ask} must be a separate key from ${research}`);
+  });
+
   it('rejects invalid pricing, budgets and limits', () => {
     expect(getAskConfig({ ...FULL_ENV, DAJC_ASK_PRICING_USD: '{"answer":1}' })).toBeNull();
     expect(getAskConfig({ ...FULL_ENV, DAJC_ASK_MONTHLY_BUDGET_EUR: '-5' })).toBeNull();

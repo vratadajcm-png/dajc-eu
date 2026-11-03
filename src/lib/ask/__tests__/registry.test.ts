@@ -91,7 +91,7 @@ describe('2. fully verified jurisdiction in the right period: verified answer wi
     expect(rows).toMatchObject({ Verified: '2026-09-26', 'Legal basis': 'Act 361/2000 Sb. §43' });
     expect(answer.verification).toEqual([{
       jurisdiction: 'CZ', outcome: 'BAN_FOUND', days: [{ date: SUNDAY, outcome: 'BAN_FOUND' }], coverageComplete: true,
-      verificationState: 'PRIMARY_VERIFIED', lastVerified: '2026-09-26T15:25:00.000Z', period: { from: '2026-10-01', to: '2026-11-30' },
+      verificationState: 'PRIMARY_VERIFIED', lastVerified: '2026-09-26T15:25:00.000Z', period: { from: SUNDAY, to: SUNDAY },
       // Listed exceptions: the shared contract asks for a check with the official source.
       authorityCheckRequired: true,
     }]);
@@ -100,11 +100,12 @@ describe('2. fully verified jurisdiction in the right period: verified answer wi
 });
 
 describe('3. a date outside the verified period: INSUFFICIENT_VERIFIED_DATA, never "no ban"', () => {
-  it('keeps a fully verified country undecided after its published period', async () => {
+  it('keeps CZ undecided in December: inside the published year, outside its verified months', async () => {
+    expect(fixtureView().window.to > '2026-12-08').toBe(true);
     const { deps: d } = deps({ classification: { dates: ['2026-12-08'] } });
     const { answer } = await runPipeline('Is there a truck driving ban in Czechia on 8 December 2026?', 'en', d);
     expect(answer.level).toBe('INSUFFICIENT_VERIFIED_DATA');
-    expect(answer.verification[0]).toMatchObject({ jurisdiction: 'CZ', outcome: 'INSUFFICIENT_VERIFIED_DATA', coverageComplete: true, period: { from: '2026-10-01', to: '2026-11-30' } });
+    expect(answer.verification[0]).toMatchObject({ jurisdiction: 'CZ', outcome: 'INSUFFICIENT_VERIFIED_DATA', coverageComplete: false, period: { from: '2026-12-08', to: '2026-12-08' } });
     expect(answer.ui.outcomeLabels[answer.verification[0].outcome]).toBe('insufficient verified data');
     expect(answer.notices).toContain('Insufficient verified data for: CZ. This does not mean that there is no ban.');
     expect(JSON.stringify(answer)).not.toContain(NO_CONFIRMED_BAN_FINDING);
@@ -117,7 +118,7 @@ describe('3. a date outside the verified period: INSUFFICIENT_VERIFIED_DATA, nev
       draft: () => ({ claims: [{ text: 'The Czech ministry page states a truck driving ban on Sunday 6 December 2026 from 13 to 22 (zákaz jízdy).', source_id: 'S1', quote: CZ_QUOTE }], covers_question: true }),
     }, { fetchPage: fakeFetchPage({ [CZ_LEAD]: { html: htmlPage('Omezení jízdy', CZ_TEXT) } }) });
     const { answer } = await runPipeline('Is there a truck driving ban in Czechia on 6 December 2026?', 'en', d);
-    expect(answer.verification[0]).toMatchObject({ jurisdiction: 'CZ', outcome: 'INSUFFICIENT_VERIFIED_DATA', coverageComplete: true });
+    expect(answer.verification[0]).toMatchObject({ jurisdiction: 'CZ', outcome: 'INSUFFICIENT_VERIFIED_DATA', coverageComplete: false });
     expect(answer.level).toBe('INSUFFICIENT_VERIFIED_DATA');
   });
 });

@@ -22,9 +22,10 @@ for (const file of execFileSync('git',['ls-files','src/lib/driving-bans/research
   assert(!/(?:writeFileSync|appendFileSync|renameSync|copyFileSync)\([^)]*canonical/i.test(readFileSync(file,'utf8')),`${file}: research must never write canonical.json`);
 }
 // Ask DAJC AI reads driving-ban facts only through the adapter and the shared AI contract: no direct
-// canonical data, no staging or review-layer writes, never the paid authorisation path.
+// canonical data, no staging or review-layer writes, never the paid authorisation path, the paid
+// Intelligence API or the research AI (no user question reaches a research model).
 for (const file of execFileSync('git',['ls-files','src/lib/ask'],{encoding:'utf8'}).split('\n').filter(name=>/\.(ts|mjs)$/.test(name)&&!name.includes('__tests__'))) {
-  assert(!/from\s+['"][^'"]*(?:driving-ban-calendars|data\/driving-bans|canonical\.json|driving-bans\/staging|evidence-store|review-workflow|web-leads|intelligence\/entitlements)|answerDrivingBansQuery/.test(readFileSync(file,'utf8')),`${file}: Ask reads driving bans only through driving-bans-adapter and driving-bans-ai-contract`);
+  assert(!/from\s+['"][^'"]*(?:driving-ban-calendars|data\/driving-bans|canonical\.json|driving-bans\/staging|evidence-store|review-workflow|web-leads|intelligence\/entitlements|driving-bans-intelligence-api|driving-bans\/research\/|lib\/ai\/|\.\.\/ai\/)|answerDrivingBansQuery/.test(readFileSync(file,'utf8')),`${file}: Ask reads driving bans only through driving-bans-adapter and driving-bans-ai-contract`);
 }
 const askOwnData=readFileSync('src/lib/ask/own-data.ts','utf8');
 assert(askOwnData.includes('intelligence/driving-bans-adapter')&&askOwnData.includes('answerFreeAskQuery'),'src/lib/ask/own-data.ts: driving-ban facts must come through driving-bans-adapter and answerFreeAskQuery');

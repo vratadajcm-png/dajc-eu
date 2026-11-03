@@ -5,7 +5,7 @@
 
 import type { AskConfig } from '../config';
 import type { DrivingBansView } from '../own-data';
-import { expandRules, publicationWindow } from '../../driving-bans/core.mjs';
+import { expandRules, includesWindow, publicationWindow, shiftDate } from '../../driving-bans/core.mjs';
 import type { FetchPage } from '../official-sources';
 import type { JsonCallParams, ModelResult, Providers } from '../providers';
 import type { Classification, DraftOutput, VerifyOutput } from '../prompts';
@@ -120,14 +120,29 @@ export const FIXTURE_CANONICAL: FixtureCanonical = {
   ],
 };
 
+/** Month portions of the published window, verified in full only inside the reviewed span (as snapshot() in core.mjs). */
+function monthlyCoverage(row: FixtureCanonical['jurisdictions'][number], window: { from: string; to: string }, reviewed: { from: string; to: string }) {
+  const months: Array<{ from: string; to: string; coverage_complete: boolean; verification_state: string }> = [];
+  for (let start = `${window.from.slice(0, 7)}-01`; start <= window.to;) {
+    const [year, month] = start.slice(0, 7).split('-').map(Number);
+    const end = new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10);
+    const period = { from: start < window.from ? window.from : start, to: end > window.to ? window.to : end };
+    const verified = row.coverage_complete && row.verification_state === 'PRIMARY_VERIFIED' && includesWindow(reviewed, period);
+    months.push({ ...period, coverage_complete: verified, verification_state: verified ? 'PRIMARY_VERIFIED' : 'UNVERIFIED' });
+    start = shiftDate(end, 1);
+  }
+  return months;
+}
+
 /**
  * The fixture published the way getDrivingBansSnapshot publishes the real
- * registry: events of the published period (current + next month in Prague)
- * and full coverage only while the reviewed span contains that period.
+ * registry: events of the published rolling year (from today in Prague),
+ * verification month by month, and whole-window coverage only while the
+ * reviewed span contains the whole year.
  */
 export function fixtureView(now: Date = NOW, data: FixtureCanonical = FIXTURE_CANONICAL): DrivingBansView {
   const window = publicationWindow(now);
-  const stale = window.from < data.window.from || window.to > data.window.to;
+  const stale = !includesWindow(data.window, window);
   return {
     dataset_version: 'fixture',
     window: { from: window.from, to: window.to },
@@ -135,6 +150,7 @@ export function fixtureView(now: Date = NOW, data: FixtureCanonical = FIXTURE_CA
     events: expandRules(data, window),
     jurisdictions: data.jurisdictions.map((row) => ({
       ...row,
+      monthly_coverage: monthlyCoverage(row, window, data.window),
       coverage_complete: !stale && row.coverage_complete,
       verification_state: stale ? 'UNVERIFIED' : row.verification_state,
     })),

@@ -12,7 +12,7 @@ describe('own verified data from the published registry (fixture)', () => {
     const result = lookupDrivingBans({ jurisdictions: ['CZ', 'AT', 'DE'], dates: [SUNDAY] }, { view, now: NOW });
     expect(Object.fromEntries(Object.entries(result.verification).map(([code, v]) => [code, v.outcome]))).toEqual({ CZ: 'BAN_FOUND', AT: 'BAN_FOUND', DE: 'INSUFFICIENT_VERIFIED_DATA' });
     expect(result.verification.AT.coverageComplete).toBe(false);
-    expect(result.verification.CZ).toMatchObject({ coverageComplete: true, verificationState: 'PRIMARY_VERIFIED', lastVerified: '2026-09-26T15:25:00.000Z', period: { from: '2026-10-01', to: '2026-11-30' } });
+    expect(result.verification.CZ).toMatchObject({ coverageComplete: true, verificationState: 'PRIMARY_VERIFIED', lastVerified: '2026-09-26T15:25:00.000Z', period: { from: SUNDAY, to: SUNDAY } });
     expect(result.records.map((r) => r.jurisdiction)).toEqual(['CZ', 'AT']);
   });
 
@@ -96,12 +96,13 @@ describe('own verified data (real published registry, invariants only)', () => {
   const real = getDrivingBansSnapshot(new Date()) as unknown as DrivingBansView;
   const codes = real.jurisdictions.map((j) => j.jurisdiction);
 
-  it('says "no confirmed ban" only for countries verified in full', () => {
-    const result = lookupDrivingBans({ jurisdictions: codes, dates: [real.window.from] }, { view: real, now: new Date() });
+  it('says "no confirmed ban" only for countries verified in full for the asked day', () => {
+    const day = real.window.from;
+    const result = lookupDrivingBans({ jurisdictions: codes, dates: [day] }, { view: real, now: new Date() });
     for (const v of Object.values(result.verification)) {
-      const row = real.jurisdictions.find((j) => j.jurisdiction === v.jurisdiction)!;
-      if (v.outcome === 'NO_CONFIRMED_BAN') expect(row.coverage_complete).toBe(true);
-      if (!row.coverage_complete) expect(v.outcome).not.toBe('NO_CONFIRMED_BAN');
+      const month = real.jurisdictions.find((j) => j.jurisdiction === v.jurisdiction)!.monthly_coverage?.find((m) => m.from <= day && day <= m.to);
+      if (v.outcome === 'NO_CONFIRMED_BAN') expect(v.coverageComplete && month?.coverage_complete).toBe(true);
+      if (!month?.coverage_complete) expect(v.outcome).not.toBe('NO_CONFIRMED_BAN');
     }
     for (const record of result.records) expect(record.text).toMatch(/^DAJC verified (driving-ban record|registry statement)/);
   });
