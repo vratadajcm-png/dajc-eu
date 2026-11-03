@@ -226,19 +226,21 @@ export function snapshot(data, identities, now = new Date()) {
 }
 const esc = value => String(value ?? '').replaceAll('\\','\\\\').replaceAll('\r','').replaceAll('\n','\\n').replaceAll(';','\\;').replaceAll(',','\\,');
 const stamp = value => value.replaceAll('-','').replaceAll(':','').replace(/\.\d{3}Z$/, 'Z');
+/** iCalendar TEXT escaping, shared by every DAJC calendar writer. */
+export const escapeIcsText = esc;
 const utf8Length = c => { const cp = c.codePointAt(0); return cp < 0x80 ? 1 : cp < 0x800 ? 2 : cp < 0x10000 ? 3 : 4; };
 export function foldLine(line) {
   let out = '', length = 0;
   for (const c of line) { const bytes = utf8Length(c); if (length + bytes > 75) { out += '\r\n '; length = 1; } out += c; length += bytes; }
   return out;
 }
-export function toIcs(view, { countries = [], type = 'all', upcoming = true } = {}) {
+export function toIcs(view, { countries = [], type = 'all', upcoming = true, name = 'DAJC HGV Driving Bans' } = {}) {
   assert(['all','general','exceptional'].includes(type), 'Invalid restriction type');
   const valid = new Set(view.jurisdictions.map(r => r.jurisdiction));
   assert(countries.every(c => valid.has(c)), 'Unknown jurisdiction');
   const events = (upcoming ? view.upcoming_events : view.events).filter(e => (!countries.length || countries.includes(e.jurisdiction)) && (type !== 'general' || e.restriction_types.includes('general')));
   const selected = view.jurisdictions.filter(r => !countries.length || countries.includes(r.jurisdiction));
-  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DAJC//Canonical Driving Bans//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:DAJC HGV Driving Bans',`X-DAJC-WINDOW:${view.window.from}/${view.window.to}`,`X-DAJC-DATASET:${esc(view.dataset_version)}`,`X-DAJC-COVERAGE-VERSION:${COVERAGE_VERSION}`,`X-DAJC-JURISDICTIONS:${esc(selected.map(r => r.jurisdiction).join(','))}`,`X-DAJC-EVENT-SCOPE:${upcoming ? 'UPCOMING' : 'WHOLE-WINDOW'}`,`X-DAJC-COVERAGE-COMPLETE:${selected.every(r => r.coverage_complete) ? 'TRUE':'FALSE'}`,`X-DAJC-UNKNOWN:${esc(selected.filter(r => r.ban_state === 'UNKNOWN').map(r => r.jurisdiction).join(','))}`,'X-WR-CALDESC:Verified ban events only. Missing events are NOT evidence of no ban. Consult the DAJC coverage status and official sources.','REFRESH-INTERVAL;VALUE=DURATION:PT1H','X-PUBLISHED-TTL:PT1H'];
+  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DAJC//Canonical Driving Bans//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH',`X-WR-CALNAME:${esc(name)}`,`X-DAJC-WINDOW:${view.window.from}/${view.window.to}`,`X-DAJC-DATASET:${esc(view.dataset_version)}`,`X-DAJC-COVERAGE-VERSION:${COVERAGE_VERSION}`,`X-DAJC-JURISDICTIONS:${esc(selected.map(r => r.jurisdiction).join(','))}`,`X-DAJC-EVENT-SCOPE:${upcoming ? 'UPCOMING' : 'WHOLE-WINDOW'}`,`X-DAJC-COVERAGE-COMPLETE:${selected.every(r => r.coverage_complete) ? 'TRUE':'FALSE'}`,`X-DAJC-UNKNOWN:${esc(selected.filter(r => r.ban_state === 'UNKNOWN').map(r => r.jurisdiction).join(','))}`,'X-WR-CALDESC:Verified ban events only. Missing events are NOT evidence of no ban. Consult the DAJC coverage status and official sources.','REFRESH-INTERVAL;VALUE=DURATION:PT1H','X-PUBLISHED-TTL:PT1H'];
   for (const e of events) {
     const description = [`Local time: ${e.date} ${e.start_time} to ${e.end_date} ${e.end_time} (${e.timezone})`, `Vehicles: ${e.vehicle_scope}`, `Weight condition: ${JSON.stringify(e.weight_threshold)}`, `Roads: ${e.roads.join('; ')}`, `Regions: ${e.regions.join('; ')}`, `Direction: ${e.direction}`, `Exceptions: ${e.exceptions.join('; ')}`, `ADR: ${e.adr_relevance}`, `Exceptional transport: ${e.exceptional_relevance}`, `Legal basis: ${e.legal_basis}`, `Authority: ${e.source_authority}`, `Verified: ${e.verified_at}`, `Version: ${e.source_version}`, e.notes, 'Coverage may be incomplete. Check permits and current official instructions.'].join('\n');
     lines.push('BEGIN:VEVENT',`UID:${esc(e.uid)}`,`DTSTAMP:${stamp(e.verified_at)}`,`LAST-MODIFIED:${stamp(e.verified_at)}`,`SEQUENCE:${e.sequence}`,`DTSTART:${stamp(e.starts_at)}`,`DTEND:${stamp(e.ends_at)}`,`SUMMARY:${esc(`${e.jurisdiction} — ${e.title}`)}`,`DESCRIPTION:${esc(description)}`,`URL:${e.source_url}`,`X-DAJC-TIMEZONE:${e.timezone}`,`X-DAJC-VERIFICATION:${e.verification_state}`,'STATUS:CONFIRMED','TRANSP:TRANSPARENT','END:VEVENT');
