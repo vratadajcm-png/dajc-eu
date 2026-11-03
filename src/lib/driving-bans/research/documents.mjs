@@ -5,6 +5,7 @@
  * passages are flagged for the reviewer (they stay in the evidence as found).
  */
 import { createHash } from 'node:crypto';
+import { pdfDocumentText } from './pdf-text.mjs';
 
 export const MAX_TEXT_CHARS = 300_000;
 
@@ -98,9 +99,13 @@ export function scanForInstructions(text) {
   return hits;
 }
 
-/** Decode retrieved bytes into text for HTML, XML, JSON and plain text; PDFs stay binary for native PDF input. */
-export function documentText(fetched) {
-  if (fetched.kind === 'PDF') return { text: null, metadata: { title: null, language: fetched.content_language ?? null, eli: null, published: null, modified: fetched.last_modified ?? null } };
+/**
+ * Decode retrieved bytes into text for HTML, XML, JSON and plain text. A PDF has text only
+ * when its local text layer was read (pdf-text.mjs, pdfPages); a scan stays binary for
+ * native PDF input, and its quotes cannot be checked by code.
+ */
+export function documentText(fetched, { pdfPages = null } = {}) {
+  if (fetched.kind === 'PDF') return { text: pdfPages ? pdfDocumentText(pdfPages).slice(0, MAX_TEXT_CHARS) : null, metadata: { title: null, language: fetched.content_language ?? null, eli: null, published: null, modified: fetched.last_modified ?? null } };
   const label = fetched.charset && /^(utf-8|utf8|iso-8859-\d+|windows-125\d)$/.test(fetched.charset) ? fetched.charset : 'utf-8';
   let raw;
   try { raw = new TextDecoder(label, { fatal: label.startsWith('utf') }).decode(fetched.bytes); } catch { raw = new TextDecoder('windows-1252').decode(fetched.bytes); }

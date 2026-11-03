@@ -43,6 +43,18 @@ const pick = (pair, cs) => (cs ? pair[1] : pair[0]);
 export const banStateText = (state, cs = false) => pick(BAN_STATES[state] ?? BAN_STATES.UNKNOWN, cs);
 export const verificationStateText = (state, cs = false) => pick(VERIFICATION_STATES[state] ?? VERIFICATION_STATES.UNVERIFIED, cs);
 
+/**
+ * Label of a rule approved automatically from an official PDF (verification_method AUTOMATED);
+ * null for rules a person verified. Shown wherever the rule is shown.
+ */
+export function verificationMethodText(event, cs = false, now = new Date()) {
+  if (event?.verification_method !== 'AUTOMATED') return null;
+  const due = String(event.auto_approval?.human_review_due ?? '');
+  const overdue = !due || Date.parse(due) < now.getTime();
+  if (cs) return `Ověřeno automaticky z úředního PDF dokumentu; ${overdue ? 'kontrola člověkem je po termínu' : `kontrola člověkem do ${due.slice(0, 10)}`}.`;
+  return `Verified automatically from an official PDF document; ${overdue ? 'human review is overdue' : `human review due ${due.slice(0, 10)}`}.`;
+}
+
 export const openItemCategory = code => OPEN_ITEM_CATEGORIES.find(category => category.match.test(code)) ?? REVIEW_INCOMPLETE;
 
 /** Distinct public explanations for a jurisdiction's open review codes, in a stable order. */

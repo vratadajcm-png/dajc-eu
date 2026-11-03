@@ -4,7 +4,7 @@
  * approves and never publishes. A person promotes a draft into the existing
  * review workflow (npm run driving-bans:evidence).
  */
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
@@ -19,6 +19,7 @@ import { createLedger, createOrchestrator, limitsFromEnv, routesFromEnv } from '
 import { researchReadiness, createResearchOrchestrator } from '../src/lib/driving-bans/research/config.mjs';
 import { runResearch, openResearchStore, listDrafts, loadDraft } from '../src/lib/driving-bans/research/pipeline.mjs';
 import { promoteDraft, rejectDraft } from '../src/lib/driving-bans/research/promote.mjs';
+import { autoApproveAll, autoApproveDraft, confirmAutoApprovedRule, AUTO_APPROVAL_GATE_VERSION } from '../src/lib/driving-bans/research/auto-approve.mjs';
 import { safeFetch } from '../src/lib/driving-bans/research/safe-fetch.mjs';
 
 const CANONICAL = resolve('data/driving-bans/canonical.json');
@@ -27,6 +28,7 @@ const { values, positionals } = parseArgs({ allowPositionals: true, options: {
   jurisdictions: { type: 'string', default: 'all' }, mode: { type: 'string', default: 'full' }, url: { type: 'string', multiple: true, default: [] },
   'max-documents': { type: 'string', default: '6' }, 'no-search': { type: 'boolean', default: false }, 'initial-repair': { type: 'boolean', default: false },
   clock: { type: 'string' }, reviewer: { type: 'string' }, reason: { type: 'string' }, 'legal-verified-at': { type: 'string' }, 'review-from': { type: 'string' }, 'review-to': { type: 'string' }, 'legal-effective-from': { type: 'string' }, 'legal-effective-to': { type: 'string' }, 'exceptions-complete': { type: 'boolean' },
+  'candidate-out': { type: 'string' }, 'report-md': { type: 'string' }, document: { type: 'string' },
 } });
 const [command, target] = positionals;
 const now = values.clock ? new Date(values.clock) : new Date();
@@ -72,6 +74,37 @@ async function demo() {
   if (readFileSync(CANONICAL, 'utf8') !== canonicalBefore) process.exitCode = 1;
 }
 
+/**
+ * Automatic approval of PDF drafts. The final candidate is copied to --candidate-out (never to
+ * canonical.json: publication is a separate, visible step of a pull request) and a Markdown
+ * report for that pull request goes to --report-md.
+ */
+async function autoApprove() {
+  if (values['candidate-out'] && resolve(values['candidate-out']) === CANONICAL) throw new Error('Write the candidate elsewhere; the publication step copies it into canonical.json');
+  const args = { researchStore: store(), evidenceStore: resolve(values['evidence-store']), rawCanonical: rawCanonical(), catalogSources: drivingBanSourceCatalog.entries, now, env: process.env };
+  const result = target ? await autoApproveDraft({ ...args, draftId: target }) : await autoApproveAll(args);
+  const results = target ? [result] : result.results;
+  const candidate = result.candidate_path;
+  if (values['candidate-out'] && candidate) {
+    mkdirSync(dirname(resolve(values['candidate-out'])), { recursive: true });
+    copyFileSync(candidate, resolve(values['candidate-out']));
+  }
+  if (values['report-md']) {
+    const approved = results.filter(item => item.approved);
+    const lines = [`## Driving Bans: automatic approval from official PDF documents (gate ${AUTO_APPROVAL_GATE_VERSION})`, '', `${approved.length} of ${results.length} draft(s) approved automatically on ${now.toISOString()}. Rules are labelled "verified automatically" and need a human review within 7 days (\`npm run driving-bans:research -- confirm-auto\`). They never change coverage, reviewed periods or NO_BAN.`, ''];
+    for (const item of results) {
+      const draft = loadDraft(store(), item.draft_id);
+      lines.push(`### ${item.approved ? 'Approved' : 'Left for a person'}: ${item.draft_id} (${draft.jurisdiction})`, `- Document: ${draft.document.final_url}`, `- SHA-256: \`${draft.document.sha256}\`, ${draft.document.page_count ?? '?'} page(s)`);
+      if (item.approved) for (const rule of item.rules) lines.push(`- Rule \`${rule.ban_id}\`, pattern of \`${rule.pattern_of}\`, human review due ${rule.human_review_due}`);
+      for (const check of item.decision.checks) lines.push(`- ${check.ok ? '✅' : '❌'} ${check.id}: ${check.detail}`);
+      lines.push('');
+    }
+    mkdirSync(dirname(resolve(values['report-md'])), { recursive: true });
+    writeFileSync(resolve(values['report-md']), lines.join('\n') + '\n');
+  }
+  print(target ? result : { ...result, results: results.map(item => ({ draft_id: item.draft_id, approved: item.approved, proposal_id: item.proposal_id ?? null, failed: item.decision.checks.filter(check => !check.ok).map(check => check.id), rules: item.rules ?? [] })) });
+}
+
 switch (command) {
   case 'status': print(researchReadiness(process.env)); break;
   case 'run': await run(); break;
@@ -81,7 +114,9 @@ switch (command) {
   case 'promote': print(promoteDraft({ researchStore: store(), draftId: target, evidenceStore: resolve(values['evidence-store']), reviewer: values.reviewer, reason: values.reason, legalVerifiedAt: values['legal-verified-at'], reviewWindow: { from: values['review-from'], to: values['review-to'] }, confirmations: { legalEffective: { from: values['legal-effective-from'], to: values['legal-effective-to'] ?? null }, exceptionsComplete: values['exceptions-complete'] === true }, rawCanonical: rawCanonical(), catalogSources: drivingBanSourceCatalog.entries, now })); break;
   case 'verify-log': { const result = verifyAuditLog(store().root); print(result); if (!result.ok) process.exitCode = 1; break; }
   case 'demo': await demo(); break;
+  case 'auto-approve': await autoApprove(); break;
+  case 'confirm-auto': print(confirmAutoApprovedRule({ banId: target, documentFile: resolve(values.document), evidenceStore: resolve(values['evidence-store']), reviewer: values.reviewer, reason: values.reason, rawCanonical: rawCanonical(), catalogSources: drivingBanSourceCatalog.entries, now })); break;
   default:
-    console.error('Usage: driving-bans-research.mjs <status | run [--jurisdictions all|AT,DE] [--mode full|urgent --url URL] [--no-search] [--max-documents N] | list | show ID | reject ID --reviewer L --reason R | promote ID --reviewer L --reason R --legal-verified-at ISO --review-from DATE --review-to DATE --legal-effective-from DATE [--legal-effective-to DATE] --exceptions-complete [--evidence-store DIR] | verify-log | demo> [--store DIR]');
+    console.error('Usage: driving-bans-research.mjs <status | run [--jurisdictions all|AT,DE] [--mode full|urgent --url URL] [--no-search] [--max-documents N] | list | show ID | reject ID --reviewer L --reason R | promote ID --reviewer L --reason R --legal-verified-at ISO --review-from DATE --review-to DATE --legal-effective-from DATE [--legal-effective-to DATE] --exceptions-complete [--evidence-store DIR] | verify-log | demo | auto-approve [ID] [--candidate-out FILE] [--report-md FILE] [--evidence-store DIR] | confirm-auto BAN_ID --document PDF --reviewer L --reason R [--evidence-store DIR]> [--store DIR]');
     process.exitCode = 2;
 }
