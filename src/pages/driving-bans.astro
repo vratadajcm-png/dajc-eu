@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getDrivingBansSnapshot } from '../../config/driving-ban-calendars/runtime.mjs';
-import { banStateText, verificationStateText, openItemTexts } from '../lib/driving-bans/public-labels.mjs';
+import { banStateText, verificationStateText, openItemTexts, verificationMethodText } from '../lib/driving-bans/public-labels.mjs';
 export const prerender = false;
 const view = getDrivingBansSnapshot();
 const tracked = view.jurisdictions.length;
@@ -64,6 +64,7 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
             <p><strong>ADR:</strong> {e.adr_relevance}</p><p><strong>Exceptional / oversize:</strong> {e.exceptional_relevance}</p>
             <p>{e.notes}</p>
             <p class="small"><a href={e.source_url} target="_blank" rel="noopener noreferrer">{e.source_authority}</a> · {e.source_version} · {label('Rule verified', 'Pravidlo ověřeno')}: {format(e.verified_at)}</p>
+            {verificationMethodText(e, cs) && <p class="small"><strong>{verificationMethodText(e, cs)}</strong></p>}
           </article>)}</div>
         </div>
       </details>)}

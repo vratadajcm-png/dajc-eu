@@ -6,6 +6,7 @@ import { appendAudit } from '../evidence-store.mjs';
 import { stableStringify } from '../review-workflow.mjs';
 import { researchTarget, discoverDocuments } from './discovery.mjs';
 import { composeDocumentParts, documentText, identifyLanguage, scanForInstructions } from './documents.mjs';
+import { readPdfPages } from './pdf-text.mjs';
 import { checkExtractedRule, draftRuleOf, extractRules, legalEffectOf, EXTRACTION_PROMPT_VERSION } from './extraction.mjs';
 import { crossCheck, dualExtraction } from './cross-check.mjs';
 import { buildOperations, documentPath, draftSubmission, sourceConflicts } from './proposal.mjs';
@@ -71,14 +72,17 @@ const dryRunFindings = dryRun => [
  */
 async function analyseDocument({ item, fetched, target, window, rawCanonical, catalogSources, orchestrator, store, runId, now, synthetic }) {
   const phases = ['DISCOVERED', 'DOCUMENT_RETRIEVED'];
-  const { text, metadata } = documentText(fetched);
+  // A PDF with a text layer is read locally, so that its quotes can be checked by code on their pages.
+  const pdfPages = fetched.kind === 'PDF' ? await readPdfPages(fetched.bytes) : null;
+  const { text, metadata } = documentText(fetched, { pdfPages });
   // Language and type of the document; the language decides whether extraction counts as complex.
   const language = identifyLanguage(text, metadata.language);
-  const document = { url: item.url, final_url: fetched.final_url, sha256: fetched.sha256, byte_length: fetched.byte_length, kind: fetched.kind, content_type: fetched.content_type, retrieved_at: fetched.retrieved_at, last_modified: fetched.last_modified, etag: fetched.etag, parts: fetched.parts ?? null, title: metadata.title ?? item.title ?? fetched.title ?? null, language: language.language, language_source: language.source, eli: metadata.eli, published: metadata.published, modified: metadata.modified, version: metadata.eli?.version ?? metadata.modified ?? null, authority: item.authority, origin: item.origin, source_id: item.source_id, licence: item.licence ?? null, rights: item.rights ?? null, bytes: fetched.bytes };
+  const document = { url: item.url, final_url: fetched.final_url, sha256: fetched.sha256, byte_length: fetched.byte_length, kind: fetched.kind, content_type: fetched.content_type, retrieved_at: fetched.retrieved_at, last_modified: fetched.last_modified, etag: fetched.etag, parts: fetched.parts ?? null, title: metadata.title ?? item.title ?? fetched.title ?? null, language: language.language, language_source: language.source, eli: metadata.eli, published: metadata.published, modified: metadata.modified, version: metadata.eli?.version ?? metadata.modified ?? null, authority: item.authority, origin: item.origin, source_id: item.source_id, licence: item.licence ?? null, rights: item.rights ?? null, text_layer: fetched.kind === 'PDF' ? (pdfPages ? 'PDF_TEXT' : 'NONE') : null, page_count: pdfPages?.length ?? null, bytes: fetched.bytes };
   const injection = text ? scanForInstructions(text) : [];
   const findings = injection.length ? [{ code: 'UNTRUSTED_INSTRUCTIONS_IN_DOCUMENT', blocking_state: 'CONFLICT', message: 'The document contains instruction-like text addressed to an AI; it was treated as data only', excerpts: injection.slice(0, 3) }] : [];
 
-  const cacheKey = `cache/${sha([fetched.sha256, target.jurisdiction, window, EXTRACTION_PROMPT_VERSION])}.json`;
+  // A PDF read through its text layer is a different reading than the native PDF input.
+  const cacheKey = `cache/${sha([fetched.sha256, target.jurisdiction, window, EXTRACTION_PROMPT_VERSION, ...(fetched.kind === 'PDF' && text !== null ? ['pdf-text-1'] : [])])}.json`;
   const checkRules = rules => rules.flatMap((rule, index) => checkExtractedRule(rule, { text, jurisdiction: target.jurisdiction, window }).map(item => ({ ...item, rule_index: index })));
   const blockingCount = list => list.filter(item => item.blocking_state !== 'NOTE').length;
   let first;
