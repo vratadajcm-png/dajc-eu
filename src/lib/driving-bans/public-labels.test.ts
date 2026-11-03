@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { getDrivingBansSnapshot } from '../../../config/driving-ban-calendars/runtime.mjs';
-import { banStateText, verificationStateText, openItemCategory, openItemTexts } from './public-labels.mjs';
+import { banStateText, verificationStateText, openItemCategory, openItemTexts, monthStatusText, monthName } from './public-labels.mjs';
 
 const CODE = /\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b/;
 const clocks = ['2026-10-15T08:00:00Z', '2026-11-02T08:00:00Z', '2026-12-02T08:00:00Z'];
@@ -15,6 +15,11 @@ describe('public driving-bans wording', () => {
     for (const state of ['PRIMARY_VERIFIED', 'CROSSCHECKED', 'UNVERIFIED', 'SOURCE_UNAVAILABLE']) for (const cs of [false, true]) {
       expect(verificationStateText(state, cs)).not.toMatch(CODE);
     }
+    for (const state of ['VERIFIED', 'PARTIAL', 'UNVERIFIED', 'AWAITING_OFFICIAL_PUBLICATION']) for (const cs of [false, true]) {
+      expect(monthStatusText(state, cs)).not.toMatch(CODE);
+    }
+    expect(monthStatusText('AWAITING_OFFICIAL_PUBLICATION', true)).toBe('Čeká na úřední publikaci');
+    expect(monthName('2027-01', true)).toBe('leden 2027');
     expect(verificationStateText('UNVERIFIED', true)).toBe('Ověření probíhá');
     expect(banStateText('NO_BAN', true)).toContain('Bez zákazu');
   });
@@ -41,7 +46,7 @@ describe('public driving-bans wording', () => {
     expect(openItemCategory('EXCEPTIONAL_TRANSPORT_PERMIT_REGIME_NOT_REVIEWED').key).toBe('review');
     expect(openItemCategory('SOME_FUTURE_CODE').key).toBe('review');
     expect(openItemTexts(['FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED', 'ACTIVE_WINDOW_NOT_REVERIFIED'], true)).toEqual([
-      'Aktuální období zatím nebylo znovu ověřeno z úředních zdrojů.',
+      'Ne všechny měsíce dvanáctiměsíčního období jsou zatím ověřené; viz přehled po měsících.',
       'Kontrola úředních zdrojů pro tuto jurisdikci zatím není úplná.',
     ]);
   });
