@@ -1,0 +1,95 @@
+name: Driving Bans research live check
+
+# Small, capped live checks of the research integration against the real AI APIs and a
+# real primary source (scripts/driving-bans-research-live.mjs): provider smoke tests, the
+# bake-off reference case cz-sun on the live Czech act, a real-API failover check and one
+# end-to-end research run on the Tyrol B 179 truck ban (RIS). Proposals only: nothing is
+# promoted, approved, merged or published, and canonical.json is checked unchanged.
+#
+# Runs ONLY when the owner approves a run: by adding the label "research-live-check" to a
+# pull request of this repository (paid checks), or "research-live-plan" (free: shows which
+# keys, models and prices are configured, by name only, and the budget estimate), or by a
+# manual dispatch once merged. Never on push or on a schedule. Costs are capped by the run
+# budget below and booked from reported usage.
+
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      check:
+        description: 'plan (free), smoke, scenario, fallback, e2e or all'
+        default: all
+        required: true
+        type: string
+      run_budget_usd:
+        description: 'Hard cap for this run in USD'
+        default: '1.50'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: driving-bans-research-live
+  cancel-in-progress: false
+
+jobs:
+  live:
+    if: github.event_name == 'workflow_dispatch' || ((github.event.label.name == 'research-live-check' || github.event.label.name == 'research-live-plan') && github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Live research checks (capped)
+        env:
+          DAJC_DRIVING_BANS_RESEARCH_ENABLED: 'true'
+          DAJC_RESEARCH_MODEL_PROFILE: bakeoff-2026-10-25
+          DAJC_RESEARCH_RUN_BUDGET_USD: ${{ inputs.run_budget_usd || vars.DAJC_RESEARCH_LIVE_RUN_BUDGET_USD || '1.50' }}
+          DAJC_RESEARCH_MONTHLY_BUDGET_USD: ${{ vars.DAJC_RESEARCH_MONTHLY_BUDGET_USD || '5' }}
+          DAJC_RESEARCH_MAX_REQUESTS_PER_RUN: '60'
+          # Anthropic is not benchmarked (bake-off key without credit), so the profile does not pick it.
+          # For these capped checks the owner approved (2026-10-29) Claude Sonnet 5.5 at the bake-off
+          # reference price of 2 / 10 USD per 1M tokens; repository variables override both.
+          DAJC_RESEARCH_ANTHROPIC_MODEL: ${{ vars.DAJC_RESEARCH_ANTHROPIC_MODEL || 'claude-sonnet-5-5' }}
+          DAJC_RESEARCH_ANTHROPIC_EFFORT: ${{ vars.DAJC_RESEARCH_ANTHROPIC_EFFORT || 'medium' }}
+          DAJC_RESEARCH_MISTRAL_MODEL: ${{ vars.DAJC_RESEARCH_MISTRAL_MODEL }}
+          DAJC_RESEARCH_PRICING_USD: ${{ vars.DAJC_RESEARCH_PRICING_USD || '{"anthropic":{"input":2,"output":10}}' }}
+          # Dedicated research keys first; the existing Weekly keys of this repository only as an
+          # explicit fallback for these capped checks. Values never appear in logs or artifacts.
+          DAJC_RESEARCH_ANTHROPIC_API_KEY: ${{ secrets.DAJC_RESEARCH_ANTHROPIC_API_KEY || secrets.ANTHROPIC_API_KEY }}
+          DAJC_RESEARCH_PERPLEXITY_API_KEY: ${{ secrets.DAJC_RESEARCH_PERPLEXITY_API_KEY || secrets.PERPLEXITY_API_KEY }}
+          DAJC_RESEARCH_OPENAI_API_KEY: ${{ secrets.DAJC_RESEARCH_OPENAI_API_KEY }}
+          DAJC_RESEARCH_GEMINI_API_KEY: ${{ secrets.DAJC_RESEARCH_GEMINI_API_KEY }}
+          DAJC_RESEARCH_XAI_API_KEY: ${{ secrets.DAJC_RESEARCH_XAI_API_KEY }}
+          DAJC_RESEARCH_MISTRAL_API_KEY: ${{ secrets.DAJC_RESEARCH_MISTRAL_API_KEY }}
+          # Passed as data, never interpolated into the shell; the script accepts known check names only.
+          LIVE_CHECK: ${{ inputs.check || (github.event.label.name == 'research-live-plan' && 'plan') || 'all' }}
+        run: node scripts/driving-bans-research-live.mjs "$LIVE_CHECK" --out artifacts/driving-bans/research-live
+
+      - name: canonical.json unchanged
+        if: always()
+        run: git diff --exit-code -- data/driving-bans/canonical.json
+
+      - name: Upload live check results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: driving-bans-research-live-${{ github.run_id }}
+          path: |
+            artifacts/driving-bans/research-live/**/*.json
+            !artifacts/driving-bans/research-live/research-store/blobs/**
+          if-no-files-found: warn
+          retention-days: 30

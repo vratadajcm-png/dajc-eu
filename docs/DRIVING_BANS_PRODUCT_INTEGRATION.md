@@ -69,6 +69,7 @@ Vše je zakázáno, dokud neplatí všechny tři podmínky:
    | history | `DAJC_INTELLIGENCE_HISTORY_ENABLED` |
    | organisation-preferences | `DAJC_INTELLIGENCE_PREFERENCES_ENABLED` |
    | ai-assistant | `DAJC_AI_DRIVING_BANS_ENABLED` |
+   | driving-bans-query (vyhledávání, pravidla, výjimky, zdroje; zároveň vypínač celého modulu) | `DAJC_INTELLIGENCE_BANS_ENABLED` |
 
 3. Ověřený subjekt má oprávnění své organizace, které funkci obsahuje a nevypršelo.
 
@@ -144,7 +145,49 @@ U časově vymezeného dotazu nese úplnost pro každou jurisdikci `outcome`:
 - `INSUFFICIENT_VERIFIED_DATA`: vše ostatní, včetně data mimo publikované období.
   Nedostatek dat nikdy neznamená, že zákaz neexistuje.
 
+`BAN_FOUND` je přípustný i u jurisdikce, která není ověřená celá (AT, DE, ES, PT),
+pokud konkrétní zákaz podporuje ověřený primární podklad. Odpověď pak vždy nese
+varování, že úplnost pokrytí jurisdikce není potvrzena.
+
+Globální `status` odpovědi je `OK` jen tehdy, když je každá dotazovaná jurisdikce
+rozhodnutá (`BAN_FOUND` nebo `NO_CONFIRMED_BAN`), je ověřená v plném rozsahu a žádné
+platící pravidlo nemá u vozidla výsledek `UNDETERMINED`. Jinak je `status`
+`INSUFFICIENT_VERIFIED_DATA`, i když jednotlivé jurisdikce `outcome` mají. Stejné
+pravidlo používá pipeline Ask DAJC AI (PR #78, `registryDecides`).
+
 Žádný jazykový model se nevolá: kontrakt určuje, co smí model dostat a co smí odpovědět.
+
+## Dotazovací služba Driving Bans (`driving-bans-query.ts`)
+
+Jediné vyhodnocení a jediný enum stavů v celém repozitáři. Vlastníkem je modul
+Driving Bans, AI je jen jeden ze spotřebitelů:
+
+| Spotřebitel | Vstupní bod | Brána |
+| --- | --- | --- |
+| Bezplatné Ask DAJC AI | `answerFreeAskQuery` (`driving-bans-ai-contract.ts`) | Ask (`DAJC_ASK_ENABLED`, přihlášení, limit) |
+| Placená DAJC AI | `answerDrivingBansQuery` | `ai-assistant` |
+| Placená DAJC Intelligence | `answerIntelligenceQuery` (`driving-bans-intelligence-api.ts`) | `driving-bans-query` + oprávnění konkrétní funkce |
+
+Data čte jen přes `readPublishedDrivingBans` z adaptéru, tedy stejný publikovaný
+snapshot jako `/driving-bans`, JSON a ICS. Nástroj `list_sources` vypíše
+ověřené právní zdroje jurisdikce (URL, autorita, verze, SHA-256, zda podporují
+publikované pravidlo).
+
+Každá placená funkce má vlastní oprávnění: `search_bans` bez vozidla,
+`explain_rule`, `list_exceptions` a `list_sources` potřebují `driving-bans-query`;
+`search_bans` s vozidlem a `evaluate_vehicle` potřebují `vehicle-aware`;
+`check_route` `route-aware`; `list_changes` `history`; `prepareOrganisationAlerts`
+`alerts` a vrací jen příjemce vlastní organizace.
+
+`handleDrivingBansIntelligenceRequest` je hotový serverový handler pro budoucí
+`POST /api/intelligence/driving-bans/{tool}` (tělo `{"input": {...}}`, nejvýše
+32 KiB; 404 u vypnutého modulu nebo neznámého nástroje, 401, 403, 400 u
+neplatného vstupu, 413, 405). **Není připojený k žádné routě**: lint drží
+nevydané kontrakty mimo `src/pages` a připojení je samostatná schválená změna
+spolu s `DRIVING_BANS_INTELLIGENCE_RELEASED`. Identita zákazníka a úložiště
+oprávnění zatím neexistují (`resolveSubject` a `resolveEntitlement` musí dodat
+vydání), historie nemá úložiště verzí, takže `list_changes` bez předaného
+seznamu změn vrací `INSUFFICIENT_VERIFIED_DATA`.
 
 ## Konektory (`driving-ban-connectors.ts`)
 

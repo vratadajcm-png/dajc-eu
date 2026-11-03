@@ -39,7 +39,7 @@ const result = {
   data_updated: false,
   published: false,
   message: stale
-    ? 'The canonical dataset is stale or lacks current+next-month review. Do not claim updated Driving Bans or NO_BAN from this technical check.'
+    ? 'The canonical dataset is stale or lacks rolling-year review. Do not claim updated Driving Bans or NO_BAN from this technical check.'
     : 'Schema/test checks passed. Source-law changes were NOT reviewed by this workflow.'
 };
 mkdirSync(dirname(target), { recursive: true });

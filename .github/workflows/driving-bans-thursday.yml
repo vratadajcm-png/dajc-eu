@@ -5,10 +5,12 @@ name: Driving Bans Thursday gate
 # sweep (see docs/DRIVING_BANS_CANONICAL.md), which updates
 # data/driving-bans/canonical.json. This workflow never fetches or interprets
 # law; it fails when the reviewed span no longer contains the active
-# current+next calendar month, or when the last sweep is older than 8 days, so
+# rolling 12-month planning horizon, or when the last sweep is older than 8 days, so
 # a missed Thursday sweep is visible instead of silently decaying to UNKNOWN.
 # The exported verification-plan.json supplies official web source seeds and
 # the central KZ/RU/TR motorway/main-road scope to the semantic reviewer.
+# The annual view can include unpublished future legal periods; incomplete legal
+# coverage must remain visible, never be presented as an empty/NO_BAN calendar.
 # Targeted source checks do not count as a fresh full-registry sweep.
 
 on:
@@ -49,6 +51,35 @@ jobs:
 
       - name: Export full-registry evidence and enforce sweep freshness
         run: npm run driving-bans:audit -- --mode full --max-sweep-age-days 8
+
+      # AI research of official sources: drafts and a run report in the artifact only.
+      # Off unless the repository variable DAJC_DRIVING_BANS_RESEARCH_ENABLED is "true";
+      # it then also needs both budgets and two configured vendors (docs/DRIVING_BANS_RESEARCH.md).
+      # It never writes canonical.json, never approves and never publishes; a technically
+      # successful run is not a legal verification. Runs even when the freshness gate fails.
+      - name: AI research of official sources (drafts only)
+        if: ${{ !cancelled() && vars.DAJC_DRIVING_BANS_RESEARCH_ENABLED == 'true' }}
+        env:
+          DAJC_DRIVING_BANS_RESEARCH_ENABLED: 'true'
+          DAJC_RESEARCH_RUN_BUDGET_USD: ${{ vars.DAJC_RESEARCH_RUN_BUDGET_USD }}
+          DAJC_RESEARCH_MONTHLY_BUDGET_USD: ${{ vars.DAJC_RESEARCH_MONTHLY_BUDGET_USD }}
+          DAJC_RESEARCH_MAX_REQUESTS_PER_RUN: ${{ vars.DAJC_RESEARCH_MAX_REQUESTS_PER_RUN }}
+          DAJC_RESEARCH_PRICING_USD: ${{ vars.DAJC_RESEARCH_PRICING_USD }}
+          DAJC_RESEARCH_ROUTE_DISCOVER: ${{ vars.DAJC_RESEARCH_ROUTE_DISCOVER }}
+          DAJC_RESEARCH_ROUTE_EXTRACT: ${{ vars.DAJC_RESEARCH_ROUTE_EXTRACT }}
+          DAJC_RESEARCH_ROUTE_VERIFY: ${{ vars.DAJC_RESEARCH_ROUTE_VERIFY }}
+          DAJC_RESEARCH_ANTHROPIC_MODEL: ${{ vars.DAJC_RESEARCH_ANTHROPIC_MODEL }}
+          DAJC_RESEARCH_OPENAI_MODEL: ${{ vars.DAJC_RESEARCH_OPENAI_MODEL }}
+          DAJC_RESEARCH_XAI_MODEL: ${{ vars.DAJC_RESEARCH_XAI_MODEL }}
+          DAJC_RESEARCH_GEMINI_MODEL: ${{ vars.DAJC_RESEARCH_GEMINI_MODEL }}
+          DAJC_RESEARCH_MISTRAL_MODEL: ${{ vars.DAJC_RESEARCH_MISTRAL_MODEL }}
+          DAJC_RESEARCH_ANTHROPIC_API_KEY: ${{ secrets.DAJC_RESEARCH_ANTHROPIC_API_KEY }}
+          DAJC_RESEARCH_OPENAI_API_KEY: ${{ secrets.DAJC_RESEARCH_OPENAI_API_KEY }}
+          DAJC_RESEARCH_XAI_API_KEY: ${{ secrets.DAJC_RESEARCH_XAI_API_KEY }}
+          DAJC_RESEARCH_GEMINI_API_KEY: ${{ secrets.DAJC_RESEARCH_GEMINI_API_KEY }}
+          DAJC_RESEARCH_MISTRAL_API_KEY: ${{ secrets.DAJC_RESEARCH_MISTRAL_API_KEY }}
+          DAJC_RESEARCH_PERPLEXITY_API_KEY: ${{ secrets.DAJC_RESEARCH_PERPLEXITY_API_KEY }}
+        run: npm run driving-bans:research -- run --mode full --store artifacts/driving-bans/research ${{ github.event_name == 'workflow_dispatch' && '--initial-repair' || '' }}
 
       - name: Upload Driving Bans evidence
         if: always()

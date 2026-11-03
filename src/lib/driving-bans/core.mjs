@@ -16,11 +16,17 @@ export function shiftDate(date, days) {
   assert(isDate(date) && Number.isInteger(days), 'Invalid date arithmetic');
   return new Date(Date.parse(`${date}T00:00:00Z`) + days * DAY).toISOString().slice(0, 10);
 }
+/** Rolling planning horizon: Prague-local today through the same calendar date next year, inclusive.
+ *  On 29 February the anniversary is clamped to 28 February in non-leap years.
+ *  This is the DISPLAY horizon, NOT a claim that future laws have been published or verified.
+ */
 export function publicationWindow(now = new Date()) {
   assert(Number.isFinite(now.getTime()), 'Invalid publication clock');
-  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Prague', year: 'numeric', month: '2-digit' }).formatToParts(now).map(p => [p.type, p.value]));
-  const year = Number(parts.year), month = Number(parts.month);
-  return { from: `${parts.year}-${parts.month}-01`, to: new Date(Date.UTC(year, month + 1, 0)).toISOString().slice(0, 10), timezone: 'Europe/Prague' };
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Prague', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now).map(p => [p.type, p.value]));
+  const year = Number(parts.year), month = Number(parts.month), day = Number(parts.day);
+  const anniversaryDay = Math.min(day, new Date(Date.UTC(year + 1, month, 0)).getUTCDate());
+  const to = new Date(Date.UTC(year + 1, month - 1, anniversaryDay)).toISOString().slice(0, 10);
+  return { from: `${parts.year}-${parts.month}-${parts.day}`, to, timezone: 'Europe/Prague' };
 }
 export function validTimezone(value) {
   if (typeof value !== 'string' || !value.includes('/')) return false;
@@ -196,23 +202,34 @@ export function snapshot(data, identities, now = new Date()) {
   validateCanonical(data, identities);
   const window = publicationWindow(now);
   const events = expandRules(data, window);
-  // The reviewed span may exceed the active window (e.g. reviewed Sep-Nov covers Sep-Oct and, after rollover, Oct-Nov); it must fully contain it.
+  // A rolling year may cross legal instruments that have not yet been issued.
+  // Keep the horizon visible but never extend legal verification or infer NO_BAN.
   const staleWindow = !includesWindow(data.window, window);
   const jurisdictions = data.jurisdictions.map(row => {
+    const monthly_coverage = [];
+    for (let monthStart = window.from.slice(0, 7) + '-01'; monthStart <= window.to;) {
+      const [year, month] = monthStart.slice(0, 7).split('-').map(Number);
+      const monthEnd = new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10);
+      const period = { from: monthStart < window.from ? window.from : monthStart, to: monthEnd > window.to ? window.to : monthEnd };
+      const verified = row.coverage_complete && row.verification_state === 'PRIMARY_VERIFIED' && includesWindow(data.window, period);
+      monthly_coverage.push({ ...period, coverage_complete: verified, verification_state: verified ? 'PRIMARY_VERIFIED' : 'UNVERIFIED' });
+      monthStart = shiftDate(monthEnd, 1);
+    }
     const rules = events.filter(e => e.jurisdiction === row.jurisdiction);
     const canKeepNoBan = !staleWindow && row.ban_state === 'NO_BAN' && row.verification_state === 'PRIMARY_VERIFIED';
     assert(!(canKeepNoBan && rules.length), `NO_BAN conflicts with an actual ban ${row.jurisdiction}`);
     const failures = [...row.coverage_failures];
     if (staleWindow) failures.push('ACTIVE_WINDOW_NOT_REVERIFIED');
-    return { ...row, period: { from: window.from, to: window.to }, ban_state: rules.length ? 'HAS_BAN' : canKeepNoBan ? 'NO_BAN' : 'UNKNOWN', verification_state: staleWindow ? 'UNVERIFIED' : row.verification_state, coverage_complete: !staleWindow && row.coverage_complete, coverage_failures: [...new Set(failures)], event_count: rules.length, last_verified: row.last_verified };
+    return { ...row, period: { from: window.from, to: window.to }, monthly_coverage, ban_state: rules.length ? 'HAS_BAN' : canKeepNoBan ? 'NO_BAN' : 'UNKNOWN', verification_state: row.verification_state === 'SOURCE_UNAVAILABLE' ? 'SOURCE_UNAVAILABLE' : staleWindow ? 'UNVERIFIED' : row.verification_state, coverage_complete: !staleWindow && row.coverage_complete, coverage_failures: [...new Set(failures)], event_count: rules.length, last_verified: row.last_verified };
   });
   return { schema_version: 1, coverage_version: COVERAGE_VERSION, geographic_scope: geographicScopePolicy, dataset_version: data.dataset_version, generated_at: now.toISOString(), window, jurisdictions, events, upcoming_events: events.filter(e => e.ends_at > now.toISOString()), sources: data.sources, complete: jurisdictions.every(r => r.coverage_complete) };
 }
 const esc = value => String(value ?? '').replaceAll('\\','\\\\').replaceAll('\r','').replaceAll('\n','\\n').replaceAll(';','\\;').replaceAll(',','\\,');
 const stamp = value => value.replaceAll('-','').replaceAll(':','').replace(/\.\d{3}Z$/, 'Z');
+const utf8Length = c => { const cp = c.codePointAt(0); return cp < 0x80 ? 1 : cp < 0x800 ? 2 : cp < 0x10000 ? 3 : 4; };
 export function foldLine(line) {
   let out = '', length = 0;
-  for (const c of line) { const bytes = new TextEncoder().encode(c).length; if (length + bytes > 75) { out += '\r\n '; length = 1; } out += c; length += bytes; }
+  for (const c of line) { const bytes = utf8Length(c); if (length + bytes > 75) { out += '\r\n '; length = 1; } out += c; length += bytes; }
   return out;
 }
 export function toIcs(view, { countries = [], type = 'all', upcoming = true } = {}) {
