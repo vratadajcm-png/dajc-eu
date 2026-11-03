@@ -1,0 +1,132 @@
+---
+// Ask DAJC AI (DAJC Intelligence, master plan §47, Phase 1). Rendered on
+// demand so it can answer 404 while DAJC_ASK_ENABLED is not "true" or the
+// configuration is incomplete; never indexed during Phase 1.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAskConfig } from '../../lib/ask/config';
+import { dictionary, t, uiLangFromRequest } from '../../lib/ask/i18n';
+
+export const prerender = false;
+
+if (!getAskConfig()) {
+  return new Response('Not found', {
+    status: 404,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+  });
+}
+
+const lang = uiLangFromRequest(Astro.url, Astro.request.headers.get('accept-language'));
+const strings = dictionary(lang);
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
+const otherLang = lang === 'cs' ? 'en' : 'cs';
+---
+<BaseLayout title={`${t(lang, 'pageTitle')} — DAJC Intelligence`} description={t(lang, 'pageDescription')} robots="noindex, nofollow" lang={lang}>
+  <main class="ask" data-ask-root data-lang={lang} data-strings={JSON.stringify(strings)}>
+    <p class="eyebrow">DAJC INTELLIGENCE · BETA</p>
+    <h1>{t(lang, 'pageTitle')}</h1>
+    <p class="lead">{t(lang, 'intro')}</p>
+    <p class="info-only">{t(lang, 'infoOnly')}</p>
+    <p class="lang-switch"><a href={`?lang=${otherLang}`}>{otherLang === 'cs' ? 'Česky' : 'English'}</a></p>
+
+    <p class="ask-message" data-ask="message" role="status" aria-live="polite"></p>
+
+    <section data-ask="confirm" hidden>
+      <h2>{t(lang, 'confirmTitle')}</h2>
+      <button type="button" class="button">{t(lang, 'confirmButton')}</button>
+    </section>
+
+    <section data-ask="sign-in" hidden>
+      <p>{t(lang, 'signInIntro')}</p>
+      <form>
+        <label>{t(lang, 'emailLabel')}<input type="email" name="email" required maxlength="254" autocomplete="email" /></label>
+        <button type="submit" class="button">{t(lang, 'sendLink')}</button>
+      </form>
+    </section>
+
+    <section data-ask="ask" hidden>
+      <form>
+        <label>{t(lang, 'questionLabel')}<textarea name="question" required minlength="5" maxlength="1000" rows="4"></textarea></label>
+        <p class="hint">{t(lang, 'questionHint')}</p>
+        <button type="submit" class="button">{t(lang, 'submit')}</button>
+      </form>
+      <p class="remaining" data-ask="remaining"></p>
+      <div class="answer" data-ask="answer" aria-live="polite"></div>
+      <button type="button" class="link-button" data-ask="sign-out">{t(lang, 'signOut')}</button>
+    </section>
+  </main>
+</BaseLayout>
+
+<script>
+  import { initAskForm } from '../../lib/ask/client/ask-form';
+  initAskForm();
+</script>
+
+<style>
+  .ask {
+    position: relative;
+    z-index: 2;
+    width: min(820px, calc(100% - 3rem));
+    margin: 0 auto;
+    padding: clamp(4rem, 9vw, 7rem) 0 6rem;
+    color: var(--dajc-muted);
+  }
+  .eyebrow {
+    margin: 0 0 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--dajc-orange);
+  }
+  h1, h2, h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--dajc-white);
+  }
+  h1 { margin: 0 0 1.2rem; font-size: clamp(2rem, 5vw, 3rem); }
+  .lead, .info-only, .hint, .remaining { line-height: 1.7; }
+  .info-only { font-size: 14px; border-left: 2px solid var(--dajc-orange); padding-left: 0.8rem; }
+  section { padding: 1.4rem 0; border-top: 1px solid var(--dajc-line); }
+  label { display: grid; gap: 0.5rem; color: var(--dajc-white); }
+  input, textarea {
+    font: inherit;
+    padding: 0.7rem;
+    border-radius: 6px;
+    border: 1px solid var(--dajc-line);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--dajc-white);
+  }
+  .button {
+    margin-top: 0.8rem;
+    padding: 0.7rem 1.2rem;
+    border: 0;
+    border-radius: 6px;
+    background: var(--dajc-orange);
+    color: #061a33;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .button[disabled] { opacity: 0.5; cursor: not-allowed; }
+  .link-button { background: none; border: 0; color: var(--dajc-orange); cursor: pointer; padding: 0; margin-top: 1.5rem; }
+  a { color: var(--dajc-orange); }
+  .answer :global(.ask-level) {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    border: 1px solid currentColor;
+  }
+  .answer :global(.ask-level--verified) { color: #3ecf8e; }
+  .answer :global(.ask-level--partial) { color: #f5b942; }
+  .answer :global(.ask-level--unknown) { color: #ff7a7a; }
+  .answer :global(.ask-level--insufficient_verified_data) { color: #ff7a7a; }
+  .answer :global(.ask-unverified) { color: #f5b942; font-size: 0.9em; }
+  .answer :global(.ask-outcome--insufficient_verified_data) { color: #f5b942; }
+  .answer :global(.ask-statements li) { margin: 0.6rem 0; color: var(--dajc-white); line-height: 1.6; }
+  .answer :global(.ask-facts) { display: grid; grid-template-columns: max-content 1fr; gap: 0.2rem 1rem; font-size: 13px; color: var(--dajc-muted); margin: 0.6rem 0; }
+  .answer :global(.ask-facts dd) { margin: 0; }
+  .answer :global(.ask-ai-notice) { font-family: 'IBM Plex Mono', monospace; font-size: 12px; margin-top: 1.5rem; }
+  .answer :global(.ask-support) { font-size: 13px; }
+</style>
