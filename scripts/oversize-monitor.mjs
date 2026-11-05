@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { oversizeSources } from '../config/oversize-sources/index.mjs';
 import { dajcEuropeCoverage, COVERAGE_VERSION } from '../config/europe-coverage.mjs';
 import { fetchSourceFindings } from './lib/fetch-source.mjs';
-import { discoverWithWebSearch, SEARCH_GROUPS } from './lib/web-search.mjs';
+import { discoverWithWebSearch, SEARCH_GROUPS, webDiscoveryFailure } from './lib/web-search.mjs';
 import { buildFindingHistory, mergeFindings, markExpired } from './lib/findings.mjs';
 import { isRecentRefresh, loadWeekFindings, loadWeekUpdatedAt, saveWeekFindings } from './lib/store.mjs';
 import { scopeFindings } from './lib/geographic-scope.mjs';
@@ -90,6 +90,13 @@ async function main() {
       }
       console.log(`${label} OK - ${entry.hits} hit(s), ${entry.kept} verified against their own page`);
       for (const rejected of entry.rejected) console.log(`    [dropped] ${rejected.url} - ${rejected.reason}`);
+    }
+    // Fail before anything is written, so the run turns red and the owner
+    // is e-mailed instead of an empty week being stored as a quiet one.
+    const failure = webDiscoveryFailure(web.groups);
+    if (failure) {
+      console.log(`::error::${failure}`);
+      throw new Error(failure);
     }
     allCandidates.push(...web.findings);
   }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildClassifierPrompt, buildSearchRequest, cleanSourceName, cleanUrl, discoverWithWebSearch, parseSearchResponse, SEARCH_GROUPS, verifySearchItem,
+  webDiscoveryFailure,
 } from '../web-search.mjs';
 import { dajcEuropeCoverage } from '../../../config/europe-coverage.mjs';
 
@@ -202,5 +203,34 @@ describe('Open Europe-wide source expansion', () => {
     const result = await verifySearchItem(article, { now, fetchPage: okPage(page()) });
     expect(result.ok).toBe(true);
     expect(result.finding.sourceTier).toBe('industry');
+  });
+});
+
+describe('webDiscoveryFailure', () => {
+  const down = (error) => ({ status: 'unavailable', error, hits: 0, kept: 0, rejected: [] });
+
+  it('names the rejected key when every group fails with HTTP 401 (2-5 November 2026)', () => {
+    const groups = [
+      down('oversize+heavy: Provider HTTP 401 from api.anthropic.com; oversize+operations: Provider HTTP 401 from api.anthropic.com'),
+      down('oversize: Provider HTTP 401 from api.anthropic.com'),
+    ];
+    const message = webDiscoveryFailure(groups);
+    expect(message).toContain('api.anthropic.com rejected the API key (HTTP 401)');
+    expect(message).toContain('ANTHROPIC_API_KEY');
+    expect(message).toContain('None of the 2 web search groups could run');
+  });
+
+  it('names the Perplexity secret for a rejected search key', () => {
+    expect(webDiscoveryFailure([down('oversize: Provider HTTP 403 from api.perplexity.ai')])).toContain('PERPLEXITY_API_KEY');
+  });
+
+  it('reports a total outage without an auth error too', () => {
+    expect(webDiscoveryFailure([down('oversize: Provider HTTP 529 from api.anthropic.com')]))
+      .toBe('None of the 1 web search groups could run: oversize: Provider HTTP 529 from api.anthropic.com');
+  });
+
+  it('accepts a run where at least one group searched', () => {
+    expect(webDiscoveryFailure([down('oversize: Provider HTTP 401 from api.anthropic.com'), { status: 'ok', hits: 3, kept: 1, rejected: [] }])).toBeNull();
+    expect(webDiscoveryFailure([])).toBeNull();
   });
 });
