@@ -88,7 +88,15 @@ revoke the disputed period and are reported to the accountant.
 ## Security and data protection
 
 - Deny by default: every route answers 404 while its feature is off.
-- CSRF: state-changing browser requests need a DAJC `Origin` and a JSON body.
+- CSRF, two layers: (1) site-wide, `src/lib/security/origin-check.ts` runs
+  first in `src/middleware.ts` and applies Astro's own same-origin rule (a
+  cross-site POST/PUT/PATCH/DELETE with a form content type or without one is
+  refused); it replaces `security.checkOrigin` only because Astro cannot exempt
+  a single route. The one exception is the RSA-signed GP webpay return POST
+  (exact path, url-encoded body). `gpwebpay-return.test.ts` proves the decision
+  equals Astro's for > 2 000 request combinations outside that exception and
+  that the middleware wiring stays first. (2) Per route: state-changing
+  browser requests to DAJC AI need a DAJC `Origin` and a JSON body.
 - Sessions: HttpOnly, SameSite=Lax cookie scoped to `/api/ask`; tokens stored
   as SHA-256 hashes; e-mail stored only as an HMAC fingerprint.
 - Database: least-privilege role `dajc_ask_app`; RLS on every table; personal
@@ -128,9 +136,10 @@ time and never logged (`monitoring.test.ts` checks every console level,
 including the internal-error path). To rotate: generate a new bearer, replace
 the hash, redeploy; old deployments keep the old hash until they are removed; a wrong
 HTTP method answers 405. **POST calls must send `Content-Type: application/json`
-(body `{}` for `run`)**: Astro's built-in origin check refuses a POST without it
-(403 "Cross-site POST form submissions are forbidden") before the handler runs,
-as verified on the Vercel preview. Example:
+(body `{}` for `run`)**: the site-wide same-origin check refuses a cross-site
+POST without a content type or with a form content type (403 "Cross-site POST
+form submissions are forbidden") before the handler runs, as verified on the
+Vercel preview. Example:
 `curl -X POST -H "Authorization: Bearer $BEARER" -H 'Content-Type: application/json' -d '{}' https://<host>/api/ask/maintenance/run`. None returns a secret value, an e-mail address, a
 question, an answer or a payment payload.
 
@@ -233,9 +242,11 @@ store contracts and the end-to-end lifecycle as `dajc_ask_app`
 - Provider adapters are verified only against synthetic payloads; the real
   event shapes (Stripe API version, Revolut order schema, GP webpay field order)
   must be confirmed in each provider's test environment.
-- GP webpay must return the customer with an HTTP GET redirect (parameters in
-  the query string) to `/api/ask/billing/return/gpwebpay`; a cross-site POST
-  form would be refused by Astro's origin check before the handler runs.
+- GP webpay may return the customer to `/api/ask/billing/return/gpwebpay`
+  (exact path, no trailing slash) with a GET redirect (query string) or a POST
+  form (`application/x-www-form-urlencoded`, ≤ 8 KB); both are accepted only
+  with GP's signature (DIGEST, DIGEST1). Which one GP uses for this merchant
+  must be confirmed in the GP test environment.
 - GP webpay recurring charges, refunds and status queries need the Web Services
   API contract. Revolut renewals are built on the documented merchant-initiated
   flow but whether the first checkout saves the card for the merchant

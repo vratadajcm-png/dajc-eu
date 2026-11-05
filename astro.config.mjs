@@ -40,6 +40,11 @@ export default defineConfig({
   // server-side per request instead of baked into a static build. See
   // docs/PARTNER_PORTAL.md and docs/INVESTOR_DOCUMENTS.md.
   output: 'static',
+  // CSRF: Astro's same-origin check runs in src/middleware.ts instead
+  // (src/lib/security/origin-check.ts): the same rule, plus one exception for
+  // the RSA-signed GP webpay return POST, which Astro cannot exempt per route.
+  // Never set this to false without that middleware.
+  security: { checkOrigin: false },
   adapter: vercel({
     includeFiles: [
       './private/investor/pitch-deck-en.pdf.enc',

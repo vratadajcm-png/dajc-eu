@@ -228,12 +228,34 @@ export async function handleBillingWebhook(provider: string, ctx: RouteContext, 
 }
 
 /** GP webpay signed browser return: verify, apply, then redirect to the account page. */
+/** GP webpay returns a handful of short fields; anything larger is not a GP return. */
+export const GP_RETURN_MAX_BYTES = 8 * 1024;
+
+/**
+ * The parameters of a GP webpay return: the query string of a GET redirect,
+ * or the url-encoded body of a POST form. Never both, never another format.
+ */
+async function gpReturnParams(request: Request, url: URL): Promise<URLSearchParams | null> {
+  if (request.method === 'GET') return url.searchParams;
+  if (request.method !== 'POST') return null;
+  const mediaType = (request.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase();
+  if (mediaType !== 'application/x-www-form-urlencoded') return null;
+  if (Number(request.headers.get('content-length') || 0) > GP_RETURN_MAX_BYTES) return null;
+  const body = await request.text();
+  if (body.length > GP_RETURN_MAX_BYTES) return null;
+  return new URLSearchParams(body);
+}
+
 export async function handleBillingReturn(provider: string, ctx: RouteContext, rt: AccountRuntime | null): Promise<Response> {
   if (!rt?.paidRuntime || provider !== 'gpwebpay' || rt.paidRuntime.adapter.provider !== 'GP_WEBPAY') return notFound();
+  if (ctx.request.method !== 'GET' && ctx.request.method !== 'POST') return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
   const page = new URL('/intelligence/ask', rt.ask.config.publicOrigin);
   let outcome = 'failed';
   try {
-    const result = await processWebhook({ rawBody: '', headers: ctx.request.headers, query: ctx.url.searchParams }, billingDeps(rt.paidRuntime));
+    const params = await gpReturnParams(ctx.request, ctx.url);
+    if (!params) throw new Error('unsupported GP return');
+    // The signature (DIGEST, DIGEST1) is verified by the adapter before any change.
+    const result = await processWebhook({ rawBody: '', headers: ctx.request.headers, query: params }, billingDeps(rt.paidRuntime));
     outcome = result.status === 'ok' && result.events.some((e) => e.kind === 'PAYMENT_SETTLED' && (e.outcome === 'applied' || e.outcome === 'duplicate')) ? 'success' : 'failed';
   } catch {
     outcome = 'failed';
