@@ -61,3 +61,52 @@ jobs:
           path: artifacts/driving-bans/
           if-no-files-found: warn
           retention-days: 14
+
+  # Real-database checks for Ask DAJC AI / paid DAJC AI: migrations 0000-0003
+  # applied with an administrative role, tests connected as the
+  # least-privileged dajc_ask_app role (RLS, grants, atomic limits,
+  # idempotent payment events, append-only audit). Throwaway service
+  # container only - no Supabase or production database is touched.
+  ask-postgres-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: ci-admin-only
+          POSTGRES_DB: dajc_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply dajc_ask migrations (admin connection, CI only)
+        env:
+          PGPASSWORD: ci-admin-only
+        run: |
+          for file in drizzle-ask/0*.sql; do
+            echo "applying $file"
+            sed 's/--> statement-breakpoint//' "$file" | psql -h localhost -U postgres -d dajc_ci -v ON_ERROR_STOP=1 -q
+          done
+          psql -h localhost -U postgres -d dajc_ci -v ON_ERROR_STOP=1 -q -c "ALTER ROLE dajc_ask_app WITH LOGIN PASSWORD 'ci-app-only'"
+
+      - name: Store contract tests against Postgres as dajc_ask_app
+        env:
+          DAJC_ASK_TEST_DB_URL: postgres://dajc_ask_app:ci-app-only@localhost:5432/dajc_ci
+        run: npx vitest run src/lib/ask/__tests__/store.test.ts src/lib/ask/__tests__/paid-store.test.ts src/lib/ask/__tests__/e2e-lifecycle.test.ts
