@@ -101,7 +101,7 @@ export function comparePermit(permitInput: unknown, transportInput: unknown): Pe
 
 // --- Upload intake -----------------------------------------------------------
 
-export const PERMIT_PDF_LIMITS = { maxBytes: 4 * 1024 * 1024, maxPages: 12 };
+export const PERMIT_PDF_LIMITS = { maxBytes: 3 * 1024 * 1024, maxPages: 12 };
 
 export type PdfCheck = { ok: true; bytes: Buffer; pages: number } | { ok: false; reason: 'not_base64' | 'too_large' | 'not_pdf' | 'encrypted' | 'active_content' | 'too_many_pages' | 'empty' };
 

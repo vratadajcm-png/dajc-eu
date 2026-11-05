@@ -266,6 +266,8 @@ describe('controlled learning workflow', () => {
   it('publishes only after source check, independent verification and approval by others', async () => {
     const { paid, deps } = await reviewers();
     expect((await propose('mallory', fields, deps)).status).toBe('forbidden');
+    expect(await propose('ann', { ...fields, id: undefined }, deps)).toMatchObject({ status: 'invalid', reason: 'INVALID_FIELDS' });
+    expect(await propose('ann', null, deps)).toMatchObject({ status: 'invalid' });
     expect((await propose('ann', fields, deps)).status).toBe('ok');
     expect(await publishedKnowledge({ topic: 'toll', jurisdictions: ['CZ'] }, deps)).toEqual([]);
     expect((await confirmSource('ann', fields.id, deps)).status).toBe('four_eyes');

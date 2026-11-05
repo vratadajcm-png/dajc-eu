@@ -24,7 +24,8 @@ import { monthlyReport, reportCsv } from './accounting/report';
 import { publishedKnowledge } from './learning/workflow';
 
 const WEBHOOK_MAX_BYTES = 256 * 1024;
-const PERMIT_MAX_BYTES = 6 * 1024 * 1024;
+// Vercel functions accept request bodies up to 4.5 MB; a 3 MB PDF is ~4 MB in base64.
+const PERMIT_MAX_BYTES = 4_400_000;
 
 async function user(ctx: RouteContext, rt: AccountRuntime): Promise<string | null> {
   return currentUserId(sessionToken(ctx), { store: rt.ask.store, now: rt.now?.() ?? rt.ask.now?.() });
@@ -321,7 +322,7 @@ export async function handleReview(action: string, ctx: RouteContext, rt: Accoun
     const id = String(g.body.id ?? '');
     let result: { status: string } | null = null;
     switch (action) {
-      case 'propose': result = await propose(g.userId, g.body.fields as never, deps); break;
+      case 'propose': result = await propose(g.userId, g.body.fields, deps); break;
       case 'source-check': result = await confirmSource(g.userId, id, deps); break;
       case 'verify': result = await verifyIndependently(g.userId, id, deps); break;
       case 'approve': result = await approve(g.userId, id, { approvedLegalScope: g.body.approvedLegalScope === true }, deps); break;

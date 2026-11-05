@@ -97,7 +97,7 @@ revoke the disputed period and are reported to the accountant.
 - Retention: history 90 days, memory 365 days, feedback comments 1 year,
   checkouts 24 h, answer cache 6 h; account deletion removes personal rows
   immediately and keeps billing records pseudonymous (tax retention).
-- Uploads: PDF only, ≤ 4 MB, ≤ 12 pages, no encryption/JavaScript/launch
+- Uploads: PDF only, ≤ 3 MB (request bodies on Vercel are limited to 4.5 MB), ≤ 12 pages, no encryption/JavaScript/launch
   actions/embedded files; processed in memory, never stored.
 - SSRF: only official-domain URLs are fetched (existing `official-sources.ts`);
   no user-supplied URL is fetched.

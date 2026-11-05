@@ -15,6 +15,7 @@
 //   rewrite the content; no raw customer text is ever published.
 // - Published knowledge expires (max 90 days) and must be re-reviewed.
 
+import { z } from 'zod';
 import { DAJC_AI_SHARED_LEARNING_POLICY_APPROVED } from '../account/service';
 import type { Topic } from '../own-data';
 import type { KnowledgeRow, KnowledgeStatusRow, PaidStore } from '../store/paid-types';
@@ -59,9 +60,17 @@ export interface ProposalFields {
   feedbackId?: string;
 }
 
+const proposalFieldsSchema = z.object({
+  id: z.string(), topic: z.string(), jurisdiction: z.string().nullable(), summary: z.string(), officialSourceUrl: z.string(),
+  sourceQuote: z.string(), sourceCheckedAt: z.string(), expiresAt: z.string(), feedbackId: z.string().uuid().optional(),
+}).strict();
+
 /** A reviewer proposes knowledge, from an official source or (policy permitting) from consented feedback. */
-export async function propose(reviewerId: string, fields: ProposalFields, deps: LearningDeps): Promise<LearningOutcome> {
+export async function propose(reviewerId: string, rawFields: unknown, deps: LearningDeps): Promise<LearningOutcome> {
   if (!(await isReviewer(reviewerId, deps))) return { status: 'forbidden' };
+  const parsed = proposalFieldsSchema.safeParse(rawFields);
+  if (!parsed.success) return { status: 'invalid', reason: 'INVALID_FIELDS' };
+  const fields = parsed.data as ProposalFields;
   const now = nowOf(deps);
   let origin: LearningProposal['origin'] = 'OFFICIAL_SOURCE_REVIEW';
   let optedIn = false;
