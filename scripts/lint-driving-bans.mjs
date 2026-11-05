@@ -24,8 +24,21 @@ for (const file of execFileSync('git',['ls-files','src/lib/driving-bans/research
 // Ask DAJC AI reads driving-ban facts only through the adapter and the shared AI contract: no direct
 // canonical data, no staging or review-layer writes, never the paid authorisation path, the paid
 // Intelligence API or the research AI (no user question reaches a research model).
+// One exception, decided by the owner on 2026-11-05 ("paid DAJC AI uses the existing AI orchestrator"):
+// src/lib/ask/orchestrated.ts may use the provider-neutral orchestrator core and model adapters
+// (lib/ai/orchestrator.mjs, lib/ai/providers.mjs) - never the research pipeline, its config or model
+// profile - with the DAJC AI task policy (ASK_POLICY) and Ask's own keys only (askAdapterEnv fills
+// the adapters' variables from DAJC_ASK_* and never reads a DAJC_RESEARCH_* variable).
+const ASK_ORCHESTRATED='src/lib/ask/orchestrated.ts';
 for (const file of execFileSync('git',['ls-files','src/lib/ask'],{encoding:'utf8'}).split('\n').filter(name=>/\.(ts|mjs)$/.test(name)&&!name.includes('__tests__'))) {
-  assert(!/from\s+['"][^'"]*(?:driving-ban-calendars|data\/driving-bans|canonical\.json|driving-bans\/staging|evidence-store|review-workflow|web-leads|intelligence\/entitlements|driving-bans-intelligence-api|driving-bans\/research\/|lib\/ai\/|\.\.\/ai\/)|answerDrivingBansQuery/.test(readFileSync(file,'utf8')),`${file}: Ask reads driving bans only through driving-bans-adapter and driving-bans-ai-contract`);
+  const code=readFileSync(file,'utf8');
+  const allowed=file===ASK_ORCHESTRATED?code.replace(/from\s+['"]\.\.\/ai\/(?:orchestrator|providers)\.mjs['"]/g,''):code;
+  assert(!/from\s+['"][^'"]*(?:driving-ban-calendars|data\/driving-bans|canonical\.json|driving-bans\/staging|evidence-store|review-workflow|web-leads|intelligence\/entitlements|driving-bans-intelligence-api|driving-bans\/research\/|lib\/ai\/|\.\.\/ai\/)|answerDrivingBansQuery/.test(allowed),`${file}: Ask reads driving bans only through driving-bans-adapter and driving-bans-ai-contract`);
+}
+{
+  const code=readFileSync(ASK_ORCHESTRATED,'utf8');
+  assert(code.includes('policy: ASK_POLICY')&&code.includes("module: 'ask-dajc-ai'"),`${ASK_ORCHESTRATED}: must run under the DAJC AI task policy and its own ledger module`);
+  assert(code.includes('askAdapterEnv(options.env)')&&!/\benv\s*(?:\.|\[\s*[`'"])DAJC_RESEARCH|process\.env/.test(code),`${ASK_ORCHESTRATED}: adapters get only DAJC_ASK_* keys, never research keys`);
 }
 const askOwnData=readFileSync('src/lib/ask/own-data.ts','utf8');
 assert(askOwnData.includes('intelligence/driving-bans-adapter')&&askOwnData.includes('answerFreeAskQuery'),'src/lib/ask/own-data.ts: driving-ban facts must come through driving-bans-adapter and answerFreeAskQuery');

@@ -31,6 +31,11 @@ createdb dajc_restore && pg_restore -d dajc_restore --exit-on-error dajc_ask-$(d
 psql -d dajc_restore -v ON_ERROR_STOP=1 -f scripts/dajc-ai-db/verify.sql
 ```
 
+Use `pg_dump`/`pg_restore` of the **same major version as the target server**
+(or newer for dumping, but restore into a server at least as new as the client):
+a newer client writes settings such as `transaction_timeout` that an older
+server rejects. CI therefore runs both inside the Postgres 16 service container.
+
 If `dajc_ask` does not exist yet, the backup is empty and step 2 creates it.
 Keep the dump encrypted at rest; it contains e-mail fingerprints (HMAC), not
 addresses.

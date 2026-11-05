@@ -122,9 +122,12 @@ jobs:
         run: |
           set -euo pipefail
           psql_admin() { psql -h localhost -U postgres -v ON_ERROR_STOP=1 -q "$@"; }
-          pg_dump -h localhost -U postgres -d dajc_ci --schema=dajc_ask -Fc -f "$RUNNER_TEMP/dajc_ask.dump"
+          # Dump and restore with the server's own major version (the runner's newer
+          # client tools write settings a Postgres 16 server rejects).
+          pg_container='${{ job.services.postgres.id }}'
+          docker exec "$pg_container" pg_dump -U postgres -d dajc_ci --schema=dajc_ask -Fc -f /tmp/dajc_ask.dump
           psql_admin -d dajc_ci -c "CREATE DATABASE dajc_restore"
-          pg_restore -h localhost -U postgres -d dajc_restore --exit-on-error "$RUNNER_TEMP/dajc_ask.dump"
+          docker exec "$pg_container" pg_restore -U postgres -d dajc_restore --exit-on-error /tmp/dajc_ask.dump
           psql_admin -d dajc_restore -f scripts/dajc-ai-db/verify.sql
           test "$(psql_admin -d dajc_ci -tAc 'select count(*) from dajc_ask.users')" = "$(psql_admin -d dajc_restore -tAc 'select count(*) from dajc_ask.users')"
           # Without the explicit confirmation the rollback must refuse.
