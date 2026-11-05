@@ -18,7 +18,7 @@ const TEST_DB_URL = process.env.DAJC_ASK_TEST_DB_URL;
 
 type Pair = { ask: AskStore; paid: PaidStore };
 
-function settle(userId: string, eventId: string, paymentRef: string): VerifiedPaymentEvent {
+function settle(userId: string, eventId: string, paymentRef: string): Extract<VerifiedPaymentEvent, { kind: 'PAYMENT_SETTLED' }> {
   return {
     kind: 'PAYMENT_SETTLED', eventId, provider: 'STRIPE', customerRef: `cus_${userId.slice(0, 8)}`, userId,
     occurredAt: NOW.toISOString(), paymentRef, amountCents: 1500, currency: 'EUR',

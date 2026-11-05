@@ -109,6 +109,13 @@ export interface PipelineDeps {
   view?: DrivingBansView;
   findings?: FindingLike[];
   deadlineMs?: number;
+  /** Called once with the normalised classification (paid tools reuse it; no second model call). */
+  onClassified?: (classification: Classification) => void;
+  /**
+   * Human-reviewed, source-backed knowledge (learning/workflow.ts), never for
+   * driving bans: the registry stays their only authority.
+   */
+  knowledge?: (query: { topic: Topic; jurisdictions: string[] }) => Promise<Array<{ id: string; summary: string; officialSourceUrl: string; sourceQuote: string; sourceCheckedAt: string }>>;
 }
 
 export class AskTimeoutError extends Error {
@@ -309,6 +316,7 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
       signal: AbortSignal.timeout(remaining(deadline)),
     }));
   const c = normalizeClassification(classified.json, question, today);
+  deps.onClassified?.(c);
   const notices = c.case_assessment ? [t(uiLang, 'caseNotice')] : [];
   if (!c.in_scope) return { answer: emptyAnswer(c.language, uiLang, 'out_of_scope', [], notices), path: 'none', reviewUrls: [] };
   if (c.jurisdictions.length === 0) return { answer: emptyAnswer(c.language, uiLang, 'need_country', [], notices), path: 'none', reviewUrls: [] };
@@ -368,9 +376,21 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
     for (const result of fetched) if (result.ok) pages.push(result.page);
   }
 
-  const sourceById = new Map<string, PromptSource & { page?: OfficialPage; record?: OwnRecord; unverified?: boolean }>();
+  const sourceById = new Map<string, PromptSource & { page?: OfficialPage; record?: OwnRecord; unverified?: boolean; checkedAt?: string }>();
   for (const record of records) {
     sourceById.set(record.id, { id: record.id, kind: 'own', url: record.facts.sourceUrl, title: record.facts.restriction, text: record.text, record });
+  }
+  if (!drivingBan && deps.knowledge) {
+    const entries = (await deps.knowledge({ topic: c.topic, jurisdictions: c.jurisdictions }).catch(() => [])).slice(0, 4);
+    entries.forEach((entry, index) => {
+      if (!isAllowedSourceUrl(entry.officialSourceUrl)) return;
+      const id = `K${index + 1}`;
+      sourceById.set(id, {
+        id, kind: 'own', url: entry.officialSourceUrl, title: 'DAJC reviewed knowledge',
+        text: `${entry.summary}\n\nQuote from the official source: ${entry.sourceQuote}`.slice(0, LIMITS.ownRecordChars),
+        checkedAt: entry.sourceCheckedAt.slice(0, 10),
+      });
+    });
   }
   const passageTerms = [...c.search_terms, TOPIC_TERMS[c.topic]];
   pages.forEach((page, index) => {
@@ -473,7 +493,7 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
         kind: s.kind,
         url: s.url,
         title: s.title,
-        checkedAt: s.record ? s.record.facts.verified : today,
+        checkedAt: s.record ? s.record.facts.verified : s.checkedAt ?? today,
         publishedAt: s.page?.publishedAt ?? null,
         verification: s.kind === 'own' ? 'DAJC_VERIFIED' as const : s.unverified ? 'UNVERIFIED_LEAD' as const : 'OFFICIAL_WEB' as const,
       };

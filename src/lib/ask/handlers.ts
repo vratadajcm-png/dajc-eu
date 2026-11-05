@@ -26,7 +26,7 @@ export interface RouteContext {
   clientAddress?: string;
 }
 
-const COOKIE_PATH = '/api/ask';
+export const COOKIE_PATH = '/api/ask';
 const MAX_BODY_BYTES = 8_192;
 const PUBLIC_ORIGINS = ['https://www.dajc.eu', 'https://dajc.eu'];
 
@@ -44,19 +44,21 @@ export function notFound(): Response {
   });
 }
 
-function json(body: unknown, status = 200): Response {
+export function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: BASE_HEADERS });
 }
 
-function originAllowed(request: Request, runtime: AskRuntime): boolean {
+export function originAllowed(request: Request, runtime: AskRuntime): boolean {
   const origin = request.headers.get('origin');
   return Boolean(origin && new Set([runtime.config.publicOrigin, ...PUBLIC_ORIGINS]).has(origin));
 }
 
-async function readJson(request: Request): Promise<Record<string, unknown> | null> {
+export async function readJson(request: Request, maxBytes = MAX_BODY_BYTES): Promise<Record<string, unknown> | null> {
   if (!(request.headers.get('content-type') || '').toLowerCase().includes('application/json')) return null;
+  const declared = Number(request.headers.get('content-length') || 0);
+  if (declared > maxBytes) return null;
   const text = await request.text();
-  if (text.length > MAX_BODY_BYTES) return null;
+  if (text.length > maxBytes) return null;
   try {
     const parsed = JSON.parse(text);
     return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
@@ -65,7 +67,7 @@ async function readJson(request: Request): Promise<Record<string, unknown> | nul
   }
 }
 
-function sessionToken(ctx: RouteContext): string | undefined {
+export function sessionToken(ctx: RouteContext): string | undefined {
   return ctx.cookies.get(SESSION_COOKIE)?.value;
 }
 

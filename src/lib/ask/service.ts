@@ -11,18 +11,20 @@
 // - Measurement: one metrics row per answered question - level, language,
 //   path, actual cost, latency - with no user reference and no content.
 
+import { createHash } from 'node:crypto';
 import type { AskConfig } from './config';
 import { CostMeter, eurToMicro, searchCostMicroEur } from './cost';
 import type { UiLang } from './i18n';
-import { isoDay } from './own-data';
-import { LIMITS, WORST_CASE_PROMPT_CHARS, runPipeline, type AskAnswer, type PipelineDeps } from './pipeline';
+import { isoDay, publishedView } from './own-data';
+import { LIMITS, WORST_CASE_PROMPT_CHARS, redactPersonalData, runPipeline, type AskAnswer, type PipelineDeps } from './pipeline';
 import type { Providers } from './providers';
 import type { AskStore, BudgetCaps } from './store/types';
+import type { PaidStore } from './store/paid-types';
 
 export const MIN_QUESTION_CHARS = 5;
 
 export type QueryOutcome =
-  | { status: 'answered'; answer: AskAnswer; used: number; limit: number }
+  | { status: 'answered'; answer: AskAnswer; used: number; limit: number; cached?: boolean }
   | { status: 'invalid' }
   | { status: 'limit'; limit: number }
   | { status: 'budget' }
@@ -33,7 +35,35 @@ export interface ServiceDeps {
   store: AskStore;
   providers: Providers;
   now?: () => Date;
-  pipeline?: Partial<Pick<PipelineDeps, 'fetchPage' | 'view' | 'findings' | 'deadlineMs'>>;
+  pipeline?: Partial<Pick<PipelineDeps, 'fetchPage' | 'view' | 'findings' | 'deadlineMs' | 'onClassified' | 'knowledge'>>;
+  cache?: AnswerCache;
+}
+
+/** Checked generic answers shared by identical questions on the same data and day. */
+export interface AnswerCache {
+  get(key: string, now: Date): Promise<AskAnswer | null>;
+  put(key: string, answer: AskAnswer, expiresAt: Date): Promise<void>;
+}
+
+const CACHEABLE = new Set(['VERIFIED', 'PARTIAL', 'INSUFFICIENT_VERIFIED_DATA']);
+const CACHE_TTL_MS = 6 * 3_600_000;
+
+export function answerCacheFrom(store: Pick<PaidStore, 'getCachedAnswer' | 'putCachedAnswer'>): AnswerCache {
+  return {
+    async get(key, now) {
+      return (await store.getCachedAnswer(key, now)) as AskAnswer | null;
+    },
+    put: (key, answer, expiresAt) => store.putCachedAnswer(key, answer, expiresAt),
+  };
+}
+
+/**
+ * Same redacted question, interface language, Driving Bans dataset version
+ * and Prague day -> same key. The key is a hash: the question itself is not stored.
+ */
+export function answerCacheKey(question: string, uiLang: UiLang, datasetVersion: string, day: string): string {
+  const normalized = redactPersonalData(question).toLowerCase().normalize('NFKC').replace(/\s+/g, ' ').replace(/[?!.\s]+$/, '').trim();
+  return createHash('sha256').update(`v1|${uiLang}|${datasetVersion}|${day}|${normalized}`, 'utf8').digest('hex');
 }
 
 export function worstCaseQuestionMicro(config: Pick<AskConfig, 'pricing' | 'usdToEur'>): number {
@@ -81,6 +111,22 @@ export async function askQuestion(userId: string, rawQuestion: unknown, uiLang: 
 
   if (!(await store.consumeDailyQuestion(userId, day, config.dailyQueryLimit))) return { status: 'limit', limit: config.dailyQueryLimit };
 
+  // A checked answer to the identical question on today's data costs no model call.
+  let cacheKey: string | null = null;
+  if (deps.cache) {
+    try {
+      const view = deps.pipeline?.view ?? publishedView(now);
+      cacheKey = answerCacheKey(question, uiLang, view.dataset_version, day);
+      const cached = await deps.cache.get(cacheKey, now);
+      if (cached) {
+        await store.recordMetric({ day, level: cached.level, language: cached.language, path: 'cache', costMicro: 0, latencyMs: 0 }).catch(() => undefined);
+        return { status: 'answered', answer: cached, used: await store.getDailyUsage(userId, day), limit: config.dailyQueryLimit, cached: true };
+      }
+    } catch {
+      cacheKey = null; // the cache is an optimisation only
+    }
+  }
+
   const caps = budgetCaps(config, now);
   const reserved = worstCaseQuestionMicro(config);
   if (!(await store.reserveBudget(caps, reserved))) {
@@ -102,6 +148,9 @@ export async function askQuestion(userId: string, rawQuestion: unknown, uiLang: 
     await store.recordMetric({ day, level: result.answer.level, language: result.answer.language, path: result.path, costMicro: meter.total, latencyMs: Date.now() - started });
     if (result.reviewUrls.length > 0) {
       await store.enqueueReviewUrls(result.reviewUrls.map((entry) => ({ ...entry, day })));
+    }
+    if (cacheKey && deps.cache && CACHEABLE.has(result.answer.level)) {
+      await deps.cache.put(cacheKey, result.answer, new Date(now.getTime() + CACHE_TTL_MS)).catch(() => undefined);
     }
     const used = await store.getDailyUsage(userId, day);
     return { status: 'answered', answer: result.answer, used, limit: config.dailyQueryLimit };

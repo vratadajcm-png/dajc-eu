@@ -6,25 +6,13 @@ import { createSandboxAdapter, signSandboxEvent, SANDBOX_SIGNATURE_HEADER, type 
 import { decideRefund, processWebhook, requestCancellation, requestRefund, startCheckout, subscriptionStatus, type BillingDeps } from '../billing/service';
 import { createStripeAdapter, mapStripeEvent, verifyStripeSignature } from '../billing/stripe';
 import { addOneMonth, hmacHex, PaymentProviderUnavailable, WebhookAuthError, type PaymentAdapter } from '../billing/types';
-import { readPaidConfig, paidReleased, type PaidConfig } from '../paid/config';
-import { parseDataKeys } from '../crypto';
+import { readPaidConfig, paidReleased } from '../paid/config';
+import { KEYS, paidConfig, SECRET } from './paid-helpers';
 import { MemoryAskStore } from '../store/memory';
 import { MemoryPaidStore } from '../store/paid-memory';
 
 const NOW = new Date('2026-11-05T10:00:00.000Z');
-const SECRET = 'sandbox-secret-0123456789abcdef0123456789';
-const KEYS = `k1:${Buffer.alloc(32, 7).toString('base64')}`;
 
-export function paidConfig(overrides: Partial<PaidConfig> = {}): PaidConfig {
-  return {
-    provider: 'DAJC_SANDBOX', mode: 'sandbox', staging: false, keyring: parseDataKeys(KEYS).keyring!,
-    fairUse: { dailyQuestions: 30, monthlyQuestions: 400, userMonthlyCostEur: 5 },
-    refund: { windowDays: 14, maxSelfService: 1, maxPaidQuestions: 20 },
-    historyRetentionDays: 90, historyMaxEntries: 200, memoryRetentionDays: 365, memoryMaxItems: 50,
-    stripe: null, revolut: null, gpwebpay: null, sandbox: { secret: SECRET },
-    ...overrides,
-  };
-}
 
 export function billingScenario(adapter?: PaymentAdapter) {
   const askStore = new MemoryAskStore();

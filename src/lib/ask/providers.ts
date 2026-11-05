@@ -31,6 +31,8 @@ export interface JsonCallParams {
   schema: Record<string, unknown>;
   maxOutputTokens: number;
   signal?: AbortSignal;
+  /** One PDF sent as data (paid permit extraction, with the user's consent). */
+  file?: { filename: string; base64: string };
 }
 
 export interface Providers {
@@ -66,14 +68,17 @@ function parseJson<T>(provider: ProviderError['provider'], text: unknown): T {
 
 export function createProviders({ openaiKey, anthropicKey, perplexityKey, fetchFn = fetch }: { openaiKey: string; anthropicKey: string; perplexityKey: string; fetchFn?: FetchFn }): Providers {
   return {
-    async openaiJson<T>({ model, system, user, schemaName, schema, maxOutputTokens, signal }: JsonCallParams): Promise<ModelResult<T>> {
+    async openaiJson<T>({ model, system, user, schemaName, schema, maxOutputTokens, signal, file }: JsonCallParams): Promise<ModelResult<T>> {
+      const userContent = file
+        ? [{ type: 'input_file', filename: file.filename, file_data: `data:application/pdf;base64,${file.base64}` }, { type: 'input_text', text: user }]
+        : user;
       const response = await postJson(fetchFn, 'openai', 'https://api.openai.com/v1/responses', { authorization: `Bearer ${openaiKey}` }, {
         model,
         store: false,
         max_output_tokens: maxOutputTokens,
         input: [
           { role: 'system', content: system },
-          { role: 'user', content: user },
+          { role: 'user', content: userContent },
         ],
         text: { format: { type: 'json_schema', name: schemaName, schema, strict: true } },
       }, signal);
