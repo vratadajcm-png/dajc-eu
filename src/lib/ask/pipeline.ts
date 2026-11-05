@@ -376,7 +376,7 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
     for (const result of fetched) if (result.ok) pages.push(result.page);
   }
 
-  const sourceById = new Map<string, PromptSource & { page?: OfficialPage; record?: OwnRecord; unverified?: boolean; checkedAt?: string }>();
+  const sourceById = new Map<string, PromptSource & { page?: OfficialPage; record?: OwnRecord; unverified?: boolean; checkedAt?: string; knowledge?: boolean }>();
   for (const record of records) {
     sourceById.set(record.id, { id: record.id, kind: 'own', url: record.facts.sourceUrl, title: record.facts.restriction, text: record.text, record });
   }
@@ -389,6 +389,7 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
         id, kind: 'own', url: entry.officialSourceUrl, title: 'DAJC reviewed knowledge',
         text: `${entry.summary}\n\nQuote from the official source: ${entry.sourceQuote}`.slice(0, LIMITS.ownRecordChars),
         checkedAt: entry.sourceCheckedAt.slice(0, 10),
+        knowledge: true,
       });
     });
   }
@@ -422,7 +423,8 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
   const consultedPath = pathOf([...sourceById.keys()]);
 
   // (6a) Deterministic checks.
-  const guardSources: GuardSource[] = sources.map((s) => ({ id: s.id, kind: s.kind, text: s.text }));
+  // Reviewed knowledge is quoted text, not template facts: numbers must appear in its quote.
+  const guardSources: GuardSource[] = sources.map((s) => ({ id: s.id, kind: s.kind === 'own' && !sourceById.get(s.id)?.knowledge ? 'own' : 'web', text: s.text }));
   const guard = checkClaims(claims.slice(0, MAX_STATEMENTS), guardSources, { language: c.language });
   const droppedCount = guard.dropped.length + Math.max(0, claims.length - MAX_STATEMENTS);
   if (guard.kept.length === 0) return { answer: empty('no_claims', authorities), path: consultedPath, reviewUrls };

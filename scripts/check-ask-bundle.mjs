@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Offline, deterministic check that no "Ask DAJC AI" secret, secret name or
-// AI provider endpoint reaches the files served to browsers. Runs after
+// Offline, deterministic check that no "Ask DAJC AI" / paid DAJC AI secret,
+// secret name, AI provider or payment API endpoint reaches the files served to browsers. Runs after
 // `npm run build` in Application CI (owner decision: no network, < 30 s).
 //
 // Scanned: the static client output (.vercel/output/static, dist/). Not
@@ -16,9 +16,15 @@ export const CLIENT_OUTPUT_DIRS = ['.vercel/output/static', 'dist'];
 
 export const FORBIDDEN_MARKERS = [
   'DAJC_ASK_',
+  'DAJC_AI_',
+  'DAJC_ABRA_',
+  'DAJC_VAT_',
   'api.openai.com',
   'api.anthropic.com',
   'api.perplexity.ai',
+  'api.stripe.com',
+  'merchant.revolut.com',
+  'pgw/order.do',
   'RESEND_API_KEY',
 ];
 
@@ -29,6 +35,16 @@ export const SECRET_ENV_NAMES = [
   'DAJC_ASK_EMAIL_PEPPER',
   'DAJC_ASK_DB_URL',
   'RESEND_API_KEY',
+  'DAJC_AI_DATA_KEYS',
+  'DAJC_AI_STRIPE_SECRET_KEY',
+  'DAJC_AI_STRIPE_WEBHOOK_SECRET',
+  'DAJC_AI_REVOLUT_SECRET_KEY',
+  'DAJC_AI_REVOLUT_WEBHOOK_SECRET',
+  'DAJC_AI_GPWEBPAY_PRIVATE_KEY_PEM',
+  'DAJC_AI_GPWEBPAY_PRIVATE_KEY_PASSPHRASE',
+  'DAJC_AI_SANDBOX_WEBHOOK_SECRET',
+  'DAJC_AI_MAINTENANCE_SECRET',
+  'DAJC_ABRA_PASSWORD',
 ];
 
 const TEXT_EXTENSIONS = new Set(['.js', '.mjs', '.cjs', '.html', '.htm', '.css', '.json', '.map', '.txt', '.xml', '.svg', '.webmanifest']);

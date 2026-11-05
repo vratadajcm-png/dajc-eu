@@ -173,8 +173,9 @@ export async function askPaidQuestion(userId: string, input: PaidQueryInput, uiL
   const dates = [...new Set([...cleanList(input.dates, (d) => DAY.test(d), 5), ...(c?.dates ?? [])])].sort().slice(0, 5);
   let registry: PaidBansResult | null = null;
   if (jurisdictions.length > 0 && dates.length > 0 && (!c || c.topic === 'driving_ban' || vehicle || route)) {
+    // The asked local calendar days in Central European time (UTC+1/+2).
     const from = new Date(Date.parse(`${dates[0]}T00:00:00Z`) - 2 * 3_600_000).toISOString();
-    const to = new Date(Date.parse(`${dates[dates.length - 1]}T00:00:00Z`) + 26 * 3_600_000).toISOString();
+    const to = new Date(Date.parse(`${dates[dates.length - 1]}T00:00:00Z`) + 23 * 3_600_000).toISOString();
     registry = await answerPaidDrivingBans({
       store: deps.store,
       // Paid access was established above from the same ledger.

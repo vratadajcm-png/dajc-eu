@@ -3,6 +3,10 @@
 // provider call happens on the server (scripts/check-ask-bundle.mjs and
 // the vitest suite check that nothing secret reaches client bundles).
 // Answers are rendered with textContent only, never as HTML.
+// With an active DAJC AI subscription (decided by the server and reported by
+// account-panel.ts) questions go to /api/ask/paid/query instead.
+
+import { feedbackControl, renderRegistry } from './account-panel';
 
 type Strings = Record<string, string>;
 
@@ -68,10 +72,17 @@ async function post(path: string, body: unknown): Promise<{ status: number; data
   return { status: res.status, data };
 }
 
-export function renderAnswer(container: HTMLElement, answer: AnswerPayload): void {
+export interface AnswerExtras {
+  s: (key: string, vars?: Record<string, string | number>) => string;
+  /** Offer "Report an error" (needs the DAJC AI account). */
+  feedback: boolean;
+}
+
+export function renderAnswer(container: HTMLElement, answer: AnswerPayload, extras?: AnswerExtras): void {
   container.replaceChildren();
   const level = el('p', answer.ui.levelLabel, `ask-level ask-level--${answer.level.toLowerCase()}`);
   container.append(level, el('p', answer.ui.levelHelp, 'ask-level-help'));
+  if (extras) container.append(el('p', `${extras.s('confidence.label')}: ${extras.s(`confidence.${answer.level}`)}`, 'ask-confidence'));
   if (answer.ui.reasonText) container.append(el('p', answer.ui.reasonText, 'ask-reason'));
   for (const notice of answer.notices) container.append(el('p', notice, 'ask-notice'));
 
@@ -147,6 +158,7 @@ export function renderAnswer(container: HTMLElement, answer: AnswerPayload): voi
   link.href = '/support';
   support.append(link);
   container.append(support);
+  if (extras?.feedback) container.append(feedbackControl(answer, extras.s));
 }
 
 export function initAskForm(root: HTMLElement | null = document.querySelector('[data-ask-root]')): void {
@@ -181,8 +193,10 @@ export function initAskForm(root: HTMLElement | null = document.querySelector('[
       if (!data.available) say(s('budgetReached'));
       show(signIn, !data.signedIn && !loginToken);
       show(askSection, Boolean(data.signedIn));
-      askSection.querySelector('button[type="submit"]')?.toggleAttribute('disabled', !data.available || data.remaining === 0);
-      if (data.signedIn) remaining.textContent = data.remaining === 0 ? s('limitReached', { limit: data.limit }) : s('remaining', { n: data.remaining, limit: data.limit });
+      // Paid fair use is counted separately (account panel); the free daily limit does not apply.
+      const paid = root.dataset.paidActive === 'true';
+      askSection.querySelector('button[type="submit"]')?.toggleAttribute('disabled', !data.available || (!paid && data.remaining === 0));
+      if (data.signedIn) remaining.textContent = paid ? '' : data.remaining === 0 ? s('limitReached', { limit: data.limit }) : s('remaining', { n: data.remaining, limit: data.limit });
     } catch {
       say(s('systemError'));
     }
@@ -195,6 +209,7 @@ export function initAskForm(root: HTMLElement | null = document.querySelector('[
       show(confirm, false);
       say(data.ok ? s('signedIn') : (data.error || s('invalidLink')));
       await refresh();
+      if (data.ok) root.dispatchEvent(new CustomEvent('dajc:signed-in'));
     }, { once: true });
   }
 
@@ -212,10 +227,32 @@ export function initAskForm(root: HTMLElement | null = document.querySelector('[
     button.disabled = true;
     answerBox.replaceChildren(el('p', s('working'), 'ask-working'));
     say('');
+    const extras: AnswerExtras = { s, feedback: Boolean(root.querySelector('[data-account-panel]')) };
     try {
+      if (root.dataset.paidActive === 'true') {
+        const paid = root.querySelector<HTMLElement>('[data-ask="paid-fields"]');
+        const vehicleId = paid?.querySelector<HTMLSelectElement>('[data-ask="vehicle"]')?.value || undefined;
+        const countries = (paid?.querySelector<HTMLInputElement>('[data-ask="countries"]')?.value || '').split(/[\s,;]+/).filter(Boolean);
+        const date = paid?.querySelector<HTMLInputElement>('[data-ask="date"]')?.value;
+        const { status, data } = await post('/api/ask/paid/query', { question: field.value, lang, vehicleId, jurisdictions: countries, dates: date ? [date] : [] });
+        answerBox.replaceChildren();
+        if (data.ok) {
+          if (data.answer) renderAnswer(answerBox, data.answer as AnswerPayload, extras);
+          const registry = el('div');
+          renderRegistry(registry, data.registry ?? null, data.notices ?? [], s);
+          answerBox.append(registry);
+        } else if (status === 429 && data.scope) {
+          say(s(`paid.limit.${data.scope}`, data.usage ?? {}));
+        } else {
+          say(data.error || s('systemError'));
+          if (status === 401) show(signIn, true);
+        }
+        await refresh();
+        return;
+      }
       const { status, data } = await post('/api/ask/query', { question: field.value, lang });
       if (data.ok && data.answer) {
-        renderAnswer(answerBox, data.answer as AnswerPayload);
+        renderAnswer(answerBox, data.answer as AnswerPayload, extras);
       } else {
         answerBox.replaceChildren();
         say(data.error || s('systemError'));
@@ -234,5 +271,6 @@ export function initAskForm(root: HTMLElement | null = document.querySelector('[
     await refresh();
   });
 
+  root.addEventListener('dajc:plan-changed', () => void refresh());
   void refresh();
 }

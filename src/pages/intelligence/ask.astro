@@ -4,6 +4,7 @@
 // configuration is incomplete; never indexed during Phase 1.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getAskConfig } from '../../lib/ask/config';
+import { getAccountRuntime } from '../../lib/ask/account/runtime';
 import { dictionary, t, uiLangFromRequest } from '../../lib/ask/i18n';
 
 export const prerender = false;
@@ -21,6 +22,10 @@ Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
 Astro.response.headers.set('Cache-Control', 'no-store');
 Astro.response.headers.set('Referrer-Policy', 'no-referrer');
 const otherLang = lang === 'cs' ? 'en' : 'cs';
+// The account panel (consents, memory, history, subscription) exists only when
+// DAJC_AI_ACCOUNT_ENABLED is on; paid parts show only for an active subscription.
+const accountOn = getAccountRuntime() !== null;
+const vehicleConfigurations = ['SOLO', 'TRUCK_TRAILER', 'ARTICULATED', 'TRACTOR_ONLY', 'OTHER'];
 ---
 <BaseLayout title={`${t(lang, 'pageTitle')} — DAJC Intelligence`} description={t(lang, 'pageDescription')} robots="noindex, nofollow" lang={lang}>
   <main class="ask" data-ask-root data-lang={lang} data-strings={JSON.stringify(strings)}>
@@ -49,18 +54,88 @@ const otherLang = lang === 'cs' ? 'en' : 'cs';
       <form>
         <label>{t(lang, 'questionLabel')}<textarea name="question" required minlength="5" maxlength="1000" rows="4"></textarea></label>
         <p class="hint">{t(lang, 'questionHint')}</p>
+        {accountOn && (
+          <fieldset class="paid-fields" data-ask="paid-fields" hidden>
+            <legend>{t(lang, 'paid.title')}</legend>
+            <label>{t(lang, 'paid.vehicle')}<select data-ask="vehicle"><option value="">{t(lang, 'paid.none')}</option></select></label>
+            <label>{t(lang, 'paid.countries')}<input type="text" data-ask="countries" maxlength="80" autocomplete="off" pattern="[A-Za-z, ;]*" /></label>
+            <label>{t(lang, 'paid.date')}<input type="date" data-ask="date" /></label>
+          </fieldset>
+        )}
         <button type="submit" class="button">{t(lang, 'submit')}</button>
       </form>
       <p class="remaining" data-ask="remaining"></p>
       <div class="answer" data-ask="answer" aria-live="polite"></div>
       <button type="button" class="link-button" data-ask="sign-out">{t(lang, 'signOut')}</button>
     </section>
+
+    {accountOn && (
+      <section class="account" data-account-panel hidden aria-labelledby="account-title">
+        <h2 id="account-title">{t(lang, 'acct.title')}</h2>
+        <p class="ask-message" data-account="message" role="status" aria-live="polite"></p>
+        <div data-account="subscription"></div>
+
+        <h3>{t(lang, 'consent.title')}</h3>
+        <div class="consents" data-account="consents"></div>
+
+        <div data-paid-only hidden>
+          <h3>{t(lang, 'mem.title')}</h3>
+          <ul class="plain-list" data-account="memory-list"></ul>
+          <form class="grid-form" data-account="memory-form">
+            <label>{t(lang, 'mem.name')}<input name="name" required maxlength="80" /></label>
+            <label>{t(lang, 'mem.configuration')}
+              <select name="configuration">{vehicleConfigurations.map((c) => <option value={c}>{t(lang, `mem.cfg.${c}` as never)}</option>)}</select>
+            </label>
+            <label>{t(lang, 'mem.mass')}<input name="mass" inputmode="decimal" /></label>
+            <label>{t(lang, 'mem.width')}<input name="width" inputmode="decimal" /></label>
+            <label>{t(lang, 'mem.height')}<input name="height" inputmode="decimal" /></label>
+            <label>{t(lang, 'mem.length')}<input name="length" inputmode="decimal" /></label>
+            <label class="inline"><input type="checkbox" name="adr" /> {t(lang, 'mem.adr')}</label>
+            <label class="inline"><input type="checkbox" name="exceptional" /> {t(lang, 'mem.exceptional')}</label>
+            <button type="submit" class="button">{t(lang, 'mem.add')}</button>
+          </form>
+
+          <h3>{t(lang, 'permit.title')}</h3>
+          <p class="hint">{t(lang, 'permit.intro')}</p>
+          <form class="grid-form" data-account="permit-form">
+            <fieldset>
+              <legend>{t(lang, 'permit.permitSide')}</legend>
+              <label>{t(lang, 'mem.length')}<input name="maxLength" inputmode="decimal" /></label>
+              <label>{t(lang, 'mem.width')}<input name="maxWidth" inputmode="decimal" /></label>
+              <label>{t(lang, 'mem.height')}<input name="maxHeight" inputmode="decimal" /></label>
+              <label>{t(lang, 'mem.mass')}<input name="maxMass" inputmode="decimal" /></label>
+              <label>{t(lang, 'permit.validTo')}<input name="validTo" type="date" /></label>
+            </fieldset>
+            <fieldset>
+              <legend>{t(lang, 'permit.transportSide')}</legend>
+              <label>{t(lang, 'mem.length')}<input name="length" inputmode="decimal" /></label>
+              <label>{t(lang, 'mem.width')}<input name="width" inputmode="decimal" /></label>
+              <label>{t(lang, 'mem.height')}<input name="height" inputmode="decimal" /></label>
+              <label>{t(lang, 'mem.mass')}<input name="mass" inputmode="decimal" /></label>
+              <label>{t(lang, 'paid.date')}<input name="date" type="date" /></label>
+            </fieldset>
+            <button type="submit" class="button">{t(lang, 'permit.compare')}</button>
+          </form>
+          <div data-account="permit-result" aria-live="polite"></div>
+
+          <h3>{t(lang, 'hist.title')}</h3>
+          <ul class="plain-list" data-account="history-list"></ul>
+          <button type="button" class="link-button" data-account="history-delete-all">{t(lang, 'hist.deleteAll')}</button>
+        </div>
+
+        <h3>{t(lang, 'data.title')}</h3>
+        <p><a href="/api/ask/account/export" download>{t(lang, 'data.export')}</a></p>
+        <button type="button" class="link-button danger" data-account="delete">{t(lang, 'data.delete')}</button>
+      </section>
+    )}
   </main>
 </BaseLayout>
 
 <script>
   import { initAskForm } from '../../lib/ask/client/ask-form';
+  import { initAccountPanel } from '../../lib/ask/client/account-panel';
   initAskForm();
+  initAccountPanel();
 </script>
 
 <style>
@@ -129,4 +204,30 @@ const otherLang = lang === 'cs' ? 'en' : 'cs';
   .answer :global(.ask-facts dd) { margin: 0; }
   .answer :global(.ask-ai-notice) { font-family: 'IBM Plex Mono', monospace; font-size: 12px; margin-top: 1.5rem; }
   .answer :global(.ask-support) { font-size: 13px; }
+  .answer :global(.ask-confidence) { font-size: 14px; color: var(--dajc-white); }
+  .answer :global(.ask-registry) { margin-top: 1.5rem; padding: 1rem; border: 1px solid var(--dajc-line); border-radius: 6px; }
+  .answer :global(.ask-feedback) { margin-top: 1rem; }
+  .answer :global(.ask-feedback summary), .answer :global(.ask-feedback label) { cursor: pointer; color: var(--dajc-orange); }
+  .answer :global(.ask-feedback form) { display: grid; gap: 0.6rem; margin-top: 0.6rem; }
+  select, input[type="date"] { font: inherit; padding: 0.6rem; border-radius: 6px; border: 1px solid var(--dajc-line); background: rgba(255, 255, 255, 0.04); color: var(--dajc-white); }
+  fieldset { border: 1px solid var(--dajc-line); border-radius: 6px; padding: 0.8rem; display: grid; gap: 0.6rem; margin: 0.8rem 0; }
+  legend { color: var(--dajc-white); padding: 0 0.4rem; }
+  .grid-form { display: grid; gap: 0.6rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); align-items: end; }
+  .grid-form button { justify-self: start; }
+  .grid-form .inline { display: flex; align-items: center; gap: 0.5rem; }
+  .plain-list { list-style: none; padding: 0; }
+  .plain-list li { padding: 0.4rem 0; border-bottom: 1px solid var(--dajc-line); overflow-wrap: anywhere; }
+  .consents { display: grid; gap: 0.6rem; }
+  .consents :global(.ask-consent) { display: flex; gap: 0.6rem; align-items: flex-start; }
+  .account :global(.ask-actions) { display: flex; flex-wrap: wrap; gap: 1rem; }
+  .account :global(.ask-test-mode) { color: #f5b942; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+  .account :global(.ask-check--exceeds_permit), .account :global(.ask-permit--discrepancies_found) { color: #ff7a7a; }
+  .danger { color: #ff7a7a; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--dajc-orange); outline-offset: 2px; }
+  @media (max-width: 640px) {
+    .ask { width: calc(100% - 2rem); padding-top: 3rem; }
+    .grid-form { grid-template-columns: 1fr; }
+    .answer :global(.ask-facts) { grid-template-columns: 1fr; }
+    .button { width: 100%; }
+  }
 </style>

@@ -66,9 +66,21 @@ describe('feature flags and entitlements', () => {
     expect(tenantRecords(records, 'org-a')).toEqual([{ organizationId: 'org-a', id: 1 }]);
     expect(() => requireSameTenant(records[1], 'org-a')).toThrow(/Cross-tenant/);
     for (const file of ['src/pages/api/driving-bans.json.ts', 'src/pages/api/driving-bans.ics.ts', 'src/pages/driving-bans.astro']) expect(readFileSync(file, 'utf8')).not.toMatch(/entitlement|authorizeFeature/);
-    // Any future paid Driving Bans endpoint must go through the shared guard.
+    // Any paid Driving Bans endpoint must go through a shared guard: the organisation
+    // entitlement wrapper (handleEntitledRequest) or, for the personal DAJC AI
+    // subscription routes under /api/ask, account-handlers.ts, whose only path to
+    // Driving Bans data is answerPaidDrivingBans (session + settled ledger +
+    // authorizeFeature). Neither may evaluate the registry directly.
     const apiDir = 'src/pages/api';
-    for (const file of readdirSync(apiDir, { recursive: true }).map(String).filter(name => /intelligence|ai/i.test(name) && /\.(ts|js|mjs)$/.test(name))) expect(readFileSync(join(apiDir, file), 'utf8')).toContain('handleEntitledRequest');
+    for (const file of readdirSync(apiDir, { recursive: true }).map(String).filter(name => /intelligence|ai/i.test(name) && /\.(ts|js|mjs)$/.test(name))) {
+      const text = readFileSync(join(apiDir, file), 'utf8');
+      expect(text.includes('handleEntitledRequest') || /from '(?:\.\.\/)+lib\/ask\/account-handlers'/.test(text), file).toBe(true);
+    }
+    for (const file of ['src/lib/ask/account-handlers.ts', 'src/lib/ask/paid/query.ts']) {
+      const text = readFileSync(file, 'utf8');
+      expect(text, file).not.toMatch(/evaluateDrivingBansQuery|answerDrivingBansQuery|readPublishedView|driving-bans-query'/);
+    }
+    expect(readFileSync('src/lib/ask/paid/query.ts', 'utf8')).toContain('answerPaidDrivingBans');
   });
 });
 
