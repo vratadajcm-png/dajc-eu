@@ -120,7 +120,11 @@ paid: everything required by Ask, plus `DAJC_AI_ACCOUNT_ENABLED`,
 
 All maintenance calls need `Authorization: Bearer $DAJC_AI_MAINTENANCE_SECRET`
 (≥ 32 characters, compared in constant time) and answer 404 otherwise; a wrong
-HTTP method answers 405. None returns a secret value, an e-mail address, a
+HTTP method answers 405. **POST calls must send `Content-Type: application/json`
+(body `{}` for `run`)**: Astro's built-in origin check refuses a POST without it
+(403 "Cross-site POST form submissions are forbidden") before the handler runs,
+as verified on the Vercel preview. Example:
+`curl -X POST -H "Authorization: Bearer $DAJC_AI_MAINTENANCE_SECRET" -H 'Content-Type: application/json' -d '{}' https://<host>/api/ask/maintenance/run`. None returns a secret value, an e-mail address, a
 question, an answer or a payment payload.
 
 | Call | Purpose |
@@ -222,6 +226,9 @@ store contracts and the end-to-end lifecycle as `dajc_ask_app`
 - Provider adapters are verified only against synthetic payloads; the real
   event shapes (Stripe API version, Revolut order schema, GP webpay field order)
   must be confirmed in each provider's test environment.
+- GP webpay must return the customer with an HTTP GET redirect (parameters in
+  the query string) to `/api/ask/billing/return/gpwebpay`; a cross-site POST
+  form would be refused by Astro's origin check before the handler runs.
 - GP webpay recurring charges, refunds and status queries need the Web Services
   API contract. Revolut renewals are built on the documented merchant-initiated
   flow but whether the first checkout saves the card for the merchant

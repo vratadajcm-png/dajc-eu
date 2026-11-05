@@ -35,6 +35,7 @@ verified. **BLOCKED**: needs an external account, contract or owner decision.
 | VAT / OSS | BLOCKED | rates must be confirmed by the accountant (`DAJC_VAT_RATES_*`) |
 | Database runbook (backup, restore, verify, guarded rollback) | TESTED | rehearsed in CI on Postgres 16 and 17 and locally on 17.11 with Supabase-like roles; not on Supabase |
 | Deny by default on a real Vercel preview (no DAJC AI variables set) | COMPLETE | preview of `dcf0343` (`dajc-kabe2w3fw-haul-board.vercel.app`, 2026-11-05): `/driving-bans` 200 with the "Ask DAJC · FAQ" entry, `/api/guide/ready` → `{"available":false}`, `/intelligence/ask` and every `/api/ask/{account,billing,billing/webhook,maintenance}/*` route tried → 404; security headers (CSP, HSTS, `X-Frame-Options: DENY`, `noindex`) present |
+| Maintenance endpoints on a real Vercel preview | COMPLETE | redeploy of `58756a0` with only `DAJC_AI_MAINTENANCE_SECRET` (sensitive, Preview, branch `claude/blissful-cori-vo1iyy`): no or wrong bearer → 404; `preflight` → 200 naming every missing setting by name, without the secret's value; `health` / `run` without the runtime → 404; POST without a JSON content type → 403 from Astro's origin check (documented) |
 | Staging E2E on `dajc-staging-e2e` with test payments | BLOCKED | Supabase refuses to restore the project: "This organization has unpaid invoices" (see below) |
 | Shared learning from customer content | BLOCKED | legal policy not approved (constant `false`) |
 | Microsoft / Azure AI | NOT IMPLEMENTED | no adapter, keys or contract; Azure OpenAI would add no vendor independence |
@@ -67,9 +68,11 @@ once the staging database and the preview environment are reachable.
    paused for inactivity is itself free, within 90 days of the pause. No other
    project was touched and no new project was created.
 2. **Vercel** — resolved: the connector reaches the team `haul-board` and the
-   project `dajc-eu`. No variable was added or changed; the project has no
-   DAJC AI variables, so DAJC AI is off in every environment. Preview
-   deployments are behind Vercel Authentication.
+   project `dajc-eu`. Production is untouched. The only variable added is
+   `DAJC_AI_MAINTENANCE_SECRET` (sensitive, Preview, branch
+   `claude/blissful-cori-vo1iyy`) for the dry run; rotate or delete it after
+   the dry run. DAJC AI stays off in every environment. Preview deployments
+   are behind Vercel Authentication.
 3. **Ask keys for the preview orchestrator** — Ask's own keys of at least two
    vendors and a preview budget (`DAJC_ASK_MONTHLY_BUDGET_EUR`,
    `DAJC_ASK_DAILY_BUDGET_EUR`); without them the routing stays off.
