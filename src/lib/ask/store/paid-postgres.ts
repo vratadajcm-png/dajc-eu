@@ -13,8 +13,8 @@ import type { CardProvider, SubscriptionLedger } from '../paid/subscription';
 import { trimLedger } from './paid-memory';
 import type {
   ApplyPaymentInput, AuditInput, AuditRow, CheckoutRow, ConsentPurpose, ConsentState, CustomerRow, DataExport,
-  FeedbackRow, KnowledgeRow, KnowledgeStatusRow, MemoryKind, MemoryRow, OutboxInput, OutboxItem, PaidQuotaResult,
-  PaidStore, RefundRow, SealedRow,
+  FeedbackRow, KnowledgeRow, KnowledgeStatusRow, MemoryKind, MemoryRow, OperationalSummary, OutboxInput, OutboxItem,
+  PaidQuotaResult, PaidStore, RefundRow, SealedRow,
 } from './paid-types';
 
 type Tx = Parameters<Parameters<AskDb['transaction']>[0]>[0];
@@ -413,6 +413,32 @@ export class PostgresPaidStore implements PaidStore {
     return rows(await this.db.execute(status
       ? sql`select * from dajc_ask.accounting_outbox where status = ${status} order by id`
       : sql`select * from dajc_ask.accounting_outbox order by id`)).map(outboxRow);
+  }
+
+  async requeueOutbox(idemKey: string, now: Date) {
+    const result = rows(await this.db.execute(sql`
+      update dajc_ask.accounting_outbox set status = 'PENDING', attempts = 0, next_attempt_at = ${iso(now)}, locked_until = null, updated_at = ${iso(now)}
+      where idem_key = ${idemKey} and status = 'DEAD' returning id`));
+    return result.length === 1;
+  }
+
+  async operationalSummary(since: Date): Promise<OperationalSummary> {
+    const [r] = rows(await this.db.execute(sql`
+      select
+        (select count(*) from dajc_ask.accounting_outbox where status = 'PENDING')::int as outbox_pending,
+        (select count(*) from dajc_ask.accounting_outbox where status = 'DEAD')::int as outbox_dead,
+        (select min(created_at) from dajc_ask.accounting_outbox where status = 'PENDING') as oldest_pending,
+        (select count(*) from dajc_ask.payment_events where received_at >= ${iso(since)} and outcome = 'APPLIED')::int as applied,
+        (select count(*) from dajc_ask.payment_events where received_at >= ${iso(since)} and outcome = 'IGNORED')::int as ignored,
+        (select count(*) from dajc_ask.payment_events where received_at >= ${iso(since)} and outcome = 'REJECTED')::int as rejected,
+        (select count(*) from dajc_ask.refund_requests where status = 'PENDING_REVIEW')::int as refunds,
+        (select count(*) from dajc_ask.knowledge_entries where status in ('PENDING', 'SOURCE_CHECKED', 'VERIFIED'))::int as knowledge`));
+    return {
+      outbox: { pending: Number(r.outbox_pending), dead: Number(r.outbox_dead), oldestPendingAt: dateOrNull(r.oldest_pending) },
+      paymentEvents: { applied: Number(r.applied), ignored: Number(r.ignored), rejected: Number(r.rejected) },
+      refundsPendingReview: Number(r.refunds),
+      knowledgeAwaitingReview: Number(r.knowledge),
+    };
   }
 
   async getOutbox(idemKey: string) {

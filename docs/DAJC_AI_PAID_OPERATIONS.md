@@ -1,6 +1,6 @@
 # DAJC AI — account, paid subscription, billing, accounting and learning
 
-Status date: 2026-11-05. Scope: the code on branch `claude/blissful-cori-vo1iyy`
+Status date: 2026-11-05 (updated). Scope: the code on branch `claude/blissful-cori-vo1iyy`
 (built on PR #101 = #98 + #96 + #97 + #78 + #90 + #100 learning/throttling).
 Everything described here is **off by default** and **not a release**.
 
@@ -32,6 +32,8 @@ Three states are kept apart on purpose:
 | Shared learning from customer content | BLOCKED by policy | `DAJC_AI_SHARED_LEARNING_POLICY_APPROVED = false` |
 | Provider resilience (retry, circuit breaker, fail closed, cache) | TECHNICALLY READY | `paid-features` resilience tests |
 | Licensed routing / live road restrictions | BLOCKED (no data contract) | `NO_ROUTING` interface states it explicitly |
+| Monitoring (health, preflight) and recovery (dead-letter requeue) | TECHNICALLY READY | `monitoring.test.ts`, `paid-store` on Postgres 16 and 17 |
+| Multi-vendor routing for Ask (`DAJC_ASK_AI_ROUTING=orchestrator`) | TECHNICALLY READY for a preview, refused in production | `orchestrated.test.ts` (fake provider APIs); no real `DAJC_ASK_*` keys of a second vendor |
 
 Nothing here is PRODUCTION READY.
 
@@ -114,6 +116,55 @@ paid: everything required by Ask, plus `DAJC_AI_ACCOUNT_ENABLED`,
 `DAJC_AI_DRIVING_BANS_ENABLED`. Accounting needs the `DAJC_ABRA_*` and
 `DAJC_VAT_*` variables. The maintenance call needs `DAJC_AI_MAINTENANCE_SECRET`.
 
+## Monitoring and recovery
+
+All maintenance calls need `Authorization: Bearer $DAJC_AI_MAINTENANCE_SECRET`
+(≥ 32 characters, compared in constant time) and answer 404 otherwise; a wrong
+HTTP method answers 405. None returns a secret value, an e-mail address, a
+question, an answer or a payment payload.
+
+| Call | Purpose |
+| --- | --- |
+| `POST /api/ask/maintenance/run` | renewals, ABRA outbox, retention purge (schedule every 15 min) |
+| `GET /api/ask/maintenance/health` | `status` ok / attention / critical and `alerts` (schedule every 15 min, alert on anything but ok) |
+| `POST /api/ask/maintenance/requeue` `{"idemKey": "..."}` | puts a DEAD accounting document back to PENDING with a fresh retry budget (audited as `ACCOUNTING_REQUEUED`) |
+| `GET /api/ask/maintenance/report?month=YYYY-MM[&format=csv]` | monthly accounting report for the accountant |
+| `GET /api/ask/maintenance/preflight` | settings by name: what is missing for Ask, the orchestrator, paid and accounting; works before the features are configured |
+
+Health alerts and what to do:
+
+| Alert | Severity | Action |
+| --- | --- | --- |
+| `AUDIT_CHAIN_BROKEN` | critical | someone edited or deleted audit records; freeze writes (flags off), compare with the last backup, investigate `brokenAtId` |
+| `OUTBOX_DEAD_LETTER` | critical | ABRA rejected an accounting document, or stayed unreachable for 12 attempts; read `deadItems[].lastError` (e-mails redacted), fix the cause in ABRA or the `DAJC_ABRA_*` codes, then `requeue` |
+| `OUTBOX_STALE` | attention | the oldest pending document is older than 6 h: the scheduler is not running, ABRA is not reachable or not configured (expected in a dry run without an ABRA test company), or the VAT configuration is unconfirmed |
+| `PAYMENT_EVENTS_REJECTED` | attention | authentic provider events refused by the subscription rules in the last 24 h (wrong price, impossible period, unknown checkout); review them in the audit log |
+| `WEBHOOK_REJECTED` | attention | signature or timestamp failures in the last 24 h: rotated webhook secret, clock skew or someone probing the endpoint |
+| `RENEWAL_PROBLEM` | attention | declined, failed or provider-blocked renewals in the last 24 h (GP webpay renewals stay `RENEWAL_BLOCKED` until the WS contract) |
+| `REFUNDS_WAITING` / `KNOWLEDGE_WAITING` | attention | a `BILLING_REVIEWER` / `KNOWLEDGE_REVIEWER` has work |
+| `ASK_BUDGET_HIGH` | attention | 80 % of the monthly or daily Ask budget is used; at 100 % new questions are refused (HTTP 503, "budget reached") until the next day or month |
+
+Recovery paths: failed renewals are retried by `run` (≤ 3 attempts, 24 h
+apart); provider webhooks are retried by the provider and are idempotent; the
+ledger can be rebuilt by replaying provider events; DEAD accounting documents
+are requeued after the cause is fixed (ABRA deduplicates by `ext:DAJC:` id, so
+a requeue never creates a second document).
+
+### Multi-vendor routing in a preview
+
+Approved by the owner for an isolated preview only. `readAskConfig` refuses
+`DAJC_ASK_AI_ROUTING=orchestrator` when `VERCEL_ENV=production`
+(`DAJC_ASK_ORCHESTRATOR_PRODUCTION_RELEASED = false`) and requires, in addition
+to the free Ask settings: models of at least two vendors with Ask's **own**
+keys (`DAJC_ASK_<P>_API_KEY`, never equal to `DAJC_RESEARCH_*` or the article
+keys), `DAJC_ASK_PROVIDER_PRICING_USD` with a price for every configured model,
+and both `DAJC_ASK_MONTHLY_BUDGET_EUR` and `DAJC_ASK_DAILY_BUDGET_EUR`.
+`preflight` reports `orchestrator.ready` and names anything missing (for
+example a legacy `DAJC_ASK_OPENAI_CLASSIFIER_MODEL` without a price leaves
+OpenAI out). If keys or budget are not available the variable stays unset and
+the direct routing is used. On a total provider outage the answer is
+`AI_UNAVAILABLE` and the FAQ keeps working.
+
 ## Database migrations (owner, administrative connection)
 
 1. Apply `drizzle-ask/0000`–`0003` in order (`0002`/`0003` are additive only).
@@ -149,9 +200,11 @@ store contracts and the end-to-end lifecycle as `dajc_ask_app`
    terms and privacy notice, merchant contract, refund policy approval.
 5. **Release change** (code review): set `DAJC_AI_PAID_RELEASED`, and for real
    money `DAJC_AI_LIVE_PAYMENTS_RELEASED` / `DAJC_ACCOUNTING_LIVE_RELEASED`.
-6. Schedule `POST /api/ask/maintenance/run` (e.g. every 15 minutes; it runs renewals, the ABRA outbox and retention) with
-   `Authorization: Bearer $DAJC_AI_MAINTENANCE_SECRET`; monthly
-   `GET /api/ask/maintenance/report?month=YYYY-MM[&format=csv]`.
+6. Schedule `POST /api/ask/maintenance/run` and `GET /api/ask/maintenance/health`
+   (e.g. every 15 minutes) with `Authorization: Bearer $DAJC_AI_MAINTENANCE_SECRET`
+   and alert on any health status other than `ok`; monthly
+   `GET /api/ask/maintenance/report?month=YYYY-MM[&format=csv]`. Run
+   `GET /api/ask/maintenance/preflight` before each step above.
 
 ## Rollback
 

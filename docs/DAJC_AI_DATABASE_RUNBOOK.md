@@ -2,14 +2,21 @@
 
 Scope: schema `dajc_ask` (free Ask DAJC AI, migrations `0000`–`0001`; paid DAJC
 AI and account, `0002`–`0003`). Every step is rehearsed automatically in the
-Application CI job `ask-postgres-integration` on a throwaway Postgres 16
-(migrate → verify → store and end-to-end tests → backup → restore → verify →
-refused rollback → confirmed rollback → re-apply → verify).
+Application CI job `ask-postgres-integration` on throwaway Postgres **16 and
+17** (matrix), with the Supabase API roles `anon`, `authenticated` and
+`service_role` emulated (migrate → verify → store and end-to-end tests → backup
+→ restore → verify → refused rollback → confirmed rollback → re-apply →
+verify). The same sequence was also run locally on Postgres 17.11 with those
+roles: `verify.sql` 115/115 PASS (67 checks without the Supabase roles).
 
-Nothing here was run against a Supabase project: in the session of 2026-11-05
-the Supabase connector listed only the organisation "Ferda Ai" with no projects,
-and the HaulBoard projects (dajc-staging-e2e, dajc-partner-portal,
-dajc-assistance-dev, HaulBoard) were last reported INACTIVE.
+Nothing here was run against a Supabase project. Staging target named by the
+owner: **`dajc-staging-e2e`**, ref `lryufeoawdlcpydzuhej`, organisation
+`etnqzdukabzlzfzxqzgw` (HaulBoard), eu-central-1, Postgres 17, last state
+INACTIVE. In the session of 2026-11-05 the Supabase connector was authorised
+only for the organisation "Ferda Ai"; `get_project lryufeoawdlcpydzuhej`
+answered "You do not have permission". The owner has to reconnect the Supabase
+connector with the HaulBoard organisation selected before any step below can
+run from a Claude session.
 
 ## 0. Choose the target (owner)
 
@@ -18,6 +25,12 @@ dajc-assistance-dev, HaulBoard) were last reported INACTIVE.
 - A paused (INACTIVE) free project can be restored from the Supabase dashboard
   (Project → Restore). Restoring is free on the Free plan; upgrading the plan or
   enabling point-in-time recovery costs money and needs the owner's approval.
+  Before restoring, read the project's pause reason and the organisation's plan
+  in the dashboard (or `get_project` / `get_organization` once the connector
+  can see HaulBoard): a project paused for inactivity on the Free plan restores
+  at no cost; a project on a paid organisation is billed from the moment it
+  runs again. Paused Free projects can only be restored for a limited time
+  after pausing; after that only the backup download remains.
 - Use the **direct connection** (port 5432) for `pg_dump`, `pg_restore` and
   migrations; the transaction pooler is for the application only.
 
@@ -34,7 +47,8 @@ psql -d dajc_restore -v ON_ERROR_STOP=1 -f scripts/dajc-ai-db/verify.sql
 Use `pg_dump`/`pg_restore` of the **same major version as the target server**
 (or newer for dumping, but restore into a server at least as new as the client):
 a newer client writes settings such as `transaction_timeout` that an older
-server rejects. CI therefore runs both inside the Postgres 16 service container.
+server rejects. CI therefore runs both inside the Postgres service container of
+the matrix version. For `dajc-staging-e2e` (Postgres 17) use client 17.
 
 If `dajc_ask` does not exist yet, the backup is empty and step 2 creates it.
 Keep the dump encrypted at rest; it contains e-mail fingerprints (HMAC), not

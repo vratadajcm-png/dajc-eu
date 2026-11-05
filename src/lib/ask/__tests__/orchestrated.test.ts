@@ -114,6 +114,17 @@ describe('DAJC AI on the shared orchestrator', () => {
     expect(readAskConfig({ ...FULL_ENV, ...ENV }).config?.routing).toBe('orchestrator');
   });
 
+  it('stays off in production and without a daily budget; preview and local runs are allowed', () => {
+    expect(readAskConfig({ ...FULL_ENV, ...ENV, VERCEL_ENV: 'preview' }).config?.routing).toBe('orchestrator');
+    const production = readAskConfig({ ...FULL_ENV, ...ENV, VERCEL_ENV: 'production' });
+    expect(production.ok).toBe(false);
+    expect(production.problems).toContain('DAJC_ASK_AI_ROUTING=orchestrator is not released for production (preview or local runs only)');
+    // The direct routing is unaffected by this gate.
+    expect(readAskConfig({ ...FULL_ENV, VERCEL_ENV: 'production' }).config?.routing).toBe('direct');
+    const noDaily = readAskConfig({ ...FULL_ENV, ...ENV, DAJC_ASK_DAILY_BUDGET_EUR: '' });
+    expect(noDaily.problems).toContain('DAJC_ASK_DAILY_BUDGET_EUR is missing');
+  });
+
   it('answers with an independent check at another vendor', async () => {
     const { result, providers } = await ask(ENV);
     expect(result.answer.level).toBe('VERIFIED');

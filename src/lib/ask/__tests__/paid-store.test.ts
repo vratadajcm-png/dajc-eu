@@ -224,6 +224,38 @@ function contract(name: string, make: () => Promise<Pair>) {
       expect(await pair.paid.updateKnowledge(id, { status: 'PENDING', version: 1 }, { status: 'SOURCE_CHECKED', sourceCheckedBy: 'reviewer:c' }, NOW)).toBe(false);
       await expect(pair.paid.updateKnowledge(id, { status: 'SOURCE_CHECKED', version: 2 }, { status: 'VERIFIED', verifiedBy: 'reviewer:b' }, NOW)).rejects.toThrow('FOUR_EYES');
     });
+
+    // Counts are global (a shared test database), so the test compares deltas.
+    it('summarises operations for monitoring and requeues only dead letters', async () => {
+      const pair = await make();
+      const since = new Date(NOW.getTime() - 60_000);
+      const before = await pair.paid.operationalSummary(since);
+      const key = `test:${randomUUID()}`;
+      await pair.paid.enqueueOutbox([{ idemKey: key, kind: 'INVOICE', payload: { n: 1 } }], NOW);
+      const queued = await pair.paid.operationalSummary(since);
+      expect(queued.outbox.pending).toBe(before.outbox.pending + 1);
+      expect(queued.outbox.oldestPendingAt).toBeInstanceOf(Date);
+      expect(await pair.paid.requeueOutbox(key, NOW)).toBe(false);
+
+      const item = (await pair.paid.getOutbox(key))!;
+      await pair.paid.failOutbox(item.id, 'HTTP 400 rejected by ABRA', null, NOW);
+      const dead = await pair.paid.operationalSummary(since);
+      expect(dead.outbox.dead).toBe(before.outbox.dead + 1);
+      expect(dead.outbox.pending).toBe(before.outbox.pending);
+
+      expect(await pair.paid.requeueOutbox(key, LATER)).toBe(true);
+      expect(await pair.paid.requeueOutbox(key, LATER)).toBe(false);
+      expect(await pair.paid.getOutbox(key)).toMatchObject({ status: 'PENDING', attempts: 0, nextAttemptAt: LATER });
+      expect((await pair.paid.operationalSummary(since)).outbox.dead).toBe(before.outbox.dead);
+
+      // Refused provider events are counted by outcome.
+      const eventId = `evt_${randomUUID()}`;
+      await pair.paid.applyPaymentEvent({
+        provider: 'STRIPE', eventId, kind: 'PAYMENT_SETTLED', payloadSha256: 'd'.repeat(64), receivedAt: NOW, userId: null, customerRef: null,
+        mutate: null, outbox: [], ignoredOutcome: 'REJECTED', audit: { actor: 'provider:STRIPE', action: 'PAYMENT_EVENT_REJECTED', subject: 'provider:STRIPE' },
+      });
+      expect((await pair.paid.operationalSummary(since)).paymentEvents.rejected).toBe(before.paymentEvents.rejected + 1);
+    });
   });
 }
 

@@ -32,6 +32,22 @@ export function verifyAuditChain(rows: AuditRow[]): number | null {
   return null;
 }
 
+/**
+ * Monitoring check of the most recent records (rows in id order): every
+ * record must link to the one before it and match its own hash. The first
+ * row's link to older history is taken as given; verifyAuditChain() checks
+ * the whole chain from the genesis.
+ */
+export function verifyAuditWindow(rows: AuditRow[]): number | null {
+  if (rows.length === 0) return null;
+  let prev = rows[0].prevHash;
+  for (const row of rows) {
+    if (row.prevHash !== prev || auditHash(prev, row, row.at) !== row.hash) return row.id;
+    prev = row.hash;
+  }
+  return null;
+}
+
 /** Keeps identifiers only; drops anything that looks like an e-mail address. */
 export function auditDetails(details: Record<string, unknown> = {}): Record<string, unknown> {
   const clean: Record<string, unknown> = {};

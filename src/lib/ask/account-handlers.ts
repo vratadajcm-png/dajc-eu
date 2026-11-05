@@ -11,6 +11,7 @@ import {
   consentState, deleteAccount, exportAccount, listHistory, listMemory, memoryItem, reportError, saveMemory, setConsent, type AccountDeps,
 } from './account/service';
 import type { AccountRuntime } from './account/runtime';
+import type { AskEnv } from './config';
 import { decideRefund, paymentManagementUrl, processWebhook, requestCancellation, requestRefund, startCheckout, subscriptionStatus, accessOf } from './billing/service';
 import { COOKIE_PATH, json, notFound, originAllowed, readJson, sessionToken, type RouteContext } from './handlers';
 import { t, uiLang, type UiLang } from './i18n';
@@ -23,6 +24,7 @@ import { runAccountingOutbox } from './accounting/outbox-worker';
 import { runRenewals } from './billing/renewals';
 import { monthlyReport, reportCsv } from './accounting/report';
 import { publishedKnowledge } from './learning/workflow';
+import { operationalHealth, preflight } from './monitoring';
 
 const WEBHOOK_MAX_BYTES = 256 * 1024;
 // Vercel functions accept request bodies up to 4.5 MB; a 3 MB PDF is ~4 MB in base64.
@@ -346,19 +348,41 @@ export async function handleReview(action: string, ctx: RouteContext, rt: Accoun
 
 // --- Maintenance (scheduled) -------------------------------------------------
 
+const MAINTENANCE_METHODS: Record<string, string> = { run: 'POST', requeue: 'POST', report: 'GET', health: 'GET', preflight: 'GET' };
+
 /**
- * Accounting sync, retention purge and the monthly report, called by a
- * scheduler with "Authorization: Bearer <DAJC_AI_MAINTENANCE_SECRET>".
+ * Called by a scheduler or the on-call operator with
+ * "Authorization: Bearer <DAJC_AI_MAINTENANCE_SECRET>":
+ * POST run (renewals, accounting sync, retention purge), GET report (monthly),
+ * GET health (monitoring), POST requeue (dead-letter recovery) and
+ * GET preflight (settings by name; works before the features are configured).
  */
-export async function handleMaintenance(action: string, ctx: RouteContext, rt: AccountRuntime | null): Promise<Response> {
-  const secret = rt?.env.DAJC_AI_MAINTENANCE_SECRET;
-  if (!rt || !secret || secret.length < 32) return notFound();
+export async function handleMaintenance(action: string, ctx: RouteContext, rt: AccountRuntime | null, env: AskEnv = rt?.env ?? process.env): Promise<Response> {
+  const secret = env.DAJC_AI_MAINTENANCE_SECRET;
+  if (!secret || secret.length < 32) return notFound();
   const auth = ctx.request.headers.get('authorization') || '';
   const { timingSafeEqual, createHash } = await import('node:crypto');
   const digest = (v: string) => createHash('sha256').update(v).digest();
   if (!timingSafeEqual(digest(auth), digest(`Bearer ${secret}`))) return notFound();
+  const method = MAINTENANCE_METHODS[action];
+  if (!method) return notFound();
+  if (ctx.request.method !== method) return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);
+  if (action === 'preflight') return json({ ok: true, preflight: preflight(env) });
+  if (!rt) return notFound();
   const now = nowOf(rt);
   try {
+    if (action === 'health') {
+      const health = await operationalHealth({ paid: rt.paid, ask: { store: rt.ask.store, config: rt.ask.config }, now });
+      return json({ ok: true, health });
+    }
+    if (action === 'requeue') {
+      const body = await readJson(ctx.request);
+      const idemKey = typeof body?.idemKey === 'string' ? body.idemKey.trim() : '';
+      if (!idemKey || idemKey.length > 200) return json({ ok: false, error: 'INVALID_REQUEST' }, 400);
+      if (!(await rt.paid.requeueOutbox(idemKey, now))) return json({ ok: false, error: 'NOT_DEAD_LETTER' }, 409);
+      await rt.paid.appendAudit({ actor: 'system:maintenance', action: 'ACCOUNTING_REQUEUED', subject: `outbox:${idemKey}`, details: {} }, now);
+      return json({ ok: true, requeued: idemKey });
+    }
     if (action === 'run') {
       const renewals = rt.paidRuntime ? await runRenewals(billingDeps(rt.paidRuntime)) : null;
       const accounting = await runAccountingOutbox({ paid: rt.paid, client: rt.paidRuntime?.accounting?.client ?? null, config: rt.paidRuntime?.accounting?.config ?? null, now: () => now });

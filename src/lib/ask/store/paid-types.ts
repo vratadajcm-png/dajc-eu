@@ -112,6 +112,15 @@ export interface OutboxItem extends OutboxInput {
   createdAt: Date;
 }
 
+/** Counts for monitoring - no personal data, no payloads. */
+export interface OperationalSummary {
+  outbox: { pending: number; dead: number; oldestPendingAt: Date | null };
+  /** Provider events received since the requested time, by outcome. */
+  paymentEvents: { applied: number; ignored: number; rejected: number };
+  refundsPendingReview: number;
+  knowledgeAwaitingReview: number;
+}
+
 export interface RefundRow {
   id: string;
   userId: string;
@@ -231,6 +240,11 @@ export interface PaidStore {
   failOutbox(id: number, error: string, nextAttemptAt: Date | null, now: Date): Promise<void>;
   listOutbox(status?: OutboxItem['status']): Promise<OutboxItem[]>;
   getOutbox(idemKey: string): Promise<OutboxItem | null>;
+  /** Recovery: a DEAD item goes back to PENDING with a fresh retry budget; false if it is not DEAD. */
+  requeueOutbox(idemKey: string, now: Date): Promise<boolean>;
+
+  // Monitoring.
+  operationalSummary(since: Date): Promise<OperationalSummary>;
 
   // Answer cache for identical generic questions on the same data.
   getCachedAnswer(cacheKey: string, now: Date): Promise<unknown | null>;

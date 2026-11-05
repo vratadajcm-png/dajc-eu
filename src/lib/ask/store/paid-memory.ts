@@ -8,8 +8,8 @@ import type { CardProvider, SubscriptionLedger } from '../paid/subscription';
 import type { MemoryAskStore } from './memory';
 import type {
   ApplyPaymentInput, AuditInput, AuditRow, CheckoutRow, ConsentPurpose, ConsentState, CustomerRow, DataExport,
-  FeedbackRow, KnowledgeRow, KnowledgeStatusRow, MemoryKind, MemoryRow, OutboxInput, OutboxItem, PaidQuotaResult,
-  PaidStore, RefundRow, SealedRow,
+  FeedbackRow, KnowledgeRow, KnowledgeStatusRow, MemoryKind, MemoryRow, OperationalSummary, OutboxInput, OutboxItem,
+  PaidQuotaResult, PaidStore, RefundRow, SealedRow,
 } from './paid-types';
 
 const clone = <T>(value: T): T => structuredClone(value);
@@ -24,7 +24,7 @@ export class MemoryPaidStore implements PaidStore {
   checkouts = new Map<string, CheckoutRow>();
   customers = new Map<string, CustomerRow>();
   ledgers = new Map<string, { provider: CardProvider; customerRef: string; ledger: SubscriptionLedger }>();
-  events = new Map<string, { userId: string | null; kind: string; outcome: string }>();
+  events = new Map<string, { userId: string | null; kind: string; outcome: string; receivedAt: Date }>();
   refunds: RefundRow[] = [];
   audit: AuditRow[] = [];
   outbox: Array<OutboxItem & { lockedUntil: Date | null }> = [];
@@ -214,7 +214,7 @@ export class MemoryPaidStore implements PaidStore {
       // Throws on an invalid event: nothing below is recorded (rollback).
       next = input.mutate(this.ledgers.has(input.userId) ? clone(this.ledgers.get(input.userId)!.ledger) : null);
     }
-    this.events.set(key, { userId: input.userId, kind: input.kind, outcome: next ? 'APPLIED' : input.ignoredOutcome ?? 'IGNORED' });
+    this.events.set(key, { userId: input.userId, kind: input.kind, outcome: next ? 'APPLIED' : input.ignoredOutcome ?? 'IGNORED', receivedAt: input.receivedAt });
     if (next && input.userId) this.ledgers.set(input.userId, { provider: next.provider, customerRef: next.customerRef, ledger: trimLedger(next) });
     await this.enqueueOutbox(input.outbox, input.receivedAt);
     await this.appendAudit(input.audit, input.receivedAt);
@@ -277,6 +277,31 @@ export class MemoryPaidStore implements PaidStore {
 
   async listOutbox(status?: OutboxItem['status']) {
     return this.outbox.filter((o) => !status || o.status === status).map(({ lockedUntil: _l, ...item }) => clone(item));
+  }
+
+  async requeueOutbox(idemKey: string, now: Date) {
+    this.maybeFail('requeueOutbox');
+    const item = this.outbox.find((o) => o.idemKey === idemKey && o.status === 'DEAD');
+    if (!item) return false;
+    Object.assign(item, { status: 'PENDING', attempts: 0, nextAttemptAt: now, lockedUntil: null });
+    return true;
+  }
+
+  async operationalSummary(since: Date): Promise<OperationalSummary> {
+    this.maybeFail('operationalSummary');
+    const pending = this.outbox.filter((o) => o.status === 'PENDING');
+    const events = [...this.events.values()].filter((e) => e.receivedAt >= since);
+    const count = (outcome: string) => events.filter((e) => e.outcome === outcome).length;
+    return {
+      outbox: {
+        pending: pending.length,
+        dead: this.outbox.filter((o) => o.status === 'DEAD').length,
+        oldestPendingAt: pending.reduce<Date | null>((min, o) => (!min || o.createdAt < min ? o.createdAt : min), null),
+      },
+      paymentEvents: { applied: count('APPLIED'), ignored: count('IGNORED'), rejected: count('REJECTED') },
+      refundsPendingReview: this.refunds.filter((r) => r.status === 'PENDING_REVIEW').length,
+      knowledgeAwaitingReview: [...this.knowledge.values()].filter((k) => k.status === 'PENDING' || k.status === 'SOURCE_CHECKED' || k.status === 'VERIFIED').length,
+    };
   }
 
   async getOutbox(idemKey: string) {

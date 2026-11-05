@@ -92,13 +92,22 @@ const REQUIRED = [
 
 // With orchestrated routing, providers, models and prices come from the
 // orchestrator settings (DAJC_ASK_<PROVIDER>_*, DAJC_ASK_PROVIDER_PRICING_USD).
+// A daily budget is required as well: a misrouted failover must stop within a day.
 const REQUIRED_ORCHESTRATED = [
   'DAJC_ASK_DB_URL',
   'DAJC_ASK_PROVIDER_PRICING_USD',
   'DAJC_ASK_USD_EUR_RATE',
   'DAJC_ASK_MONTHLY_BUDGET_EUR',
+  'DAJC_ASK_DAILY_BUDGET_EUR',
   'DAJC_ASK_EMAIL_PEPPER',
 ] as const;
+
+/**
+ * Orchestrated routing is approved for an isolated preview (and local runs)
+ * only. Production keeps the direct routing until the owner releases it in
+ * code review.
+ */
+export const DAJC_ASK_ORCHESTRATOR_PRODUCTION_RELEASED = false;
 
 /** The central feature flag. Exactly "true" - anything else is off. */
 export function isAskFlagOn(env: AskEnv = process.env): boolean {
@@ -171,6 +180,9 @@ export function readAskConfig(env: AskEnv = process.env): AskConfigResult {
 
   let pricing: AskPricing | null;
   if (routing === 'orchestrator') {
+    if (env.VERCEL_ENV === 'production' && !DAJC_ASK_ORCHESTRATOR_PRODUCTION_RELEASED) {
+      problems.push('DAJC_ASK_AI_ROUTING=orchestrator is not released for production (preview or local runs only)');
+    }
     const status = orchestratedStatus(env);
     if (!status.independent) problems.push('DAJC_ASK_AI_ROUTING=orchestrator needs configured models of at least two vendors (an answer and its independent check never share a vendor)');
     pricing = orchestratedPricing(env);
