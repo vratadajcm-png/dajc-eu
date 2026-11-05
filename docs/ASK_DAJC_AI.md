@@ -262,3 +262,47 @@ select * from dajc_ask.review_queue where status = 'NEW' order by seen_count des
 - Prompt injection is mitigated (delimited untrusted blocks, verbatim quotes,
   official domains only, independent check), not impossible: an official page
   could itself contain misleading text that is then quoted correctly.
+
+
+## One public Ask DAJC · FAQ entry (integration candidate #101)
+
+The existing floating **Ask DAJC · FAQ** stays intact. It is the single
+navigation entry to the free Ask experience. When AI is disabled or
+misconfigured, `/api/guide/ready` returns only `{ "available": false }`
+(no credentials, user data, requests, provider calls or costs); the FAQ
+remains usable and no hidden Ask route is linked.
+
+The entry code comes from #90. Its eventual integration must follow the
+#98 combination of #96 + #97 + #78, preserving month-scoped legal
+verification and the published Driving Bans registry.
+
+## Paid DAJC AI (EUR 15/month) — offline release gate
+
+**Not for sale or activated.** The initial policy implementation is
+`src/lib/ask/paid/subscription.ts`, with an isolated read-only
+Driving Bans adapter in `src/lib/dajc-ai/paid-driving-bans.ts`.
+The public Ask module must not import the paid Driving Bans authorization
+or AI research modules. No customer can reach that adapter through an HTTP
+endpoint at this stage.
+
+A future payment-provider adapter must validate the merchant, signatures,
+settlement and amount, then persist idempotent payment events transactionally.
+The policy only recognizes exactly EUR 15, includes period-end cancellation,
+does not extend access on failed charges and revokes refunded or disputed
+periods. It does **not** certify a successful transaction by itself.
+`DAJC_AI_PAID_RELEASED` is compiled as `false`; changing environment
+variables alone never enables paid access.
+
+A standalone legal entity, merchant approval, privacy/consumer terms,
+payment provider integration, database read model, refund service and
+ABRA Flexi accounting connection are still required before sale.
+
+## Longitudinal learning — policy only
+
+`src/lib/ask/learning/knowledge.ts` requires explicit opt-in before
+using question-derived insights, human-sanitized text, an official source,
+independent human approval, tenant scoping and expiry. It cannot store
+conversations, share private vehicle/route data or modify the legal
+Driving Bans registry. Production learning requires an approved privacy
+policy, authenticated reviewer workflow, deletion rights and persistent
+database before any capture is switched on.
