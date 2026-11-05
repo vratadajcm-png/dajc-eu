@@ -106,7 +106,30 @@ jobs:
           done
           psql -h localhost -U postgres -d dajc_ci -v ON_ERROR_STOP=1 -q -c "ALTER ROLE dajc_ask_app WITH LOGIN PASSWORD 'ci-app-only'"
 
+      - name: Verify grants, RLS and constraints after migration
+        env:
+          PGPASSWORD: ci-admin-only
+        run: psql -h localhost -U postgres -d dajc_ci -v ON_ERROR_STOP=1 -f scripts/dajc-ai-db/verify.sql
+
       - name: Store contract tests against Postgres as dajc_ask_app
         env:
           DAJC_ASK_TEST_DB_URL: postgres://dajc_ask_app:ci-app-only@localhost:5432/dajc_ci
         run: npx vitest run src/lib/ask/__tests__/store.test.ts src/lib/ask/__tests__/paid-store.test.ts src/lib/ask/__tests__/e2e-lifecycle.test.ts
+
+      - name: Backup, restore, guarded rollback and re-apply (runbook rehearsal)
+        env:
+          PGPASSWORD: ci-admin-only
+        run: |
+          set -euo pipefail
+          psql_admin() { psql -h localhost -U postgres -v ON_ERROR_STOP=1 -q "$@"; }
+          pg_dump -h localhost -U postgres -d dajc_ci --schema=dajc_ask -Fc -f "$RUNNER_TEMP/dajc_ask.dump"
+          psql_admin -d dajc_ci -c "CREATE DATABASE dajc_restore"
+          pg_restore -h localhost -U postgres -d dajc_restore --exit-on-error "$RUNNER_TEMP/dajc_ask.dump"
+          psql_admin -d dajc_restore -f scripts/dajc-ai-db/verify.sql
+          test "$(psql_admin -d dajc_ci -tAc 'select count(*) from dajc_ask.users')" = "$(psql_admin -d dajc_restore -tAc 'select count(*) from dajc_ask.users')"
+          # Without the explicit confirmation the rollback must refuse.
+          if psql_admin -d dajc_restore -f scripts/dajc-ai-db/rollback-0003-0002.sql; then echo "rollback ran without confirmation"; exit 1; fi
+          { echo "SET dajc_ask.confirm_rollback = 'drop paid DAJC AI tables';"; cat scripts/dajc-ai-db/rollback-0003-0002.sql; } | psql_admin -d dajc_restore
+          test "$(psql_admin -d dajc_restore -tAc "select count(*) from pg_tables where schemaname = 'dajc_ask'")" = "8"
+          for file in drizzle-ask/0002_*.sql drizzle-ask/0003_*.sql; do sed 's/--> statement-breakpoint//' "$file" | psql_admin -d dajc_restore; done
+          psql_admin -d dajc_restore -f scripts/dajc-ai-db/verify.sql
