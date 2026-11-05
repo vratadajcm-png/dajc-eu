@@ -1,6 +1,6 @@
 ---
-title: "European Oversize & Special Transport Briefing: 9–15 November 2026"
-description: "Weekly DAJC intelligence for heavy and abnormal road transport in Europe: exceptional-transport movements on Bosnia and Herzegovina's M16/M15 corridor and the ECT Rotterdam driver safety test postponement."
+title: "EU Oversize Weekly: ECT Driver Safety Test Moved to 5 January and Exceptional Transports on Bosnia's M16–M15 Route | 9–15 November 2026"
+description: "ECT again postpones its mandatory truck-driver safety test for the Delta and Euromax terminals in Rotterdam, now to 5 January 2027; a cantonal notice announces exceptional transports on the Kamensko–Tomislavgrad route in Bosnia and Herzegovina until 31 December."
 slug: "eu-oversize-weekly-2026-w46"
 category: "eu-oversize"
 publishedAt: 2026-11-06T11:00:00.000Z
@@ -8,62 +8,59 @@ language: "en"
 author: "DAJC"
 status: "published"
 sources:
-  - name: "RadioTG"
-    url: "https://radiotg.com/vijesti/hbz/obavijest-o-izvanrednom-prijevozu-2"
   - name: "transport-online.nl"
     url: "https://www.transport-online.nl/143608/ect-stelt-verplichte-veiligheidstoets-voor-vrachtwagenchauffeurs-opnieuw-uit-tot-5-januari-2027/"
+  - name: "RadioTG"
+    url: "https://radiotg.com/vijesti/hbz/obavijest-o-izvanrednom-prijevozu-2"
 ---
 
 ## Intro
 
-This week's briefing covers an announced period of exceptional transport on main roads in the Herzegovina-Bosnia Canton (Bosnia and Herzegovina), and a further postponement of the mandatory driver safety test at ECT in the Netherlands. Operators should check route and timing details with the competent authorities and terminals before dispatch.
+This edition covers the week of **9–15 November 2026**. ECT in Rotterdam has again postponed enforcement of its mandatory safety test for truck drivers visiting its Delta and Euromax terminals, now to 5 January 2027. In Bosnia and Herzegovina, a Herzegovina-Bosnia Canton notice reported by local media announces exceptional transports on the Kamensko–Tomislavgrad main-road route until 31 December. No other development in the monitored sources met DAJC's rules for this week.
 
 ## Lead reports
 
-### Exceptional transport on main roads M16, M16.5, M6.1 and M15 in Herzegovina-Bosnia Canton, 1 Nov–31 Dec 2026 (Bosnia and Herzegovina)
+### Netherlands: ECT postpones its mandatory truck-driver safety test again, to 5 January 2027
 
-The Herzegovina-Bosnia Canton notice, published 28 October 2026, informs drivers that exceptional transport (izvanredni prijevoz) will be carried out on main roads in the canton from 1 November to 31 December 2026.
-
-**Category:** Infrastructure restriction  
-**Where:** Herzegovina-Bosnia Canton (Hercegbosanska županija), Bosnia and Herzegovina. Route: main road M16 (border crossing Kamensko – Kazaginac), M16.5 (Kazaginac – Prisoje), M6.1 (Prisoje – Kolo), M15 (Kolo – Tomislavgrad – connection to VP Baljci).  
-**Affected vehicles:** Exceptional transport as named in the notice. The notice gives no dimensions, weights, escort arrangements or daily movement times.  
-**When:** 1 November 2026 to 31 December 2026
-
-**Impact:** Heavy and slow exceptional convoys can be expected on the M16–M16.5–M6.1–M15 route for two months, including through Tomislavgrad. Conventional heavy vehicles on the same roads may face delays. Operators moving abnormal loads on this corridor should expect other exceptional movements in the same period.
-
-**Recommended action:** Before planning movements on the Kamensko–Tomislavgrad route, confirm timing, permit conditions and any escort requirements with the cantonal or road authority. Add buffer time for possible convoy delays on M16, M16.5, M6.1 and M15. Do not assume the notice sets any weight or dimension limits.
-
-**Exemptions/conditions:** None stated in the notice.
-
-*Source: [RadioTG](https://radiotg.com/vijesti/hbz/obavijest-o-izvanrednom-prijevozu-2) — Industry report — regulatory/route conditions require confirmation with the competent authority*
-
-### ECT again postpones mandatory safety test for truck drivers, now until 5 January 2027 (Netherlands)
-
-According to trade outlet transport-online.nl (2 November 2026), ECT has postponed its mandatory safety test for truck drivers again, now to 5 January 2027. This is an industry report, not an official legal or permit condition.
+Trade outlet transport-online.nl reports (2 November 2026) that ECT has again postponed the introduction and enforcement of the mandatory safety test for truck drivers visiting the **ECT Delta** and **ECT Euromax** terminals on the Maasvlakte, Rotterdam. The new date is **Tuesday 5 January 2027**. According to the report, ECT took the decision at the market's request and after consulting the industry association, so that drivers have enough time to pass the test.
 
 **Category:** Operational development  
-**Where:** ECT terminals (Rotterdam), Netherlands. The supplied evidence does not specify which sites the test covers.  
-**Affected vehicles:** Truck drivers collecting or delivering at ECT. The supplied evidence gives no further vehicle classes.  
-**When:** Postponed until 5 January 2027
+**Where:** ECT Delta and ECT Euromax container terminals, Maasvlakte, Rotterdam, Netherlands  
+**Affected vehicles:** Trucks whose drivers deliver to or collect from these two terminals  
+**When:** Enforcement from 5 January 2027
 
-**Impact:** Drivers and carriers serving ECT do not need to complete the safety test before the new date, according to the report. Carriers should plan driver training and terminal access ahead of the new deadline, since earlier postponements show the date can shift.
+**Impact:** From 5 January 2027 ECT will actively check the test. Drivers without a valid, passed safety test will no longer be admitted to the ECT Delta and ECT Euromax terminals. Drivers who have already passed the test need not do anything for now; ECT will adjust the validity of passed tests to the new date and will explain how later.
 
-**Recommended action:** Check ECT's own communication for the exact scope and booking arrangements. Brief drivers and subcontractors on the new date and plan test completion well before 5 January 2027.
+**Recommended action:** Identify the drivers and subcontractors who serve ECT Delta or ECT Euromax without a passed test and book their test appointments now, so that terminal access is not refused from 5 January 2027.
 
-**Exemptions/conditions:** Not stated in the supplied evidence.
+**Exemptions/conditions:** None stated, other than the adjusted validity of tests already passed.
 
 *Source: [transport-online.nl](https://www.transport-online.nl/143608/ect-stelt-verplichte-veiligheidstoets-voor-vrachtwagenchauffeurs-opnieuw-uit-tot-5-januari-2027/) — Industry report — not an official authority notice*
 
+## Rest of Europe: sourced operational reports
+
+### Bosnia and Herzegovina: exceptional transports announced on the Kamensko–Tomislavgrad route until 31 December
+
+The Tomislavgrad news site RadioTG (28 October 2026) publishes a Herzegovina-Bosnia Canton notice informing drivers that exceptional transport (izvanredni prijevoz) will take place on main roads in the canton from 1 November to 31 December 2026, on the route M16 (Kamensko border crossing – Kazaginac), M16.5 (Kazaginac – Prisoje), M6.1 (Prisoje – Kolo) and M15 (Kolo – Tomislavgrad – connection to VP Baljci). The notice asks drivers for patience and to respect the traffic rules. It gives no dimensions, weights, escort arrangements or movement times.
+
+**Where: M16, M16.5, M6.1 and M15, Kamensko border crossing – Tomislavgrad, Herzegovina-Bosnia Canton · When: 1 November–31 December 2026**
+
+**Operator action:** If you plan to use this route in the period, ask the cantonal road authority for the movement schedule before dispatch. The notice itself sets no restriction for other traffic.
+
+*Source: [RadioTG](https://radiotg.com/vijesti/hbz/obavijest-o-izvanrednom-prijevozu-2) — Local news report of a cantonal notice — not the authority's own publication; confirm with the competent authority*
+
 ## Operator checklist
 
-- Bosnia and Herzegovina: Before planning movements on the Kamensko–Tomislavgrad route, confirm timing, permit conditions and any escort requirements with the cantonal or road authority. Add buffer time for possible convoy delays on M16, M16.5, M6.1 and M15. Do not assume the notice sets any weight or dimension limits.
-- Netherlands: Check ECT's own communication for the exact scope and booking arrangements. Brief drivers and subcontractors on the new date and plan test completion well before 5 January 2027.
+- Netherlands: Book the ECT safety test now for every driver serving ECT Delta or ECT Euromax without a passed test; access is refused without it from 5 January 2027.
+- Bosnia and Herzegovina: Ask the cantonal road authority for the exceptional-transport schedule before using the Kamensko–Tomislavgrad route until 31 December.
+- Recheck the terminal's and road authority's current notices before travel.
 
 ## Sources
 
-- [RadioTG](https://radiotg.com/vijesti/hbz/obavijest-o-izvanrednom-prijevozu-2)
-- [transport-online.nl](https://www.transport-online.nl/143608/ect-stelt-verplichte-veiligheidstoets-voor-vrachtwagenchauffeurs-opnieuw-uit-tot-5-januari-2027/)
+- [transport-online.nl — ECT postpones the safety test to 5 January 2027](https://www.transport-online.nl/143608/ect-stelt-verplichte-veiligheidstoets-voor-vrachtwagenchauffeurs-opnieuw-uit-tot-5-januari-2027/)
+
+- [RadioTG — Herzegovina-Bosnia Canton notice on exceptional transport](https://radiotg.com/vijesti/hbz/obavijest-o-izvanrednom-prijevozu-2)
 
 ## Next EU Oversize Weekly
 
-Friday, 13 November 2026 at 12:00 CET.
+Friday, 13 November 2026 at 12:00 Europe/Prague (CET).
