@@ -70,6 +70,15 @@ function contract(name: string, makeStore: () => AskStore | Promise<AskStore>) {
       expect(await store.hitRateLimit(key, 3600, 3, new Date(NOW.getTime() + 2 * 3600_000))).toBe(true);
     });
 
+    it('rate limits atomically even under parallel login attempts', async () => {
+      const store = await makeStore();
+      const key = `parallel-login:${unique()}`;
+      const decisions = await Promise.all(Array.from({ length: 12 }, () =>
+        store.hitRateLimit(key, 3600, 3, NOW)));
+      expect(decisions.filter(Boolean)).toHaveLength(3);
+      expect(decisions.filter((allowed) => !allowed)).toHaveLength(9);
+    });
+
     it('records metrics and queues review URLs without user data', async () => {
       const store = await makeStore();
       await store.recordMetric({ day: '2026-10-25', level: 'UNKNOWN', language: 'cs', path: 'web', costMicro: 1234, latencyMs: 4567 });
