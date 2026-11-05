@@ -1,7 +1,8 @@
 // Monitoring and recovery behind the maintenance secret: health, dead-letter
 // requeue and the preflight of settings (names only, never values).
 
-import { describe, expect, it } from 'vitest';
+import { createHash } from 'node:crypto';
+import { describe, expect, it, vi } from 'vitest';
 import { handleMaintenance } from '../account-handlers';
 import type { AccountRuntime } from '../account/runtime';
 import { DAJC_ASK_ORCHESTRATOR_PRODUCTION_RELEASED } from '../config';
@@ -66,6 +67,50 @@ describe('maintenance access', () => {
     expect(preflightOnly.status).toBe(200);
     expect(preflightOnly.body.preflight.ask.ready).toBe(false);
     expect((await call('health', null, {}, env)).status).toBe(404);
+  });
+
+  it('verifies against a stored SHA-256 only; the hash is not a bearer and the plaintext is ignored once a hash is set', async () => {
+    const hash = createHash('sha256').update(SECRET).digest('hex');
+    const hashed = setup({ DAJC_AI_MAINTENANCE_SECRET_SHA256: hash }).rt;
+    expect((await call('health', hashed)).status).toBe(200);
+    expect((await call('health', hashed, { auth: `Bearer ${hash}` })).status).toBe(404);
+    expect((await call('health', setup({ DAJC_AI_MAINTENANCE_SECRET_SHA256: hash.toUpperCase() }).rt)).status).toBe(200);
+    const other = 'a-different-plaintext-secret-0123456789abcdef';
+    const both = setup({ DAJC_AI_MAINTENANCE_SECRET_SHA256: hash, DAJC_AI_MAINTENANCE_SECRET: other }).rt;
+    expect((await call('health', both, { auth: `Bearer ${other}` })).status).toBe(404);
+    expect((await call('health', both)).status).toBe(200);
+    // An invalid hash disables maintenance even with a valid plaintext secret.
+    expect((await call('health', setup({ DAJC_AI_MAINTENANCE_SECRET_SHA256: 'not-hex', DAJC_AI_MAINTENANCE_SECRET: SECRET }).rt)).status).toBe(404);
+    // The rotated plaintext value (deliberately short) disables it as well.
+    expect((await call('health', setup({ DAJC_AI_MAINTENANCE_SECRET: 'rotated-2026-11-05' }).rt, { auth: 'Bearer rotated-2026-11-05' })).status).toBe(404);
+    // Only "Bearer <token>" is accepted.
+    expect((await call('health', hashed, { auth: `Basic ${SECRET}` })).status).toBe(404);
+    expect((await call('health', hashed, { auth: SECRET })).status).toBe(404);
+    expect(preflight({ DAJC_AI_MAINTENANCE_SECRET_SHA256: hash }).maintenance).toBe('sha256');
+    expect(preflight({ DAJC_AI_MAINTENANCE_SECRET: 'rotated-2026-11-05' }).maintenance).toBe('plaintext-too-short');
+    expect(preflight({}).maintenance).toBe('off');
+  });
+
+  it('never writes the bearer, its hash or the preflight values to logs, including on internal errors', async () => {
+    const hash = createHash('sha256').update(SECRET).digest('hex');
+    const logged: string[] = [];
+    const spies = (['log', 'info', 'warn', 'error', 'debug'] as const).map((level) => vi.spyOn(console, level).mockImplementation((...args: unknown[]) => { logged.push(args.map(String).join(' ')); }));
+    try {
+      const { rt, paid } = setup({ DAJC_AI_MAINTENANCE_SECRET_SHA256: hash });
+      await call('health', rt);
+      await call('health', rt, { auth: `Bearer ${SECRET}x` });
+      await call('preflight', rt);
+      paid.failNext = 'operationalSummary';
+      expect((await call('health', rt)).status).toBe(500);
+      await call('requeue', rt, { method: 'POST', body: { idemKey: SECRET } });
+    } finally {
+      for (const spy of spies) spy.mockRestore();
+    }
+    expect(logged.some((line) => line.includes('maintenance health failed'))).toBe(true);
+    for (const line of logged) {
+      expect(line).not.toContain(SECRET);
+      expect(line).not.toContain(hash);
+    }
   });
 });
 

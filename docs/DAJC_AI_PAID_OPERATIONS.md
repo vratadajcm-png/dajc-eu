@@ -114,17 +114,24 @@ paid: everything required by Ask, plus `DAJC_AI_ACCOUNT_ENABLED`,
 `DAJC_AI_PAID_ENABLED`, `DAJC_AI_DATA_KEYS`, `DAJC_AI_PAYMENT_PROVIDER`,
 `DAJC_AI_PAYMENT_MODE` and that provider's credentials. Registry tools also need
 `DAJC_AI_DRIVING_BANS_ENABLED`. Accounting needs the `DAJC_ABRA_*` and
-`DAJC_VAT_*` variables. The maintenance call needs `DAJC_AI_MAINTENANCE_SECRET`.
+`DAJC_VAT_*` variables. The maintenance calls need `DAJC_AI_MAINTENANCE_SECRET_SHA256` (preferred) or `DAJC_AI_MAINTENANCE_SECRET`.
 
 ## Monitoring and recovery
 
-All maintenance calls need `Authorization: Bearer $DAJC_AI_MAINTENANCE_SECRET`
-(≥ 32 characters, compared in constant time) and answer 404 otherwise; a wrong
+All maintenance calls need `Authorization: Bearer <bearer>` and answer 404
+otherwise. The deployment should hold only the bearer's SHA-256 in
+`DAJC_AI_MAINTENANCE_SECRET_SHA256` (generate the bearer where the scheduler
+runs, `printf '%s' "$BEARER" | sha256sum`, and store only the hash in Vercel);
+`DAJC_AI_MAINTENANCE_SECRET` (≥ 32 characters) is a fallback for local runs and
+is ignored once the hash is set. The bearer is hashed and compared in constant
+time and never logged (`monitoring.test.ts` checks every console level,
+including the internal-error path). To rotate: generate a new bearer, replace
+the hash, redeploy; old deployments keep the old hash until they are removed; a wrong
 HTTP method answers 405. **POST calls must send `Content-Type: application/json`
 (body `{}` for `run`)**: Astro's built-in origin check refuses a POST without it
 (403 "Cross-site POST form submissions are forbidden") before the handler runs,
 as verified on the Vercel preview. Example:
-`curl -X POST -H "Authorization: Bearer $DAJC_AI_MAINTENANCE_SECRET" -H 'Content-Type: application/json' -d '{}' https://<host>/api/ask/maintenance/run`. None returns a secret value, an e-mail address, a
+`curl -X POST -H "Authorization: Bearer $BEARER" -H 'Content-Type: application/json' -d '{}' https://<host>/api/ask/maintenance/run`. None returns a secret value, an e-mail address, a
 question, an answer or a payment payload.
 
 | Call | Purpose |
@@ -205,7 +212,7 @@ store contracts and the end-to-end lifecycle as `dajc_ask_app`
 5. **Release change** (code review): set `DAJC_AI_PAID_RELEASED`, and for real
    money `DAJC_AI_LIVE_PAYMENTS_RELEASED` / `DAJC_ACCOUNTING_LIVE_RELEASED`.
 6. Schedule `POST /api/ask/maintenance/run` and `GET /api/ask/maintenance/health`
-   (e.g. every 15 minutes) with `Authorization: Bearer $DAJC_AI_MAINTENANCE_SECRET`
+   (e.g. every 15 minutes) with `Authorization: Bearer <bearer>`
    and alert on any health status other than `ok`; monthly
    `GET /api/ask/maintenance/report?month=YYYY-MM[&format=csv]`. Run
    `GET /api/ask/maintenance/preflight` before each step above.

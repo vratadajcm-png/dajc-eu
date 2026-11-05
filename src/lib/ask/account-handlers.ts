@@ -6,6 +6,7 @@
 //   - the user is always the one of the HttpOnly session cookie, never a body field;
 //   - payment webhooks are authenticated by the provider's signature only.
 
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { currentUserId, SESSION_COOKIE } from './auth';
 import {
   consentState, deleteAccount, exportAccount, listHistory, listMemory, memoryItem, reportError, saveMemory, setConsent, type AccountDeps,
@@ -348,6 +349,23 @@ export async function handleReview(action: string, ctx: RouteContext, rt: Accoun
 
 // --- Maintenance (scheduled) -------------------------------------------------
 
+export const MAINTENANCE_SECRET_MIN_LENGTH = 32;
+const sha256 = (value: string) => createHash('sha256').update(value, 'utf8').digest();
+
+/**
+ * What the maintenance bearer must hash to. Preferred: DAJC_AI_MAINTENANCE_SECRET_SHA256
+ * (64 hex characters) - the deployment then stores only a verifier, never the
+ * bearer itself. Fallback: DAJC_AI_MAINTENANCE_SECRET (>= 32 characters), for
+ * local runs. When the hash variable is set the plaintext one is ignored; an
+ * invalid hash or a short secret disables maintenance (fail closed).
+ */
+export function maintenanceVerifier(env: AskEnv): Buffer | null {
+  const hex = env.DAJC_AI_MAINTENANCE_SECRET_SHA256?.trim();
+  if (hex) return /^[0-9a-fA-F]{64}$/.test(hex) ? Buffer.from(hex.toLowerCase(), 'hex') : null;
+  const plain = env.DAJC_AI_MAINTENANCE_SECRET;
+  return plain && plain.length >= MAINTENANCE_SECRET_MIN_LENGTH ? sha256(plain) : null;
+}
+
 const MAINTENANCE_METHODS: Record<string, string> = { run: 'POST', requeue: 'POST', report: 'GET', health: 'GET', preflight: 'GET' };
 
 /**
@@ -358,12 +376,13 @@ const MAINTENANCE_METHODS: Record<string, string> = { run: 'POST', requeue: 'POS
  * GET preflight (settings by name; works before the features are configured).
  */
 export async function handleMaintenance(action: string, ctx: RouteContext, rt: AccountRuntime | null, env: AskEnv = rt?.env ?? process.env): Promise<Response> {
-  const secret = env.DAJC_AI_MAINTENANCE_SECRET;
-  if (!secret || secret.length < 32) return notFound();
+  const verifier = maintenanceVerifier(env);
+  if (!verifier) return notFound();
+  // The bearer is only hashed and compared in constant time; it is never
+  // logged, stored or echoed (see monitoring.test.ts).
   const auth = ctx.request.headers.get('authorization') || '';
-  const { timingSafeEqual, createHash } = await import('node:crypto');
-  const digest = (v: string) => createHash('sha256').update(v).digest();
-  if (!timingSafeEqual(digest(auth), digest(`Bearer ${secret}`))) return notFound();
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  if (token.length < MAINTENANCE_SECRET_MIN_LENGTH || !timingSafeEqual(sha256(token), verifier)) return notFound();
   const method = MAINTENANCE_METHODS[action];
   if (!method) return notFound();
   if (ctx.request.method !== method) return json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, 405);

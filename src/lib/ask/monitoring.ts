@@ -156,6 +156,16 @@ export interface Preflight {
   account: { enabled: boolean; dataKeys: string };
   paid: { enabled: boolean; released: boolean; staging: boolean; livePaymentsReleased: boolean; ready: boolean; problems: string[] };
   accounting: { liveReleased: boolean; ready: boolean; problems: string[] };
+  /** How the maintenance bearer is verified: 'sha256' (verifier only, preferred), 'plaintext', or why it is off. */
+  maintenance: 'sha256' | 'plaintext' | 'invalid-sha256' | 'plaintext-too-short' | 'off';
+}
+
+function maintenanceMode(env: AskEnv): Preflight['maintenance'] {
+  const hex = env.DAJC_AI_MAINTENANCE_SECRET_SHA256?.trim();
+  if (hex) return /^[0-9a-fA-F]{64}$/.test(hex) ? 'sha256' : 'invalid-sha256';
+  const plain = env.DAJC_AI_MAINTENANCE_SECRET;
+  if (!plain) return 'off';
+  return plain.length >= 32 ? 'plaintext' : 'plaintext-too-short';
 }
 
 export function preflight(env: AskEnv): Preflight {
@@ -208,5 +218,6 @@ export function preflight(env: AskEnv): Preflight {
       problems: paid.problems,
     },
     accounting: { liveReleased: DAJC_ACCOUNTING_LIVE_RELEASED, ready: accounting.ok, problems: accounting.problems },
+    maintenance: maintenanceMode(env),
   };
 }

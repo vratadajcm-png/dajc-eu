@@ -68,11 +68,18 @@ once the staging database and the preview environment are reachable.
    paused for inactivity is itself free, within 90 days of the pause. No other
    project was touched and no new project was created.
 2. **Vercel** — resolved: the connector reaches the team `haul-board` and the
-   project `dajc-eu`. Production is untouched. The only variable added is
-   `DAJC_AI_MAINTENANCE_SECRET` (sensitive, Preview, branch
-   `claude/blissful-cori-vo1iyy`) for the dry run; rotate or delete it after
-   the dry run. DAJC AI stays off in every environment. Preview deployments
-   are behind Vercel Authentication.
+   project `dajc-eu`. Production is untouched. Preview (branch
+   `claude/blissful-cori-vo1iyy` only) holds `DAJC_AI_MAINTENANCE_SECRET_SHA256`
+   (a verifier, not the bearer) and the rotated, deliberately invalid
+   `DAJC_AI_MAINTENANCE_SECRET` (safe to delete). The first preview bearer was
+   rotated on 2026-11-05 because its value had passed through a tool call; it
+   is not in the repository, its history, the build output or the session
+   files, and the app never logs it. Two earlier preview deployments
+   (`dpl_4D1hcYswWH7aFpLAyjKkrt4YwAPN`, `dpl_496j3g5rN2Tf4Tcr7WKX4M6FATXt`)
+   still carry the old value baked in; they are behind Vercel Authentication
+   (the share link was revoked) and expose only the names-only preflight. The
+   owner can delete them in the Vercel dashboard (the connector cannot delete
+   deployments). DAJC AI stays off in every environment.
 3. **Ask keys for the preview orchestrator** — Ask's own keys of at least two
    vendors and a preview budget (`DAJC_ASK_MONTHLY_BUDGET_EUR`,
    `DAJC_ASK_DAILY_BUDGET_EUR`); without them the routing stays off.
@@ -87,7 +94,7 @@ Preview deployment or `astro dev` with: Ask variables, `DAJC_AI_ACCOUNT_ENABLED=
 `VERCEL_ENV=preview`, `DAJC_AI_STAGING_SANDBOX=true`,
 `DAJC_AI_PAYMENT_PROVIDER=sandbox`, `DAJC_AI_PAYMENT_MODE=sandbox`,
 `DAJC_AI_SANDBOX_WEBHOOK_SECRET=<32+ chars>`, `DAJC_AI_DATA_KEYS=k1:<base64 32 bytes>`,
-`DAJC_AI_MAINTENANCE_SECRET=<32+ chars>`.
+`DAJC_AI_MAINTENANCE_SECRET_SHA256=<sha256 of a 32+ char bearer>`.
 Before the run: `GET /api/ask/maintenance/preflight` (names anything missing).
 Browser run: `scripts/dajc-ai-e2e/browser-e2e.mjs` (with
 `NODE_OPTIONS=--require ./scripts/dajc-ai-e2e/offline-ai.cjs` for the server
