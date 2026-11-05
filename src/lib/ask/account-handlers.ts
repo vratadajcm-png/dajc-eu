@@ -20,6 +20,7 @@ import { comparePermit, transportSchema } from './paid/permits';
 import { askPaidQuestion, extractPermit, type PaidQueryDeps } from './paid/query';
 import { isoDay } from './own-data';
 import { runAccountingOutbox } from './accounting/outbox-worker';
+import { runRenewals } from './billing/renewals';
 import { monthlyReport, reportCsv } from './accounting/report';
 import { publishedKnowledge } from './learning/workflow';
 
@@ -359,10 +360,11 @@ export async function handleMaintenance(action: string, ctx: RouteContext, rt: A
   const now = nowOf(rt);
   try {
     if (action === 'run') {
+      const renewals = rt.paidRuntime ? await runRenewals(billingDeps(rt.paidRuntime)) : null;
       const accounting = await runAccountingOutbox({ paid: rt.paid, client: rt.paidRuntime?.accounting?.client ?? null, config: rt.paidRuntime?.accounting?.config ?? null, now: () => now });
       const purged = await rt.paid.purgePersonalData(now);
       await rt.ask.store.purgeExpired(now);
-      return json({ ok: true, accounting, purged });
+      return json({ ok: true, renewals, accounting, purged });
     }
     if (action === 'report') {
       const month = ctx.url.searchParams.get('month') || isoDay(now).slice(0, 7);

@@ -276,6 +276,15 @@ export class PostgresPaidStore implements PaidStore {
     return (r?.ledger as SubscriptionLedger) ?? null;
   }
 
+  async listRenewableLedgers(providers: CardProvider[]) {
+    if (providers.length === 0) return [];
+    const list = sql.join(providers.map((p) => sql`${p}`), sql`, `);
+    return rows(await this.db.execute(sql`
+      select user_id, ledger from dajc_ask.subscriptions
+      where provider in (${list}) and coalesce((ledger->>'cancelAtPeriodEnd')::boolean, false) = false
+      order by updated_at`)).map((r) => ({ userId: String(r.user_id), ledger: r.ledger as SubscriptionLedger }));
+  }
+
   async findUserByPaymentRef(provider: CardProvider, paymentRef: string) {
     const [r] = rows(await this.db.execute(sql`
       select user_id from dajc_ask.subscriptions

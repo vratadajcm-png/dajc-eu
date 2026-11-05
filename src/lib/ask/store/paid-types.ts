@@ -209,6 +209,8 @@ export interface PaidStore {
   findCustomer(provider: CardProvider, customerRef: string): Promise<CustomerRow | null>;
   findCustomersOfUser(userId: string): Promise<CustomerRow[]>;
   getLedger(userId: string): Promise<SubscriptionLedger | null>;
+  /** Ledgers of these providers that are not cancelled (renewal candidates). */
+  listRenewableLedgers(providers: CardProvider[]): Promise<Array<{ userId: string; ledger: SubscriptionLedger }>>;
   /** The user whose stored ledger contains this provider payment (refunds and disputes carry only the payment). */
   findUserByPaymentRef(provider: CardProvider, paymentRef: string): Promise<string | null>;
   applyPaymentEvent(input: ApplyPaymentInput): Promise<'applied' | 'duplicate' | 'ignored'>;

@@ -23,8 +23,9 @@ Three states are kept apart on purpose:
 | Permit extraction by AI (consented) | IMPLEMENTED | contract tested with a fake provider only; real model output not evaluated |
 | Billing lifecycle (checkout → settle → renew → cancel → refund → dispute) | TECHNICALLY READY with the sandbox provider | `billing`, `e2e-lifecycle`, browser run |
 | Stripe adapter | IMPLEMENTED | signature/mapping tests on synthetic events; not run against Stripe test mode |
-| Revolut Merchant adapter | IMPLEMENTED | signature/confirmation tests on synthetic data; renewal orders not implemented |
-| GP webpay (Česká spořitelna) adapter | IMPLEMENTED (partial) | RSA request/return verified with generated keys; recurring charge, refund and status WS API need the merchant WS contract |
+| Revolut Merchant adapter | IMPLEMENTED | signature/confirmation and merchant-initiated renewal (saved card → order → pay with `initiator: merchant`) tested against request shapes from the Merchant API reference with a fake server; not run in the Revolut sandbox |
+| GP webpay (Česká spořitelna) adapter | IMPLEMENTED (partial) | RSA request/return verified with generated keys; recurring charge, refund and status WS API need the merchant WS contract (renewal run records `RENEWAL_BLOCKED`) |
+| Monthly renewal scheduler (Revolut, GP webpay, sandbox) | TECHNICALLY READY with the sandbox | `renewals.test.ts`: one charge per period, retries ≤ 3 × 24 h, cancelled/refunded never renewed, access only from the verified settlement, period continued server-side |
 | ABRA Flexi connector + outbox | TECHNICALLY READY against the simulated ABRA | `accounting` tests; not run against an ABRA test company |
 | VAT / OSS | IMPLEMENTED, configuration-driven | no rate is built in; needs accountant-confirmed `DAJC_VAT_RATES_JSON` |
 | Controlled learning workflow | TECHNICALLY READY | `paid-features` (four eyes, RBAC, expiry, revoke), DB constraint |
@@ -148,7 +149,7 @@ store contracts and the end-to-end lifecycle as `dajc_ask_app`
    terms and privacy notice, merchant contract, refund policy approval.
 5. **Release change** (code review): set `DAJC_AI_PAID_RELEASED`, and for real
    money `DAJC_AI_LIVE_PAYMENTS_RELEASED` / `DAJC_ACCOUNTING_LIVE_RELEASED`.
-6. Schedule `POST /api/ask/maintenance/run` (e.g. every 15 minutes) with
+6. Schedule `POST /api/ask/maintenance/run` (e.g. every 15 minutes; it runs renewals, the ABRA outbox and retention) with
    `Authorization: Bearer $DAJC_AI_MAINTENANCE_SECRET`; monthly
    `GET /api/ask/maintenance/report?month=YYYY-MM[&format=csv]`.
 
@@ -169,7 +170,9 @@ store contracts and the end-to-end lifecycle as `dajc_ask_app`
   event shapes (Stripe API version, Revolut order schema, GP webpay field order)
   must be confirmed in each provider's test environment.
 - GP webpay recurring charges, refunds and status queries need the Web Services
-  API contract; Revolut renewals need merchant-initiated orders (not built).
+  API contract. Revolut renewals are built on the documented merchant-initiated
+  flow but whether the first checkout saves the card for the merchant
+  (`save_payment_method_for`) must be confirmed in the Revolut sandbox.
 - ABRA payload field names follow the public REST documentation and must be
   confirmed in an ABRA test company (`statDph`, `sparovani`, document codes).
 - AI permit extraction output quality was not evaluated with real permits.

@@ -7,31 +7,13 @@ import { decideRefund, processWebhook, requestCancellation, requestRefund, start
 import { createStripeAdapter, mapStripeEvent, verifyStripeSignature } from '../billing/stripe';
 import { addOneMonth, hmacHex, PaymentProviderUnavailable, WebhookAuthError, type PaymentAdapter } from '../billing/types';
 import { readPaidConfig, paidReleased } from '../paid/config';
-import { KEYS, paidConfig, SECRET } from './paid-helpers';
+import { billingScenario, KEYS, paidConfig, SECRET } from './paid-helpers';
 import { MemoryAskStore } from '../store/memory';
 import { MemoryPaidStore } from '../store/paid-memory';
 
 const NOW = new Date('2026-11-05T10:00:00.000Z');
 
 
-export function billingScenario(adapter?: PaymentAdapter) {
-  const askStore = new MemoryAskStore();
-  const paid = new MemoryPaidStore(askStore);
-  let clock = NOW;
-  const deps: BillingDeps = {
-    config: paidConfig(), askStore, paid, adapter: adapter ?? createSandboxAdapter({ secret: SECRET, publicOrigin: 'https://www.dajc.eu' }),
-    publicOrigin: 'https://www.dajc.eu', env: { DAJC_AI_PAID_ENABLED: 'true' }, released: true, now: () => clock,
-  };
-  return {
-    deps, askStore, paid,
-    setNow(date: Date) { clock = date; },
-    async sandboxEvent(event: Omit<SandboxEventInput, 'occurredAt'> & { occurredAt?: string }, secret = SECRET) {
-      const body = JSON.stringify({ occurredAt: clock.toISOString(), ...event });
-      const headers = new Headers({ [SANDBOX_SIGNATURE_HEADER]: signSandboxEvent(secret, body, clock) });
-      return processWebhook({ rawBody: body, headers }, deps);
-    },
-  };
-}
 
 describe('payment provider signatures', () => {
   it('Stripe: accepts only a fresh signature over the exact body', () => {

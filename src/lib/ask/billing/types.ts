@@ -113,6 +113,20 @@ export interface PaymentAdapter {
   refund(input: { paymentRef: string; amountCents: number; idempotencyKey: string }): Promise<{ refundRef: string }>;
   /** A provider-hosted page to change the card or cancel, where available. */
   managementUrl(input: { customerRef: string; returnUrl: string }): Promise<string | null>;
+  /**
+   * Merchant-initiated renewal with the card the customer saved for the
+   * merchant, for providers without a provider-side subscription (Revolut,
+   * GP webpay). 'submitted' grants nothing: access is extended only by the
+   * provider's verified settlement event for checkoutRef. Absent = the provider
+   * renews on its own (Stripe subscriptions).
+   */
+  chargeRenewal?(input: { customerRef: string; checkoutRef: string }): Promise<RenewalResult>;
+}
+
+export interface RenewalResult {
+  status: 'submitted' | 'declined' | 'no_saved_card';
+  providerRef: string | null;
+  reason?: string | null;
 }
 
 export type FetchFn = typeof fetch;

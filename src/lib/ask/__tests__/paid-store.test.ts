@@ -113,6 +113,27 @@ function contract(name: string, make: () => Promise<Pair>) {
       expect(await pair.paid.applyPaymentEvent({ ...input, mutate: (ledger: any) => applyVerifiedPaymentEvent(ledger, good) })).toBe('applied');
     });
 
+    it('lists renewable ledgers of the given providers, never cancelled ones', async () => {
+      const pair = await make();
+      const a = await user(pair);
+      const b = await user(pair);
+      for (const [id, cancel] of [[a, false], [b, true]] as const) {
+        const event = { ...settle(id, `evt_${randomUUID()}`, `pay_${randomUUID()}`), provider: 'REVOLUT_MERCHANT' as const };
+        await pair.paid.applyPaymentEvent({
+          provider: 'REVOLUT_MERCHANT', eventId: event.eventId, kind: event.kind, payloadSha256: 'd'.repeat(64), receivedAt: NOW, userId: id, customerRef: event.customerRef,
+          mutate: (l) => {
+            const next = applyVerifiedPaymentEvent(l, event);
+            return cancel ? applyVerifiedPaymentEvent(next, { kind: 'CANCEL_AT_PERIOD_END', eventId: `${event.eventId}_c`, provider: 'REVOLUT_MERCHANT', customerRef: event.customerRef, userId: id, occurredAt: NOW.toISOString() }) : next;
+          },
+          outbox: [], audit: { actor: 'test', action: 'SEED', subject: `user:${id}` },
+        });
+      }
+      const listed = (await pair.paid.listRenewableLedgers(['REVOLUT_MERCHANT'])).map((r) => r.userId);
+      expect(listed).toContain(a);
+      expect(listed).not.toContain(b);
+      expect((await pair.paid.listRenewableLedgers(['GP_WEBPAY'])).map((r) => r.userId)).not.toContain(a);
+    });
+
     it('binds a provider customer to one user only', async () => {
       const pair = await make();
       const a = await user(pair);

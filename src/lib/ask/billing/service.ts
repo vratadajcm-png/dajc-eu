@@ -18,7 +18,7 @@ import { applyVerifiedPaymentEvent, paidAccess, DAJC_AI_MONTHLY_EUR_CENTS, type 
 import type { OutboxInput, PaidStore, RefundRow } from '../store/paid-types';
 import { isoDay } from '../own-data';
 import {
-  NotSupportedByProvider, PaymentProviderRejected, PaymentProviderUnavailable, WebhookAuthError,
+  addOneMonth, NotSupportedByProvider, PaymentProviderRejected, PaymentProviderUnavailable, WebhookAuthError,
   type PaymentAdapter, type ProviderEvent, type WebhookRequest,
 } from './types';
 
@@ -154,6 +154,22 @@ function outboxFor(event: ProviderEvent, userId: string, ledger: SubscriptionLed
   return [];
 }
 
+/**
+ * The paid period for a settlement whose provider event carries none (Revolut,
+ * GP webpay renewals): it continues the latest unreversed period when that one
+ * ended at most 7 days before the payment (renewal), otherwise starts at the
+ * payment; always one calendar month. Never taken from the browser.
+ */
+export function derivePeriod(ledger: SubscriptionLedger | null, occurredAt: string): { periodStart: string; periodEnd: string } {
+  const paidAt = Date.parse(occurredAt);
+  const latest = (ledger?.settled ?? [])
+    .filter((p) => !ledger!.reversedPaymentRefs.includes(p.paymentRef))
+    .sort((a, b) => Date.parse(b.until) - Date.parse(a.until))[0];
+  const continues = latest && Date.parse(latest.until) >= paidAt - 7 * 86_400_000 && Date.parse(latest.until) <= paidAt + 3 * 86_400_000;
+  const start = continues ? latest!.until : new Date(paidAt).toISOString();
+  return { periodStart: start, periodEnd: addOneMonth(start) };
+}
+
 function verifiedEvent(event: ProviderEvent, userId: string, customerRef: string): VerifiedPaymentEvent {
   const base = { eventId: event.eventId, provider: event.provider, customerRef, userId, occurredAt: new Date(event.occurredAt).toISOString() };
   switch (event.kind) {
@@ -225,6 +241,9 @@ async function handleEvent(raw: ProviderEvent, payloadSha256: string, deps: Bill
   }
 
   const ledger = await deps.paid.getLedger(userId);
+  if (event.kind === 'PAYMENT_SETTLED' && (!event.periodStart || !event.periodEnd)) {
+    event = { ...event, ...derivePeriod(ledger, event.occurredAt) };
+  }
   const customerRef = event.customerRef ?? ledger?.customerRef ?? (event.checkoutRef ? `chk-${event.checkoutRef}` : null);
   if (!customerRef || (event.kind !== 'PAYMENT_SETTLED' && !ledger)) {
     const result = await record('IGNORED', 'NO_SUBSCRIPTION_FOR_EVENT', userId, { kind: event.kind });

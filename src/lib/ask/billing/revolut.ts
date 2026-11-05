@@ -134,6 +134,32 @@ export function createRevolutAdapter(settings: RevolutSettings): PaymentAdapter 
       // No hosted customer portal: card changes go through a new checkout.
       return null;
     },
+
+    // Merchant-initiated renewal (API version 2024-09-01+):
+    //   GET  /customers/{id}/payment-methods?only_merchant=true  -> card saved for the merchant
+    //   POST /orders {amount, currency, customer.id, merchant_order_ext_ref}
+    //   POST /orders/{order_id}/payments {saved_payment_method: {type, id, initiator: "merchant"}}
+    // The settlement still arrives as ORDER_COMPLETED and is confirmed via the API.
+    async chargeRenewal({ customerRef, checkoutRef }) {
+      const methods = await providerFetch('REVOLUT_MERCHANT', fetchFn, `${base}/customers/${encodeURIComponent(customerRef)}/payment-methods?only_merchant=true`, { method: 'GET', headers });
+      const list = Array.isArray(methods) ? methods : Array.isArray(methods?.payment_methods) ? methods.payment_methods : [];
+      const card = list.find((m: any) => typeof m?.id === 'string' && (m.type === 'card' || m.type === 'CARD') && String(m.saved_for ?? 'MERCHANT').toUpperCase() === 'MERCHANT');
+      if (!card) return { status: 'no_saved_card' as const, providerRef: null };
+      const order = await providerFetch('REVOLUT_MERCHANT', fetchFn, `${base}/orders`, {
+        method: 'POST', headers: { ...headers, 'idempotency-key': checkoutRef },
+        body: JSON.stringify({ amount: 1500, currency: 'EUR', customer: { id: customerRef }, merchant_order_ext_ref: checkoutRef, description: 'DAJC AI - monthly subscription renewal' }),
+      });
+      if (typeof order?.id !== 'string') throw new PaymentProviderRejected('REVOLUT_MERCHANT', 'renewal order without id');
+      const payment = await providerFetch('REVOLUT_MERCHANT', fetchFn, `${base}/orders/${encodeURIComponent(order.id)}/payments`, {
+        method: 'POST', headers: { ...headers, 'idempotency-key': `${checkoutRef}:pay` },
+        body: JSON.stringify({ saved_payment_method: { type: 'card', id: card.id, initiator: 'merchant' } }),
+      });
+      const state = String(payment?.state ?? '').toLowerCase();
+      if (['declined', 'soft_declined', 'failed', 'cancelled'].includes(state)) {
+        return { status: 'declined' as const, providerRef: order.id, reason: typeof payment?.decline_reason === 'string' ? payment.decline_reason.slice(0, 60) : state };
+      }
+      return { status: 'submitted' as const, providerRef: order.id };
+    },
   };
 }
 

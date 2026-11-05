@@ -79,8 +79,10 @@ export function createSandboxAdapter(settings: { secret: string; publicOrigin: s
         paymentRef: body.paymentRef ?? null,
         amountCents: body.amountCents ?? null,
         currency: body.currency ?? null,
-        periodStart: body.periodStart ?? (body.type === 'payment.settled' ? body.occurredAt : null),
-        periodEnd: body.periodEnd ?? (body.type === 'payment.settled' ? addOneMonth(body.periodStart ?? body.occurredAt) : null),
+        // Like Revolut and GP webpay, a sandbox settlement without a period gets it from
+        // the server (derivePeriod: continue the paid period or start at the payment).
+        periodStart: body.periodStart ?? null,
+        periodEnd: body.periodEnd ?? (body.periodStart ? addOneMonth(body.periodStart) : null),
         billingCountry: body.billingCountry ?? null,
         feeCents: body.feeCents ?? null,
       }];
@@ -101,6 +103,11 @@ export function createSandboxAdapter(settings: { secret: string; publicOrigin: s
 
     async managementUrl({ returnUrl }) {
       return returnUrl;
+    },
+
+    // The test harness then sends the settlement (or failure) event, as a real provider would.
+    async chargeRenewal({ checkoutRef }) {
+      return { status: 'submitted', providerRef: `sandbox_${checkoutRef}` };
     },
   };
 }

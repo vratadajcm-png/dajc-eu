@@ -191,6 +191,11 @@ export class MemoryPaidStore implements PaidStore {
     return row ? clone(row.ledger) : null;
   }
 
+  async listRenewableLedgers(providers: CardProvider[]) {
+    return [...this.ledgers].filter(([, row]) => providers.includes(row.ledger.provider) && !row.ledger.cancelAtPeriodEnd)
+      .map(([userId, row]) => ({ userId, ledger: clone(row.ledger) }));
+  }
+
   async findUserByPaymentRef(provider: CardProvider, paymentRef: string) {
     for (const [userId, row] of this.ledgers) {
       // Payment references are unique per provider; a ledger may have moved to another provider since.

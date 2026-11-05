@@ -130,5 +130,10 @@ export function createGpWebpayAdapter(settings: GpWebpaySettings): PaymentAdapte
     async managementUrl() {
       return null;
     },
+
+    async chargeRenewal() {
+      // processRecurringPayment (Web Services API) needs the merchant's WS contract and credentials.
+      throw new NotSupportedByProvider('GP_WEBPAY', 'recurring charge');
+    },
   };
 }
