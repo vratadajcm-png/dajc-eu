@@ -3,7 +3,7 @@ import { hashToken } from '../../../portal/lib/tokens';
 import { MemoryAskStore } from '../store/memory';
 import { fixtureView } from './helpers';
 import { applyVerifiedPaymentEvent } from '../paid/subscription';
-import { answerPaidDrivingBans, type PaidBansDeps } from '../paid/driving-bans';
+import { answerPaidDrivingBans, type PaidBansDeps } from '../../dajc-ai/paid-driving-bans';
 
 const NOW = new Date('2026-11-01T14:00:00.000Z');
 const SESSION = 'test-authenticated-session-token-1234567890';
