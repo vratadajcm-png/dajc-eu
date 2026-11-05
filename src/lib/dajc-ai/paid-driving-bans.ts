@@ -10,7 +10,7 @@ import {
   AI_TOOLS, answerDrivingBansQuery, type AiAnswer,
 } from '../intelligence/driving-bans-ai-contract';
 import { readPublishedView, type PublishedView } from '../intelligence/driving-bans-query';
-import { paidAccess, type SubscriptionLedger } from '../ask/paid/subscription';
+import { DAJC_AI_PAID_RELEASED, paidAccess, type SubscriptionLedger } from '../ask/paid/subscription';
 
 export interface PaidBansDeps {
   store: AskStore;
@@ -33,7 +33,7 @@ export type PaidBansResult =
 /** Financial or legal state is NEVER inferred from prompts or client JSON. */
 export async function answerPaidDrivingBans(deps: PaidBansDeps): Promise<PaidBansResult> {
   // Block even a database read when disabled; the static release flag is OFF.
-  if (deps.released !== true || deps.env.DAJC_AI_PAID_ENABLED !== 'true' ||
+  if ((deps.released ?? DAJC_AI_PAID_RELEASED) !== true || deps.env.DAJC_AI_PAID_ENABLED !== 'true' ||
       deps.env.DAJC_AI_DRIVING_BANS_ENABLED !== 'true') {
     return { status: 'DISABLED', answer: null };
   }
