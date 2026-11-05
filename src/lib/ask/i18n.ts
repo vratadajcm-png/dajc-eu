@@ -186,6 +186,10 @@ const en = {
   'permit.status.NO_DISCREPANCY_IN_COMPARED_FIELDS': 'No discrepancy in the compared values',
   'permit.status.INCOMPLETE': 'Incomplete comparison',
   'permit.notCompared': 'Not compared',
+  'permit.axle': 'Axle load (kg)',
+  'permit.validity': 'Date within the permit validity',
+  'permit.country': 'Country of the permit',
+  'permit.disclaimer': 'DAJC compares the values you entered. It does not verify that the permit is authentic or valid, that the route is passable or that the transport is legal. Only the issuing authority decides; follow every condition and escort requirement written in the permit.',
 } as const;
 
 export type UiKey = keyof typeof en;
@@ -368,6 +372,10 @@ const cs: Record<UiKey, string> = {
   'permit.status.NO_DISCREPANCY_IN_COMPARED_FIELDS': 'V porovnaných hodnotách bez rozporu',
   'permit.status.INCOMPLETE': 'Neúplné porovnání',
   'permit.notCompared': 'Neporovnáno',
+  'permit.axle': 'Zatížení nápravy (kg)',
+  'permit.validity': 'Datum v době platnosti povolení',
+  'permit.country': 'Země povolení',
+  'permit.disclaimer': 'DAJC porovnává zadané hodnoty. Neověřuje pravost ani platnost povolení, průjezdnost trasy ani legálnost přepravy. Rozhoduje výhradně vydávající úřad; dodržujte všechny podmínky a požadavky na doprovod uvedené v povolení.',
 };
 
 const DICTIONARIES: Record<UiLang, Record<UiKey, string>> = { en, cs };

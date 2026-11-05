@@ -223,6 +223,11 @@ const vehicleConfigurations = ['SOLO', 'TRUCK_TRAILER', 'ARTICULATED', 'TRACTOR_
   .account :global(.ask-test-mode) { color: #f5b942; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
   .account :global(.ask-check--exceeds_permit), .account :global(.ask-permit--discrepancies_found) { color: #ff7a7a; }
   .danger { color: #ff7a7a; }
+  /* Buttons created by the browser scripts do not carry Astro's scope attribute. */
+  .account :global(.button), .answer :global(.button) { margin-top: 0.8rem; padding: 0.7rem 1.2rem; border: 0; border-radius: 6px; background: var(--dajc-orange); color: #061a33; font: inherit; font-weight: 600; cursor: pointer; }
+  .account :global(.link-button), .answer :global(.link-button) { background: none; border: 0; color: var(--dajc-orange); cursor: pointer; padding: 0; font: inherit; text-decoration: underline; }
+  .account :global(button[disabled]) { opacity: 0.5; cursor: not-allowed; }
+  .answer :global(.ask-feedback select), .answer :global(.ask-feedback textarea) { font: inherit; padding: 0.6rem; border-radius: 6px; border: 1px solid var(--dajc-line); background: rgba(255, 255, 255, 0.04); color: var(--dajc-white); }
   button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--dajc-orange); outline-offset: 2px; }
   @media (max-width: 640px) {
     .ask { width: calc(100% - 2rem); padding-top: 3rem; }

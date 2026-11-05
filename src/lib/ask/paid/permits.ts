@@ -50,7 +50,7 @@ export type CheckResult = 'WITHIN_PERMIT' | 'EXCEEDS_PERMIT' | 'NOT_COMPARED';
 
 export interface PermitComparison {
   status: 'DISCREPANCIES_FOUND' | 'NO_DISCREPANCY_IN_COMPARED_FIELDS' | 'INCOMPLETE';
-  checks: Array<{ parameter: string; permit: number | string | null; transport: number | string | null; result: CheckResult; note?: string }>;
+  checks: Array<{ key: string; parameter: string; permit: number | string | null; transport: number | string | null; result: CheckResult; note?: string }>;
   notCompared: string[];
   authorityConfirmationRequired: true;
   disclaimer: string;
@@ -77,20 +77,20 @@ export function comparePermit(permitInput: unknown, transportInput: unknown): Pe
     const limit = p[pKey] as number | undefined;
     const value = t[tKey] as number | undefined;
     if (limit === undefined || value === undefined) {
-      checks.push({ parameter: label, permit: limit ?? null, transport: value ?? null, result: 'NOT_COMPARED', note: limit === undefined ? 'not stated in the permit data' : 'not stated for the transport' });
+      checks.push({ key: tKey, parameter: label, permit: limit ?? null, transport: value ?? null, result: 'NOT_COMPARED', note: limit === undefined ? 'not stated in the permit data' : 'not stated for the transport' });
       continue;
     }
     // Exact comparison, no tolerance: a measurement margin is the authority's call.
-    checks.push({ parameter: label, permit: limit, transport: value, result: value <= limit ? 'WITHIN_PERMIT' : 'EXCEEDS_PERMIT' });
+    checks.push({ key: tKey, parameter: label, permit: limit, transport: value, result: value <= limit ? 'WITHIN_PERMIT' : 'EXCEEDS_PERMIT' });
   }
   if (t.date && (p.validFrom || p.validTo)) {
     const inside = (!p.validFrom || t.date >= p.validFrom) && (!p.validTo || t.date <= p.validTo);
-    checks.push({ parameter: 'date within the stated validity', permit: `${p.validFrom ?? '…'} – ${p.validTo ?? '…'}`, transport: t.date, result: inside ? 'WITHIN_PERMIT' : 'EXCEEDS_PERMIT' });
+    checks.push({ key: 'validity', parameter: 'date within the stated validity', permit: `${p.validFrom ?? '…'} – ${p.validTo ?? '…'}`, transport: t.date, result: inside ? 'WITHIN_PERMIT' : 'EXCEEDS_PERMIT' });
   } else {
-    checks.push({ parameter: 'date within the stated validity', permit: p.validFrom || p.validTo ? `${p.validFrom ?? '…'} – ${p.validTo ?? '…'}` : null, transport: t.date ?? null, result: 'NOT_COMPARED' });
+    checks.push({ key: 'validity', parameter: 'date within the stated validity', permit: p.validFrom || p.validTo ? `${p.validFrom ?? '…'} – ${p.validTo ?? '…'}` : null, transport: t.date ?? null, result: 'NOT_COMPARED' });
   }
   if (t.jurisdiction && p.jurisdiction) {
-    checks.push({ parameter: 'country of the permit', permit: p.jurisdiction, transport: t.jurisdiction, result: t.jurisdiction === p.jurisdiction ? 'WITHIN_PERMIT' : 'EXCEEDS_PERMIT', note: t.jurisdiction === p.jurisdiction ? undefined : 'a permit is valid only in the country (and on the route) it was issued for' });
+    checks.push({ key: 'jurisdiction', parameter: 'country of the permit', permit: p.jurisdiction, transport: t.jurisdiction, result: t.jurisdiction === p.jurisdiction ? 'WITHIN_PERMIT' : 'EXCEEDS_PERMIT', note: t.jurisdiction === p.jurisdiction ? undefined : 'a permit is valid only in the country (and on the route) it was issued for' });
   }
   const notCompared = checks.filter((c) => c.result === 'NOT_COMPARED').map((c) => c.parameter);
   if (p.routeDescription) notCompared.push('route (DAJC has no licensed routing data to check the permitted route)');

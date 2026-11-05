@@ -30,6 +30,11 @@ async function call(path: string, body?: unknown): Promise<{ status: number; dat
   return { status: res.status, data };
 }
 
+const PERMIT_LABELS: Record<string, string> = {
+  lengthM: 'mem.length', widthM: 'mem.width', heightM: 'mem.height', massKg: 'mem.mass',
+  maxAxleLoadKg: 'permit.axle', validity: 'permit.validity', jurisdiction: 'permit.country',
+};
+
 const day = (iso: string | null | undefined) => (iso ? new Date(iso).toLocaleDateString(document.documentElement.lang || 'en', { year: 'numeric', month: 'long', day: 'numeric' }) : '');
 
 export function feedbackControl(answer: unknown, s: (key: string, vars?: Record<string, string | number>) => string): HTMLElement {
@@ -294,11 +299,13 @@ export function initAccountPanel(root: HTMLElement | null = document.querySelect
       return;
     }
     out.append(el('p', s(`permit.status.${r.comparison.status}`), `ask-permit ask-permit--${String(r.comparison.status).toLowerCase()}`));
+    const label = (key: string) => s(PERMIT_LABELS[key] ?? key);
     const table = el('ul');
-    for (const check of r.comparison.checks) table.append(el('li', `${check.parameter}: ${check.transport ?? '–'} / ${check.permit ?? '–'} → ${s(`permit.${check.result}`)}`, `ask-check ask-check--${String(check.result).toLowerCase()}`));
+    for (const check of r.comparison.checks) table.append(el('li', `${label(check.key)}: ${check.transport ?? '–'} / ${check.permit ?? '–'} → ${s(`permit.${check.result}`)}`, `ask-check ask-check--${String(check.result).toLowerCase()}`));
     out.append(table);
-    if (r.comparison.notCompared.length) out.append(el('p', `${s('permit.notCompared')}: ${r.comparison.notCompared.join('; ')}`, 'hint'));
-    out.append(el('p', r.comparison.disclaimer, 'ask-ai-notice'));
+    const notCompared = r.comparison.checks.filter((c: Json) => c.result === 'NOT_COMPARED').map((c: Json) => label(c.key));
+    if (notCompared.length) out.append(el('p', `${s('permit.notCompared')}: ${notCompared.join('; ')}`, 'hint'));
+    out.append(el('p', s('permit.disclaimer'), 'ask-ai-notice'));
   });
 
   panel.querySelector<HTMLButtonElement>('[data-account="history-delete-all"]')?.addEventListener('click', async () => {
