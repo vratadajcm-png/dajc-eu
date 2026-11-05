@@ -33,8 +33,8 @@ const check = (name, ok, detail = '') => {
 };
 
 const TEXT = {
-  cs: { subscribe: /Předplatit/, active: /Předplatné DAJC AI je aktivní do/, memory: 'Ukládat moje vozidla, náklady a trasy (šifrovaně)', history: /Ukládat historii mých dotazů/, save: 'Uložit vozidlo', compare: 'Porovnat', discrepancy: 'Zjištěny rozpory', ask: 'Zeptat se', aiDown: /Vysvětlení od AI je dočasně nedostupné/, registry: 'Kontrola v registru zákazů jízd', cancel: 'Zrušit předplatné', cancelled: /Obnovení zrušeno/, delete: 'Smazat účet' },
-  en: { subscribe: /Subscribe/, active: /DAJC AI subscription active until/, memory: 'Keep my vehicles, loads and routes (encrypted)', history: /Keep my question history/, save: 'Save vehicle', compare: 'Compare', discrepancy: 'Discrepancies found', ask: 'Ask', aiDown: /The AI explanation is temporarily unavailable/, registry: 'Driving Bans registry check', cancel: 'Cancel subscription', cancelled: /Renewal cancelled/, delete: 'Delete my account' },
+  cs: { subscribe: /Předplatit/, active: /Předplatné DAJC AI je aktivní do/, memory: 'Ukládat moje vozidla, náklady a trasy (šifrovaně)', history: /Ukládat historii mých dotazů/, save: 'Uložit vozidlo', compare: 'Porovnat', discrepancy: 'Zjištěny rozpory', ask: 'Zeptat se', aiDown: /Vysvětlení od AI je dočasně nedostupné/, registry: 'Kontrola v registru zákazů jízd', disclaimer: /^DAJC AI vysvětluje zveřejněné a ověřené údaje/, cancel: 'Zrušit předplatné', cancelled: /Obnovení zrušeno/, delete: 'Smazat účet' },
+  en: { subscribe: /Subscribe/, active: /DAJC AI subscription active until/, memory: 'Keep my vehicles, loads and routes (encrypted)', history: /Keep my question history/, save: 'Save vehicle', compare: 'Compare', discrepancy: 'Discrepancies found', ask: 'Ask', aiDown: /The AI explanation is temporarily unavailable/, registry: 'Driving Bans registry check', disclaimer: /^DAJC AI explains published, verified Driving Bans data/, cancel: 'Cancel subscription', cancelled: /Renewal cancelled/, delete: 'Delete my account' },
 };
 
 async function seedUser() {
@@ -102,6 +102,7 @@ for (const lang of ['cs', 'en']) {
       await page.getByRole('button', { name: L.ask, exact: true }).click();
       check(`${tag}: AI outage is explained`, await visible(page.getByText(L.aiDown).first(), 30_000));
       check(`${tag}: registry check shown without AI`, await visible(page.getByText(L.registry, { exact: true }).first(), 5_000));
+      check(`${tag}: registry notice in the interface language`, await visible(page.locator('.ask-registry .ask-ai-notice').filter({ hasText: L.disclaimer }).first(), 5_000));
       const permit = page.locator('[data-account="permit-form"]');
       await permit.locator('input[name="maxWidth"]').fill('3');
       await permit.locator('input[name="width"]').fill('3,2');

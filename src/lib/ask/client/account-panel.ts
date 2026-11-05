@@ -94,7 +94,7 @@ export function renderRegistry(container: HTMLElement, registry: Json | null, no
     const events = el('ul');
     for (const fact of facts) {
       const applicability = fact.vehicle?.status;
-      const text = [fact.jurisdiction, fact.title, fact.local_time, fact.vehicle_scope, applicability ? `(${applicability})` : '']
+      const text = [fact.jurisdiction, fact.title, fact.local_time, fact.vehicle_scope, applicability ? `(${s(`applicability.${applicability}`)})` : '']
         .filter(Boolean).join(' · ');
       events.append(el('li', text || JSON.stringify(fact).slice(0, 200)));
     }

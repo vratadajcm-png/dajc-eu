@@ -17,7 +17,7 @@ verified. **BLOCKED**: needs an external account, contract or owner decision.
 | Area | State | Evidence / what is missing |
 | --- | --- | --- |
 | Ask DAJC · FAQ entry (one entry point; FAQ works with AI off) | COMPLETE | `guide-entry.test.ts`; `/api/guide/ready` |
-| Account: sign-in session, consents, encrypted history and memory, error reports, export, deletion | COMPLETE | unit + Postgres 16/17 + `e2e-lifecycle` + browser E2E (cs/en, desktop/mobile) |
+| Account: sign-in session, consents, encrypted history and memory, error reports, export, deletion | COMPLETE | unit + Postgres 16/17 + `e2e-lifecycle` + browser E2E 38/38 (cs/en, desktop/mobile) |
 | Data protection in the database (RLS per user, least privilege, append-only audit, four eyes) | COMPLETE | `verify.sql` (67 checks; 115 with the Supabase roles) and `paid-store` on Postgres 16 and 17 in CI |
 | Paid Driving Bans tools (same registry, verified periods, vehicle applicability fail-closed) | COMPLETE | browser E2E against the real published registry |
 | Permit comparison (deterministic, never a legal verdict); safe PDF intake | COMPLETE | `paid-features.test.ts` |
@@ -39,14 +39,14 @@ verified. **BLOCKED**: needs an external account, contract or owner decision.
 | Shared learning from customer content | BLOCKED | legal policy not approved (constant `false`) |
 | Microsoft / Azure AI | NOT IMPLEMENTED | no adapter, keys or contract; Azure OpenAI would add no vendor independence |
 | Licensed routing / live road restrictions | NOT IMPLEMENTED (interface only) | `NO_ROUTING` states it to users; no data contract |
-| Czech wording of shared Driving Bans warnings | NOT IMPLEMENTED | warnings come from the shared contract in English |
+| Czech wording of the registry check (warnings, disclaimer, next step, vehicle applicability) | COMPLETE | fixed templates in `src/lib/ask/paid/registry-i18n.ts` (no AI); `registry-i18n.test.ts` fails when the shared contract gains a text without a template; browser E2E checks the notice language. Event titles and vehicle scope stay in the registry's source language |
 | zod 4 migration | NOT IMPLEMENTED | advisory not reachable today (guarded); separate change |
 
 ## Readiness by dimension
 
 | Dimension | Verdict | Why |
 | --- | --- | --- |
-| Technical | **TECHNICALLY READY for a staging dry run** | CI green (unit, typecheck, build, bundle scan, Postgres 16 + 17 integration, runbook rehearsal); browser E2E 36/36; monitoring and recovery in place |
+| Technical | **TECHNICALLY READY for a staging dry run** | CI green (unit, typecheck, build, bundle scan, Postgres 16 + 17 integration, runbook rehearsal); browser E2E 38/38; monitoring and recovery in place |
 | Security | No known critical issue | per-user RLS, CSRF/Origin, signed webhooks, encrypted personal data, no secrets in the client bundle, maintenance calls behind a constant-time bearer check, 13 → 5 dependency advisories, none production-reachable (`SECURITY_DEPENDENCIES.md`) |
 | Legal | NOT READY | operator entity, terms, privacy notice, refund policy, shared-learning policy need approval |
 | Payments | NOT READY | no merchant contract or provider test account verified |

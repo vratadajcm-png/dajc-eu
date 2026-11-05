@@ -229,5 +229,8 @@ store contracts and the end-to-end lifecycle as `dajc_ask_app`
 - ABRA payload field names follow the public REST documentation and must be
   confirmed in an ABRA test company (`statDph`, `sparovani`, document codes).
 - AI permit extraction output quality was not evaluated with real permits.
-- Registry facts and warnings come from the shared Driving Bans contract and
-  are English.
+- Registry warnings, disclaimer and next step are shown in Czech through fixed
+  templates (`paid/registry-i18n.ts`); event titles and vehicle scope come from
+  the registry's source data and stay in its language. A new contract text
+  without a template stays English until a template is added (the drift test
+  fails first).

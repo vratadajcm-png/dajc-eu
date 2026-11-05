@@ -28,6 +28,7 @@ import { budgetCaps, worstCaseQuestionMicro, MIN_QUESTION_CHARS, type ProviderFa
 import type { AskStore } from '../store/types';
 import type { PaidStore } from '../store/paid-types';
 import type { PaidConfig } from './config';
+import { localizeRegistryAnswer } from './registry-i18n';
 import { PERMIT_EXTRACTION_SCHEMA, PERMIT_EXTRACTION_SYSTEM, sanitizeExtraction, validatePermitPdf, type PdfCheck } from './permits';
 
 export interface PaidQueryDeps {
@@ -191,6 +192,8 @@ export async function askPaidQuestion(userId: string, input: PaidQueryInput, uiL
   } else if (!c || c.topic === 'driving_ban') {
     notices.push('REGISTRY_NEEDS_COUNTRY_AND_DATE');
   }
+  // The registry's fixed texts in the interface language (templates only).
+  if (registry && registry.status === 'ANSWER') registry = { status: 'ANSWER', answer: localizeRegistryAnswer(registry.answer, uiLang) };
   if (route || c?.topic === 'road_restriction' || c?.topic === 'oversize_permit') notices.push('ROUTING_NOT_AVAILABLE');
 
   await reservation.release(meter.total, systemError && !registry);
