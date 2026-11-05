@@ -63,12 +63,18 @@ export class PostgresAskStore implements AskStore {
 
   async hitRateLimit(bucketKey: string, windowSeconds: number, max: number, now: Date) {
     const since = new Date(now.getTime() - windowSeconds * 1000);
-    const [{ count }] = await this.db.select({ count: sql<number>`count(*)::int` })
-      .from(rateEvents)
-      .where(and(eq(rateEvents.bucketKey, bucketKey), gte(rateEvents.createdAt, since)));
-    // Recorded even when denied, so hammering a refused route keeps it refused.
-    await this.db.insert(rateEvents).values({ bucketKey, createdAt: now });
-    return count < max;
+    // Serialise read/count/insert by bucket across independent serverless
+    // instances. Without a DB-side lock, concurrent login requests all read
+    // the same count and can bypass the advertised rate limit.
+    return this.db.transaction(async (tx) => {
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${bucketKey}, 0))`);
+      const [{ count }] = await tx.select({ count: sql<number>`count(*)::int` })
+        .from(rateEvents)
+        .where(and(eq(rateEvents.bucketKey, bucketKey), gte(rateEvents.createdAt, since)));
+      // Record denied attempts too: hammering a refused bucket stays refused.
+      await tx.insert(rateEvents).values({ bucketKey, createdAt: now });
+      return count < max;
+    });
   }
 
   async getDailyUsage(userId: string, day: string) {
