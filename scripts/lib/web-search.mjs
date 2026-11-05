@@ -524,6 +524,27 @@ export async function searchGroup(group, { now = new Date(), focuses = SEARCH_FO
   return { status: 'ok', items, ...(errors.length ? { error: errors.join('; ') } : {}) };
 }
 
+const PROVIDER_SECRETS = { 'api.anthropic.com': 'ANTHROPIC_API_KEY', 'api.perplexity.ai': 'PERPLEXITY_API_KEY' };
+
+/**
+ * Why the whole web discovery failed, or null when at least one group ran.
+ * A run where no group could search is a pipeline failure, not a quiet week:
+ * from 2 to 5 November 2026 a rejected Claude key (HTTP 401) left every group
+ * unavailable while the monitor and the Thursday run reported success.
+ */
+export function webDiscoveryFailure(groups = []) {
+  if (groups.length === 0 || groups.some((entry) => entry.status === 'ok')) return null;
+  const errors = groups.map((entry) => String(entry.error || ''));
+  for (const text of errors) {
+    const rejected = text.match(/Provider HTTP (401|403) from ([a-z0-9.-]+)/i);
+    if (rejected) {
+      const secret = PROVIDER_SECRETS[rejected[2]] || 'the provider API key';
+      return `${rejected[2]} rejected the API key (HTTP ${rejected[1]}): replace the ${secret} repository secret. None of the ${groups.length} web search groups could run.`;
+    }
+  }
+  return `None of the ${groups.length} web search groups could run: ${errors[0] || 'unknown error'}`;
+}
+
 /**
  * Search every group, then verify each hit against its own page.
  * @returns {Promise<{ findings: object[], groups: { group: object, status: string, error?: string, hits: number, kept: number, rejected: { url: string, reason: string }[] }[] }>}
