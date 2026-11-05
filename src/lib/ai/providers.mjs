@@ -105,7 +105,8 @@ export function parsePricing(raw) {
   return out;
 }
 
-const TASK_SUFFIXES = ['EXTRACT', 'VERIFY', 'EXPLAIN'];
+// ASK_*: per-task models of DAJC AI (orchestrator ASK_POLICY), e.g. a cheaper model for classification.
+const TASK_SUFFIXES = ['EXTRACT', 'VERIFY', 'EXPLAIN', 'ASK_CLASSIFY', 'ASK_ANSWER', 'ASK_VERIFY', 'ASK_DOCUMENT'];
 /** Model for a task: <P>_MODEL_<TASK>_COMPLEX for complex documents, then <P>_MODEL_<TASK>, then <P>_MODEL. */
 export function modelFor(env, id, task = null, complex = false) {
   const base = PROVIDER_CATALOG[id].modelEnv;

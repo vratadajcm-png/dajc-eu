@@ -97,6 +97,8 @@ export function resilientProviders(inner: Providers, options: ResilienceOptions 
 
 /** True when a model needed for an independently checked answer is known to be down. */
 export function aiUnavailable(providers: Providers): boolean {
+  const orchestrated = (providers as { unavailable?: () => boolean }).unavailable;
+  if (typeof orchestrated === 'function') return orchestrated.call(providers);
   const state = (providers as Partial<ReturnType<typeof resilientProviders>>).breakerState?.();
   return Boolean(state && (state.openai?.open || state.anthropic?.open));
 }

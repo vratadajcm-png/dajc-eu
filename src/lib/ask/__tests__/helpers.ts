@@ -29,6 +29,7 @@ export const FULL_ENV: Record<string, string> = {
 
 export function testConfig(overrides: Partial<AskConfig> = {}): AskConfig {
   return {
+    routing: 'direct',
     dbUrl: FULL_ENV.DAJC_ASK_DB_URL,
     openaiKey: FULL_ENV.DAJC_ASK_OPENAI_API_KEY,
     classifierModel: 'classifier-model-from-env',

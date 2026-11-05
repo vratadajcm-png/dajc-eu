@@ -37,7 +37,11 @@ export interface ServiceDeps {
   now?: () => Date;
   pipeline?: Partial<Pick<PipelineDeps, 'fetchPage' | 'view' | 'findings' | 'deadlineMs' | 'onClassified' | 'knowledge'>>;
   cache?: AnswerCache;
+  /** Orchestrated routing: providers for one question, limited to its reserved budget. */
+  providerFactory?: ProviderFactory;
 }
+
+export type ProviderFactory = (options: { budgetMicro: number; personalData: boolean }) => Providers;
 
 /** Checked generic answers shared by identical questions on the same data and day. */
 export interface AnswerCache {
@@ -137,9 +141,10 @@ export async function askQuestion(userId: string, rawQuestion: unknown, uiLang: 
   const meter = new CostMeter(config);
   const started = Date.now();
   try {
+    const providers = deps.providerFactory ? deps.providerFactory({ budgetMicro: reserved, personalData: false }) : deps.providers;
     const result = await runPipeline(question, uiLang, {
       config,
-      providers: deps.providers,
+      providers,
       meter,
       now,
       ...deps.pipeline,

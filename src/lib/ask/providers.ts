@@ -21,6 +21,10 @@ export class ProviderError extends Error {
 export interface ModelResult<T> {
   json: T;
   usage: { inputTokens: number; outputTokens: number };
+  /** Actual cost reported by the orchestrator for the model it used (orchestrated routing). */
+  costUsd?: number;
+  provider?: string;
+  model?: string;
 }
 
 export interface JsonCallParams {
@@ -35,6 +39,13 @@ export interface JsonCallParams {
   file?: { filename: string; base64: string };
 }
 
+/**
+ * The two roles of the answer pipeline. Their names come from the original
+ * two-vendor setup: `openaiJson` = classification, answer draft and document
+ * reading; `anthropicJson` = the independent check. With orchestrated routing
+ * (orchestrated.ts) each role can run at any configured vendor, and the check
+ * always at another vendor than the answer.
+ */
 export interface Providers {
   openaiJson<T>(params: JsonCallParams): Promise<ModelResult<T>>;
   anthropicJson<T>(params: JsonCallParams): Promise<ModelResult<T>>;

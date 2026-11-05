@@ -24,7 +24,7 @@ import { LIMITS, redactPersonalData, runPipeline, type AskAnswer, type PipelineD
 import type { Classification } from '../prompts';
 import type { Providers } from '../providers';
 import { aiUnavailable } from '../resilience';
-import { budgetCaps, worstCaseQuestionMicro, MIN_QUESTION_CHARS } from '../service';
+import { budgetCaps, worstCaseQuestionMicro, MIN_QUESTION_CHARS, type ProviderFactory } from '../service';
 import type { AskStore } from '../store/types';
 import type { PaidStore } from '../store/paid-types';
 import type { PaidConfig } from './config';
@@ -41,6 +41,8 @@ export interface PaidQueryDeps {
   sessionToken: string | undefined;
   now?: () => Date;
   pipeline?: Partial<Pick<PipelineDeps, 'fetchPage' | 'view' | 'findings' | 'deadlineMs' | 'knowledge'>>;
+  /** Orchestrated routing: providers for one question, limited to its reserved budget. */
+  providerFactory?: ProviderFactory;
 }
 
 export interface PaidQueryInput {
@@ -145,13 +147,14 @@ export async function askPaidQuestion(userId: string, input: PaidQueryInput, uiL
   let answer: AskAnswer | null = null;
   let systemError = false;
   const started = Date.now();
-  if (aiUnavailable(deps.providers)) {
+  const providers = deps.providerFactory ? deps.providerFactory({ budgetMicro: worst, personalData: Boolean(personalContext) }) : deps.providers;
+  if (aiUnavailable(providers)) {
     notices.push('AI_UNAVAILABLE');
   } else {
     try {
       const fullQuestion = personalContext ? `${question}\n\n${redactPersonalData(personalContext)}`.slice(0, LIMITS.questionChars + 600) : question;
       const result = await runPipeline(fullQuestion, uiLang, {
-        config: deps.askConfig, providers: deps.providers, meter, now, ...deps.pipeline,
+        config: deps.askConfig, providers, meter, now, ...deps.pipeline,
         onClassified: (c) => { classification = c; },
       });
       answer = result.answer;
@@ -219,8 +222,9 @@ export async function extractPermit(userId: string, input: { fileBase64?: unknow
   const reservation = await reserve(userId, deps, now, worst);
   if (!reservation.ok) return (reservation as { outcome: PaidQueryOutcome }).outcome as PermitExtractOutcome;
   const meter = new CostMeter(deps.askConfig);
+  const providers = deps.providerFactory ? deps.providerFactory({ budgetMicro: worst, personalData: true }) : deps.providers;
   try {
-    const result = await meter.track('answer', EXTRACTION_PROMPT_CHARS, EXTRACTION_OUTPUT_TOKENS, () => deps.providers.openaiJson<unknown>({
+    const result = await meter.track('answer', EXTRACTION_PROMPT_CHARS, EXTRACTION_OUTPUT_TOKENS, () => providers.openaiJson<unknown>({
       model: deps.askConfig.answerModel, system: PERMIT_EXTRACTION_SYSTEM,
       user: 'Extract the permit parameters from the attached document.',
       schemaName: 'dajc_permit', schema: PERMIT_EXTRACTION_SCHEMA as unknown as Record<string, unknown>, maxOutputTokens: EXTRACTION_OUTPUT_TOKENS,

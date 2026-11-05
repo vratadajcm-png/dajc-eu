@@ -243,7 +243,7 @@ export async function handleBillingReturn(provider: string, ctx: RouteContext, r
 function paidQueryDeps(g: Guarded, ctx: RouteContext): PaidQueryDeps {
   const paidRt = g.rt.paidRuntime!;
   return {
-    askConfig: g.rt.ask.config, store: g.rt.ask.store, providers: g.rt.ask.providers, paid: g.rt.paid, paidConfig: paidRt.config,
+    askConfig: g.rt.ask.config, store: g.rt.ask.store, providers: g.rt.ask.providers, providerFactory: g.rt.ask.providerFactory, paid: g.rt.paid, paidConfig: paidRt.config,
     env: paidRt.env, released: paidRt.released, sessionToken: sessionToken(ctx), now: () => nowOf(g.rt),
     pipeline: { ...g.rt.ask.pipeline, knowledge: (query) => publishedKnowledge(query, { paid: g.rt.paid, now: () => nowOf(g.rt) }) },
   };

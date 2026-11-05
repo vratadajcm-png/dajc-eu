@@ -152,7 +152,7 @@ export async function handleQuery(ctx: RouteContext, runtime: AskRuntime | null)
   try {
     const userId = await currentUserId(sessionToken(ctx), { store: rt.store, now: rt.now?.() });
     if (!userId) return json({ ok: false, error: t(lang, 'invalidLink'), signedIn: false }, 401);
-    const outcome = await askQuestion(userId, body.question, lang, { config: rt.config, store: rt.store, providers: rt.providers, now: rt.now, pipeline: rt.pipeline });
+    const outcome = await askQuestion(userId, body.question, lang, { config: rt.config, store: rt.store, providers: rt.providers, now: rt.now, pipeline: rt.pipeline, cache: rt.cache, providerFactory: rt.providerFactory });
     switch (outcome.status) {
       case 'answered':
         return json({ ok: true, answer: outcome.answer, usage: { used: outcome.used, limit: outcome.limit, remaining: Math.max(0, outcome.limit - outcome.used) } });
