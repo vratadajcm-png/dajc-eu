@@ -1,0 +1,90 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:02.171
+Welcome to the public DAJC demo.
+
+00:00:02.451 --> 00:00:07.385
+In this walkthrough, we will follow a transport from the overview
+to its documents.
+
+00:00:07.665 --> 00:00:09.825
+All the data you see is synthetic.
+
+00:00:10.105 --> 00:00:14.087
+The opening screen shows active transports and their readiness.
+
+00:00:14.367 --> 00:00:19.127
+Look for warnings about missing documents, permits and
+participant confirmations.
+
+00:00:19.407 --> 00:00:26.768
+The purpose of this overview is to help the dispatcher identify
+which transport needs attention, and decide what to resolve next.
+
+00:00:27.648 --> 00:00:29.877
+Open D-ID Orders in the menu.
+
+00:00:30.157 --> 00:00:34.685
+Each row has its own identity, route, status and readiness
+indicator.
+
+00:00:34.965 --> 00:00:39.945
+Select the first example: a gas turbine travelling from Ostrava
+to Hamburg.
+
+00:00:40.225 --> 00:00:44.231
+Think of D-ID as a shared folder for one transport.
+
+00:00:44.511 --> 00:00:48.447
+Participants, documents and changes all belong to the same
+assignment.
+
+00:00:48.727 --> 00:00:55.275
+This keeps the context together, instead of asking the dispatcher
+to reconstruct it from separate messages.
+
+00:00:56.155 --> 00:00:59.429
+Inside the transport, start with Command Center.
+
+00:00:59.709 --> 00:01:05.154
+Here you can review progress, planned milestones and the
+readiness of individual steps.
+
+00:01:05.434 --> 00:01:10.832
+Warnings highlight issues such as missing permits or an escort
+participant who has not yet confirmed.
+
+00:01:11.112 --> 00:01:15.884
+Check what is blocking progress and who needs to confirm the next
+step.
+
+00:01:16.164 --> 00:01:19.659
+A readiness percentage is not official permission to travel.
+
+00:01:19.939 --> 00:01:24.629
+The actual permits, approved route and transport conditions still
+apply.
+
+00:01:25.509 --> 00:01:27.982
+Finally, open the Documents tab.
+
+00:01:28.262 --> 00:01:31.385
+Compare each document status and its versions.
+
+00:01:31.665 --> 00:01:35.044
+Approved indicates a document marked as approved in this demo.
+
+00:01:35.324 --> 00:01:38.714
+Required identifies a document that is still missing.
+
+00:01:38.994 --> 00:01:44.868
+Keeping these records with the same transport helps you see what
+is ready and what needs attention.
+
+00:01:45.148 --> 00:01:49.479
+You can now explore the public demo yourself, using test data
+only.
+
+00:01:49.759 --> 00:01:57.619
+To express interest in testing from the fourth of January, twenty
+twenty seven, use the testing registration page on this website.
