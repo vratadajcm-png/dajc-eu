@@ -67,12 +67,19 @@ jobs:
   # least-privileged dajc_ask_app role (RLS, grants, atomic limits,
   # idempotent payment events, append-only audit). Throwaway service
   # container only - no Supabase or production database is touched.
+  # Postgres 16 and 17 (the Supabase staging project dajc-staging-e2e runs 17),
+  # with the Supabase API roles emulated so the REVOKE paths and the
+  # "no anon/authenticated access" checks of verify.sql are exercised.
   ask-postgres-integration:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres: ['16', '17']
     services:
       postgres:
-        image: postgres:16
+        image: postgres:${{ matrix.postgres }}
         env:
           POSTGRES_PASSWORD: ci-admin-only
           POSTGRES_DB: dajc_ci
@@ -100,6 +107,8 @@ jobs:
         env:
           PGPASSWORD: ci-admin-only
         run: |
+          # Supabase-like API roles with the default grants Supabase gives them on public.
+          psql -h localhost -U postgres -d dajc_ci -v ON_ERROR_STOP=1 -q -c "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN BYPASSRLS; GRANT USAGE ON SCHEMA public TO anon, authenticated; ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated;"
           for file in drizzle-ask/0*.sql; do
             echo "applying $file"
             sed 's/--> statement-breakpoint//' "$file" | psql -h localhost -U postgres -d dajc_ci -v ON_ERROR_STOP=1 -q

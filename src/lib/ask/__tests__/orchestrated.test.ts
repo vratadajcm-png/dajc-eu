@@ -203,3 +203,60 @@ describe('service wiring', () => {
     expect(budgets).toEqual([worstCaseQuestionMicro(config)]);
   });
 });
+
+describe('boundary between DAJC AI and Driving Bans research (negative tests)', () => {
+  it('only src/lib/ask/orchestrated.ts reaches lib/ai, and only the orchestrator core and adapters', async () => {
+    const { readdirSync, readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const root = new URL('../', import.meta.url).pathname;
+    const files = (function walk(dir: string): string[] {
+      return readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? (e.name === '__tests__' ? [] : walk(join(dir, e.name))) : /\.(ts|mjs)$/.test(e.name) ? [join(dir, e.name)] : []));
+    })(root);
+    const importsAi = files.filter((f) => /from\s+['"][^'"]*(?:lib\/ai\/|\.\.\/ai\/)/.test(readFileSync(f, 'utf8')));
+    expect(importsAi.map((f) => f.slice(root.length))).toEqual(['orchestrated.ts']);
+    const code = readFileSync(join(root, 'orchestrated.ts'), 'utf8');
+    expect([...code.matchAll(/from\s+['"](\.\.\/ai\/[^'"]+)['"]/g)].map((m) => m[1]).sort()).toEqual(['../ai/orchestrator.mjs', '../ai/providers.mjs']);
+    expect(code).not.toMatch(/process\.env|driving-bans\/research|model-profile|\benv\s*(?:\.|\[\s*[`'"])DAJC_RESEARCH/);
+    for (const file of files) expect(readFileSync(file, 'utf8'), file).not.toMatch(/driving-bans\/research\//);
+  });
+
+  it('the research orchestrator refuses DAJC AI tasks and user questions; DAJC AI refuses research tasks and unconsented customer data', async () => {
+    const { createOrchestrator, ASK_POLICY } = await import('../../ai/orchestrator.mjs');
+    const limits = { runBudgetUsd: 1, monthlyBudgetUsd: 1, maxRequestsPerRun: 5, maxInputTokensPerCall: 10_000, complexInputTokens: 1e9, maxRetryWaitMs: 0, minIntervalMs: {}, preferLowerCost: false, testedLanguages: null };
+    const research = (createOrchestrator as any)({ providers: {}, limits });
+    await expect(research.run('ask_answer', { system: 's', user: 'u' })).rejects.toThrow(/Unknown research task/);
+    await expect(research.run('extract', { system: 's', user: 'u' }, { dataClass: 'user-question' })).rejects.toThrow(/Unknown data class/);
+    let called = 0;
+    const openai = { id: 'openai', configured: true, json: async () => { called += 1; throw new Error('must not be called'); } };
+    const ask = (createOrchestrator as any)({ providers: { openai }, limits, policy: ASK_POLICY, routes: { ask_answer: ['openai'], ask_document: ['openai'] } });
+    await expect(ask.run('extract', { system: 's', user: 'u' })).rejects.toThrow(/Unknown DAJC AI task/);
+    await expect(ask.run('ask_answer', { system: 's', user: 'u' }, { dataClass: 'customer' })).rejects.toThrow(/Unknown data class/);
+    await expect(ask.run('ask_answer', { system: 's', user: 'u' }, { dataClass: 'verified-registry' })).rejects.toThrow(/Unknown data class/);
+    await expect(ask.run('ask_document', { system: 's', user: 'u' }, { dataClass: 'user-question' })).rejects.toThrow(/openai: data class user-question not allowed for DAJC AI answers/);
+    expect(called).toBe(0);
+  });
+
+  it('keeps the check independent even when the answer vendor is first on the verify route', async () => {
+    const env = { ...ENV, DAJC_ASK_ROUTE_ASK_VERIFY: 'openai,gemini' };
+    const { result, providers } = await ask(env);
+    expect(result.answer.level).toBe('VERIFIED');
+    const answer = providers.calls().find((c) => c.task === 'ask_answer' && c.outcome === 'OK')!;
+    const verify = providers.calls().find((c) => c.task === 'ask_verify' && c.outcome === 'OK')!;
+    expect([answer.provider, verify.provider]).toEqual(['openai', 'gemini']);
+  });
+
+  it('sends providers neither e-mail addresses nor phone numbers from the question, and uses Ask keys only', async () => {
+    const bodies: string[] = [];
+    const apis = fakeApis();
+    const recording = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      bodies.push(String(init?.body ?? ''));
+      return apis.fetchFn(input, init);
+    }) as typeof fetch;
+    const providers = orchestratedProviders({ env: { ...ENV, DAJC_RESEARCH_OPENAI_API_KEY: 'research-only-key' }, budgetUsd: 1, fetchFn: recording, clock: () => NOW });
+    const config = { ...testConfig(), routing: 'orchestrator' as const, pricing: orchestratedPricing(ENV)! };
+    await runPipeline(`Driving ban in Czechia on ${SUNDAY}? Reply to jan.novak@firma.cz or +420 777 123 456`, 'en', { config, providers, meter: new CostMeter(config), now: NOW, view: fixtureView(), findings: [] });
+    expect(bodies.length).toBeGreaterThan(0);
+    expect(bodies.join(' ')).not.toMatch(/jan\.novak|firma\.cz|777 123 456/);
+    expect(apis.log.every((l) => l.key?.startsWith('ask-'))).toBe(true);
+  });
+});
