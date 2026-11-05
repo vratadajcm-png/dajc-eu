@@ -209,6 +209,8 @@ export interface PaidStore {
   findCustomer(provider: CardProvider, customerRef: string): Promise<CustomerRow | null>;
   findCustomersOfUser(userId: string): Promise<CustomerRow[]>;
   getLedger(userId: string): Promise<SubscriptionLedger | null>;
+  /** The user whose stored ledger contains this provider payment (refunds and disputes carry only the payment). */
+  findUserByPaymentRef(provider: CardProvider, paymentRef: string): Promise<string | null>;
   applyPaymentEvent(input: ApplyPaymentInput): Promise<'applied' | 'duplicate' | 'ignored'>;
 
   createRefundRequest(row: Omit<RefundRow, 'id' | 'createdAt' | 'decidedAt' | 'decidedBy' | 'refundRef'>, now: Date): Promise<{ status: 'created'; id: string } | { status: 'exists' }>;
@@ -226,6 +228,7 @@ export interface PaidStore {
   completeOutbox(id: number, externalRef: string, now: Date): Promise<void>;
   failOutbox(id: number, error: string, nextAttemptAt: Date | null, now: Date): Promise<void>;
   listOutbox(status?: OutboxItem['status']): Promise<OutboxItem[]>;
+  getOutbox(idemKey: string): Promise<OutboxItem | null>;
 
   // Answer cache for identical generic questions on the same data.
   getCachedAnswer(cacheKey: string, now: Date): Promise<unknown | null>;

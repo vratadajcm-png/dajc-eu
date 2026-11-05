@@ -13,7 +13,8 @@
 export const DAJC_AI_MONTHLY_EUR_CENTS = 1500;
 export const DAJC_AI_PAID_RELEASED = false;
 
-export type CardProvider = 'STRIPE' | 'REVOLUT_MERCHANT' | 'GP_WEBPAY';
+/** DAJC_SANDBOX: synthetic payments for automated and staging tests; never valid in production. */
+export type CardProvider = 'STRIPE' | 'REVOLUT_MERCHANT' | 'GP_WEBPAY' | 'DAJC_SANDBOX';
 export type SubscriptionEventKind = 'PAYMENT_SETTLED' | 'PAYMENT_REFUNDED' |
   'PAYMENT_DISPUTED' | 'CANCEL_AT_PERIOD_END' | 'PAYMENT_FAILED';
 
@@ -49,7 +50,7 @@ export interface SubscriptionLedger {
 }
 
 const ID = /^[A-Za-z0-9][A-Za-z0-9_.:-]{3,191}$/;
-const PROVIDERS: CardProvider[] = ['STRIPE', 'REVOLUT_MERCHANT', 'GP_WEBPAY'];
+const PROVIDERS: CardProvider[] = ['STRIPE', 'REVOLUT_MERCHANT', 'GP_WEBPAY', 'DAJC_SANDBOX'];
 const KINDS: SubscriptionEventKind[] = [
   'PAYMENT_SETTLED', 'PAYMENT_REFUNDED', 'PAYMENT_DISPUTED',
   'CANCEL_AT_PERIOD_END', 'PAYMENT_FAILED',
@@ -152,6 +153,10 @@ export function paidAccess(args: {
   if (!args.authenticatedUserId) return { allowed: false, reason: 'UNAUTHENTICATED', paidUntil: null };
   const ledger = args.ledger;
   if (!ledger) return { allowed: false, reason: 'NO_SUBSCRIPTION', paidUntil: null };
+  // Synthetic sandbox payments never grant access in a production deployment.
+  if (ledger.provider === 'DAJC_SANDBOX' && args.env?.VERCEL_ENV === 'production') {
+    return { allowed: false, reason: 'NO_SUBSCRIPTION', paidUntil: null };
+  }
   if (ledger.userId !== args.authenticatedUserId) {
     return { allowed: false, reason: 'WRONG_CUSTOMER', paidUntil: null };
   }

@@ -191,6 +191,15 @@ export class MemoryPaidStore implements PaidStore {
     return row ? clone(row.ledger) : null;
   }
 
+  async findUserByPaymentRef(provider: CardProvider, paymentRef: string) {
+    for (const [userId, row] of this.ledgers) {
+      // Payment references are unique per provider; a ledger may have moved to another provider since.
+      if (row.ledger.settled.some((p) => p.paymentRef === paymentRef)) return userId;
+      void provider;
+    }
+    return null;
+  }
+
   async applyPaymentEvent(input: ApplyPaymentInput) {
     this.maybeFail('applyPaymentEvent');
     const key = `${input.provider}|${input.eventId}`;
@@ -263,6 +272,13 @@ export class MemoryPaidStore implements PaidStore {
 
   async listOutbox(status?: OutboxItem['status']) {
     return this.outbox.filter((o) => !status || o.status === status).map(({ lockedUntil: _l, ...item }) => clone(item));
+  }
+
+  async getOutbox(idemKey: string) {
+    const item = this.outbox.find((o) => o.idemKey === idemKey);
+    if (!item) return null;
+    const { lockedUntil: _l, ...rest } = item;
+    return clone(rest);
   }
 
   async getCachedAnswer(cacheKey: string, now: Date) {

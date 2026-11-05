@@ -276,6 +276,14 @@ export class PostgresPaidStore implements PaidStore {
     return (r?.ledger as SubscriptionLedger) ?? null;
   }
 
+  async findUserByPaymentRef(provider: CardProvider, paymentRef: string) {
+    const [r] = rows(await this.db.execute(sql`
+      select user_id from dajc_ask.subscriptions
+      where ledger->'settled' @> ${JSON.stringify([{ paymentRef }])}::jsonb limit 1`));
+    void provider;
+    return r?.user_id ?? null;
+  }
+
   private async appendAuditTx(tx: Tx, entry: AuditInput, now: Date) {
     // One writer at a time keeps the hash chain linear across instances.
     await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended('dajc_ask.audit_log', 0))`);
@@ -396,6 +404,11 @@ export class PostgresPaidStore implements PaidStore {
     return rows(await this.db.execute(status
       ? sql`select * from dajc_ask.accounting_outbox where status = ${status} order by id`
       : sql`select * from dajc_ask.accounting_outbox order by id`)).map(outboxRow);
+  }
+
+  async getOutbox(idemKey: string) {
+    const [r] = rows(await this.db.execute(sql`select * from dajc_ask.accounting_outbox where idem_key = ${idemKey}`));
+    return r ? outboxRow(r) : null;
   }
 
   async getCachedAnswer(cacheKey: string, now: Date) {
