@@ -9,6 +9,7 @@ import { publicationSlotFor, targetWeekDateFor } from './lib/next-publication.mj
 import { isoWeekLabel } from './lib/week.mjs';
 import { extractDetailText, fetchTextWithRetry } from './lib/fetch-source.mjs';
 import { sourceTier } from './lib/source-policy.mjs';
+import { providerErrorDetail } from './lib/provider-error.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ARTICLE_PATH = /^src\/content\/news\/eu-oversize\/eu-oversize-weekly-(\d{4}-w\d{2})\.md$/;
@@ -148,7 +149,7 @@ async function apiJson(url, headers, payload) {
     method: 'POST', headers: { 'content-type': 'application/json', ...headers },
     body: JSON.stringify(payload), signal: AbortSignal.timeout(300000)
   });
-  if (!response.ok) throw new Error('Reviewer API failed with HTTP ' + response.status + ' at ' + new URL(url).hostname);
+  if (!response.ok) throw new Error('Reviewer API failed with HTTP ' + response.status + ' at ' + new URL(url).hostname + await providerErrorDetail(response));
   return response.json();
 }
 
