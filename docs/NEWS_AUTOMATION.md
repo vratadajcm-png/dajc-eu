@@ -69,7 +69,7 @@ The original editorial maximums (30 lead + 15 Rest), zero filler requirement, ex
 
 ## Editorial rules
 
-All editorial rules - scope (freight vehicles over 12 t, oversize/abnormal
+All editorial rules - scope (tachograph-using goods vehicles from 3.5 t, oversize/abnormal
 transport first), freshness (7 days back, one month ahead), exclusions,
 closure duration, driving-ban scope, counts and article structure - are
 stated once, in [`DAJC_WEEKLY_INTELLIGENCE_SPEC.md`](DAJC_WEEKLY_INTELLIGENCE_SPEC.md).
@@ -272,7 +272,7 @@ the normal monitor and eligibility rules.
    country first) and classifies the leads with Claude Haiku. OpenAI is not
    used. Every returned URL is fetched;
    the finding's title, text and publication date come from that page, not
-   from the model. Unreachable pages, PDFs and pages without freight (>12 t)
+   from the model. Unreachable pages, PDFs and pages without relevant road freight (tachograph-using vehicles from 3.5 t)
    or oversize context are dropped with a logged reason; a failed search is
    logged as `UNAVAILABLE` and the jurisdictions it covers are recorded as
    `checked-source-availability-limited`. Classifier model:

@@ -1,6 +1,7 @@
 // Deterministic heavy-transport domain gate.
 //
-// Weekly scope: road freight with vehicles over 12 t (EU category N3), with
+// Weekly scope: commercial road freight with tachograph-using vehicles or
+// combinations >=3.5 t (including qualifying 3.5-t vehicles and N2/N3), with
 // oversize/abnormal/special transport taking priority (ranking and order are
 // handled in select-candidates.mjs and edition-order.mjs).
 //
@@ -32,7 +33,7 @@ export const HEAVY_TRANSPORT_CONTEXT = new RegExp([
   't[uú]lm[eé]retes', 'agabaritic', 'exceptionee?le? transport', 'uitzonderlijk vervoer', 'spesialtransport',
   'specialtransport', 'dispenstransport', 'erikoiskuljetus',
   // heavy goods vehicles
-  '\\bhgvs?\\b', '\\blgvs?\\b', '(?:category|kategori[ea]|fahrzeugklasse|klasse|cat[eé]gorie) n3', 'n3 (?:vehicles?|trucks?)', 'heavy goods vehicle', 'heavy vehicle', 'goods vehicle', '\\blorr(?:y|ies)\\b',
+  '\\bhgvs?\\b', '\\blgvs?\\b', '(?:category|kategori[ea]|fahrzeugklasse|klasse|cat[eé]gorie) n[23]', 'n[23] (?:vehicles?|trucks?)', 'heavy goods vehicle', 'heavy vehicle', 'goods vehicle', '\\blorr(?:y|ies)\\b',
   '\\btrucks?\\b', '\\blkw\\b', 'lkw-', 'lastwagen', 'schwerverkehr', 'g(?:ü|ue)terverkehr', 'nutzfahrzeug', 'sattelz(?:u|ü)g',
   'autocarr', 'cami(?:ã|a)o', 'cami(?:õ|o)es', '\\bkamyon',
   'poids lourds?', 'v[ée]hicules lourds', '\\bcamion', '\\bcami[oó]n', 'mezzi pesanti', 'veicoli pesanti',
@@ -118,6 +119,6 @@ export function checkTransportDomainRelevance(candidate = {}) {
 
   return {
     ok: false,
-    reason: 'no demonstrated heavy/abnormal/oversize road-transport context - nothing for freight vehicles over 12 t (a generic road, tunnel or bridge mention is not enough)',
+    reason: 'no demonstrated heavy/abnormal/oversize road-transport context - nothing for Weekly's tachograph-using freight-vehicle audience from 3.5 t (a generic road, tunnel or bridge mention is not enough)',
   };
 }

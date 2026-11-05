@@ -53,9 +53,9 @@ it('keeps source-backed regional scope inside the tracked country and rejects an
 });
 
 describe('buildClassifierPrompt', () => {
-  it('keeps the >12 t / oversize scope and never classifies DAJC pages or general driving bans', () => {
+  it('keeps the >=3.5 t tachograph / oversize scope and never classifies DAJC pages or general driving bans', () => {
     const prompt = buildClassifierPrompt(SEARCH_GROUPS[0], []);
-    expect(prompt).toMatch(/vehicles over 12 t, oversize\/abnormal transport first/);
+    expect(prompt).toMatch(/at or above 3\.5 t using tachographs, oversize\/abnormal transport first/);
     expect(prompt).toMatch(/Skip pages from dajc\.eu or dajc\.cz, general recurring truck driving bans/);
     expect(prompt).toContain('["Czechia"]');
   });
@@ -122,7 +122,7 @@ describe('verifySearchItem', () => {
     const html = page({ heading: 'Neuer Radweg eröffnet', text: 'Der neue Radweg entlang der Straße wurde heute eröffnet. '.repeat(4) });
     const result = await verifySearchItem(item(), { fetchPage: okPage(html), now });
     expect(result.ok).toBe(false);
-    expect(result.reason).toMatch(/no freight-vehicle \(>12 t\) or oversize-transport context/);
+    expect(result.reason).toMatch(/no relevant road-freight or oversize-transport context/);
   });
 
   it('never trusts a model date that the page does not show', async () => {
