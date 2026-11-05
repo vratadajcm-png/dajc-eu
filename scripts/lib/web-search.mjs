@@ -25,6 +25,7 @@ import { extractPublicationDate, extractValidityPeriod, findDates } from './publ
 import { checkOperationalRelevance } from './relevance-filter.mjs';
 import { checkTransportDomainRelevance } from './transport-domain.mjs';
 import { looksBinary } from './text-quality.mjs';
+import { providerErrorDetail } from './provider-error.mjs';
 import { FRESHNESS_WINDOW_DAYS, FORWARD_HORIZON_DAYS } from './weekly-eligibility.mjs';
 import {
   sourceTier, isOfficialPublisher, isOwnPublication, needsSecondaryDiscovery, officialDomainsFor,
@@ -467,7 +468,7 @@ export async function searchWithPerplexitySearch(group, request, {
       method: 'POST', headers: { 'content-type': 'application/json', ...headers },
       body: JSON.stringify(payload), signal: AbortSignal.timeout(45000),
     });
-    if (!res.ok) throw new Error('Provider HTTP ' + res.status + ' from ' + new URL(url).hostname);
+    if (!res.ok) throw new Error('Provider HTTP ' + res.status + ' from ' + new URL(url).hostname + await providerErrorDetail(res));
     return res.json();
   };
   const payload = typeof request === 'string' ? { query: request } : request;

@@ -5,6 +5,7 @@
 
 import { dajcEuropeCoverage, geographicScopePolicy } from '../../config/europe-coverage.mjs';
 import { readableText } from './text-quality.mjs';
+import { providerErrorDetail } from './provider-error.mjs';
 
 const DEVELOPMENT_SCHEMA = {
   type: 'object',
@@ -166,7 +167,7 @@ async function claudeStructured(prompt, schema, {
     }),
     signal: AbortSignal.timeout(115000),
   });
-  if (!res.ok) throw new Error('Claude writer rejected request HTTP ' + res.status);
+  if (!res.ok) throw new Error('Claude writer rejected request HTTP ' + res.status + await providerErrorDetail(res));
   const data = await res.json();
   if (data.stop_reason !== 'end_turn') throw new Error('Claude writer response incomplete');
   const output = data.content?.find(c => c.type === 'text')?.text;
