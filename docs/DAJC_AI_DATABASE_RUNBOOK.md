@@ -12,11 +12,11 @@ roles: `verify.sql` 115/115 PASS (67 checks without the Supabase roles).
 Nothing here was run against a Supabase project. Staging target named by the
 owner: **`dajc-staging-e2e`**, ref `lryufeoawdlcpydzuhej`, organisation
 `etnqzdukabzlzfzxqzgw` (HaulBoard), eu-central-1, Postgres 17, last state
-INACTIVE. In the session of 2026-11-05 the Supabase connector was authorised
-only for the organisation "Ferda Ai"; `get_project lryufeoawdlcpydzuhej`
-answered "You do not have permission". The owner has to reconnect the Supabase
-connector with the HaulBoard organisation selected before any step below can
-run from a Claude session.
+INACTIVE. After the owner reconnected the Supabase connector (2026-11-05) the
+organisation is visible (Free plan, all four projects INACTIVE), but
+`restore_project` is refused: "This organization has unpaid invoices. Settle
+outstanding payments before trying to restore project." The steps below can
+run only after the owner settles the invoices and the project is restored.
 
 ## 0. Choose the target (owner)
 

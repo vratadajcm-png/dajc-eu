@@ -34,7 +34,8 @@ verified. **BLOCKED**: needs an external account, contract or owner decision.
 | ABRA Flexi connector and outbox (invoice, payment pairing, fee, credit note, report) | TESTED | simulated ABRA only |
 | VAT / OSS | BLOCKED | rates must be confirmed by the accountant (`DAJC_VAT_RATES_*`) |
 | Database runbook (backup, restore, verify, guarded rollback) | TESTED | rehearsed in CI on Postgres 16 and 17 and locally on 17.11 with Supabase-like roles; not on Supabase |
-| Staging E2E on `dajc-staging-e2e` + Vercel preview with test payments | BLOCKED | no access to the HaulBoard Supabase organisation or the Vercel team (see below) |
+| Deny by default on a real Vercel preview (no DAJC AI variables set) | COMPLETE | preview of `dcf0343` (`dajc-kabe2w3fw-haul-board.vercel.app`, 2026-11-05): `/driving-bans` 200 with the "Ask DAJC · FAQ" entry, `/api/guide/ready` → `{"available":false}`, `/intelligence/ask` and every `/api/ask/{account,billing,billing/webhook,maintenance}/*` route tried → 404; security headers (CSP, HSTS, `X-Frame-Options: DENY`, `noindex`) present |
+| Staging E2E on `dajc-staging-e2e` with test payments | BLOCKED | Supabase refuses to restore the project: "This organization has unpaid invoices" (see below) |
 | Shared learning from customer content | BLOCKED | legal policy not approved (constant `false`) |
 | Microsoft / Azure AI | NOT IMPLEMENTED | no adapter, keys or contract; Azure OpenAI would add no vendor independence |
 | Licensed routing / live road restrictions | NOT IMPLEMENTED (interface only) | `NO_ROUTING` states it to users; no data contract |
@@ -50,25 +51,25 @@ verified. **BLOCKED**: needs an external account, contract or owner decision.
 | Legal | NOT READY | operator entity, terms, privacy notice, refund policy, shared-learning policy need approval |
 | Payments | NOT READY | no merchant contract or provider test account verified |
 | Accounting | NOT READY | no ABRA test company; VAT/OSS rates unconfirmed; no legal entity to issue documents |
-| Infrastructure | BLOCKED | Supabase connector not authorised for the HaulBoard organisation; Vercel connector not authorised for the team `haul-board` |
+| Infrastructure | BLOCKED | connectors now reach the HaulBoard Supabase organisation (Free plan) and the Vercel team `haul-board`; restoring `dajc-staging-e2e` is refused by Supabase because the organisation has unpaid invoices |
 
 **Overall: NOT READY for production. TECHNICALLY READY for a staging dry run**
 once the staging database and the preview environment are reachable.
 
 ## Remaining real blockers (owner actions)
 
-1. **Supabase** — reconnect the Supabase connector in claude.ai (Settings →
-   Connectors → Supabase → disconnect / connect) and, in Supabase's
-   authorisation screen, select the organisation **HaulBoard**
-   (`etnqzdukabzlzfzxqzgw`). Then start a new session. Until then
-   `get_project lryufeoawdlcpydzuhej` answers "You do not have permission" and
-   the pause reason, plan and restore cost of `dajc-staging-e2e` cannot be read.
-   Restore only after the owner confirms the cost (free for an inactivity pause
-   on the Free plan).
-2. **Vercel** — approve the connector for the team `haul-board`
-   (`team_VlxT3ykRmbVKj5DBnySvjCJA`) with a fresh single-use link (valid 10
-   minutes); only the preview environment of `dajc-eu`
-   (`prj_DOUOzfClWtxYRSw4vm6Alqf8iACD`) will be configured, never production.
+1. **Supabase invoices** — access works (organisation HaulBoard, Free plan;
+   `dajc-staging-e2e`, Postgres 17.6, eu-central-1, INACTIVE like the other
+   three projects). `restore_project` answered on 2026-11-05: *"This
+   organization has unpaid invoices. Settle outstanding payments before trying
+   to restore project."* Settling them is the owner's decision (Supabase
+   dashboard → Organization → Billing → Invoices). Restoring a Free project
+   paused for inactivity is itself free, within 90 days of the pause. No other
+   project was touched and no new project was created.
+2. **Vercel** — resolved: the connector reaches the team `haul-board` and the
+   project `dajc-eu`. No variable was added or changed; the project has no
+   DAJC AI variables, so DAJC AI is off in every environment. Preview
+   deployments are behind Vercel Authentication.
 3. **Ask keys for the preview orchestrator** — Ask's own keys of at least two
    vendors and a preview budget (`DAJC_ASK_MONTHLY_BUDGET_EUR`,
    `DAJC_ASK_DAILY_BUDGET_EUR`); without them the routing stays off.
