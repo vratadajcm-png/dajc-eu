@@ -17,7 +17,7 @@ export type KnowledgeStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'REVOKED';
 export interface LearningProposal {
   id: string;
   origin: ProposalOrigin;
-  topic: Exclude<Topic, 'driving_ban'>;
+  topic: Topic;
   jurisdiction: string | null;
   scope: KnowledgeScope;
   organisationId: string | null;
