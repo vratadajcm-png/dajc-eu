@@ -21,6 +21,13 @@
       "postId": "6ae4db9a10a950f13737f75d",
       "postUrl": null,
       "publishedAt": "2026-10-30T18:02:03.458Z"
+    },
+    "eu-oversize-weekly-2026-w46": {
+      "approvedText": "A4 Wiehltal bridge: closures towards Olpe from 9 Nov for a barrier aimed at trucks over 44 t. Check routing before dispatch. Read the full EU Oversize Weekly: https://www.dajc.eu/news/eu-oversize/eu-oversize-weekly-2026-w46",
+      "status": "pending",
+      "sourceUrl": "https://www.dajc.eu/news/eu-oversize/eu-oversize-weekly-2026-w46",
+      "reservedByRunId": "42279557717",
+      "reservedAt": "2026-11-06T19:26:02.667Z"
     }
   }
 }
