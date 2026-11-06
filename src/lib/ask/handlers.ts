@@ -53,12 +53,41 @@ export function originAllowed(request: Request, runtime: AskRuntime): boolean {
   return Boolean(origin && new Set([runtime.config.publicOrigin, ...PUBLIC_ORIGINS]).has(origin));
 }
 
-export async function readJson(request: Request, maxBytes = MAX_BODY_BYTES): Promise<Record<string, unknown> | null> {
-  if (!(request.headers.get('content-type') || '').toLowerCase().includes('application/json')) return null;
+/**
+ * The request body as UTF-8 text, read in chunks and abandoned as soon as it
+ * exceeds maxBytes (bytes, not characters), whatever Content-Length claims or
+ * omits. null when it is too large. Decodes like Request.text().
+ */
+export async function readBodyLimited(request: Request, maxBytes: number): Promise<string | null> {
   const declared = Number(request.headers.get('content-length') || 0);
   if (declared > maxBytes) return null;
-  const text = await request.text();
-  if (text.length > maxBytes) return null;
+  if (!request.body) return '';
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > maxBytes) {
+      await reader.cancel().catch(() => undefined);
+      return null;
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder('utf-8').decode(bytes);
+}
+
+export async function readJson(request: Request, maxBytes = MAX_BODY_BYTES): Promise<Record<string, unknown> | null> {
+  if (!(request.headers.get('content-type') || '').toLowerCase().includes('application/json')) return null;
+  const text = await readBodyLimited(request, maxBytes);
+  if (text === null) return null;
   try {
     const parsed = JSON.parse(text);
     return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;

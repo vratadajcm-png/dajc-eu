@@ -18,6 +18,34 @@ organisation is visible (Free plan, all four projects INACTIVE), but
 outstanding payments before trying to restore project." The steps below can
 run only after the owner settles the invoices and the project is restored.
 
+## One command (once the project is restored)
+
+`scripts/dajc-ai-db/staging-dry-run.sh` runs steps 1–4 below and creates the
+app role password, additively and without printing a secret:
+
+```bash
+ADMIN_URL='postgres://postgres:<password>@db.lryufeoawdlcpydzuhej.supabase.co:5432/postgres' \
+CONFIRM_TARGET='db.lryufeoawdlcpydzuhej.supabase.co/postgres' \
+SCRATCH_ADMIN_URL='postgres://postgres@127.0.0.1:5432/postgres' \
+RUN_TESTS=1 scripts/dajc-ai-db/staging-dry-run.sh
+```
+
+It refuses to run unless `CONFIRM_TARGET` repeats the target host and
+database; dumps with the server's own major version (schema of the whole
+database, plus `dajc_ask` data if present) and records SHA-256 hashes; proves
+the dump restores on a throwaway server; applies `drizzle-ask/0000`–`0003`
+through drizzle's bookkeeping (already applied files are skipped); runs
+`verify.sql`; sets the `dajc_ask_app` password as a SCRAM-SHA-256 verifier
+computed locally (`scram-verifier.mjs`), so the password never reaches the
+server, its statement log or the process list; writes the app connection
+string to `<OUT_DIR>/dajc-ask-app.url` (0600) and checks that the role signs in
+without BYPASSRLS; optionally runs the store contract tests as that role. Each
+run rotates the app password. Rehearsed on 2026-11-05 against a fresh
+Postgres 17.11 database with the Supabase roles: backup + restore proof,
+4 migrations, `verify.sql` 115/115, sign-in, 43 store tests; a second run was
+idempotent; a wrong `CONFIRM_TARGET` was refused; the password was found only
+in the 0600 file (not in other outputs or the server log).
+
 ## 0. Choose the target (owner)
 
 - Use an **existing staging project** (e.g. `dajc-staging-e2e`); never create a

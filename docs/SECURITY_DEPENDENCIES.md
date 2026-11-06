@@ -26,3 +26,12 @@ glob/minimatch chain, build only). No production-reachable advisory remains.
 Verification after the update: full CI equivalent (lints, Driving Bans audit,
 `astro check`, all unit tests, Postgres integration, build, client-bundle
 secret scan) — see the PR description for the counts.
+
+## Re-check 2026-11-05 (late)
+
+`npm audit`: unchanged, 5 advisories (1 high `zod` direct, not reachable; 4
+moderate in the build-time chain `@astrojs/vercel` → `@vercel/nft` → `glob` →
+`minimatch`). The newest `@vercel/nft` (1.11.1) still depends on `glob@^13`,
+inside the advisory range, so no upstream fix exists yet; nothing changed in
+the lockfile. `dependency-guards.test.ts` passes.
+

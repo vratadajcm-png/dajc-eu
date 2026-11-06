@@ -38,6 +38,8 @@ verified. **BLOCKED**: needs an external account, contract or owner decision.
 | Maintenance endpoints on a real Vercel preview | COMPLETE | redeploy of `58756a0` with only `DAJC_AI_MAINTENANCE_SECRET` (sensitive, Preview, branch `claude/blissful-cori-vo1iyy`): no or wrong bearer → 404; `preflight` → 200 naming every missing setting by name, without the secret's value; `health` / `run` without the runtime → 404; POST without a JSON content type → 403 from Astro's origin check (documented) |
 | CSRF with GP webpay return by GET or POST | COMPLETE | Astro's same-origin rule kept site-wide in `src/lib/security/origin-check.ts` (parity test against Astro's implementation, > 2 000 combinations) with one exception: the RSA-signed GP return POST (exact path, url-encoded, ≤ 8 KB); verified in the running app (cross-site form POSTs elsewhere → 403) and by `gpwebpay-return.test.ts` (signed GET/POST settle once, forged/oversized/wrongly encoded → failed, other methods 405) |
 | Maintenance bearer rotation | COMPLETE | deployments store only `DAJC_AI_MAINTENANCE_SECRET_SHA256`; the first preview bearer was rotated on 2026-11-05 and verified on the preview (old bearer → 404, hash as bearer → 404, new bearer → 200, no runtime log lines) |
+| Staging database dry run, one command | COMPLETE (script) / BLOCKED (target) | `scripts/dajc-ai-db/staging-dry-run.sh` rehearsed on a fresh Postgres 17.11 database with Supabase roles: backup + SHA-256 manifest + restore proof, 4 migrations, `verify.sql` 115/115, app role password as a locally computed SCRAM verifier (never printed or logged), sign-in without BYPASSRLS, 43 store tests; idempotent; wrong target refused |
+| Bounded request bodies | COMPLETE | JSON, webhook and GP return bodies are read in chunks and abandoned past the limit whatever `Content-Length` says (`body-limit.test.ts`) |
 | Staging E2E on `dajc-staging-e2e` with test payments | BLOCKED | Supabase refuses to restore the project: "This organization has unpaid invoices" (see below) |
 | Shared learning from customer content | BLOCKED | legal policy not approved (constant `false`) |
 | Microsoft / Azure AI | NOT IMPLEMENTED | no adapter, keys or contract; Azure OpenAI would add no vendor independence |
@@ -56,7 +58,7 @@ verified. **BLOCKED**: needs an external account, contract or owner decision.
 | Accounting | NOT READY | no ABRA test company; VAT/OSS rates unconfirmed; no legal entity to issue documents |
 | Infrastructure | BLOCKED | connectors now reach the HaulBoard Supabase organisation (Free plan) and the Vercel team `haul-board`; restoring `dajc-staging-e2e` is refused by Supabase because the organisation has unpaid invoices |
 
-**Overall: NOT READY for production. TECHNICALLY READY for a staging dry run**
+**Overall: NOT READY for production. TECHNICALLY READY for a staging dry run** (RC1 criteria: `docs/DAJC_AI_RC1_CHECKLIST.md`)
 once the staging database and the preview environment are reachable.
 
 ## Remaining real blockers (owner actions)

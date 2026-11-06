@@ -14,7 +14,7 @@ import {
 import type { AccountRuntime } from './account/runtime';
 import type { AskEnv } from './config';
 import { decideRefund, paymentManagementUrl, processWebhook, requestCancellation, requestRefund, startCheckout, subscriptionStatus, accessOf } from './billing/service';
-import { COOKIE_PATH, json, notFound, originAllowed, readJson, sessionToken, type RouteContext } from './handlers';
+import { COOKIE_PATH, json, notFound, originAllowed, readBodyLimited, readJson, sessionToken, type RouteContext } from './handlers';
 import { t, uiLang, type UiLang } from './i18n';
 import { approve, confirmSource, propose, reject, revoke, verifyIndependently } from './learning/workflow';
 import { billingDeps } from './paid/runtime';
@@ -212,9 +212,9 @@ const WEBHOOK_PATH: Record<string, string> = { stripe: 'STRIPE', revolut: 'REVOL
 export async function handleBillingWebhook(provider: string, ctx: RouteContext, rt: AccountRuntime | null): Promise<Response> {
   if (!rt?.paidRuntime || WEBHOOK_PATH[provider] !== rt.paidRuntime.adapter.provider) return notFound();
   if (ctx.request.method !== 'POST') return json({ ok: false }, 405);
-  if (Number(ctx.request.headers.get('content-length') || 0) > WEBHOOK_MAX_BYTES) return json({ ok: false }, 413);
-  const rawBody = await ctx.request.text();
-  if (rawBody.length > WEBHOOK_MAX_BYTES) return json({ ok: false }, 413);
+  // Signatures cover the exact body, decoded exactly like Request.text().
+  const rawBody = await readBodyLimited(ctx.request, WEBHOOK_MAX_BYTES);
+  if (rawBody === null) return json({ ok: false }, 413);
   try {
     const result = await processWebhook({ rawBody, headers: ctx.request.headers }, billingDeps(rt.paidRuntime));
     if (result.status === 'auth_failed') return json({ ok: false }, 400);
@@ -240,10 +240,8 @@ async function gpReturnParams(request: Request, url: URL): Promise<URLSearchPara
   if (request.method !== 'POST') return null;
   const mediaType = (request.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase();
   if (mediaType !== 'application/x-www-form-urlencoded') return null;
-  if (Number(request.headers.get('content-length') || 0) > GP_RETURN_MAX_BYTES) return null;
-  const body = await request.text();
-  if (body.length > GP_RETURN_MAX_BYTES) return null;
-  return new URLSearchParams(body);
+  const body = await readBodyLimited(request, GP_RETURN_MAX_BYTES);
+  return body === null ? null : new URLSearchParams(body);
 }
 
 export async function handleBillingReturn(provider: string, ctx: RouteContext, rt: AccountRuntime | null): Promise<Response> {
