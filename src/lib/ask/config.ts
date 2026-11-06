@@ -13,6 +13,8 @@
 // models). Those variables are only compared here, never read for use, so a
 // copied key is rejected instead of silently sharing their quota.
 
+import { orchestratedPricing, orchestratedStatus } from './orchestrated';
+
 export type AskEnv = Record<string, string | undefined>;
 
 export interface AskModelPrice {
@@ -31,6 +33,8 @@ export interface AskPricing {
 }
 
 export interface AskConfig {
+  /** direct: OpenAI drafts, Anthropic checks (providers.ts). orchestrator: shared multi-vendor orchestrator (orchestrated.ts). */
+  routing: 'direct' | 'orchestrator';
   dbUrl: string;
   openaiKey: string;
   classifierModel: string;
@@ -64,6 +68,12 @@ const SEPARATE_KEYS: Array<[ask: string, other: string]> = [
   ['DAJC_ASK_OPENAI_API_KEY', 'DAJC_RESEARCH_OPENAI_API_KEY'],
   ['DAJC_ASK_ANTHROPIC_API_KEY', 'DAJC_RESEARCH_ANTHROPIC_API_KEY'],
   ['DAJC_ASK_PERPLEXITY_API_KEY', 'DAJC_RESEARCH_PERPLEXITY_API_KEY'],
+  ['DAJC_ASK_GEMINI_API_KEY', 'DAJC_RESEARCH_GEMINI_API_KEY'],
+  ['DAJC_ASK_XAI_API_KEY', 'DAJC_RESEARCH_XAI_API_KEY'],
+  ['DAJC_ASK_MISTRAL_API_KEY', 'DAJC_RESEARCH_MISTRAL_API_KEY'],
+  ['DAJC_ASK_GEMINI_API_KEY', 'GEMINI_API_KEY'],
+  ['DAJC_ASK_XAI_API_KEY', 'XAI_API_KEY'],
+  ['DAJC_ASK_MISTRAL_API_KEY', 'MISTRAL_API_KEY'],
 ];
 
 const REQUIRED = [
@@ -79,6 +89,25 @@ const REQUIRED = [
   'DAJC_ASK_MONTHLY_BUDGET_EUR',
   'DAJC_ASK_EMAIL_PEPPER',
 ] as const;
+
+// With orchestrated routing, providers, models and prices come from the
+// orchestrator settings (DAJC_ASK_<PROVIDER>_*, DAJC_ASK_PROVIDER_PRICING_USD).
+// A daily budget is required as well: a misrouted failover must stop within a day.
+const REQUIRED_ORCHESTRATED = [
+  'DAJC_ASK_DB_URL',
+  'DAJC_ASK_PROVIDER_PRICING_USD',
+  'DAJC_ASK_USD_EUR_RATE',
+  'DAJC_ASK_MONTHLY_BUDGET_EUR',
+  'DAJC_ASK_DAILY_BUDGET_EUR',
+  'DAJC_ASK_EMAIL_PEPPER',
+] as const;
+
+/**
+ * Orchestrated routing is approved for an isolated preview (and local runs)
+ * only. Production keeps the direct routing until the owner releases it in
+ * code review.
+ */
+export const DAJC_ASK_ORCHESTRATOR_PRODUCTION_RELEASED = false;
 
 /** The central feature flag. Exactly "true" - anything else is off. */
 export function isAskFlagOn(env: AskEnv = process.env): boolean {
@@ -141,15 +170,27 @@ export interface AskConfigResult {
  */
 export function readAskConfig(env: AskEnv = process.env): AskConfigResult {
   const problems: string[] = [];
-  for (const name of REQUIRED) {
+  const routing: AskConfig['routing'] = env.DAJC_ASK_AI_ROUTING === 'orchestrator' ? 'orchestrator' : 'direct';
+  for (const name of routing === 'orchestrator' ? REQUIRED_ORCHESTRATED : REQUIRED) {
     if (!env[name]?.trim()) problems.push(`${name} is missing`);
   }
   for (const [ask, other] of SEPARATE_KEYS) {
     if (env[ask] && env[ask] === env[other]) problems.push(`${ask} must be a separate key from ${other}`);
   }
 
-  const pricing = parsePricing(env.DAJC_ASK_PRICING_USD);
-  if (env.DAJC_ASK_PRICING_USD && !pricing) problems.push('DAJC_ASK_PRICING_USD is not valid pricing JSON');
+  let pricing: AskPricing | null;
+  if (routing === 'orchestrator') {
+    if (env.VERCEL_ENV === 'production' && !DAJC_ASK_ORCHESTRATOR_PRODUCTION_RELEASED) {
+      problems.push('DAJC_ASK_AI_ROUTING=orchestrator is not released for production (preview or local runs only)');
+    }
+    const status = orchestratedStatus(env);
+    if (!status.independent) problems.push('DAJC_ASK_AI_ROUTING=orchestrator needs configured models of at least two vendors (an answer and its independent check never share a vendor)');
+    pricing = orchestratedPricing(env);
+    if (env.DAJC_ASK_PROVIDER_PRICING_USD && !pricing) problems.push('DAJC_ASK_PROVIDER_PRICING_USD has no price for a configured model on the classify, answer and verify routes');
+  } else {
+    pricing = parsePricing(env.DAJC_ASK_PRICING_USD);
+    if (env.DAJC_ASK_PRICING_USD && !pricing) problems.push('DAJC_ASK_PRICING_USD is not valid pricing JSON');
+  }
   const usdToEur = positiveNumber(env.DAJC_ASK_USD_EUR_RATE, 10);
   if (env.DAJC_ASK_USD_EUR_RATE && usdToEur === null) problems.push('DAJC_ASK_USD_EUR_RATE must be a positive number');
   const monthlyBudgetEur = positiveNumber(env.DAJC_ASK_MONTHLY_BUDGET_EUR, 10_000);
@@ -181,13 +222,15 @@ export function readAskConfig(env: AskEnv = process.env): AskConfigResult {
     ok: true,
     problems: [],
     config: {
+      routing,
       dbUrl: env.DAJC_ASK_DB_URL!.trim(),
-      openaiKey: env.DAJC_ASK_OPENAI_API_KEY!.trim(),
-      classifierModel: env.DAJC_ASK_OPENAI_CLASSIFIER_MODEL!.trim(),
-      answerModel: env.DAJC_ASK_OPENAI_ANSWER_MODEL!.trim(),
-      anthropicKey: env.DAJC_ASK_ANTHROPIC_API_KEY!.trim(),
-      verifierModel: env.DAJC_ASK_ANTHROPIC_VERIFIER_MODEL!.trim(),
-      perplexityKey: env.DAJC_ASK_PERPLEXITY_API_KEY!.trim(),
+      // Orchestrated routing picks models per task and provider itself.
+      openaiKey: env.DAJC_ASK_OPENAI_API_KEY?.trim() ?? '',
+      classifierModel: env.DAJC_ASK_OPENAI_CLASSIFIER_MODEL?.trim() || 'orchestrated',
+      answerModel: env.DAJC_ASK_OPENAI_ANSWER_MODEL?.trim() || 'orchestrated',
+      anthropicKey: env.DAJC_ASK_ANTHROPIC_API_KEY?.trim() ?? '',
+      verifierModel: env.DAJC_ASK_ANTHROPIC_VERIFIER_MODEL?.trim() || 'orchestrated',
+      perplexityKey: env.DAJC_ASK_PERPLEXITY_API_KEY?.trim() ?? '',
       pricing,
       usdToEur,
       monthlyBudgetEur,

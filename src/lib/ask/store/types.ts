@@ -31,7 +31,7 @@ export interface MetricRow {
   day: string;
   level: 'VERIFIED' | 'PARTIAL' | 'UNKNOWN' | 'INSUFFICIENT_VERIFIED_DATA' | 'SYSTEM_ERROR';
   language: string;
-  path: 'own' | 'web' | 'mixed' | 'none';
+  path: 'own' | 'web' | 'mixed' | 'none' | 'cache';
   costMicro: number;
   latencyMs: number;
 }

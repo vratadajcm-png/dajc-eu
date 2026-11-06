@@ -61,6 +61,39 @@ export const TASK_DATA_CLASSES = Object.freeze({ discover: ['public-legal'], ext
 // Tasks that read a legal document, where the document language counts.
 const DOCUMENT_TASKS = ['extract', 'verify'];
 
+/**
+ * Ask DAJC AI / paid DAJC AI on the same orchestrator (routing, independent check at
+ * another vendor, budgets, retries, circuit breaker, failover, audit) with its own
+ * tasks, keys and data classes. Research tasks and their data classes stay exactly as
+ * above; a research call can never carry a user's question and vice versa.
+ * - user-question: a user's question with e-mail addresses and phone numbers redacted,
+ *   plus public sources (official pages, verified registry records);
+ * - customer-consented: a document or saved parameters a user explicitly consented to
+ *   send to an AI provider (DOCUMENT_ANALYSIS / AI_PERSONAL_CONTEXT).
+ */
+export const ASK_TASKS = Object.freeze(['discover', 'ask_classify', 'ask_answer', 'ask_verify', 'ask_document']);
+export const ASK_DATA_CLASSES = Object.freeze(['public-legal', 'user-question', 'customer-consented']);
+export const ASK_TASK_DATA_CLASSES = Object.freeze({ discover: ['public-legal'], ask_classify: ['user-question', 'customer-consented'], ask_answer: ['user-question', 'customer-consented'], ask_verify: ['user-question', 'customer-consented'], ask_document: ['customer-consented'] });
+export const ASK_DEFAULT_ROUTES = Object.freeze({
+  discover: ['perplexity'],
+  ask_classify: ['openai', 'gemini', 'xai', 'mistral', 'anthropic'],
+  ask_answer: ['openai', 'gemini', 'anthropic', 'xai', 'mistral'],
+  // Independent check: always another vendor than the answer (excludeVendors).
+  ask_verify: ['anthropic', 'gemini', 'openai', 'xai', 'mistral'],
+  ask_document: ['openai', 'gemini', 'anthropic'],
+});
+export const ASK_POLICY = Object.freeze({ tasks: ASK_TASKS, knownClasses: ASK_DATA_CLASSES, dataClasses: ASK_TASK_DATA_CLASSES, label: 'DAJC AI answers' });
+const RESEARCH_POLICY = Object.freeze({ tasks: RESEARCH_TASKS, knownClasses: DATA_CLASSES, dataClasses: TASK_DATA_CLASSES, label: null });
+
+/** DAJC_ASK_ROUTE_ASK_ANSWER="gemini,openai" etc.; unknown ids are dropped. */
+export function askRoutesFromEnv(env = process.env) {
+  return Object.fromEntries(ASK_TASKS.map(task => {
+    const raw = env[`DAJC_ASK_ROUTE_${task.toUpperCase()}`];
+    const list = raw ? [...new Set(raw.split(',').map(value => value.trim()).filter(value => PROVIDER_IDS.includes(value)))] : [];
+    return [task, list.length ? list : [...ASK_DEFAULT_ROUTES[task]]];
+  }));
+}
+
 export class BudgetExceededError extends Error {
   constructor(message) { super(message); this.name = 'BudgetExceededError'; }
 }
@@ -147,6 +180,8 @@ export function createOrchestrator({
   onAudit = () => {},
   // Providers already refused earlier in the same run (id -> category), e.g. by a previous check.
   blocked = {},
+  // Which tasks and data classes this orchestrator serves (research by default, ASK_POLICY for DAJC AI).
+  policy = RESEARCH_POLICY,
 }) {
   if (!limits) throw new Error('Explicit research limits are required');
   const state = new Map(PROVIDER_IDS.map(id => [id, { failures: 0, openUntil: 0, blocked: blocked[id] ?? null, lastCallAt: null }]));
@@ -170,7 +205,7 @@ export function createOrchestrator({
   }
 
   function candidates(task, { excludeVendors = [], needsPdf = false, dataClass, complex }) {
-    if (!DATA_CLASSES.includes(dataClass)) throw new Error(`Unknown data class ${dataClass}`);
+    if (!policy.knownClasses.includes(dataClass)) throw new Error(`Unknown data class ${dataClass}`);
     const reasons = [];
     const eligible = [];
     for (const id of (task === 'extract' && complex ? routes.extract_complex ?? routes.extract : routes[task]) ?? []) {
@@ -178,7 +213,7 @@ export function createOrchestrator({
       const spec = PROVIDER_CATALOG[id];
       if (!provider?.configured) { reasons.push(`${id}: not configured`); continue; }
       // Customer data (vehicles, routes, organisations, tenants) never goes to a provider.
-      if (!TASK_DATA_CLASSES[task].includes(dataClass)) { reasons.push(`${id}: data class ${dataClass} not allowed for ${task === 'explain' ? 'explanations' : 'research'}`); continue; }
+      if (!policy.dataClasses[task]?.includes(dataClass)) { reasons.push(`${id}: data class ${dataClass} not allowed for ${policy.label ?? (task === 'explain' ? 'explanations' : 'research')}`); continue; }
       if (state.get(id).blocked) { reasons.push(`${id}: blocked for this run (${state.get(id).blocked})`); continue; }
       if (excludeVendors.includes(spec.vendor)) { reasons.push(`${id}: same vendor as the checked step`); continue; }
       if (needsPdf && !spec.capabilities.includes('pdf')) { reasons.push(`${id}: no PDF input`); continue; }
@@ -241,7 +276,7 @@ export function createOrchestrator({
    * request: provider request; meta: { purpose, subject, dataClass, excludeVendors, needsPdf, language, escalate }.
    */
   async function run(task, request, meta = {}) {
-    if (!RESEARCH_TASKS.includes(task)) throw new Error(`Unknown research task ${task}`);
+    if (!policy.tasks.includes(task)) throw new Error(`Unknown ${policy.label ? 'DAJC AI' : 'research'} task ${task}`);
     const dataClass = meta.dataClass ?? (task === 'explain' ? 'verified-registry' : 'public-legal');
     // A PDF is estimated at one token per 20 bytes, deliberately on the high side.
     const estimatedInput = task === 'discover' ? 0 : estimateTokens(request.system) + estimateTokens(request.user) + (request.document ? Math.ceil(request.document.base64.length * 0.75 / 20) : 0);

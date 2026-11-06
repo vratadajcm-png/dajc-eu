@@ -21,6 +21,10 @@ export class ProviderError extends Error {
 export interface ModelResult<T> {
   json: T;
   usage: { inputTokens: number; outputTokens: number };
+  /** Actual cost reported by the orchestrator for the model it used (orchestrated routing). */
+  costUsd?: number;
+  provider?: string;
+  model?: string;
 }
 
 export interface JsonCallParams {
@@ -31,8 +35,17 @@ export interface JsonCallParams {
   schema: Record<string, unknown>;
   maxOutputTokens: number;
   signal?: AbortSignal;
+  /** One PDF sent as data (paid permit extraction, with the user's consent). */
+  file?: { filename: string; base64: string };
 }
 
+/**
+ * The two roles of the answer pipeline. Their names come from the original
+ * two-vendor setup: `openaiJson` = classification, answer draft and document
+ * reading; `anthropicJson` = the independent check. With orchestrated routing
+ * (orchestrated.ts) each role can run at any configured vendor, and the check
+ * always at another vendor than the answer.
+ */
 export interface Providers {
   openaiJson<T>(params: JsonCallParams): Promise<ModelResult<T>>;
   anthropicJson<T>(params: JsonCallParams): Promise<ModelResult<T>>;
@@ -66,14 +79,17 @@ function parseJson<T>(provider: ProviderError['provider'], text: unknown): T {
 
 export function createProviders({ openaiKey, anthropicKey, perplexityKey, fetchFn = fetch }: { openaiKey: string; anthropicKey: string; perplexityKey: string; fetchFn?: FetchFn }): Providers {
   return {
-    async openaiJson<T>({ model, system, user, schemaName, schema, maxOutputTokens, signal }: JsonCallParams): Promise<ModelResult<T>> {
+    async openaiJson<T>({ model, system, user, schemaName, schema, maxOutputTokens, signal, file }: JsonCallParams): Promise<ModelResult<T>> {
+      const userContent = file
+        ? [{ type: 'input_file', filename: file.filename, file_data: `data:application/pdf;base64,${file.base64}` }, { type: 'input_text', text: user }]
+        : user;
       const response = await postJson(fetchFn, 'openai', 'https://api.openai.com/v1/responses', { authorization: `Bearer ${openaiKey}` }, {
         model,
         store: false,
         max_output_tokens: maxOutputTokens,
         input: [
           { role: 'system', content: system },
-          { role: 'user', content: user },
+          { role: 'user', content: userContent },
         ],
         text: { format: { type: 'json_schema', name: schemaName, schema, strict: true } },
       }, signal);

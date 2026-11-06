@@ -40,3 +40,11 @@ Status: **development only**; NOT a release authorization. The existing **Ask DA
 - Keep live flags and paid checkout disabled until the owner approves customer release.
 
 This PR targets #90 as a stacked draft so it can reuse the existing Ask implementation; it must NOT be merged into main ahead of its dependencies.
+
+## Update — integration of the remaining gates
+
+The account, paid subscription, billing adapters, accounting outbox, controlled
+learning workflow and their tests are documented in
+[DAJC_AI_PAID_OPERATIONS.md](DAJC_AI_PAID_OPERATIONS.md), with the state of each
+area (IMPLEMENTED / TECHNICALLY READY / PRODUCTION READY), the launch runbook,
+rollback and the remaining external blockers. All release constants stay false.

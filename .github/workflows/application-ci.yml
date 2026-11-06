@@ -61,3 +61,87 @@ jobs:
           path: artifacts/driving-bans/
           if-no-files-found: warn
           retention-days: 14
+
+  # Real-database checks for Ask DAJC AI / paid DAJC AI: migrations 0000-0003
+  # applied with an administrative role, tests connected as the
+  # least-privileged dajc_ask_app role (RLS, grants, atomic limits,
+  # idempotent payment events, append-only audit). Throwaway service
+  # container only - no Supabase or production database is touched.
+  # Postgres 16 and 17 (the Supabase staging project dajc-staging-e2e runs 17),
+  # with the Supabase API roles emulated so the REVOKE paths and the
+  # "no anon/authenticated access" checks of verify.sql are exercised.
+  ask-postgres-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres: ['16', '17']
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres }}
+        env:
+          POSTGRES_PASSWORD: ci-admin-only
+          POSTGRES_DB: dajc_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply dajc_ask migrations (admin connection, CI only)
+        env:
+          PGPASSWORD: ci-admin-only
+        run: |
+          # Supabase-like API roles with the default grants Supabase gives them on public.
+          psql -h localhost -U postgres -d dajc_ci -v ON_ERROR_STOP=1 -q -c "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN BYPASSRLS; GRANT USAGE ON SCHEMA public TO anon, authenticated; ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated;"
+          for file in drizzle-ask/0*.sql; do
+            echo "applying $file"
+            sed 's/--> statement-breakpoint//' "$file" | psql -h localhost -U postgres -d dajc_ci -v ON_ERROR_STOP=1 -q
+          done
+          psql -h localhost -U postgres -d dajc_ci -v ON_ERROR_STOP=1 -q -c "ALTER ROLE dajc_ask_app WITH LOGIN PASSWORD 'ci-app-only'"
+
+      - name: Verify grants, RLS and constraints after migration
+        env:
+          PGPASSWORD: ci-admin-only
+        run: psql -h localhost -U postgres -d dajc_ci -v ON_ERROR_STOP=1 -f scripts/dajc-ai-db/verify.sql
+
+      - name: Store contract tests against Postgres as dajc_ask_app
+        env:
+          DAJC_ASK_TEST_DB_URL: postgres://dajc_ask_app:ci-app-only@localhost:5432/dajc_ci
+        run: npx vitest run src/lib/ask/__tests__/store.test.ts src/lib/ask/__tests__/paid-store.test.ts src/lib/ask/__tests__/e2e-lifecycle.test.ts
+
+      - name: Backup, restore, guarded rollback and re-apply (runbook rehearsal)
+        env:
+          PGPASSWORD: ci-admin-only
+        run: |
+          set -euo pipefail
+          psql_admin() { psql -h localhost -U postgres -v ON_ERROR_STOP=1 -q "$@"; }
+          # Dump and restore with the server's own major version (the runner's newer
+          # client tools write settings a Postgres 16 server rejects).
+          pg_container='${{ job.services.postgres.id }}'
+          docker exec "$pg_container" pg_dump -U postgres -d dajc_ci --schema=dajc_ask -Fc -f /tmp/dajc_ask.dump
+          psql_admin -d dajc_ci -c "CREATE DATABASE dajc_restore"
+          docker exec "$pg_container" pg_restore -U postgres -d dajc_restore --exit-on-error /tmp/dajc_ask.dump
+          psql_admin -d dajc_restore -f scripts/dajc-ai-db/verify.sql
+          test "$(psql_admin -d dajc_ci -tAc 'select count(*) from dajc_ask.users')" = "$(psql_admin -d dajc_restore -tAc 'select count(*) from dajc_ask.users')"
+          # Without the explicit confirmation the rollback must refuse.
+          if psql_admin -d dajc_restore -f scripts/dajc-ai-db/rollback-0003-0002.sql; then echo "rollback ran without confirmation"; exit 1; fi
+          { echo "SET dajc_ask.confirm_rollback = 'drop paid DAJC AI tables';"; cat scripts/dajc-ai-db/rollback-0003-0002.sql; } | psql_admin -d dajc_restore
+          test "$(psql_admin -d dajc_restore -tAc "select count(*) from pg_tables where schemaname = 'dajc_ask'")" = "8"
+          for file in drizzle-ask/0002_*.sql drizzle-ask/0003_*.sql; do sed 's/--> statement-breakpoint//' "$file" | psql_admin -d dajc_restore; done
+          psql_admin -d dajc_restore -f scripts/dajc-ai-db/verify.sql

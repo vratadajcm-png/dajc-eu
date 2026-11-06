@@ -8,8 +8,24 @@ import { onRequest } from '../../middleware';
 const ENV_KEY = 'DAJC_PARTNER_PORTAL_ENABLED';
 
 function fakeContext(pathname: string) {
-  return { url: new URL(`https://www.dajc.eu${pathname}`) } as Parameters<typeof onRequest>[0];
+  // Astro always passes the request; the middleware's first step (the
+  // same-origin check) reads it.
+  const url = new URL(`https://www.dajc.eu${pathname}`);
+  return { url, request: new Request(url), isPrerendered: false } as Parameters<typeof onRequest>[0];
 }
+
+describe('same-origin check runs before every other middleware step', () => {
+  it('refuses a cross-site form POST to any on-demand route, private or public', async () => {
+    for (const path of ['/partner-portal/login', '/platform', '/api/ask/account/delete', '/intelligence/ask']) {
+      const url = new URL(`https://www.dajc.eu${path}`);
+      const request = new Request(url, { method: 'POST', headers: { origin: 'https://evil.example', 'content-type': 'application/x-www-form-urlencoded' }, body: 'a=1' });
+      let reached = false;
+      const result = await onRequest({ url, request, isPrerendered: false } as Parameters<typeof onRequest>[0], async () => { reached = true; return new Response('ok'); });
+      expect((result as Response).status, path).toBe(403);
+      expect(reached, path).toBe(false);
+    }
+  });
+});
 
 // onRequest's real MiddlewareHandler type allows a `void` return (Astro
 // permits a middleware to fall through without producing a response); this
@@ -123,7 +139,7 @@ describe('public missing-page recovery', () => {
     ['/missing.js', 'text/html', 404],
     ['/mistyped-page', 'application/json', 404],
   ])('handles %s with accept %s', async (path, accept, expected) => {
-    const context = { url: new URL(`https://www.dajc.eu${path}`), request: new Request(`https://www.dajc.eu${path}`, { headers: { accept } }) } as Parameters<typeof onRequest>[0];
+    const context = { url: new URL(`https://www.dajc.eu${path}`), request: new Request(`https://www.dajc.eu${path}`, { headers: { accept } }), isPrerendered: false } as Parameters<typeof onRequest>[0];
     const result = await onRequest(context, async () => new Response('missing', { status: 404 }));
     if (!result) throw new Error('Expected response');
     expect(result.status).toBe(expected);

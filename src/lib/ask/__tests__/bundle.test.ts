@@ -24,18 +24,26 @@ const askSources = filesUnder(ASK_DIR);
 const askRoutes = [...filesUnder(join(ROOT, 'src/pages/api/ask')), join(ROOT, 'src/pages/intelligence/ask.astro')];
 
 describe('no key in the client bundle', () => {
-  const client = readFileSync(join(ASK_DIR, 'client/ask-form.ts'), 'utf8');
+  const clientFiles = filesUnder(join(ASK_DIR, 'client'));
 
-  it('the browser script imports nothing and reads no environment', () => {
-    expect(client).not.toMatch(/^\s*import\s+(?!type\b)/m);
-    expect(client).not.toMatch(/process\.env|import\.meta\.env/);
-    expect(client).not.toMatch(/DAJC_ASK_|api\.openai\.com|api\.anthropic\.com|api\.perplexity\.ai|Bearer|x-api-key/);
+  it('the browser scripts import only each other and read no environment', () => {
+    expect(clientFiles.map((f) => f.split('/').pop()).sort()).toEqual(['account-panel.ts', 'ask-form.ts']);
+    for (const file of clientFiles) {
+      const client = readFileSync(file, 'utf8');
+      // Only sibling browser modules - never server code, config or a provider client.
+      for (const match of client.matchAll(/^\s*import\s+(?!type\b)[^;]*from\s+'([^']+)'/gm)) expect(match[1], file).toMatch(/^\.\/[a-z-]+$/);
+      expect(client, file).not.toMatch(/process\.env|import\.meta\.env/);
+      expect(client, file).not.toMatch(/DAJC_ASK_|DAJC_AI_|api\.openai\.com|api\.anthropic\.com|api\.perplexity\.ai|api\.stripe\.com|Bearer|x-api-key|innerHTML|outerHTML|insertAdjacentHTML|eval\(/);
+    }
   });
 
-  it('the page ships only the browser script to the client', () => {
+  it('the page ships only the browser scripts to the client', () => {
     const page = readFileSync(join(ROOT, 'src/pages/intelligence/ask.astro'), 'utf8');
     const script = page.match(/<script>([\s\S]*?)<\/script>/)?.[1] || '';
-    expect(script.match(/import .* from '([^']+)'/g)).toEqual(["import { initAskForm } from '../../lib/ask/client/ask-form'"]);
+    expect(script.match(/import .* from '([^']+)'/g)).toEqual([
+      "import { initAskForm } from '../../lib/ask/client/ask-form'",
+      "import { initAccountPanel } from '../../lib/ask/client/account-panel'",
+    ]);
     // data-strings carries only interface texts.
     expect(page).toMatch(/data-strings=\{JSON\.stringify\(strings\)\}/);
     expect(page).toMatch(/const strings = dictionary\(lang\)/);

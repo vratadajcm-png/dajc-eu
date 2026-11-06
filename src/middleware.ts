@@ -8,9 +8,15 @@
 // route added later that forgets this file exists still fails closed on
 // its own.
 import { defineMiddleware } from 'astro:middleware';
+import { originCheck } from './lib/security/origin-check';
 import { isPartnerPortalEnabled, isPartnerPortalPath } from './portal/config/gate';
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  // CSRF: Astro's same-origin rule with one signed-provider exception; it
+  // replaces security.checkOrigin (false in astro.config.mjs) and must stay
+  // the first step. See src/lib/security/origin-check.ts.
+  const forbidden = originCheck(context.request, context.url, context.isPrerendered);
+  if (forbidden) return forbidden;
   // These sections are deliberately private, regardless of navigation or
   // indexing settings. Never invoke their page handlers on the public site.
   if (/^\/(?:platform|partners|integration-ecosystem)(?:\/|$)/i.test(context.url.pathname)) {

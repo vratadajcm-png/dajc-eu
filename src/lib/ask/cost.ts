@@ -44,10 +44,13 @@ export class CostMeter {
   }
 
   /** Runs one model call and records its actual cost, or its worst case if it throws. */
-  async track<T extends { usage: Usage }>(role: CostRole, promptChars: number, maxOutputTokens: number, call: () => Promise<T>): Promise<T> {
+  async track<T extends { usage: Usage; costUsd?: number }>(role: CostRole, promptChars: number, maxOutputTokens: number, call: () => Promise<T>): Promise<T> {
     try {
       const result = await call();
-      const micro = tokenCostMicroEur(this.config.pricing[role], this.config.usdToEur, result.usage.inputTokens, result.usage.outputTokens);
+      // Orchestrated routing reports the cost of the model it actually used.
+      const micro = typeof result.costUsd === 'number' && Number.isFinite(result.costUsd) && result.costUsd >= 0
+        ? Math.ceil(result.costUsd * this.config.usdToEur * 1_000_000 - 1e-6) // round up, ignoring float noise
+        : tokenCostMicroEur(this.config.pricing[role], this.config.usdToEur, result.usage.inputTokens, result.usage.outputTokens);
       this.add(role, micro, false);
       return result;
     } catch (error) {
