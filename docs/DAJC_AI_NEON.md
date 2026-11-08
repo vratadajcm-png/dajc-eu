@@ -116,8 +116,9 @@ only; they never go into the repository, GitHub or a conversation.
      read it;
    - add the label **`kb-import-dev`** to PR #111 → *Review deployments* →
      approve `kb-import-dev` → the workflow imports the 20 EUR-Lex versions
-     (AUTO_CHECKED, no AI, free) and keeps the original PDFs as an artifact for
-     14 days;
+     (AUTO_CHECKED, no AI, free), verifies every one of them
+     (`DAJC_AI_LEGAL_LIBRARY.md` § 5a; report kept as an artifact for 30 days)
+     and keeps the original PDFs as an artifact for 14 days;
    - after the test the owner may rotate the password (Reset password again)
      or switch the role back to `NOLOGIN`.
 

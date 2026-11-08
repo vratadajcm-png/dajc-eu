@@ -35,6 +35,7 @@ archive of originals (archive.mjs)       catalogue + index (Neon, schema dajc_kb
 | Provisions | `src/lib/kb/provisions.mjs` | anchors on their own line, references never split, headers and EUR-Lex markers removed |
 | Import and human review | `src/lib/kb/importer.mjs`, `scripts/kb-import.mjs`, `scripts/kb-review.mjs` | one transaction, nothing is deleted; import and review are separate roles (§ 2a) |
 | Connection safety | `src/lib/kb/db-guard.mjs` | masks and redacts connection strings; refuses a wrong role or branch |
+| Verification | `src/lib/kb/verify.mjs`, `scripts/kb-verify.mjs`, `config/legal-library/verification.json` | read-only check of every imported version (§ 5a) |
 | Search | `src/lib/kb/search.mjs`, `scripts/kb-search.mjs` | exact full text + filters; vectors only later, as candidate proposals |
 | DAJC AI integration | `src/lib/ask/library.ts`, `pipeline.ts` | before the paid web search; not for driving bans |
 | Schema and permissions | `drizzle-kb/0000_dajc_kb_library.sql`, `drizzle-kb/0001_dajc_kb_import_review_separation.sql` | own migration history, no collision with #102 |
@@ -154,6 +155,34 @@ database. The StVO (DE) could not be imported (see above). On Neon
 (`dev-kb-tests`) there is only a sample of 3 provisions of Regulation 561/2006
 (CS) to verify compatibility; the full import into Neon runs through the
 workflow `kb-import-dev` (`DAJC_AI_NEON.md` § 4, step 6).
+
+### 5a. Verification of every imported version
+
+`scripts/kb-verify.mjs` (read-only; logic in `src/lib/kb/verify.mjs`, plan in
+`config/legal-library/verification.json`) checks each manifest entry and runs
+in the import workflow right after the import:
+
+| Check | What must hold |
+|---|---|
+| catalogue | exactly one stored version for the official URL and language; machine-checked or human-verified; text layer; pages and citable provisions; every provision inside the document's pages |
+| source | HTTPS on the registered official source of the entry; reuse terms allow storing and quoting; URL and label equal the manifest |
+| validity | status and dates equal the manifest; in force on the check day; not superseded; status checked within 31 days; **online:** EUR-Lex shows the act *In force* and lists exactly the stored text as the *current consolidated version* |
+| integrity | the archived original exists with the catalogue's SHA-256 and size; **online:** the official URL still serves exactly these bytes, so a citation link opens the stored text |
+| content | pages and provisions re-extracted from the original equal the stored ones |
+| search | a driver's question in the version's language, sent exactly as DAJC AI sends it (terms + question, Ask topic, country CZ), finds the named article among the 4 sources the model receives |
+| citation | that hit has the version label, article and page, the official URL with `#page=N` inside the document, the version's SHA-256, and its text is on the cited pages |
+
+Local result on 2026-11-08 (Neon-like cluster, as `dajc_kb_importer`, online):
+**20/20 versions passed every check**; the expected article was the first
+source in 18 cases and the second in 2. EUR-Lex lists all four acts as in force
+and the stored consolidations (561/2006 and 165/2014: 31 Dec 2024; 96/53/EC:
+14 Aug 2019; 1072/2009: 21 Feb 2022) as current. The first run failed
+honestly in two places, which were fixed in the check, not in the data: EUR-Lex
+amendment markers (▼M1) on the pages broke the "text on the cited page"
+comparison, and searches without the Ask topic filter ranked Article 3 of
+Directive 96/53/EC too low in cs/sk/pl (in Polish not at all) — with the topic
+DAJC AI actually sends it ranks first or second. Retrieval in cs/sk/pl
+therefore depends on the classifier choosing the right topic.
 
 ## 6. Search and answer
 

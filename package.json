@@ -25,7 +25,8 @@
     "migrate:geographic-coverage": "node scripts/migrate-geographic-coverage.mjs",
     "kb:import": "node scripts/kb-import.mjs",
     "kb:review": "node scripts/kb-review.mjs",
-    "kb:search": "node scripts/kb-search.mjs"
+    "kb:search": "node scripts/kb-search.mjs",
+    "kb:verify": "node scripts/kb-verify.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",

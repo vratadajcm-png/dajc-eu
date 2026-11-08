@@ -67,6 +67,7 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Import official documents into the Neon dev branch
+        id: import
         env:
           DAJC_KB_IMPORT_DB_URL: ${{ secrets.DAJC_KB_DEV_IMPORT_DB_URL }}
           DAJC_KB_ARCHIVE: local:${{ runner.temp }}/kb-archive
@@ -79,6 +80,29 @@ jobs:
           set -- --source eu-eurlex --expect-role dajc_kb_importer --expect-environment dev
           if [ -n "$ONLY" ]; then set -- "$@" --only "$ONLY"; fi
           node scripts/kb-import.mjs "$@"
+
+      # Read-only: source, validity at EUR-Lex, SHA-256 of the archived and the
+      # official original, re-extracted content, production search and the
+      # citation of every imported version (scripts/kb-verify.mjs).
+      - name: Verify every imported version
+        if: ${{ !cancelled() && steps.import.outcome != 'skipped' }}
+        env:
+          DAJC_KB_VERIFY_DB_URL: ${{ secrets.DAJC_KB_DEV_IMPORT_DB_URL }}
+          DAJC_KB_ARCHIVE: local:${{ runner.temp }}/kb-archive
+          ONLY: ${{ inputs.only }}
+        run: |
+          set -- --source eu-eurlex --online --expect-role dajc_kb_importer --expect-environment dev --report "$RUNNER_TEMP/kb-verification.json"
+          if [ -n "$ONLY" ]; then set -- "$@" --only "$ONLY"; fi
+          node scripts/kb-verify.mjs "$@"
+
+      - name: Keep the verification report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kb-verification-${{ github.run_id }}
+          path: ${{ runner.temp }}/kb-verification.json
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Keep the downloaded originals
         if: always()

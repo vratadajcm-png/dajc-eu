@@ -27,6 +27,11 @@ const ANCHORS = [
 const REFERENCE_TITLE = /^(Abs|Absatz|Satz|Nr|Nummer|Buchst|Odst|Odstavec|Písm|Ods|Ust|Pkt|Ziff|Paragraph|Paragraf|Sb|Z\.)\b/iu;
 
 const MARKERS = /[▼►◄]\s*(?:[A-Z]\d{0,3}|C\d{0,3})?/gu;
+
+/** Removes EUR-Lex amendment markers (▼B, ►M3, ◄) from a text. */
+export function stripEurlexMarkers(text) {
+  return String(text ?? '').replace(MARKERS, ' ');
+}
 const MAX_CHUNK_CHARS = 3500;
 const MASS_RE = /(?<![\d.,])(\d{1,3}(?:[.,]\d{1,2})?)\s*(?:t|tun|tuny|tunách|tonnes?|tons?|Tonnen|ton|tonach|tony|tonami)(?![\p{L}])/giu;
 
