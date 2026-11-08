@@ -194,3 +194,37 @@ describe('free every day, contributions change nothing', () => {
     expect((await ask()).status).toBe(200);
   });
 });
+
+// --- Public links only after activation ---------------------------------------
+
+describe('DAJC AI in the main navigation and the FAQ appears only after activation', () => {
+  const header = readFileSync(join(ROOT, 'src/components/Header.astro'), 'utf8');
+
+  it('needs both the complete Ask gate and the separate publication switch', async () => {
+    const { isAskPublicEntryEnabled } = await import('../public-entry');
+    const { isGuideAiAvailable } = await import('../guide-entry');
+    const { FULL_ENV } = await import('./helpers');
+    const { DAJC_ASK_PUBLIC_ENTRY: _published, ...activatedOnly } = FULL_ENV;
+    expect(isAskPublicEntryEnabled({})).toBe(false);
+    expect(isAskPublicEntryEnabled(activatedOnly)).toBe(false);
+    for (const value of ['TRUE', '1', 'yes', ' true', '']) expect(isAskPublicEntryEnabled({ ...activatedOnly, DAJC_ASK_PUBLIC_ENTRY: value })).toBe(false);
+    expect(isAskPublicEntryEnabled({ DAJC_ASK_PUBLIC_ENTRY: 'true' })).toBe(false);
+    expect(isAskPublicEntryEnabled({ ...FULL_ENV, DAJC_ASK_ENABLED: 'false' })).toBe(false);
+    expect(isAskPublicEntryEnabled(FULL_ENV)).toBe(true);
+    // The FAQ panel follows the same rule.
+    expect(isGuideAiAvailable(activatedOnly)).toBe(false);
+    expect(isGuideAiAvailable(FULL_ENV)).toBe(true);
+  });
+
+  it('renders the link server-side only, in desktop and mobile navigation', () => {
+    expect(header).toMatch(/const showAsk = isAskPublicEntryEnabled\(\);/);
+    expect(header.match(/\{showAsk && <a class="ask-link" href=\{ASK_PUBLIC_PATH\}/g)).toHaveLength(2);
+    expect(header).not.toMatch(/import\.meta\.env|PUBLIC_DAJC|DAJC_ASK_|<script/);
+    expect(header).toContain("'DAJC AI · bezplatné dotazy pro řidiče'");
+    expect(header).toContain("'DAJC AI · free questions for drivers'");
+  });
+
+  it('is off in .env.example', () => {
+    expect(readFileSync(join(ROOT, '.env.example'), 'utf8')).toMatch(/^DAJC_ASK_PUBLIC_ENTRY=false$/m);
+  });
+});

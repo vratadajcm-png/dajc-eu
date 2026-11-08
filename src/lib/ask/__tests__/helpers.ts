@@ -25,6 +25,8 @@ export const FULL_ENV: Record<string, string> = {
   DAJC_ASK_DAILY_BUDGET_EUR: '2',
   DAJC_ASK_DAILY_QUERY_LIMIT: '3',
   DAJC_ASK_EMAIL_PEPPER: 'test-pepper-0123456789abcdef0123456789abcdef',
+  // Public links (navigation, FAQ) published after the smoke test (public-entry.ts).
+  DAJC_ASK_PUBLIC_ENTRY: 'true',
 };
 
 export function testConfig(overrides: Partial<AskConfig> = {}): AskConfig {

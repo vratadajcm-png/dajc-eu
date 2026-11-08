@@ -1,10 +1,12 @@
 // Public read-only state for the existing "Ask DAJC · FAQ" site guide.
 // Unlike /api/ask/* this endpoint must never return 404 while Ask is disabled;
 // it reveals only a boolean, not configuration details, keys, quotas or sessions.
-import { getAskConfig, type AskEnv } from './config';
+import type { AskEnv } from './config';
+import { isAskPublicEntryEnabled } from './public-entry';
 
+// Same rule as the main navigation: activated and published (public-entry.ts).
 export function isGuideAiAvailable(env: AskEnv = process.env): boolean {
-  return getAskConfig(env) !== null;
+  return isAskPublicEntryEnabled(env);
 }
 
 export function guideAiAvailabilityResponse(env: AskEnv = process.env): Response {

@@ -1,4 +1,15 @@
 ---
+// The DAJC AI link (existing free Ask) is rendered only after activation AND
+// publication (src/lib/ask/public-entry.ts). Server-side only: no flag, key or
+// configuration detail reaches the browser, just the link or nothing.
+import { ASK_PUBLIC_PATH, isAskPublicEntryEnabled } from '../lib/ask/public-entry';
+
+interface Props {
+  lang?: string;
+}
+const { lang = 'en' } = Astro.props;
+const showAsk = isAskPublicEntryEnabled();
+const askHint = lang === 'cs' ? 'DAJC AI · bezplatné dotazy pro řidiče' : 'DAJC AI · free questions for drivers';
 ---
 <header class="site-header">
   <div class="site-header__inner">
@@ -8,6 +19,7 @@
     </a>
 
     <nav class="desktop-nav" aria-label="Primary navigation">
+      {showAsk && <a class="ask-link" href={ASK_PUBLIC_PATH} title={askHint}><span class="ask-link__dot" aria-hidden="true"></span>DAJC AI</a>}
       <a href="/assistance">Assistance</a>
       <details class="tools-dropdown">
         <summary>Tools <span aria-hidden="true">⌄</span></summary>
@@ -33,6 +45,7 @@
           </svg>
         </summary>
         <nav aria-label="Mobile navigation" class="mobile-navigation__panel">
+          {showAsk && <a class="ask-link" href={ASK_PUBLIC_PATH}><span class="ask-link__dot" aria-hidden="true"></span>{askHint}</a>}
           <a href="/assistance">DAJC Assistance</a>
           <a href="/driving-bans">Driving Bans</a>
           <a href="/intelligence">DAJC Intelligence</a>
@@ -77,6 +90,8 @@
     transition:color .18s ease;
   }
   .desktop-nav a:hover, .desktop-nav a:focus-visible, .desktop-nav summary:hover, .header-secondary:hover, .header-secondary:focus-visible { color:var(--dajc-orange); }
+  .ask-link { display:inline-flex; align-items:center; gap:.45rem; }
+  .ask-link__dot { width:.45rem; height:.45rem; border-radius:50%; background:var(--dajc-orange); box-shadow:0 0 0 3px rgba(255,159,0,.18); flex-shrink:0; }
   .tools-dropdown { position:relative; }
   .tools-dropdown summary { cursor:pointer; list-style:none; }
   .tools-dropdown summary::-webkit-details-marker {display:none;}
