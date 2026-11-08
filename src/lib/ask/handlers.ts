@@ -9,7 +9,7 @@
 
 import { completeLogin, currentUserId, endSession, requestLoginLink, SESSION_COOKIE } from './auth';
 import { SESSION_TTL_DAYS } from './config';
-import { t, uiLang } from './i18n';
+import { limitReachedText, t, uiLang } from './i18n';
 import type { AskRuntime } from './runtime';
 import { askQuestion, budgetAvailable, getUsage } from './service';
 
@@ -188,7 +188,9 @@ export async function handleQuery(ctx: RouteContext, runtime: AskRuntime | null)
       case 'invalid':
         return json({ ok: false, error: t(lang, 'questionInvalid') }, 400);
       case 'limit':
-        return json({ ok: false, error: t(lang, 'limitReached', { limit: outcome.limit }) }, 429);
+        // Only a message and a voluntary /support link (rendered by the page):
+        // no redirect, no payment, nothing that unlocks questions.
+        return json({ ok: false, limitReached: true, limit: outcome.limit, error: limitReachedText(lang, outcome.limit) }, 429);
       case 'budget':
         return json({ ok: false, error: t(lang, 'budgetReached'), available: false }, 503);
       default:

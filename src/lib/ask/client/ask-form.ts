@@ -164,6 +164,7 @@ export function initAskForm(root: HTMLElement | null = document.querySelector('[
   const signIn = part('sign-in');
   const confirm = part('confirm');
   const askSection = part('ask');
+  const limitSection = part('limit');
   const message = part('message');
   const remaining = part('remaining');
   const answerBox = part('answer');
@@ -182,7 +183,11 @@ export function initAskForm(root: HTMLElement | null = document.querySelector('[
       show(signIn, !data.signedIn && !loginToken);
       show(askSection, Boolean(data.signedIn));
       askSection.querySelector('button[type="submit"]')?.toggleAttribute('disabled', !data.available || data.remaining === 0);
-      if (data.signedIn) remaining.textContent = data.remaining === 0 ? s('limitReached', { limit: data.limit }) : s('remaining', { n: data.remaining, limit: data.limit });
+      // Daily free questions used up: message plus a voluntary /support link
+      // (the user decides whether to open it; nothing redirects).
+      const limitReached = Boolean(data.signedIn) && data.remaining === 0;
+      show(limitSection, limitReached);
+      if (data.signedIn) remaining.textContent = limitReached ? '' : s('remaining', { n: data.remaining, limit: data.limit });
     } catch {
       say(s('systemError'));
     }
@@ -216,6 +221,10 @@ export function initAskForm(root: HTMLElement | null = document.querySelector('[
       const { status, data } = await post('/api/ask/query', { question: field.value, lang });
       if (data.ok && data.answer) {
         renderAnswer(answerBox, data.answer as AnswerPayload);
+        answerBox.append(el('p', s('safetyNotice'), 'ask-safety'));
+      } else if (status === 429 && data.limitReached) {
+        answerBox.replaceChildren();
+        show(limitSection, true);
       } else {
         answerBox.replaceChildren();
         say(data.error || s('systemError'));

@@ -138,7 +138,12 @@ describe('questions over HTTP', () => {
     }
     const limited = await handleQuery(request('/api/ask/query', { question: 'Is there a truck driving ban in Czechia on 1 November 2026?', lang: 'cs' }, { jar }), rt);
     expect(limited.status).toBe(429);
-    expect((await limited.json()).error).toBe('Dnes jste využili všech 3 dotazů. Limit se obnoví o půlnoci (pražského času).');
+    const limitedBody = await limited.json();
+    expect(limitedBody.error).toBe('Dnes jste využili všechny 3 bezplatné dotazy. Další budete mít k dispozici zítra. Pokud vám DAJC AI pomáhá při práci, můžete dobrovolně podpořit její provoz a další vývoj.');
+    expect(limitedBody).toMatchObject({ ok: false, limitReached: true, limit: 3 });
+    // No payment, redirect or unlock is offered by the API itself.
+    expect(limited.headers.get('location')).toBeNull();
+    expect(JSON.stringify(limitedBody)).not.toMatch(/checkout|revolut|lnurl|bitcoin:|unlock|subscription/i);
   });
 
   it('answers 503 once the cost cap is reached', async () => {

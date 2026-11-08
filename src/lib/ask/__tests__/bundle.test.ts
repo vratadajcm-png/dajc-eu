@@ -38,7 +38,9 @@ describe('no key in the client bundle', () => {
     expect(script.match(/import .* from '([^']+)'/g)).toEqual(["import { initAskForm } from '../../lib/ask/client/ask-form'"]);
     // data-strings carries only interface texts.
     expect(page).toMatch(/data-strings=\{JSON\.stringify\(strings\)\}/);
-    expect(page).toMatch(/const strings = dictionary\(lang\)/);
+    // Interface texts only: the dictionary plus the server-rendered limit message.
+    expect(page).toMatch(/const strings = \{ \.\.\.dictionary\(lang\), limitReached: limitMessage \};/);
+    expect(page).toMatch(/const limitMessage = limitReachedText\(lang, config\.dailyQueryLimit\);/);
   });
 
   it('no Ask variable is ever exposed with the PUBLIC_ prefix', () => {

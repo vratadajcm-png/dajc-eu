@@ -31,6 +31,7 @@ import { isValidIsoDate } from '../../../scripts/lib/date-validation.mjs';
 import type { AskConfig } from './config';
 import type { CostMeter } from './cost';
 import { renderDrivingBanFacts, type FactRow } from './facts';
+import { asksForConfirmation } from './confirmation';
 import { checkClaims, normalizeForMatch, type DraftClaim, type GuardSource } from './guard';
 import { t, type UiKey, type UiLang } from './i18n';
 import { detectLanguage } from './language';
@@ -310,6 +311,9 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
     }));
   const c = normalizeClassification(classified.json, question, today);
   const notices = c.case_assessment ? [t(uiLang, 'caseNotice')] : [];
+  // Deterministic, independent of the classifier: a question asking DAJC AI to
+  // confirm passability, an authorisation or an exception always gets the fixed notice.
+  if (c.case_assessment || asksForConfirmation(question)) notices.push(t(uiLang, 'noConfirmationNotice'));
   if (!c.in_scope) return { answer: emptyAnswer(c.language, uiLang, 'out_of_scope', [], notices), path: 'none', reviewUrls: [] };
   if (c.jurisdictions.length === 0) return { answer: emptyAnswer(c.language, uiLang, 'need_country', [], notices), path: 'none', reviewUrls: [] };
 

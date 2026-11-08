@@ -4,11 +4,12 @@
 // configuration is incomplete; never indexed during Phase 1.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getAskConfig } from '../../lib/ask/config';
-import { dictionary, t, uiLangFromRequest } from '../../lib/ask/i18n';
+import { dictionary, limitReachedText, t, uiLangFromRequest } from '../../lib/ask/i18n';
 
 export const prerender = false;
 
-if (!getAskConfig()) {
+const config = getAskConfig();
+if (!config) {
   return new Response('Not found', {
     status: 404,
     headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
@@ -16,18 +17,23 @@ if (!getAskConfig()) {
 }
 
 const lang = uiLangFromRequest(Astro.url, Astro.request.headers.get('accept-language'));
-const strings = dictionary(lang);
+const limitMessage = limitReachedText(lang, config.dailyQueryLimit);
+// The client script renders only text it is given here (textContent, never HTML).
+const strings = { ...dictionary(lang), limitReached: limitMessage };
 Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
 Astro.response.headers.set('Cache-Control', 'no-store');
 Astro.response.headers.set('Referrer-Policy', 'no-referrer');
 const otherLang = lang === 'cs' ? 'en' : 'cs';
 ---
-<BaseLayout title={`${t(lang, 'pageTitle')} — DAJC Intelligence`} description={t(lang, 'pageDescription')} robots="noindex, nofollow" lang={lang}>
+<BaseLayout title={`${t(lang, 'pageTitle')} — DAJC`} description={t(lang, 'pageDescription')} robots="noindex, nofollow" lang={lang}>
   <main class="ask" data-ask-root data-lang={lang} data-strings={JSON.stringify(strings)}>
-    <p class="eyebrow">DAJC INTELLIGENCE · BETA</p>
+    <p class="eyebrow">{t(lang, 'eyebrow')}</p>
     <h1>{t(lang, 'pageTitle')}</h1>
     <p class="lead">{t(lang, 'intro')}</p>
+    <p class="safety" role="note"><strong aria-hidden="true">⚠</strong> {t(lang, 'safetyNotice')}</p>
     <p class="info-only">{t(lang, 'infoOnly')}</p>
+    <p class="info-only">{t(lang, 'noConfirmationNotice')}</p>
+    <p class="free">{t(lang, 'freeNotice')}</p>
     <p class="lang-switch"><a href={`?lang=${otherLang}`}>{otherLang === 'cs' ? 'Česky' : 'English'}</a></p>
 
     <p class="ask-message" data-ask="message" role="status" aria-live="polite"></p>
@@ -55,6 +61,16 @@ const otherLang = lang === 'cs' ? 'en' : 'cs';
       <div class="answer" data-ask="answer" aria-live="polite"></div>
       <button type="button" class="link-button" data-ask="sign-out">{t(lang, 'signOut')}</button>
     </section>
+
+    <!-- Shown only after the daily free questions are used up. A plain link the
+         user may follow; no automatic redirect, no payment, nothing unlocked. -->
+    <section class="limit" data-ask="limit" hidden aria-live="polite">
+      <p class="limit-message">{limitMessage}</p>
+      <a class="button support-button" href="/support">{t(lang, 'supportAiButton')}</a>
+      <p class="hint">{t(lang, 'supportAiNote')}</p>
+    </section>
+
+    <p class="legal-links"><a href="/terms">{t(lang, 'termsLink')}</a> · <a href="/privacy">{t(lang, 'privacyLink')}</a></p>
   </main>
 </BaseLayout>
 
@@ -86,6 +102,21 @@ const otherLang = lang === 'cs' ? 'en' : 'cs';
   h1 { margin: 0 0 1.2rem; font-size: clamp(2rem, 5vw, 3rem); }
   .lead, .info-only, .hint, .remaining { line-height: 1.7; }
   .info-only { font-size: 14px; border-left: 2px solid var(--dajc-orange); padding-left: 0.8rem; }
+  .safety {
+    margin: 1.2rem 0;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--dajc-orange);
+    border-radius: 8px;
+    background: rgba(255, 159, 0, 0.08);
+    color: var(--dajc-white);
+    line-height: 1.6;
+    font-weight: 500;
+  }
+  .safety strong { color: var(--dajc-orange); margin-right: 0.3rem; }
+  .free { font-size: 14px; line-height: 1.7; }
+  .limit .limit-message { color: var(--dajc-white); line-height: 1.7; }
+  .support-button { display: inline-block; text-decoration: none; }
+  .legal-links { margin-top: 2rem; font-size: 13px; }
   section { padding: 1.4rem 0; border-top: 1px solid var(--dajc-line); }
   label { display: grid; gap: 0.5rem; color: var(--dajc-white); }
   input, textarea {
@@ -129,4 +160,5 @@ const otherLang = lang === 'cs' ? 'en' : 'cs';
   .answer :global(.ask-facts dd) { margin: 0; }
   .answer :global(.ask-ai-notice) { font-family: 'IBM Plex Mono', monospace; font-size: 12px; margin-top: 1.5rem; }
   .answer :global(.ask-support) { font-size: 13px; }
+  .answer :global(.ask-safety) { font-size: 13px; color: var(--dajc-white); border-left: 2px solid var(--dajc-orange); padding-left: 0.8rem; }
 </style>

@@ -12,7 +12,11 @@
 //     "vám hrozí pokuta", "your transport is exempt", ...) - DAJC gives
 //     information about rules, never legal advice (§47.3, zákon č. 85/1996
 //     Sb.), and never decides an exception, an authorisation to drive or a
-//     permit for a specific transport.
+//     permit for a specific transport;
+//   - it does not confirm by itself that a route or road is passable, that
+//     an oversize transport is authorised or that a legal exception applies
+//     (CONFIRMATION_PATTERNS) - only the authority, the permit and the road
+//     signs on site can confirm that.
 // The whole answer is dropped when it is not written in the question's
 // language (checked for the languages detectLanguage() knows).
 
@@ -43,6 +47,37 @@ const MAX_CLAIM_CHARS = 700;
 function phrase(pattern: string, flags = 'iu'): RegExp {
   return new RegExp(`(?<![\\p{L}\\p{N}])(?:${pattern})(?![\\p{L}\\p{N}])`, flags);
 }
+
+// Affirmative confirmations that only an authority, a permit or the road
+// signs on site can give: "the route is passable", "trasa je průjezdná",
+// "the transport is authorised", "the exception applies here". General
+// rules stay allowed ("vehicles over 3 m wide need a permit"); a negative
+// restriction ("the bridge is not passable for vehicles over 40 t") is not
+// matched. Over-matching only drops a statement (DAJC owner decision for
+// the public B2C release: DAJC AI never confirms passability of a route,
+// an authorisation for oversize transport or a legal exception by itself).
+export const CONFIRMATION_PATTERNS: RegExp[] = [
+  // English
+  phrase('(?:the|this|that)\\s+(?:route|road|section|stretch|journey|trip|transport|passage|crossing|move)\\s+(?:is|will\\s+be|would\\s+be|can\\s+be)\\s+(?:passable|clear|possible|authori[sz]ed|permitted|allowed|approved|cleared|legal|lawful|feasible|safe)'),
+  phrase('(?:is|are|will\\s+be|remains?)\\s+passable'),
+  phrase('(?:exception|exemption|derogation)\\s+(?:therefore\\s+|thus\\s+|also\\s+)?applies\\s+(?:here|in\\s+this\\s+case|to\\s+(?:it|this|that|them|the\\s+(?:planned|described|asked)))'),
+  phrase('qualif(?:y|ies)\\s+for\\s+(?:the|an|this)\\s+(?:exception|exemption|derogation)'),
+  // Czech
+  phrase('(?:trasa|silnice|úsek|cesta|přeprava|jízda|průjezd)\\s+(?:je|bude|by\\s+byl[ao]?)\\s+(?:průjezdn\\p{L}*|povolen\\p{L}*|možn\\p{L}*|schválen\\p{L}*|legální|bez\\s+omezení|v\\s+pořádku|bezpečn\\p{L}*)'),
+  phrase('(?:je|jsou|bude|budou|zůstává|zůstávají)\\s+průjezdn\\p{L}*'),
+  phrase('výjimk\\p{L}*\\s+se\\s+(?:tedy\\s+|proto\\s+|také\\s+)?(?:zde\\s+|tady\\s+|na\\s+(?:ni|něj|ně|to)\\s+)(?:vztahuje|uplatní|použije)'),
+  phrase('splňuj\\p{L}*\\s+podmínky\\s+výjimk\\p{L}*'),
+  // Slovak
+  phrase('(?:trasa|cesta|preprava|jazda|úsek)\\s+(?:je|bude)\\s+(?:prejazdn\\p{L}*|priechodn\\p{L}*|povolen\\p{L}*|možn\\p{L}*|schválen\\p{L}*)'),
+  phrase('(?:je|sú|bude|budú)\\s+(?:prejazdn|priechodn)\\p{L}*'),
+  // Polish
+  phrase('(?:trasa|droga|przejazd|transport|odcinek)\\s+(?:jest|będzie)\\s+(?:przejezdn\\p{L}*|dozwolon\\p{L}*|możliw\\p{L}*|zatwierdzon\\p{L}*)'),
+  phrase('(?:jest|są|będzie|będą)\\s+przejezdn\\p{L}*'),
+  // German
+  phrase('(?:Route|Strecke|Straße|Fahrt|Transport|Durchfahrt)\\s+(?:ist|wird|wäre)\\s+(?:befahrbar|passierbar|frei|erlaubt|genehmigt|zulässig|möglich)'),
+  phrase('(?:ist|sind|bleibt|bleiben)\\s+(?:befahrbar|passierbar)'),
+  phrase('Ausnahme\\s+(?:gilt|greift)\\s+(?:hier|für\\s+(?:diese|diesen|dieses))'),
+];
 
 // Second-person and case-assessing wording. Rules are described
 // impersonally ("vehicles over 7.5 t may not ..."), never addressed to the
@@ -76,6 +111,7 @@ export const FORBIDDEN_PATTERNS: RegExp[] = [
   phrase('twój|twoja|twoje|twojego|twojej|twoim|pański|pańska|pańskie|pańskiego'),
   phrase('Ihr(?:e|en|em|er|es)?\\s+(?:Fahrzeug|Lkw|LKW|Transport|Fahrt|Ladung|Route|Genehmigung|Sattelzug)', 'u'), phrase('dein(?:e|en|em|er|es)?'),
   phrase('[Dd]ies(?:er|e|en|em)\\s+(?:Transport|Fahrt|Ladung)', 'u'),
+  ...CONFIRMATION_PATTERNS,
 ];
 
 export function forbiddenPhrase(text: string): string | null {

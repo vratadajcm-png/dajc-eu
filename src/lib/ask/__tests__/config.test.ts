@@ -104,7 +104,7 @@ describe('Ask DAJC AI is off by default', () => {
   it('the page itself refuses to render while off and is never indexed', () => {
     const page = readFileSync(new URL('../../../pages/intelligence/ask.astro', import.meta.url), 'utf8');
     expect(page).toMatch(/export const prerender = false/);
-    expect(page).toMatch(/if \(!getAskConfig\(\)\)[\s\S]*status: 404/);
+    expect(page).toMatch(/const config = getAskConfig\(\);\s*if \(!config\) \{[\s\S]*status: 404/);
     expect(page).toMatch(/robots="noindex, nofollow"/);
     expect(page).toMatch(/X-Robots-Tag', 'noindex/);
   });
