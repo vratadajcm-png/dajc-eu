@@ -1,0 +1,79 @@
+name: DAJC legal library import (Neon dev)
+
+# Imports the official documents of config/legal-library/manifest.json into the
+# DAJC legal library on the Neon DEVELOPMENT branch (docs/DAJC_AI_LEGAL_LIBRARY.md).
+# The Claude Code sandbox cannot open PostgreSQL connections, so the full import
+# runs here, where TCP to Neon works.
+#
+# Runs ONLY when the owner asks for it: by adding the label "kb-import-dev" to a
+# pull request of this repository, or by a manual dispatch once merged. Never on
+# push or on a schedule. No AI is called and nothing is paid.
+#
+# Needs the repository secret DAJC_KB_DEV_IMPORT_DB_URL: the pooled or direct
+# connection string of the Neon branch "dev" for the role dajc_kb_importer
+# (password set by the owner in the Neon SQL editor). Never the production
+# branch, never the owner role. Imported versions are AUTO_CHECKED: DAJC AI in
+# production answers only from HUMAN_VERIFIED versions (scripts/kb-review.mjs).
+# The downloaded originals are kept as a workflow artifact for 14 days (public
+# law texts; EUR-Lex reuse under Commission Decision 2011/833/EU).
+
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'Import only this officialNumber (empty = whole manifest)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kb-import-dev
+  cancel-in-progress: false
+
+jobs:
+  import:
+    if: github.event_name == 'workflow_dispatch' || (github.event.label.name == 'kb-import-dev' && github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check the secret is configured (value never printed)
+        env:
+          DAJC_KB_IMPORT_DB_URL: ${{ secrets.DAJC_KB_DEV_IMPORT_DB_URL }}
+        run: |
+          if [ -z "$DAJC_KB_IMPORT_DB_URL" ]; then
+            echo "::error::Repository secret DAJC_KB_DEV_IMPORT_DB_URL is not set (Neon branch dev, role dajc_kb_importer)."
+            exit 1
+          fi
+
+      - name: Import official documents into the Neon dev branch
+        env:
+          DAJC_KB_IMPORT_DB_URL: ${{ secrets.DAJC_KB_DEV_IMPORT_DB_URL }}
+          DAJC_KB_ARCHIVE: local:${{ runner.temp }}/kb-archive
+          ONLY: ${{ inputs.only }}
+        run: |
+          if [ -n "$ONLY" ]; then node scripts/kb-import.mjs --only "$ONLY"; else node scripts/kb-import.mjs; fi
+
+      - name: Keep the downloaded originals
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kb-archive-${{ github.run_id }}
+          path: ${{ runner.temp }}/kb-archive
+          if-no-files-found: warn
+          retention-days: 14

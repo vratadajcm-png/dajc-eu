@@ -62,6 +62,12 @@ Všechny řetězce a hesla zůstávají jen v Neon Console a ve Vercelu; do repo
    Ověření: `DAJC_ASK_TEST_DB_URL=<pooled dajc_ask_app> npx vitest run src/lib/ask` — **jen na `dev`/testovací větvi**, testy zapisují data.
 4. **Vercel → Environment Variables → Production**: `DAJC_ASK_DB_URL` = pooled řetězec role `dajc_ask_app`. Na Preview použít větev `dev` (jiný řetězec).
 5. Data API v Neonu nezapínat; `dajc_ask` ani `dajc_kb` nesmí být vystavené.
+6. **Plný import knihovny na větev `dev`** (sandbox Claude Code nepouští TCP k Neonu):
+   - v Neon SQL editoru na větvi `dev`: `ALTER ROLE dajc_kb_importer WITH LOGIN PASSWORD '<heslo>';`
+   - GitHub → Settings → Secrets and variables → Actions → nové tajemství
+     `DAJC_KB_DEV_IMPORT_DB_URL` = řetězec větve `dev` s uživatelem `dajc_kb_importer` (ne vlastník, ne produkce);
+   - přidat štítek **`kb-import-dev`** k PR #111 → workflow `.github/workflows/kb-import-dev.yml` naimportuje
+     manifest (AUTO_CHECKED, bez AI, zdarma) a uloží originály PDF jako artefakt na 14 dní.
 
 ## 5. Plán produkčního prostředí
 

@@ -143,4 +143,4 @@ Stropy rozpočtu (`DAJC_ASK_DAILY_BUDGET_EUR`, `…MONTHLY…`) a bezpečné poz
 - EUR-Lex PDF obsahují slova rozdělená na konci řádku. Citace přes takové místo kontrola zahodí, což je bezpečné, ale snižuje to počet použitelných citací.
 - Rozsah stran u dlouhých článků rozdělených na části je celý rozsah článku (citace nikdy neukáže před text).
 - OCR cesta je jen fronta, samotné OCR není implementováno ani schváleno.
-- Na Neonu je zatím jen vzorek. Plný import vyžaduje spuštění importéru z prostředí s TCP přístupem k Neonu (počítač vlastníka nebo GitHub Actions s tajemstvím).
+- Na Neonu je zatím jen vzorek. Plný import vyžaduje spuštění importéru z prostředí s TCP přístupem k Neonu: připraven je ruční workflow `kb-import-dev` (štítek na PR, tajemství `DAJC_KB_DEV_IMPORT_DB_URL`, postup v `DAJC_AI_NEON.md` § 4 bod 6).
