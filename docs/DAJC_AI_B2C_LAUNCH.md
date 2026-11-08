@@ -1,225 +1,228 @@
-# DAJC AI — veřejné bezplatné spuštění (B2C): stav připravenosti
+# DAJC AI — public free launch (B2C): readiness
 
-Stav k 2026-11-08, větev `claude/gracious-brown-n9m8el`. Dokument popisuje jen
-to, co bylo skutečně ověřeno; vše ostatní je výslovně označeno jako
-neověřené nebo blokující.
+Status on 2026-11-08, branch `claude/gracious-brown-n9m8el`. This document only
+states what was actually verified; everything else is explicitly marked as
+unverified or blocking.
 
-**Rozhodnutí: NO-GO pro veřejný provoz.** Kód je připravený ke kontrole a
-sloučení (vše zůstává vypnuté), ale chybí databáze, klíče poskytovatelů AI,
-e-mail, schválené právní texty a rozhodnutí o rozpočtu. Podrobnosti v
-oddílech 4–7.
+**Decision: NO-GO for public operation.** The code is ready for review and
+merge (everything stays off), but the database, the AI provider keys, e-mail,
+approved legal texts and a budget decision are missing. Details in sections 4–7.
 
-> **Aktualizace 2026-11-08 (větev `claude/dajc-ai-neon-knowledge-base`):** databáze je nově
-> **Neon PostgreSQL** (projekt `dajc-ai`, Frankfurt, větev `dev` s migracemi; produkční větev
-> prázdná) — viz `docs/DAJC_AI_NEON.md`. Supabase zůstává beze změny. Přibyla evropská knihovna
-> úředních předpisů (`docs/DAJC_AI_LEGAL_LIBRARY.md`). Body níže o Supabase platí pro Supabase;
-> pro Neon platí blokující podmínky v tom dokumentu.
+> **Update 2026-11-08 (branch `claude/dajc-ai-neon-knowledge-base`):** the database is now
+> **Neon PostgreSQL** (project `dajc-ai`, Frankfurt, branch `dev` with the migrations; the
+> production branch is empty) — see `docs/DAJC_AI_NEON.md`. Supabase is unchanged. A European
+> library of official legal documents was added (`docs/DAJC_AI_LEGAL_LIBRARY.md`). The points
+> below about Supabase apply to Supabase; for Neon, the blocking conditions in that document apply.
 
-## 1. Co je DAJC AI v této verzi
+## 1. What DAJC AI is in this version
 
-Existující „Zeptejte se DAJC AI“ (Ask, PR #78) jako bezplatný pracovní AI
-asistent profesionálních řidičů nákladních vozidel. Žádný druhý asistent,
-orchestrátor ani registr zákazů jízd.
+The existing "Ask DAJC AI" (Ask, PR #78) as a free work assistant for
+professional truck drivers. No second assistant, orchestrator or driving-ban
+registry.
 
-| Vlastnost | Stav v kódu |
+| Property | State in the code |
 |---|---|
-| Přihlášení e-mailem (jednorázový odkaz, ukládá se jen HMAC otisk) | beze změny z #78 |
-| 3 dotazy denně na ověřený e-mail, obnova o půlnoci pražského času | beze změny; test „další den zase zdarma“ |
-| Nezávislá kontrola odpovědí (jiný poskytovatel) + deterministická kontrola | beze změny, rozšířeno o pravidlo nepotvrzování |
-| Ověřitelné zdroje, „NEDOSTATEK OVĚŘENÝCH DAT“ | beze změny |
-| Ochrana klíčů (jen server, oddělené od pipeline článků a research, kontrola bundlu) | beze změny |
-| Rozpočtové limity (rezervace nejhoršího případu, denní a měsíční strop) | beze změny; text pozastavení opraven |
-| Po vyčerpání limitu: text vlastníka + tlačítko „Dobrovolně podpořit DAJC AI“ → `/support` | **nové** |
-| Upozornění pro řidiče (jen při bezpečném zastavení) | **nové**, na stránce i pod každou odpovědí |
-| AI nepotvrzuje průjezdnost, oprávnění k nadrozměrné přepravě ani výjimku | **nové**, 4 vrstvy (detektor otázky, guard, prompt, nezávislá kontrola) |
-| Odkaz v hlavní navigaci a ve FAQ jen po aktivaci **a** zveřejnění | **nové** (`DAJC_ASK_PUBLIC_ENTRY`) |
-| Placené DAJC AI, Intelligence, ABRA, platby | **nejsou součástí**; zůstávají v #101/#102 |
+| Sign-in by e-mail (one-time link, only an HMAC fingerprint is stored) | unchanged from #78 |
+| 3 questions per day per verified e-mail, reset at midnight Prague time | unchanged; test "free again the next day" |
+| Independent check of answers (another provider) + deterministic check | unchanged, extended by the no-confirmation rule |
+| Verifiable sources, "INSUFFICIENT VERIFIED DATA" | unchanged |
+| Key protection (server only, separate from the article pipeline and research, bundle scan) | unchanged |
+| Cost limits (worst-case reservation, daily and monthly cap) | unchanged; pause message corrected |
+| After the limit: the owner's text + button "Dobrovolně podpořit DAJC AI" → `/support` | **new** |
+| Driver safety notice (use only when safely stopped) | **new**, on the page and under every answer |
+| The AI never confirms route passability, oversize authorisation or a legal exception | **new**, 4 layers (question detector, guard, prompt, independent check) |
+| Link in the main navigation and in the FAQ only after activation **and** publication | **new** (`DAJC_ASK_PUBLIC_ENTRY`) |
+| Paid DAJC AI, Intelligence, ABRA, payments | **not included**; they stay in #101/#102 |
 
-Příspěvek nic neodemyká: API ani databáze žádný příspěvek nečtou, odkaz na
-`/support` je obyčejný odkaz bez přesměrování (ověřeno testem i v prohlížeči).
+A contribution unlocks nothing: neither the API nor the database reads any
+contribution, and the link to `/support` is a plain link without a redirect
+(verified by tests and in the browser).
 
-## 2. Integrace PR
+## 2. PR integration
 
-| PR | Co obsahuje | Jak je v této větvi |
+| PR | Content | How it is on this branch |
 |---|---|---|
-| #98 | #96 + #97 + #78 | sloučen merge commitem `81fafd7` do aktuálního `main` (`7d06803`) |
-| #96, #97, #78 | Driving Bans ověřené období, osobní kalendář (vypnuto), Ask | obsaženy přes #98 |
-| #90 (v #101) | vstup přes „Ask DAJC · FAQ“ | převzato byte po bytu (`2e12b42`), brána upravena na `public-entry.ts` |
-| #100 (v #101) | atomický throttling přihlášení (advisory lock) | převzato byte po bytu (`2e12b42`) |
-| #102 | účet, placené DAJC AI, platby, ABRA, učení | **nepřevzato**, kromě bezpečnostní opravy ohraničeného čtení těla požadavku (`730750a`, stejné hunky) |
+| #98 | #96 + #97 + #78 | merged with merge commit `81fafd7` into the current `main` (`7d06803`) |
+| #96, #97, #78 | Driving Bans verified period, personal calendar (off), Ask | included via #98 |
+| #90 (in #101) | entry via "Ask DAJC · FAQ" | taken byte for byte (`2e12b42`), gate changed to `public-entry.ts` |
+| #100 (in #101) | atomic sign-in throttling (advisory lock) | taken byte for byte (`2e12b42`) |
+| #102 | account, paid DAJC AI, payments, ABRA, learning | **not taken**, except the security fix for bounded request-body reading (`730750a`, same hunks) |
 
-**Proč #98 hlásil `mergeable: false`.** GitHub hlásí u #98
-`mergeable_state: behind`: větev stála na `ea27928` a `main` mezitím dostal
-7 commitů (#103, #104, #105, odkaz na X, Founding Customers). Textový konflikt
-neexistuje (lokální merge prošel bez konfliktu) a po sloučení prošly všechny
-kroky Application CI. Sémantický konflikt nebyl nalezen.
+**Why #98 reported `mergeable: false`.** GitHub reported
+`mergeable_state: behind` for #98: the branch was based on `ea27928` while
+`main` had received 7 commits (#103, #104, #105, the X link, Founding
+Customers). There is no textual conflict (a local merge succeeded) and all
+Application CI steps passed after the merge. No semantic conflict was found.
 
-**Navazující PR zůstávají použitelné.** Zkušební sloučení #102 (obsahuje #101)
-nad touto větví: konflikty jen ve 4 souborech, vždy typu „zachovat obojí“.
-Po vyřešení: typecheck 0 chyb, `npm test` 111 souborů, 1 280 testů prošlo,
-26 přeskočeno (Postgres bez DB). Řešení pro budoucí sloučení:
+**Follow-up PRs stay usable.** A trial merge of #102 (which contains #101) on
+top of this branch: conflicts in 4 files only, always "keep both". After
+resolving: typecheck 0 errors, `npm test` 111 files, 1,280 tests passed, 26
+skipped (Postgres without a DB). Resolution for the later merge:
 
-| Soubor | Řešení |
+| File | Resolution |
 |---|---|
-| `src/lib/ask/guide-entry.ts` | ponechat verzi této větve (`isAskPublicEntryEnabled`) |
-| `.env.example` | ponechat oba bloky (`DAJC_ASK_PUBLIC_ENTRY` i proměnné #102) |
-| `src/pages/intelligence/ask.astro` | importy spojit (`getAccountRuntime` + `limitReachedText`), panel limitu a účet ponechat oba, styly oba |
-| `src/lib/ask/client/ask-form.ts` | `limitReached = !paid && signedIn && remaining === 0`; po `renderAnswer(…, extras)` přidat bezpečnostní upozornění; větev 429 s panelem limitu ponechat |
+| `src/lib/ask/guide-entry.ts` | keep this branch's version (`isAskPublicEntryEnabled`) |
+| `.env.example` | keep both blocks (`DAJC_ASK_PUBLIC_ENTRY` and #102's variables) |
+| `src/pages/intelligence/ask.astro` | combine the imports (`getAccountRuntime` + `limitReachedText`), keep both the limit panel and the account panel, keep both style blocks |
+| `src/lib/ask/client/ask-form.ts` | `limitReached = !paid && signedIn && remaining === 0`; append the safety notice after `renderAnswer(…, extras)`; keep the 429 branch with the limit panel |
 
-Do `main` je nutné sloučit **merge commitem** (ne squash), aby #101/#102
-zůstaly navázané na historii #98.
+Merge into `main` with a **merge commit** (not squash), so #101/#102 stay
+attached to the history of #98.
 
-## 3. Provedené testy
+## 3. Tests performed
 
-| Krok (Application CI) | Výsledek |
+| Step (Application CI) | Result |
 |---|---|
 | `npm run lint:geographic-coverage` | OK |
 | `npm run lint:driving-bans` | PASS |
 | `npm run driving-bans:audit` | OK |
-| `npm run typecheck` | 0 chyb, 0 varování |
-| `npm test` | 97 souborů, **1 148 prošlo**, 8 přeskočeno (Postgres bez DB) |
-| `npm run build` | OK; render funkce má `maxDuration: 60` |
-| `node scripts/check-ask-bundle.mjs` | v klientském kódu žádný klíč ani endpoint AI |
+| `npm run typecheck` | 0 errors, 0 warnings |
+| `npm test` | 97 files, **1,148 passed**, 8 skipped (Postgres without a DB) |
+| `npm run build` | OK; the render function has `maxDuration: 60` |
+| `node scripts/check-ask-bundle.mjs` | no key and no AI endpoint in the client code |
 
-**Izolované prostředí (lokální kontejner, bez sítě k AI):**
+**Isolated environment (local container, no network access to AI):**
 
-- PostgreSQL 16, migrace `drizzle-ask` 0000 + 0001 jako admin, role
-  `dajc_ask_app` s heslem: Ask testy včetně Postgres **232/232, 0 přeskočeno**
-  (kontrakt úložiště, 12 paralelních přihlášení → přesně 3 povolena,
-  aplikační role nečte metriky). `anon`/`authenticated` bez přístupu,
-  `dajc_ask_app` bez superuser/bypassrls, nevlastní tabulky.
-- `astro dev` proti této DB s fiktivními klíči, Chromium (Playwright):
-  vyčerpaný limit → panel s přesným textem, tlačítko `/support`, odeslání
-  zakázané, žádná navigace mimo stránku; 4. dotaz přes API → 429 i s polem
-  `supported: true`; odkaz v navigaci a FAQ jen při `ENABLED` + `PUBLIC_ENTRY`;
-  aktivováno bez zveřejnění → stránka 200, žádný odkaz; vypnuto → 404, žádný
-  odkaz; bez horizontálního přetečení na 1180 px a iPhone 13.
+- PostgreSQL 16, `drizzle-ask` migrations 0000 + 0001 applied as admin, role
+  `dajc_ask_app` with a password: Ask tests including Postgres **232/232, 0
+  skipped** (store contract, 12 parallel sign-ins → exactly 3 allowed, the app
+  role cannot read metrics). `anon`/`authenticated` have no access,
+  `dajc_ask_app` has no superuser/bypassrls and owns no tables.
+- `astro dev` against this DB with fake keys, Chromium (Playwright): limit
+  used up → panel with the exact text, `/support` button, submit disabled, no
+  navigation away from the page; 4th question via the API → 429 even with the
+  field `supported: true`; link in the navigation and the FAQ only with
+  `ENABLED` + `PUBLIC_ENTRY`; activated but not published → page 200, no link;
+  off → 404, no link; no horizontal overflow at 1180 px or on an iPhone 13.
 
-**Netestováno (nelze bez schválení/přístupů):** skutečné volání OpenAI,
-Anthropic, Perplexity; skutečné odeslání e-mailu přes Resend; nasazení s
-produkční konfigurací; test hodnoty na 20 skutečných otázkách. Žádný z
-výsledků výše není důkazem produkční připravenosti služeb třetích stran.
+**Not tested (impossible without approval or access):** real calls to OpenAI,
+Anthropic and Perplexity; a real e-mail through Resend; a deployment with the
+production configuration; the value test on 20 real questions. None of the
+results above proves the production readiness of third-party services.
 
-## 4. Provozní služby — co skutečně chybí (ověřeno 2026-11-08, jen čtení)
+## 4. Operational services — what is actually missing (checked 2026-11-08, read-only)
 
-| Služba | Zjištěný stav | Co chybí |
+| Service | Observed state | Missing |
 |---|---|---|
-| **Supabase / PostgreSQL EU** | Organizace „DAJC“ na tarifu **free**. Všechny 4 projekty (`dajc-partner-portal` eu-west-1, `dajc-assistance-dev`, `dajc-staging-e2e`, `HaulBoard` eu-central-1) jsou **INACTIVE**. Podle #102 obnova projektu selhala na „organization has unpaid invoices“ (neověřováno znovu, nic se neměnilo). | aktivní projekt v EU (Frankfurt), migrace 0000+0001, heslo role, kontrola „Exposed schemas“; vyřešit neuhrazené faktury |
-| **OpenAI API** | Ve Vercelu žádný `DAJC_ASK_OPENAI_*`. Pipeline článků OpenAI nepoužívá; existenci účtu nelze z tohoto prostředí ověřit. | samostatný projektový klíč s limitem útraty, názvy modelů, ověřené ceny, DPA |
-| **Anthropic API** | Ve Vercelu žádný `DAJC_ASK_ANTHROPIC_*` (pipeline článků používá vlastní klíč v GitHub Actions — pro Ask je zakázaný). | samostatný workspace a klíč s limitem útraty, model kontroly, DPA |
-| **Perplexity API** | Ve Vercelu žádný `DAJC_ASK_PERPLEXITY_API_KEY`. | samostatný klíč s limitem, DPA |
-| **Resend** | Ve Vercelu **chybí i `RESEND_API_KEY`** (týká se i registrace testování 2027). Ověření domény nelze odsud zjistit. | ověřená doména `dajc.eu`, klíč v Production, `DAJC_ASK_EMAIL_MODE=live` |
-| **Vercel** | Projekt `dajc-eu` (tým HaulBoard). Proměnné: jen investor + 2 preview proměnné z #102. Produkční funkce běží v **iad1 (USA)**. Tarif nelze přes API zjistit (billing API vrací 404 → pravděpodobně Hobby). | Ask proměnné; region `fra1` (v této větvi v `vercel.json`, platí po sloučení); potvrdit tarif — podmínky Hobby omezují komerční použití, posoudit s ohledem na příspěvky a B2B nabídky |
-| **Rozpočty a monitoring** | V kódu: denní a měsíční strop, tabulka `metrics`, SQL v `docs/ASK_DAJC_AI.md`. U poskytovatelů nic nastaveno. | rozhodnout stropy (oddíl 5), limity útraty u poskytovatelů, denní kontrola metrik |
+| **Supabase / PostgreSQL EU** | Organisation "DAJC" on the **free** plan. All 4 projects (`dajc-partner-portal` eu-west-1, `dajc-assistance-dev`, `dajc-staging-e2e`, `HaulBoard` eu-central-1) are **INACTIVE**. According to #102, restoring a project failed with "organization has unpaid invoices" (not re-checked; nothing was changed). | an active EU project (Frankfurt), migrations 0000+0001, role password, check of "Exposed schemas"; settle the unpaid invoices |
+| **OpenAI API** | No `DAJC_ASK_OPENAI_*` in Vercel. The article pipeline does not use OpenAI; whether an account exists cannot be checked from here. | a separate project key with a spend limit, model names, verified prices, DPA |
+| **Anthropic API** | No `DAJC_ASK_ANTHROPIC_*` in Vercel (the article pipeline has its own key in GitHub Actions, which Ask may not use). | a separate workspace and key with a spend limit, the checking model, DPA |
+| **Perplexity API** | No `DAJC_ASK_PERPLEXITY_API_KEY` in Vercel. | a separate key with a limit, DPA |
+| **Resend** | **`RESEND_API_KEY` is also missing** in Vercel (this also affects the Testing 2027 registration). Domain verification cannot be checked from here. | verified `dajc.eu` domain, key in Production, `DAJC_ASK_EMAIL_MODE=live` |
+| **Vercel** | Project `dajc-eu` (team HaulBoard). Variables: investor only + 2 preview variables from #102. Production functions run in **iad1 (USA)**. The plan cannot be read via the API (billing API returns 404 → probably Hobby). | Ask variables; region `fra1` (set in `vercel.json` on this branch, effective after the merge); confirm the plan — Hobby terms restrict commercial use, to be assessed given the contributions and B2B offers |
+| **Budgets and monitoring** | In the code: daily and monthly cap, the `metrics` table, SQL in `docs/ASK_DAJC_AI.md`. Nothing set at the providers. | decide the caps (section 5), spend limits at the providers, a daily check of the metrics |
 
-Nic nebylo vytvořeno, obnoveno, migrováno ani změněno v Supabase ani ve
-Vercelu.
+Nothing was created, restored, migrated or changed in Supabase or Vercel.
 
-## 5. Odhad provozních nákladů (3 dotazy denně, 30 dní)
+## 5. Estimated operating costs (3 questions per day, 30 days)
 
-**Předpoklady** (odhad, ne měření — první týden provozu je nutné porovnat s
-tabulkou `metrics`):
+**Assumptions** (an estimate, not a measurement — compare with the `metrics`
+table in the first week of operation):
 
-- ceny z konfigurace §47.5 / `.env.example` (USD za 1M tokenů): klasifikace
-  0,20/1,25, návrh odpovědi 0,75/4,50, kontrola 2/10 (= Claude Sonnet 5.5),
-  vyhledávání 0,005 USD; kurz 0,92 EUR/USD. Ceny OpenAI a Perplexity nebyly
-  ověřeny na aktuálním ceníku; ceny Anthropic odpovídají ceníku k 2026-10.
-- tokeny na dotaz: klasifikace 700/200, návrh 5 000/700, kontrola 3 000/300,
-  vyhledávání u 60 % dotazů.
-- **základ ≈ 0,018 € / dotaz**; nejlevnější varianta s kontrolou Claude
-  Haiku 5.5 (0,10/0,50 USD) ≈ 0,010 €; pesimistická (skryté reasoning
-  tokeny, vyhledávání u všech dotazů) ≈ 0,028 €. Rezervace nejhoršího
-  případu před dotazem ≈ 0,24 € (s Haiku ≈ 0,10 €).
+- prices from the configuration §47.5 / `.env.example` (USD per 1M tokens):
+  classification 0.20/1.25, answer draft 0.75/4.50, check 2/10 (= Claude
+  Sonnet 5.5), search 0.005 USD; rate 0.92 EUR/USD. OpenAI and Perplexity
+  prices were not checked against the current price lists; Anthropic prices
+  match the price list as of 2026-10.
+- tokens per question: classification 700/200, draft 5,000/700, check
+  3,000/300, search for 60 % of the questions.
+- **baseline ≈ €0.018 per question**; the cheapest variant with Claude Haiku
+  5.5 as the checker (0.10/0.50 USD) ≈ €0.010; pessimistic (hidden reasoning
+  tokens, search for every question) ≈ €0.028. The worst-case reservation
+  before a question ≈ €0.24 (with Haiku ≈ €0.10).
 
-| Aktivní řidiči | Dotazů / měsíc | AI základ | AI nejlevnější | AI pesimisticky | Infrastruktura | **Celkem základ** |
+| Active drivers | Questions / month | AI baseline | AI cheapest | AI pessimistic | Infrastructure | **Total baseline** |
 |---|---|---|---|---|---|---|
-| 100 | 9 000 | 159 € | 89 € | 248 € | ≈ 41 € | **≈ 200 € / měsíc** |
-| 500 | 45 000 | 797 € | 445 € | 1 238 € | ≈ 60 € | **≈ 860 € / měsíc** |
-| 1 000 | 90 000 | 1 593 € | 889 € | 2 477 € | ≈ 60 € | **≈ 1 650 € / měsíc** |
+| 100 | 9,000 | €159 | €89 | €248 | ≈ €41 | **≈ €200 / month** |
+| 500 | 45,000 | €797 | €445 | €1,238 | ≈ €60 | **≈ €860 / month** |
+| 1,000 | 90,000 | €1,593 | €889 | €2,477 | ≈ €60 | **≈ €1,650 / month** |
 
-Infrastruktura (seznamové ceny, ověřit): Supabase Pro 25 USD (≈ 23 €;
-free tarif uspává neaktivní projekty a nemá zálohy), Vercel Pro 20 USD
-(≈ 18 €; pokud Hobby nevyhovuje podmínkám), Resend free (3 000 e-mailů/měsíc,
-100/den) stačí pro 100 řidičů, pro 500+ Resend Pro 20 USD (≈ 18 €).
-Přihlášení platí 7 dní → ≈ 4–5 e-mailů na řidiče měsíčně.
+Infrastructure (list prices, to verify): Supabase Pro 25 USD (≈ €23; the free
+plan pauses inactive projects and has no backups), Vercel Pro 20 USD (≈ €18;
+if Hobby does not meet the terms), Resend free (3,000 e-mails/month, 100/day)
+is enough for 100 drivers, Resend Pro 20 USD (≈ €18) for 500+. A sign-in lasts
+7 days → ≈ 4–5 e-mails per driver per month.
 
-Nejlevnější bezpečná varianta pro start (≈ 100 řidičů): kontrola Claude
-Haiku 5.5, Supabase Pro, Resend free, Vercel podle posouzení tarifu →
-**≈ 110–130 € / měsíc**. Kvalitu kontroly s Haiku je nutné ověřit testem
-hodnoty (oddíl 7, krok 9) před přepnutím.
+Cheapest safe variant for the start (≈ 100 drivers): Claude Haiku 5.5 as the
+checker, Supabase Pro, Resend free, Vercel depending on the plan assessment →
+**≈ €110–130 / month**. The checking quality with Haiku must be confirmed by
+the value test (section 7, step 9) before switching.
 
-**Stropy v kódu musí odpovídat počtu uživatelů.** Výchozí hodnoty
-(`DAJC_ASK_DAILY_BUDGET_EUR=2`, `DAJC_ASK_MONTHLY_BUDGET_EUR=20`) unesou jen
-≈ 100 dotazů denně a ≈ 1 100 dotazů měsíčně (≈ 12 plně aktivních řidičů).
-Potom se služba pozastaví — měsíční strop až do konce měsíce, což by
-porušilo „zdarma každý další den“. Doporučení: měsíční strop ≥ 31 × denní,
-aby rozhodoval denní strop a služba se každý den obnovila.
+**The caps in the code must match the number of users.** The defaults
+(`DAJC_ASK_DAILY_BUDGET_EUR=2`, `DAJC_ASK_MONTHLY_BUDGET_EUR=20`) carry only
+≈ 100 questions per day and ≈ 1,100 questions per month (≈ 12 fully active
+drivers). Then the service pauses — the monthly cap until the end of the
+month, which would break "free every day". Recommendation: monthly cap ≥ 31 ×
+daily cap, so the daily cap decides and the service resumes every day.
 
-| Řidiči | `DAJC_ASK_DAILY_BUDGET_EUR` | `DAJC_ASK_MONTHLY_BUDGET_EUR` |
+| Drivers | `DAJC_ASK_DAILY_BUDGET_EUR` | `DAJC_ASK_MONTHLY_BUDGET_EUR` |
 |---|---|---|
 | 100 | 10 | 310 |
-| 500 | 35 | 1 085 |
-| 1 000 | 65 | 2 015 |
+| 500 | 35 | 1,085 |
+| 1,000 | 65 | 2,015 |
 
-Další kapacitní limity v kódu: nejvýš 300 přihlašovacích e-mailů denně
-celkem (`auth.ts`), Resend free 100 e-mailů denně — při spuštění pro stovky
-řidičů najednou bude přihlášení první den omezené.
+Other capacity limits in the code: at most 300 sign-in e-mails per day in total
+(`auth.ts`), Resend free 100 e-mails per day — at a launch for hundreds of
+drivers at once, sign-in is limited on the first day.
 
-## 6. Zbývající blokující podmínky
+## 6. Remaining blocking conditions
 
-1. **Právní texty** (`docs/ASK_DAJC_AI_LEGAL_DRAFT.md`): schválení
-   provozovatelem a advokátem, sjednocení provozovatele (Miroslav Dajč vs.
-   Dajc s.r.o.), zveřejnění v `/privacy` a `/terms` samostatnou změnou.
-2. **DPA a předávání do USA** s OpenAI, Anthropic, Perplexity (a Resend):
-   uzavřít, ověřit uchování a zákaz trénování.
-3. **Databáze:** neuhrazené faktury Supabase, aktivní EU projekt, migrace.
-4. **Klíče AI:** tři samostatné klíče s limity útraty, modely, ověřené ceny.
-5. **Resend:** ověřená doména, klíč, `live` režim.
-6. **Rozpočet:** rozhodnutí o stropech podle oddílu 5.
-7. **Vercel:** tarif (komerční použití), proměnné prostředí, region `fra1`
-   po sloučení.
-8. **Test hodnoty** na 20 skutečných otázkách (EN, CS, SK, PL, DE) se
-   schválením nákladů (≈ 0,5 €).
-9. **Merge** této větve do `main` — jen po výslovném schválení vlastníka.
+1. **Legal texts** (`docs/ASK_DAJC_AI_LEGAL_DRAFT.md`): approval by the
+   operator and a lawyer, a single operator (Miroslav Dajč vs. Dajc s.r.o.),
+   publication in `/privacy` and `/terms` by a separate change.
+2. **DPAs and transfers to the USA** with OpenAI, Anthropic, Perplexity (and
+   Resend): sign them, verify retention and no training.
+3. **Database:** Supabase's unpaid invoices, an active EU project, migrations.
+4. **AI keys:** three separate keys with spend limits, models, verified prices.
+5. **Resend:** verified domain, key, `live` mode.
+6. **Budget:** decision on the caps according to section 5.
+7. **Vercel:** plan (commercial use), environment variables, region `fra1`
+   after the merge.
+8. **Value test** on 20 real questions (EN, CS, SK, PL, DE) with approved
+   costs (≈ €0.5).
+9. **Merge** of this branch into `main` — only after the owner's explicit
+   approval.
 
-Doporučené, ne blokující: CAPTCHA/bot ochrana před přihlášením (otevřené z
-#78), automatické mazání otisků po neaktivitě (pokud ho Privacy slíbí).
+Recommended, not blocking: CAPTCHA/bot protection before sign-in (open since
+#78), automatic deletion of fingerprints after inactivity (if the Privacy
+notice promises it).
 
-## 7. Poslední kroky ke spuštění (v tomto pořadí)
+## 7. Last steps to launch (in this order)
 
-1. Vlastník zkontroluje a schválí PR; sloučit do `main` **merge commitem**.
-   Po nasazení ověřit, že web funguje (region `fra1`), DAJC AI zůstává 404.
-2. Rozhodnutí vlastníka: provozovatel, stropy, model kontroly (Sonnet 5.5
-   vs. Haiku 5.5), tarif Vercel a Supabase.
-3. Advokát schválí texty → samostatný PR zveřejní sekce DAJC AI v Privacy a
-   Terms.
-4. Supabase: vyřešit faktury, vytvořit/obnovit projekt v EU, jako admin
+1. The owner reviews and approves the PR; merge into `main` with a **merge
+   commit**. After the deployment, check that the website works (region
+   `fra1`) and DAJC AI still answers 404.
+2. Owner decisions: operator, caps, the checking model (Sonnet 5.5 vs. Haiku
+   5.5), Vercel and Supabase plans.
+3. A lawyer approves the texts → a separate PR publishes the DAJC AI sections
+   in Privacy and Terms.
+4. Supabase: settle the invoices, create/restore an EU project, as admin
    `DAJC_ASK_MIGRATION_DB_URL=… npx drizzle-kit migrate --config drizzle.ask.config.ts`,
-   `ALTER ROLE dajc_ask_app WITH LOGIN PASSWORD '…'` mimo repozitář,
-   ověřit, že `dajc_ask` není v „Exposed schemas“; spustit
-   `DAJC_ASK_TEST_DB_URL=… npx vitest run src/lib/ask` proti nové DB před
-   prvními uživateli.
-5. Vytvořit samostatné klíče OpenAI / Anthropic / Perplexity s měsíčním
-   limitem útraty u poskytovatele (≤ měsíční strop) a uzavřít DPA.
-6. Resend: ověřit doménu, klíč do Vercel Production.
-7. Vercel Production — proměnné (jen názvy, hodnoty mimo repozitář):
+   `ALTER ROLE dajc_ask_app WITH LOGIN PASSWORD '…'` outside the repository,
+   check that `dajc_ask` is not in "Exposed schemas"; run
+   `DAJC_ASK_TEST_DB_URL=… npx vitest run src/lib/ask` against the new DB
+   before the first users.
+5. Create separate OpenAI / Anthropic / Perplexity keys with a monthly spend
+   limit at the provider (≤ the monthly cap) and sign the DPAs.
+6. Resend: verify the domain, put the key into Vercel Production.
+7. Vercel Production — variables (names only, values outside the repository):
    `DAJC_ASK_ENABLED=true`, `DAJC_ASK_PUBLIC_ENTRY=false`, `DAJC_ASK_DB_URL`,
    `DAJC_ASK_OPENAI_API_KEY`, `DAJC_ASK_ANTHROPIC_API_KEY`,
    `DAJC_ASK_PERPLEXITY_API_KEY`, `DAJC_ASK_OPENAI_CLASSIFIER_MODEL`,
    `DAJC_ASK_OPENAI_ANSWER_MODEL`, `DAJC_ASK_ANTHROPIC_VERIFIER_MODEL`,
    `DAJC_ASK_PRICING_USD`, `DAJC_ASK_USD_EUR_RATE`,
    `DAJC_ASK_DAILY_BUDGET_EUR`, `DAJC_ASK_MONTHLY_BUDGET_EUR`,
-   `DAJC_ASK_DAILY_QUERY_LIMIT=3`, `DAJC_ASK_EMAIL_PEPPER` (≥ 32 znaků),
-   `DAJC_ASK_EMAIL_MODE=live`, `RESEND_API_KEY`; znovu nasadit.
-8. Kontrolní test v produkci přes přímou adresu `/intelligence/ask`:
-   přihlášení e-mailem, 3 dotazy (úrovně, zdroje, bezpečnostní upozornění),
-   4. dotaz → panel limitu s odkazem na `/support`; zkontrolovat řádky v
-   `dajc_ask.metrics` a `dajc_ask.budget` a logy Vercelu.
-9. Test hodnoty na 20 skutečných otázkách; vlastník posoudí odpovědi.
-10. `DAJC_ASK_PUBLIC_ENTRY=true` a nové nasazení → odkaz „DAJC AI“ v hlavní
-    navigaci a ve FAQ. Tím je služba veřejně spuštěná.
-11. Provoz: denně SQL z `docs/ASK_DAJC_AI.md` (podíl NEVÍM, náklady na
-    dotaz), útrata u poskytovatelů; podle skutečných nákladů upravit stropy.
+   `DAJC_ASK_DAILY_QUERY_LIMIT=3`, `DAJC_ASK_EMAIL_PEPPER` (≥ 32 characters),
+   `DAJC_ASK_EMAIL_MODE=live`, `RESEND_API_KEY`; redeploy.
+8. Production smoke test via the direct address `/intelligence/ask`: sign-in
+   by e-mail, 3 questions (levels, sources, safety notice), 4th question → the
+   limit panel with the link to `/support`; check the rows in
+   `dajc_ask.metrics` and `dajc_ask.budget` and the Vercel logs.
+9. Value test on 20 real questions; the owner reviews the answers.
+10. `DAJC_ASK_PUBLIC_ENTRY=true` and a new deployment → the "DAJC AI" link in
+    the main navigation and in the FAQ. The service is then publicly launched.
+11. Operations: daily SQL from `docs/ASK_DAJC_AI.md` (share of DON'T KNOW,
+    cost per question) and provider spend; adjust the caps to the real costs.
 
-Vypnutí kdykoli: `DAJC_ASK_PUBLIC_ENTRY=false` (skryje odkazy) nebo
-`DAJC_ASK_ENABLED=false` (vše 404) a nové nasazení.
+Switching off at any time: `DAJC_ASK_PUBLIC_ENTRY=false` (hides the links) or
+`DAJC_ASK_ENABLED=false` (everything 404) and a new deployment.
