@@ -26,7 +26,7 @@ export interface RouteContext {
   clientAddress?: string;
 }
 
-const COOKIE_PATH = '/api/ask';
+export const COOKIE_PATH = '/api/ask';
 const MAX_BODY_BYTES = 8_192;
 const PUBLIC_ORIGINS = ['https://www.dajc.eu', 'https://dajc.eu'];
 
@@ -44,19 +44,50 @@ export function notFound(): Response {
   });
 }
 
-function json(body: unknown, status = 200): Response {
+export function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: BASE_HEADERS });
 }
 
-function originAllowed(request: Request, runtime: AskRuntime): boolean {
+export function originAllowed(request: Request, runtime: AskRuntime): boolean {
   const origin = request.headers.get('origin');
   return Boolean(origin && new Set([runtime.config.publicOrigin, ...PUBLIC_ORIGINS]).has(origin));
 }
 
-async function readJson(request: Request): Promise<Record<string, unknown> | null> {
+/**
+ * The request body as UTF-8 text, read in chunks and abandoned as soon as it
+ * exceeds maxBytes (bytes, not characters), whatever Content-Length claims or
+ * omits. null when it is too large. Decodes like Request.text().
+ */
+export async function readBodyLimited(request: Request, maxBytes: number): Promise<string | null> {
+  const declared = Number(request.headers.get('content-length') || 0);
+  if (declared > maxBytes) return null;
+  if (!request.body) return '';
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > maxBytes) {
+      await reader.cancel().catch(() => undefined);
+      return null;
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder('utf-8').decode(bytes);
+}
+
+export async function readJson(request: Request, maxBytes = MAX_BODY_BYTES): Promise<Record<string, unknown> | null> {
   if (!(request.headers.get('content-type') || '').toLowerCase().includes('application/json')) return null;
-  const text = await request.text();
-  if (text.length > MAX_BODY_BYTES) return null;
+  const text = await readBodyLimited(request, maxBytes);
+  if (text === null) return null;
   try {
     const parsed = JSON.parse(text);
     return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
@@ -65,7 +96,7 @@ async function readJson(request: Request): Promise<Record<string, unknown> | nul
   }
 }
 
-function sessionToken(ctx: RouteContext): string | undefined {
+export function sessionToken(ctx: RouteContext): string | undefined {
   return ctx.cookies.get(SESSION_COOKIE)?.value;
 }
 
