@@ -10,9 +10,10 @@ interface Props {
   title: string;
   description: string;
   socialImage?: SocialImageKey;
+  noindex?: boolean;
 }
 
-const { title, description, socialImage = 'default' } = Astro.props;
+const { title, description, socialImage = 'default', noindex = false } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 const siteName = 'DAJC';
@@ -61,6 +62,7 @@ const homeStructuredData = {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title}</title>
   <meta name="description" content={description} />
+  {noindex && <meta name="robots" content="noindex, nofollow, noarchive" />}
   <meta name="application-name" content={siteName} />
   <meta name="theme-color" content="#061A33" />
   {googleSiteVerification && <meta name="google-site-verification" content={googleSiteVerification} />}
