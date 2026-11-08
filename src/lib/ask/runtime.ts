@@ -4,6 +4,7 @@
 
 import { getAskConfig, type AskConfig, type AskEnv } from './config';
 import { createMailer, type AskMailer } from './email';
+import { libraryLookupFor, readLibraryConfig } from './library';
 import { createProviders, type Providers } from './providers';
 import { PostgresAskStore } from './store/postgres';
 import type { ServiceDeps } from './service';
@@ -27,5 +28,12 @@ export function getAskRuntime(env: AskEnv = process.env): AskRuntime | null {
     store: PostgresAskStore.fromUrl(config.dbUrl),
     providers: createProviders({ openaiKey: config.openaiKey, anthropicKey: config.anthropicKey, perplexityKey: config.perplexityKey }),
     mailer: createMailer(config),
+    // DAJC legal library, only with DAJC_KB_ENABLED=true (docs/DAJC_AI_LEGAL_LIBRARY.md).
+    pipeline: libraryPipeline(config.dbUrl, env),
   };
+}
+
+function libraryPipeline(dbUrl: string, env: AskEnv): AskRuntime['pipeline'] {
+  const library = readLibraryConfig(env);
+  return library ? { library: libraryLookupFor(dbUrl, library) } : undefined;
 }

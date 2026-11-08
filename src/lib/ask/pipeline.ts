@@ -32,6 +32,7 @@ import type { AskConfig } from './config';
 import type { CostMeter } from './cost';
 import { renderDrivingBanFacts, type FactRow } from './facts';
 import { asksForConfirmation } from './confirmation';
+import { citable, countriesCovered, LIBRARY_MAX_SOURCES, libraryLimits, librarySourceText, type LibraryHit, type LibraryLookup } from './library';
 import { checkClaims, normalizeForMatch, type DraftClaim, type GuardSource } from './guard';
 import { t, type UiKey, type UiLang } from './i18n';
 import { detectLanguage } from './language';
@@ -110,6 +111,8 @@ export interface PipelineDeps {
   view?: DrivingBansView;
   findings?: FindingLike[];
   deadlineMs?: number;
+  /** DAJC legal library (library.ts), off unless DAJC_KB_ENABLED; never for driving bans. */
+  library?: LibraryLookup;
 }
 
 export class AskTimeoutError extends Error {
@@ -339,8 +342,17 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
   const fallbackLevel: Level = registryDecides ? 'UNKNOWN' : 'INSUFFICIENT_VERIFIED_DATA';
   const empty = (reason: UnknownReason, authorities: string[]) => emptyAnswer(c.language, uiLang, reason, authorities, notices, fallbackLevel, verificationList);
 
+  // (2b) DAJC legal library: archived official documents with article and page.
+  // Countries it answers directly need no paid web search.
+  const askedDay = c.dates[0] ?? today;
+  const libraryHits: LibraryHit[] = !drivingBan && deps.library
+    ? (await withDeadline(deps.library({ countries: c.jurisdictions, topic: c.topic, language: c.language, searchTerms: c.search_terms, question, date: askedDay, massT: c.vehicle.weight_t }).catch(() => [] as LibraryHit[]), deadline, [] as LibraryHit[]))
+      .filter((hit) => citable(hit, askedDay)).slice(0, LIBRARY_MAX_SOURCES)
+    : [];
+  const libraryCountries = new Set(libraryHits.flatMap((hit) => countriesCovered(hit, c.jurisdictions)));
+
   // (3) Official domains, only where own data cannot answer.
-  const webJurisdictions = drivingBan ? undecided : c.jurisdictions;
+  const webJurisdictions = drivingBan ? undecided : c.jurisdictions.filter((code) => !libraryCountries.has(code));
   const pages: OfficialPage[] = [];
   const consulted: string[] = [];
   if (webJurisdictions.length > 0) {
@@ -372,10 +384,14 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
     for (const result of fetched) if (result.ok) pages.push(result.page);
   }
 
-  const sourceById = new Map<string, PromptSource & { page?: OfficialPage; record?: OwnRecord; unverified?: boolean }>();
+  const sourceById = new Map<string, PromptSource & { page?: OfficialPage; record?: OwnRecord; unverified?: boolean; library?: LibraryHit }>();
   for (const record of records) {
     sourceById.set(record.id, { id: record.id, kind: 'own', url: record.facts.sourceUrl, title: record.facts.restriction, text: record.text, record });
   }
+  libraryHits.forEach((hit, index) => {
+    const id = `L${index + 1}`;
+    sourceById.set(id, { id, kind: 'web', url: hit.url, title: hit.citation, text: librarySourceText(hit), library: hit });
+  });
   const passageTerms = [...c.search_terms, TOPIC_TERMS[c.topic]];
   pages.forEach((page, index) => {
     const id = `S${index + 1}`;
@@ -438,9 +454,10 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
 
   // (7) Level and output. Facts from own data are rendered by template.
   const citedIds = [...new Set(guard.kept.map((claim) => claim.source_id))];
-  const answeredJurisdictions = new Set(citedIds.map((id) => {
+  const answeredJurisdictions = new Set(citedIds.flatMap((id) => {
     const source = sourceById.get(id)!;
-    return source.record ? source.record.jurisdiction : jurisdictionOfUrl(source.url, c.jurisdictions);
+    if (source.library) return countriesCovered(source.library, c.jurisdictions);
+    return [source.record ? source.record.jurisdiction : jurisdictionOfUrl(source.url, c.jurisdictions)];
   }));
   const everyCountryAnswered = c.jurisdictions.every((code) => answeredJurisdictions.has(code));
   const complete = droppedCount === 0 && draft.json?.covers_question === true && everyCountryAnswered;
@@ -456,6 +473,17 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
     const source = sourceById.get(id)!;
     return source.kind === 'own' ? 'dajc_verified' : source.unverified ? 'unverified_official_lead' : 'official_web';
   };
+  // Library passages: a VERIFIED answer needs person-verified versions that apply directly and fit the vehicle's mass band.
+  const citedLibrary = citedIds.map((id) => sourceById.get(id)?.library).filter((hit): hit is LibraryHit => Boolean(hit));
+  if (citedLibrary.length > 0) {
+    const limits = new Set(citedLibrary.flatMap(libraryLimits));
+    if (limits.size > 0 && level === 'VERIFIED') level = 'PARTIAL';
+    notices.push(t(uiLang, 'libraryInterpretationNotice'));
+    if (citedLibrary.some((hit) => hit.authenticity === 'CONSOLIDATED_DOCUMENTATION')) notices.push(t(uiLang, 'libraryConsolidatedNotice'));
+    if (limits.has('unreviewed')) notices.push(t(uiLang, 'libraryUnreviewedNotice'));
+    if (limits.has('applicability')) notices.push(t(uiLang, 'libraryApplicabilityNotice'));
+    if (limits.has('mass')) notices.push(t(uiLang, 'libraryMassNotice'));
+  }
   const citedRecords = citedIds.map((id) => sourceById.get(id)?.record).filter((r): r is OwnRecord => Boolean(r));
   if (citedRecords.some((record) => record.facts.exceptions)) notices.push(t(uiLang, 'exceptionsNotice'));
   if (guard.kept.some((claim) => basisOf(claim.source_id) === 'unverified_official_lead')) notices.push(t(uiLang, 'unverifiedLeadNotice'));
@@ -477,7 +505,7 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
         kind: s.kind,
         url: s.url,
         title: s.title,
-        checkedAt: s.record ? s.record.facts.verified : today,
+        checkedAt: s.record ? s.record.facts.verified : s.library?.validityCheckedOn ?? today,
         publishedAt: s.page?.publishedAt ?? null,
         verification: s.kind === 'own' ? 'DAJC_VERIFIED' as const : s.unverified ? 'UNVERIFIED_LEAD' as const : 'OFFICIAL_WEB' as const,
       };
