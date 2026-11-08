@@ -9,6 +9,12 @@ sloučení (vše zůstává vypnuté), ale chybí databáze, klíče poskytovate
 e-mail, schválené právní texty a rozhodnutí o rozpočtu. Podrobnosti v
 oddílech 4–7.
 
+> **Aktualizace 2026-11-08 (větev `claude/dajc-ai-neon-knowledge-base`):** databáze je nově
+> **Neon PostgreSQL** (projekt `dajc-ai`, Frankfurt, větev `dev` s migracemi; produkční větev
+> prázdná) — viz `docs/DAJC_AI_NEON.md`. Supabase zůstává beze změny. Přibyla evropská knihovna
+> úředních předpisů (`docs/DAJC_AI_LEGAL_LIBRARY.md`). Body níže o Supabase platí pro Supabase;
+> pro Neon platí blokující podmínky v tom dokumentu.
+
 ## 1. Co je DAJC AI v této verzi
 
 Existující „Zeptejte se DAJC AI“ (Ask, PR #78) jako bezplatný pracovní AI
