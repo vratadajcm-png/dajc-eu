@@ -1,81 +1,115 @@
-# DAJC AI — databáze Neon PostgreSQL (místo Supabase)
+# DAJC AI — Neon PostgreSQL database (instead of Supabase)
 
-Stav k 2026-11-08. Supabase zůstává beze změny (projekty ani data se nemazaly).
+Status on 2026-11-08. Supabase is unchanged (no projects or data were deleted).
 
-## 1. Skutečný stav
+## 1. Actual state
 
-| Položka | Stav (ověřeno přes Neon MCP v této relaci) |
+| Item | State (checked through the Neon MCP connector in this session) |
 |---|---|
-| Přístup | Konektor Neon připojený do relace Claude Code. Neon API ze sandboxu dosažitelné; **přímé TCP spojení na port 5432 sandbox nepouští** — veškerá práce s DB šla přes Neon MCP (SQL běží na straně Neonu), žádný připojovací řetězec ani heslo neprošly sandboxem. |
-| Organizace | „Miroslav“ (`org-winter-glitter-59519495`), tarif **Free**, bez platební karty |
-| Projekt | **`dajc-ai`** (`lively-shadow-23612355`), region **`aws-eu-central-1` (Frankfurt)**, PostgreSQL **17.11**, UTF8 / `C.UTF-8` |
-| Větev `production` (výchozí) | prázdná, žádné migrace — vyhrazená pro budoucí produkci |
-| Větev `dev` | migrace `drizzle-ask` 0000+0001 a `drizzle-kb` 0000, evidence migrací drizzle (stejné SHA-256 jako soubory) |
-| Větev `dev-security-tests` | testovací data bezpečnostních testů (1 otisk, počítadla, rozpočet, metrika) |
-| Větev `dev-kb-tests` | vzorek knihovny: 3 ustanovení nařízení 561/2006 (CS) pro ověření vyhledávání |
-| Data API | není zapnuté (404) — schémata nejsou vystavená přes HTTP |
-| Free tarif | 100 projektů, 10 větví/projekt, 100 CU-h/projekt/měsíc, 1 GB/projekt (20 GB účet), uspání po 5 min nečinnosti (nelze vypnout), bez karty |
+| Access | The Neon connector is connected to the Claude Code session. The Neon API is reachable from the sandbox; **the sandbox does not allow direct TCP connections to port 5432** — all database work went through the Neon MCP connector (SQL runs on Neon's side); no connection string or password passed through the sandbox. |
+| Organisation | "Miroslav" (`org-winter-glitter-59519495`), **Free** plan, no payment card |
+| Project | **`dajc-ai`** (`lively-shadow-23612355`), region **`aws-eu-central-1` (Frankfurt)**, PostgreSQL **17.11**, UTF8 / `C.UTF-8` |
+| Branch `production` (default) | empty, no migrations — reserved for the future production |
+| Branch `dev` | migrations `drizzle-ask` 0000+0001 and `drizzle-kb` 0000, drizzle migration bookkeeping (same SHA-256 as the files) |
+| Branch `dev-security-tests` | test data of the security tests (1 fingerprint, counters, budget, a metric) |
+| Branch `dev-kb-tests` | library sample: 3 provisions of Regulation 561/2006 (CS) to verify search |
+| Data API | not enabled (404) — the schemas are not exposed over HTTP |
+| Free plan | 100 projects, 10 branches/project, 100 CU-hours/project/month, 1 GB/project (20 GB per account), suspend after 5 min of inactivity (cannot be disabled), no card |
 
-Testovací větve lze smazat, až nebudou potřeba (rozhodnutí vlastníka; Claude je nemaže).
+The test branches can be deleted when no longer needed (owner's decision;
+Claude does not delete them).
 
-## 2. Kompatibilita (ověřeno na Neonu a na lokálním klonu Neonu)
+## 2. Compatibility (verified on Neon and on a local Neon-like cluster)
 
-| Vlastnost | Výsledek |
+| Property | Result |
 |---|---|
-| Vlastník DB (`dajc_owner`) | **není superuživatel**, ale má `CREATEROLE`, `CREATEDB`, **`BYPASSRLS`** (člen `neon_superuser`) → aplikace **nesmí** používat vlastníka |
-| Role vytvořená migrací (`dajc_ask_app`) | bez superuživatele, bez `BYPASSRLS`, mimo `neon_superuser`, člen žádné role; heslo nastaví vlastník mimo repozitář (Neon vyžaduje ≥ 60 bitů entropie) |
-| RLS | zapnuté na všech 8 tabulkách `dajc_ask`; aplikační role nečte metriky |
-| Drizzle ORM + postgres-js | `prepare: false` (už v kódu) — kompatibilní s PgBouncerem Neonu v režimu `transaction` |
-| Transakce, `pg_advisory_xact_lock` | fungují (zámek je transakční, ne relační — přesně to pooler podporuje) |
-| `gen_random_uuid`, `unaccent`, generovaný `tsvector`, `regconfig` | fungují na PG 17.11 |
-| Čeština/slovenština/polština ve fulltextu | správně (`ridic`, `prestavku` …) díky `C.UTF-8` + `unaccent`; PostgreSQL pro ně nemá stemmer → knihovna hledá kmeny předponou |
+| Database owner (`dajc_owner`) | **not a superuser**, but has `CREATEROLE`, `CREATEDB`, **`BYPASSRLS`** (member of `neon_superuser`) → the application **must not** use the owner |
+| Role created by the migration (`dajc_ask_app`) | no superuser, no `BYPASSRLS`, not in `neon_superuser`, member of no role; the owner sets its password outside the repository (Neon requires ≥ 60 bits of entropy) |
+| RLS | enabled on all 8 tables of `dajc_ask`; the app role cannot read metrics |
+| Drizzle ORM + postgres-js | `prepare: false` (already in the code) — compatible with Neon's PgBouncer in `transaction` mode |
+| Transactions, `pg_advisory_xact_lock` | work (the lock is transaction-level, not session-level — exactly what the pooler supports) |
+| `gen_random_uuid`, `unaccent`, generated `tsvector`, `regconfig` | work on PG 17.11 |
+| Czech/Slovak/Polish full text | correct (`ridic`, `prestavku` …) thanks to `C.UTF-8` + `unaccent`; PostgreSQL has no stemmer for them → the library searches by stem prefix |
 
-Lokální klon Neonu (PG 16, `UTF8`/`C.UTF-8`, vlastník bez superuživatele s `CREATEROLE`/`BYPASSRLS`, **PgBouncer 1.22 `pool_mode=transaction`**): migrace jako vlastník, testy jako `dajc_ask_app` přes pooler.
+Local Neon-like cluster (PG 16, `UTF8`/`C.UTF-8`, owner without superuser but
+with `CREATEROLE`/`BYPASSRLS`, **PgBouncer 1.22 `pool_mode=transaction`**):
+migrations as the owner, tests as `dajc_ask_app` through the pooler.
 
-## 3. Výsledky testů databáze
+## 3. Database test results
 
-**Na Neonu (`dev-security-tests`, PG 17.11, jako `dajc_ask_app`):**
-- denní limit: 1 → 2 → 3, čtvrtý dotaz zamítnut, další den znovu 1;
-- rezervace rozpočtu nad denní strop zamítnuta; zápis metriky povolen; `pg_advisory_xact_lock` funguje;
-- zamítnuto oprávněním: čtení metrik, `DISABLE ROW LEVEL SECURITY` („must be owner“), `TRUNCATE budget`, `CREATE TABLE` v `dajc_ask` i `public`, čtení evidence migrací, `DELETE review_queue`;
-- `dajc_ask_app` není členem žádné role a nemůže se přepnout na vlastníka ani `neon_superuser` (`pg_has_role … SET` = false).
-  Poznámka: test přes MCP běží jako vlastník s `SET ROLE`; PostgreSQL u `SET ROLE` ověřuje přihlášeného uživatele, proto byl únik do role vlastníka ověřen přes `pg_has_role` a v lokálním klonu se skutečným přihlášením aplikační rolí.
+**On Neon (`dev-security-tests`, PG 17.11, as `dajc_ask_app`):**
+- daily limit: 1 → 2 → 3, the fourth question refused, the next day 1 again;
+- a budget reservation over the daily cap refused; writing a metric allowed;
+  `pg_advisory_xact_lock` works;
+- refused by permissions: reading metrics, `DISABLE ROW LEVEL SECURITY`
+  ("must be owner"), `TRUNCATE budget`, `CREATE TABLE` in `dajc_ask` and
+  `public`, reading the migration bookkeeping, `DELETE review_queue`;
+- `dajc_ask_app` is a member of no role and cannot switch to the owner or
+  `neon_superuser` (`pg_has_role … SET` = false).
+  Note: a test through MCP runs as the owner with `SET ROLE`; PostgreSQL checks
+  `SET ROLE` against the session user, so escalation to the owner role was
+  verified with `pg_has_role` and, on the local cluster, with a real login as
+  the app role.
 
-**Na lokálním klonu Neonu přes PgBouncer (transakční režim), přihlášení `dajc_ask_app`:**
-- `src/lib/ask/__tests__/db-security.test.ts` 15/15 (včetně 20 paralelních dotazů → přesně 3 povoleny; 12 paralelních rezervací → nikdy přes strop);
-- celá sada Ask s databází 247/247, knihovna 58/58 (včetně práv rolí `dajc_kb_importer` a `dajc_ask_app`).
+**On the local Neon-like cluster through PgBouncer (transaction mode), logged in as `dajc_ask_app`:**
+- `src/lib/ask/__tests__/db-security.test.ts` 15/15 (including 20 parallel
+  questions → exactly 3 allowed; 12 parallel reservations → never over the cap);
+- the whole Ask suite with the database 247/247, the library 58/58 (including
+  the permissions of `dajc_kb_importer` and `dajc_ask_app`).
 
-**Na Neonu (`dev-kb-tests`, jako `dajc_ask_app`):** přesný dotaz knihovny „přestávka řízení“ → *Nařízení (ES) č. 561/2006 · Článek 7 · s. 7* na prvním místě; aplikace čte jen pohled `answerable_provisions`, ne tabulky.
+**On Neon (`dev-kb-tests`, as `dajc_ask_app`):** the exact library query
+"přestávka řízení" → *Nařízení (ES) č. 561/2006 · Článek 7 · s. 7* first; the
+application reads only the view `answerable_provisions`, not the tables.
 
-**Zbývající riziko (pro rozhodnutí vlastníka):** aplikační role smí měnit vlastní počítadla a rozpočet (potřebuje to pro vrácení dotazu po chybě). Kdo by získal její heslo, mohl by limity v DB přepsat. Zpevnění: funkce `SECURITY DEFINER` pro `consume/refund/reserve/settle` a odebrání přímého `UPDATE`; navrženo po sloučení #102 (jeho migrace 0002/0003 by jinak kolidovaly v číslování).
+**Remaining risk (owner's decision):** the application role may change its own
+counters and budget (it needs this to give a question back after an error).
+Whoever obtained its password could overwrite the limits in the database.
+Hardening: `SECURITY DEFINER` functions for `consume/refund/reserve/settle` and
+removing direct `UPDATE`; proposed after #102 is merged (its migrations
+0002/0003 would otherwise collide in numbering).
 
-## 4. Postup připojení a nasazení (bez hesel v konverzaci)
+## 4. Connection and deployment procedure (no passwords in the conversation)
 
-Všechny řetězce a hesla zůstávají jen v Neon Console a ve Vercelu; do repozitáře, GitHubu ani konverzace nepatří.
+All connection strings and passwords stay in the Neon Console and in Vercel
+only; they never go into the repository, GitHub or a conversation.
 
-1. **Neon Console → projekt `dajc-ai` → Connect.** Pro aplikaci zvolit větev, databázi `dajc` a zapnout **Connection pooling** (host s `-pooler`, `sslmode=require`); pro migrace pooling vypnout (přímé spojení).
-2. **Hesla rolí** (SQL Editor v Neon Console, jako `dajc_owner`), vygenerovat ≥ 24 náhodných znaků:
-   `ALTER ROLE dajc_ask_app WITH LOGIN PASSWORD '<heslo>';` a pro import `ALTER ROLE dajc_kb_importer WITH LOGIN PASSWORD '<heslo>';`
-3. **Migrace na produkční větev** (až po schválení): z počítače s přístupem k Neonu
-   `DAJC_ASK_MIGRATION_DB_URL=<přímé spojení vlastníka> npx drizzle-kit migrate --config drizzle.ask.config.ts`, potom
-   `DAJC_KB_MIGRATION_DB_URL=<totéž> npx drizzle-kit migrate --config drizzle.kb.config.ts` (pořadí je důležité).
-   Ověření: `DAJC_ASK_TEST_DB_URL=<pooled dajc_ask_app> npx vitest run src/lib/ask` — **jen na `dev`/testovací větvi**, testy zapisují data.
-4. **Vercel → Environment Variables → Production**: `DAJC_ASK_DB_URL` = pooled řetězec role `dajc_ask_app`. Na Preview použít větev `dev` (jiný řetězec).
-5. Data API v Neonu nezapínat; `dajc_ask` ani `dajc_kb` nesmí být vystavené.
-6. **Plný import knihovny na větev `dev`** (sandbox Claude Code nepouští TCP k Neonu):
-   - v Neon SQL editoru na větvi `dev`: `ALTER ROLE dajc_kb_importer WITH LOGIN PASSWORD '<heslo>';`
-   - GitHub → Settings → Secrets and variables → Actions → nové tajemství
-     `DAJC_KB_DEV_IMPORT_DB_URL` = řetězec větve `dev` s uživatelem `dajc_kb_importer` (ne vlastník, ne produkce);
-   - přidat štítek **`kb-import-dev`** k PR #111 → workflow `.github/workflows/kb-import-dev.yml` naimportuje
-     manifest (AUTO_CHECKED, bez AI, zdarma) a uloží originály PDF jako artefakt na 14 dní.
+1. **Neon Console → project `dajc-ai` → Connect.** For the application choose
+   the branch, the database `dajc` and enable **Connection pooling** (host with
+   `-pooler`, `sslmode=require`); for migrations disable pooling (direct
+   connection).
+2. **Role passwords** (SQL Editor in the Neon Console, as `dajc_owner`),
+   generate ≥ 24 random characters:
+   `ALTER ROLE dajc_ask_app WITH LOGIN PASSWORD '<password>';` and for the
+   import `ALTER ROLE dajc_kb_importer WITH LOGIN PASSWORD '<password>';`
+3. **Migrations on the production branch** (only after approval): from a
+   machine with access to Neon,
+   `DAJC_ASK_MIGRATION_DB_URL=<owner direct connection> npx drizzle-kit migrate --config drizzle.ask.config.ts`, then
+   `DAJC_KB_MIGRATION_DB_URL=<same> npx drizzle-kit migrate --config drizzle.kb.config.ts` (the order matters).
+   Check: `DAJC_ASK_TEST_DB_URL=<pooled dajc_ask_app> npx vitest run src/lib/ask`
+   — **only on `dev`/a test branch**, the tests write data.
+4. **Vercel → Environment Variables → Production**: `DAJC_ASK_DB_URL` = the
+   pooled string of the role `dajc_ask_app`. For Preview use the branch `dev`
+   (a different string).
+5. Do not enable the Neon Data API; neither `dajc_ask` nor `dajc_kb` may be
+   exposed.
+6. **Full library import into the branch `dev`** (the Claude Code sandbox
+   cannot open TCP connections to Neon):
+   - in the Neon SQL editor on the branch `dev`:
+     `ALTER ROLE dajc_kb_importer WITH LOGIN PASSWORD '<password>';`
+   - GitHub → Settings → Secrets and variables → Actions → new secret
+     `DAJC_KB_DEV_IMPORT_DB_URL` = the connection string of the branch `dev`
+     with the user `dajc_kb_importer` (not the owner, not production);
+   - add the label **`kb-import-dev`** to PR #111 → the workflow
+     `.github/workflows/kb-import-dev.yml` imports the manifest (AUTO_CHECKED,
+     no AI, free) and keeps the original PDFs as an artifact for 14 days.
 
-## 5. Plán produkčního prostředí
+## 5. Production environment plan
 
-| Krok | Free (interní test) | Produkce (doporučení) |
+| Item | Free (internal test) | Production (recommended) |
 |---|---|---|
-| Tarif | Free: 100 CU-h/měsíc a uspávání nelze vypnout; při vyčerpání se compute zastaví do konce měsíce → v rozporu s „zdarma každý den“ | **Launch** (bez měsíčního minima): $0.106/CU-h, $0.35/GB-měsíc, instant restore $0.20/GB-měsíc, chráněné větve |
-| Větve | `dev` pro vývoj, testovací větve krátkodobě | `production` s ochranou, `dev` pro Preview |
-| Zálohy | historie 6 h | historie až 7 dní (Launch) |
-| Kapacita | 0.25 CU stačí | 0.25–0.5 CU s autoscalingem; uspávání ponechat (studený start ~stovky ms) |
+| Plan | Free: 100 CU-hours/month and suspension cannot be disabled; when used up, compute stops until the end of the month → conflicts with "free every day" | **Launch** (no monthly minimum): $0.106/CU-hour, $0.35/GB-month, instant restore $0.20/GB-month, protected branches |
+| Branches | `dev` for development, test branches short-lived | protected `production`, `dev` for Preview |
+| Backups | 6-hour history | history up to 7 days (Launch) |
+| Capacity | 0.25 CU is enough | 0.25–0.5 CU with autoscaling; keep suspension (cold start of a few hundred ms) |
 
-Odhad provozu DB je v `docs/DAJC_AI_LEGAL_LIBRARY.md` § 7.
+Database operating estimate: `docs/DAJC_AI_LEGAL_LIBRARY.md` § 7.

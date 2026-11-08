@@ -1,146 +1,229 @@
-# DAJC AI — evropská knihovna úředních předpisů (znalostní báze)
+# DAJC AI — European library of official legal documents (knowledge base)
 
-Stav k 2026-11-08. Knihovna je ve výchozím stavu **vypnutá** (`DAJC_KB_ENABLED`), placené funkce, platby ani ABRA se jí netýkají.
+Status on 2026-11-08. The library is **off** by default (`DAJC_KB_ENABLED`);
+paid features, payments and ABRA are not involved.
 
-Zásada: **existence úředního dokumentu sama neznamená správný právní výklad.** Knihovna dodává ověřitelné pasáže s článkem a stranou. Odpověď z nich sestavuje existující pipeline DAJC AI se svou deterministickou a nezávislou kontrolou. Halucinace to nevylučuje, jen snižuje jejich riziko a umožňuje je měřit (`dajc_ask.metrics`, přehled úrovní odpovědí).
+Principle: **the existence of an official document does not by itself mean a
+correct legal interpretation.** The library supplies verifiable passages with
+article and page; the existing DAJC AI pipeline builds the answer from them with
+its deterministic and independent checks. This does not eliminate
+hallucinations; it reduces their risk and makes them measurable
+(`dajc_ask.metrics`, distribution of answer levels).
 
-## 1. Architektura
+## 1. Architecture
 
 ```
-úřední zdroj (EUR-Lex, sbírka zákonů, ministerstvo …)   ← jen registrované domény, HTTPS i po přesměrování
-        │  scripts/kb-import.mjs  (manifest: metadata, platnost a datum jejího ověření)
+official source (EUR-Lex, law gazette, ministry …)   ← registered domains only, HTTPS also after redirects
+        │  scripts/kb-import.mjs  (manifest: metadata, validity and the date it was checked)
         ▼
-archiv originálů (archive.mjs)          katalog + index (Neon, schéma dajc_kb)
-  local:<dir> | S3-kompatibilní            documents → document_versions (URL, SHA-256, platnost, původ)
-  (Cloudflare R2 EU / AWS S3 …)            → pages (text po stranách) → provisions (článek/§/příloha, strany,
-  klíč = <země>/<dokument>/<jazyk>/<sha256>  tsvector, hmotnostní pásmo)
-        │                                          │ pohled answerable_provisions (jen platné a ověřené)
+archive of originals (archive.mjs)       catalogue + index (Neon, schema dajc_kb)
+  local:<dir> | S3-compatible              documents → document_versions (URL, SHA-256, validity, provenance)
+  (Cloudflare R2 EU / AWS S3 …)            → pages (text per page) → provisions (article/§/annex, pages,
+  key = <country>/<document>/<lang>/<sha256>  tsvector, mass band)
+        │                                          │ view answerable_provisions (valid and checked only)
         │                                          ▼
         └──────── scripts/kb-review.mjs ──► DAJC AI (src/lib/ask/library.ts → pipeline)
-                  (osoba: HUMAN_VERIFIED / REJECTED)   přesný fulltext → citace → guard → nezávislá kontrola
+                  (person: HUMAN_VERIFIED / REJECTED)   exact full text → citation → guard → independent check
 ```
 
-| Vrstva | Soubor | Poznámka |
+| Layer | File | Note |
 |---|---|---|
-| Slovník (témata, kategorie, prahy, použitelnost) | `src/lib/kb/taxonomy.mjs` | 12 témat, nadrozměrná přeprava první |
-| Registr právních zdrojů | `src/lib/kb/legal-sources.mjs` | země × témata × kategorie, podmínky užití, co bylo ověřeno |
-| Archiv | `src/lib/kb/archive.mjs` | paměť, lokální adresář, S3-kompatibilní (SigV4 dle testovací sady AWS) |
-| PDF | `src/lib/kb/pdf-text.mjs` | pdf.js bez eval/fontů/skriptů, limity velikosti, stran a času |
-| Ustanovení | `src/lib/kb/provisions.mjs` | kotvy na samostatném řádku, odkazy nikdy nedělí, záhlaví a značky EUR-Lex pryč |
-| Import a kontrola člověkem | `src/lib/kb/importer.mjs`, `scripts/kb-import.mjs`, `scripts/kb-review.mjs` | jedna transakce, nic se nemaže |
-| Vyhledávání | `src/lib/kb/search.mjs`, `scripts/kb-search.mjs` | přesný fulltext + filtry; vektory jen později jako návrh kandidátů |
-| Napojení na DAJC AI | `src/lib/ask/library.ts`, `pipeline.ts` | před placeným webovým hledáním; ne pro zákazy jízd |
-| Schéma a práva | `drizzle-kb/0000_dajc_kb_library.sql` | vlastní historie migrací, nekoliduje s #102 |
+| Vocabulary (topics, categories, thresholds, applicability) | `src/lib/kb/taxonomy.mjs` | 12 topics, oversize transport first |
+| Registry of legal sources | `src/lib/kb/legal-sources.mjs` | country × topics × categories, reuse terms, what was verified |
+| Archive | `src/lib/kb/archive.mjs` | memory, local directory, S3-compatible (SigV4 per the AWS test suite) |
+| PDF | `src/lib/kb/pdf-text.mjs` | pdf.js without eval/fonts/scripting, size, page and time limits |
+| Provisions | `src/lib/kb/provisions.mjs` | anchors on their own line, references never split, headers and EUR-Lex markers removed |
+| Import and human review | `src/lib/kb/importer.mjs`, `scripts/kb-import.mjs`, `scripts/kb-review.mjs` | one transaction, nothing is deleted |
+| Search | `src/lib/kb/search.mjs`, `scripts/kb-search.mjs` | exact full text + filters; vectors only later, as candidate proposals |
+| DAJC AI integration | `src/lib/ask/library.ts`, `pipeline.ts` | before the paid web search; not for driving bans |
+| Schema and permissions | `drizzle-kb/0000_dajc_kb_library.sql` | own migration history, no collision with #102 |
+| Import into Neon `dev` | `.github/workflows/kb-import-dev.yml` | started only by the owner (label `kb-import-dev`) |
 
-Přechod mezi úložišti (R2 ↔ S3 ↔ jiné S3-kompatibilní) je jen změna proměnných `DAJC_KB_ARCHIVE` a `DAJC_KB_S3_*`. Klíče objektů jsou obsahově adresované, takže objekty lze zkopírovat beze změny.
+Moving between stores (R2 ↔ S3 ↔ another S3-compatible service) only changes
+`DAJC_KB_ARCHIVE` and `DAJC_KB_S3_*`. Object keys are content-addressed, so
+objects can be copied unchanged.
 
-**Cloudflare R2 je zatím návrh.** Bucket ani účet nebyly vytvořeny. Před nasazením je potřeba schválení vlastníka, účet Cloudflare a nastavení jurisdikce EU (koncový bod `https://<účet>.eu.r2.cloudflarestorage.com`).
+**Cloudflare R2 is a proposal only.** No bucket or account was created. Before
+deployment: the owner's approval, a Cloudflare account and the EU jurisdiction
+(endpoint `https://<account>.eu.r2.cloudflarestorage.com`).
 
-## 2. Evidence každého dokumentu
+## 2. Record of every document
 
-| Požadavek | Kde |
+| Requirement | Where |
 |---|---|
-| název, země, vydávající orgán, právní kategorie | `documents` (+ lokalizovaný název verze v `version_label`) |
-| původní úřední URL | `document_versions.official_url` |
-| vydání, účinnost, zrušení / nahrazení | `issued_on`, `effective_from`, `effective_to`, `superseded_by`, `validity` |
-| datum posledního ověření | `validity_checked_on`, `last_verified_at`, `verified_by`; doklad v `notes` (URL stavu u vydavatele) |
-| jazyk a verze | `language`, `version_label` |
-| SHA-256 | `sha256` (také v klíči archivu; archiv obsah při čtení ověřuje) |
-| kontrola původu a platnosti | `provenance` UNVERIFIED → AUTO_CHECKED → HUMAN_VERIFIED / REJECTED, `review_log` |
-| autenticita | `authenticity` (např. konsolidované znění EUR-Lex = dokumentační nástroj) |
-| podmínky stažení, uložení, užití | `reuse_status` (ze zdroje); import s UNKNOWN/RESTRICTED se zastaví ještě před stažením |
-| vazba na články, přílohy a stránky | `provisions` (typ a číslo kotvy, `page_from`–`page_to`), `pages` |
-| skenované PDF | `text_extraction = NEEDS_OCR` + `ocr_queue`; žádný text se neindexuje bez schválené OCR cesty |
-| historie | starší verze se označí SUPERSEDED s `effective_to`; nikdy se nemaže (importér nemá `DELETE`) |
+| title, country, issuing body, legal category | `documents` (+ localised version title in `version_label`) |
+| original official URL | `document_versions.official_url` |
+| issue, entry into force, repeal / replacement | `issued_on`, `effective_from`, `effective_to`, `superseded_by`, `validity` |
+| date of last verification | `validity_checked_on`, `last_verified_at`, `verified_by`; evidence in `notes` (URL of the status at the publisher) |
+| language and version | `language`, `version_label` |
+| SHA-256 | `sha256` (also in the archive key; the archive checks content on read) |
+| check of provenance and validity | `provenance` UNVERIFIED → AUTO_CHECKED → HUMAN_VERIFIED / REJECTED, `review_log` |
+| authenticity | `authenticity` (e.g. an EUR-Lex consolidated text = documentation tool) |
+| terms of download, storage, use | `reuse_status` (from the source); an import with UNKNOWN/RESTRICTED stops before downloading |
+| link to articles, annexes and pages | `provisions` (anchor type and number, `page_from`–`page_to`), `pages` |
+| scanned PDF | `text_extraction = NEEDS_OCR` + `ocr_queue`; no text is indexed without the approved OCR path |
+| history | older versions are marked SUPERSEDED with `effective_to`; never deleted (the importer has no `DELETE`) |
 
-Na co se DAJC AI smí odvolat (pohled `answerable_provisions` + kontroly v kódu): verze IN_FORCE / NOT_YET_IN_FORCE platná v dotazovaný den, s textovou vrstvou, bez omezených podmínek užití, s článkem/§/přílohou (nikdy preambule) a s povoleným stavem původu. V produkci smí odpověď vycházet jen z verzí HUMAN_VERIFIED. AUTO_CHECKED jen pro interní test (`DAJC_KB_ALLOW_AUTO_CHECKED`, mimo Vercel produkci) a vždy jako ČÁSTEČNĚ.
+What DAJC AI may cite (view `answerable_provisions` + checks in the code): an
+IN_FORCE / NOT_YET_IN_FORCE version valid on the asked day, with a text layer,
+without restricted reuse terms, with an article/§/annex (never a preamble) and
+with an allowed provenance state. In production only HUMAN_VERIFIED versions;
+AUTO_CHECKED only for internal tests (`DAJC_KB_ALLOW_AUTO_CHECKED`, outside
+Vercel production) and always as PARTIAL.
 
-## 3. Rozsah: jurisdikce a témata
+## 3. Scope: jurisdictions and topics
 
-- **Jurisdikce:** jediný zdroj pravdy zůstává `config/europe-coverage.mjs` (50 kódů), plus `EU` a `INT`. Rozšíření = nová země v `europe-coverage.mjs` (zvedne `COVERAGE_VERSION`) a její zdroje v `legal-sources.mjs`. `legislationCoverageGaps()` vypíše země bez zdroje legislativy; registr validuje test.
-- **Témata:** nadrozměrná a těžká přeprava; povolení, výjimky, doprovody a zvláštní podmínky; hmotnosti, rozměry, nápravy; zákazy jízd; doby řízení a odpočinku; tachografy; pravidla pro nákladní vozidla nad 2,5 t a vyšší prahy; ADR; silniční kontroly a doklady; mýto, poplatky a ekologická omezení; přeshraniční přeprava a kabotáž; úřední uzavírky.
-- **Hmotnostní prahy (2,5 t, 3,5 t, 7,5 t, 12 t, …):** text ustanovení se zmínkou o tunách dostane jen nápovědu `mass_mentions`. Pásmo, pro které pravidlo platí, nastavuje jmenovitě recenzent (`massBands` v manifestu, kontrola v DB). Bez potvrzeného pásma je výsledek UNREVIEWED a odpověď může být nejvýš ČÁSTEČNĚ. Pravidlo jiného pásma (MISMATCH) se nikdy nepoužije.
-- **Použitelnost práva EU:** nařízení EU platí přímo v členských státech. U směrnice je nutné ověřit národní provedení, u států EHP (NO, IS, LI) začlenění do Dohody o EHP. Pro UK, Švýcarsko a země mimo EU/EHP se právo EU **nepoužije**. Mezinárodní dohody (ADR, AETR) vyžadují kontrolu smluvní strany.
-- **Zákazy jízd:** jedinou autoritou pro DAJC AI zůstává registr Driving Bans. Knihovna smí uchovávat úřední podklady k zákazům pro jejich kontrolní vrstvu, ale DAJC AI z ní u zákazů neodpovídá.
+- **Jurisdictions:** the single source of truth stays `config/europe-coverage.mjs`
+  (50 codes), plus `EU` and `INT`. Extension = a new country in
+  `europe-coverage.mjs` (bumps `COVERAGE_VERSION`) and its sources in
+  `legal-sources.mjs`; `legislationCoverageGaps()` lists countries without a
+  legislation source; a test validates the registry.
+- **Topics:** oversize and heavy transport; permits, exemptions, escorts and
+  special conditions; weights, dimensions, axles; driving bans; driving and
+  rest times; tachographs; rules for goods vehicles over 2.5 t and higher
+  thresholds; ADR; roadside checks and documents; tolls, charges and
+  environmental restrictions; cross-border transport and cabotage; official
+  closures.
+- **Mass thresholds (2.5 t, 3.5 t, 7.5 t, 12 t, …):** a provision mentioning
+  tonnes only gets a hint (`mass_mentions`); the band a rule applies to is set
+  by a named reviewer (`massBands` in the manifest, check in the database).
+  Without a confirmed band → UNREVIEWED → the answer is at most PARTIAL. A rule
+  of another band (MISMATCH) is never used.
+- **Applicability of EU law:** EU regulations apply directly in member states;
+  a directive → check the national transposition; EEA states (NO, IS, LI) →
+  check incorporation into the EEA Agreement; UK, Switzerland and countries
+  outside the EU/EEA → EU law is **not used**; international agreements (ADR,
+  AETR) → check the contracting party.
+- **Driving bans:** the only authority for DAJC AI stays the Driving Bans
+  registry; the library may keep official documents on bans for its review
+  layer, but DAJC AI does not answer driving-ban questions from it.
 
-## 4. Úřední zdroje (registr) a co bylo skutečně ověřeno
+## 4. Official sources (registry) and what was actually verified
 
-| Zdroj | Stav ověření 2026-11-08 |
+| Source | Verification state on 2026-11-08 |
 |---|---|
-| **EUR-Lex** (`eur-lex.europa.eu`) | **podmínky ověřeny** na právním upozornění: užití povoleno (rozhodnutí 2011/833/EU), konsolidovaná znění CC BY 4.0 s uvedením zdroje; autentické je jen znění v Úředním věstníku. Stav platnosti 6 předpisů ověřen na stránkách EUR-Lex („In force“, poslední konsolidace). |
-| e-Sbírka (CZ), Slov-Lex (SK), Gesetze im Internet (DE) | dostupné z vývojového prostředí; podmínky užití nepřečteny (právní základ volného užití úředních děl uveden k potvrzení advokátem). gesetze-im-internet.de odmítá automatizované stahování (HTTP 503 pro importér), ochrana se neobcházela. |
-| ISAP / Dziennik Ustaw (PL), RIS (AT), UNECE (ADR/AETR) | **zablokované** pro vývojové prostředí (HTTP 403/503 přímo z jejich serverů) |
-| Ostatní národní sbírky (FR, IT, ES, NL, BE, LU, HU, SI, HR, RO, BG, DK, SE, FI, EE, LV, LT, IE, PT, GR, CH, LI, NO, UK, MT), ministerstva a silniční správci | v registru jako NOT_CHECKED; import se zastaví, dokud se neověří podmínky užití |
+| **EUR-Lex** (`eur-lex.europa.eu`) | **terms verified** on its legal notice: reuse allowed (Decision 2011/833/EU), consolidated texts CC BY 4.0 with attribution; only the Official Journal is authentic. The validity of 6 acts checked on EUR-Lex ("In force", latest consolidation). |
+| e-Sbírka (CZ), Slov-Lex (SK), Gesetze im Internet (DE) | reachable from the development environment; reuse terms not read (legal basis for free use of official works noted, to be confirmed by a lawyer). gesetze-im-internet.de refuses automated downloads (HTTP 503 for the importer); the protection was not circumvented. |
+| ISAP / Dziennik Ustaw (PL), RIS (AT), UNECE (ADR/AETR) | **blocked** for the development environment (HTTP 403/503 from their own servers) |
+| Other national gazettes (FR, IT, ES, NL, BE, LU, HU, SI, HR, RO, BG, DK, SE, FI, EE, LV, LT, IE, PT, GR, CH, LI, NO, UK, MT), ministries and road authorities | in the registry as NOT_CHECKED; an import stops until the reuse terms are verified |
 
-## 5. Zpracované dokumenty (lokální vývojová DB, ne produkce)
+## 5. Processed documents (local development database, not production)
 
-Staženo z EUR-Lex 2026-11-08, archivováno lokálně (obsahově adresováno), stav AUTO_CHECKED. Žádný dokument zatím neověřil člověk.
+Downloaded from EUR-Lex on 2026-11-08, archived locally (content-addressed),
+state AUTO_CHECKED — **no person has verified them yet**.
 
-| Předpis (konsolidace) | Jazyky | Stran | Ustanovení (cs/de/en/pl/sk) | Účinnost verze |
+| Act (consolidation) | Languages | Pages | Provisions (cs/de/en/pl/sk) | Version in force from |
 |---|---|---|---|---|
-| Nařízení (ES) č. 561/2006 — doby řízení a odpočinku | cs, de, en, pl, sk | 26 | 38 / 39 / 38 / 39 / 38 | 31. 12. 2024 |
-| Nařízení (EU) č. 165/2014 — tachografy | cs, de, en, pl, sk | 49 | 59 / 64 / 62 / 64 / 60 | 31. 12. 2024 |
-| Směrnice 96/53/ES — hmotnosti a rozměry | cs, de, en, pl, sk | 29 | 30 / 35 / 37 / 31 / 32 | 14. 8. 2019 |
-| Nařízení (ES) č. 1072/2009 — přístup na trh, kabotáž | cs, de, en, pl, sk | 24 | 35 / 37 / 35 / 28 / 27 | 21. 2. 2022 |
+| Regulation (EC) No 561/2006 — driving and rest times | cs, de, en, pl, sk | 26 | 38 / 39 / 38 / 39 / 38 | 31 Dec 2024 |
+| Regulation (EU) No 165/2014 — tachographs | cs, de, en, pl, sk | 49 | 59 / 64 / 62 / 64 / 60 | 31 Dec 2024 |
+| Directive 96/53/EC — weights and dimensions | cs, de, en, pl, sk | 29 | 30 / 35 / 37 / 31 / 32 | 14 Aug 2019 |
+| Regulation (EC) No 1072/2009 — market access, cabotage | cs, de, en, pl, sk | 24 | 35 / 37 / 35 / 28 / 27 | 21 Feb 2022 |
 
-20 verzí, SHA-256 a ID verzí jsou ve výstupu importu a v DB. StVO (DE) se importovat nepodařilo (viz výše). Na Neonu (`dev-kb-tests`) je kvůli ověření kompatibility jen vzorek 3 ustanovení nařízení 561/2006 (CS); plný import na Neon čeká na spojení importéru (sandbox nepouští TCP 5432).
+20 versions; SHA-256 and version IDs are in the import output and in the
+database. The StVO (DE) could not be imported (see above). On Neon
+(`dev-kb-tests`) there is only a sample of 3 provisions of Regulation 561/2006
+(CS) to verify compatibility; the full import into Neon runs through the
+workflow `kb-import-dev` (`DAJC_AI_NEON.md` § 4, step 6).
 
-## 6. Vyhledávání a odpověď
+## 6. Search and answer
 
-1. Klasifikace dotazu řidiče (existující Ask): země, téma, data, hmotnost vozidla, klíčová slova v úředním jazyce i angličtině.
-2. Knihovna (ne pro zákazy jízd): přesný fulltext ve vybraných jazycích (jazyk dotazu, úřední jazyky zemí, angličtina) s filtry na jurisdikci včetně použitelnosti EU, den účinnosti, téma a povolený stav původu. Pro cs/sk/pl se hledá podle kmene (předpony), protože PostgreSQL pro ně nemá stemmer. Shoda celého výrazu má přednost, protože PostgreSQL nezná vzácnost slov.
-3. Kontrola citovatelnosti: článek/§/příloha, strana, `#page=N`, SHA-256, platnost v daný den, žádné jiné hmotnostní pásmo, použitelnost v zemi.
-4. Země, na kterou knihovna odpovídá přímo, se **nehledá placeně na webu**.
-5. Návrh odpovědi jen z pasáží, doslovná citace, čísla musí být v citaci, deterministická kontrola (včetně zákazu potvrzovat průjezdnost, povolení nebo výjimku) a nezávislá kontrola jiným poskytovatelem. Ta se kvůli ceně nevypíná.
-6. Zobrazení: *dokument · článek · strana*, odkaz na úřední PDF na konkrétní stranu, datum ověření a pevná upozornění. Citace není výklad, konsolidované znění není závazné a u neověřené verze, nejisté použitelnosti nebo hmotnostního pásma odpověď přizná nejistotu (nejvýš ČÁSTEČNĚ).
+1. Classification of the driver's question (existing Ask): country, topic,
+   dates, vehicle mass, keywords in the official language and in English.
+2. Library (not for driving bans): exact full text in the selected languages
+   (question language, official languages of the countries, English) with
+   filters on jurisdiction including EU applicability, the day in force, topic
+   and allowed provenance; for cs/sk/pl by stem prefix (PostgreSQL has no
+   stemmer for them); a match of the whole term ranks first (PostgreSQL has no
+   word rarity).
+3. Citability check: article/§/annex, page, `#page=N`, SHA-256, valid on the
+   day, no other mass band, applicable in the country.
+4. A country answered directly by the library is **not searched on the web
+   (paid)**.
+5. Draft only from the passages, verbatim quote, numbers must be in the quote,
+   deterministic check (including the ban on confirming passability, permits
+   or exceptions) and independent check by another provider — not switched off
+   to save money.
+6. Display: *document · article · page*, link to the official PDF at the page,
+   date of verification, fixed notices (a quotation is not an interpretation; a
+   consolidated text is not binding; for an unverified version, uncertain
+   applicability or mass band the answer admits uncertainty — at most PARTIAL).
 
-**Dotazy v pěti jazycích (lokální knihovna, role `dajc_ask_app` přes pooler, 2026-11-08):**
+**Questions in five languages (local library, role `dajc_ask_app` through the pooler, 2026-11-08):**
 
-| Jazyk | Dotaz | První výsledek |
+| Language | Query | First result |
 |---|---|---|
 | cs | přestávka v řízení po čtyřech a půl hodinách | Nařízení (ES) č. 561/2006 · Článek 7 · s. 7 |
 | pl | dzienny okres odpoczynku | Rozporządzenie (WE) nr 561/2006 · Artykuł 4 / Artykuł 8 · str. 4–10 |
 | en (IE) | cabotage operations international carriage | Regulation (EC) No 1072/2009 · Article 8 · p. 7–9 |
 | sk | tachograf karta vodiča | Nariadenie (EÚ) č. 165/2014 · Článok 2 · s. 3–5 |
-| de | Fahrtunterbrechung, Lenkdauer viereinhalb Stunden | 561/2006 Artikel 4 (definice), Artikel 7 hned za ním |
-| en (UK) | daily rest period driver | **nic** (právo EU se na UK nepoužije) |
-| en (NO) | weekly rest period | 561/2006 Article 8 jako „ověřit začlenění do EHP“ |
-| cs (2019-01-01) | přestávka v řízení | **nic** (verze účinná až od 31. 12. 2024) |
+| de | Fahrtunterbrechung, Lenkdauer viereinhalb Stunden | 561/2006 Artikel 4 (definitions), Artikel 7 right after it |
+| en (UK) | daily rest period driver | **nothing** (EU law not applied to the UK) |
+| en (NO) | weekly rest period | 561/2006 Article 8 as "check EEA incorporation" |
+| cs (2019-01-01) | přestávka v řízení | **nothing** (version in force only from 31 Dec 2024) |
 
-Celé odpovědi AI se zatím nemohly vyzkoušet, protože chybí klíče poskytovatelů. Pipeline je otestovaná s podvrženými modely na skutečných úryvcích článku 7 v cs/en/de/pl/sk (`src/lib/ask/__tests__/library.test.ts`).
+Complete AI answers could not be tried (no provider keys); the pipeline is
+tested with fake models on real excerpts of Article 7 in cs/en/de/pl/sk
+(`src/lib/ask/__tests__/library.test.ts`).
 
-**Regresní testy:** zastaralá a nahrazená verze, chybné hmotnostní pásmo (3,5 t vs 7,5 t), neúplná citace (preambule, chybí strana nebo hash), chybná výjimka („výjimka se zde uplatní“), čísla mimo citaci, neověřená a zamítnutá verze, UK/EHP/směrnice, výpadek knihovny.
+**Regression tests:** outdated and replaced version, wrong mass band (3.5 t vs
+7.5 t), incomplete citation (preamble, missing page or hash), wrong exception
+("the exemption applies here"), numbers outside the quote, unverified and
+rejected version, UK/EEA/directive, library outage.
 
-## 7. Náklady provozu (3 dotazy denně, 30 dní; odhad, ne měření)
+## 7. Operating costs (3 questions per day, 30 days; an estimate, not a measurement)
 
-Předpoklady: ceny modelů jako v `docs/DAJC_AI_B2C_LAUNCH.md` (klasifikace 0,20/1,25; návrh 0,75/4,50; nezávislá kontrola 2/10 USD za 1M tokenů ≈ Claude Sonnet 5.5; vyhledávání 0,005 USD; 0,92 EUR/USD). Odpověď z knihovny posílá do modelu ≤ 4 ustanovení (≈ 4 000 tokenů) místo stažených webových stránek (≈ 10 000 tokenů) a nevolá Perplexity.
+Assumptions: model prices as in `docs/DAJC_AI_B2C_LAUNCH.md` (classification
+0.20/1.25; draft 0.75/4.50; independent check 2/10 USD per 1M tokens ≈ Claude
+Sonnet 5.5; search 0.005 USD; 0.92 EUR/USD). An answer from the library sends
+≤ 4 provisions (≈ 4,000 tokens) to the model instead of downloaded web pages
+(≈ 10,000 tokens) and does not call Perplexity.
 
-| Cesta dotazu | Náklad AI na dotaz |
+| Question path | AI cost per question |
 |---|---|
-| přes web (Perplexity + stránky) | ≈ 0,023 € |
-| z knihovny (bez Perplexity) | ≈ 0,014 € (**−38 %**) |
-| z knihovny + kontrola Claude Haiku 5.5 | ≈ 0,007 € (kvalitu nutno ověřit) |
+| via the web (Perplexity + pages) | ≈ €0.023 |
+| from the library (no Perplexity) | ≈ €0.014 (**−38 %**) |
+| from the library + check by Claude Haiku 5.5 | ≈ €0.007 (quality to be verified) |
 
-| Řidiči (dotazů/měsíc) | AI jen web | AI 50 % knihovna | AI 80 % knihovna | Neon (Launch) | Archiv R2 | Import a indexace | **Celkem při 50 % knihovně*** |
+| Drivers (questions/month) | AI web only | AI 50 % library | AI 80 % library | Neon (Launch) | R2 archive | Import and indexing | **Total at 50 % library*** |
 |---|---|---|---|---|---|---|---|
-| 100 (9 000) | 207 € | 167 € | 144 € | ≈ 15 € | 0 € | 0 € | **≈ 200 €** |
-| 500 (45 000) | 1 035 € | 833 € | 720 € | ≈ 18 € | 0 € | 0 € | **≈ 890 €** |
-| 1 000 (90 000) | 2 070 € | 1 665 € | 1 440 € | ≈ 23 € | 0 € | 0 € | **≈ 1 720 €** |
+| 100 (9,000) | €207 | €167 | €144 | ≈ €15 | €0 | €0 | **≈ €200** |
+| 500 (45,000) | €1,035 | €833 | €720 | ≈ €18 | €0 | €0 | **≈ €890** |
+| 1,000 (90,000) | €2,070 | €1,665 | €1,440 | ≈ €23 | €0 | €0 | **≈ €1,720** |
 
-\* včetně Vercel Pro ≈ 18 € a Resend (0 € / 18 € / 18 €) z `DAJC_AI_B2C_LAUNCH.md`.
+\* including Vercel Pro ≈ €18 and Resend (€0 / €18 / €18) from `DAJC_AI_B2C_LAUNCH.md`.
 
-- **Neon:** Launch vychází podle odhadu aktivní doby na 0,25–0,5 CU zhruba na 110–240 CU-h (12–26 USD) plus úložiště ~1 GB (0,35 USD) a historie (0,20 USD/GB). Free tarif (100 CU-h, uspávání) stačí pro interní test, ne pro denní dostupnost.
-- **Archiv R2:** celoevropská knihovna ≈ 1–5 GB PDF (≈ 750 národních předpisů × ~1 MB + předpisy EU ve 24 jazycích). Vejde se do bezplatných 10 GB-měsíc, výstup dat je zdarma a při dotazech se PDF nečte (text je v DB). Nad rámec bezplatného limitu stojí 0,015 USD/GB-měsíc. Vyžaduje účet Cloudflare a schválení.
-- **Import a indexace:** bez AI (pdf.js + PostgreSQL fulltext), řádově sekundy na dokument; lze spouštět lokálně nebo v GitHub Actions v rámci bezplatných minut. Vektorové embeddingy se nepoužívají.
-- **Skutečný hlavní náklad knihovny je lidská kontrola** (HUMAN_VERIFIED, hmotnostní pásma, podmínky užití), nikoli infrastruktura.
-- **Knihovna vs. Perplexity:** každý dotaz zodpovězený z knihovny ušetří ≈ 0,009 €. Při 50 % podílu je to ≈ 40 / 200 / 400 € měsíčně pro 100 / 500 / 1 000 řidičů. Úspora roste s pokrytím knihovny.
+- **Neon:** Launch estimated from active time at 0.25–0.5 CU ≈ 110–240
+  CU-hours (12–26 USD) + storage ~1 GB (0.35 USD) + history (0.20 USD/GB).
+  The Free plan (100 CU-hours, suspension) is enough for an internal test, not
+  for daily availability.
+- **R2 archive:** a Europe-wide library ≈ 1–5 GB of PDFs (≈ 750 national acts ×
+  ~1 MB + EU acts in 24 languages) — within the free 10 GB-month; egress is
+  free; PDFs are not read at question time (the text is in the database).
+  Above the free tier 0.015 USD/GB-month. Needs a Cloudflare account and
+  approval.
+- **Import and indexing:** no AI (pdf.js + PostgreSQL full text), seconds per
+  document; can run locally or in GitHub Actions within the free minutes. No
+  vector embeddings.
+- **The real main cost of the library is human review** (HUMAN_VERIFIED, mass
+  bands, reuse terms), not infrastructure.
+- **Library vs. Perplexity:** every question answered from the library saves
+  ≈ €0.009; at a 50 % share ≈ €40 / €200 / €400 per month for 100 / 500 /
+  1,000 drivers. The saving grows with the library's coverage.
 
-Stropy rozpočtu (`DAJC_ASK_DAILY_BUDGET_EUR`, `…MONTHLY…`) a bezpečné pozastavení zůstávají beze změny. Doporučené hodnoty jsou v `DAJC_AI_B2C_LAUNCH.md` § 5.
+Budget caps (`DAJC_ASK_DAILY_BUDGET_EUR`, `…MONTHLY…`) and the safe pause stay
+unchanged; recommended values in `DAJC_AI_B2C_LAUNCH.md` § 5.
 
-## 8. Známá omezení
+## 8. Known limitations
 
-- PostgreSQL nemá stemmer pro češtinu, slovenštinu ani polštinu: hledání podle kmene je hrubé, přesnost řeší řazení a kontroly. Definiční články (např. čl. 4 nařízení 561/2006) se umísťují vysoko.
-- EUR-Lex PDF obsahují slova rozdělená na konci řádku. Citace přes takové místo kontrola zahodí, což je bezpečné, ale snižuje to počet použitelných citací.
-- Rozsah stran u dlouhých článků rozdělených na části je celý rozsah článku (citace nikdy neukáže před text).
-- OCR cesta je jen fronta, samotné OCR není implementováno ani schváleno.
-- Na Neonu je zatím jen vzorek. Plný import vyžaduje spuštění importéru z prostředí s TCP přístupem k Neonu: připraven je ruční workflow `kb-import-dev` (štítek na PR, tajemství `DAJC_KB_DEV_IMPORT_DB_URL`, postup v `DAJC_AI_NEON.md` § 4 bod 6).
+- PostgreSQL has no stemmer for Czech, Slovak or Polish: stem-prefix search is
+  coarse, precision comes from ranking and the checks; definition articles
+  (e.g. Art. 4 of Regulation 561/2006) rank high.
+- EUR-Lex PDFs contain words hyphenated at line ends; a quote across such a
+  place is dropped by the check (safe, but fewer usable citations).
+- The page range of a long article split into chunks is the article's whole
+  range (a citation never points before the text).
+- The OCR path is a queue only; OCR itself is neither implemented nor
+  approved.
+- On Neon there is only a sample so far; the full import runs through the
+  manual workflow `kb-import-dev` (label on the PR, secret
+  `DAJC_KB_DEV_IMPORT_DB_URL`, procedure in `DAJC_AI_NEON.md` § 4, step 6).
