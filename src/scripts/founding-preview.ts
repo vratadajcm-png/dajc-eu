@@ -6,6 +6,7 @@ import {
 
 // Internal UI only. There are NO network calls, real payment-provider credentials,
 // real order IDs, emails sent or backend entitlements in this module.
+if (document.querySelector('#founding-plan-form')) {
 const q = <T extends Element>(selector: string): T => {
   const element = document.querySelector<T>(selector);
   if (!element) throw new Error('Missing internal demo element: ' + selector);
@@ -50,6 +51,7 @@ function updatePlan() {
   setText('#founding-plan-summary', plan.title);
   setText('#founding-price-summary', plan.amountEUR + ' €');
   setText('#founding-testing-summary', plan.testing);
+  setText('#founding-checkout-plan', plan.title + ' · ' + plan.amountEUR + ' € proposed');
 }
 
 planForm.addEventListener('submit', (event) => {
@@ -216,3 +218,5 @@ if (reservation) {
 } else {
   showStep(1);
 }
+
+} // No form is rendered if this preview-only route is unavailable.
