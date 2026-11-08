@@ -2,18 +2,27 @@ name: DAJC legal library import (Neon dev)
 
 # Imports the official documents of config/legal-library/manifest.json into the
 # DAJC legal library on the Neon DEVELOPMENT branch (docs/DAJC_AI_LEGAL_LIBRARY.md).
-# The Claude Code sandbox cannot open PostgreSQL connections, so the full import
-# runs here, where TCP to Neon works.
+# The Claude Code sandbox cannot open PostgreSQL connections, so the import
+# runs here, where TCP to Neon works. No AI is called and nothing is paid.
 #
-# Runs ONLY when the owner asks for it: by adding the label "kb-import-dev" to a
-# pull request of this repository, or by a manual dispatch once merged. Never on
-# push or on a schedule. No AI is called and nothing is paid.
-#
-# Needs the repository secret DAJC_KB_DEV_IMPORT_DB_URL: the pooled or direct
-# connection string of the Neon branch "dev" for the role dajc_kb_importer
-# (password set by the owner in the Neon SQL editor). Never the production
-# branch, never the owner role. Imported versions are AUTO_CHECKED: DAJC AI in
-# production answers only from HUMAN_VERIFIED versions (scripts/kb-review.mjs).
+# Security - the repository is public, so this log is public:
+#   * runs only when the repository OWNER adds the label "kb-import-dev" to a
+#     pull request of this repository (or dispatches it once merged), and only
+#     after the owner approves the deployment to the GitHub environment
+#     "kb-import-dev" (required reviewer). Never on push or on a schedule.
+#   * the connection string is an ENVIRONMENT secret of "kb-import-dev"
+#     (DAJC_KB_DEV_IMPORT_DB_URL), never a repository secret, so no other
+#     workflow or branch can read it without the owner's approval. It belongs to
+#     the role dajc_kb_importer, which can add machine-checked versions only and
+#     can never record a human verification (drizzle-kb/0001).
+#   * the import refuses any other role, a role with administrative attributes,
+#     and any database whose marker dajc_kb.deployment is not 'dev'. Host and
+#     password are masked, and every error message is redacted.
+#   * third-party actions are pinned to full commit SHAs, dependencies are
+#     installed without lifecycle scripts and before the secret is present, and
+#     no git credentials stay on the runner.
+# Imported versions are AUTO_CHECKED: DAJC AI in production answers only from
+# HUMAN_VERIFIED versions, recorded by a person (scripts/kb-review.mjs).
 # The downloaded originals are kept as a workflow artifact for 14 days (public
 # law texts; EUR-Lex reuse under Commission Decision 2011/833/EU).
 
@@ -23,7 +32,7 @@ on:
   workflow_dispatch:
     inputs:
       only:
-        description: 'Import only this officialNumber (empty = whole manifest)'
+        description: 'Import only this officialNumber (empty = all EUR-Lex entries)'
         required: false
         type: string
 
@@ -36,30 +45,26 @@ concurrency:
 
 jobs:
   import:
-    if: github.event_name == 'workflow_dispatch' || (github.event.label.name == 'kb-import-dev' && github.event.pull_request.head.repo.full_name == github.repository)
-    runs-on: ubuntu-latest
+    if: >-
+      github.actor == github.repository_owner &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.label.name == 'kb-import-dev' && github.event.pull_request.head.repo.full_name == github.repository))
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
+    environment: kb-import-dev
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
-          cache: npm
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Check the secret is configured (value never printed)
-        env:
-          DAJC_KB_IMPORT_DB_URL: ${{ secrets.DAJC_KB_DEV_IMPORT_DB_URL }}
-        run: |
-          if [ -z "$DAJC_KB_IMPORT_DB_URL" ]; then
-            echo "::error::Repository secret DAJC_KB_DEV_IMPORT_DB_URL is not set (Neon branch dev, role dajc_kb_importer)."
-            exit 1
-          fi
+      - name: Install dependencies (no lifecycle scripts, no secret present)
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Import official documents into the Neon dev branch
         env:
@@ -67,11 +72,17 @@ jobs:
           DAJC_KB_ARCHIVE: local:${{ runner.temp }}/kb-archive
           ONLY: ${{ inputs.only }}
         run: |
-          if [ -n "$ONLY" ]; then node scripts/kb-import.mjs --only "$ONLY"; else node scripts/kb-import.mjs; fi
+          if [ -z "$DAJC_KB_IMPORT_DB_URL" ]; then
+            echo "::error::Environment secret DAJC_KB_DEV_IMPORT_DB_URL of the environment kb-import-dev is not set (Neon branch dev, role dajc_kb_importer)."
+            exit 1
+          fi
+          set -- --source eu-eurlex --expect-role dajc_kb_importer --expect-environment dev
+          if [ -n "$ONLY" ]; then set -- "$@" --only "$ONLY"; fi
+          node scripts/kb-import.mjs "$@"
 
       - name: Keep the downloaded originals
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: kb-archive-${{ github.run_id }}
           path: ${{ runner.temp }}/kb-archive

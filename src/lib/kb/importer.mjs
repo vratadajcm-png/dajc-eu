@@ -12,7 +12,10 @@
 //     from the manifest, entered from the publisher's own status page, with
 //     the date it was checked and the page it was checked on;
 //   - provenance is AUTO_CHECKED only when every machine check passed; a
-//     named reviewer makes it HUMAN_VERIFIED later (scripts/kb-review.mjs);
+//     named reviewer makes it HUMAN_VERIFIED later (scripts/kb-review.mjs,
+//     role dajc_kb_reviewer). The import role cannot record a human decision,
+//     cannot change a document's metadata and cannot touch the content of a
+//     human-verified version (drizzle-kb/0001);
 //   - a scanned PDF is stored and queued for the approved OCR path, but no
 //     text of it is indexed;
 //   - a newer version of the same document and language closes the older
@@ -64,12 +67,13 @@ export function reuseAllowed(source) {
  * Downloads from a registered source only: every redirect must stay HTTPS on
  * the same source; the body is read with a hard size cap.
  */
-export async function fetchOfficialBytes(url, { fetchImpl = globalThis.fetch, maxBytes = PDF_LIMITS.maxBytes, maxRedirects = 5 } = {}) {
+export async function fetchOfficialBytes(url, { fetchImpl = globalThis.fetch, maxBytes = PDF_LIMITS.maxBytes, maxRedirects = 5, timeoutMs = 120_000 } = {}) {
   const source = legalSourceForUrl(url);
   if (!source) throw new Error('not a registered official source');
+  const signal = AbortSignal.timeout(timeoutMs);
   let current = url;
   for (let hop = 0; hop <= maxRedirects; hop++) {
-    const res = await fetchImpl(current, { redirect: 'manual', headers: { 'user-agent': USER_AGENT, accept: 'application/pdf,*/*;q=0.5' } });
+    const res = await fetchImpl(current, { redirect: 'manual', signal, headers: { 'user-agent': USER_AGENT, accept: 'application/pdf,*/*;q=0.5' } });
     if (res.status >= 300 && res.status < 400 && res.headers.get('location')) {
       const next = new URL(res.headers.get('location'), current).toString();
       if (legalSourceForUrl(next)?.id !== source.id) throw new Error('redirect left the registered source');
@@ -176,11 +180,19 @@ export async function writeVersion(sql, prepared, { actor = 'importer' } = {}) {
               ${source.reuse.termsUrl || null}, ${source.check.status}, ${source.check.checkedOn || null})
       on conflict (id) do update set name = excluded.name, domains = excluded.domains, reuse_status = excluded.reuse_status,
         reuse_basis = excluded.reuse_basis, terms_url = excluded.terms_url, check_status = excluded.check_status, checked_on = excluded.checked_on, updated_at = now()`;
-    const [doc] = await tx`
+    // Documents are insert-only for the importer: a later change of title,
+    // topics or category (which steer retrieval of verified versions) is the
+    // owner's decision, so a manifest that disagrees with the library stops.
+    await tx`
       insert into dajc_kb.documents (source_id, jurisdiction, official_number, title, legal_category, issuing_body, topics)
       values (${d.sourceId}, ${d.jurisdiction}, ${d.officialNumber}, ${d.title}, ${d.legalCategory}, ${d.issuingBody}, ${d.topics})
-      on conflict (jurisdiction, official_number) do update set title = excluded.title, topics = excluded.topics
-      returning id`;
+      on conflict (jurisdiction, official_number) do nothing`;
+    const [doc] = await tx`
+      select id, source_id, title, legal_category, issuing_body, topics from dajc_kb.documents
+      where jurisdiction = ${d.jurisdiction} and official_number = ${d.officialNumber}`;
+    const differs = ['source_id', 'title', 'legal_category', 'issuing_body'].filter((k) => doc[k] !== { source_id: d.sourceId, title: d.title, legal_category: d.legalCategory, issuing_body: d.issuingBody }[k]);
+    if ([...doc.topics].sort().join('|') !== [...d.topics].sort().join('|')) differs.push('topics');
+    if (differs.length > 0) throw new Error(`document ${d.officialNumber} in the library differs from the manifest (${differs.join(', ')}); only the owner changes document metadata`);
     const existing = await tx`select id from dajc_kb.document_versions where document_id = ${doc.id} and language = ${v.language} and sha256 = ${v.sha256}`;
     if (existing.length > 0) return { status: 'UNCHANGED', versionId: existing[0].id, documentId: doc.id };
 

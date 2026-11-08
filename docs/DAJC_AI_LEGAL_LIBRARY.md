@@ -33,11 +33,12 @@ archive of originals (archive.mjs)       catalogue + index (Neon, schema dajc_kb
 | Archive | `src/lib/kb/archive.mjs` | memory, local directory, S3-compatible (SigV4 per the AWS test suite) |
 | PDF | `src/lib/kb/pdf-text.mjs` | pdf.js without eval/fonts/scripting, size, page and time limits |
 | Provisions | `src/lib/kb/provisions.mjs` | anchors on their own line, references never split, headers and EUR-Lex markers removed |
-| Import and human review | `src/lib/kb/importer.mjs`, `scripts/kb-import.mjs`, `scripts/kb-review.mjs` | one transaction, nothing is deleted |
+| Import and human review | `src/lib/kb/importer.mjs`, `scripts/kb-import.mjs`, `scripts/kb-review.mjs` | one transaction, nothing is deleted; import and review are separate roles (§ 2a) |
+| Connection safety | `src/lib/kb/db-guard.mjs` | masks and redacts connection strings; refuses a wrong role or branch |
 | Search | `src/lib/kb/search.mjs`, `scripts/kb-search.mjs` | exact full text + filters; vectors only later, as candidate proposals |
 | DAJC AI integration | `src/lib/ask/library.ts`, `pipeline.ts` | before the paid web search; not for driving bans |
-| Schema and permissions | `drizzle-kb/0000_dajc_kb_library.sql` | own migration history, no collision with #102 |
-| Import into Neon `dev` | `.github/workflows/kb-import-dev.yml` | started only by the owner (label `kb-import-dev`) |
+| Schema and permissions | `drizzle-kb/0000_dajc_kb_library.sql`, `drizzle-kb/0001_dajc_kb_import_review_separation.sql` | own migration history, no collision with #102 |
+| Import into Neon `dev` | `.github/workflows/kb-import-dev.yml` | started only by the owner (label `kb-import-dev`) and approved by the owner (GitHub environment `kb-import-dev`) |
 
 Moving between stores (R2 ↔ S3 ↔ another S3-compatible service) only changes
 `DAJC_KB_ARCHIVE` and `DAJC_KB_S3_*`. Object keys are content-addressed, so
@@ -63,6 +64,35 @@ deployment: the owner's approval, a Cloudflare account and the EU jurisdiction
 | link to articles, annexes and pages | `provisions` (anchor type and number, `page_from`–`page_to`), `pages` |
 | scanned PDF | `text_extraction = NEEDS_OCR` + `ocr_queue`; no text is indexed without the approved OCR path |
 | history | older versions are marked SUPERSEDED with `effective_to`; never deleted (the importer has no `DELETE`) |
+
+## 2a. Who may write what (security of the import)
+
+The import runs in GitHub Actions of a **public** repository, so its connection
+string is the most exposed credential of the library. It therefore belongs to a
+role that cannot make anything answerable in production
+(`drizzle-kb/0001_dajc_kb_import_review_separation.sql`, tested in
+`src/lib/kb/__tests__/kb-db.test.ts` against a Neon-like cluster):
+
+| Action | `dajc_kb_importer` (CI secret) | `dajc_kb_reviewer` (a person) | `dajc_ask_app` (DAJC AI) |
+|---|---|---|---|
+| add a new version (UNVERIFIED / AUTO_CHECKED) with its pages and provisions | yes, once per version | no | no |
+| record HUMAN_VERIFIED / REJECTED | **no** (by update or insert) | yes; the database stamps the time | no |
+| change pages, provisions or metadata of a stored version | **no** | mass bands only | no |
+| add pages or provisions to an existing or verified version | **no** | no | no |
+| close an older version when a newer one of the same document and language enters into force | yes, nothing else | no | no |
+| revive a superseded version, repeal, change dates otherwise | **no** | no | no |
+| change a document's title, topics or category | **no** (the import stops; the owner decides) | no | no |
+| approve OCR | no | yes | no |
+| write `review_log` | `IMPORT` / `SUPERSEDE` only, time from the database | `REVIEW` only | no |
+| delete anything | no | no | no |
+| read | tables + answerable view | tables + answerable view | answerable view only |
+
+Before writing, the CI import checks that it runs as `dajc_kb_importer` without
+administrative attributes or role memberships, and that the marker row
+`dajc_kb.deployment` says `dev`; otherwise it stops (exit 2). The owner writes
+the marker once per branch (`INSERT INTO dajc_kb.deployment (environment)
+VALUES ('dev')`); a production branch gets `production`. In GitHub Actions the
+host and password are masked, and every error message is redacted.
 
 What DAJC AI may cite (view `answerable_provisions` + checks in the code): an
 IN_FORCE / NOT_YET_IN_FORCE version valid on the asked day, with a text layer,
@@ -225,5 +255,8 @@ unchanged; recommended values in `DAJC_AI_B2C_LAUNCH.md` § 5.
 - The OCR path is a queue only; OCR itself is neither implemented nor
   approved.
 - On Neon there is only a sample so far; the full import runs through the
-  manual workflow `kb-import-dev` (label on the PR, secret
-  `DAJC_KB_DEV_IMPORT_DB_URL`, procedure in `DAJC_AI_NEON.md` § 4, step 6).
+  manual workflow `kb-import-dev` (label on the PR, approval of the GitHub
+  environment `kb-import-dev`, environment secret `DAJC_KB_DEV_IMPORT_DB_URL`;
+  procedure in `DAJC_AI_NEON.md` § 4, step 6). It covers the 20 EUR-Lex
+  versions; StVO (DE) stays out until its source allows automated download and
+  the in-force date of its last amendment is checked.

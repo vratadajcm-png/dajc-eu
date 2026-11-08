@@ -26,6 +26,7 @@ Claude does not delete them).
 | Database owner (`dajc_owner`) | **not a superuser**, but has `CREATEROLE`, `CREATEDB`, **`BYPASSRLS`** (member of `neon_superuser`) → the application **must not** use the owner |
 | Role created by the migration (`dajc_ask_app`) | no superuser, no `BYPASSRLS`, not in `neon_superuser`, member of no role; the owner sets its password outside the repository (Neon requires ≥ 60 bits of entropy) |
 | RLS | enabled on all 8 tables of `dajc_ask`; the app role cannot read metrics |
+| Library roles | `dajc_kb_importer` (CI import: adds machine-checked versions only) and `dajc_kb_reviewer` (a person: HUMAN_VERIFIED / REJECTED); separation enforced by grants and triggers (`drizzle-kb/0001`, `DAJC_AI_LEGAL_LIBRARY.md` § 2a) |
 | Drizzle ORM + postgres-js | `prepare: false` (already in the code) — compatible with Neon's PgBouncer in `transaction` mode |
 | Transactions, `pg_advisory_xact_lock` | work (the lock is transaction-level, not session-level — exactly what the pooler supports) |
 | `gen_random_uuid`, `unaccent`, generated `tsvector`, `regconfig` | work on PG 17.11 |
@@ -93,15 +94,32 @@ only; they never go into the repository, GitHub or a conversation.
 5. Do not enable the Neon Data API; neither `dajc_ask` nor `dajc_kb` may be
    exposed.
 6. **Full library import into the branch `dev`** (the Claude Code sandbox
-   cannot open TCP connections to Neon):
-   - in the Neon SQL editor on the branch `dev`:
-     `ALTER ROLE dajc_kb_importer WITH LOGIN PASSWORD '<password>';`
-   - GitHub → Settings → Secrets and variables → Actions → new secret
-     `DAJC_KB_DEV_IMPORT_DB_URL` = the connection string of the branch `dev`
-     with the user `dajc_kb_importer` (not the owner, not production);
-   - add the label **`kb-import-dev`** to PR #111 → the workflow
-     `.github/workflows/kb-import-dev.yml` imports the manifest (AUTO_CHECKED,
-     no AI, free) and keeps the original PDFs as an artifact for 14 days.
+   cannot open TCP connections to Neon; the repository is public, so the
+   import credential is kept as narrow as possible — `DAJC_AI_LEGAL_LIBRARY.md`
+   § 2a):
+   - prepared on `dev` through the Neon connector, without any password:
+     migration `drizzle-kb` 0001, marker row `dajc_kb.deployment = 'dev'`,
+     `ALTER ROLE dajc_kb_importer LOGIN`;
+   - **Neon Console → project `dajc-ai` → branch `dev` → Roles →
+     `dajc_kb_importer` → Reset password.** Neon generates the password and
+     shows it once. Do not type a password into the SQL editor: it keeps a
+     query history;
+   - **Connect** → branch `dev`, database `dajc`, role `dajc_kb_importer`,
+     connection pooling off → copy the connection string;
+   - **GitHub → Settings → Environments → New environment `kb-import-dev`**:
+     *Required reviewers* = the owner (leave *Prevent self-review* off: the
+     owner both starts and approves the run); *Deployment branches and tags* =
+     no restriction (a pull-request run is not on a named branch — the
+     required reviewer is the protection); **Environment secrets → Add
+     secret** `DAJC_KB_DEV_IMPORT_DB_URL` = the copied string. Never create a
+     *repository* secret with this name: every workflow on every branch could
+     read it;
+   - add the label **`kb-import-dev`** to PR #111 → *Review deployments* →
+     approve `kb-import-dev` → the workflow imports the 20 EUR-Lex versions
+     (AUTO_CHECKED, no AI, free) and keeps the original PDFs as an artifact for
+     14 days;
+   - after the test the owner may rotate the password (Reset password again)
+     or switch the role back to `NOLOGIN`.
 
 ## 5. Production environment plan
 
