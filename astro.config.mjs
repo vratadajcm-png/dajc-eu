@@ -48,6 +48,10 @@ export default defineConfig({
     webAnalytics: {
       enabled: true,
     },
+    // DAJC AI (src/lib/ask) answers within an internal 50 s deadline and then
+    // settles its cost reservation; 60 s keeps that inside the function limit
+    // on every Vercel plan (with or without Fluid compute) and caps runaway runs.
+    maxDuration: 60,
   }),
   integrations: [
     sitemap({
