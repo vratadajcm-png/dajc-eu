@@ -1,0 +1,269 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { FOUNDING_PLANS, TEST_TERMS_VERSION } from '../../lib/founding-preview';
+export const prerender = false;
+
+const previewAllowed = import.meta.env.DEV || process.env.VERCEL_ENV === 'preview';
+// Even if this file were merged by mistake, the production route remains 404.
+if (!previewAllowed) Astro.response.status = 404;
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+---
+<BaseLayout
+  noindex={true}
+  title="INTERNAL SANDBOX | DAJC Founding Customers"
+  description="Internal, protected simulation of the DAJC Founding Customers B2B preorder flow. No money or real reservations."
+>
+{previewAllowed ? (
+  <main class="founding-preview" id="founding-step-container">
+    <div class="sandbox-banner" role="note">
+      <span class="sandbox-dot" aria-hidden="true"></span>
+      <strong>INTERNAL TEST · SIMULATED PAYMENTS · NO REAL ORDERS</strong>
+    </div>
+    <section class="intro">
+      <p class="eyebrow">DAJC FOUNDING CUSTOMERS · INTERNAL PREVIEW</p>
+      <h1>Build the next era of transport operations.</h1>
+      <p class="lead">Explore the proposed B2B pre-order journey for DAJC Platform and DAJC TAR. The entire flow below is a <strong>simulation</strong> for internal review: no contract, no charged funds, no confirmed test invitation.</p>
+      <div class="benefits">
+        <span>Product-specific testing</span>
+        <span>Indicative reservation credit</span>
+        <span>Subscription only after launch</span>
+      </div>
+    </section>
+
+    <section class="wizard" aria-label="Test a founding-customer reservation">
+      <div class="wizard-header">
+        <div>
+          <p class="eyebrow">RESERVATION SIMULATOR</p>
+          <h2>Try the five-step journey</h2>
+        </div>
+        <span id="founding-step-indicator" class="count">Step 1 of 5</span>
+      </div>
+      <ol class="progress" aria-label="Reservation stages">
+        <li data-progress="1">Product</li>
+        <li data-progress="2">Company</li>
+        <li data-progress="3">Review</li>
+        <li data-progress="4">Mock payment</li>
+        <li data-progress="5">Dashboard</li>
+      </ol>
+
+      <section data-demo-step="1" aria-labelledby="step-1-title">
+        <h3 id="step-1-title">1. Choose a product</h3>
+        <p>Select the product your company would want to reserve. All amounts are <strong>draft B2B prices</strong> per organisation, not a live offer.</p>
+        <form id="founding-plan-form">
+          <fieldset class="plan-grid">
+            <legend class="sr-only">Choose one of the proposed reservation options</legend>
+            {FOUNDING_PLANS.map((plan, i) => (
+              <label class="plan">
+                <input type="radio" name="plan" value={plan.id} required checked={i === 0}/>
+                <span class="plan-content">
+                  <span class="plan-top"><strong>{plan.title}</strong><span class="plan-price">{plan.amountEUR} €</span></span>
+                  <span class="plan-desc">{plan.details}</span>
+                  <span class="plan-testing">Testing: {plan.testing}</span>
+                  <span class="draft">One-time proposed amount · VAT not finalised</span>
+                </span>
+              </label>
+            ))}
+          </fieldset>
+          <div class="actions"><button type="submit" class="primary">Continue to company details</button></div>
+        </form>
+      </section>
+
+      <section data-demo-step="2" hidden aria-labelledby="step-2-title">
+        <h3 id="step-2-title">2. Company and billing details</h3>
+        <p>Use <strong>fictional test data only</strong>. This sandbox stores simulated reservation details in this browser tab; there is no backend or outgoing email.</p>
+        <form id="founding-company-form" class="form-grid">
+          <label>Product *
+            <select name="product" id="founding-product">
+              <option value="platform">DAJC Platform</option>
+              <option value="tar">DAJC TAR</option>
+              <option value="both">Platform + TAR</option>
+            </select>
+          </label>
+          <label>Company legal name *
+            <input name="company" autocomplete="off" required minlength="2" maxlength="160" placeholder="Example Logistics s.r.o."/>
+          </label>
+          <div class="two-cols">
+            <label>Contact person *
+              <input name="contact" autocomplete="off" required minlength="2" maxlength="120" placeholder="Test Person"/>
+            </label>
+            <label>Business email *
+              <input name="email" type="email" autocomplete="off" required maxlength="254" placeholder="test@example.invalid"/>
+            </label>
+          </div>
+          <div class="two-cols">
+            <label>Country *
+              <input name="country" autocomplete="off" required minlength="2" maxlength="100" placeholder="Czech Republic"/>
+            </label>
+            <label>Company ID / VAT ID (optional)
+              <input name="companyId" autocomplete="off" maxlength="70" placeholder="DEMO-123456"/>
+            </label>
+          </div>
+          <label>Business activity
+            <select name="activity">
+              <option>Heavy / oversized transport</option>
+              <option>Towing, recovery & roadside assistance</option>
+              <option>Logistics / dispatch / fleet management</option>
+              <option>Other B2B activity</option>
+            </select>
+          </label>
+          <p class="error-text" id="founding-customer-errors" aria-live="polite"></p>
+          <div class="actions">
+            <button type="button" class="secondary" id="founding-back-product">Back</button>
+            <button type="submit" class="primary">Review proposed reservation</button>
+          </div>
+        </form>
+      </section>
+
+      <section data-demo-step="3" hidden aria-labelledby="step-3-title">
+        <h3 id="step-3-title">3. Review and acknowledge terms</h3>
+        <div class="summary">
+          <div><span>Product</span><strong id="founding-plan-summary">DAJC Platform</strong></div>
+          <div><span>Indicative one-time amount</span><strong id="founding-price-summary">199 €</strong></div>
+          <div><span>Planned testing</span><strong id="founding-testing-summary">Q3 2027</strong></div>
+          <div><span>Company / contact</span><strong id="founding-review-customer">—</strong></div>
+        </div>
+        <div class="terms-panel">
+          <h4>Draft reservation principles · {TEST_TERMS_VERSION}</h4>
+          <p><strong>Subject:</strong> future B2B software access and potential pre-production testing. Platform testing is planned for Q3 2027; TAR's Q1 2028 date is provisional. Final dates, scope, guarantees, maximum delivery deadline and remedies require an approved written agreement.</p>
+          <p><strong>Payment:</strong> the proposed one-time reservation amount would be credited to future software invoices. No recurring subscription would be charged during testing. Final VAT treatment, cancellation and refund rules, seller identification and invoicing are <strong>not yet approved</strong>.</p>
+          <p><strong>Product status:</strong> test users would work with the evolving product intended for production; it is not a separately licensed Early Access edition. This sandbox provides no commercial entitlement.</p>
+        </div>
+        <form id="founding-terms-form" class="terms-form">
+          <label><input type="checkbox" required name="authority"/> I am testing the company purchasing process for a business customer.</label>
+          <label><input type="checkbox" required name="sandbox"/> I understand this is only an internal simulation: there is no payment, tax invoice, signed contract, reservation or testing entitlement.</label>
+          <div class="actions">
+            <button class="secondary" type="button" id="founding-back-company">Back to company</button>
+            <button class="primary" type="submit">Continue to TEST checkout</button>
+          </div>
+        </form>
+      </section>
+
+      <section data-demo-step="4" hidden aria-labelledby="step-4-title">
+        <h3 id="step-4-title">4. Payment provider — simulation</h3>
+        <div class="checkout-panel">
+          <div class="checkout-title"><span>DAJC · TEST CHECKOUT</span><span class="test-tag">SANDBOX</span></div>
+          <p>In the live version, the customer would be redirected to an authorised payment provider. For this test you can simulate every outcome without entering any card data.</p>
+          <div class="summary">
+            <div><span>Product</span><strong id="founding-checkout-plan">DAJC Founding Customers</strong></div>
+            <div><span>Amount due in this test</span><strong>0 € · no real charge</strong></div>
+          </div>
+          <p class="test-warning">The sample price is never collected. No payment provider, webhooks, banks or external APIs are contacted.</p>
+          <div class="actions checkout-actions">
+            <button type="button" class="primary" id="founding-pay">Simulate successful payment</button>
+            <button type="button" class="secondary" id="founding-decline">Simulate declined payment</button>
+            <button type="button" class="secondary" id="founding-cancel">Cancel / go back</button>
+          </div>
+          <p id="founding-payment-result" role="status" aria-live="polite"></p>
+        </div>
+        <div class="actions"><button type="button" class="secondary" id="founding-back-review">Back to review</button></div>
+      </section>
+
+      <section data-demo-step="5" hidden aria-labelledby="step-5-title">
+        <h3 id="step-5-title">5. Customer reservation dashboard</h3>
+        <div class="success-banner"><strong>SIMULATED payment completed</strong><span>Nothing has been charged, sent, booked or activated.</span></div>
+        <div class="summary order">
+          <div><span>Mock reservation number</span><strong id="founding-order-id">DEMO-...</strong></div>
+          <div><span>Product</span><strong id="founding-order-product">—</strong></div>
+          <div><span>Company</span><strong id="founding-order-company">—</strong></div>
+          <div><span>Proposed amount</span><strong id="founding-order-amount">—</strong></div>
+          <div><span>Created</span><strong id="founding-order-date">—</strong></div>
+          <div><span>Testing target</span><strong id="founding-order-testing">—</strong></div>
+          <div><span>Payment status</span><strong id="founding-order-status">—</strong></div>
+          <div><span>Remaining mock credit</span><strong id="founding-order-credit">—</strong></div>
+          <div><span>Production licence</span><strong>NOT ACTIVE</strong></div>
+        </div>
+        <div class="actions">
+          <button type="button" class="primary" id="founding-preview-email">Preview confirmation email</button>
+          <button type="button" class="secondary" id="founding-download">Download TEST confirmation</button>
+          <button type="button" class="secondary" id="founding-refund">Simulate refund</button>
+        </div>
+        <pre id="founding-email-preview" class="email-preview" hidden></pre>
+        <p id="founding-refund-info" class="hint"></p>
+        <div class="actions"><button type="button" class="secondary" id="founding-start-over">Clear test and start again</button></div>
+      </section>
+    </section>
+
+    <section class="test-notes">
+      <h2>What this preview does and does not test</h2>
+      <p><strong>Included:</strong> product selection, company details, consent, summary, checkout outcomes, confirmation, simulated credit/refund, sample email and download. Data persists only in this browser tab via session storage; clearing the tab clears it.</p>
+      <p><strong>Not included:</strong> real payments, merchant verification, tax documentation, customer database, server-side order idempotency, contract signature, email delivery, authentication, access rights or live billing. These must be implemented and independently tested before accepting real money.</p>
+    </section>
+  </main>
+) : (
+  <main class="disabled"><h1>Not found</h1><p>This internal test is unavailable in production.</p></main>
+)}
+  <script>
+    import '../../scripts/founding-preview';
+  </script>
+</BaseLayout>
+
+<style>
+  .founding-preview{position:relative;z-index:2;width:min(1100px,calc(100% - 3rem));margin:0 auto;padding:2.4rem 0 6rem;color:var(--dajc-white)}
+  h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);line-height:1.14}
+  h1{font-size:clamp(2.3rem,6vw,4.6rem);margin:.65rem 0 1.2rem;max-width:20ch}
+  h2{font-size:clamp(1.7rem,4vw,2.6rem);margin:.6rem 0}
+  h3{font-size:1.5rem;margin:0 0 1rem}
+  h4{font-size:1.1rem;margin:.2rem 0 1rem}
+  p{color:var(--dajc-muted);line-height:1.68}
+  strong{color:var(--dajc-white)}
+  .eyebrow{font:500 .72rem 'IBM Plex Mono',monospace;letter-spacing:.16em;color:var(--dajc-orange);text-transform:uppercase}
+  .sandbox-banner{display:flex;align-items:center;gap:.7rem;background:#542d11;border:1px solid #db8c4b;padding:.85rem 1rem;border-radius:8px;font:.76rem 'IBM Plex Mono',monospace;color:#ffe0bb}
+  .sandbox-dot{width:10px;height:10px;background:#ffb154;border-radius:50%;flex-shrink:0}
+  .intro{padding:3rem 0}
+  .lead{font-size:1.06rem;max-width:75ch}
+  .benefits{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.8rem}
+  .benefits span{padding:.5rem .75rem;border:1px solid var(--dajc-line);border-radius:99px;color:var(--dajc-muted);font-size:.8rem}
+  .wizard{background:rgba(0,24,55,.62);border:1px solid var(--dajc-line);border-radius:18px;padding:clamp(1rem,4vw,2.5rem)}
+  .wizard-header{display:flex;justify-content:space-between;gap:1rem;align-items:center}
+  .count{font:.75rem 'IBM Plex Mono',monospace;color:var(--dajc-orange)}
+  .progress{list-style:none;padding:0;margin:1rem 0 2.2rem;display:grid;grid-template-columns:repeat(5,1fr);gap:.35rem}
+  .progress li{padding:.7rem .3rem;border-bottom:3px solid var(--dajc-line);color:var(--dajc-muted);text-align:center;font-size:.76rem}
+  .progress li[data-current="true"]{color:var(--dajc-white);border-color:var(--dajc-orange);font-weight:700}
+  [hidden]{display:none!important}
+  fieldset{margin:0;padding:0;border:0}
+  .plan-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+  .plan{display:flex;cursor:pointer;border:1px solid var(--dajc-line);padding:1rem;border-radius:12px;background:rgba(255,255,255,.025);gap:.5rem}
+  .plan:has(input:checked){border-color:var(--dajc-orange);background:rgba(239,125,0,.08)}
+  .plan input{margin-top:.25rem;accent-color:var(--dajc-orange)}
+  .plan-content{display:flex;flex-direction:column;gap:.85rem;min-width:0;flex:1}
+  .plan-top{display:flex;flex-direction:column;gap:.4rem}
+  .plan-price{font:700 2rem 'Space Grotesk',sans-serif;color:var(--dajc-white)}
+  .plan-desc{color:var(--dajc-muted);font-size:.88rem}
+  .plan-testing{font-size:.81rem;color:#d6e1ee}
+  .draft{color:#e8a87b;font-size:.72rem}
+  .actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}
+  button{min-height:46px;border-radius:8px;padding:.75rem 1rem;font:700 .78rem 'IBM Plex Mono',monospace;cursor:pointer}
+  button:disabled{cursor:not-allowed;opacity:.5}
+  .primary{background:var(--dajc-orange);border:1px solid var(--dajc-orange);color:#061a33}
+  .secondary{background:transparent;border:1px solid var(--dajc-line);color:var(--dajc-white)}
+  .form-grid{display:grid;gap:1rem}
+  .two-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+  .form-grid label{display:flex;flex-direction:column;gap:.4rem;font-size:.86rem}
+  input:not([type="checkbox"]):not([type="radio"]),select{width:100%;box-sizing:border-box;min-height:46px;border:1px solid var(--dajc-line);border-radius:8px;background:#061a33;color:var(--dajc-white);font:inherit;padding:.65rem .85rem}
+  input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--dajc-orange);outline-offset:3px}
+  .error-text,#founding-payment-result[data-status="error"]{color:#ffb6b6}
+  .summary{background:rgba(255,255,255,.035);border:1px solid var(--dajc-line);border-radius:12px;padding:1rem 1.4rem}
+  .summary>div{display:flex;align-items:start;justify-content:space-between;gap:1rem;border-bottom:1px solid var(--dajc-line);padding:.85rem 0}
+  .summary>div:last-child{border-bottom:0}
+  .summary span{color:var(--dajc-muted);font-size:.86rem}
+  .summary strong{text-align:right;font-size:.9rem;overflow-wrap:anywhere}
+  .terms-panel,.checkout-panel{margin-top:1.5rem;border:1px solid var(--dajc-line);border-radius:12px;padding:1.3rem;background:rgba(0,0,0,.14)}
+  .terms-panel p{font-size:.88rem}
+  .terms-form{margin-top:1.5rem}
+  .terms-form label{display:flex;align-items:start;gap:.75rem;margin:.8rem 0;color:var(--dajc-muted);font-size:.88rem;line-height:1.5}
+  .terms-form input{accent-color:var(--dajc-orange);margin-top:.3rem}
+  .checkout-title{display:flex;justify-content:space-between;align-items:center;gap:1rem;font:700 .84rem 'IBM Plex Mono',monospace}
+  .test-tag{background:#684013;border:1px solid #ca873d;padding:.4rem .6rem;border-radius:6px;color:#ffe5c3}
+  .test-warning{border-left:3px solid #e39d5c;padding:.6rem 1rem;background:rgba(220,133,30,.08)}
+  .success-banner{display:flex;flex-direction:column;gap:.3rem;padding:1rem;border:1px solid #4a9675;background:rgba(24,98,68,.18);border-radius:10px;margin-bottom:1.2rem}
+  .success-banner span{color:var(--dajc-muted);font-size:.83rem}
+  .email-preview{margin-top:1.5rem;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;background:#071224;color:#d7e1ef;border:1px solid var(--dajc-line);border-radius:8px;font-size:.78rem}
+  .test-notes{margin-top:3rem;border-top:1px solid var(--dajc-line);padding-top:2rem}
+  .test-notes p{max-width:85ch}
+  .hint{font-size:.86rem}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .disabled{min-height:70vh;max-width:900px;margin:auto;padding:6rem 1.5rem}
+  @media(max-width:780px){.plan-grid{grid-template-columns:1fr}.two-cols{grid-template-columns:1fr}.progress li{font-size:.64rem}.wizard-header{align-items:start}}
+  @media(max-width:430px){.founding-preview{width:calc(100% - 2rem)}.progress{gap:.18rem}.progress li{font-size:.55rem}.summary>div{flex-direction:column;gap:.2rem}.summary strong{text-align:left}}
+</style>
