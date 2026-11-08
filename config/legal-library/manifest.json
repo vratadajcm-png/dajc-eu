@@ -1,0 +1,534 @@
+{
+ "$comment": "Official documents of the DAJC legal library. Validity and dates are entered from the publisher's own status page (validityEvidenceUrl) on validityCheckedOn; never inferred from the text. Mass bands (massBands) only by a named reviewer.",
+ "entries": [
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 561/2006",
+   "title": "Regulation (EC) No 561/2006, consolidated text of 31.12.2024",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "driving_rest_times",
+    "roadside_checks_documents"
+   ],
+   "version": {
+    "label": "Regulation (EC) No 561/2006, consolidated text of 31.12.2024",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02006R0561-20241231",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-03-15",
+    "effectiveFrom": "2024-12-31",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006R0561",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 561/2006",
+   "title": "Regulation (EC) No 561/2006, consolidated text of 31.12.2024",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "driving_rest_times",
+    "roadside_checks_documents"
+   ],
+   "version": {
+    "label": "Nařízení (ES) č. 561/2006, konsolidované znění k 31. 12. 2024",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02006R0561-20241231",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-03-15",
+    "effectiveFrom": "2024-12-31",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006R0561",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 561/2006",
+   "title": "Regulation (EC) No 561/2006, consolidated text of 31.12.2024",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "driving_rest_times",
+    "roadside_checks_documents"
+   ],
+   "version": {
+    "label": "Verordnung (EG) Nr. 561/2006, konsolidierte Fassung vom 31.12.2024",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02006R0561-20241231",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-03-15",
+    "effectiveFrom": "2024-12-31",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006R0561",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 561/2006",
+   "title": "Regulation (EC) No 561/2006, consolidated text of 31.12.2024",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "driving_rest_times",
+    "roadside_checks_documents"
+   ],
+   "version": {
+    "label": "Rozporządzenie (WE) nr 561/2006, tekst skonsolidowany z 31.12.2024",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02006R0561-20241231",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-03-15",
+    "effectiveFrom": "2024-12-31",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006R0561",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 561/2006",
+   "title": "Regulation (EC) No 561/2006, consolidated text of 31.12.2024",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "driving_rest_times",
+    "roadside_checks_documents"
+   ],
+   "version": {
+    "label": "Nariadenie (ES) č. 561/2006, konsolidované znenie k 31. 12. 2024",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02006R0561-20241231",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-03-15",
+    "effectiveFrom": "2024-12-31",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006R0561",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EU) No 165/2014",
+   "title": "Regulation (EU) No 165/2014 on tachographs, consolidated text of 31.12.2024",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "tachograph",
+    "roadside_checks_documents"
+   ],
+   "version": {
+    "label": "Regulation (EU) No 165/2014 on tachographs, consolidated text of 31.12.2024",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02014R0165-20241231",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-02-04",
+    "effectiveFrom": "2024-12-31",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014R0165",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EU) No 165/2014",
+   "title": "Regulation (EU) No 165/2014 on tachographs, consolidated text of 31.12.2024",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "tachograph",
+    "roadside_checks_documents"
+   ],
+   "version": {
+    "label": "Nařízení (EU) č. 165/2014 o tachografech, konsolidované znění k 31. 12. 2024",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02014R0165-20241231",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-02-04",
+    "effectiveFrom": "2024-12-31",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014R0165",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EU) No 165/2014",
+   "title": "Regulation (EU) No 165/2014 on tachographs, consolidated text of 31.12.2024",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "tachograph",
+    "roadside_checks_documents"
+   ],
+   "version": {
+    "label": "Verordnung (EU) Nr. 165/2014 über Fahrtenschreiber, konsolidierte Fassung vom 31.12.2024",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02014R0165-20241231",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-02-04",
+    "effectiveFrom": "2024-12-31",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014R0165",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EU) No 165/2014",
+   "title": "Regulation (EU) No 165/2014 on tachographs, consolidated text of 31.12.2024",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "tachograph",
+    "roadside_checks_documents"
+   ],
+   "version": {
+    "label": "Rozporządzenie (UE) nr 165/2014 w sprawie tachografów, tekst skonsolidowany z 31.12.2024",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02014R0165-20241231",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-02-04",
+    "effectiveFrom": "2024-12-31",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014R0165",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EU) No 165/2014",
+   "title": "Regulation (EU) No 165/2014 on tachographs, consolidated text of 31.12.2024",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "tachograph",
+    "roadside_checks_documents"
+   ],
+   "version": {
+    "label": "Nariadenie (EÚ) č. 165/2014 o tachografoch, konsolidované znenie k 31. 12. 2024",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02014R0165-20241231",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-02-04",
+    "effectiveFrom": "2024-12-31",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014R0165",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Council Directive 96/53/EC",
+   "title": "Council Directive 96/53/EC (weights and dimensions), consolidated text of 14.8.2019",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "Council of the European Union",
+   "topics": [
+    "weights_dimensions_axles",
+    "oversize_heavy_transport",
+    "permits_exceptions_escorts"
+   ],
+   "version": {
+    "label": "Council Directive 96/53/EC (weights and dimensions), consolidated text of 14.8.2019",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:01996L0053-20190814",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "1996-07-25",
+    "effectiveFrom": "2019-08-14",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:31996L0053",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Council Directive 96/53/EC",
+   "title": "Council Directive 96/53/EC (weights and dimensions), consolidated text of 14.8.2019",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "Council of the European Union",
+   "topics": [
+    "weights_dimensions_axles",
+    "oversize_heavy_transport",
+    "permits_exceptions_escorts"
+   ],
+   "version": {
+    "label": "Směrnice Rady 96/53/ES (hmotnosti a rozměry), konsolidované znění k 14. 8. 2019",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:01996L0053-20190814",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "1996-07-25",
+    "effectiveFrom": "2019-08-14",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:31996L0053",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Council Directive 96/53/EC",
+   "title": "Council Directive 96/53/EC (weights and dimensions), consolidated text of 14.8.2019",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "Council of the European Union",
+   "topics": [
+    "weights_dimensions_axles",
+    "oversize_heavy_transport",
+    "permits_exceptions_escorts"
+   ],
+   "version": {
+    "label": "Richtlinie 96/53/EG des Rates (Gewichte und Abmessungen), konsolidierte Fassung vom 14.8.2019",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:01996L0053-20190814",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "1996-07-25",
+    "effectiveFrom": "2019-08-14",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:31996L0053",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Council Directive 96/53/EC",
+   "title": "Council Directive 96/53/EC (weights and dimensions), consolidated text of 14.8.2019",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "Council of the European Union",
+   "topics": [
+    "weights_dimensions_axles",
+    "oversize_heavy_transport",
+    "permits_exceptions_escorts"
+   ],
+   "version": {
+    "label": "Dyrektywa Rady 96/53/WE (masy i wymiary), tekst skonsolidowany z 14.8.2019",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:01996L0053-20190814",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "1996-07-25",
+    "effectiveFrom": "2019-08-14",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:31996L0053",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Council Directive 96/53/EC",
+   "title": "Council Directive 96/53/EC (weights and dimensions), consolidated text of 14.8.2019",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "Council of the European Union",
+   "topics": [
+    "weights_dimensions_axles",
+    "oversize_heavy_transport",
+    "permits_exceptions_escorts"
+   ],
+   "version": {
+    "label": "Smernica Rady 96/53/ES (hmotnosti a rozmery), konsolidované znenie k 14. 8. 2019",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:01996L0053-20190814",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "1996-07-25",
+    "effectiveFrom": "2019-08-14",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:31996L0053",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 1072/2009",
+   "title": "Regulation (EC) No 1072/2009 (access to the road haulage market, cabotage), consolidated text of 21.2.2022",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage"
+   ],
+   "version": {
+    "label": "Regulation (EC) No 1072/2009 (access to the road haulage market, cabotage), consolidated text of 21.2.2022",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02009R1072-20220221",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-10-21",
+    "effectiveFrom": "2022-02-21",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009R1072",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 1072/2009",
+   "title": "Regulation (EC) No 1072/2009 (access to the road haulage market, cabotage), consolidated text of 21.2.2022",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage"
+   ],
+   "version": {
+    "label": "Nařízení (ES) č. 1072/2009 (přístup na trh mezinárodní silniční nákladní dopravy, kabotáž), konsolidované znění k 21. 2. 2022",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02009R1072-20220221",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-10-21",
+    "effectiveFrom": "2022-02-21",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009R1072",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 1072/2009",
+   "title": "Regulation (EC) No 1072/2009 (access to the road haulage market, cabotage), consolidated text of 21.2.2022",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage"
+   ],
+   "version": {
+    "label": "Verordnung (EG) Nr. 1072/2009 (Zugang zum Markt des grenzüberschreitenden Güterkraftverkehrs, Kabotage), konsolidierte Fassung vom 21.2.2022",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02009R1072-20220221",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-10-21",
+    "effectiveFrom": "2022-02-21",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009R1072",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 1072/2009",
+   "title": "Regulation (EC) No 1072/2009 (access to the road haulage market, cabotage), consolidated text of 21.2.2022",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage"
+   ],
+   "version": {
+    "label": "Rozporządzenie (WE) nr 1072/2009 (dostęp do rynku międzynarodowych przewozów drogowych, kabotaż), tekst skonsolidowany z 21.2.2022",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02009R1072-20220221",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-10-21",
+    "effectiveFrom": "2022-02-21",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009R1072",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 1072/2009",
+   "title": "Regulation (EC) No 1072/2009 (access to the road haulage market, cabotage), consolidated text of 21.2.2022",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage"
+   ],
+   "version": {
+    "label": "Nariadenie (ES) č. 1072/2009 (prístup na trh medzinárodnej cestnej nákladnej dopravy, kabotáž), konsolidované znenie k 21. 2. 2022",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02009R1072-20220221",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-10-21",
+    "effectiveFrom": "2022-02-21",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009R1072",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Latest consolidated version listed on EUR-Lex on the check date."
+   }
+  },
+  {
+   "sourceId": "de-gesetze",
+   "jurisdiction": "DE",
+   "officialNumber": "StVO 2013",
+   "title": "Straßenverkehrs-Ordnung (StVO)",
+   "legalCategory": "NATIONAL_REGULATION",
+   "issuingBody": "Bundesministerium für Verkehr (Verordnung), veröffentlicht durch das Bundesministerium der Justiz",
+   "topics": [
+    "hgv_traffic_rules",
+    "driving_bans",
+    "closures_restrictions",
+    "oversize_heavy_transport",
+    "permits_exceptions_escorts",
+    "weights_dimensions_axles"
+   ],
+   "version": {
+    "label": "Straßenverkehrs-Ordnung (StVO), Stand: zuletzt geändert durch Art. 4 V v. 30.1.2026",
+    "language": "de",
+    "url": "https://www.gesetze-im-internet.de/stvo_2013/StVO.pdf",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2013-03-06",
+    "effectiveFrom": "2026-11-08",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-08",
+    "validityEvidenceUrl": "https://www.gesetze-im-internet.de/stvo_2013/",
+    "notes": "Not the authentic Bundesgesetzblatt. effective_from is the date this text was retrieved and shown as current; the entry into force of the last amendment was not checked."
+   }
+  }
+ ]
+}

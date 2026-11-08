@@ -22,7 +22,10 @@
     "oversize:monitor": "node scripts/oversize-monitor.mjs",
     "oversize:publish": "node scripts/generate-weekly-article.mjs",
     "lint:geographic-coverage": "node scripts/audit-geographic-coverage.mjs",
-    "migrate:geographic-coverage": "node scripts/migrate-geographic-coverage.mjs"
+    "migrate:geographic-coverage": "node scripts/migrate-geographic-coverage.mjs",
+    "kb:import": "node scripts/kb-import.mjs",
+    "kb:review": "node scripts/kb-review.mjs",
+    "kb:search": "node scripts/kb-search.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",
@@ -37,6 +40,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
     "drizzle-kit": "^0.31.10",
+    "pdfjs-dist": "^4.10.38",
     "typescript": "^5.7.3",
     "vitest": "^4.1.11"
   },
