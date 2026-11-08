@@ -1,5 +1,6 @@
 {
   "git": { "deploymentEnabled": { "fix/geographic-coverage-50-20261022": false } },
+  "regions": ["fra1"],
   "headers": [{
     "source": "/(.*)",
     "headers": [

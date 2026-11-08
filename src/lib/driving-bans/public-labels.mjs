@@ -14,11 +14,18 @@ const VERIFICATION_STATES = {
   SOURCE_UNAVAILABLE: ['Official source unavailable', 'Úřední zdroj nedostupný'],
 };
 
+const MONTH_STATES = {
+  VERIFIED: ['Verified', 'Ověřeno'],
+  PARTIAL: ['Individual bans verified, review incomplete', 'Ověřeny jednotlivé zákazy, kontrola neúplná'],
+  UNVERIFIED: ['Verification in progress', 'Ověření probíhá'],
+  AWAITING_OFFICIAL_PUBLICATION: ['Awaiting official publication', 'Čeká na úřední publikaci'],
+};
+
 // Ordered: the first matching category wins; anything unmatched is an incomplete review.
 const OPEN_ITEM_CATEGORIES = [
   { key: 'window', match: /^ACTIVE_WINDOW_NOT_REVERIFIED$/,
-    en: 'The current period has not yet been re-verified against official sources.',
-    cs: 'Aktuální období zatím nebylo znovu ověřeno z úředních zdrojů.' },
+    en: 'Not every month of the 12-month period is verified yet; see the monthly overview.',
+    cs: 'Ne všechny měsíce dvanáctiměsíčního období jsou zatím ověřené; viz přehled po měsících.' },
   { key: 'exemptions', match: /EXEMPTION|EXCEPTION(?!AL)|EASING|LOW_WATER/,
     en: 'The validity of some exemptions or relaxations is not confirmed by an official source.',
     cs: 'Platnost některých výjimek nebo úlev není potvrzena úředním zdrojem.' },
@@ -42,6 +49,9 @@ const pick = (pair, cs) => (cs ? pair[1] : pair[0]);
 
 export const banStateText = (state, cs = false) => pick(BAN_STATES[state] ?? BAN_STATES.UNKNOWN, cs);
 export const verificationStateText = (state, cs = false) => pick(VERIFICATION_STATES[state] ?? VERIFICATION_STATES.UNVERIFIED, cs);
+
+export const monthStatusText = (state, cs = false) => pick(MONTH_STATES[state] ?? MONTH_STATES.UNVERIFIED, cs);
+export const monthName = (month, cs = false) => new Intl.DateTimeFormat(cs ? 'cs-CZ' : 'en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${month}-01T00:00:00Z`));
 
 export const openItemCategory = code => OPEN_ITEM_CATEGORIES.find(category => category.match.test(code)) ?? REVIEW_INCOMPLETE;
 
