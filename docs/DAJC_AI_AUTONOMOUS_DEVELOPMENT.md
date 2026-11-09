@@ -46,10 +46,10 @@ live API calls, paid run, release, merge or production change performed.
 - GitHub Actions secret `ANTHROPIC_API_KEY`: dedicated development API key,
   **not** a claude.ai subscription limit.
 - GitHub Actions secret `OPENAI_API_KEY`: separate independent Codex reviewer.
-- GitHub repository variable `DAJC_CLAUDE_DEV_MODEL`: explicitly approved
-  available Claude Code model ID.
-- GitHub repository variable `DAJC_CODEX_REVIEW_MODEL`: explicitly approved
-  available Codex review model ID.
+- Optional repository variable `DAJC_CLAUDE_DEV_MODEL`: defaults to the
+  published `claude-sonnet-5-5` model ID; set to override.
+- Optional repository variable `DAJC_CODEX_REVIEW_MODEL`: when unset the
+  Codex Action selects its supported default model.
 - Repository variable `DAJC_CLAUDE_AUTONOMY_ENABLED`: leave unset or false
   until a **supervised manually triggered run** passes and owner explicitly
   approves recurring API spend.
