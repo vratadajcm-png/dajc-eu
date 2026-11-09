@@ -24,3 +24,24 @@ jobs:
         run: '$(go env GOPATH)/bin/actionlint .github/workflows/dajc-ai-autonomous-claude.yml .github/workflows/dajc-ai-independent-codex-review.yml'
       - name: Validate JSON review contract
         run: node -e 'const s=require("./.github/ai-autonomy/review-schema.json"); if(!s.properties?.verdict || !s.properties?.findings) process.exit(1)'
+
+  credentials-present:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Verify both existing API secrets are accessible — no provider requests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        shell: bash
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::Missing OPENAI_API_KEY in this repository"
+            exit 1
+          fi
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::Missing ANTHROPIC_API_KEY in this repository"
+            exit 1
+          fi
+          echo "Both required API secret names are configured. No external API was called."
