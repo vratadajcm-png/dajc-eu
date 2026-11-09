@@ -21,6 +21,10 @@ import { accessRegisterProblems, connectorMatrix, connectorProblems, loadAccessR
 import { DISCOVERY } from '../src/lib/kb/discovery.mjs';
 import { officialRobots } from '../src/lib/kb/importer.mjs';
 import { runProbe } from '../src/lib/kb/probe.mjs';
+import { PoliteClient } from '../src/lib/kb/acquire/polite-fetch.mjs';
+import { GII_TOC_URL, parseGiiToc, selectDeLaws } from '../src/lib/kb/acquire/de-gii.mjs';
+import { discoverAtChanges, risClient } from '../src/lib/kb/acquire/at-ris.mjs';
+import { discoverHrChanges, nnClient } from '../src/lib/kb/acquire/hr-nn.mjs';
 import { dajcEuropeCoverage } from '../config/europe-coverage.mjs';
 
 const args = process.argv.slice(2);
@@ -56,6 +60,16 @@ const discoveryErrors = [];
 for (const [code, fn] of Object.entries(DISCOVERY)) {
   try { discovered.push(...await fn({ year: new Date().getUTCFullYear(), since, robots: officialRobots() })); } catch (e) { discoveryErrors.push(`${code}: ${String(e.message).slice(0, 120)}`); }
 }
+// Catalogue-based discovery (publisher catalogues, not test documents). Outcomes are classified, never blurred.
+const catalogue = {};
+const classify = (e) => ({ outcome: e.kind ?? 'FAILED', reason: String(e.message).slice(0, 200) });
+try {
+  const toc = parseGiiToc(new TextDecoder().decode((await new PoliteClient({ minIntervalMs: 1500 }).get(GII_TOC_URL)).bytes));
+  const laws = selectDeLaws(toc);
+  catalogue.DE = { outcome: 'OK', catalogueEntries: toc.length, relevantLaws: laws.length, slugs: laws.map((l) => l.slug) };
+} catch (e) { catalogue.DE = classify(e); }
+try { catalogue.HR = { outcome: 'OK', changedEntries: (await discoverHrChanges(nnClient(), { since })).length, importAllowed: false, note: 'reuse terms not verified' }; } catch (e) { catalogue.HR = classify(e); }
+try { catalogue.AT = { outcome: 'OK', changedDocuments: (await discoverAtChanges(risClient(), { from: since, to: new Date().toISOString().slice(0, 10) })).length }; } catch (e) { catalogue.AT = classify(e); }
 const proven = new Set(probeResults.filter((r) => r.outcome === 'PROVEN').map((r) => connectors.find((c) => c.id === r.id)?.jurisdiction));
 const failures = [];
 if (src.status !== 0 || !sources) failures.push('SOURCE_CHECK_FAILED');
@@ -77,9 +91,10 @@ const out = {
   deltaQueueForAiVerification: delta,
   newOrAmendedActsDiscovered: discovered,
   connectorRegressions: regressions,
+  catalogueDiscovery: catalogue,
   discoveryErrors,
-  discoveryImplementedFor: Object.keys(DISCOVERY),
-  discoveryNotImplementedFor: dajcEuropeCoverage.map(([c]) => c).filter((c) => !(c in DISCOVERY)),
+  discoveryImplementedFor: [...new Set([...Object.keys(DISCOVERY), ...Object.entries(catalogue).filter(([, v]) => v.outcome === 'OK').map(([k]) => k)])],
+  discoveryNotImplementedFor: dajcEuropeCoverage.map(([c]) => c).filter((c) => !(c in DISCOVERY) && catalogue[c]?.outcome !== 'OK'),
   jurisdictionsWithoutProvenAcquisition: dajcEuropeCoverage.map(([c]) => c).filter((c) => !proven.has(c)),
   accessRegister: loadAccessRegister().available ? 'AVAILABLE' : 'PRIVATE_REGISTER_NOT_CONFIGURED',
   failures,

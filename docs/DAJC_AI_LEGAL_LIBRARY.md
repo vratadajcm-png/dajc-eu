@@ -420,3 +420,22 @@ unchanged; recommended values in `DAJC_AI_B2C_LAUNCH.md` § 5.
   procedure in `DAJC_AI_NEON.md` § 4, step 6). It covers the 20 EUR-Lex
   versions; StVO (DE) stays out until its source allows automated download and
   the in-force date of its last amendment is checked.
+
+## Official acquisition into Neon dev (kb-acquire)
+
+`scripts/kb-acquire.mjs` runs Discovery → Acquisition → Text extraction → SHA-256 →
+archive (private Neon Object Storage bucket `dajc-kb-originals-dev`, S3-compatible
+`S3CompatibleArchive`, credentials only as environment secrets) → PostgreSQL → read-back
+of both stores → audit record. Workflow `kb-acquire-dev` (owner label/dispatch and
+environment approval, like `kb-import-dev`). Idempotent: the archive is content-addressed
+and immutable, the database write is one transaction keyed on (document, language,
+SHA-256), older legal versions are superseded, never rewritten.
+
+| Jurisdiction | Route | State on 2026-11-09 |
+|---|---|---|
+| DE | Gesetze im Internet catalogue `gii-toc.xml` + `xml.zip` | implemented and unit-tested; live run from the Claude sandbox ended `ROBOTS_UNAVAILABLE` (robots.txt answers Node requests with HTTP 503, temporary, retried, not circumvented); first real import must run from the GitHub runner |
+| AT | RIS OGD API v2.6 incl. history, 0.5 req/s serial | client implemented, UNTESTED_LIVE: `data.bka.gv.at/robots.txt` disallows generic agents (`Disallow: /`), so it runs only with an access arrangement from the publisher (`DAJC_KB_AT_RIS_AUTHORIZATION_REF`) |
+| HR | Narodne novine sitemaps + ELI → JSON-LD, 3 req/s serial | discovery client implemented; **no import**: reuse terms not verified |
+
+HTTP failures are classified: `ROBOTS_DISALLOWED`, `ROBOTS_UNAVAILABLE` (temporary),
+`PERMANENT_HTTP`, `TRANSIENT_EXHAUSTED` (e.g. a persistent 503), `CHALLENGE`.

@@ -114,7 +114,7 @@ export const legalSources = Object.freeze([
   }),
   S({
     id: 'at-ris', jurisdiction: 'AT', name: 'RIS - Rechtsinformationssystem des Bundes (Bundeskanzleramt)', kind: 'LEGISLATION_DATABASE',
-    domains: ['ris.bka.gv.at'], categories: LAW, topics: ALL, languages: ['de'],
+    domains: ['ris.bka.gv.at', 'data.bka.gv.at'], categories: LAW, topics: ALL, languages: ['de'],
     reuse: { status: 'PERMITTED', basis: 'Laws are free works, § 7 UrhG (to confirm).', termsUrl: null },
     check: { status: 'BLOCKED_FROM_DEV', checkedOn: CHECKED_ON, note: 'HTTP 503 from ris.bka.gv.at.' },
   }),
