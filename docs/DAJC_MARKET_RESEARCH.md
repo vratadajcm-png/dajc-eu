@@ -29,6 +29,15 @@ FROM public.market_research_submissions
 GROUP BY product, usage_interest ORDER BY product, usage_interest;
 ```
 
+**Interest and willingness to pay:**
+
+```sql
+SELECT product, usage_interest, payment_interest, count(*) AS replies
+FROM public.market_research_submissions
+GROUP BY product, usage_interest, payment_interest
+ORDER BY product, replies DESC;
+```
+
 **Top-ranked functions:**
 
 ```sql
