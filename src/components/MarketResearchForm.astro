@@ -62,7 +62,15 @@ const options = isPlatform
         <option value="no">No</option>
       </select>
     </label>
-    <label><span>5. What would you change or add to the proposed solution?</span>
+    <label><span>5. Would your company pay for this product if it delivered the promised value? *</span>
+      <select name="paymentInterest" required>
+        <option value="">Choose one</option>
+        <option value="yes">Yes — if the value is proven</option>
+        <option value="maybe">It depends on price and included features</option>
+        <option value="no">No</option>
+      </select>
+    </label>
+    <label><span>What would you change or add to the proposed solution?</span>
       <textarea name="suggestion" rows="2" maxlength="1200" placeholder="Optional — tell us what we may have missed."></textarea>
     </label>
     <div class="contact-block">
