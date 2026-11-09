@@ -72,6 +72,7 @@ export const POST:APIRoute = async ({ request, clientAddress }) => {
   const biggestProblem = clean(data.biggestProblem,1500);
   const mostUseful = single(data.mostUseful,40);
   const usageInterest = single(data.usageInterest,20);
+  const paymentInterest = single(data.paymentInterest,20);
   const suggestion = clean(data.suggestion,1200);
   const email = single(data.email,254).toLowerCase();
   const followUp = data.followUp === 'on';
@@ -80,7 +81,7 @@ export const POST:APIRoute = async ({ request, clientAddress }) => {
 
   if (!company || !country || !currentSoftware || !biggestProblem ||
       !ROLES.has(role) || !FEATURES[product].has(mostUseful) ||
-      !INTEREST.has(usageInterest) || !acknowledged ||
+      !INTEREST.has(usageInterest) || !INTEREST.has(paymentInterest) || !acknowledged ||
       (email !== '' && !isEmail(email)) || (followUp && !email) ||
       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
     return reply(400,{ok:false,error:'Please complete all required fields and check your contact details.'});
@@ -106,9 +107,9 @@ export const POST:APIRoute = async ({ request, clientAddress }) => {
       const row = await tx`
         INSERT INTO public.market_research_submissions
         (id,product,company,country,role,current_software,biggest_problem,most_useful,
-         usage_interest,suggestion,contact_email,follow_up_allowed)
+         usage_interest,payment_interest,suggestion,contact_email,follow_up_allowed)
         VALUES (${id}::uuid,${product},${company},${country},${role},${currentSoftware},
-          ${biggestProblem},${mostUseful},${usageInterest},${suggestion},
+          ${biggestProblem},${mostUseful},${usageInterest},${paymentInterest},${suggestion},
           ${followUp ? email : null},${followUp})
         ON CONFLICT (id) DO NOTHING
         RETURNING id`;
@@ -144,6 +145,7 @@ export const POST:APIRoute = async ({ request, clientAddress }) => {
         'Biggest problem: '+biggestProblem,
         'Most useful function: '+mostUseful,
         'Interest: '+usageInterest,
+        'Willingness to pay: '+paymentInterest,
         'Suggestions: '+(suggestion||'None'),
         'Contact permitted: '+(followUp?'Yes':'No'),
         'Contact email: '+(followUp?email:'Not provided'),
