@@ -31,6 +31,7 @@
     "kb:coverage": "node scripts/kb-coverage.mjs",
     "kb:discover": "node scripts/kb-eurlex-discover.mjs",
     "kb:monitor": "node scripts/kb-monitor.mjs",
+    "kb:audit": "node scripts/kb-monthly-audit.mjs",
     "kb:sources-check": "node scripts/kb-sources-check.mjs"
   },
   "dependencies": {

@@ -351,7 +351,7 @@ rejected version, UK/EEA/directive, library outage.
   next AI verification revokes an AI_VERIFIED state that relies on an outdated
   text (layer 1 fails). Workflow `kb-monitor` (runner, no secret) also repeats
   the source check; it has **no schedule** until the owner confirms operating
-  limits (regular tier weekly, intensive tier daily are prepared).
+  limits (superseded: one monthly audit only, `kb-monthly-audit`).
 * National legislation: the registry and the matrix are ready; national
   imports need, per source, readable reuse terms, robots.txt permission and a
   verified way to the official document (PDF or structured text), source by

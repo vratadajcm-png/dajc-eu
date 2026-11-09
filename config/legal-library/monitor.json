@@ -1,11 +1,9 @@
 {
- "$comment": "Change monitoring of the legal library (scripts/kb-monitor.mjs, workflow kb-monitor). Tiers say how often an act should be checked once a schedule is enabled; the workflow has NO schedule until the owner confirms operating limits. 'intensive' lists acts with known pending or frequent amendments.",
+ "$comment": "Change monitoring of the legal library. ONE audit: monthly, all acts (scripts/kb-monthly-audit.mjs, workflow kb-monthly-audit). No daily or weekly legislative checks. Driving Bans weekly monitoring is separate and untouched.",
  "tiers": {
-  "regular": { "everyDays": 7, "description": "Every stored EUR-Lex act." },
-  "intensive": {
-   "everyDays": 1,
-   "description": "Acts under revision or amended often: weights and dimensions (revision proposal COM(2023) 445), driving licences (new directive adopted), road charging, dangerous goods annexes, eFTI delegated and implementing acts.",
-   "celex": ["31996L0053", "32006L0126", "31999L0062", "32008L0068", "32020R1056"]
+  "monthly": {
+   "everyDays": 31,
+   "description": "Every stored EUR-Lex act (delta against the stored consolidation)."
   }
  }
 }

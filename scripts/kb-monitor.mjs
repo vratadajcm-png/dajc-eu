@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Change monitoring of the legal library (config/legal-library/monitor.json).
 //
-//   node scripts/kb-monitor.mjs [--tier regular|intensive] [--write] [--report monitor.json]
+//   node scripts/kb-monitor.mjs [--tier monthly] [--write] [--report monitor.json]
 //
 // For every EUR-Lex act of the manifest, reads the act's own status page
 // (robots.txt and crawl delay respected) and reports:
@@ -24,7 +24,7 @@ import { baseActCelex, celexOf, consolidationDate } from '../src/lib/kb/verify.m
 
 const args = process.argv.slice(2);
 const value = (name) => (args.includes(name) ? args[args.indexOf(name) + 1] : null);
-const tier = value('--tier') || 'regular';
+const tier = value('--tier') || 'monthly';
 const checkedOn = new Date().toISOString().slice(0, 10);
 const manifestPath = 'config/legal-library/manifest.json';
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
