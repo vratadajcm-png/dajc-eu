@@ -27,3 +27,4 @@ data/driving-bans/staging/blobs/
 
 # AI research documents stay local like the evidence blobs; their metadata is committed.
 data/driving-bans/staging/research/blobs/
+reports/legal-coverage/

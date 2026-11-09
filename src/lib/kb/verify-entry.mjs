@@ -126,7 +126,9 @@ export async function verifyEntry({ sql, entry, archive = null, online = false, 
     // Search exactly as DAJC AI asks (src/lib/ask/library.ts), then the citation of the expected provision.
     const check = searchChecks.find((c) => c.officialNumber === entry.officialNumber);
     const asked = check?.questions?.[v.language];
-    if (!asked) problems.search.push('no search check defined for this language');
+    // Without a curated question the retrieval of this version is tested by the
+    // generated questions of AI layer 5, which AI_VERIFIED requires.
+    if (!asked) facts.search = { skipped: 'no curated question (retrieval tested by AI layer 5)' };
     else {
       const hits = await searchLibrary(postgresQuery(sql), {
         terms: [...asked.terms, asked.question], question: asked.question, languages: [v.language], countries: [check.country || 'CZ'], onDate,

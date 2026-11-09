@@ -1,6 +1,6 @@
 # DAJC AI — Neon PostgreSQL database (instead of Supabase)
 
-Status on 2026-11-08. Supabase is unchanged (no projects or data were deleted).
+Status on 2026-11-09. Supabase is unchanged (no projects or data were deleted).
 
 ## 1. Actual state
 
@@ -10,7 +10,8 @@ Status on 2026-11-08. Supabase is unchanged (no projects or data were deleted).
 | Organisation | "Miroslav" (`org-winter-glitter-59519495`), **Free** plan, no payment card |
 | Project | **`dajc-ai`** (`lively-shadow-23612355`), region **`aws-eu-central-1` (Frankfurt)**, PostgreSQL **17.11**, UTF8 / `C.UTF-8` |
 | Branch `production` (default) | empty, no migrations — reserved for the future production |
-| Branch `dev` | migrations `drizzle-ask` 0000+0001 and `drizzle-kb` 0000, drizzle migration bookkeeping (same SHA-256 as the files) |
+| Branch `dev` | migrations `drizzle-ask` 0000+0001 and `drizzle-kb` 0000+0001+0002, drizzle migration bookkeeping (same SHA-256 as the files); marker `dajc_kb.deployment = 'dev'`; library: 20 EUR-Lex versions, 848 provisions (run 42543642195), identical in SHA-256 and content digest to the locally verified import |
+| Branch `dev-backup-before-0002-2026-11-09` | copy of `dev` before migration 0002, no compute (costs no CU-hours) |
 | Branch `dev-security-tests` | test data of the security tests (1 fingerprint, counters, budget, a metric) |
 | Branch `dev-kb-tests` | library sample: 3 provisions of Regulation 561/2006 (CS) to verify search |
 | Data API | not enabled (404) — the schemas are not exposed over HTTP |
@@ -26,7 +27,7 @@ Claude does not delete them).
 | Database owner (`dajc_owner`) | **not a superuser**, but has `CREATEROLE`, `CREATEDB`, **`BYPASSRLS`** (member of `neon_superuser`) → the application **must not** use the owner |
 | Role created by the migration (`dajc_ask_app`) | no superuser, no `BYPASSRLS`, not in `neon_superuser`, member of no role; the owner sets its password outside the repository (Neon requires ≥ 60 bits of entropy) |
 | RLS | enabled on all 8 tables of `dajc_ask`; the app role cannot read metrics |
-| Library roles | `dajc_kb_importer` (CI import: adds machine-checked versions only) and `dajc_kb_reviewer` (a person: HUMAN_VERIFIED / REJECTED); separation enforced by grants and triggers (`drizzle-kb/0001`, `DAJC_AI_LEGAL_LIBRARY.md` § 2a) |
+| Library roles | `dajc_kb_importer` (CI import: adds machine-checked versions only), `dajc_kb_ai_verifier` (CI AI verification: records runs; the database decides AI_VERIFIED) and the optional `dajc_kb_reviewer` (a person: HUMAN_VERIFIED / REJECTED); separation enforced by grants, triggers and a `SECURITY DEFINER` function (`drizzle-kb/0001`, `0002`, `DAJC_AI_LEGAL_LIBRARY.md` § 2a-2b) |
 | Drizzle ORM + postgres-js | `prepare: false` (already in the code) — compatible with Neon's PgBouncer in `transaction` mode |
 | Transactions, `pg_advisory_xact_lock` | work (the lock is transaction-level, not session-level — exactly what the pooler supports) |
 | `gen_random_uuid`, `unaccent`, generated `tsvector`, `regconfig` | work on PG 17.11 |
@@ -121,6 +122,25 @@ only; they never go into the repository, GitHub or a conversation.
      and keeps the original PDFs as an artifact for 14 days;
    - after the test the owner may rotate the password (Reset password again)
      or switch the role back to `NOLOGIN`.
+7. **AI verification on the branch `dev`** (`DAJC_AI_LEGAL_LIBRARY.md` § 2b):
+   - prepared through the Neon connector, without any password: migration
+     `drizzle-kb` 0002 (backup branch `dev-backup-before-0002-2026-11-09`
+     first, no compute), `ALTER ROLE dajc_kb_ai_verifier LOGIN`;
+   - **Neon Console → branch `dev` → Roles → `dajc_kb_ai_verifier` → Reset
+     password**; **Connect** → branch `dev`, database `dajc`, role
+     `dajc_kb_ai_verifier`, pooling off → copy the string;
+   - **GitHub → Settings → Environments → New environment
+     `kb-ai-verify-dev`**: required reviewer = the owner (*Prevent
+     self-review* off), no branch restriction; environment secrets
+     `DAJC_KB_DEV_AI_VERIFIER_DB_URL` (the copied string) and the AI keys
+     `DAJC_RESEARCH_OPENAI_API_KEY` and `DAJC_RESEARCH_ANTHROPIC_API_KEY`
+     (environment secrets are preferred; repository secrets of the same name
+     are used if present). Optional repository variables:
+     `DAJC_KB_AI_RUN_BUDGET_USD` (default 12), `DAJC_KB_AI_OPENAI_MODEL`,
+     `DAJC_KB_AI_ANTHROPIC_MODEL`, `DAJC_KB_AI_PRICING_USD`;
+   - label **`kb-ai-verify-dev`** on PR #111 → approve the deployment. The
+     import credential never reaches this job, and this credential never
+     reaches the import job.
 
 ## 5. Production environment plan
 

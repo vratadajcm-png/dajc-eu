@@ -41,7 +41,7 @@ describe.skipIf(!IMPORTER_URL || !APP_URL || !REVIEW_URL)('legal library in Post
   function entry(number: string, version: Record<string, unknown>, extra: Record<string, unknown> = {}) {
     return {
       sourceId: 'eu-eurlex', jurisdiction: 'EU', officialNumber: `Test ${number} ${run}`, title: `Test ${number}`, legalCategory: 'EU_REGULATION',
-      issuingBody: 'Test', topics: ['driving_rest_times'],
+      issuingBody: 'Test', topics: ['driving_rest_times'], legalAreas: ['A.driving_rest_times'],
       version: {
         label: `Test ${number} ${version.effectiveFrom}`, language: 'en', url: `https://eur-lex.europa.eu/test/${run}/${number}/${version.effectiveFrom}.pdf`,
         authenticity: 'CONSOLIDATED_DOCUMENTATION', issuedOn: '2019-01-01', validity: 'IN_FORCE', validityCheckedOn: '2026-11-08',

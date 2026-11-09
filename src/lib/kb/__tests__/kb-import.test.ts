@@ -11,7 +11,7 @@ const manifest = JSON.parse(readFileSync(new URL('../../../../config/legal-libra
 function entry(overrides: Record<string, unknown> = {}, version: Record<string, unknown> = {}) {
   return {
     sourceId: 'eu-eurlex', jurisdiction: 'EU', officialNumber: 'Regulation (XX) No 1/2099', title: 'Test regulation', legalCategory: 'EU_REGULATION',
-    issuingBody: 'European Parliament and Council', topics: ['driving_rest_times'],
+    issuingBody: 'European Parliament and Council', topics: ['driving_rest_times'], legalAreas: ['A.driving_rest_times'],
     version: {
       label: 'Regulation (XX) No 1/2099, consolidated text of 1.1.2026', language: 'en', url: 'https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32099R0001',
       authenticity: 'CONSOLIDATED_DOCUMENTATION', issuedOn: '2099-01-01', effectiveFrom: '2026-01-01', effectiveTo: null, validity: 'IN_FORCE',
@@ -116,12 +116,12 @@ describe('import: provenance, reuse and validity are checked, never assumed', ()
   });
   it('downloads only from the registered source, also across redirects, with a size cap', async () => {
     const redirectAway = async () => new Response(null, { status: 302, headers: { location: 'https://mirror.example.com/561.pdf' } });
-    await expect(fetchOfficialBytes('https://eur-lex.europa.eu/x.pdf', { fetchImpl: redirectAway as any })).rejects.toThrow(/left the registered source/);
+    await expect(fetchOfficialBytes('https://eur-lex.europa.eu/x.pdf', { fetchImpl: redirectAway as any, robots: false })).rejects.toThrow(/left the registered source/);
     await expect(fetchOfficialBytes('https://www.truck-blog.example/x.pdf')).rejects.toThrow(/not a registered official source/);
     const huge = async () => new Response(new Uint8Array(2048), { status: 200 });
-    await expect(fetchOfficialBytes('https://eur-lex.europa.eu/x.pdf', { fetchImpl: huge as any, maxBytes: 1024 })).rejects.toThrow(/larger than the import limit/);
+    await expect(fetchOfficialBytes('https://eur-lex.europa.eu/x.pdf', { fetchImpl: huge as any, maxBytes: 1024, robots: false })).rejects.toThrow(/larger than the import limit/);
     const ok = async () => new Response(regulationPdf() as unknown as BodyInit, { status: 200, headers: { 'content-type': 'application/pdf' } });
-    const result = await fetchOfficialBytes('https://eur-lex.europa.eu/x.pdf', { fetchImpl: ok as any });
+    const result = await fetchOfficialBytes('https://eur-lex.europa.eu/x.pdf', { fetchImpl: ok as any, robots: false });
     expect(isPdf(result.bytes)).toBe(true);
   });
 });

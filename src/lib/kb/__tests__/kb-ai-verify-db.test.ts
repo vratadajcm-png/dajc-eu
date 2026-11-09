@@ -43,7 +43,7 @@ describe.skipIf(!IMPORTER_URL || !VERIFIER_URL || !REVIEW_URL || !APP_URL)('AI v
     const { importer } = await clients();
     const entry = {
       sourceId: 'eu-eurlex', jurisdiction: 'EU', officialNumber: `AI test ${name} ${run}`, title: `AI test ${name}`, legalCategory: 'EU_REGULATION',
-      issuingBody: 'Test', topics: ['driving_rest_times'],
+      issuingBody: 'Test', topics: ['driving_rest_times'], legalAreas: ['A.driving_rest_times'],
       version: {
         label: `AI test ${name}`, language: 'en', url: `https://eur-lex.europa.eu/test/${run}/${name}.pdf`, authenticity: 'CONSOLIDATED_DOCUMENTATION',
         issuedOn: '2019-01-01', effectiveFrom: '2025-01-01', effectiveTo: null, validity: 'IN_FORCE', validityCheckedOn: '2026-11-08',

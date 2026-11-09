@@ -24,7 +24,9 @@
 import { archiveKey, sha256Hex } from './archive.mjs';
 import { legalSourceForUrl, legalSources } from './legal-sources.mjs';
 import { extractPdfText, isPdf, PDF_LIMITS } from './pdf-text.mjs';
+import { RobotsPolicy } from './robots.mjs';
 import { splitProvisions } from './provisions.mjs';
+import { LEGAL_AREA_IDS } from './legal-areas.mjs';
 import { AUTHENTICITY, KB_TOPICS, LEGAL_CATEGORIES, VALIDITY } from './taxonomy.mjs';
 
 export const USER_AGENT = 'DAJC legal library importer (+https://www.dajc.eu)';
@@ -41,6 +43,8 @@ export function validateManifestEntry(entry, sources = legalSources) {
   if (!entry.officialNumber || !entry.title || !entry.issuingBody) problems.push('officialNumber, title and issuingBody are required');
   for (const topic of entry.topics || []) if (!KB_TOPICS.includes(topic)) problems.push(`unknown topic ${topic}`);
   if (!Array.isArray(entry.topics) || entry.topics.length === 0) problems.push('at least one topic is required');
+  if (!Array.isArray(entry.legalAreas) || entry.legalAreas.length === 0) problems.push('at least one legal area is required (src/lib/kb/legal-areas.mjs)');
+  for (const area of entry.legalAreas || []) if (!LEGAL_AREA_IDS.includes(area)) problems.push(`unknown legal area ${area}`);
   const v = entry.version || {};
   if (!/^[a-z]{2}$/.test(v.language || '')) problems.push('version.language must be ISO 639-1');
   if (!source.languages.includes(v.language)) problems.push(`source ${source.id} does not publish in ${v.language}`);
@@ -63,16 +67,26 @@ export function reuseAllowed(source) {
   return source?.reuse?.status === 'PERMITTED' || source?.reuse?.status === 'PERMITTED_WITH_ATTRIBUTION';
 }
 
+let sharedRobots = null;
+/** The process-wide robots.txt policy of the library (one cache and pace per host). */
+export function officialRobots() {
+  sharedRobots ??= new RobotsPolicy({ userAgent: USER_AGENT });
+  return sharedRobots;
+}
+
 /**
  * Downloads from a registered source only: every redirect must stay HTTPS on
- * the same source; the body is read with a hard size cap.
+ * the same source; the body is read with a hard size cap; every request is
+ * allowed by the publisher's robots.txt and paced by its Crawl-delay
+ * (robots: false only in unit tests with a fake fetch).
  */
-export async function fetchOfficialBytes(url, { fetchImpl = globalThis.fetch, maxBytes = PDF_LIMITS.maxBytes, maxRedirects = 5, timeoutMs = 120_000 } = {}) {
+export async function fetchOfficialBytes(url, { fetchImpl = globalThis.fetch, maxBytes = PDF_LIMITS.maxBytes, maxRedirects = 5, timeoutMs = 120_000, robots = officialRobots() } = {}) {
   const source = legalSourceForUrl(url);
   if (!source) throw new Error('not a registered official source');
   const signal = AbortSignal.timeout(timeoutMs);
   let current = url;
   for (let hop = 0; hop <= maxRedirects; hop++) {
+    if (robots) await robots.admit(current);
     const res = await fetchImpl(current, { redirect: 'manual', signal, headers: { 'user-agent': USER_AGENT, accept: 'application/pdf,*/*;q=0.5' } });
     if (res.status >= 300 && res.status < 400 && res.headers.get('location')) {
       const next = new URL(res.headers.get('location'), current).toString();

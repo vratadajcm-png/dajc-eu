@@ -134,6 +134,55 @@ export const legalSources = Object.freeze([
     id: `${jurisdiction.toLowerCase()}-legislation`, jurisdiction, name, kind: 'LEGISLATION_DATABASE', domains: [domain], categories: LAW, topics: ALL,
     languages: [lang], reuse: { status: 'UNKNOWN', basis: 'To confirm per source before import.', termsUrl: null }, check: { status: 'NOT_CHECKED' },
   })),
+
+  // --- Official legislation of the remaining DAJC jurisdictions (2026-11-09) --
+  // National official gazettes or legislation portals of the state itself.
+  // Reuse terms are not read yet (UNKNOWN), so the importer refuses them until
+  // they are; reachability and robots.txt are recorded in
+  // config/legal-library/source-checks.json (scripts/kb-sources-check.mjs).
+  ...[
+    ['AD', 'BOPA - Butlletí Oficial del Principat d\'Andorra', ['bopa.ad'], ['ca']],
+    ['AL', 'Qendra e Botimeve Zyrtare (Official Publications Centre)', ['qbz.gov.al'], ['sq']],
+    ['AM', 'ARLIS - Armenian Legal Information System', ['arlis.am'], ['hy']],
+    ['AZ', 'e-qanun.az - Unified Internet Database of Legal Acts (Ministry of Justice)', ['e-qanun.az'], ['az']],
+    ['BA', 'Službeni glasnik Bosne i Hercegovine', ['sllist.ba'], ['bs', 'hr', 'sr']],
+    ['BY', 'National Legal Internet Portal of the Republic of Belarus', ['pravo.by'], ['ru', 'be']],
+    ['CY', 'Government Printing Office - Official Gazette of the Republic of Cyprus', ['mof.gov.cy'], ['el']],
+    ['GE', 'Legislative Herald of Georgia (Ministry of Justice)', ['matsne.gov.ge'], ['ka']],
+    ['IS', 'Alþingi - Lagasafn and Stjórnartíðindi', ['althingi.is', 'stjornartidindi.is'], ['is']],
+    ['KZ', 'Adilet - Legal Information System of Regulatory Legal Acts (Ministry of Justice)', ['adilet.zan.kz'], ['ru', 'kk']],
+    ['MC', 'Légimonaco and Journal de Monaco', ['legimonaco.mc', 'journaldemonaco.gouv.mc'], ['fr']],
+    ['MD', 'Registrul de stat al actelor juridice', ['legis.md'], ['ro']],
+    ['ME', 'Službeni list Crne Gore', ['sluzbenilist.me'], ['sr']],
+    ['MK', 'Службен весник на Република Северна Македонија', ['slvesnik.com.mk'], ['mk']],
+    ['RS', 'Pravno-informacioni sistem Republike Srbije', ['pravno-informacioni-sistem.rs'], ['sr']],
+    ['RU', 'Official Internet Portal of Legal Information', ['pravo.gov.ru'], ['ru']],
+    ['SM', 'Consiglio Grande e Generale - leggi e decreti', ['consigliograndeegenerale.sm'], ['it']],
+    ['TR', 'Mevzuat Bilgi Sistemi and Resmî Gazete', ['mevzuat.gov.tr', 'resmigazete.gov.tr'], ['tr']],
+    ['UA', 'Законодавство України (Verkhovna Rada)', ['zakon.rada.gov.ua'], ['uk']],
+    ['XK', 'Gazeta Zyrtare e Republikës së Kosovës', ['gzk.rks-gov.net'], ['sq', 'sr']],
+  ].map(([jurisdiction, name, domains, languages]) => S({
+    id: `${jurisdiction.toLowerCase()}-legislation`, jurisdiction, name, kind: 'LEGISLATION_DATABASE', domains, categories: LAW, topics: ALL,
+    languages, reuse: { status: 'UNKNOWN', basis: 'To confirm per source before import.', termsUrl: null }, check: { status: 'NOT_CHECKED' },
+  })),
+
+  // --- Regional legislation where regions legislate themselves --------------
+  // A regional rule keeps its region: it never applies to the rest of the state.
+  // AT (RIS), ES (BOE), PT (Diário da República) and UK (legislation.gov.uk)
+  // publish regional legislation in the national source above.
+  ...[
+    ['BA', 'FBIH', 'Službene novine Federacije Bosne i Hercegovine', ['sluzbenenovine.ba'], ['bs', 'hr']],
+    ['BA', 'RS', 'Službeni glasnik Republike Srpske', ['slglasnik.org'], ['sr']],
+    ['BA', 'BD', 'Službeni glasnik Brčko distrikta BiH (Skupština)', ['skupstinabd.ba'], ['bs', 'hr', 'sr']],
+    ['BE', 'VLG', 'Vlaamse Codex (Flemish legislation)', ['codex.vlaanderen.be'], ['nl']],
+    ['BE', 'WAL', 'Wallex (Walloon legislation)', ['wallex.wallonie.be'], ['fr']],
+    ['DE', 'BY', 'BAYERN.RECHT', ['gesetze-bayern.de'], ['de']],
+    ['DE', 'NW', 'Recht.NRW.de', ['recht.nrw.de'], ['de']],
+    ['DE', 'BW', 'Landesrecht Baden-Württemberg', ['landesrecht-bw.de'], ['de']],
+  ].map(([jurisdiction, region, name, domains, languages]) => S({
+    id: `${jurisdiction.toLowerCase()}-${region.toLowerCase()}-legislation`, jurisdiction, region, name, kind: 'LEGISLATION_DATABASE', domains, categories: LAW, topics: ALL,
+    languages, reuse: { status: 'UNKNOWN', basis: 'To confirm per source before import.', termsUrl: null }, check: { status: 'NOT_CHECKED' },
+  })),
 ]);
 
 function hostOf(url) {

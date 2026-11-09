@@ -1,0 +1,73 @@
+name: DAJC legal library monitor
+
+# Change monitoring of the legal library (scripts/kb-monitor.mjs) and of the
+# official sources (scripts/kb-sources-check.mjs), from the GitHub runner. Uses
+# no secret and writes nothing: it reads public status pages and robots.txt
+# (crawl delays respected) and keeps the reports as artifacts.
+#
+# NO SCHEDULE on purpose: recurring monitoring is enabled only after the owner
+# confirms operating limits (frequency per tier in config/legal-library/
+# monitor.json, failure notifications, who acts on NEW_CONSOLIDATION). Until
+# then: label "kb-monitor" on a pull request (owner only) or a manual dispatch
+# once merged. To enable later, add for example:
+#   schedule:
+#     - cron: '17 4 * * 1'     # regular tier, Mondays
+#     - cron: '23 5 * * *'     # intensive tier, daily
+
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: 'regular or intensive'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kb-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    if: >-
+      github.actor == github.repository_owner &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.label.name == 'kb-monitor' && github.event.pull_request.head.repo.full_name == github.repository))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+
+      - name: Install dependencies (no lifecycle scripts)
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Check official sources from the runner (reachability, robots.txt)
+        run: node scripts/kb-sources-check.mjs --out "$RUNNER_TEMP/source-checks.json"
+
+      - name: Check EUR-Lex for new consolidations and repeals
+        env:
+          TIER: ${{ inputs.tier || 'regular' }}
+        run: node scripts/kb-monitor.mjs --tier "$TIER" --report "$RUNNER_TEMP/kb-monitor.json"
+
+      - name: Keep the reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kb-monitor-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/source-checks.json
+            ${{ runner.temp }}/kb-monitor.json
+          if-no-files-found: warn
+          retention-days: 30

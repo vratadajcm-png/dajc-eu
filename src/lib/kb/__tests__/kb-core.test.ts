@@ -59,10 +59,9 @@ describe('registry of legal and official sources', () => {
     expect(legalSources.find((s) => s.id === 'eu-eurlex')?.check.status).toBe('TERMS_VERIFIED');
     expect(legalSources.find((s) => s.id === 'pl-isap')?.check.status).toBe('BLOCKED_FROM_DEV');
   });
-  it('lists the jurisdictions still without a legislation source', () => {
-    const gaps = legislationCoverageGaps(dajcEuropeCoverage.map(([code]) => code));
-    expect(gaps).not.toContain('CZ');
-    expect(gaps).toContain('RS');
+  it('has a legislation source for every DAJC jurisdiction (and reports any gap)', () => {
+    expect(legislationCoverageGaps(dajcEuropeCoverage.map(([code]) => code))).toEqual([]);
+    expect(legislationCoverageGaps(['CZ', 'XX'])).toEqual(['XX']);
   });
   it('covers every library topic, oversize first', () => {
     expect(KB_TOPICS[0]).toBe('oversize_heavy_transport');

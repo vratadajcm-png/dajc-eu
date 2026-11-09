@@ -26,7 +26,12 @@
     "kb:import": "node scripts/kb-import.mjs",
     "kb:review": "node scripts/kb-review.mjs",
     "kb:search": "node scripts/kb-search.mjs",
-    "kb:verify": "node scripts/kb-verify.mjs"
+    "kb:verify": "node scripts/kb-verify.mjs",
+    "kb:ai-verify": "node scripts/kb-ai-verify.mjs",
+    "kb:coverage": "node scripts/kb-coverage.mjs",
+    "kb:discover": "node scripts/kb-eurlex-discover.mjs",
+    "kb:monitor": "node scripts/kb-monitor.mjs",
+    "kb:sources-check": "node scripts/kb-sources-check.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",

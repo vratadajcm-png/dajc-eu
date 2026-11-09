@@ -60,7 +60,7 @@ for (const entry of entries) {
   const failed = CHECKS.filter((c) => problems[c].length > 0);
   report.push({ name, officialNumber: entry.officialNumber, language: v.language, url: v.url, result: failed.length ? 'FAIL' : 'PASS', problems, facts });
   const marks = CHECKS.map((c) => `${c} ${problems[c].length ? '✗' : '✓'}`).join('  ');
-  console.log(`${failed.length ? 'FAIL' : 'PASS'}  ${name}: ${marks}${facts.citation ? `\n      ${facts.citation} (search position ${facts.search?.position})` : ''}`);
+  console.log(`${failed.length ? 'FAIL' : 'PASS'}  ${name}: ${marks}${facts.citation ? `\n      ${facts.citation} (search position ${facts.search?.position})` : ''}${facts.search?.skipped ? `\n      search: ${facts.search.skipped}` : ''}`);
   for (const c of failed) for (const p of problems[c]) console.log(`      ${c}: ${p}`);
 }
 await sql.end();

@@ -12,6 +12,9 @@
     "driving_rest_times",
     "roadside_checks_documents"
    ],
+   "legalAreas": [
+    "A.driving_rest_times"
+   ],
    "version": {
     "label": "Regulation (EC) No 561/2006, consolidated text of 31.12.2024",
     "language": "en",
@@ -36,6 +39,9 @@
    "topics": [
     "driving_rest_times",
     "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.driving_rest_times"
    ],
    "version": {
     "label": "Nařízení (ES) č. 561/2006, konsolidované znění k 31. 12. 2024",
@@ -62,6 +68,9 @@
     "driving_rest_times",
     "roadside_checks_documents"
    ],
+   "legalAreas": [
+    "A.driving_rest_times"
+   ],
    "version": {
     "label": "Verordnung (EG) Nr. 561/2006, konsolidierte Fassung vom 31.12.2024",
     "language": "de",
@@ -86,6 +95,9 @@
    "topics": [
     "driving_rest_times",
     "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.driving_rest_times"
    ],
    "version": {
     "label": "Rozporządzenie (WE) nr 561/2006, tekst skonsolidowany z 31.12.2024",
@@ -112,6 +124,9 @@
     "driving_rest_times",
     "roadside_checks_documents"
    ],
+   "legalAreas": [
+    "A.driving_rest_times"
+   ],
    "version": {
     "label": "Nariadenie (ES) č. 561/2006, konsolidované znenie k 31. 12. 2024",
     "language": "sk",
@@ -136,6 +151,9 @@
    "topics": [
     "tachograph",
     "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.tachographs"
    ],
    "version": {
     "label": "Regulation (EU) No 165/2014 on tachographs, consolidated text of 31.12.2024",
@@ -162,6 +180,9 @@
     "tachograph",
     "roadside_checks_documents"
    ],
+   "legalAreas": [
+    "A.tachographs"
+   ],
    "version": {
     "label": "Nařízení (EU) č. 165/2014 o tachografech, konsolidované znění k 31. 12. 2024",
     "language": "cs",
@@ -186,6 +207,9 @@
    "topics": [
     "tachograph",
     "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.tachographs"
    ],
    "version": {
     "label": "Verordnung (EU) Nr. 165/2014 über Fahrtenschreiber, konsolidierte Fassung vom 31.12.2024",
@@ -212,6 +236,9 @@
     "tachograph",
     "roadside_checks_documents"
    ],
+   "legalAreas": [
+    "A.tachographs"
+   ],
    "version": {
     "label": "Rozporządzenie (UE) nr 165/2014 w sprawie tachografów, tekst skonsolidowany z 31.12.2024",
     "language": "pl",
@@ -236,6 +263,9 @@
    "topics": [
     "tachograph",
     "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.tachographs"
    ],
    "version": {
     "label": "Nariadenie (EÚ) č. 165/2014 o tachografoch, konsolidované znenie k 31. 12. 2024",
@@ -263,6 +293,13 @@
     "oversize_heavy_transport",
     "permits_exceptions_escorts"
    ],
+   "legalAreas": [
+    "B.weights",
+    "B.dimensions",
+    "B.axle_loads",
+    "C.oversize_limits",
+    "C.special_use_permits"
+   ],
    "version": {
     "label": "Council Directive 96/53/EC (weights and dimensions), consolidated text of 14.8.2019",
     "language": "en",
@@ -288,6 +325,13 @@
     "weights_dimensions_axles",
     "oversize_heavy_transport",
     "permits_exceptions_escorts"
+   ],
+   "legalAreas": [
+    "B.weights",
+    "B.dimensions",
+    "B.axle_loads",
+    "C.oversize_limits",
+    "C.special_use_permits"
    ],
    "version": {
     "label": "Směrnice Rady 96/53/ES (hmotnosti a rozměry), konsolidované znění k 14. 8. 2019",
@@ -315,6 +359,13 @@
     "oversize_heavy_transport",
     "permits_exceptions_escorts"
    ],
+   "legalAreas": [
+    "B.weights",
+    "B.dimensions",
+    "B.axle_loads",
+    "C.oversize_limits",
+    "C.special_use_permits"
+   ],
    "version": {
     "label": "Richtlinie 96/53/EG des Rates (Gewichte und Abmessungen), konsolidierte Fassung vom 14.8.2019",
     "language": "de",
@@ -340,6 +391,13 @@
     "weights_dimensions_axles",
     "oversize_heavy_transport",
     "permits_exceptions_escorts"
+   ],
+   "legalAreas": [
+    "B.weights",
+    "B.dimensions",
+    "B.axle_loads",
+    "C.oversize_limits",
+    "C.special_use_permits"
    ],
    "version": {
     "label": "Dyrektywa Rady 96/53/WE (masy i wymiary), tekst skonsolidowany z 14.8.2019",
@@ -367,6 +425,13 @@
     "oversize_heavy_transport",
     "permits_exceptions_escorts"
    ],
+   "legalAreas": [
+    "B.weights",
+    "B.dimensions",
+    "B.axle_loads",
+    "C.oversize_limits",
+    "C.special_use_permits"
+   ],
    "version": {
     "label": "Smernica Rady 96/53/ES (hmotnosti a rozmery), konsolidované znenie k 14. 8. 2019",
     "language": "sk",
@@ -390,6 +455,10 @@
    "issuingBody": "European Parliament and Council",
    "topics": [
     "cross_border_cabotage"
+   ],
+   "legalAreas": [
+    "A.cabotage_market_access",
+    "A.international_transport"
    ],
    "version": {
     "label": "Regulation (EC) No 1072/2009 (access to the road haulage market, cabotage), consolidated text of 21.2.2022",
@@ -415,6 +484,10 @@
    "topics": [
     "cross_border_cabotage"
    ],
+   "legalAreas": [
+    "A.cabotage_market_access",
+    "A.international_transport"
+   ],
    "version": {
     "label": "Nařízení (ES) č. 1072/2009 (přístup na trh mezinárodní silniční nákladní dopravy, kabotáž), konsolidované znění k 21. 2. 2022",
     "language": "cs",
@@ -438,6 +511,10 @@
    "issuingBody": "European Parliament and Council",
    "topics": [
     "cross_border_cabotage"
+   ],
+   "legalAreas": [
+    "A.cabotage_market_access",
+    "A.international_transport"
    ],
    "version": {
     "label": "Verordnung (EG) Nr. 1072/2009 (Zugang zum Markt des grenzüberschreitenden Güterkraftverkehrs, Kabotage), konsolidierte Fassung vom 21.2.2022",
@@ -463,6 +540,10 @@
    "topics": [
     "cross_border_cabotage"
    ],
+   "legalAreas": [
+    "A.cabotage_market_access",
+    "A.international_transport"
+   ],
    "version": {
     "label": "Rozporządzenie (WE) nr 1072/2009 (dostęp do rynku międzynarodowych przewozów drogowych, kabotaż), tekst skonsolidowany z 21.2.2022",
     "language": "pl",
@@ -486,6 +567,10 @@
    "issuingBody": "European Parliament and Council",
    "topics": [
     "cross_border_cabotage"
+   ],
+   "legalAreas": [
+    "A.cabotage_market_access",
+    "A.international_transport"
    ],
    "version": {
     "label": "Nariadenie (ES) č. 1072/2009 (prístup na trh medzinárodnej cestnej nákladnej dopravy, kabotáž), konsolidované znenie k 21. 2. 2022",
@@ -516,6 +601,11 @@
     "permits_exceptions_escorts",
     "weights_dimensions_axles"
    ],
+   "legalAreas": [
+    "D.weekend_holiday_bans",
+    "B.mass_categories",
+    "D.urban_restrictions"
+   ],
    "version": {
     "label": "Straßenverkehrs-Ordnung (StVO), Stand: zuletzt geändert durch Art. 4 V v. 30.1.2026",
     "language": "de",
@@ -528,6 +618,1646 @@
     "validityCheckedOn": "2026-11-08",
     "validityEvidenceUrl": "https://www.gesetze-im-internet.de/stvo_2013/",
     "notes": "Not the authentic Bundesgesetzblatt. effective_from is the date this text was retrieved and shown as current; the entry into force of the last amendment was not checked."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 1071/2009",
+   "title": "Regulation (EC) No 1071/2009 (access to the occupation of road transport operator)",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage",
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.operator_licensing"
+   ],
+   "version": {
+    "label": "Nařízení (ES) č. 1071/2009, konsolidované znění k 21. 2. 2022",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02009R1071-20220221",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-10-21",
+    "effectiveFrom": "2022-02-21",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009R1071",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 1071/2009",
+   "title": "Regulation (EC) No 1071/2009 (access to the occupation of road transport operator)",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage",
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.operator_licensing"
+   ],
+   "version": {
+    "label": "Verordnung (EG) Nr. 1071/2009, konsolidierte Fassung vom 21.2.2022",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02009R1071-20220221",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-10-21",
+    "effectiveFrom": "2022-02-21",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009R1071",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 1071/2009",
+   "title": "Regulation (EC) No 1071/2009 (access to the occupation of road transport operator)",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage",
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.operator_licensing"
+   ],
+   "version": {
+    "label": "Regulation (EC) No 1071/2009, consolidated text of 21.2.2022",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02009R1071-20220221",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-10-21",
+    "effectiveFrom": "2022-02-21",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009R1071",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 1071/2009",
+   "title": "Regulation (EC) No 1071/2009 (access to the occupation of road transport operator)",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage",
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.operator_licensing"
+   ],
+   "version": {
+    "label": "Rozporządzenie (WE) nr 1071/2009, tekst skonsolidowany z 21.2.2022",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02009R1071-20220221",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-10-21",
+    "effectiveFrom": "2022-02-21",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009R1071",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EC) No 1071/2009",
+   "title": "Regulation (EC) No 1071/2009 (access to the occupation of road transport operator)",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage",
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.operator_licensing"
+   ],
+   "version": {
+    "label": "Nariadenie (ES) č. 1071/2009, konsolidované znenie k 21. 2. 2022",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02009R1071-20220221",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-10-21",
+    "effectiveFrom": "2022-02-21",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009R1071",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/22/EC",
+   "title": "Directive 2006/22/EC (enforcement of the social legislation in road transport, checks)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents",
+    "driving_rest_times"
+   ],
+   "legalAreas": [
+    "E.checks_sanctions"
+   ],
+   "version": {
+    "label": "Směrnice 2006/22/ES, konsolidované znění k 20. 6. 2024",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02006L0022-20240620",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-03-15",
+    "effectiveFrom": "2024-06-20",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0022",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/22/EC",
+   "title": "Directive 2006/22/EC (enforcement of the social legislation in road transport, checks)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents",
+    "driving_rest_times"
+   ],
+   "legalAreas": [
+    "E.checks_sanctions"
+   ],
+   "version": {
+    "label": "Richtlinie 2006/22/EG, konsolidierte Fassung vom 20.6.2024",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02006L0022-20240620",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-03-15",
+    "effectiveFrom": "2024-06-20",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0022",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/22/EC",
+   "title": "Directive 2006/22/EC (enforcement of the social legislation in road transport, checks)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents",
+    "driving_rest_times"
+   ],
+   "legalAreas": [
+    "E.checks_sanctions"
+   ],
+   "version": {
+    "label": "Directive 2006/22/EC, consolidated text of 20.6.2024",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02006L0022-20240620",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-03-15",
+    "effectiveFrom": "2024-06-20",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0022",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/22/EC",
+   "title": "Directive 2006/22/EC (enforcement of the social legislation in road transport, checks)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents",
+    "driving_rest_times"
+   ],
+   "legalAreas": [
+    "E.checks_sanctions"
+   ],
+   "version": {
+    "label": "Dyrektywa 2006/22/WE, tekst skonsolidowany z 20.6.2024",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02006L0022-20240620",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-03-15",
+    "effectiveFrom": "2024-06-20",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0022",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/22/EC",
+   "title": "Directive 2006/22/EC (enforcement of the social legislation in road transport, checks)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents",
+    "driving_rest_times"
+   ],
+   "legalAreas": [
+    "E.checks_sanctions"
+   ],
+   "version": {
+    "label": "Smernica 2006/22/ES, konsolidované znenie k 20. 6. 2024",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02006L0022-20240620",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-03-15",
+    "effectiveFrom": "2024-06-20",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0022",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/126/EC",
+   "title": "Directive 2006/126/EC (driving licences)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.driving_licences"
+   ],
+   "version": {
+    "label": "Směrnice 2006/126/ES, konsolidované znění k 1. 11. 2020",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02006L0126-20201101",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-12-20",
+    "effectiveFrom": "2020-11-01",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0126",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/126/EC",
+   "title": "Directive 2006/126/EC (driving licences)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.driving_licences"
+   ],
+   "version": {
+    "label": "Richtlinie 2006/126/EG, konsolidierte Fassung vom 1.11.2020",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02006L0126-20201101",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-12-20",
+    "effectiveFrom": "2020-11-01",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0126",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/126/EC",
+   "title": "Directive 2006/126/EC (driving licences)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.driving_licences"
+   ],
+   "version": {
+    "label": "Directive 2006/126/EC, consolidated text of 1.11.2020",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02006L0126-20201101",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-12-20",
+    "effectiveFrom": "2020-11-01",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0126",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/126/EC",
+   "title": "Directive 2006/126/EC (driving licences)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.driving_licences"
+   ],
+   "version": {
+    "label": "Dyrektywa 2006/126/WE, tekst skonsolidowany z 1.11.2020",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02006L0126-20201101",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-12-20",
+    "effectiveFrom": "2020-11-01",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0126",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/126/EC",
+   "title": "Directive 2006/126/EC (driving licences)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "A.driving_licences"
+   ],
+   "version": {
+    "label": "Smernica 2006/126/ES, konsolidované znenie k 1. 11. 2020",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02006L0126-20201101",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-12-20",
+    "effectiveFrom": "2020-11-01",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0126",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2008/68/EC",
+   "title": "Directive 2008/68/EC (inland transport of dangerous goods)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "adr_dangerous_goods"
+   ],
+   "legalAreas": [
+    "E.adr",
+    "D.adr_restrictions"
+   ],
+   "version": {
+    "label": "Směrnice 2008/68/ES, konsolidované znění k 12. 5. 2026",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02008L0068-20260512",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2008-09-24",
+    "effectiveFrom": "2026-05-12",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32008L0068",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2008/68/EC",
+   "title": "Directive 2008/68/EC (inland transport of dangerous goods)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "adr_dangerous_goods"
+   ],
+   "legalAreas": [
+    "E.adr",
+    "D.adr_restrictions"
+   ],
+   "version": {
+    "label": "Richtlinie 2008/68/EG, konsolidierte Fassung vom 12.5.2026",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02008L0068-20260512",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2008-09-24",
+    "effectiveFrom": "2026-05-12",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32008L0068",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2008/68/EC",
+   "title": "Directive 2008/68/EC (inland transport of dangerous goods)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "adr_dangerous_goods"
+   ],
+   "legalAreas": [
+    "E.adr",
+    "D.adr_restrictions"
+   ],
+   "version": {
+    "label": "Directive 2008/68/EC, consolidated text of 12.5.2026",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02008L0068-20260512",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2008-09-24",
+    "effectiveFrom": "2026-05-12",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32008L0068",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2008/68/EC",
+   "title": "Directive 2008/68/EC (inland transport of dangerous goods)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "adr_dangerous_goods"
+   ],
+   "legalAreas": [
+    "E.adr",
+    "D.adr_restrictions"
+   ],
+   "version": {
+    "label": "Dyrektywa 2008/68/WE, tekst skonsolidowany z 12.5.2026",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02008L0068-20260512",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2008-09-24",
+    "effectiveFrom": "2026-05-12",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32008L0068",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2008/68/EC",
+   "title": "Directive 2008/68/EC (inland transport of dangerous goods)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "adr_dangerous_goods"
+   ],
+   "legalAreas": [
+    "E.adr",
+    "D.adr_restrictions"
+   ],
+   "version": {
+    "label": "Smernica 2008/68/ES, konsolidované znenie k 12. 5. 2026",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02008L0068-20260512",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2008-09-24",
+    "effectiveFrom": "2026-05-12",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32008L0068",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2014/47/EU",
+   "title": "Directive 2014/47/EU (technical roadside inspection of commercial vehicles)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "B.roadside_technical_inspections",
+    "B.load_securing"
+   ],
+   "version": {
+    "label": "Směrnice 2014/47/EU, konsolidované znění k 27. 9. 2022",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02014L0047-20220927",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-04-03",
+    "effectiveFrom": "2022-09-27",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014L0047",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2014/47/EU",
+   "title": "Directive 2014/47/EU (technical roadside inspection of commercial vehicles)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "B.roadside_technical_inspections",
+    "B.load_securing"
+   ],
+   "version": {
+    "label": "Richtlinie 2014/47/EU, konsolidierte Fassung vom 27.9.2022",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02014L0047-20220927",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-04-03",
+    "effectiveFrom": "2022-09-27",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014L0047",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2014/47/EU",
+   "title": "Directive 2014/47/EU (technical roadside inspection of commercial vehicles)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "B.roadside_technical_inspections",
+    "B.load_securing"
+   ],
+   "version": {
+    "label": "Directive 2014/47/EU, consolidated text of 27.9.2022",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02014L0047-20220927",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-04-03",
+    "effectiveFrom": "2022-09-27",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014L0047",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2014/47/EU",
+   "title": "Directive 2014/47/EU (technical roadside inspection of commercial vehicles)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "B.roadside_technical_inspections",
+    "B.load_securing"
+   ],
+   "version": {
+    "label": "Dyrektywa 2014/47/UE, tekst skonsolidowany z 27.9.2022",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02014L0047-20220927",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-04-03",
+    "effectiveFrom": "2022-09-27",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014L0047",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2014/47/EU",
+   "title": "Directive 2014/47/EU (technical roadside inspection of commercial vehicles)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "B.roadside_technical_inspections",
+    "B.load_securing"
+   ],
+   "version": {
+    "label": "Smernica 2014/47/EÚ, konsolidované znenie k 27. 9. 2022",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02014L0047-20220927",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-04-03",
+    "effectiveFrom": "2022-09-27",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014L0047",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2014/45/EU",
+   "title": "Directive 2014/45/EU (periodic roadworthiness tests)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "B.roadworthiness"
+   ],
+   "version": {
+    "label": "Směrnice 2014/45/EU, konsolidované znění k 20. 5. 2023",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02014L0045-20230520",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-04-03",
+    "effectiveFrom": "2023-05-20",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014L0045",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2014/45/EU",
+   "title": "Directive 2014/45/EU (periodic roadworthiness tests)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "B.roadworthiness"
+   ],
+   "version": {
+    "label": "Richtlinie 2014/45/EU, konsolidierte Fassung vom 20.5.2023",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02014L0045-20230520",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-04-03",
+    "effectiveFrom": "2023-05-20",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014L0045",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2014/45/EU",
+   "title": "Directive 2014/45/EU (periodic roadworthiness tests)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "B.roadworthiness"
+   ],
+   "version": {
+    "label": "Directive 2014/45/EU, consolidated text of 20.5.2023",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02014L0045-20230520",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-04-03",
+    "effectiveFrom": "2023-05-20",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014L0045",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2014/45/EU",
+   "title": "Directive 2014/45/EU (periodic roadworthiness tests)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "B.roadworthiness"
+   ],
+   "version": {
+    "label": "Dyrektywa 2014/45/UE, tekst skonsolidowany z 20.5.2023",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02014L0045-20230520",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-04-03",
+    "effectiveFrom": "2023-05-20",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014L0045",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2014/45/EU",
+   "title": "Directive 2014/45/EU (periodic roadworthiness tests)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "B.roadworthiness"
+   ],
+   "version": {
+    "label": "Smernica 2014/45/EÚ, konsolidované znenie k 20. 5. 2023",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02014L0045-20230520",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2014-04-03",
+    "effectiveFrom": "2023-05-20",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014L0045",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 1999/62/EC",
+   "title": "Directive 1999/62/EC (charging of vehicles for the use of road infrastructure)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "tolls_charges_environmental"
+   ],
+   "legalAreas": [
+    "E.tolls_charges"
+   ],
+   "version": {
+    "label": "Směrnice 1999/62/ES, konsolidované znění k 24. 12. 2025",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:01999L0062-20251224",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "1999-06-17",
+    "effectiveFrom": "2025-12-24",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:31999L0062",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 1999/62/EC",
+   "title": "Directive 1999/62/EC (charging of vehicles for the use of road infrastructure)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "tolls_charges_environmental"
+   ],
+   "legalAreas": [
+    "E.tolls_charges"
+   ],
+   "version": {
+    "label": "Richtlinie 1999/62/EG, konsolidierte Fassung vom 24.12.2025",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:01999L0062-20251224",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "1999-06-17",
+    "effectiveFrom": "2025-12-24",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:31999L0062",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 1999/62/EC",
+   "title": "Directive 1999/62/EC (charging of vehicles for the use of road infrastructure)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "tolls_charges_environmental"
+   ],
+   "legalAreas": [
+    "E.tolls_charges"
+   ],
+   "version": {
+    "label": "Directive 1999/62/EC, consolidated text of 24.12.2025",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:01999L0062-20251224",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "1999-06-17",
+    "effectiveFrom": "2025-12-24",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:31999L0062",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 1999/62/EC",
+   "title": "Directive 1999/62/EC (charging of vehicles for the use of road infrastructure)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "tolls_charges_environmental"
+   ],
+   "legalAreas": [
+    "E.tolls_charges"
+   ],
+   "version": {
+    "label": "Dyrektywa 1999/62/WE, tekst skonsolidowany z 24.12.2025",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:01999L0062-20251224",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "1999-06-17",
+    "effectiveFrom": "2025-12-24",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:31999L0062",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 1999/62/EC",
+   "title": "Directive 1999/62/EC (charging of vehicles for the use of road infrastructure)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "tolls_charges_environmental"
+   ],
+   "legalAreas": [
+    "E.tolls_charges"
+   ],
+   "version": {
+    "label": "Smernica 1999/62/ES, konsolidované znenie k 24. 12. 2025",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:01999L0062-20251224",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "1999-06-17",
+    "effectiveFrom": "2025-12-24",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:31999L0062",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EU) 2020/1056",
+   "title": "Regulation (EU) 2020/1056 (electronic freight transport information, eFTI)",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.efti"
+   ],
+   "version": {
+    "label": "Nařízení (EU) 2020/1056, konsolidované znění k 9. 1. 2025",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02020R1056-20250109",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2020-07-15",
+    "effectiveFrom": "2025-01-09",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32020R1056",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EU) 2020/1056",
+   "title": "Regulation (EU) 2020/1056 (electronic freight transport information, eFTI)",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.efti"
+   ],
+   "version": {
+    "label": "Verordnung (EU) 2020/1056, konsolidierte Fassung vom 9.1.2025",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02020R1056-20250109",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2020-07-15",
+    "effectiveFrom": "2025-01-09",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32020R1056",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EU) 2020/1056",
+   "title": "Regulation (EU) 2020/1056 (electronic freight transport information, eFTI)",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.efti"
+   ],
+   "version": {
+    "label": "Regulation (EU) 2020/1056, consolidated text of 9.1.2025",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02020R1056-20250109",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2020-07-15",
+    "effectiveFrom": "2025-01-09",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32020R1056",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EU) 2020/1056",
+   "title": "Regulation (EU) 2020/1056 (electronic freight transport information, eFTI)",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.efti"
+   ],
+   "version": {
+    "label": "Rozporządzenie (UE) 2020/1056, tekst skonsolidowany z 9.1.2025",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02020R1056-20250109",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2020-07-15",
+    "effectiveFrom": "2025-01-09",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32020R1056",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Regulation (EU) 2020/1056",
+   "title": "Regulation (EU) 2020/1056 (electronic freight transport information, eFTI)",
+   "legalCategory": "EU_REGULATION",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.efti"
+   ],
+   "version": {
+    "label": "Nariadenie (EÚ) 2020/1056, konsolidované znenie k 9. 1. 2025",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02020R1056-20250109",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2020-07-15",
+    "effectiveFrom": "2025-01-09",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32020R1056",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2009/103/EC",
+   "title": "Directive 2009/103/EC (motor vehicle insurance)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.insurance"
+   ],
+   "version": {
+    "label": "Směrnice 2009/103/ES, konsolidované znění k 23. 12. 2023",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02009L0103-20231223",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-09-16",
+    "effectiveFrom": "2023-12-23",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009L0103",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2009/103/EC",
+   "title": "Directive 2009/103/EC (motor vehicle insurance)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.insurance"
+   ],
+   "version": {
+    "label": "Richtlinie 2009/103/EG, konsolidierte Fassung vom 23.12.2023",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02009L0103-20231223",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-09-16",
+    "effectiveFrom": "2023-12-23",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009L0103",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2009/103/EC",
+   "title": "Directive 2009/103/EC (motor vehicle insurance)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.insurance"
+   ],
+   "version": {
+    "label": "Directive 2009/103/EC, consolidated text of 23.12.2023",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02009L0103-20231223",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-09-16",
+    "effectiveFrom": "2023-12-23",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009L0103",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2009/103/EC",
+   "title": "Directive 2009/103/EC (motor vehicle insurance)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.insurance"
+   ],
+   "version": {
+    "label": "Dyrektywa 2009/103/WE, tekst skonsolidowany z 23.12.2023",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02009L0103-20231223",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-09-16",
+    "effectiveFrom": "2023-12-23",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009L0103",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2009/103/EC",
+   "title": "Directive 2009/103/EC (motor vehicle insurance)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.insurance"
+   ],
+   "version": {
+    "label": "Smernica 2009/103/ES, konsolidované znenie k 23. 12. 2023",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02009L0103-20231223",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2009-09-16",
+    "effectiveFrom": "2023-12-23",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009L0103",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2004/54/EC",
+   "title": "Directive 2004/54/EC (minimum safety requirements for tunnels in the trans-European road network)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "closures_restrictions"
+   ],
+   "legalAreas": [
+    "D.tunnel_bridge_restrictions"
+   ],
+   "version": {
+    "label": "Směrnice 2004/54/ES, konsolidované znění k 7. 8. 2009",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02004L0054-20090807",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2004-04-29",
+    "effectiveFrom": "2009-08-07",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32004L0054",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2004/54/EC",
+   "title": "Directive 2004/54/EC (minimum safety requirements for tunnels in the trans-European road network)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "closures_restrictions"
+   ],
+   "legalAreas": [
+    "D.tunnel_bridge_restrictions"
+   ],
+   "version": {
+    "label": "Richtlinie 2004/54/EG, konsolidierte Fassung vom 7.8.2009",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02004L0054-20090807",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2004-04-29",
+    "effectiveFrom": "2009-08-07",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32004L0054",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2004/54/EC",
+   "title": "Directive 2004/54/EC (minimum safety requirements for tunnels in the trans-European road network)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "closures_restrictions"
+   ],
+   "legalAreas": [
+    "D.tunnel_bridge_restrictions"
+   ],
+   "version": {
+    "label": "Directive 2004/54/EC, consolidated text of 7.8.2009",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02004L0054-20090807",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2004-04-29",
+    "effectiveFrom": "2009-08-07",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32004L0054",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2004/54/EC",
+   "title": "Directive 2004/54/EC (minimum safety requirements for tunnels in the trans-European road network)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "closures_restrictions"
+   ],
+   "legalAreas": [
+    "D.tunnel_bridge_restrictions"
+   ],
+   "version": {
+    "label": "Dyrektywa 2004/54/WE, tekst skonsolidowany z 7.8.2009",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02004L0054-20090807",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2004-04-29",
+    "effectiveFrom": "2009-08-07",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32004L0054",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2004/54/EC",
+   "title": "Directive 2004/54/EC (minimum safety requirements for tunnels in the trans-European road network)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "closures_restrictions"
+   ],
+   "legalAreas": [
+    "D.tunnel_bridge_restrictions"
+   ],
+   "version": {
+    "label": "Smernica 2004/54/ES, konsolidované znenie k 7. 8. 2009",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02004L0054-20090807",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2004-04-29",
+    "effectiveFrom": "2009-08-07",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32004L0054",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/1/EC",
+   "title": "Directive 2006/1/EC (use of vehicles hired without drivers for the carriage of goods by road)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage"
+   ],
+   "legalAreas": [
+    "A.operator_licensing"
+   ],
+   "version": {
+    "label": "Směrnice 2006/1/ES, konsolidované znění k 5. 6. 2022",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02006L0001-20220605",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-01-18",
+    "effectiveFrom": "2022-06-05",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0001",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/1/EC",
+   "title": "Directive 2006/1/EC (use of vehicles hired without drivers for the carriage of goods by road)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage"
+   ],
+   "legalAreas": [
+    "A.operator_licensing"
+   ],
+   "version": {
+    "label": "Richtlinie 2006/1/EG, konsolidierte Fassung vom 5.6.2022",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02006L0001-20220605",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-01-18",
+    "effectiveFrom": "2022-06-05",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0001",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/1/EC",
+   "title": "Directive 2006/1/EC (use of vehicles hired without drivers for the carriage of goods by road)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage"
+   ],
+   "legalAreas": [
+    "A.operator_licensing"
+   ],
+   "version": {
+    "label": "Directive 2006/1/EC, consolidated text of 5.6.2022",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02006L0001-20220605",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-01-18",
+    "effectiveFrom": "2022-06-05",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0001",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/1/EC",
+   "title": "Directive 2006/1/EC (use of vehicles hired without drivers for the carriage of goods by road)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage"
+   ],
+   "legalAreas": [
+    "A.operator_licensing"
+   ],
+   "version": {
+    "label": "Dyrektywa 2006/1/WE, tekst skonsolidowany z 5.6.2022",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02006L0001-20220605",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-01-18",
+    "effectiveFrom": "2022-06-05",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0001",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive 2006/1/EC",
+   "title": "Directive 2006/1/EC (use of vehicles hired without drivers for the carriage of goods by road)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "cross_border_cabotage"
+   ],
+   "legalAreas": [
+    "A.operator_licensing"
+   ],
+   "version": {
+    "label": "Smernica 2006/1/ES, konsolidované znenie k 5. 6. 2022",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02006L0001-20220605",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2006-01-18",
+    "effectiveFrom": "2022-06-05",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0001",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive (EU) 2015/413",
+   "title": "Directive (EU) 2015/413 (cross-border exchange of information on road-safety-related traffic offences)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.checks_sanctions"
+   ],
+   "version": {
+    "label": "Směrnice (EU) 2015/413, konsolidované znění k 19. 1. 2025",
+    "language": "cs",
+    "url": "https://eur-lex.europa.eu/legal-content/CS/TXT/PDF/?uri=CELEX:02015L0413-20250119",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2015-03-11",
+    "effectiveFrom": "2025-01-19",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32015L0413",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive (EU) 2015/413",
+   "title": "Directive (EU) 2015/413 (cross-border exchange of information on road-safety-related traffic offences)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.checks_sanctions"
+   ],
+   "version": {
+    "label": "Richtlinie (EU) 2015/413, konsolidierte Fassung vom 19.1.2025",
+    "language": "de",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/PDF/?uri=CELEX:02015L0413-20250119",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2015-03-11",
+    "effectiveFrom": "2025-01-19",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32015L0413",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive (EU) 2015/413",
+   "title": "Directive (EU) 2015/413 (cross-border exchange of information on road-safety-related traffic offences)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.checks_sanctions"
+   ],
+   "version": {
+    "label": "Directive (EU) 2015/413, consolidated text of 19.1.2025",
+    "language": "en",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02015L0413-20250119",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2015-03-11",
+    "effectiveFrom": "2025-01-19",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32015L0413",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive (EU) 2015/413",
+   "title": "Directive (EU) 2015/413 (cross-border exchange of information on road-safety-related traffic offences)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.checks_sanctions"
+   ],
+   "version": {
+    "label": "Dyrektywa (UE) 2015/413, tekst skonsolidowany z 19.1.2025",
+    "language": "pl",
+    "url": "https://eur-lex.europa.eu/legal-content/PL/TXT/PDF/?uri=CELEX:02015L0413-20250119",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2015-03-11",
+    "effectiveFrom": "2025-01-19",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32015L0413",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
+   }
+  },
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "officialNumber": "Directive (EU) 2015/413",
+   "title": "Directive (EU) 2015/413 (cross-border exchange of information on road-safety-related traffic offences)",
+   "legalCategory": "EU_DIRECTIVE",
+   "issuingBody": "European Parliament and Council",
+   "topics": [
+    "roadside_checks_documents"
+   ],
+   "legalAreas": [
+    "E.checks_sanctions"
+   ],
+   "version": {
+    "label": "Smernica (EÚ) 2015/413, konsolidované znenie k 19. 1. 2025",
+    "language": "sk",
+    "url": "https://eur-lex.europa.eu/legal-content/SK/TXT/PDF/?uri=CELEX:02015L0413-20250119",
+    "authenticity": "CONSOLIDATED_DOCUMENTATION",
+    "issuedOn": "2015-03-11",
+    "effectiveFrom": "2025-01-19",
+    "effectiveTo": null,
+    "validity": "IN_FORCE",
+    "validityCheckedOn": "2026-11-09",
+    "validityEvidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32015L0413",
+    "notes": "EUR-Lex consolidated text: documentation tool without legal effect; the authentic text is the Official Journal. Current consolidated version listed on EUR-Lex on 2026-11-09 (discovered by scripts/kb-eurlex-discover.mjs)."
    }
   }
  ]

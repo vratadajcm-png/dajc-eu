@@ -1,7 +1,10 @@
 # DAJC AI — European library of official legal documents (knowledge base)
 
-Status on 2026-11-08. The library is **off** by default (`DAJC_KB_ENABLED`);
-paid features, payments and ABRA are not involved.
+Status on 2026-11-09. The library is **off** by default (`DAJC_KB_ENABLED`);
+paid features, payments and ABRA are not involved. Since 2026-11-09 a document
+version no longer needs a person's approval: it becomes **AI_VERIFIED** through
+the automated verification of § 2b (owner decision). AI_VERIFIED is never a
+human, official or legally binding approval.
 
 Principle: **the existence of an official document does not by itself mean a
 correct legal interpretation.** The library supplies verifiable passages with
@@ -74,19 +77,22 @@ role that cannot make anything answerable in production
 (`drizzle-kb/0001_dajc_kb_import_review_separation.sql`, tested in
 `src/lib/kb/__tests__/kb-db.test.ts` against a Neon-like cluster):
 
-| Action | `dajc_kb_importer` (CI secret) | `dajc_kb_reviewer` (a person) | `dajc_ask_app` (DAJC AI) |
-|---|---|---|---|
-| add a new version (UNVERIFIED / AUTO_CHECKED) with its pages and provisions | yes, once per version | no | no |
-| record HUMAN_VERIFIED / REJECTED | **no** (by update or insert) | yes; the database stamps the time | no |
-| change pages, provisions or metadata of a stored version | **no** | mass bands only | no |
-| add pages or provisions to an existing or verified version | **no** | no | no |
-| close an older version when a newer one of the same document and language enters into force | yes, nothing else | no | no |
-| revive a superseded version, repeal, change dates otherwise | **no** | no | no |
-| change a document's title, topics or category | **no** (the import stops; the owner decides) | no | no |
-| approve OCR | no | yes | no |
-| write `review_log` | `IMPORT` / `SUPERSEDE` only, time from the database | `REVIEW` only | no |
-| delete anything | no | no | no |
-| read | tables + answerable view | tables + answerable view | answerable view only |
+| Action | `dajc_kb_importer` (import CI secret) | `dajc_kb_ai_verifier` (AI verification CI secret) | `dajc_kb_reviewer` (a person, optional) | `dajc_ask_app` (DAJC AI) |
+|---|---|---|---|---|
+| add a new version (UNVERIFIED / AUTO_CHECKED) with its pages and provisions | yes, once per version | no | no | no |
+| record a verification run with evidence | no | yes, append-only, evidence quoted verbatim from the stored text | no | no |
+| make a version AI_VERIFIED / CONFLICTED / revoke it | **no** | only through `dajc_kb.apply_ai_verification(run)`, which the database checks | no | no |
+| record HUMAN_VERIFIED / REJECTED | **no** (by update or insert) | no (and never overrides them) | yes; the database stamps the time | no |
+| change pages, provisions or metadata of a stored version | **no** | **no** | mass bands only | no |
+| add pages or provisions to an existing or verified version | **no** | no | no | no |
+| close an older version when a newer one of the same document and language enters into force | yes, nothing else | no | no | no |
+| revive a superseded version, repeal, change dates otherwise | **no** | no | no | no |
+| change a document's title, topics or category | **no** (the import stops; the owner decides) | no | no | no |
+| approve OCR | no | no | yes | no |
+| write `review_log` | `IMPORT` / `SUPERSEDE` only | `AI_VERIFICATION` only, by the database function | `REVIEW` only | no |
+| update or delete runs, claims or `review_log` | no | no | no | no (append-only triggers, also for the owner) |
+| delete anything | no | no | no | no |
+| read | tables, answerable view, inventory | tables, runs, claims, views | tables, runs, views | answerable view and text-free inventory only |
 
 Before writing, the CI import checks that it runs as `dajc_kb_importer` without
 administrative attributes or role memberships, and that the marker row
@@ -95,12 +101,55 @@ the marker once per branch (`INSERT INTO dajc_kb.deployment (environment)
 VALUES ('dev')`); a production branch gets `production`. In GitHub Actions the
 host and password are masked, and every error message is redacted.
 
+## 2b. Automated AI verification (replaces mandatory human review)
+
+States of a version: `UNVERIFIED` → `AUTO_CHECKED` (official source, HTTPS,
+SHA-256, format, publisher metadata) → **`AI_VERIFIED`** (all five layers below
+passed, decided by the database) or **`CONFLICTED`** (material disagreement,
+kept out). `HUMAN_VERIFIED` and `REJECTED` remain for a person and are never
+overridden by the AI. Validity is separate: `IN_FORCE`, `NOT_YET_IN_FORCE`,
+`SUPERSEDED`, `REPEALED`, `UNKNOWN`. Candidates before import
+(`config/legal-library/candidates-status.json`): `DISCOVERED` →
+`SOURCE_CONFIRMED` → `MANIFESTED` (→ imported), or `BLOCKED`.
+
+| Layer | What must hold (`src/lib/kb/ai-verify/`) |
+|---|---|
+| 1 deterministic | all checks of § 5a (source, validity at EUR-Lex, SHA-256 of the archived and the official original, re-extracted content, production search where a curated question exists, citation) |
+| 2 extraction | model A extracts the normative statements of **every** citable provision, each with a verbatim quote (located in the stored text, stored exactly as it stands there) and its quantities |
+| 3 independent | model B of **another vendor** judges every claim against the provision text with its own verbatim quote and its own reading of the quantities; A and B also read act type, territory and consolidation date blind |
+| 4 conflicts | deterministic: any contradiction, any difference in quantities, act type, territory or consolidation date, two versions in force at once, or a stored mass band not named by a supported threshold → CONFLICT; never a majority vote |
+| 5 applicability | questions generated in the version's language must find their provision through the production search among the 4 sources the model receives, with a complete citation; the version must not answer for the day before it applied nor for a jurisdiction where it does not apply |
+
+The database decides (`drizzle-kb/0002`): a run must name the stored SHA-256
+and the database's own digest of the stored provisions; claims are accepted
+only verbatim and only in their run's transaction; `apply_ai_verification`
+requires the newest run (< 24 h), PASS in all five layers, two vendors and only
+supported evidence. FAIL revokes an earlier AI_VERIFIED; ERROR (provider down,
+no credit, budget exhausted) changes nothing; every decision goes to the
+append-only `review_log` with the note "automated, not a human or official
+approval". DAJC AI answers VERIFIED from AI_VERIFIED or HUMAN_VERIFIED versions
+and then always shows that the verification was automated (cs/en).
+
+Run: workflow `kb-ai-verify-dev` (owner label, environment approval, verifier
+role secret, AI keys, `DAJC_KB_AI_RUN_BUDGET_USD`, default $12). Every call is
+priced before it is sent; token usage and list-price cost are stored per run.
+`scripts/kb-ai-verify.mjs --estimate` prices the worst case without any AI call:
+**$10.93 for the 20 stored versions** with `gpt-6-sol` + `claude-sonnet-5-5`
+($2/$10 per 1M tokens), about $0.45-0.90 per version. Unchanged AI_VERIFIED
+versions are skipped (content-addressed: their SHA-256 cannot change).
+
+Tests: `kb-ai-verify-db.test.ts` (forged approvals refused: import role,
+direct updates, wrong SHA-256 or content, invented quotes, late claims,
+incomplete PASS, one vendor, human decisions, stale runs, append-only audit),
+`kb-ai-engine.test.ts` (decision logic with scripted test providers; these are
+not an AI verification of any real document).
+
 What DAJC AI may cite (view `answerable_provisions` + checks in the code): an
 IN_FORCE / NOT_YET_IN_FORCE version valid on the asked day, with a text layer,
 without restricted reuse terms, with an article/§/annex (never a preamble) and
-with an allowed provenance state. In production only HUMAN_VERIFIED versions;
-AUTO_CHECKED only for internal tests (`DAJC_KB_ALLOW_AUTO_CHECKED`, outside
-Vercel production) and always as PARTIAL.
+with an allowed provenance state. In production AI_VERIFIED and HUMAN_VERIFIED
+versions; AUTO_CHECKED only for internal tests (`DAJC_KB_ALLOW_AUTO_CHECKED`,
+outside Vercel production) and always as PARTIAL; CONFLICTED and REJECTED never.
 
 ## 3. Scope: jurisdictions and topics
 
@@ -131,12 +180,27 @@ Vercel production) and always as PARTIAL.
 
 ## 4. Official sources (registry) and what was actually verified
 
-| Source | Verification state on 2026-11-08 |
+`src/lib/kb/legal-sources.mjs` lists **68 official sources; every one of the 50
+jurisdictions has at least one official legislation source** (national gazette
+or legislation portal of the state itself), plus regional sources where regions
+legislate themselves (BA: FBiH, Republika Srpska, Brčko; BE: Flanders,
+Wallonia; DE: Bayern, NRW, Baden-Württemberg). AT, ES, PT and UK publish their
+regional legislation in the national source. Commercial databases, blogs,
+forums and AI answers are never a source of the library.
+
+| What | State on 2026-11-09 |
 |---|---|
-| **EUR-Lex** (`eur-lex.europa.eu`) | **terms verified** on its legal notice: reuse allowed (Decision 2011/833/EU), consolidated texts CC BY 4.0 with attribution; only the Official Journal is authentic. The validity of 6 acts checked on EUR-Lex ("In force", latest consolidation). |
-| e-Sbírka (CZ), Slov-Lex (SK), Gesetze im Internet (DE) | reachable from the development environment; reuse terms not read (legal basis for free use of official works noted, to be confirmed by a lawyer). gesetze-im-internet.de refuses automated downloads (HTTP 503 for the importer); the protection was not circumvented. |
-| ISAP / Dziennik Ustaw (PL), RIS (AT), UNECE (ADR/AETR) | **blocked** for the development environment (HTTP 403/503 from their own servers) |
-| Other national gazettes (FR, IT, ES, NL, BE, LU, HU, SI, HR, RO, BG, DK, SE, FI, EE, LV, LT, IE, PT, GR, CH, LI, NO, UK, MT), ministries and road authorities | in the registry as NOT_CHECKED; an import stops until the reuse terms are verified |
+| **EUR-Lex** (`eur-lex.europa.eu`) | **terms verified** on its legal notice: reuse allowed (Decision 2011/833/EU), consolidated texts CC BY 4.0 with attribution; only the Official Journal is authentic. robots.txt allows the PDF and status pages used, with **Crawl-delay 10 s** - now enforced. |
+| Reachability and robots.txt of all sources | `scripts/kb-sources-check.mjs` → `config/legal-library/source-checks.json` (from the development sandbox): 54 reachable, 4 with robots.txt disallowing automated access (ISAP and Dziennik Ustaw PL, Lovdata NO, VEMAGS DE), 22 refused the sandbox with 403/5xx. The sandbox's own network can cause such refusals, so they count only when seen from the GitHub runner (workflow `kb-monitor` repeats the check there). |
+| Reuse terms of national sources | not read yet (`reuse.status: UNKNOWN`): the importer refuses such a source until its terms are verified and recorded |
+
+**robots.txt and automated access** (`src/lib/kb/robots.mjs`, RFC 9309):
+every download - import, verification, discovery, monitoring - first checks the
+publisher's robots.txt for the library's user agent and waits for the host's
+crawl delay (at least 1 s). A robots.txt that cannot be read because of a server
+or network error blocks the host (fail closed); CAPTCHAs, blocks and terms are
+never circumvented. Where automated retrieval is not allowed, only metadata may
+be recorded and the cell is SOURCE_UNAVAILABLE.
 
 ## 5. Processed documents (local development database, not production)
 
@@ -184,6 +248,29 @@ Directive 96/53/EC too low in cs/sk/pl (in Polish not at all) — with the topic
 DAJC AI actually sends it ranks first or second. Retrieval in cs/sk/pl
 therefore depends on the classifier choosing the right topic.
 
+## 5b. Coverage matrix: 50 jurisdictions × legal areas
+
+`src/lib/kb/legal-areas.mjs` splits the five areas of the brief into 49
+sub-areas (A drivers and operators 9, B vehicles and loads 9, C oversize 11,
+D traffic restrictions 9, E other areas 11), each mapped to the library's search
+topics. `src/lib/kb/coverage.mjs` evaluates every cell of **50 jurisdictions
+(only `config/europe-coverage.mjs`) × 49 sub-areas = 2,450 cells**:
+
+| Status | Rule |
+|---|---|
+| COVERED | only from an audit in `config/legal-library/coverage-evidence.json` with official evidence, naming documents that are all stored, in force and AI- or person-verified |
+| PARTIAL | at least one stored official document that applies there; the cell lists why it is incomplete (directive transposition, EEA incorporation, no national act, not verified, regional legislation) |
+| CONFLICTED | an applicable version is CONFLICTED, or an audit recorded a conflict |
+| NOT_APPLICABLE | only from an audit with official legal evidence - never "nothing was found" |
+| SOURCE_UNAVAILABLE | nothing stored and automated access to every national legislation source is not allowed (robots.txt, restricted terms) or refused when checked from the runner |
+| NOT_YET_RESEARCHED | everything else |
+
+A jurisdiction is complete only when every cell is COVERED or NOT_APPLICABLE;
+**none is complete today**. `scripts/kb-coverage.mjs` writes JSON, Markdown
+and an internal HTML dashboard (`noindex`, not part of the website) from the
+database (`dajc_kb.library_inventory`, a text-free view) or an exported
+inventory. Snapshot: `docs/DAJC_AI_LEGAL_COVERAGE.md`.
+
 ## 6. Search and answer
 
 1. Classification of the driver's question (existing Ask): country, topic,
@@ -228,6 +315,28 @@ tested with fake models on real excerpts of Article 7 in cs/en/de/pl/sk
 7.5 t), incomplete citation (preamble, missing page or hash), wrong exception
 ("the exemption applies here"), numbers outside the quote, unverified and
 rejected version, UK/EEA/directive, library outage.
+
+## 6a. Discovery, imports in batches and change monitoring
+
+* **Discovery** (`scripts/kb-eurlex-discover.mjs`, candidates in
+  `config/legal-library/eurlex-candidates.json`): reads each act's own EUR-Lex
+  status page and writes manifest entries only for an act shown *In force*
+  with a current consolidated version; dates and labels come from that page and
+  from the Official Journal's naming rules, never from a guess. Other
+  candidates keep their reason in `config/legal-library/candidates-status.json`.
+* **Monitoring** (`scripts/kb-monitor.mjs`, tiers in
+  `config/legal-library/monitor.json`): for every stored EUR-Lex act reports
+  UNCHANGED, NEW_CONSOLIDATION, NO_LONGER_IN_FORCE or UNREADABLE (never taken
+  as "unchanged"). `--write` adds a new consolidation to the manifest; the next
+  import supersedes the older version and keeps it for historical questions; the
+  next AI verification revokes an AI_VERIFIED state that relies on an outdated
+  text (layer 1 fails). Workflow `kb-monitor` (runner, no secret) also repeats
+  the source check; it has **no schedule** until the owner confirms operating
+  limits (regular tier weekly, intensive tier daily are prepared).
+* National legislation: the registry and the matrix are ready; national
+  imports need, per source, readable reuse terms, robots.txt permission and a
+  verified way to the official document (PDF or structured text), source by
+  source.
 
 ## 7. Operating costs (3 questions per day, 30 days; an estimate, not a measurement)
 
