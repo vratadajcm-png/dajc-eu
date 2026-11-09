@@ -88,6 +88,21 @@ jobs:
         shell: bash
         run: |
           echo "base_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          # Claude beta action writes its result transcript to output.txt in
+          # the checkout root. It is not an application source modification.
+          # Discard only that known, untracked regular file; other out-of-scope
+          # changes remain in the patch and are rejected by the publisher.
+          if [ -e output.txt ] || [ -L output.txt ]; then
+            if git ls-files --error-unmatch -- output.txt >/dev/null 2>&1; then
+              echo "::error::Unexpected tracked output.txt: refuse cleanup"
+              exit 1
+            fi
+            if [ ! -f output.txt ] || [ -L output.txt ]; then
+              echo "::error::Unexpected output.txt type; refuse cleanup"
+              exit 1
+            fi
+            rm -- output.txt
+          fi
           git add -N -- .
           git diff --binary HEAD > /tmp/dajc-claude.patch
           if [ ! -s /tmp/dajc-claude.patch ]; then
