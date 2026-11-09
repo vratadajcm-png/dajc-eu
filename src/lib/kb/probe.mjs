@@ -6,7 +6,6 @@
 // import or republish: reuse terms are checked separately (legal-sources.mjs).
 
 import { createHash } from 'node:crypto';
-import { inflateRawSync } from 'node:zlib';
 import { USER_AGENT } from './importer.mjs';
 import { RobotsPolicy } from './robots.mjs';
 

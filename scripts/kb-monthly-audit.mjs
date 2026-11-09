@@ -19,6 +19,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { accessRegisterProblems, connectorMatrix, connectorProblems, loadAccessRegister, loadConnectors } from '../src/lib/kb/connectors.mjs';
 import { DISCOVERY } from '../src/lib/kb/discovery.mjs';
+import { officialRobots } from '../src/lib/kb/importer.mjs';
 import { runProbe } from '../src/lib/kb/probe.mjs';
 import { dajcEuropeCoverage } from '../config/europe-coverage.mjs';
 
@@ -38,7 +39,7 @@ const stored = readJson('config/legal-library/connector-proofs.json')?.results ?
 const probes = readJson('config/legal-library/connector-probes.json')?.probes ?? [];
 const connectors = loadConnectors();
 const probeResults = [];
-for (const p of probes) probeResults.push(await runProbe(p));
+for (const p of probes) probeResults.push(await runProbe(p, { robots: officialRobots() }));
 const delta = [];
 const regressions = [];
 for (const r of probeResults) {
@@ -53,7 +54,7 @@ const since = new Date(Date.now() - 35 * 86_400_000).toISOString().slice(0, 10);
 const discovered = [];
 const discoveryErrors = [];
 for (const [code, fn] of Object.entries(DISCOVERY)) {
-  try { discovered.push(...await fn({ year: new Date().getUTCFullYear(), since })); } catch (e) { discoveryErrors.push(`${code}: ${String(e.message).slice(0, 120)}`); }
+  try { discovered.push(...await fn({ year: new Date().getUTCFullYear(), since, robots: officialRobots() })); } catch (e) { discoveryErrors.push(`${code}: ${String(e.message).slice(0, 120)}`); }
 }
 const proven = new Set(probeResults.filter((r) => r.outcome === 'PROVEN').map((r) => connectors.find((c) => c.id === r.id)?.jurisdiction));
 const failures = [];

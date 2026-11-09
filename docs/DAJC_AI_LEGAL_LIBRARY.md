@@ -191,7 +191,7 @@ forums and AI answers are never a source of the library.
 | What | State on 2026-11-09 |
 |---|---|
 | **EUR-Lex** (`eur-lex.europa.eu`) | **terms verified** on its legal notice: reuse allowed (Decision 2011/833/EU), consolidated texts CC BY 4.0 with attribution; only the Official Journal is authentic. robots.txt allows the PDF and status pages used, with **Crawl-delay 10 s** - now enforced. |
-| Reachability and robots.txt of all sources | `scripts/kb-sources-check.mjs` → `config/legal-library/source-checks.json` (from the development sandbox): 54 reachable, 4 with robots.txt disallowing automated access (ISAP and Dziennik Ustaw PL, Lovdata NO, VEMAGS DE), 22 refused the sandbox with 403/5xx. The sandbox's own network can cause such refusals, so they count only when seen from the GitHub runner (workflow `kb-monitor` repeats the check there). |
+| Reachability and robots.txt of all sources | `scripts/kb-sources-check.mjs` → `config/legal-library/source-checks.json` (from the development sandbox): 54 reachable, 4 with robots.txt disallowing automated access (ISAP and Dziennik Ustaw PL, Lovdata NO, VEMAGS DE), 22 refused the sandbox with 403/5xx. The sandbox's own network can cause such refusals, so they count only when seen from the GitHub runner (the monthly audit workflow `kb-monthly-audit` repeats the check there). |
 | Reuse terms of national sources | not read yet (`reuse.status: UNKNOWN`): the importer refuses such a source until its terms are verified and recorded |
 
 **robots.txt and automated access** (`src/lib/kb/robots.mjs`, RFC 9309):
@@ -343,15 +343,18 @@ rejected version, UK/EEA/directive, library outage.
   with a current consolidated version; dates and labels come from that page and
   from the Official Journal's naming rules, never from a guess. Other
   candidates keep their reason in `config/legal-library/candidates-status.json`.
-* **Monitoring** (`scripts/kb-monitor.mjs`, tiers in
+* **Monitoring** (`scripts/kb-monitor.mjs`, the single `monthly` tier in
   `config/legal-library/monitor.json`): for every stored EUR-Lex act reports
   UNCHANGED, NEW_CONSOLIDATION, NO_LONGER_IN_FORCE or UNREADABLE (never taken
   as "unchanged"). `--write` adds a new consolidation to the manifest; the next
   import supersedes the older version and keeps it for historical questions; the
   next AI verification revokes an AI_VERIFIED state that relies on an outdated
-  text (layer 1 fails). Workflow `kb-monitor` (runner, no secret) also repeats
-  the source check; it has **no schedule** until the owner confirms operating
-  limits (superseded: one monthly audit only, `kb-monthly-audit`).
+  text (layer 1 fails). The only scheduled legislative check is the monthly workflow `kb-monthly-audit`
+  (runner, no secret, active only from the default branch): it repeats the source
+  check, re-acquires one probe document per connector (SHA-256 delta, robots.txt
+  and crawl delay shared per run), queues changed documents for AI verification
+  and discovers new acts where an API is implemented (PL). There are no daily or
+  weekly legislative checks.
 * National legislation: the registry and the matrix are ready; national
   imports need, per source, readable reuse terms, robots.txt permission and a
   verified way to the official document (PDF or structured text), source by

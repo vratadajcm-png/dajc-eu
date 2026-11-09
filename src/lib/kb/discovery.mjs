@@ -6,8 +6,10 @@
 export const TRANSPORT_KEYWORDS = Object.freeze(['ruchu drogowym', 'transporcie drogowym', 'drogow', 'pojazd', 'kierowc', 'tachograf', 'przewóz', 'autostrad', 'ADR', 'niebezpiecznych']);
 
 /** Polish Sejm ELI API: acts of a year that changed after `since` and match transport keywords. */
-export async function discoverPl({ year, since, fetchImpl = globalThis.fetch, keywords = TRANSPORT_KEYWORDS }) {
-  const res = await fetchImpl(`https://api.sejm.gov.pl/eli/acts/DU/${year}`, { headers: { 'user-agent': 'DAJC legal library importer (+https://www.dajc.eu)' }, signal: AbortSignal.timeout(90_000) });
+export async function discoverPl({ year, since, fetchImpl = globalThis.fetch, keywords = TRANSPORT_KEYWORDS, robots = null }) {
+  const url = `https://api.sejm.gov.pl/eli/acts/DU/${year}`;
+  if (robots) await robots.admit(url);
+  const res = await fetchImpl(url, { headers: { 'user-agent': 'DAJC legal library importer (+https://www.dajc.eu)' }, signal: AbortSignal.timeout(90_000) });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
   const kw = keywords.map((k) => k.toLowerCase());

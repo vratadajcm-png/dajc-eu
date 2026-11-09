@@ -6,6 +6,7 @@
 // connectors.json statuses.
 //   node scripts/kb-connector-proof.mjs [--write] [--out proofs.json]
 import { readFileSync, writeFileSync } from 'node:fs';
+import { officialRobots } from '../src/lib/kb/importer.mjs';
 import { runProbe } from '../src/lib/kb/probe.mjs';
 
 const args = process.argv.slice(2);
@@ -13,7 +14,7 @@ const out = args.includes('--out') ? args[args.indexOf('--out') + 1] : 'config/l
 const probes = JSON.parse(readFileSync('config/legal-library/connector-probes.json', 'utf8')).probes;
 const results = [];
 for (const p of probes) {
-  const r = await runProbe(p);
+  const r = await runProbe(p, { robots: officialRobots() });
   results.push(r);
   console.log(`${r.outcome.padEnd(15)} ${p.id} ${r.bytes ?? ''} ${r.reason ?? r.missing ?? ''}`);
 }
