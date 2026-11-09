@@ -70,11 +70,14 @@ export const AUTHENTICITY = Object.freeze(['OFFICIAL_PUBLICATION', 'CONSOLIDATED
 export const VALIDITY = Object.freeze(['IN_FORCE', 'NOT_YET_IN_FORCE', 'REPEALED', 'SUPERSEDED', 'UNKNOWN']);
 
 /**
- * Provenance review: UNVERIFIED -> AUTO_CHECKED (official domain, HTTPS, hash,
- * format, metadata from the publisher) -> HUMAN_VERIFIED (a named reviewer
- * confirmed origin, version and validity). REJECTED is kept for the history.
+ * Verification state of a version: UNVERIFIED -> AUTO_CHECKED (official domain,
+ * HTTPS, hash, format, metadata from the publisher) -> AI_VERIFIED (automated
+ * multi-layer verification by two AI models of different vendors, decided by
+ * the database; never a human or official approval) or CONFLICTED (material
+ * disagreement, kept out). HUMAN_VERIFIED (a named person, optional since
+ * 2026-11-09) and REJECTED (a person) are never overridden by the AI.
  */
-export const PROVENANCE = Object.freeze(['UNVERIFIED', 'AUTO_CHECKED', 'HUMAN_VERIFIED', 'REJECTED']);
+export const PROVENANCE = Object.freeze(['UNVERIFIED', 'AUTO_CHECKED', 'AI_VERIFIED', 'CONFLICTED', 'HUMAN_VERIFIED', 'REJECTED']);
 
 /** Text extraction: scanned PDFs never enter the index without the approved OCR path. */
 export const TEXT_EXTRACTION = Object.freeze(['TEXT', 'NEEDS_OCR', 'OCR_APPROVED', 'FAILED']);

@@ -15,6 +15,13 @@
       "when": 1794157200000,
       "tag": "0001_dajc_kb_import_review_separation",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794189600000,
+      "tag": "0002_dajc_kb_ai_verification",
+      "breakpoints": true
     }
   ]
 }

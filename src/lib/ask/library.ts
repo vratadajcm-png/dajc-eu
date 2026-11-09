@@ -42,6 +42,9 @@ export interface LibraryHit {
   validityCheckedOn: string | null;
   provenance: string;
   lastVerifiedAt: string | null;
+  /** Set when the version is AI_VERIFIED: automated verification, never a human or official approval. */
+  aiVerifiedAt?: string | null;
+  aiVerificationModels?: string | null;
   applicability: string;
   massCheck: string;
   citation: string;
@@ -83,10 +86,18 @@ export function countriesCovered(hit: LibraryHit, countries: string[]): string[]
     && ['NO_THRESHOLD', 'MATCH'].includes(hit.massCheck));
 }
 
+/**
+ * Version states that can support a VERIFIED answer: an automated multi-layer
+ * AI verification against the official text (owner decision of 2026-11-09,
+ * drizzle-kb/0002) or a person's verification. CONFLICTED and REJECTED versions
+ * are never searched; AUTO_CHECKED only in internal tests.
+ */
+export const VERIFIED_PROVENANCE = Object.freeze(['AI_VERIFIED', 'HUMAN_VERIFIED']);
+
 /** Why a cited passage cannot make the answer VERIFIED (empty = it can). */
 export function libraryLimits(hit: LibraryHit): Array<'unreviewed' | 'applicability' | 'mass'> {
   const limits: Array<'unreviewed' | 'applicability' | 'mass'> = [];
-  if (hit.provenance !== 'HUMAN_VERIFIED') limits.push('unreviewed');
+  if (!VERIFIED_PROVENANCE.includes(hit.provenance)) limits.push('unreviewed');
   if (!['DIRECT', 'EU_DIRECT'].includes(hit.applicability)) limits.push('applicability');
   if (!['NO_THRESHOLD', 'MATCH'].includes(hit.massCheck)) limits.push('mass');
   return limits;
@@ -102,14 +113,15 @@ export interface LibraryConfig {
 }
 
 /**
- * Library settings from the environment, or null while off. AUTO_CHECKED
- * (machine-checked, not yet confirmed by a person) is accepted only outside
- * Vercel production and only with an explicit switch - for internal tests.
+ * Library settings from the environment, or null while off. Answers come from
+ * AI_VERIFIED and HUMAN_VERIFIED versions; AUTO_CHECKED (technical checks only,
+ * no independent verification) is accepted only outside Vercel production and
+ * only with an explicit switch - for internal tests.
  */
 export function readLibraryConfig(env: AskEnv = process.env): LibraryConfig | null {
   if (env.DAJC_KB_ENABLED !== 'true') return null;
   const allowAuto = env.DAJC_KB_ALLOW_AUTO_CHECKED === 'true' && env.VERCEL_ENV !== 'production';
-  return { allowedProvenance: allowAuto ? ['HUMAN_VERIFIED', 'AUTO_CHECKED'] : ['HUMAN_VERIFIED'] };
+  return { allowedProvenance: allowAuto ? [...VERIFIED_PROVENANCE, 'AUTO_CHECKED'] : [...VERIFIED_PROVENANCE] };
 }
 
 const clients = new Map<string, unknown>();

@@ -6,7 +6,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { CostMeter } from '../cost';
-import { libraryLanguages, type LibraryHit, type LibraryLookup } from '../library';
+import { libraryLanguages, readLibraryConfig, type LibraryHit, type LibraryLookup } from '../library';
 import { runPipeline, type PipelineDeps } from '../pipeline';
 import type { JsonCallParams } from '../providers';
 import { fakeFetchPage, fakeProviders, fixtureView, NOW, testConfig, type FakeScenario } from './helpers';
@@ -117,10 +117,30 @@ describe('DAJC AI answers from the legal library in five languages', () => {
 });
 
 describe('the library never raises an answer it cannot support', () => {
-  it('keeps a machine-checked (not person-verified) version at PARTIAL and says so', async () => {
+  it('keeps a machine-checked (not independently verified) version at PARTIAL and says so', async () => {
     const { answer } = await run('en', [hit('en', { provenance: 'AUTO_CHECKED' })]).promise;
     expect(answer.level).toBe('PARTIAL');
-    expect(answer.notices.join(' ')).toMatch(/not yet confirmed by a DAJC reviewer/);
+    expect(answer.notices.join(' ')).toMatch(/not yet the independent verification/);
+  });
+
+  it('answers VERIFIED from an AI-verified version and says that the verification was automated', async () => {
+    const { answer } = await run('en', [hit('en', { provenance: 'AI_VERIFIED', aiVerifiedAt: '2026-11-09T10:00:00.000Z', aiVerificationModels: 'openai/gpt-6-sol + anthropic/claude-sonnet-5-5' })]).promise;
+    expect(answer.level).toBe('VERIFIED');
+    expect(answer.notices.join(' ')).toMatch(/verified automatically: two independent AI models/);
+    expect(answer.notices.join(' ')).toMatch(/not a human, official or legally binding confirmation/);
+    const cs = await run('cs', [hit('cs', { provenance: 'AI_VERIFIED' })]).promise;
+    expect(cs.answer.notices.join(' ')).toMatch(/Nejde o lidské, úřední ani právně závazné potvrzení/);
+  });
+
+  it('never presents a person-verified version as AI-verified', async () => {
+    const { answer } = await run('en', [hit('en')]).promise;
+    expect(answer.notices.join(' ')).not.toMatch(/two independent AI models/);
+  });
+
+  it('reads AI- and person-verified versions in production, machine-checked ones only in internal tests', () => {
+    expect(readLibraryConfig({ DAJC_KB_ENABLED: 'true', VERCEL_ENV: 'production', DAJC_KB_ALLOW_AUTO_CHECKED: 'true' } as any)).toEqual({ allowedProvenance: ['AI_VERIFIED', 'HUMAN_VERIFIED'] });
+    expect(readLibraryConfig({ DAJC_KB_ENABLED: 'true', VERCEL_ENV: 'preview', DAJC_KB_ALLOW_AUTO_CHECKED: 'true' } as any)).toEqual({ allowedProvenance: ['AI_VERIFIED', 'HUMAN_VERIFIED', 'AUTO_CHECKED'] });
+    expect(readLibraryConfig({ DAJC_KB_ENABLED: 'false' } as any)).toBeNull();
   });
 
   it('keeps a provision with an unreviewed mass band at PARTIAL (no transfer between 3.5 t and 7.5 t rules)', async () => {

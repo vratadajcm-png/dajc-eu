@@ -1,0 +1,106 @@
+name: DAJC legal library AI verification (Neon dev)
+
+# Automated multi-layer AI verification of the library versions on the Neon
+# DEVELOPMENT branch (src/lib/kb/ai-verify/, drizzle-kb/0002,
+# docs/DAJC_AI_LEGAL_LIBRARY.md). AI_VERIFIED is an automated technical
+# verification against the official text - never a human, official or legally
+# binding approval - and the database itself decides it
+# (dajc_kb.apply_ai_verification).
+#
+# Security and cost - the repository is public, so this log is public:
+#   * runs only when the repository OWNER adds the label "kb-ai-verify-dev" to a
+#     pull request of this repository (or dispatches it once merged), and only
+#     after the owner approves the deployment to the GitHub environment
+#     "kb-ai-verify-dev" (required reviewer). Never on push or on a schedule.
+#   * the database credential is the ENVIRONMENT secret
+#     DAJC_KB_DEV_AI_VERIFIER_DB_URL of the role dajc_kb_ai_verifier. It is not
+#     the import credential, and the import workflow never sees it or the AI keys.
+#   * extraction and independent verification use two different vendors; every
+#     call is priced before it is sent and the run stops at the budget
+#     (DAJC_KB_AI_RUN_BUDGET_USD); actual token usage and cost are recorded per
+#     run in dajc_kb.verification_runs and in the report artifact.
+#   * actions pinned to full commit SHAs, dependencies installed without
+#     lifecycle scripts and before any secret is present, no git credentials kept.
+
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'Verify only this officialNumber (empty = all EUR-Lex entries)'
+        required: false
+        type: string
+      budget_usd:
+        description: 'Hard budget for this run in USD'
+        required: false
+        type: string
+      reverify:
+        description: 'Verify AI_VERIFIED versions again'
+        required: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kb-ai-verify-dev
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: >-
+      github.actor == github.repository_owner &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.label.name == 'kb-ai-verify-dev' && github.event.pull_request.head.repo.full_name == github.repository))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    environment: kb-ai-verify-dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+
+      - name: Install dependencies (no lifecycle scripts, no secret present)
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: AI-verify the library versions on the Neon dev branch
+        id: verify
+        env:
+          DAJC_KB_AI_VERIFIER_DB_URL: ${{ secrets.DAJC_KB_DEV_AI_VERIFIER_DB_URL }}
+          DAJC_KB_AI_EXTRACT_PROVIDER: ${{ vars.DAJC_KB_AI_EXTRACT_PROVIDER || 'openai' }}
+          DAJC_KB_AI_VERIFY_PROVIDER: ${{ vars.DAJC_KB_AI_VERIFY_PROVIDER || 'anthropic' }}
+          DAJC_RESEARCH_OPENAI_MODEL: ${{ vars.DAJC_KB_AI_OPENAI_MODEL || 'gpt-6-sol' }}
+          DAJC_RESEARCH_ANTHROPIC_MODEL: ${{ vars.DAJC_KB_AI_ANTHROPIC_MODEL || 'claude-sonnet-5-5' }}
+          DAJC_RESEARCH_GEMINI_MODEL: ${{ vars.DAJC_KB_AI_GEMINI_MODEL }}
+          DAJC_RESEARCH_PRICING_USD: ${{ vars.DAJC_KB_AI_PRICING_USD || '{"openai":{"input":2,"output":10},"anthropic":{"input":2,"output":10}}' }}
+          DAJC_RESEARCH_OPENAI_API_KEY: ${{ secrets.DAJC_RESEARCH_OPENAI_API_KEY }}
+          DAJC_RESEARCH_ANTHROPIC_API_KEY: ${{ secrets.DAJC_RESEARCH_ANTHROPIC_API_KEY || secrets.ANTHROPIC_API_KEY }}
+          DAJC_RESEARCH_GEMINI_API_KEY: ${{ secrets.DAJC_RESEARCH_GEMINI_API_KEY }}
+          DAJC_KB_AI_RUN_BUDGET_USD: ${{ inputs.budget_usd || vars.DAJC_KB_AI_RUN_BUDGET_USD || '12' }}
+          ONLY: ${{ inputs.only }}
+          REVERIFY: ${{ inputs.reverify }}
+        run: |
+          if [ -z "$DAJC_KB_AI_VERIFIER_DB_URL" ]; then
+            echo "::error::Environment secret DAJC_KB_DEV_AI_VERIFIER_DB_URL of the environment kb-ai-verify-dev is not set (Neon branch dev, role dajc_kb_ai_verifier)."
+            exit 1
+          fi
+          set -- --source eu-eurlex --online --expect-role dajc_kb_ai_verifier --expect-environment dev --report "$RUNNER_TEMP/kb-ai-verification.json"
+          if [ -n "$ONLY" ]; then set -- "$@" --only "$ONLY"; fi
+          if [ "$REVERIFY" = "true" ]; then set -- "$@" --reverify; fi
+          node scripts/kb-ai-verify.mjs "$@"
+
+      - name: Keep the AI verification report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kb-ai-verification-${{ github.run_id }}
+          path: ${{ runner.temp }}/kb-ai-verification.json
+          if-no-files-found: warn
+          retention-days: 30

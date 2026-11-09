@@ -473,7 +473,7 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
     const source = sourceById.get(id)!;
     return source.kind === 'own' ? 'dajc_verified' : source.unverified ? 'unverified_official_lead' : 'official_web';
   };
-  // Library passages: a VERIFIED answer needs person-verified versions that apply directly and fit the vehicle's mass band.
+  // Library passages: a VERIFIED answer needs AI- or person-verified versions that apply directly and fit the vehicle's mass band.
   const citedLibrary = citedIds.map((id) => sourceById.get(id)?.library).filter((hit): hit is LibraryHit => Boolean(hit));
   if (citedLibrary.length > 0) {
     const limits = new Set(citedLibrary.flatMap(libraryLimits));
@@ -481,6 +481,8 @@ export async function runPipeline(rawQuestion: string, uiLang: UiLang, deps: Pip
     notices.push(t(uiLang, 'libraryInterpretationNotice'));
     if (citedLibrary.some((hit) => hit.authenticity === 'CONSOLIDATED_DOCUMENTATION')) notices.push(t(uiLang, 'libraryConsolidatedNotice'));
     if (limits.has('unreviewed')) notices.push(t(uiLang, 'libraryUnreviewedNotice'));
+    // AI verification is automated: say so every time it is relied on, never present it as a human or official check.
+    if (citedLibrary.some((hit) => hit.provenance === 'AI_VERIFIED')) notices.push(t(uiLang, 'libraryAiVerifiedNotice'));
     if (limits.has('applicability')) notices.push(t(uiLang, 'libraryApplicabilityNotice'));
     if (limits.has('mass')) notices.push(t(uiLang, 'libraryMassNotice'));
   }

@@ -87,7 +87,7 @@ export function citationLabel(hit) {
  */
 export async function searchLibrary(query, input) {
   const { languages, countries, onDate } = input;
-  const allowed = input.allowedProvenance?.length ? input.allowedProvenance : ['HUMAN_VERIFIED'];
+  const allowed = input.allowedProvenance?.length ? input.allowedProvenance : ['AI_VERIFIED', 'HUMAN_VERIFIED'];
   const limit = Math.min(input.limit || 6, SEARCH_LIMITS.maxResults);
   const q = websearchQuery(input.terms);
   const strict = strictQuery(input.terms);
@@ -105,6 +105,7 @@ export async function searchLibrary(query, input) {
       select ap.id, ap.anchor_type, ap.anchor_label, ap.anchor_number, ap.page_from, ap.page_to, ap.text, ap.language, ap.official_url,
              ap.sha256, ap.version_label, ap.authenticity, ap.effective_from::text as effective_from, ap.effective_to::text as effective_to,
              ap.validity, ap.validity_checked_on::text as validity_checked_on, ap.provenance, ap.verified_by, ap.last_verified_at,
+             ap.ai_verified_at, ap.ai_verification_models,
              ap.jurisdiction, ap.official_number, ap.title, ap.legal_category, ap.issuing_body, ap.mass_mentions,
              ap.mass_min_t, ap.mass_min_inclusive, ap.mass_max_t, ap.mass_max_inclusive, ap.mass_basis,
              -- PostgreSQL ranking has no word rarity (IDF): a whole search term matching counts most,
@@ -144,6 +145,7 @@ function toHit(row, countries, massT) {
     authenticity: row.authenticity, effectiveFrom: row.effective_from, effectiveTo: row.effective_to, validity: row.validity,
     validityCheckedOn: row.validity_checked_on, provenance: row.provenance, verifiedBy: row.verified_by,
     lastVerifiedAt: row.last_verified_at ? new Date(row.last_verified_at).toISOString() : null,
+    aiVerifiedAt: row.ai_verified_at ? new Date(row.ai_verified_at).toISOString() : null, aiVerificationModels: row.ai_verification_models ?? null,
     applicability: best, massBand: band, massCheck: massApplies(band, massT, (row.mass_mentions || []).map(Number)), rank: Number(row.rank),
   };
   hit.citation = citationLabel(hit);
