@@ -1,0 +1,100 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MarketResearchForm from '../components/MarketResearchForm.astro';
+---
+<BaseLayout
+  title="DAJC TAR | Tow, Assistance & Recovery Coordination"
+  description="Discover the proposed DAJC TAR product for towing, roadside assistance and heavy recovery operators: one coordinated case from incident intake through dispatch, evidence and billing. Share your industry feedback."
+>
+  <main class="product-page">
+    <section class="hero">
+      <p class="eyebrow">DAJC TAR · TOW, ASSISTANCE & RECOVERY</p>
+      <h1>One incident.<br /><em>One recovery process.</em></h1>
+      <p class="lead">Roadside assistance and recovery involve fast decisions, different vehicles, multiple partners and extensive documentation. DAJC TAR is being designed as one operational product for towing, assistance and recovery — from first incident report to final settlement.</p>
+      <p class="status"><strong>Research & product development.</strong> DAJC TAR is not a live emergency, roadside assistance or towing service. No provider coverage, insurer integration, dispatch availability or launch date is guaranteed.</p>
+      <a class="button" href="#research">Share your industry feedback</a>
+    </section>
+
+    <section aria-labelledby="audience-title">
+      <p class="eyebrow">WHO IT IS FOR</p>
+      <h2 id="audience-title">For everyone involved in one recovery operation.</h2>
+      <div class="grid">
+        <article><h3>Towing & recovery businesses</h3><p>One organisation can operate light and heavy recovery trucks, rotators, cranes, support vans and mixed crews in a shared workflow.</p></article>
+        <article><h3>Dispatchers & field technicians</h3><p>Coordinate job details, vehicles, assignments, site evidence and status updates.</p></article>
+        <article><h3>Assistance networks & insurers</h3><p>Potential structured handovers and verified service documentation, subject to agreements and access.</p></article>
+        <article><h3>Motorists & fleet operators</h3><p>Clear incident intake and relevant case updates when offered by a responsible participating provider.</p></article>
+      </div>
+    </section>
+
+    <section aria-labelledby="problems-title">
+      <p class="eyebrow">THE PROBLEM</p>
+      <h2 id="problems-title">A single incident can be spread across five different places.</h2>
+      <div class="grid">
+        <article><span class="num">01</span><h3>Fragmented job intake</h3><p>Requests may arrive via calls, emails, assistance portals or messages, each with different information.</p></article>
+        <article><span class="num">02</span><h3>Complex dispatch decisions</h3><p>Finding the right vehicle, specialist equipment and crew requires reliable operational context.</p></article>
+        <article><span class="num">03</span><h3>Evidence collected too late</h3><p>Photos, condition reports, signatures and job updates can become disconnected from the original case.</p></article>
+        <article><span class="num">04</span><h3>Slow completion and billing</h3><p>Time, mileage, equipment and extra work must be reconciled before a case can be settled.</p></article>
+      </div>
+    </section>
+
+    <section aria-labelledby="solution-title">
+      <p class="eyebrow">THE PROPOSED SOLUTION</p>
+      <h2 id="solution-title">One Recovery Passport for the entire case.</h2>
+      <p class="section-lead">DAJC TAR aims to connect the operational record across dispatch, field teams, authorised partners and billing. A mixed recovery fleet is managed within one provider organisation — not split into separate towing and recovery products.</p>
+      <div class="steps">
+        <article><span>01</span><div><h3>Capture the incident</h3><p>Record the location, vehicle, incident details and source of the request in one case.</p></div></article>
+        <article><span>02</span><div><h3>Dispatch the right resources</h3><p>Support assignment of the appropriate crew, vehicle and equipment, including heavy recovery operations.</p></div></article>
+        <article><span>03</span><div><h3>Document work at the scene</h3><p>Bring field status, photos, measurements, safety notes and completion evidence into the case.</p></div></article>
+        <article><span>04</span><div><h3>Close and account for the job</h3><p>Prepare verified work records, partner handovers, cost items and billing data.</p></div></article>
+      </div>
+    </section>
+
+    <section class="scenario" aria-labelledby="example-title">
+      <p class="eyebrow">ILLUSTRATIVE USE CASE</p>
+      <h2 id="example-title">A disabled truck requires heavy recovery and an additional service crew.</h2>
+      <div class="compare">
+        <article><span>COMMON WORKFLOW TODAY</span><p>The operator may coordinate a call centre, a heavy truck, a technician and documentation through multiple channels, then reconcile the records after the job.</p></article>
+        <article><span>WITH DAJC TAR · INTENDED WORKFLOW</span><p>One case could connect the initial request, dispatched resources, field documentation, partner updates and final cost evidence, with access restricted by role.</p></article>
+      </div>
+      <p class="small">Illustrative workflow only. DAJC TAR is not an emergency-response service. In an actual emergency, contact the competent emergency services (112 in the EU where applicable).</p>
+    </section>
+
+    <section aria-labelledby="integrations-title">
+      <p class="eyebrow">DESIGNED FOR REAL OPERATIONS</p>
+      <h2 id="integrations-title">One business. Multiple job types. Existing partner relationships preserved.</h2>
+      <p>Future integration options may cover authorised assistance-provider interfaces, incident and traffic information, connected fleet systems, mobile field applications and electronic evidence. These are product intentions, not claims of active provider connections or signed partnerships.</p>
+      <p>The central question is not whether every company should replace its current tools. It is where a shared workflow would create real value alongside them.</p>
+    </section>
+
+    <MarketResearchForm product="tar" />
+  </main>
+</BaseLayout>
+<style>
+  .product-page{position:relative;z-index:2;width:min(1140px,calc(100% - 2.6rem));margin:auto;padding:clamp(3rem,7vw,6rem) 0 6rem;}
+  .eyebrow{color:var(--dajc-orange);font:500 .72rem 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);}
+  h1{font-size:clamp(2.8rem,6vw,5.5rem);line-height:1.02;letter-spacing:-.04em;margin:.6rem 0 1.5rem;}
+  h1 em{color:var(--dajc-orange);font-style:normal;}
+  h2{font-size:clamp(1.7rem,3.3vw,2.8rem);line-height:1.12;margin:.45rem 0 1.2rem;max-width:25ch;}
+  h3{font-size:1.12rem;margin:.1rem 0 .7rem;}
+  p{line-height:1.7;color:var(--dajc-muted);}
+  .lead{max-width:78ch;font-size:clamp(1.05rem,1.7vw,1.23rem);color:#c5d4e5;}
+  .hero{padding:1.6rem 0 clamp(3.5rem,8vw,6rem);}
+  .status{max-width:75ch;border-left:3px solid var(--dajc-orange);background:rgba(255,159,0,.08);padding:.9rem 1.15rem;color:#d9e0eb;margin:1.7rem 0;}
+  .status strong{color:#fff;}
+  .button{display:inline-flex;min-height:48px;align-items:center;padding:0 1.2rem;border-radius:8px;background:var(--dajc-orange);color:#061A33;font:700 .8rem 'IBM Plex Mono',monospace;text-decoration:none;}
+  .small{font-size:.79rem;max-width:80ch;}
+  section:not(.hero){border-top:1px solid var(--dajc-line);padding:clamp(2.5rem,5vw,4rem) 0;}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-top:2rem;}
+  .grid article,.compare article{border:1px solid var(--dajc-line);border-radius:12px;padding:1.4rem;background:rgba(7,33,66,.72);}
+  .grid article p{margin:0;}
+  .num{font:.75rem 'IBM Plex Mono',monospace;color:var(--dajc-orange);display:block;margin-bottom:.7rem;}
+  .section-lead{max-width:80ch;font-size:1.08rem;}
+  .steps{display:grid;gap:.8rem;margin-top:2rem;max-width:900px;}
+  .steps article{display:flex;gap:1.5rem;align-items:flex-start;border-bottom:1px solid var(--dajc-line);padding:1rem 0;}
+  .steps article>span{font:600 1.2rem 'IBM Plex Mono',monospace;color:var(--dajc-orange);}
+  .steps article p{margin:0;}
+  .compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:2rem 0 0;}
+  .compare span{font:.7rem 'IBM Plex Mono',monospace;color:var(--dajc-orange);letter-spacing:.08em;}
+  @media(max-width:700px){.grid,.compare{grid-template-columns:1fr}.product-page{width:min(100% - 2rem,1140px)}}
+</style>
