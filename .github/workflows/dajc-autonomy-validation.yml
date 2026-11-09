@@ -40,6 +40,22 @@ jobs:
               raise SystemExit("Missing current supported Claude model default")
           print("Claude beta action input contract verified")
           PY
+      - name: Guard against leaking Claude action transcript into source patch
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          workflow = Path(".github/workflows/dajc-ai-autonomous-claude.yml").read_text()
+          start = workflow.index("      - name: Export bounded source patch")
+          end = workflow.index("      - name: Preserve patch", start)
+          step = workflow[start:end]
+          if not ("git ls-files --error-unmatch -- output.txt" in step
+                  and "rm -- output.txt" in step
+                  and step.index("rm -- output.txt") < step.index("git add -N -- .")):
+              raise SystemExit("Claude action output cleanup must be safe and precede patch capture")
+          if "Strict source-only patch validation" not in workflow:
+              raise SystemExit("Publisher source whitelist missing")
+          print("Untracked action output isolated from restricted source patch")
+          PY
       - name: Validate JSON review contract
         run: node -e 'const s=require("./.github/ai-autonomy/review-schema.json"); if(!s.properties?.verdict || !s.properties?.findings) process.exit(1)'
 
