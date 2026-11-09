@@ -81,10 +81,12 @@ const options = isPlatform
 <script>
   const form = document.querySelector<HTMLFormElement>('#market-research-form');
   const status = document.querySelector<HTMLElement>('#research-status');
+  let pendingSubmissionId: string | null = null;
   form?.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!status) return;
     const data = new FormData(form);
+    data.set('submissionId', pendingSubmissionId ??= crypto.randomUUID());
     if (data.get('followUp') === 'on' && !String(data.get('email') || '').trim()) {
       status.textContent = 'Please provide an email address if you would like us to contact you.';
       status.dataset.state = 'error';
@@ -108,6 +110,7 @@ const options = isPlatform
       const result = await response.json();
       if (!response.ok || !result.ok) throw new Error(result.error || 'Unable to send your answer.');
       form.reset();
+      pendingSubmissionId = null;
       status.textContent = 'Thank you. Your feedback has been received and will help guide DAJC research.';
       status.dataset.state = 'success';
     } catch (error) {
