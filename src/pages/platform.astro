@@ -1,19 +1,20 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import MarketResearchForm from '../components/MarketResearchForm.astro';
+import ProductFeatureCatalogue from '../components/ProductFeatureCatalogue.astro';
 ---
 <BaseLayout
   title="DAJC Platform | European Heavy & Oversized Transport Coordination"
-  description="Discover the planned DAJC Platform: provider-neutral coordination for heavy and oversized transport, connecting transport context, routes, permits, documents and execution. Share your industry feedback."
+  description="DAJC Platform: the complete European heavy and oversized transport coordination experience. Explore D-ID, permits, routing, dispatch, documents, integrations and all product capabilities."
 >
   <main class="product-page">
     <section class="hero">
       <p class="eyebrow">DAJC PLATFORM · HEAVY & OVERSIZED TRANSPORT</p>
       <h1>One transport.<br /><em>One coordinated process.</em></h1>
-      <p class="lead">Complex transport involves more than moving a load. DAJC Platform is being designed as a provider-neutral coordination layer that connects the people, documents, permits and operational steps around one transport — while respecting the systems companies already use.</p>
-      <p class="status">In development · Pre-production testing planned for Q3 2027. Features and third-party integrations described here are proposed, not live production capabilities.</p>
+      <p class="lead">DAJC Platform connects the people, documents, permits, technical planning and operational decisions around each heavy or oversized movement. One D-ID links every step from the first request to final settlement — without forcing carriers to abandon the software they already rely on.</p>
+      <p class="status">Product status: in development; pre-production testing planned for Q3 2027. This page describes the complete product, not functions or external integrations already available to customers.</p>
       <div class="actions">
-        <a class="button" href="#research">Share your industry feedback</a>
+        <a class="button" href="#capabilities">Discover every product function</a>
         <a class="outline" href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">Explore illustrative demo ↗</a>
       </div>
       <p class="small">The demo uses synthetic data and is not evidence of live permits, routing feeds or customer integrations.</p>
@@ -42,9 +43,9 @@ import MarketResearchForm from '../components/MarketResearchForm.astro';
     </section>
 
     <section aria-labelledby="solution-title">
-      <p class="eyebrow">THE PROPOSED SOLUTION</p>
+      <p class="eyebrow">HOW DAJC PLATFORM WORKS</p>
       <h2 id="solution-title">One D-ID transport context, connected to the workflow.</h2>
-      <p class="section-lead">DAJC is not intended to replace your TMS, navigation, permit specialist or existing service providers. It aims to connect the relevant information and actions so authorised participants can follow the same transport process.</p>
+      <p class="section-lead">DAJC does not replace a carrier’s TMS, specialist routing, permit agents or existing service providers. It connects the relevant information and decisions through a common workflow that participants can follow without losing control of their own systems.</p>
       <div class="steps">
         <article><span>01</span><div><h3>Create a shared transport reference</h3><p>Link the load, parties, equipment, quotation and accepted plan to a D-ID.</p></div></article>
         <article><span>02</span><div><h3>Prepare the journey</h3><p>Coordinate route constraints, permit requirements, supporting documents and approval status.</p></div></article>
@@ -54,11 +55,11 @@ import MarketResearchForm from '../components/MarketResearchForm.astro';
     </section>
 
     <section class="scenario" aria-labelledby="example-title">
-      <p class="eyebrow">ILLUSTRATIVE USE CASE</p>
+      <p class="eyebrow">PRODUCT WORKFLOW EXAMPLE</p>
       <h2 id="example-title">Loading time changes after the transport has been arranged.</h2>
       <div class="compare">
         <article><span>COMMON WORKFLOW TODAY</span><p>The change may appear in an email, while the driver, permit documents and dispatcher refer to different versions. The team must reconcile each source.</p></article>
-        <article><span>WITH DAJC · INTENDED WORKFLOW</span><p>The transport's D-ID would link an approved change, the affected operational steps and the relevant documents for authorised participants to confirm.</p></article>
+        <article><span>WITH THE COMPLETE DAJC PRODUCT</span><p>The transport's D-ID would link an approved change, the affected operational steps and the relevant documents for authorised participants to confirm.</p></article>
       </div>
       <p class="small">Illustrative scenario, not a measured customer outcome or a promise of time savings. Authority decisions on permits remain with the competent authorities.</p>
     </section>
@@ -70,6 +71,7 @@ import MarketResearchForm from '../components/MarketResearchForm.astro';
       <a href="/testing">Read about Platform testing 2027 →</a>
     </section>
 
+    <ProductFeatureCatalogue product="platform" />
     <MarketResearchForm product="platform" />
   </main>
 </BaseLayout>
