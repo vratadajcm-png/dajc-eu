@@ -1,0 +1,133 @@
+---
+import MarketResearchForm from './MarketResearchForm.astro';
+import ProductFeatureCatalogue from './ProductFeatureCatalogue.astro';
+import type { ProductKey } from '../data/product-capabilities';
+
+interface Props { product: ProductKey }
+const { product } = Astro.props;
+const platform = product === 'platform';
+const content = platform ? {
+  eyebrow: 'DAJC PLATFORM · HEAVY & OVERSIZED TRANSPORT',
+  headlineStart: 'One transport.',
+  headlineEnd: 'Everyone connected.',
+  intro: 'Heavy and oversized transport is more than the journey itself. DAJC Platform brings the order, cargo, equipment, routes, permits, companies, drivers, documents and decisions together in one controlled D-ID workflow — while keeping the specialist systems companies already use.',
+  status: 'Complete product concept · Currently in development · Pre-production testing planned for Q3 2027',
+  audience: ['Heavy and oversized carriers', 'Dispatchers and drivers', 'Shippers and logistics teams', 'Permit, escort and route specialists'],
+  issue: 'A loading time changes shortly before an oversized transport. The email is updated, but the driver, permit agent and dispatcher may still be working with different documents and instructions.',
+  result: 'One D-ID connects the approved change to the affected route, permits, crew, documents and responsibilities. Authorised participants can confirm the current version without abandoning their existing applications.',
+  example: 'Illustrative workflow — not a claim of measured time savings or automated official permit approval.',
+  benefits: [
+    { title: 'One transport identity', copy: 'Connect every participant and milestone to the same D-ID, from enquiry and quotation through proof of delivery and settlement.' },
+    { title: 'Permits and legal certainty', copy: 'Keep permit requirements, authority-approved applications, historical matches and verified driving restrictions within the transport context.' },
+    { title: 'Fleet and route coordination', copy: 'Match cargo dimensions, vehicle configuration, suitable infrastructure, traffic information and scheduling constraints.' },
+    { title: 'Dispatch and driver continuity', copy: 'Share approved plans, operational events, offline documents, defects and handovers with the people who need them.' },
+    { title: 'Keep the tools you trust', copy: 'Coordinate existing TMS, ERP, telematics, specialist routing and document systems via authorised integrations.' },
+  ],
+} : {
+  eyebrow: 'DAJC TAR · TOW, ASSISTANCE & RECOVERY',
+  headlineStart: 'One incident.',
+  headlineEnd: 'One recovery process.',
+  intro: 'From a passenger car breakdown to complex heavy-truck recovery, DAJC TAR connects incident intake, mixed-fleet dispatch, field technicians, partner networks, evidence and final billing. One organisation manages its entire towing, roadside assistance and recovery operation through one Recovery Passport.',
+  status: 'Complete product concept · Currently in development · Not an operational towing or emergency assistance service',
+  audience: ['Towing and recovery providers', 'Dispatchers and field technicians', 'Assistance networks and insurers', 'Fleet operators and motorists'],
+  issue: 'A disabled truck needs heavy recovery and a mobile service crew. Requests, assignments, photographs, on-scene decisions and additional charges are spread across calls, portals and separate applications.',
+  result: 'One Recovery Passport links the original request, the qualified crew, recovery vehicle and equipment, partner updates, technical notes, evidence and approved billing items in a single case.',
+  example: 'Illustrative workflow. Field safety remains with qualified personnel; insurance and assistance entitlements must be confirmed by their responsible providers.',
+  benefits: [
+    { title: 'Every request in one place', copy: 'Bring authorised jobs from assistance portals, phone, web, email and partner interfaces into a common incident workflow.' },
+    { title: 'One dispatch for mixed fleets', copy: 'Coordinate light and heavy tow trucks, rotators, cranes, mobile workshops and crews within one provider organisation.' },
+    { title: 'Smarter on-scene work', copy: 'Link assignments, positioning, technical recovery assessments, diagnostic evidence and field safety documentation.' },
+    { title: 'One auditable Recovery Passport', copy: 'Keep photographs, signatures, custody handovers, case statuses and insurer or partner reports together.' },
+    { title: 'Complete the job and the accounts', copy: 'Connect performed work, time, equipment, agreed extra costs, final reports and accounting-system handovers.' },
+  ],
+};
+---
+<main class="landing">
+  <section class="hero" aria-labelledby="hero-title">
+    <p class="eyebrow">{content.eyebrow}</p>
+    <h1 id="hero-title">{content.headlineStart}<br /><em>{content.headlineEnd}</em></h1>
+    <p class="intro">{content.intro}</p>
+    <div class="audiences" aria-label="Who this product is for">
+      {content.audience.map(item => <span>{item}</span>)}
+    </div>
+    <div class="actions">
+      <a class="primary" href="#value">See how it changes daily work <span aria-hidden="true">↓</span></a>
+      <a class="secondary" href="#research">Share your feedback <span aria-hidden="true">↓</span></a>
+    </div>
+    <p class="status"><span aria-hidden="true">●</span> {content.status}</p>
+    {platform && <p class="demo">See also the <a href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">Platform demonstration ↗</a>, which uses synthetic information rather than live customer or authority data.</p>}
+  </section>
+
+  <section id="value" class="value" aria-labelledby="value-title">
+    <div class="section-heading">
+      <p class="eyebrow">WHY IT MATTERS</p>
+      <h2 id="value-title">The work does not need another disconnected application.</h2>
+      <p class="section-intro">It needs one reliable operational context across the tools and people already involved.</p>
+    </div>
+    <div class="comparison">
+      <article class="comparison-old">
+        <span class="comparison-label">A TYPICAL WORKFLOW TODAY</span>
+        <p>{content.issue}</p>
+      </article>
+      <article class="comparison-new">
+        <span class="comparison-label">WITH THE COMPLETE DAJC PRODUCT</span>
+        <p>{content.result}</p>
+      </article>
+    </div>
+    <p class="note">{content.example}</p>
+
+    <h3 class="benefits-title">Five changes that matter most</h3>
+    <div class="benefits">
+      {content.benefits.map((item,index) => (
+        <article>
+          <span class="benefit-number">{String(index+1).padStart(2,'0')}</span>
+          <h4>{item.title}</h4>
+          <p>{item.copy}</p>
+        </article>
+      ))}
+    </div>
+    <p class="system-principle"><strong>Existing-system preservation:</strong> DAJC is designed to connect specialist applications and authorised partners, not to force every company to replace its software.</p>
+  </section>
+
+  <ProductFeatureCatalogue product={product} />
+  <MarketResearchForm product={product} />
+</main>
+
+<style>
+  .landing{position:relative;z-index:2;width:min(1160px,calc(100% - 2.8rem));margin:auto;padding:clamp(3rem,6vw,6rem) 0 5rem;}
+  .eyebrow,.comparison-label,.benefit-number{font:500 .71rem/1.5 'IBM Plex Mono',monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--dajc-orange);}
+  h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white);}
+  h1{font-size:clamp(2.9rem,6.8vw,6rem);line-height:1.02;letter-spacing:-.048em;margin:.85rem 0 1.5rem;}
+  h1 em{font-style:normal;color:var(--dajc-orange);}
+  .intro{max-width:79ch;font-size:clamp(1.08rem,1.9vw,1.3rem);line-height:1.72;color:#c9d7e6;}
+  .hero{padding:clamp(.8rem,2vw,1.5rem) 0 clamp(3.6rem,7vw,6rem);}
+  .audiences{display:flex;flex-wrap:wrap;gap:.55rem;margin:1.8rem 0 1.6rem;}
+  .audiences span{padding:.6rem .8rem;border:1px solid #426381;background:rgba(10,41,76,.54);border-radius:100px;color:#dbe5f0;font-size:.79rem;}
+  .actions{display:flex;gap:.9rem;flex-wrap:wrap;margin:1.7rem 0 2rem;}
+  .actions a{display:inline-flex;align-items:center;gap:.7rem;padding:.85rem 1.15rem;min-height:48px;border-radius:8px;text-decoration:none;font:700 .75rem/1.4 'IBM Plex Mono',monospace;}
+  .primary{background:var(--dajc-orange);color:#061A33;}
+  .secondary{color:#e7eff8;border:1px solid #627e99;}
+  .status{color:#b9c9dc;font-size:.79rem;line-height:1.7;max-width:84ch;}
+  .status span{color:var(--dajc-orange);padding-right:.35rem;}
+  .demo{font-size:.8rem;color:var(--dajc-muted);line-height:1.6;}
+  .demo a{color:var(--dajc-orange);}
+  .value{border-top:1px solid var(--dajc-line);padding:clamp(3rem,6vw,5rem) 0;}
+  .section-heading{max-width:850px;}
+  h2{font-size:clamp(2rem,4vw,3.3rem);line-height:1.13;max-width:23ch;letter-spacing:-.025em;margin:.55rem 0 1rem;}
+  .section-intro{font-size:1.07rem;line-height:1.7;color:var(--dajc-muted);}
+  .comparison{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin:2rem 0 0;}
+  .comparison article{padding:clamp(1.2rem,3vw,2rem);border:1px solid var(--dajc-line);border-radius:14px;background:rgba(7,31,60,.72);}
+  .comparison .comparison-new{background:rgba(255,159,0,.065);border-color:rgba(255,159,0,.45);}
+  .comparison p{font-size:1rem;line-height:1.75;color:#d7e0eb;margin:1rem 0 .2rem;}
+  .comparison-old .comparison-label{color:#a9b8ca;}
+  .note{font-size:.76rem;color:var(--dajc-muted);line-height:1.65;margin:1rem 0 2.5rem;}
+  .benefits-title{font-size:clamp(1.45rem,2.6vw,2.15rem);margin:2.7rem 0 1.4rem;}
+  .benefits{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.85rem;}
+  .benefits article{border:1px solid var(--dajc-line);background:rgba(8,32,59,.75);padding:1.2rem;border-radius:11px;}
+  .benefits h4{font-size:1.04rem;line-height:1.3;margin:.8rem 0;}
+  .benefits p{font-size:.86rem;line-height:1.65;color:var(--dajc-muted);margin:0;}
+  .system-principle{max-width:95ch;color:#c6d4e4;font-size:.95rem;line-height:1.7;margin:2rem 0 0;}
+  .system-principle strong{color:var(--dajc-white);}
+  @media(max-width:1040px){.benefits{grid-template-columns:repeat(3,minmax(0,1fr));}}
+  @media(max-width:660px){.landing{width:min(100% - 2rem,1160px)}.comparison{grid-template-columns:1fr}.benefits{grid-template-columns:1fr}.benefits article{padding:1.1rem}.hero{padding-bottom:3.6rem}.audiences{margin-top:1.3rem}}
+</style>
