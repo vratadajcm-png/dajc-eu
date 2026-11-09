@@ -33,6 +33,7 @@
     "kb:monitor": "node scripts/kb-monitor.mjs",
     "kb:audit": "node scripts/kb-monthly-audit.mjs",
     "kb:acquire": "node scripts/kb-acquire.mjs",
+    "kb:progress": "node scripts/kb-progress.mjs",
     "kb:sources-check": "node scripts/kb-sources-check.mjs"
   },
   "dependencies": {

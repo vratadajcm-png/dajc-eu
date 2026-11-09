@@ -69,6 +69,28 @@ function sectionNumber(value) {
   return m ? Number(m[1]) + (m[2] ? (m[2].charCodeAt(0) - 96) / 100 : 0) : null;
 }
 
+// Polish style: "Art. 5. 1. text..." and "§ 3. text..." (number, a dot, then the body on the same line).
+// Accepted only when the number grows past the previous provision of that kind, so a cross
+// reference starting a wrapped line ("Art. 5. ...") inside provision 12 does not split it.
+const DOT_STYLE = [
+  { type: 'ARTICLE', re: /^(Art\.)\s+(\d{1,3}[a-z]?)\.\s+(\S.*)$/u },
+  { type: 'SECTION', re: /^§\s*(\d{1,4}[a-z]?)\.\s+(\S.*)$/u },
+];
+
+function matchDotStyle(line, last) {
+  for (const anchor of DOT_STYLE) {
+    const m = line.match(anchor.re);
+    if (!m) continue;
+    const number = anchor.type === 'SECTION' ? m[1] : m[2];
+    const rest = anchor.type === 'SECTION' ? m[2] : m[3];
+    const n = sectionNumber(number);
+    const previous = last[anchor.type];
+    if (n == null || (previous != null && n <= previous) || (previous == null && n > 2)) return null;
+    return { type: anchor.type, number, label: anchor.type === 'SECTION' ? `§ ${number}` : `Art. ${number}`, title: null, rest };
+  }
+  return null;
+}
+
 function matchAnchor(line, last) {
   for (const anchor of ANCHORS) {
     const m = line.match(anchor.re);
@@ -105,11 +127,11 @@ export function splitProvisions(pages) {
       if (running.has(normaliseRunningLine(raw.trim()))) continue;
       const line = cleanLine(raw);
       if (!line) continue;
-      const anchor = matchAnchor(line, last);
+      const anchor = matchAnchor(line, last) ?? matchDotStyle(line, last);
       if (anchor) {
         if (anchor.type in last && sectionNumber(anchor.number) != null) last[anchor.type] = sectionNumber(anchor.number);
         if (current.lines.length > 0 || current.anchor.type !== 'PREAMBLE') blocks.push(current);
-        current = { anchor, pageFrom: page.pageNo, pageTo: page.pageNo, lines: [] };
+        current = { anchor, pageFrom: page.pageNo, pageTo: page.pageNo, lines: anchor.rest ? [anchor.rest] : [] };
         continue;
       }
       current.lines.push(line);

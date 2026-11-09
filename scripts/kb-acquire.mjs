@@ -22,6 +22,8 @@ import { prepareStructuredVersion } from '../src/lib/kb/acquire/structured.mjs';
 import { storeVersion } from '../src/lib/kb/acquire/pipeline.mjs';
 import { discoverAtChanges, risClient } from '../src/lib/kb/acquire/at-ris.mjs';
 import { discoverHrChanges, nnClient } from '../src/lib/kb/acquire/hr-nn.mjs';
+import { discoverPlCandidates, plClient, planPlEntry } from '../src/lib/kb/acquire/pl-eli.mjs';
+import { runImportQueue } from '../src/lib/kb/acquire/queue.mjs';
 
 const args = process.argv.slice(2);
 const flag = (n) => args.includes(n);
@@ -37,7 +39,7 @@ const fail = (e) => ({ status: e instanceof AcquireError ? e.kind : 'FAILED', re
 
 let sql = null;
 let archive = null;
-if (jurisdiction === 'DE') {
+if (['DE', 'PL'].includes(jurisdiction)) {
   archive = dryRun && !process.env.DAJC_KB_ARCHIVE ? new MemoryArchive() : archiveFromEnv();
   if (!dryRun) {
     if (!dbUrl) throw new Error('DAJC_KB_IMPORT_DB_URL is not set');
@@ -79,6 +81,19 @@ try {
       console.log(`${String(line.status).padEnd(20)} ${law.slug}${line.reason ? `: ${line.reason}` : ''}`);
       if (['WAF_BLOCKED', 'RATE_LIMITED'].includes(line.status)) break;
     }
+  } else if (jurisdiction === 'PL') {
+    const client = plClient();
+    const candidates = await discoverPlCandidates(client);
+    report.discovery = { candidates: candidates.length };
+    console.log(`PL discovery: ${candidates.length} base acts in force match the road-freight queries`);
+    const entries = [];
+    const skipped = [];
+    for (const c of candidates.slice(0, max)) {
+      try { const plan = await planPlEntry(client, c); if (plan.entry) entries.push(plan.entry); else skipped.push({ eli: c.eli, reason: plan.skip }); } catch (e) { skipped.push({ eli: c.eli, ...fail(e) }); }
+    }
+    report.discovery.planned = entries.length; report.discovery.skipped = skipped;
+    report.results = await runImportQueue({ entries, client, archive, sql, dryRun, actor: 'scripts/kb-acquire.mjs' });
+    for (const r of report.results) console.log(`${String(r.status).padEnd(20)} ${r.officialNumber}${r.reason ? `: ${r.reason}` : ''}`);
   } else if (jurisdiction === 'AT') {
     const found = await discoverAtChanges(risClient(), { from: new Date(Date.now() - 35 * 86_400_000).toISOString().slice(0, 10), to: today });
     report.discovery = { changedDocuments: found.length };
@@ -95,6 +110,7 @@ try {
 }
 await sql?.end();
 const n = (s) => report.results.filter((r) => r.status === s).length;
-console.log(`\n${n('IMPORTED')} imported, ${n('UNCHANGED')} unchanged, ${n('DRY_RUN')} dry-run, ${report.results.filter((r) => !['IMPORTED', 'UNCHANGED', 'DRY_RUN'].includes(r.status)).length} not acquired.`);
+const OK_STATES = ['IMPORTED', 'UNCHANGED', 'DRY_RUN', 'STORED', 'DUPLICATE_IN_QUEUE'];
+console.log(`\n${n('IMPORTED')} imported, ${n('UNCHANGED')} unchanged, ${n('DRY_RUN')} dry-run, ${report.results.filter((r) => !OK_STATES.includes(r.status)).length} not acquired.`);
 if (value('--report')) writeFileSync(value('--report'), `${JSON.stringify(report, null, 1)}\n`);
-if (report.results.some((r) => ['FAILED', 'TRANSIENT_EXHAUSTED', 'ROBOTS_UNAVAILABLE', 'WAF_BLOCKED', 'RATE_LIMITED', 'NETWORK_ERROR', 'ROBOTS_DISALLOWED', 'PERMANENT_HTTP'].includes(r.status))) process.exitCode = 1;
+if (report.results.some((r) => !OK_STATES.includes(r.status))) process.exitCode = 1;

@@ -86,6 +86,13 @@ export const legalSources = Object.freeze([
     reuse: { status: 'UNKNOWN', basis: 'To confirm.', termsUrl: null }, check: { status: 'NOT_CHECKED' },
   }),
   S({
+    id: 'pl-sejm-eli', jurisdiction: 'PL', name: 'ELI API of the Polish Sejm (official legal acts: Dziennik Ustaw, Monitor Polski)', kind: 'LEGISLATION_DATABASE',
+    domains: ['api.sejm.gov.pl'], categories: LAW, topics: ALL, languages: ['pl'],
+    authenticity: 'Dz.U./M.P. publication via the Sejm ELI API (OpenAPI 3.0.3, https://api.sejm.gov.pl/eli/openapi, documentation https://api.sejm.gov.pl/eli.html, retrieved 2026-11-09, sha256 c37b3a5a15489c7469b55508cd845fb556d4f494b8e63cfb88b263cb32352244).',
+    reuse: { status: 'PERMITTED', basis: 'Normative acts are not subject to copyright, art. 4 ustawy o prawie autorskim (to confirm by advocate); the API documentation states no further restriction.', termsUrl: 'https://api.sejm.gov.pl/eli.html' },
+    check: { status: 'REACHABLE', checkedOn: CHECKED_ON, note: 'API documented and answering; robots.txt of api.sejm.gov.pl answers an HTML "Request Rejected" page from the sandbox (no rules readable).' },
+  }),
+  S({
     id: 'pl-isap', jurisdiction: 'PL', name: 'ISAP (Kancelaria Sejmu) / Dziennik Ustaw', kind: 'LEGISLATION_DATABASE',
     domains: ['isap.sejm.gov.pl', 'dziennikustaw.gov.pl'], categories: LAW, topics: ALL, languages: ['pl'],
     reuse: { status: 'PERMITTED', basis: 'Normative acts are not subject to copyright, art. 4 ustawy o prawie autorskim (to confirm by advocate).', termsUrl: null },

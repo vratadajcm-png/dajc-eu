@@ -83,7 +83,7 @@ describe('coverage statuses are never optimistic', () => {
   });
 
   it('calls a source unavailable on robots.txt evidence, but not for a refusal seen only from the sandbox', () => {
-    const results = (outcome: string) => [{ domain: 'isap.sejm.gov.pl', outcome }, { domain: 'dziennikustaw.gov.pl', outcome }];
+    const results = (outcome: string) => [{ domain: 'isap.sejm.gov.pl', outcome }, { domain: 'dziennikustaw.gov.pl', outcome }, { domain: 'api.sejm.gov.pl', outcome }];
     expect(cell(build({ sourceChecks: { environment: 'DAJC development sandbox', results: results('ROBOTS_RESTRICTED') } }), 'PL', 'C.escorts').status).toBe('SOURCE_UNAVAILABLE');
     const sandbox = cell(build({ sourceChecks: { environment: 'DAJC development sandbox', results: results('BLOCKED_FROM_DEV') } }), 'PL', 'C.escorts');
     expect(sandbox.status).toBe('NOT_YET_RESEARCHED');
