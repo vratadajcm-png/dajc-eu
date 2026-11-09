@@ -38,8 +38,10 @@ if (!dbUrl) throw new Error('DAJC_KB_AI_VERIFIER_DB_URL is not set (role dajc_kb
 const manifest = JSON.parse(readFileSync(value('--manifest') || 'config/legal-library/manifest.json', 'utf8'));
 const verification = JSON.parse(readFileSync(value('--verification') || 'config/legal-library/verification.json', 'utf8'));
 const entries = manifest.entries.filter((e) => (!value('--source') || e.sourceId === value('--source'))
-  && (!value('--only') || e.officialNumber === value('--only')) && (!value('--lang') || e.version.language === value('--lang')))
-  .slice(0, value('--max-versions') ? Number(value('--max-versions')) : undefined);
+  && (!value('--only') || e.officialNumber === value('--only')) && (!value('--lang') || e.version.language === value('--lang')));
+// At most this many versions are processed (skipped ones do not count): each needs official downloads.
+const maxVersions = value('--max-versions') ? Number(value('--max-versions')) : Infinity;
+let processed = 0;
 if (entries.length === 0) throw new Error('no manifest entry matches the filters');
 const online = flag('--online');
 const archive = env.DAJC_KB_ARCHIVE ? archiveFromEnv() : null;
@@ -68,6 +70,7 @@ const search = (input) => searchLibrary(postgresQuery(sql), input);
 const report = [];
 let estimateTotal = 0;
 for (const entry of entries) {
+  if (processed >= maxVersions) break;
   const name = `${entry.officialNumber} [${entry.version.language}]`;
   const line = { name, officialNumber: entry.officialNumber, language: entry.version.language };
   try {
@@ -85,6 +88,7 @@ for (const entry of entries) {
       console.log(`SKIP     ${name}: ${row.provenance} (unchanged content; --reverify to check again)`);
       continue;
     }
+    processed++;
     const stored = await readVersionForVerification(sql, row.id);
     if (flag('--estimate')) {
       const citable = stored.provisions.filter((p) => ['ARTICLE', 'SECTION', 'ANNEX'].includes(p.anchor_type));

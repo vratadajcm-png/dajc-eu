@@ -77,7 +77,7 @@ jobs:
             echo "::error::Environment secret DAJC_KB_DEV_IMPORT_DB_URL of the environment kb-import-dev is not set (Neon branch dev, role dajc_kb_importer)."
             exit 1
           fi
-          set -- --source eu-eurlex --expect-role dajc_kb_importer --expect-environment dev
+          set -- --source eu-eurlex --expect-role dajc_kb_importer --expect-environment dev --report "$RUNNER_TEMP/kb-import.json"
           if [ -n "$ONLY" ]; then set -- "$@" --only "$ONLY"; fi
           node scripts/kb-import.mjs "$@"
 
@@ -91,7 +91,9 @@ jobs:
           DAJC_KB_ARCHIVE: local:${{ runner.temp }}/kb-archive
           ONLY: ${{ inputs.only }}
         run: |
-          set -- --source eu-eurlex --online --expect-role dajc_kb_importer --expect-environment dev --report "$RUNNER_TEMP/kb-verification.json"
+          # Only the versions imported in this run: each official download is one more request to EUR-Lex
+          # (crawl delay, bot protection); versions stored earlier were verified when they were imported.
+          set -- --source eu-eurlex --online --expect-role dajc_kb_importer --expect-environment dev --report "$RUNNER_TEMP/kb-verification.json" --entries-from "$RUNNER_TEMP/kb-import.json"
           if [ -n "$ONLY" ]; then set -- "$@" --only "$ONLY"; fi
           node scripts/kb-verify.mjs "$@"
 

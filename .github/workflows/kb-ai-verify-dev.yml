@@ -39,6 +39,10 @@ on:
         description: 'Verify AI_VERIFIED versions again'
         required: false
         type: boolean
+      max_versions:
+        description: 'At most this many versions per run (each needs official downloads; default 20)'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -86,12 +90,13 @@ jobs:
           DAJC_KB_AI_RUN_BUDGET_USD: ${{ inputs.budget_usd || vars.DAJC_KB_AI_RUN_BUDGET_USD || '12' }}
           ONLY: ${{ inputs.only }}
           REVERIFY: ${{ inputs.reverify }}
+          MAX_VERSIONS: ${{ inputs.max_versions || vars.DAJC_KB_AI_MAX_VERSIONS || '20' }}
         run: |
           if [ -z "$DAJC_KB_AI_VERIFIER_DB_URL" ]; then
             echo "::error::Environment secret DAJC_KB_DEV_AI_VERIFIER_DB_URL of the environment kb-ai-verify-dev is not set (Neon branch dev, role dajc_kb_ai_verifier)."
             exit 1
           fi
-          set -- --source eu-eurlex --online --expect-role dajc_kb_ai_verifier --expect-environment dev --report "$RUNNER_TEMP/kb-ai-verification.json"
+          set -- --source eu-eurlex --online --expect-role dajc_kb_ai_verifier --expect-environment dev --report "$RUNNER_TEMP/kb-ai-verification.json" --max-versions "$MAX_VERSIONS"
           if [ -n "$ONLY" ]; then set -- "$@" --only "$ONLY"; fi
           if [ "$REVERIFY" = "true" ]; then set -- "$@" --reverify; fi
           node scripts/kb-ai-verify.mjs "$@"

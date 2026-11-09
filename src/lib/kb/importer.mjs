@@ -67,6 +67,14 @@ export function reuseAllowed(source) {
   return source?.reuse?.status === 'PERMITTED' || source?.reuse?.status === 'PERMITTED_WITH_ATTRIBUTION';
 }
 
+/** The publisher refused automated access for now (challenge or rate limit). */
+export class SourceChallenge extends Error {
+  constructor(url, reason) {
+    super(`${new URL(url).host} answered with ${reason}; not circumvented, retry later`);
+    this.name = 'SourceChallenge';
+  }
+}
+
 let sharedRobots = null;
 /** The process-wide robots.txt policy of the library (one cache and pace per host). */
 export function officialRobots() {
@@ -88,6 +96,13 @@ export async function fetchOfficialBytes(url, { fetchImpl = globalThis.fetch, ma
   for (let hop = 0; hop <= maxRedirects; hop++) {
     if (robots) await robots.admit(current);
     const res = await fetchImpl(current, { redirect: 'manual', signal, headers: { 'user-agent': USER_AGENT, accept: 'application/pdf,*/*;q=0.5' } });
+    // A bot challenge (e.g. AWS WAF on EUR-Lex) or a rate limit: stop asking this host for the run.
+    const waf = res.headers.get('x-amzn-waf-action');
+    if (waf || res.status === 429 || (res.status === 202 && Number(res.headers.get('content-length') || 0) === 0)) {
+      const reason = waf ? `bot challenge (${waf})` : res.status === 429 ? 'rate limited (HTTP 429)' : 'HTTP 202 without content';
+      if (robots) await robots.block(current, `${reason}; not circumvented, retry later`);
+      throw new SourceChallenge(current, reason);
+    }
     if (res.status >= 300 && res.status < 400 && res.headers.get('location')) {
       const next = new URL(res.headers.get('location'), current).toString();
       if (legalSourceForUrl(next)?.id !== source.id) throw new Error('redirect left the registered source');

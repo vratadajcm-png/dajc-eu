@@ -3,7 +3,7 @@
 // DAJC legal library (docs/DAJC_AI_LEGAL_LIBRARY.md).
 //
 //   DAJC_KB_IMPORT_DB_URL=... DAJC_KB_ARCHIVE=local:/path node scripts/kb-import.mjs [--source eu-eurlex] [--only <officialNumber>] [--lang cs] [--dry-run]
-//       [--expect-role dajc_kb_importer] [--expect-environment dev]
+//       [--expect-role dajc_kb_importer] [--expect-environment dev] [--report import.json] [--refetch]
 //
 // The database URL (dajc_kb_importer) and archive credentials come from the
 // environment only and are never printed: in GitHub Actions their parts are
@@ -13,7 +13,7 @@
 // differs (src/lib/kb/db-guard.mjs). --dry-run downloads and checks without
 // writing to the database.
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { archiveFromEnv, MemoryArchive } from '../src/lib/kb/archive.mjs';
 import { assertDatabaseTarget, maskInGitHubActions, redact } from '../src/lib/kb/db-guard.mjs';
 import { fetchOfficialBytes, prepareVersion, writeVersion } from '../src/lib/kb/importer.mjs';
@@ -49,9 +49,25 @@ if (!dryRun) {
 }
 
 let failed = 0;
+const report = [];
 for (const entry of entries) {
   const name = `${entry.officialNumber} [${entry.version.language}]`;
+  const line = { officialNumber: entry.officialNumber, language: entry.version.language, url: entry.version.url };
   try {
+    // Delta import: an official URL already stored for this document and language
+    // is not downloaded again (its content is fixed; the monitor and the
+    // verifiers re-check it). --refetch downloads everything.
+    if (sql && !flag('--refetch')) {
+      const [stored] = await sql`
+        select dv.id from dajc_kb.document_versions dv join dajc_kb.documents d on d.id = dv.document_id
+        where d.jurisdiction = ${entry.jurisdiction} and d.official_number = ${entry.officialNumber} and dv.language = ${entry.version.language}
+          and dv.official_url = ${entry.version.url}`;
+      if (stored) {
+        report.push({ ...line, status: 'STORED', versionId: stored.id });
+        console.log(`STORED    ${name}: already stored, not downloaded again; version ${stored.id}`);
+        continue;
+      }
+    }
     const download = await fetchOfficialBytes(entry.version.url);
     const prepared = await prepareVersion(entry, download, { archive });
     const counts = `${prepared.version.pageCount} pages, ${prepared.provisions.length} provisions, ${prepared.version.textExtraction}, ${prepared.version.provenance}`;
@@ -60,11 +76,16 @@ for (const entry of entries) {
       continue;
     }
     const result = await writeVersion(sql, prepared, { actor: 'scripts/kb-import.mjs' });
+    report.push({ ...line, status: result.status, versionId: result.versionId, sha256: prepared.version.sha256 });
     console.log(`${result.status.padEnd(9)} ${name}: ${counts}; version ${result.versionId}; sha256 ${prepared.version.sha256}${result.superseded?.length ? `; superseded ${result.superseded.length}` : ''}`);
   } catch (error) {
     failed++;
+    report.push({ ...line, status: 'FAILED', reason: redact(error?.message || error, dbUrl).slice(0, 300) });
     console.error(`FAILED   ${name}: ${redact(error?.message || error, dbUrl).slice(0, 300)}`);
   }
 }
 await sql?.end();
+const count = (s) => report.filter((r) => r.status === s).length;
+console.log(`\n${count('IMPORTED')} imported, ${count('UNCHANGED')} unchanged, ${count('STORED')} already stored, ${failed} failed.`);
+if (value('--report')) writeFileSync(value('--report'), `${JSON.stringify({ importedOn: new Date().toISOString(), results: report }, null, 1)}\n`);
 process.exitCode = failed ? 1 : 0;

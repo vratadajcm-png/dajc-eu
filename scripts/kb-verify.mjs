@@ -3,7 +3,7 @@
 //
 //   DAJC_KB_VERIFY_DB_URL=... [DAJC_KB_ARCHIVE=local:/path] node scripts/kb-verify.mjs
 //       [--source eu-eurlex] [--only <officialNumber>] [--lang cs] [--online] [--date YYYY-MM-DD]
-//       [--expect-role dajc_kb_importer] [--expect-environment dev] [--report report.json]
+//       [--expect-role dajc_kb_importer] [--expect-environment dev] [--report report.json] [--entries-from import.json]
 //
 // For every manifest entry: catalogue, source, validity, integrity, content,
 // search and citation checks (src/lib/kb/verify.mjs). --online also downloads
@@ -33,6 +33,16 @@ const searchChecks = verification.checks;
 const modelSources = verification.modelSources;
 const entries = manifest.entries.filter((e) => (!value('--source') || e.sourceId === value('--source'))
   && (!value('--only') || e.officialNumber === value('--only')) && (!value('--lang') || e.version.language === value('--lang')));
+// --entries-from <import report>: only the versions imported in that run (the others were verified when imported).
+if (value('--entries-from')) {
+  const imported = new Set(JSON.parse(readFileSync(value('--entries-from'), 'utf8')).results
+    .filter((r) => r.status === 'IMPORTED').map((r) => `${r.officialNumber}|${r.language}`));
+  entries.splice(0, entries.length, ...entries.filter((e) => imported.has(`${e.officialNumber}|${e.version.language}`)));
+  if (entries.length === 0) {
+    console.log('nothing newly imported to verify');
+    process.exit(0);
+  }
+}
 if (entries.length === 0) throw new Error('no manifest entry matches the filters');
 const archive = process.env.DAJC_KB_ARCHIVE ? archiveFromEnv() : null;
 if (!archive && !online) throw new Error('integrity and content checks need DAJC_KB_ARCHIVE or --online');

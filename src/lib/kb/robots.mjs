@@ -99,6 +99,15 @@ export class RobotsPolicy {
     return this.hosts.get(origin);
   }
 
+  /**
+   * Stops all further requests to a host for this run: a bot challenge or a rate
+   * limit is the publisher saying "not now". It is never circumvented.
+   */
+  async block(url, reason) {
+    const state = await this.host(new URL(url).origin);
+    state.blocked = reason;
+  }
+
   /** Waits for the host's turn, or throws RobotsRefusal. */
   async admit(url) {
     const u = new URL(url);

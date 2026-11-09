@@ -220,6 +220,25 @@ database. The StVO (DE) could not be imported (see above). On Neon
 (CS) to verify compatibility; the full import into Neon runs through the
 workflow `kb-import-dev` (`DAJC_AI_NEON.md` § 4, step 6).
 
+**Second batch (2026-11-09, local, discovered on EUR-Lex):** 12 more acts in
+force with a current consolidation - Regulation (EC) No 1071/2009, Directives
+2006/22/EC, 2006/126/EC, 2008/68/EC, 2014/47/EU, 2014/45/EU, 1999/62/EC,
+2009/103/EC, 2004/54/EC, 2006/1/EC, (EU) 2015/413 and Regulation (EU)
+2020/1056 - in cs/de/en/pl/sk (60 manifest entries). Imported locally as
+`dajc_kb_importer`: **51 new versions** (all with a text layer, AUTO_CHECKED),
+71 of 80 manifest versions stored; the offline verification (archived
+originals, re-extraction, catalogue, citations) passes for all 71. The other
+9 (2006/1/EC de/en/pl/sk, (EU) 2015/413 all languages) were **not imported**:
+after about 100 downloads that day, EUR-Lex's CloudFront answered the
+development sandbox with an AWS WAF bot challenge (`x-amzn-waf-action:
+challenge`, HTTP 202, no content). The importer refused the non-PDF answer; the
+challenge was not circumvented. Since then a challenge or HTTP 429 stops every
+further request to that host for the run, imports skip versions already stored
+(delta import), and the import workflow verifies online only what it imported.
+Three candidates have no consolidated version on EUR-Lex (2002/15/EC, (EU)
+2020/1057, (EU) 2022/2561) and stay SOURCE_CONFIRMED until their dates of
+application are checked.
+
 ### 5a. Verification of every imported version
 
 `scripts/kb-verify.mjs` (read-only; logic in `src/lib/kb/verify.mjs`, plan in

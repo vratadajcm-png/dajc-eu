@@ -59,3 +59,22 @@ describe('robots policy per host', () => {
     await expect(new RobotsPolicy({ ...opts, fetchImpl: respond(404) as any }).admit('https://example.gov/law.pdf')).resolves.toMatchObject({ allowed: true });
   });
 });
+
+describe('a bot challenge stops the run for that host', () => {
+  it('refuses the challenge page and sends no further request to the host', async () => {
+    const { fetchOfficialBytes } = await import('../importer.mjs');
+    const robots = new RobotsPolicy({ userAgent: USER_AGENT, fetchImpl: (async () => new Response(EURLEX, { status: 200 })) as any, sleep: async () => undefined });
+    let documentRequests = 0;
+    const challenged = (async () => {
+      documentRequests++;
+      return new Response('', { status: 202, headers: { 'x-amzn-waf-action': 'challenge', 'content-length': '0' } });
+    }) as any;
+    const url = 'https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:02015L0413-20250119';
+    await expect(fetchOfficialBytes(url, { fetchImpl: challenged, robots })).rejects.toThrow(/bot challenge \(challenge\); not circumvented, retry later/);
+    await expect(fetchOfficialBytes(url.replace('EN', 'CS'), { fetchImpl: challenged, robots })).rejects.toThrow(/does not allow this download/);
+    expect(documentRequests).toBe(1);
+    const limited = (async () => new Response('', { status: 429 })) as any;
+    const other = new RobotsPolicy({ userAgent: USER_AGENT, fetchImpl: (async () => new Response('', { status: 404 })) as any, sleep: async () => undefined });
+    await expect(fetchOfficialBytes(url, { fetchImpl: limited, robots: other })).rejects.toThrow(/rate limited/);
+  });
+});
