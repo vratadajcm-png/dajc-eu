@@ -1,18 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import MarketResearchForm from '../components/MarketResearchForm.astro';
+import ProductFeatureCatalogue from '../components/ProductFeatureCatalogue.astro';
 ---
 <BaseLayout
   title="DAJC TAR | Tow, Assistance & Recovery Coordination"
-  description="Discover the proposed DAJC TAR product for towing, roadside assistance and heavy recovery operators: one coordinated case from incident intake through dispatch, evidence and billing. Share your industry feedback."
+  description="DAJC TAR: the complete Tow, Assistance & Recovery operational product. Explore incident intake, mixed fleet dispatch, technical recovery, partner networks, documentation and billing."
 >
   <main class="product-page">
     <section class="hero">
       <p class="eyebrow">DAJC TAR · TOW, ASSISTANCE & RECOVERY</p>
       <h1>One incident.<br /><em>One recovery process.</em></h1>
-      <p class="lead">Roadside assistance and recovery involve fast decisions, different vehicles, multiple partners and extensive documentation. DAJC TAR is being designed as one operational product for towing, assistance and recovery — from first incident report to final settlement.</p>
-      <p class="status"><strong>Research & product development.</strong> DAJC TAR is not a live emergency, roadside assistance or towing service. No provider coverage, insurer integration, dispatch availability or launch date is guaranteed.</p>
-      <a class="button" href="#research">Share your industry feedback</a>
+      <p class="lead">DAJC TAR connects towing, roadside assistance and heavy recovery in one complete operational product. A single Recovery Passport brings together incident intake, dispatch, mixed fleets, partner communication, work at the scene, documentation and final settlement.</p>
+      <p class="status"><strong>Product status: in development.</strong> The page describes the complete DAJC TAR product. It is not currently a live emergency, towing or assistance service, and the described external connections are not automatically available.</p>
+      <a class="button" href="#capabilities">Discover every product function</a>
     </section>
 
     <section aria-labelledby="audience-title">
@@ -38,9 +39,9 @@ import MarketResearchForm from '../components/MarketResearchForm.astro';
     </section>
 
     <section aria-labelledby="solution-title">
-      <p class="eyebrow">THE PROPOSED SOLUTION</p>
+      <p class="eyebrow">HOW DAJC TAR WORKS</p>
       <h2 id="solution-title">One Recovery Passport for the entire case.</h2>
-      <p class="section-lead">DAJC TAR aims to connect the operational record across dispatch, field teams, authorised partners and billing. A mixed recovery fleet is managed within one provider organisation — not split into separate towing and recovery products.</p>
+      <p class="section-lead">DAJC TAR connects dispatch, field teams, authorised partners and billing through the same Recovery Passport. Light and heavy tow trucks, rotators, cranes and service vans belong to one provider organisation and shared dispatch — not artificially separated businesses.</p>
       <div class="steps">
         <article><span>01</span><div><h3>Capture the incident</h3><p>Record the location, vehicle, incident details and source of the request in one case.</p></div></article>
         <article><span>02</span><div><h3>Dispatch the right resources</h3><p>Support assignment of the appropriate crew, vehicle and equipment, including heavy recovery operations.</p></div></article>
@@ -50,11 +51,11 @@ import MarketResearchForm from '../components/MarketResearchForm.astro';
     </section>
 
     <section class="scenario" aria-labelledby="example-title">
-      <p class="eyebrow">ILLUSTRATIVE USE CASE</p>
+      <p class="eyebrow">PRODUCT WORKFLOW EXAMPLE</p>
       <h2 id="example-title">A disabled truck requires heavy recovery and an additional service crew.</h2>
       <div class="compare">
         <article><span>COMMON WORKFLOW TODAY</span><p>The operator may coordinate a call centre, a heavy truck, a technician and documentation through multiple channels, then reconcile the records after the job.</p></article>
-        <article><span>WITH DAJC TAR · INTENDED WORKFLOW</span><p>One case could connect the initial request, dispatched resources, field documentation, partner updates and final cost evidence, with access restricted by role.</p></article>
+        <article><span>WITH THE COMPLETE DAJC TAR PRODUCT</span><p>One case could connect the initial request, dispatched resources, field documentation, partner updates and final cost evidence, with access restricted by role.</p></article>
       </div>
       <p class="small">Illustrative workflow only. DAJC TAR is not an emergency-response service. In an actual emergency, contact the competent emergency services (112 in the EU where applicable).</p>
     </section>
@@ -66,6 +67,7 @@ import MarketResearchForm from '../components/MarketResearchForm.astro';
       <p>The central question is not whether every company should replace its current tools. It is where a shared workflow would create real value alongside them.</p>
     </section>
 
+    <ProductFeatureCatalogue product="tar" />
     <MarketResearchForm product="tar" />
   </main>
 </BaseLayout>
