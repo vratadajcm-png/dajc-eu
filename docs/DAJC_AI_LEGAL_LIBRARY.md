@@ -438,4 +438,4 @@ SHA-256), older legal versions are superseded, never rewritten.
 | HR | Narodne novine sitemaps + ELI → JSON-LD, 3 req/s serial | discovery client implemented; **no import**: reuse terms not verified |
 
 HTTP failures are classified: `ROBOTS_DISALLOWED`, `ROBOTS_UNAVAILABLE` (temporary),
-`PERMANENT_HTTP`, `TRANSIENT_EXHAUSTED` (e.g. a persistent 503), `CHALLENGE`.
+`PERMANENT_HTTP`, `TRANSIENT_EXHAUSTED` (e.g. a persistent 503), `WAF_BLOCKED`.

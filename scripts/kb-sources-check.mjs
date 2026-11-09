@@ -19,6 +19,7 @@
 // robots.txt again at download time (src/lib/kb/robots.mjs).
 
 import { writeFileSync } from 'node:fs';
+import { classifyHttp } from '../src/lib/kb/acquire/outcomes.mjs';
 import { USER_AGENT } from '../src/lib/kb/importer.mjs';
 import { legalSources } from '../src/lib/kb/legal-sources.mjs';
 import { parseRobots, robotsDecision } from '../src/lib/kb/robots.mjs';
@@ -31,9 +32,9 @@ async function get(url) {
   try {
     const res = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(20_000), headers: { 'user-agent': USER_AGENT } });
     const body = (await res.text()).slice(0, 300_000);
-    return { status: res.status, body, finalHost: new URL(res.url).host };
+    return { status: res.status, body, finalHost: new URL(res.url).host, classification: classifyHttp(res.status, res.headers, body.length === 0 ? 0 : null), retrievedAt: new Date().toISOString() };
   } catch (error) {
-    return { status: null, error: String(error?.cause?.code || error?.name || 'error') };
+    return { status: null, error: String(error?.cause?.code || error?.name || 'error'), classification: 'NETWORK_ERROR', retrievedAt: new Date().toISOString() };
   }
 }
 
@@ -62,12 +63,17 @@ for (const source of legalSources) {
     const outcome = home.status === null ? 'UNREACHABLE'
       : [403, 429].includes(home.status) || home.status >= 500 ? 'BLOCKED_FROM_DEV'
         : robots.rootAllowed === false ? 'ROBOTS_RESTRICTED' : 'REACHABLE';
-    results.push({ sourceId: source.id, jurisdiction: source.jurisdiction, region: source.region ?? null, domain, origin, home: { status: home.status, error: home.error ?? null }, robots, outcome });
+    const classification = home.classification !== 'OK' ? home.classification
+      : robots.rootAllowed === false ? 'ROBOTS_DISALLOWED'
+        : robotsRes.classification === 'HTTP_ERROR' && robotsRes.status >= 500 ? 'ROBOTS_UNAVAILABLE'
+          : robotsRes.classification === 'NETWORK_ERROR' ? 'ROBOTS_UNAVAILABLE' : 'OK';
+    results.push({ sourceId: source.id, jurisdiction: source.jurisdiction, region: source.region ?? null, domain, origin, home: { status: home.status, error: home.error ?? null, classification: home.classification, retrievedAt: home.retrievedAt }, robots: { ...robots, classification: robotsRes.classification, retrievedAt: robotsRes.retrievedAt }, outcome, classification });
     console.log(`${outcome.padEnd(18)} ${source.jurisdiction}${source.region ? `/${source.region}` : ''} ${domain} (home ${home.status ?? home.error}, robots ${robots.status ?? '-'}${robots.crawlDelaySec != null ? `, delay ${robots.crawlDelaySec}s` : ''})`);
     await new Promise((resolve) => setTimeout(resolve, 1_000));
   }
 }
 const summary = Object.fromEntries(['REACHABLE', 'ROBOTS_RESTRICTED', 'BLOCKED_FROM_DEV', 'UNREACHABLE'].map((k) => [k, results.filter((r) => r.outcome === k).length]));
+summary.byClassification = Object.fromEntries([...new Set(results.map((r) => r.classification))].map((k) => [k, results.filter((r) => r.classification === k).length]));
 writeFileSync(out, `${JSON.stringify({
   $comment: 'Reachability and robots.txt of the registered official legal sources, checked by scripts/kb-sources-check.mjs from the environment named here. Not a statement about reuse terms.',
   checkedOn, environment: process.env.GITHUB_ACTIONS === 'true' ? 'GitHub Actions runner' : 'DAJC development sandbox (Claude Code, egress through a proxy)', userAgent: USER_AGENT, summary, results,

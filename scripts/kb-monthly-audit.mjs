@@ -26,6 +26,8 @@ import { GII_TOC_URL, parseGiiToc, selectDeLaws } from '../src/lib/kb/acquire/de
 import { discoverAtChanges, risClient } from '../src/lib/kb/acquire/at-ris.mjs';
 import { discoverHrChanges, nnClient } from '../src/lib/kb/acquire/hr-nn.mjs';
 import { dajcEuropeCoverage } from '../config/europe-coverage.mjs';
+import { classifyError } from '../src/lib/kb/acquire/outcomes.mjs';
+import { legalSources } from '../src/lib/kb/legal-sources.mjs';
 
 const args = process.argv.slice(2);
 const report = args.includes('--report') ? args[args.indexOf('--report') + 1] : null;
@@ -62,7 +64,7 @@ for (const [code, fn] of Object.entries(DISCOVERY)) {
 }
 // Catalogue-based discovery (publisher catalogues, not test documents). Outcomes are classified, never blurred.
 const catalogue = {};
-const classify = (e) => ({ outcome: e.kind ?? 'FAILED', reason: String(e.message).slice(0, 200) });
+const classify = (e) => ({ outcome: classifyError(e), reason: String(e.message).slice(0, 200) });
 try {
   const toc = parseGiiToc(new TextDecoder().decode((await new PoliteClient({ minIntervalMs: 1500 }).get(GII_TOC_URL)).bytes));
   const laws = selectDeLaws(toc);
@@ -80,6 +82,23 @@ const unreadable = monitor?.results?.filter((r) => r.outcome === 'UNREADABLE').m
 if (unreadable.length) failures.push(`EURLEX_UNREADABLE: ${unreadable.join(', ')}`);
 const problems = [...connectorProblems(), ...accessRegisterProblems()];
 const matrix = connectorMatrix();
+const jurisdictions = dajcEuropeCoverage.map(([code, name]) => {
+  const own = connectors.filter((c) => c.jurisdiction === code);
+  const ownProbes = probeResults.filter((r) => own.some((c) => c.id === r.id));
+  const sourceChecks = (sources?.results ?? []).filter((r) => r.jurisdiction === code);
+  return {
+    jurisdiction: code, name,
+    connectors: own.map((c) => ({ id: c.id, status: c.status, format: c.format, kind: c.kind })),
+    registeredSources: legalSources.filter((x) => x.jurisdiction === code).map((x) => x.id),
+    sourceAvailability: sourceChecks.map((r) => ({ sourceId: r.sourceId, domain: r.domain, classification: r.classification, homeStatus: r.home?.status ?? null, homeError: r.home?.error ?? null, robotsStatus: r.robots?.status ?? null, robotsRootAllowed: r.robots?.rootAllowed ?? null, crawlDelaySec: r.robots?.crawlDelaySec ?? null, retrievedAt: r.home?.retrievedAt ?? null })),
+    acquisitionProofs: ownProbes.map((r) => ({ id: r.id, url: r.url, outcome: r.outcome, classification: r.classification ?? null, status: r.status ?? null, bytes: r.bytes ?? null, sha256: r.sha256 ?? null, retrievedAt: r.retrievedAt, reason: r.reason ?? null })),
+    catalogueDiscovery: catalogue[code] ?? { outcome: 'NOT_IMPLEMENTED' },
+    regressions: regressions.filter((r) => r.jurisdiction === code),
+    documentChanges: delta.filter((d) => d.jurisdiction === code),
+    status: proven.has(code) || catalogue[code]?.outcome === 'OK' ? 'PARTIAL_EVIDENCE' : 'NOT_VERIFIED',
+    note: 'An unreadable source is never evidence that legislation is unchanged.',
+  };
+});
 const out = {
   auditedOn: new Date().toISOString().slice(0, 10),
   note: 'Monthly interval: a change may be caught up to a month after publication.',
@@ -96,6 +115,11 @@ const out = {
   discoveryImplementedFor: [...new Set([...Object.keys(DISCOVERY), ...Object.entries(catalogue).filter(([, v]) => v.outcome === 'OK').map(([k]) => k)])],
   discoveryNotImplementedFor: dajcEuropeCoverage.map(([c]) => c).filter((c) => !(c in DISCOVERY) && catalogue[c]?.outcome !== 'OK'),
   jurisdictionsWithoutProvenAcquisition: dajcEuropeCoverage.map(([c]) => c).filter((c) => !proven.has(c)),
+  environment: process.env.GITHUB_ACTIONS === 'true' ? 'GitHub Actions runner' : 'local or sandbox',
+  runUrl: process.env.GITHUB_RUN_ID ? `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}` : null,
+  sourceCheckSummary: sources?.summary ?? null,
+  eurLex: monitor ?? null,
+  jurisdictions,
   accessRegister: loadAccessRegister().available ? 'AVAILABLE' : 'PRIVATE_REGISTER_NOT_CONFIGURED',
   failures,
   complete: false,

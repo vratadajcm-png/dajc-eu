@@ -7,6 +7,7 @@
 
 import { createHash } from 'node:crypto';
 import { USER_AGENT } from './importer.mjs';
+import { classifyHttp } from './acquire/outcomes.mjs';
 import { RobotsPolicy } from './robots.mjs';
 
 export const PROBE_MAX_BYTES = 40 * 1024 * 1024;
@@ -39,7 +40,7 @@ export async function runProbe(probe, { robots = new RobotsPolicy({ userAgent: U
   try {
     let current = probe.url;
     for (let hop = 0; hop < 5; hop++) {
-      try { await robots.admit(current); } catch (e) { return { ...base, outcome: 'ROBOTS_REFUSED', reason: String(e.message).slice(0, 160) }; }
+      try { await robots.admit(current); } catch (e) { const temporary = /HTTP 5\d\d for robots\.txt|robots\.txt not readable/.test(String(e.message)); return { ...base, outcome: 'ROBOTS_REFUSED', classification: temporary ? 'ROBOTS_UNAVAILABLE' : 'ROBOTS_DISALLOWED', reason: String(e.message).slice(0, 160) }; }
       const res = await fetchImpl(current, { redirect: 'manual', signal: AbortSignal.timeout(90_000), headers: { 'user-agent': USER_AGENT, accept: '*/*' } });
       if (res.status >= 300 && res.status < 400 && res.headers.get('location')) {
         const next = new URL(res.headers.get('location'), current);
@@ -47,17 +48,17 @@ export async function runProbe(probe, { robots = new RobotsPolicy({ userAgent: U
         current = next.toString();
         continue;
       }
-      if (!res.ok) return { ...base, outcome: 'HTTP_ERROR', status: res.status };
+      if (!res.ok || classifyHttp(res.status, res.headers) === 'WAF_BLOCKED') return { ...base, outcome: 'HTTP_ERROR', classification: classifyHttp(res.status, res.headers), status: res.status };
       const buf = new Uint8Array(await res.arrayBuffer());
       if (buf.length > PROBE_MAX_BYTES) return { ...base, outcome: 'HTTP_ERROR', reason: 'larger than the probe limit' };
       const contentType = res.headers.get('content-type') || '';
       const text = textOf(buf, contentType).toLowerCase();
       const missing = probe.markers.filter((m) => !text.includes(m.toLowerCase()));
-      const out = { ...base, finalUrl: current, status: res.status, contentType, bytes: buf.length, sha256: createHash('sha256').update(buf).digest('hex') };
+      const out = { ...base, classification: 'OK', finalUrl: current, status: res.status, contentType, bytes: buf.length, sha256: createHash('sha256').update(buf).digest('hex') };
       return missing.length ? { ...out, outcome: 'MARKER_MISSING', missing } : { ...out, outcome: 'PROVEN' };
     }
     return { ...base, outcome: 'HTTP_ERROR', reason: 'too many redirects' };
   } catch (error) {
-    return { ...base, outcome: 'UNREACHABLE', reason: String(error?.cause?.code || error?.message || error).slice(0, 160) };
+    return { ...base, outcome: 'UNREACHABLE', classification: 'NETWORK_ERROR', reason: String(error?.cause?.code || error?.message || error).slice(0, 160) };
   }
 }

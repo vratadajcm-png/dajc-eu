@@ -78,7 +78,7 @@ describe('polite client', () => {
     await expect(refusing.get('https://x.example/a')).rejects.toMatchObject({ kind: 'ROBOTS_DISALLOWED' });
     const c = client(async () => resp(202, '', { 'x-amzn-waf-action': 'challenge' }));
     await expect(c.get('https://x.example/a')).rejects.toBeInstanceOf(AcquireError);
-    await expect(c.get('https://x.example/b')).rejects.toMatchObject({ kind: 'CHALLENGE' });
+    await expect(c.get('https://x.example/b')).rejects.toMatchObject({ kind: 'WAF_BLOCKED' });
   });
   it('is serial and paced: 0.5 req/s for AT, 3 req/s for HR', async () => {
     expect(RIS_MIN_INTERVAL_MS).toBe(2000);

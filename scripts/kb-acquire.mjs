@@ -77,7 +77,7 @@ try {
       } catch (e) { Object.assign(line, fail(e)); }
       report.results.push(line);
       console.log(`${String(line.status).padEnd(20)} ${law.slug}${line.reason ? `: ${line.reason}` : ''}`);
-      if (line.status === 'CHALLENGE') break;
+      if (['WAF_BLOCKED', 'RATE_LIMITED'].includes(line.status)) break;
     }
   } else if (jurisdiction === 'AT') {
     const found = await discoverAtChanges(risClient(), { from: new Date(Date.now() - 35 * 86_400_000).toISOString().slice(0, 10), to: today });
@@ -97,4 +97,4 @@ await sql?.end();
 const n = (s) => report.results.filter((r) => r.status === s).length;
 console.log(`\n${n('IMPORTED')} imported, ${n('UNCHANGED')} unchanged, ${n('DRY_RUN')} dry-run, ${report.results.filter((r) => !['IMPORTED', 'UNCHANGED', 'DRY_RUN'].includes(r.status)).length} not acquired.`);
 if (value('--report')) writeFileSync(value('--report'), `${JSON.stringify(report, null, 1)}\n`);
-if (report.results.some((r) => ['FAILED', 'TRANSIENT_EXHAUSTED', 'ROBOTS_UNAVAILABLE', 'CHALLENGE', 'ROBOTS_DISALLOWED', 'PERMANENT_HTTP'].includes(r.status))) process.exitCode = 1;
+if (report.results.some((r) => ['FAILED', 'TRANSIENT_EXHAUSTED', 'ROBOTS_UNAVAILABLE', 'WAF_BLOCKED', 'RATE_LIMITED', 'NETWORK_ERROR', 'ROBOTS_DISALLOWED', 'PERMANENT_HTTP'].includes(r.status))) process.exitCode = 1;

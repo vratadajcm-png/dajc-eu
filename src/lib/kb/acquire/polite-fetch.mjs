@@ -5,7 +5,9 @@
 //   - failures are classified, never blurred:
 //       ROBOTS_DISALLOWED  permanent: the publisher forbids it for our agent
 //       PERMANENT_HTTP     401/403/404/410 and other 4xx: not retried
-//       CHALLENGE          bot challenge / 429 without a retry window: stop the host
+//       WAF_BLOCKED        bot challenge: stop the host for the run (never circumvented)
+//       RATE_LIMITED       HTTP 429 that persisted: stop the host for the run
+//       NETWORK_ERROR      DNS/TLS/timeout/reset that persisted after the retries
 //       TRANSIENT_EXHAUSTED 5xx (e.g. a temporary 503), timeouts, network errors
 //                          that persisted after the allowed retries (backoff,
 //                          Retry-After honoured): retry in a later run
@@ -74,7 +76,7 @@ export class PoliteClient {
     if (hops > 5) throw new AcquireError('PERMANENT_HTTP', 'too many redirects');
     const u = new URL(url);
     if (u.protocol !== 'https:') throw new AcquireError('PERMANENT_HTTP', 'only HTTPS is fetched');
-    if (this.blocked.has(u.host)) throw new AcquireError('CHALLENGE', `${u.host} is blocked for this run: ${this.blocked.get(u.host)}`);
+    if (this.blocked.has(u.host)) throw new AcquireError(this.blocked.get(u.host) === 'rate limited' ? 'RATE_LIMITED' : 'WAF_BLOCKED', `${u.host} is blocked for this run: ${this.blocked.get(u.host)}`);
     if (!this.authorization) await this.#admit(url);
     let lastReason = '';
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
@@ -90,7 +92,7 @@ export class PoliteClient {
       }
       if (res.headers.get('x-amzn-waf-action')) {
         this.blocked.set(u.host, 'bot challenge');
-        throw new AcquireError('CHALLENGE', `${u.host}: bot challenge, not circumvented`);
+        throw new AcquireError('WAF_BLOCKED', `${u.host}: bot challenge, not circumvented`);
       }
       if (res.status >= 300 && res.status < 400 && res.headers.get('location')) {
         const next = new URL(res.headers.get('location'), url);
@@ -106,9 +108,10 @@ export class PoliteClient {
       lastReason = `HTTP ${res.status}`;
       const retryAfter = Number(res.headers.get('retry-after'));
       const wait = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter * 1000, this.maxRetryAfterMs) : this.backoffMs * 2 ** attempt;
-      if (res.status === 429 && attempt === this.maxRetries) { this.blocked.set(u.host, 'rate limited'); throw new AcquireError('CHALLENGE', `${u.host}: rate limited (HTTP 429)`); }
+      if (res.status === 429 && attempt === this.maxRetries) { this.blocked.set(u.host, 'rate limited'); throw new AcquireError('RATE_LIMITED', `${u.host}: rate limited (HTTP 429)`); }
       await this.sleep(wait);
     }
+    if (lastReason.startsWith('network')) throw new AcquireError('NETWORK_ERROR', `${u.host}: ${lastReason} persisted after ${this.maxRetries + 1} attempts`, { reason: lastReason });
     throw new AcquireError('TRANSIENT_EXHAUSTED', `${u.host}: ${lastReason} persisted after ${this.maxRetries + 1} attempts; retry in a later run`, { reason: lastReason });
   }
 }
