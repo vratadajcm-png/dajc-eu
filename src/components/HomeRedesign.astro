@@ -56,12 +56,13 @@ const resources = [
     <div class="hero-copy">
       <p class="eyebrow">European digital coordination ecosystem</p>
       <h1 id="home-title">Connecting European <em>transport</em> and recovery operations.</h1>
-      <p class="hero-lead">DAJC Platform and DAJC TAR are two separate products in development: one for heavy and oversized transport, the other for towing, assistance and recovery. Explore their intended workflows and tell us what your company actually needs.</p>
-      <div class="platform-links hero-actions"><a class="solid-link" href="/platform">Explore DAJC Platform</a><a class="line-link" href="/tar">Explore DAJC TAR →</a><a class="line-link" href="/demo-guide">Demo walkthrough →</a></div>
-      <p class="hero-status">Demo uses synthetic data. Pre-production testing is planned for Q3 2027; this is not a commercial launch.</p>
+      <p class="hero-lead">Discover two complete DAJC product visions: a provider-neutral coordination layer for heavy and oversized transport, and one unified operational system for towing, roadside assistance and heavy recovery. See exactly how each changes existing workflows — and tell us what your company needs.</p>
+      <div class="platform-links hero-actions"><a class="solid-link" href="/platform">Explore DAJC Platform</a><a class="solid-link" href="/tar">Explore DAJC TAR</a><a class="line-link" href="/demo-guide">Demo walkthrough →</a></div>
+      <p class="hero-status">Platform pre-production testing is planned for Q3 2027; TAR remains in development. Demonstration data is synthetic; these pages are not a commercial launch.</p>
       <p class="hero-status">Built from real operations. Developed step by step. No unannounced commercial services or integrations implied.</p>
     </div>
 
+    <div class="solution-intro"><p class="eyebrow">THE DAJC PRODUCTS</p><h2>Two products. Two industries. One connected way of working.</h2><p>Explore the full capability of each product and help shape its final priorities.</p></div>
     <div class="solution-grid" aria-label="Explore DAJC solutions">
       <article class="solution-card solution-card--primary">
         <div class="solution-card__top">
@@ -70,20 +71,20 @@ const resources = [
           </span>
           <div><h2>DAJC Platform</h2><p>Heavy &amp; oversized transport coordination</p></div>
         </div>
-        <p class="solution-card__description">A provider-neutral workflow being designed to connect participants, D-ID transport context, routes, permits and documents.</p>
+        <p class="solution-card__description">The complete European coordination layer for complex transport: D-ID, cargo and fleets, route intelligence, permits, drivers, partners, proof of delivery and existing-system integrations.</p>
         <span class="solution-card__status"><i aria-hidden="true"></i>In development · Testing planned Q3 2027</span>
         <a class="solution-card__button" href="/platform">Explore Platform &amp; share feedback <span aria-hidden="true">↗</span></a>
       </article>
-      <article class="solution-card">
+      <article class="solution-card solution-card--primary">
         <div class="solution-card__top">
           <span class="solution-card__icon" aria-hidden="true">
             <svg viewBox="0 0 56 40" fill="none"><path d="M4 22h26V9H18M30 20h12l9 8v7H30V20Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 10h21M15 4v12M22 11h11" stroke="currentColor" stroke-width="2.5"/><circle cx="13" cy="34" r="5" stroke="currentColor" stroke-width="2.5"/><circle cx="42" cy="34" r="5" stroke="currentColor" stroke-width="2.5"/></svg>
           </span>
           <div><h2>DAJC TAR</h2><p>Tow, Assistance &amp; Recovery coordination</p></div>
         </div>
-        <p class="solution-card__description">One proposed product connecting incident intake, dispatch, mixed recovery fleets, field evidence, partner handovers and final settlement.</p>
-        <span class="solution-card__status solution-card__status--muted"><i aria-hidden="true"></i>Research &amp; design · Not a live service</span>
-        <a class="solution-card__button solution-card__button--outline" href="/tar">Explore DAJC TAR &amp; share feedback <span aria-hidden="true">↗</span></a>
+        <p class="solution-card__description">The complete towing, assistance and recovery workspace: one Recovery Passport for incident intake, mixed-fleet dispatch, technical recovery, field evidence, partners and billing.</p>
+        <span class="solution-card__status"><i aria-hidden="true"></i>In development · Not a live service</span>
+        <a class="solution-card__button" href="/tar">Explore DAJC TAR &amp; share feedback <span aria-hidden="true">↗</span></a>
       </article>
     </div>
     <div class="hero-meta"><span>One DAJC brand · Two distinct products: Platform and TAR</span><a href="/testing">Registration open: Testing 2027 <span aria-hidden="true">→</span></a></div>
@@ -110,6 +111,21 @@ const resources = [
       <div><span>02</span><strong>Routes, permits &amp; documents</strong><small>Relevant information in one workflow</small></div>
       <div><span>03</span><strong>Coordinated execution</strong><small>Permissioned status and handoffs</small></div>
       <p>Illustrative intended workflow. Not a claim of production availability.</p>
+    </div>
+  </section>
+
+  <section class="home-section platform-overview tar-overview" id="tar-overview" aria-labelledby="tar-overview-heading">
+    <div class="platform-overview__copy">
+      <p class="section-eyebrow">DAJC TAR · In development</p>
+      <h2 id="tar-overview-heading">From the first breakdown call to the final recovery invoice.</h2>
+      <p>DAJC TAR connects phone and partner requests, dispatch for light and heavy recovery, service vans, on-scene technical evidence, vehicle handover and billing through one Recovery Passport. One company operates its full mixed fleet in one shared workspace.</p>
+      <div class="platform-links"><a class="solid-link" href="/tar">Discover all TAR functions &amp; share feedback ↗</a></div>
+    </div>
+    <div class="workflow" aria-label="Illustrative DAJC TAR workflow">
+      <div><span>01</span><strong>Incident and Recovery Passport</strong><small>One case with original partner references</small></div>
+      <div><span>02</span><strong>Fleet, crew and specialist equipment</strong><small>One dispatch across towing and recovery</small></div>
+      <div><span>03</span><strong>Evidence and verified completion</strong><small>Technical notes, handover and billing context</small></div>
+      <p>Illustrative complete-product workflow. DAJC TAR is not a live emergency service.</p>
     </div>
   </section>
 
@@ -180,7 +196,10 @@ const resources = [
   .hero-visual {position:absolute;z-index:0;pointer-events:none;top:0;right:-1.5rem;width:min(65%,790px);height:590px;opacity:.86;}
   .hero-svg {width:100%;height:100%;object-fit:contain;}
   .hero-visual__label {position:absolute;bottom:1.7rem;right:3rem;color:#7d9db6;font: .59rem 'IBM Plex Mono',monospace;letter-spacing:.18em;white-space:nowrap;}
-  .solution-grid {position:relative;z-index:3;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.2rem;max-width:1020px;margin:clamp(3rem,5vw,4.5rem) 0 0;}
+  .solution-intro {position:relative;z-index:3;max-width:830px;margin:clamp(3rem,5vw,4.5rem) 0 0;}
+  .solution-intro h2 {margin:.4rem 0 .7rem;max-width:20ch;font:700 clamp(1.8rem,3.5vw,3rem)/1.12 'Space Grotesk',sans-serif;color:#f5f7fa;letter-spacing:-.025em;}
+  .solution-intro > p:last-child {font-size:.95rem;line-height:1.6;color:#b5c8db;}
+  .solution-grid {position:relative;z-index:3;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.2rem;max-width:1020px;margin:1.6rem 0 0;}
   .solution-card {display:flex;flex-direction:column;gap:1.15rem;padding:clamp(1.3rem,2vw,2rem);border:1px solid #49617a;border-radius:16px;background:linear-gradient(145deg,rgba(15,44,74,.96),rgba(7,26,49,.97));box-shadow:0 25px 55px rgba(0,0,0,.28);min-width:0;}
   .solution-card--primary {border-color:rgba(255,159,0,.8);background:linear-gradient(145deg,rgba(26,54,78,.98),rgba(7,26,49,.98));}
   .solution-card__top {display:flex;align-items:flex-start;gap:1rem;}
@@ -209,6 +228,7 @@ const resources = [
   .proof-grid h3 {margin:.9rem 0 .6rem;font:700 1.1rem/1.3 'Space Grotesk',sans-serif;}
   .proof-grid p {margin:0;color:#a6b8cd;font-size:.88rem;line-height:1.75;}
   .platform-overview {display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:clamp(2rem,7vw,6rem);align-items:center;border-top:1px solid rgba(124,141,166,.18);}
+  .tar-overview {border-top:1px solid rgba(124,141,166,.18);}
   .platform-overview__copy>p:not(.section-eyebrow) {color:#abc0d7;line-height:1.75;max-width:62ch;font-size:.98rem;}
   .platform-links {display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;margin-top:1.6rem;}
   .solid-link,.line-link {font:700 .75rem/1.35 'IBM Plex Mono',monospace;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:.75rem 1rem;border-radius:8px;}
