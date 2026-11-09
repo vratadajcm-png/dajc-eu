@@ -1,0 +1,92 @@
+---
+import { platformGroups, tarGroups, type ProductKey } from '../data/product-capabilities';
+interface Props { product: ProductKey }
+const { product } = Astro.props;
+const groups = product === 'platform' ? platformGroups : tarGroups;
+const count = groups.reduce((total, group) => total + group.features.length, 0);
+---
+<section class="capability-catalogue" id="capabilities" aria-labelledby="capabilities-title">
+  <div class="catalogue-heading">
+    <div>
+      <p class="eyebrow">THE COMPLETE PRODUCT · FUNCTION BY FUNCTION</p>
+      <h2 id="capabilities-title">How DAJC changes the way the work gets done.</h2>
+      <p class="intro">Explore {count} core capabilities across {groups.length} areas. For every function, see the problem in today’s workflow, how the complete DAJC product addresses it, and what happens to the software your company already uses.</p>
+    </div>
+    <a class="feedback-link" href="#research">Tell us what you would change ↓</a>
+  </div>
+  <nav class="catalogue-nav" aria-label="Jump to product feature categories">
+    {groups.map((group, index) => <a href={'#cap-' + product + '-' + index}>{String(index + 1).padStart(2, '0')} · {group.title}</a>)}
+  </nav>
+  <div class="catalogue-groups">
+    {groups.map((group, groupIndex) => (
+      <div class="catalogue-group" id={'cap-' + product + '-' + groupIndex}>
+        <div class="group-intro">
+          <p class="group-number">AREA {String(groupIndex + 1).padStart(2, '0')}</p>
+          <h3>{group.title}</h3>
+          <p>{group.summary}</p>
+        </div>
+        <div class="feature-list">
+          {group.features.map((feature, featureIndex) => (
+            <details class="feature" open={groupIndex === 0 && featureIndex === 0}>
+              <summary>
+                <span class="feature-index">{String(featureIndex + 1).padStart(2, '0')}</span>
+                <strong>{feature.title}</strong>
+                <span class="feature-chevron" aria-hidden="true">+</span>
+              </summary>
+              <div class="feature-content">
+                <div>
+                  <span class="feature-label">THE CURRENT PROBLEM</span>
+                  <p>{feature.problem}</p>
+                </div>
+                <div>
+                  <span class="feature-label feature-label--accent">HOW THE COMPLETE DAJC PRODUCT SOLVES IT</span>
+                  <p>{feature.solution}</p>
+                </div>
+                <div class="feature-compatibility">
+                  <span class="feature-label">WHAT HAPPENS TO YOUR EXISTING SOFTWARE</span>
+                  <p>{feature.systems}</p>
+                </div>
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+  <p class="catalogue-disclosure">These descriptions explain the functionality of the complete product design. They are not a statement that every capability, integration or geographic service is currently available. See the product status above for present availability.</p>
+</section>
+<style>
+  .capability-catalogue{padding:clamp(3rem,6vw,5rem) 0;border-top:1px solid var(--dajc-line);}
+  .eyebrow,.group-number,.feature-label{font:500 .72rem 'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dajc-orange);}
+  h2,h3,strong{color:var(--dajc-white);}
+  h2,h3{font-family:'Space Grotesk',sans-serif;}
+  h2{font-size:clamp(2rem,4.1vw,3rem);line-height:1.12;max-width:24ch;margin:.65rem 0 1.3rem;}
+  .catalogue-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:1.4rem;flex-wrap:wrap;}
+  .intro{color:var(--dajc-muted);max-width:74ch;line-height:1.7;font-size:1.04rem;}
+  .feedback-link{display:inline-block;color:var(--dajc-orange);font:600 .82rem 'IBM Plex Mono',monospace;text-underline-offset:4px;white-space:normal;}
+  .catalogue-nav{display:flex;gap:.6rem;flex-wrap:wrap;margin:2rem 0 3rem;}
+  .catalogue-nav a{border:1px solid var(--dajc-line);border-radius:8px;padding:.65rem .8rem;color:#d4deea;text-decoration:none;font-size:.8rem;line-height:1.5;background:rgba(255,255,255,.03);}
+  .catalogue-nav a:hover,.catalogue-nav a:focus-visible{border-color:var(--dajc-orange);color:var(--dajc-orange);}
+  .catalogue-groups{display:grid;gap:3.7rem;}
+  .catalogue-group{display:grid;grid-template-columns:minmax(0,.77fr) minmax(0,1.5fr);gap:clamp(1.5rem,4vw,3.2rem);scroll-margin-top:2rem;}
+  .group-intro h3{font-size:clamp(1.45rem,2.4vw,2rem);line-height:1.18;margin:.5rem 0 1rem;}
+  .group-intro p:not(.group-number){color:var(--dajc-muted);line-height:1.7;}
+  .feature-list{display:grid;gap:.65rem;}
+  .feature{border:1px solid var(--dajc-line);background:rgba(7,30,58,.7);border-radius:11px;overflow:hidden;}
+  .feature[open]{border-color:rgba(255,159,0,.65);background:rgba(9,32,61,.95);}
+  .feature summary{display:flex;gap:.8rem;align-items:center;padding:1rem 1.1rem;cursor:pointer;list-style:none;}
+  .feature summary::-webkit-details-marker{display:none;}
+  .feature summary:focus-visible{outline:2px solid var(--dajc-orange);outline-offset:-3px;}
+  .feature-index{font:500 .71rem 'IBM Plex Mono',monospace;color:var(--dajc-orange);}
+  .feature strong{font:600 1rem/1.45 'Space Grotesk',sans-serif;flex:1;}
+  .feature-chevron{color:var(--dajc-orange);font:400 1.4rem/1 sans-serif;}
+  .feature[open] .feature-chevron{transform:rotate(45deg);}
+  .feature-content{display:grid;gap:1.2rem;padding:0 1.25rem 1.3rem 2.8rem;}
+  .feature-label{color:#a5b8d0;font-size:.67rem;}
+  .feature-label--accent{color:var(--dajc-orange);}
+  .feature-content p{margin:.38rem 0 0;color:#d2dce8;line-height:1.75;font-size:.91rem;}
+  .feature-compatibility{padding:.95rem 1rem;border-left:3px solid #6083a0;background:rgba(0,12,28,.55);border-radius:0 8px 8px 0;}
+  .catalogue-disclosure{color:var(--dajc-muted);font-size:.78rem;line-height:1.7;margin:2rem 0 0;max-width:95ch;}
+  @media(max-width:860px){.catalogue-group{grid-template-columns:1fr;gap:1rem}.group-intro h3{max-width:38ch}.catalogue-groups{gap:3rem}}
+  @media(max-width:530px){.feature-content{padding:0 1rem 1.25rem}.feature summary{padding:1rem}.feature strong{font-size:.94rem}.catalogue-nav{gap:.45rem}}
+</style>
