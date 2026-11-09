@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS public.market_research_submissions (
   biggest_problem text NOT NULL CHECK (char_length(biggest_problem) BETWEEN 1 AND 1500),
   most_useful text NOT NULL,
   usage_interest text NOT NULL CHECK (usage_interest IN ('yes','maybe','no')),
+  payment_interest text NOT NULL DEFAULT 'maybe' CHECK (payment_interest IN ('yes','maybe','no')),
   suggestion text NOT NULL DEFAULT '',
   contact_email text,
   follow_up_allowed boolean NOT NULL DEFAULT false,
