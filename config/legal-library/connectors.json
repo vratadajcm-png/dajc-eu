@@ -1,5 +1,5 @@
 {
- "$comment": "Connector plan of the DAJC legal library. 'basis' = DECLARED_FROM_PUBLISHER_KNOWLEDGE: the publisher format and access listed here are NOT yet verified by a live check or by correspondence; status stays PLANNED until an adapter has downloaded at least one document, and a NATIONAL legal gazette is never assumed to be the same thing as the national transport-data access point (NAP). Regional and specialised transport sources (e.g. Länder, ES CAT/BAS, road authorities) are added as separate connectors per jurisdiction when found.",
+ "$comment": "Connector plan of the DAJC legal library. 'basis' = DECLARED_FROM_PUBLISHER_KNOWLEDGE: the publisher format and access listed here are NOT yet verified by a live check or by correspondence; status stays PLANNED until an adapter has downloaded at least one document, and a NATIONAL legal gazette is never assumed to be the same thing as the national transport-data access point (NAP). Regional and specialised transport sources (e.g. Länder, ES CAT/BAS, road authorities) are added as separate connectors per jurisdiction when found. 'kind' separates legal collections from transport NAPs, permit authorities and licensed data services; every connector here is a LEGAL_COLLECTION until correspondence conclusions are recorded in the PRIVATE register. Private agreements are not stored in this public repository.",
  "connectors": [
   {
    "id": "eu-eurlex-consolidated",
@@ -14,7 +14,8 @@
     "registration": "NONE_REQUIRED",
     "permission": "REUSE_TERMS_READ"
    },
-   "basis": "VERIFIED_LIVE"
+   "basis": "VERIFIED_LIVE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "de-gesetze-html-pdf",
@@ -23,13 +24,19 @@
    "baseUrl": "https://www.gesetze-im-internet.de/",
    "format": "PDF",
    "scope": "national",
-   "status": "IMPLEMENTED",
+   "status": "PLANNED",
    "adapter": "official-bytes",
    "access": {
     "registration": "NONE_REQUIRED",
     "permission": "TO_CONFIRM"
    },
-   "basis": "VERIFIED_LIVE"
+   "basis": "VERIFIED_LIVE",
+   "lastFailure": {
+    "on": "2026-11-09",
+    "outcome": "HTTP_ERROR",
+    "reason": 503
+   },
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "at-national-gazette",
@@ -44,7 +51,13 @@
     "registration": "NONE_REQUIRED",
     "permission": "TO_CONFIRM"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "lastFailure": {
+    "on": "2026-11-09",
+    "outcome": "ROBOTS_REFUSED",
+    "reason": "robots.txt of data.bka.gv.at does not allow this download (disallowed)"
+   },
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "de-gesetze-xml",
@@ -59,7 +72,13 @@
     "registration": "NONE_REQUIRED",
     "permission": "TO_CONFIRM"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "lastFailure": {
+    "on": "2026-11-09",
+    "outcome": "ROBOTS_REFUSED",
+    "reason": "robots.txt of www.gesetze-im-internet.de does not allow this download (HTTP 503 for robots.txt)"
+   },
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "cz-national-gazette",
@@ -74,7 +93,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "sk-national-gazette",
@@ -89,7 +109,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "pl-national-gazette",
@@ -98,13 +119,18 @@
    "baseUrl": "https://api.sejm.gov.pl/eli/",
    "format": "REST_API",
    "scope": "national",
-   "status": "PLANNED",
-   "adapter": null,
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
    "access": {
     "registration": "NONE_REQUIRED",
     "permission": "TO_CONFIRM"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "1a8a4174d16f909ac973fa34bb8cb0a75dd6e5b5f7d7022785850d9a79dbc1d3"
+   },
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "fr-national-gazette",
@@ -119,7 +145,8 @@
     "registration": "REGISTRATION_REQUIRED",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "it-national-gazette",
@@ -134,7 +161,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "es-national-gazette",
@@ -143,13 +171,18 @@
    "baseUrl": "https://www.boe.es/datosabiertos/api/",
    "format": "REST_API",
    "scope": "national",
-   "status": "PLANNED",
-   "adapter": null,
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
    "access": {
     "registration": "NONE_REQUIRED",
     "permission": "TO_CONFIRM"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "d02a0db992e6646cec67505bc30ac78b1467723bb552b142347b35f018a71ca1"
+   },
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "nl-national-gazette",
@@ -164,7 +197,8 @@
     "registration": "NONE_REQUIRED",
     "permission": "TO_CONFIRM"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "be-national-gazette",
@@ -179,7 +213,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "lu-national-gazette",
@@ -194,7 +229,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "hu-national-gazette",
@@ -209,7 +245,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "si-national-gazette",
@@ -224,7 +261,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "hr-national-gazette",
@@ -239,7 +277,13 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "lastFailure": {
+    "on": "2026-11-09",
+    "outcome": "ROBOTS_REFUSED",
+    "reason": "robots.txt of narodne-novine.nn.hr does not allow this download (HTTP 503 for robots.txt)"
+   },
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "ro-national-gazette",
@@ -254,7 +298,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "bg-national-gazette",
@@ -269,7 +314,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "dk-national-gazette",
@@ -284,7 +330,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "se-national-gazette",
@@ -293,13 +340,18 @@
    "baseUrl": "https://data.riksdagen.se/",
    "format": "REST_API",
    "scope": "national",
-   "status": "PLANNED",
-   "adapter": null,
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
    "access": {
     "registration": "NONE_REQUIRED",
     "permission": "TO_CONFIRM"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "9f7c481c8904b3b107f011ccb75301284ddaa800f864fe6a84a597ad79b5944d"
+   },
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "fi-national-gazette",
@@ -308,13 +360,18 @@
    "baseUrl": "https://opendata.finlex.fi/",
    "format": "REST_API",
    "scope": "national",
-   "status": "PLANNED",
-   "adapter": null,
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
    "access": {
     "registration": "NONE_REQUIRED",
     "permission": "TO_CONFIRM"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "143b14e0048b0743f628c3ba1775d79104b9ddeecb4a1caaa177a41a57bbe012"
+   },
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "ee-national-gazette",
@@ -329,7 +386,15 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "lastFailure": {
+    "on": "2026-11-09",
+    "outcome": "MARKER_MISSING",
+    "reason": [
+     "Liiklusseadus"
+    ]
+   },
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "lv-national-gazette",
@@ -338,13 +403,18 @@
    "baseUrl": "https://likumi.lv/",
    "format": "HTML",
    "scope": "national",
-   "status": "PLANNED",
-   "adapter": null,
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
    "access": {
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "f95863ab38e39e160d6822862e6e1ff68fc154c90a1b5b82778838ce0f089cc1"
+   },
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "lt-national-gazette",
@@ -359,7 +429,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "ie-national-gazette",
@@ -368,13 +439,18 @@
    "baseUrl": "https://www.irishstatutebook.ie/",
    "format": "HTML",
    "scope": "national",
-   "status": "PLANNED",
-   "adapter": null,
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
    "access": {
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "874db9c6bd41e54c54d69c20f2f347619a982fe4b0797a9b621f56727305dea1"
+   },
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "pt-national-gazette",
@@ -389,7 +465,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "gr-national-gazette",
@@ -404,7 +481,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "ch-national-gazette",
@@ -419,7 +497,15 @@
     "registration": "NONE_REQUIRED",
     "permission": "TO_CONFIRM"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "lastFailure": {
+    "on": "2026-11-09",
+    "outcome": "MARKER_MISSING",
+    "reason": [
+     "Strassenverkehr"
+    ]
+   },
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "li-national-gazette",
@@ -434,7 +520,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "no-national-gazette",
@@ -449,7 +536,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "uk-national-gazette",
@@ -458,13 +546,18 @@
    "baseUrl": "https://www.legislation.gov.uk/",
    "format": "XML",
    "scope": "national",
-   "status": "PLANNED",
-   "adapter": null,
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
    "access": {
     "registration": "NONE_REQUIRED",
     "permission": "TO_CONFIRM"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "0b2cc5c2bafbf154e086b9c24b1fae62be5f8d734a2c134b8ecbe026fa8845bf"
+   },
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "mt-national-gazette",
@@ -479,7 +572,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "ad-national-gazette",
@@ -494,7 +588,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "al-national-gazette",
@@ -509,7 +604,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "am-national-gazette",
@@ -524,7 +620,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "az-national-gazette",
@@ -539,7 +636,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "ba-national-gazette",
@@ -554,7 +652,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "by-national-gazette",
@@ -569,7 +668,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "cy-national-gazette",
@@ -584,7 +684,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "ge-national-gazette",
@@ -599,7 +700,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "is-national-gazette",
@@ -614,7 +716,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "kz-national-gazette",
@@ -629,7 +732,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "mc-national-gazette",
@@ -644,7 +748,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "md-national-gazette",
@@ -659,7 +764,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "me-national-gazette",
@@ -674,7 +780,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "mk-national-gazette",
@@ -689,7 +796,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "rs-national-gazette",
@@ -704,7 +812,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "ru-national-gazette",
@@ -719,7 +828,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "sm-national-gazette",
@@ -734,7 +844,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "tr-national-gazette",
@@ -749,7 +860,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "ua-national-gazette",
@@ -764,7 +876,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   },
   {
    "id": "xk-national-gazette",
@@ -779,7 +892,8 @@
     "registration": "TO_CONFIRM",
     "permission": "REQUIRED_IF_NOT_OPEN"
    },
-   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE"
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
   }
  ]
 }

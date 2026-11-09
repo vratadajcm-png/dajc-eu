@@ -28,3 +28,6 @@ data/driving-bans/staging/blobs/
 # AI research documents stay local like the evidence blobs; their metadata is committed.
 data/driving-bans/staging/research/blobs/
 reports/legal-coverage/
+
+# private access register (agreements with authorities) never belongs in the public repository
+config/legal-library/internal-*

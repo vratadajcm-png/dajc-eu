@@ -13,7 +13,19 @@ export const CONNECTOR_STATUSES = Object.freeze(['IMPLEMENTED', 'PLANNED', 'BLOC
 const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8'));
 
 export const loadConnectors = () => read('../../../config/legal-library/connectors.json').connectors;
-export const loadAccessRegister = () => read('../../../config/legal-library/internal-access-register.json');
+export const CONNECTOR_KINDS = Object.freeze(['LEGAL_COLLECTION', 'TRANSPORT_NAP', 'PERMIT_AUTHORITY', 'LICENSED_DATA_SERVICE']);
+
+/**
+ * The internal access register (agreements with authorities) lives in a PRIVATE
+ * store, never in this public repository. Its path comes from
+ * DAJC_ACCESS_REGISTER_PATH; without it the register is reported as unavailable,
+ * not as empty.
+ */
+export function loadAccessRegister(env = process.env) {
+  const path = env.DAJC_ACCESS_REGISTER_PATH;
+  if (!path) return { available: false, entries: [] };
+  return { available: true, ...JSON.parse(readFileSync(path, 'utf8')) };
+}
 
 /** Problems of the connector plan (empty = consistent). */
 export function connectorProblems(connectors = loadConnectors()) {
@@ -23,6 +35,8 @@ export function connectorProblems(connectors = loadConnectors()) {
     if (ids.has(c.id)) problems.push(`duplicate connector ${c.id}`);
     ids.add(c.id);
     if (!CONNECTOR_FORMATS.includes(c.format)) problems.push(`${c.id}: unknown format ${c.format}`);
+    if (c.kind && !CONNECTOR_KINDS.includes(c.kind)) problems.push(`${c.id}: unknown kind ${c.kind}`);
+    if (c.status === 'IMPLEMENTED' && c.adapter !== 'eurlex' && !c.lastProof?.sha256) problems.push(`${c.id}: IMPLEMENTED needs a SHA-256 acquisition proof`);
     if (!CONNECTOR_STATUSES.includes(c.status)) problems.push(`${c.id}: unknown status ${c.status}`);
     if (c.status === 'IMPLEMENTED' && (!c.adapter || c.basis !== 'VERIFIED_LIVE')) problems.push(`${c.id}: IMPLEMENTED needs an adapter and a live-verified basis`);
     if (!['EU', 'INT'].includes(c.jurisdiction) && !dajcCoverageCodes.includes(c.jurisdiction)) problems.push(`${c.id}: ${c.jurisdiction} is not a DAJC jurisdiction`);
