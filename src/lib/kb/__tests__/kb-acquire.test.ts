@@ -61,6 +61,12 @@ describe('polite client', () => {
     const down = client(async () => resp(200), { robots: { hosts: new Map(), admit: async () => { throw new Error('robots.txt of x.example does not allow this download (HTTP 503 for robots.txt)'); } } as never, maxRetries: 1 });
     await expect(down.get('https://x.example/a')).rejects.toMatchObject({ kind: 'ROBOTS_UNAVAILABLE' });
   });
+  it('stops a redirect loop', async () => {
+    let n = 0;
+    const c = client(async () => { n++; return resp(302, '', { location: 'https://x.example/loop' }); });
+    await expect(c.get('https://x.example/a')).rejects.toMatchObject({ kind: 'PERMANENT_HTTP' });
+    expect(n).toBeLessThanOrEqual(7);
+  });
   it('treats 403 and 404 as permanent without retrying', async () => {
     let n = 0;
     const c = client(async () => { n++; return resp(403); });

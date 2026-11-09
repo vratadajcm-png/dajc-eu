@@ -70,7 +70,8 @@ export class PoliteClient {
     }
   }
 
-  async #get(url, { accept = '*/*', maxBytes = 60 * 1024 * 1024, timeoutMs = 120_000 } = {}) {
+  async #get(url, { accept = '*/*', maxBytes = 60 * 1024 * 1024, timeoutMs = 120_000, hops = 0 } = {}) {
+    if (hops > 5) throw new AcquireError('PERMANENT_HTTP', 'too many redirects');
     const u = new URL(url);
     if (u.protocol !== 'https:') throw new AcquireError('PERMANENT_HTTP', 'only HTTPS is fetched');
     if (this.blocked.has(u.host)) throw new AcquireError('CHALLENGE', `${u.host} is blocked for this run: ${this.blocked.get(u.host)}`);
@@ -94,7 +95,7 @@ export class PoliteClient {
       if (res.status >= 300 && res.status < 400 && res.headers.get('location')) {
         const next = new URL(res.headers.get('location'), url);
         if (next.protocol !== 'https:' || next.host !== u.host) throw new AcquireError('PERMANENT_HTTP', `redirect leaves ${u.host}`);
-        return this.#get(next.toString(), { accept, maxBytes, timeoutMs });
+        return this.#get(next.toString(), { accept, maxBytes, timeoutMs, hops: hops + 1 });
       }
       if (res.ok) {
         const bytes = new Uint8Array(await res.arrayBuffer());

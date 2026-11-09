@@ -63,7 +63,7 @@ export function readZip(bytes) {
     const lnl = dv.getUint16(off + 26, true); const lel = dv.getUint16(off + 28, true);
     const raw = bytes.subarray(off + 30 + lnl + lel, off + 30 + lnl + lel + csize);
     if (usize > 200 * 1024 * 1024) throw new Error('ZIP entry too large');
-    files.push({ name, data: method === 0 ? raw : method === 8 ? new Uint8Array(inflateRawSync(raw)) : (() => { throw new Error(`ZIP method ${method} unsupported`); })() });
+    files.push({ name, data: method === 0 ? raw : method === 8 ? new Uint8Array(inflateRawSync(raw, { maxOutputLength: 200 * 1024 * 1024 })) : (() => { throw new Error(`ZIP method ${method} unsupported`); })() });
     p += 46 + nl + el + cl;
   }
   return files;
