@@ -91,9 +91,9 @@ jobs:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           model: ${{ vars.DAJC_CODEX_REVIEW_MODEL }}
           prompt-file: .github/ai-autonomy/codex-review-prompt.md
-          permission-profile: ":read-only"
+          sandbox: read-only
           safety-strategy: drop-sudo
-          allow-bot-users: "github-actions[bot]"
+          allow-bots: "true"
           output-schema-file: .github/ai-autonomy/review-schema.json
           output-file: review.json
       - name: Preserve immutable review result for isolated publisher
