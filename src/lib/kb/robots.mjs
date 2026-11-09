@@ -73,7 +73,11 @@ export class RobotsRefusal extends Error {
 
 /** Per-run robots.txt cache and per-host pacing. */
 export class RobotsPolicy {
-  constructor({ userAgent, fetchImpl = globalThis.fetch, now = () => Date.now(), sleep = (ms) => new Promise((r) => setTimeout(r, ms)), minDelayMs = MIN_DELAY_MS } = {}) {
+  /**
+   * @param {{ userAgent: string, fetchImpl?: (url: string, init?: any) => Promise<any>, now?: () => number,
+   *           sleep?: (ms: number) => Promise<unknown>, minDelayMs?: number }} options
+   */
+  constructor({ userAgent, fetchImpl = globalThis.fetch, now = () => Date.now(), sleep = (ms) => new Promise((r) => setTimeout(r, ms)), minDelayMs = MIN_DELAY_MS }) {
     if (!userAgent) throw new Error('RobotsPolicy needs the user agent');
     Object.assign(this, { userAgent, fetchImpl, now, sleep, minDelayMs });
     this.hosts = new Map();

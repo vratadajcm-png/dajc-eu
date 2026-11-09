@@ -85,7 +85,13 @@ export function consolidatedPdfUrl(lang, celex) {
  * page. Only an act that EUR-Lex shows in force with a current consolidated
  * version qualifies; anything else returns a reason instead of entries.
  */
-export function entriesFromStatus(candidate, info, { checkedOn, languages = LABEL_LANGUAGES } = {}) {
+/**
+ * @param {any} candidate entry of config/legal-library/eurlex-candidates.json
+ * @param {any} info parseEurlexDocumentInfo() of the act's status page
+ * @param {{ checkedOn: string, languages?: readonly string[] }} options
+ * @returns {{ entries: any[], reason: string | null }}
+ */
+export function entriesFromStatus(candidate, info, { checkedOn, languages = LABEL_LANGUAGES }) {
   if (info.inForce !== true) return { entries: [], reason: `EUR-Lex status: ${info.statusText || 'not readable'}` };
   if (!info.currentConsolidated) return { entries: [], reason: 'EUR-Lex shows no current consolidated version (original act only; dates need a manual check)' };
   if (baseActCelex(info.currentConsolidated) !== candidate.celex) return { entries: [], reason: `consolidation ${info.currentConsolidated} belongs to another act` };
