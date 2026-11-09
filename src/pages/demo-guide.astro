@@ -1,7 +1,59 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import chapters from '../data/demo-chapters.en.json';
+const timestamp = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 ---
-<BaseLayout title="Public demo walkthrough — DAJC" description="Follow a dispatcher through the public DAJC demo using synthetic transport data.">
-<main class="public-info"><p class="eyebrow">PUBLIC DEMO WALKTHROUGH</p><h1>Follow one transport through its D-ID.</h1><p>This walkthrough uses the public demo and synthetic data. It is an illustration of work in development, not an operational transport service.</p><ol><li><h2>Overview</h2><p>Start with active transports, upcoming milestones and items requiring attention. Look for permit blockers and missing documents.</p></li><li><h2>D-ID Orders</h2><p>Open the example D-2026-00482. Each order keeps the route, participants and readiness status together under one transport identity.</p></li><li><h2>Command Center</h2><p>Check Readiness Gates and Critical Blockers. The example shows missing permits, participant confirmations and documents that still need attention.</p></li><li><h2>Documents</h2><p>Open the Documents tab within the order. Compare Approved documents, Versions and Required items. Keeping them attached to the same D-ID makes it easier to identify what is missing.</p></li></ol><p><a href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">Open the public demo ↗</a></p><p><a href="https://www.dajc.cz/demo" lang="cs">Video with Czech narration and captions →</a></p><p>Use test data only. Demo readiness does not replace official transport permits or approved route conditions. <a href="/testing">Register for testing from 4 January 2027</a>.</p></main>
+<BaseLayout title="Public demo walkthrough — DAJC" description="Watch the DAJC public demo with English narration, English captions and four guided chapters.">
+<main class="public-info">
+<p class="eyebrow">PUBLIC DEMO WALKTHROUGH</p>
+<h1>Follow one transport through its D-ID.</h1>
+<p>Explore the dispatcher's workflow with English narration and English captions. This walkthrough uses synthetic data from the public demo.</p>
+<video id="demo-video" controls playsinline preload="metadata" width="1280" height="1000" poster="/media/demo-overview.jpg">
+  <source src="/media/dajc-demo-en.mp4?v=20261023-voice" type="video/mp4" />
+  <track kind="captions" src="/media/dajc-demo-en.vtt" srclang="en" label="English captions" default />
+  Your browser cannot play this video. <a href="/media/dajc-demo-en.mp4">Open the video</a> or read the transcript below.
+</video>
+<div class="actions"><button id="play-sound" type="button">▶ Play with sound</button><a href="/media/dajc-demo-en.mp4?v=20261023-voice">Open the video ↗</a></div>
+<p class="hint">English synthetic narration · English captions. Use “Play with sound” to start, and check your device volume.</p>
+<p id="player-status" role="status" aria-live="polite"></p>
+<nav class="chapters" aria-label="Video chapters">
+{chapters.map((chapter, i) => <button type="button" data-start={chapter.start}><span>{timestamp(chapter.start)}</span> {i + 1}. {chapter.title}</button>)}
+</nav>
+<details><summary>Read the full English transcript</summary>{chapters.map(chapter => <section><h2>{chapter.title}</h2><p>{chapter.text.replaceAll('D I D', 'D-ID')}</p></section>)}</details>
+<p>Use test data only. Demo readiness does not replace official transport permits or approved route conditions.</p>
+<div class="actions"><a class="cta" href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">Open the public demo ↗</a><a href="/testing">Register for testing from 4 January 2027 →</a></div>
+<p><a href="https://www.dajc.cz/demo" lang="cs" hreflang="cs">Český průvodce s českými titulky →</a></p>
+</main>
 </BaseLayout>
-<style>.public-info{position:relative;z-index:2;width:min(850px,calc(100% - 3rem));margin:4rem auto 5rem;color:var(--dajc-white)}h1{font-size:clamp(2rem,5vw,3rem)}h2{font-size:1.4rem}p{color:#b7c8db;line-height:1.8}li{padding:1rem;border-bottom:1px solid var(--dajc-line)}ol{padding-left:1.5rem}a,.eyebrow{color:var(--dajc-orange)}a{display:inline-block;padding:.4rem 0}a:focus-visible{outline:2px solid var(--dajc-orange);outline-offset:4px}</style>
+<script>
+const video = document.querySelector<HTMLVideoElement>('#demo-video');
+const status = document.querySelector<HTMLElement>('#player-status');
+async function play(start?: number) {
+  if (!video || !status) return;
+  if (start !== undefined) video.currentTime = start;
+  video.muted = false;
+  video.volume = 1;
+  status.textContent = '';
+  try { await video.play(); }
+  catch { status.textContent = 'Please use the video controls to start playback, or open the video directly.'; }
+}
+document.querySelector('#play-sound')?.addEventListener('click', () => play());
+document.querySelectorAll<HTMLButtonElement>('[data-start]').forEach(button => {
+  button.addEventListener('click', () => play(Number(button.dataset.start)));
+});
+video?.addEventListener('error', () => {
+  if (status) status.textContent = 'The video could not load. Open it directly or read the transcript below.';
+});
+</script>
+<style>
+.public-info{position:relative;z-index:2;width:min(950px,calc(100% - 3rem));margin:4rem auto 5rem;color:var(--dajc-white)}
+h1{font-size:clamp(2rem,5vw,3rem)}h2{font-size:1.3rem}p{color:#b7c8db;line-height:1.8}
+video{display:block;width:100%;height:auto;max-height:75vh;background:#091525;border:1px solid var(--dajc-line);border-radius:12px}
+a,.eyebrow{color:var(--dajc-orange)}a{display:inline-block;padding:.4rem 0}
+.actions{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin:1rem 0}.hint{font-size:.9rem}
+button,.cta{font:inherit;cursor:pointer;border:1px solid var(--dajc-orange);border-radius:8px;padding:.85rem 1rem;background:var(--dajc-orange);color:#101827;font-weight:700;text-decoration:none}
+.chapters{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin:1.5rem 0}.chapters button{background:#142235;color:#fff;border-color:#3d5068;text-align:left;line-height:1.5}.chapters span{color:var(--dajc-orange);margin-right:.5rem}
+details{border:1px solid #3d5068;border-radius:8px;padding:1rem;margin:1.5rem 0}summary{cursor:pointer;font-weight:700;min-height:2rem}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--dajc-orange);outline-offset:4px}
+@media(max-width:600px){.chapters{grid-template-columns:1fr}.public-info{width:calc(100% - 2rem);margin-top:2rem}.actions{align-items:stretch;flex-direction:column}}
+</style>
