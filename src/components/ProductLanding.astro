@@ -55,7 +55,7 @@ const content = platform ? {
       <a class="secondary" href="#research">Share your feedback <span aria-hidden="true">↓</span></a>
     </div>
     <p class="status"><span aria-hidden="true">●</span> {content.status}</p>
-    {platform && <p class="demo">See also the <a href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">Platform demonstration ↗</a>, which uses synthetic information rather than live customer or authority data.</p>}
+    {platform && <div class="demo-entry" id="platform-demo"><a href="https://demo.dajc.eu/" class="demo-button" target="_blank" rel="noopener noreferrer">Open DAJC Platform demo ↗</a><p>Illustrative demonstration using synthetic data — not live permits, routing or customer integrations.</p></div>}
   </section>
 
   <section id="value" class="value" aria-labelledby="value-title">
@@ -109,8 +109,10 @@ const content = platform ? {
   .secondary{color:#e7eff8;border:1px solid #627e99;}
   .status{color:#b9c9dc;font-size:.79rem;line-height:1.7;max-width:84ch;}
   .status span{color:var(--dajc-orange);padding-right:.35rem;}
-  .demo{font-size:.8rem;color:var(--dajc-muted);line-height:1.6;}
-  .demo a{color:var(--dajc-orange);}
+  .demo-entry{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;margin:1.1rem 0 0;scroll-margin-top:2rem;}
+  .demo-button{display:inline-flex;align-items:center;min-height:46px;padding:.7rem 1rem;border:1px solid var(--dajc-orange);border-radius:8px;color:#fff;text-decoration:none;font:700 .75rem/1.45 'IBM Plex Mono',monospace;}
+  .demo-button:hover,.demo-button:focus-visible{background:rgba(255,159,0,.12);}
+  .demo-entry p{font-size:.79rem;line-height:1.6;color:var(--dajc-muted);max-width:48ch;margin:0;}
   .value{border-top:1px solid var(--dajc-line);padding:clamp(3rem,6vw,5rem) 0;}
   .section-heading{max-width:850px;}
   h2{font-size:clamp(2rem,4vw,3.3rem);line-height:1.13;max-width:23ch;letter-spacing:-.025em;margin:.55rem 0 1rem;}
