@@ -22,6 +22,24 @@ jobs:
         run: go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
       - name: Validate DAJC autonomous workflow expressions and shell
         run: '$(go env GOPATH)/bin/actionlint .github/workflows/dajc-ai-autonomous-claude.yml .github/workflows/dajc-ai-independent-codex-review.yml'
+      - name: Reject unsupported Claude beta action arguments (regression guard)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          source = Path(".github/workflows/dajc-ai-autonomous-claude.yml").read_text()
+          if "anthropics/claude-code-base-action@beta" not in source:
+              raise SystemExit("Unexpected Claude action version; re-audit its input contract")
+          if re.search(r"(?m)^\s+claude_args:", source):
+              raise SystemExit("The selected @beta action ignores claude_args")
+          for required in ("model:", "max_turns:", "allowed_tools:"):
+              if not re.search(r"(?m)^\s+" + re.escape(required), source):
+                  raise SystemExit("Missing required Claude action input: " + required)
+          if "claude-sonnet-5-5" not in source:
+              raise SystemExit("Missing current supported Claude model default")
+          print("Claude beta action input contract verified")
+          PY
       - name: Validate JSON review contract
         run: node -e 'const s=require("./.github/ai-autonomy/review-schema.json"); if(!s.properties?.verdict || !s.properties?.findings) process.exit(1)'
 
