@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
     inputs:
       jurisdiction:
-        description: 'PL, DE, AT or HR'
+        description: 'PL, UK, DE, AT or HR'
         required: false
         type: string
 

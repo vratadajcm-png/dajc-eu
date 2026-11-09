@@ -23,7 +23,7 @@ export function prepareStructuredVersion(entry, download, { now = new Date() } =
   if (legalSourceForUrl(finalUrl)?.id !== source.id) checks.push('final URL is not on the registered source');
   const sha256 = sha256Hex(bytes);
   const storageKey = archiveKey({ jurisdiction: entry.jurisdiction, officialNumber: entry.officialNumber, language: v.language, sha256, extension: download.extension });
-  const provisions = splitProvisions(pages);
+  const provisions = download.provisions ?? splitProvisions(pages);
   if (!provisions.some((p) => p.anchorType !== 'PREAMBLE')) checks.push('no article, section or annex found');
   if (!v.validityEvidenceUrl) checks.push('no validity evidence URL');
   return {

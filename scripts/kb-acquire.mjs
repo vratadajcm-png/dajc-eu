@@ -23,7 +23,8 @@ import { storeVersion } from '../src/lib/kb/acquire/pipeline.mjs';
 import { discoverAtChanges, risClient } from '../src/lib/kb/acquire/at-ris.mjs';
 import { discoverHrChanges, nnClient } from '../src/lib/kb/acquire/hr-nn.mjs';
 import { discoverPlCandidates, plClient, planPlEntry } from '../src/lib/kb/acquire/pl-eli.mjs';
-import { runImportQueue } from '../src/lib/kb/acquire/queue.mjs';
+import { runImportQueue, runStructuredQueue } from '../src/lib/kb/acquire/queue.mjs';
+import { acquireUkDocument, discoverUkCandidates, ukClient } from '../src/lib/kb/acquire/uk-legislation.mjs';
 
 const args = process.argv.slice(2);
 const flag = (n) => args.includes(n);
@@ -39,7 +40,7 @@ const fail = (e) => ({ status: e instanceof AcquireError ? e.kind : 'FAILED', re
 
 let sql = null;
 let archive = null;
-if (['DE', 'PL'].includes(jurisdiction)) {
+if (['DE', 'PL', 'UK'].includes(jurisdiction)) {
   archive = dryRun && !process.env.DAJC_KB_ARCHIVE ? new MemoryArchive() : archiveFromEnv();
   if (!dryRun) {
     if (!dbUrl) throw new Error('DAJC_KB_IMPORT_DB_URL is not set');
@@ -94,6 +95,13 @@ try {
     report.discovery.planned = entries.length; report.discovery.skipped = skipped;
     report.results = await runImportQueue({ entries, client, archive, sql, dryRun, actor: 'scripts/kb-acquire.mjs' });
     for (const r of report.results) console.log(`${String(r.status).padEnd(20)} ${r.officialNumber}${r.reason ? `: ${r.reason}` : ''}`);
+  } else if (jurisdiction === 'UK') {
+    const client = ukClient();
+    const candidates = await discoverUkCandidates(client, { maxPages: Number(value('--pages')) || 3 });
+    report.discovery = { candidates: candidates.length };
+    console.log(`UK discovery: ${candidates.length} base acts/instruments match the road-freight queries`);
+    report.results = await runStructuredQueue({ items: candidates.slice(0, max), acquire: (c) => acquireUkDocument(client, c), archive, sql, dryRun, actor: 'scripts/kb-acquire.mjs' });
+    for (const r of report.results) console.log(`${String(r.status).padEnd(22)} ${r.id}${r.reason ? `: ${r.reason}` : ''}`);
   } else if (jurisdiction === 'AT') {
     const found = await discoverAtChanges(risClient(), { from: new Date(Date.now() - 35 * 86_400_000).toISOString().slice(0, 10), to: today });
     report.discovery = { changedDocuments: found.length };
@@ -110,7 +118,7 @@ try {
 }
 await sql?.end();
 const n = (s) => report.results.filter((r) => r.status === s).length;
-const OK_STATES = ['IMPORTED', 'UNCHANGED', 'DRY_RUN', 'STORED', 'DUPLICATE_IN_QUEUE'];
+const OK_STATES = ['IMPORTED', 'UNCHANGED', 'DRY_RUN', 'STORED', 'DUPLICATE_IN_QUEUE', 'SKIPPED_NOT_IN_FORCE'];
 console.log(`\n${n('IMPORTED')} imported, ${n('UNCHANGED')} unchanged, ${n('DRY_RUN')} dry-run, ${report.results.filter((r) => !OK_STATES.includes(r.status)).length} not acquired.`);
 if (value('--report')) writeFileSync(value('--report'), `${JSON.stringify(report, null, 1)}\n`);
 if (report.results.some((r) => !OK_STATES.includes(r.status))) process.exitCode = 1;

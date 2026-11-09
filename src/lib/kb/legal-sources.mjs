@@ -126,6 +126,14 @@ export const legalSources = Object.freeze([
     check: { status: 'BLOCKED_FROM_DEV', checkedOn: CHECKED_ON, note: 'HTTP 503 from ris.bka.gv.at.' },
   }),
 
+  S({
+    id: 'uk-legislation', jurisdiction: 'UK', name: 'legislation.gov.uk (The National Archives) - Legislation API', kind: 'LEGISLATION_DATABASE',
+    domains: ['legislation.gov.uk'], categories: LAW, topics: ALL, languages: ['en'],
+    authenticity: 'Revised (consolidated) versions are not the authoritative text; the enacted or made version is. Developer documentation: https://www.legislation.gov.uk/developer (read 2026-11-09).',
+    reuse: { status: 'PERMITTED_WITH_ATTRIBUTION', basis: 'Open Government Licence v3.0 (site footer: all content except where otherwise stated; content derived from EUR-Lex reused under Decision 2011/833/EU). Attribute: Contains public sector information licensed under the Open Government Licence v3.0.', termsUrl: 'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/' },
+    check: { status: 'TERMS_VERIFIED', checkedOn: CHECKED_ON, note: 'robots.txt Crawl-delay 5 s respected; data.xml and Atom data.feed answered; OGL v3.0 stated on the site.' },
+  }),
+
   // --- Official legislation databases, not yet checked ----------------------
   ...[
     ['FR', 'Légifrance', 'legifrance.gouv.fr', 'fr'], ['IT', 'Normattiva', 'normattiva.it', 'it'], ['ES', 'Boletín Oficial del Estado', 'boe.es', 'es'],
@@ -136,7 +144,7 @@ export const legalSources = Object.freeze([
     ['EE', 'Riigi Teataja', 'riigiteataja.ee', 'et'], ['LV', 'Likumi.lv', 'likumi.lv', 'lv'], ['LT', 'Teisės aktų registras', 'e-tar.lt', 'lt'],
     ['IE', 'Irish Statute Book', 'irishstatutebook.ie', 'en'], ['PT', 'Diário da República', 'diariodarepublica.pt', 'pt'], ['GR', 'Εθνικό Τυπογραφείο', 'et.gr', 'el'],
     ['CH', 'Fedlex', 'fedlex.admin.ch', 'de'], ['LI', 'Liechtensteinisches Landesgesetzblatt', 'gesetze.li', 'de'], ['NO', 'Lovdata', 'lovdata.no', 'no'],
-    ['UK', 'legislation.gov.uk (The National Archives)', 'legislation.gov.uk', 'en'], ['MT', 'Legislation Malta', 'legislation.mt', 'mt'],
+    ['MT', 'Legislation Malta', 'legislation.mt', 'mt'],
   ].map(([jurisdiction, name, domain, lang]) => S({
     id: `${jurisdiction.toLowerCase()}-legislation`, jurisdiction, name, kind: 'LEGISLATION_DATABASE', domains: [domain], categories: LAW, topics: ALL,
     languages: [lang], reuse: { status: 'UNKNOWN', basis: 'To confirm per source before import.', termsUrl: null }, check: { status: 'NOT_CHECKED' },

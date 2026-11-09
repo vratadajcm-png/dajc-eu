@@ -19,25 +19,28 @@
     "robots.txt of api.sejm.gov.pl answers an HTML 'Request Rejected' page from the sandbox (no readable rules); the documented API is used at 2 requests/s, serially.",
     "AI verification: none run (needs verifier role and AI keys)."
    ],
-   "next": "Run kb-acquire-dev for PL, then kb-ai-verify-dev on the new versions; then UK."
+   "next": "Run kb-acquire-dev for PL, then kb-ai-verify-dev on the new versions."
   },
   {
    "order": 2,
    "jurisdiction": "UK",
    "name": "United Kingdom",
-   "provider": "legislation.gov.uk",
+   "provider": "legislation.gov.uk Legislation API (The National Archives)",
    "candidateFormat": "XML",
-   "officialDocumentation": null,
-   "documentationVerifiedOn": null,
-   "implementation": "NOT_STARTED",
-   "testing": "NOT_STARTED",
+   "officialDocumentation": "https://www.legislation.gov.uk/developer (uris, formats, searching; read 2026-11-09); licence OGL v3.0; robots Crawl-delay 5 s",
+   "documentationVerifiedOn": "2026-11-09",
+   "implementation": "CLIENT_IMPLEMENTED (Atom listing + new feed + data.xml; point-in-time versions and the changes/effects endpoints not yet implemented)",
+   "testing": "UNIT_AND_LIVE_DRY_RUN_PASSED (3 real acts downloaded, parsed, SHA-256); NEON_IMPORT_NOT_RUN",
    "importedDocuments": 0,
    "aiVerifiedVersions": 0,
    "lastCommit": null,
    "knownIssues": [
-    "Acquisition proof exists (document downloaded, SHA-256 recorded); the official API manual has not been studied yet."
+    "Live Neon import not run (no access from the sandbox): kb-acquire-dev with jurisdiction UK.",
+    "Only ukpga and uksi are queried; Scottish, Welsh and Northern Ireland instruments are not yet in scope of the queries.",
+    "Historical (point-in-time) versions and the /changes endpoints are not implemented; new versions arrive as new SHA-256 and supersede the old one.",
+    "Atom listing and XML structure checked live; no formal OpenAPI exists for this API."
    ],
-   "next": "Phase A: study the official API documentation, then implement the client."
+   "next": "Run kb-acquire-dev for UK; then ES (BOE open data API)."
   },
   {
    "order": 3,

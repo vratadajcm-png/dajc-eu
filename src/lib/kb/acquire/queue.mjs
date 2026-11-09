@@ -49,3 +49,34 @@ export async function runImportQueue({ entries, client, archive, sql = null, dry
   }
   return results;
 }
+
+import { prepareStructuredVersion } from './structured.mjs';
+
+/**
+ * Same guarantees for publishers whose first download already carries both the
+ * metadata and the text (XML APIs): `acquire(item)` returns { entry, download } or { skip }.
+ * Sequential; a WAF block or rate limit stops the host for the run.
+ */
+export async function runStructuredQueue({ items, acquire, archive, sql = null, dryRun = false, actor = 'kb-acquire', label = (i) => i.id }) {
+  const results = [];
+  let stop = null;
+  for (const item of items) {
+    const line = { id: label(item) };
+    if (stop) { results.push({ ...line, status: 'SKIPPED_HOST_BLOCKED', classification: stop }); continue; }
+    try {
+      const got = await acquire(item);
+      if (got.skip) { results.push({ ...line, status: 'SKIPPED_NOT_IN_FORCE', reason: got.skip }); continue; }
+      const problems = validateManifestEntry(got.entry);
+      if (problems.length) { results.push({ ...line, status: 'REJECTED_INVALID', problems }); continue; }
+      const prepared = prepareStructuredVersion(got.entry, got.download);
+      const summary = { officialNumber: got.entry.officialNumber, sha256: prepared.version.sha256, provisions: prepared.provisions.length, provenance: prepared.version.provenance, checks: prepared.checks };
+      if (dryRun || !sql) { results.push({ ...line, status: 'DRY_RUN', ...summary }); continue; }
+      results.push({ ...line, ...summary, ...await storeVersion({ sql, archive, prepared, actor }) });
+    } catch (error) {
+      const classification = classifyError(error);
+      results.push({ ...line, status: error?.name === 'IntegrityError' ? 'INTEGRITY_ERROR' : classification, classification, reason: String(error?.message || error).slice(0, 300) });
+      if (['WAF_BLOCKED', 'RATE_LIMITED'].includes(classification)) stop = classification;
+    }
+  }
+  return results;
+}
