@@ -77,7 +77,7 @@ jobs:
           claude_args: |
             --model ${{ vars.DAJC_CLAUDE_DEV_MODEL }}
             --max-turns 12
-            --allowedTools Read,Glob,Grep,Edit,Write,Bash(npm test:*),Bash(npm run typecheck:*),Bash(npm run build:*)
+            --allowedTools "Read,Glob,Grep,Edit,Write,Bash(npm test:*),Bash(npm run typecheck:*),Bash(npm run build:*)"
       - name: Export bounded source patch without pushing
         id: patch
         shell: bash
