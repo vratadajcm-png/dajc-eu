@@ -64,7 +64,7 @@ jobs:
       - name: Explicit Claude API configuration preflight
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          CLAUDE_DEV_MODEL: ${{ vars.DAJC_CLAUDE_DEV_MODEL }}
+          CLAUDE_DEV_MODEL: ${{ vars.DAJC_CLAUDE_DEV_MODEL || 'claude-sonnet-5-5' }}
         shell: bash
         run: |
           test -n "$ANTHROPIC_API_KEY" || { echo "::error::Missing ANTHROPIC_API_KEY"; exit 1; }
@@ -75,7 +75,7 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt_file: .github/ai-autonomy/claude-developer.md
           claude_args: |
-            --model ${{ vars.DAJC_CLAUDE_DEV_MODEL }}
+            --model ${{ vars.DAJC_CLAUDE_DEV_MODEL || 'claude-sonnet-5-5' }}
             --max-turns 12
             --allowedTools "Read,Glob,Grep,Edit,Write,Bash(npm test),Bash(npm run typecheck),Bash(npm run build)"
       - name: Export bounded source patch without pushing
