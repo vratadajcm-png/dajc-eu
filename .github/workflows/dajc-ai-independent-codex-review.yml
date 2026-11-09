@@ -83,7 +83,6 @@ jobs:
           API_KEY: ${{ secrets.OPENAI_API_KEY }}
         shell: bash
         run: |
-          test -n "$MODEL" || { echo "::error::Missing DAJC_CODEX_REVIEW_MODEL"; exit 1; }
           test -n "$API_KEY" || { echo "::error::Missing OPENAI_API_KEY"; exit 1; }
       - name: Independent Codex review with constrained JSON output
         uses: openai/codex-action@v1
