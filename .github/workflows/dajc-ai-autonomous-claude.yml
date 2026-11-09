@@ -83,6 +83,19 @@ jobs:
         shell: bash
         run: |
           echo "base_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          # Remove only the Claude beta action's untracked result transcript.
+          # Keep the strict publisher whitelist unchanged for all other files.
+          if [ -e output.txt ] || [ -L output.txt ]; then
+            if git ls-files --error-unmatch -- output.txt >/dev/null 2>&1; then
+              echo "::error::Unexpected tracked output.txt: refuse cleanup"
+              exit 1
+            fi
+            if [ ! -f output.txt ] || [ -L output.txt ]; then
+              echo "::error::Unexpected output.txt type; refuse cleanup"
+              exit 1
+            fi
+            rm -- output.txt
+          fi
           git add -N -- .
           git diff --binary HEAD > /tmp/dajc-claude.patch
           if [ ! -s /tmp/dajc-claude.patch ]; then
