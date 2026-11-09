@@ -34,7 +34,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          prs=$(gh pr list --state open --base main --limit 100 \
+          prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --base main --limit 100 \
             --json number,headRefName,isDraft \
             --jq '[.[] | select(.isDraft and (.headRefName | startswith("claude/autonomous-ai-")))]')
           count=$(jq length <<< "$prs")
