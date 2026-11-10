@@ -1,7 +1,19 @@
 # DAJC AI — Autonomous Claude Development Pipeline
 
-**Status: DRAFT / INACTIVE.** Configuration staged in a draft PR, with no
-live API calls, paid run, release, merge or production change performed.
+**Current runtime status (10 Nov 2026): REGISTERED ON MAIN, SCHEDULE OFF.**
+Bootstrap PR #114, Claude action model fix #115 and output.txt publisher fix
+#116 are merged. First three manual trials rejected an old ignored CLI model
+input with HTTP 404 and 0 tokens; supervised manual run #4 successfully called
+`claude-sonnet-5-5` (reported USD 0.2453265) but the publisher rejected the
+action-generated `output.txt`. Fixed in #116; run #4 source test was recovered
+into draft PR #117. **Post-fix successful publisher + independent review not
+yet verified.** No autonomous release or schedule activation is approved.
+For overall product design and sources read
+[AI Build Source Map](DAJC_AI_BUILD_SOURCE_MAP.md) and
+[Official Source Registry](DAJC_AI_SOURCE_AND_CONNECTOR_REGISTRY.md).
+
+**The remaining text is the original pipeline design record and is
+historical where it calls the workflow "staged" or "not tested".**
 
 ## Product and repository boundaries
 
