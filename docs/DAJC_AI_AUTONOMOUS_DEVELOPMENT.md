@@ -94,3 +94,10 @@ Before enabling:
    reviewer quality and open PR accumulation.
 
 No live run has been executed as part of staging this configuration.
+
+## Recovery and activation blockers — 2026-11-10
+
+- Autonomous manual run `42677240647` produced a candidate, but the publishing job correctly rejected an extra generated `output.txt` artifact. Only the audited source change was recovered as draft PR #117: https://github.com/vratadajcm-png/dajc-eu/pull/117.
+- Resolve PR #117's application/news CI failures on its exact head SHA; do not bypass source-only artifact validation or treat a successful developer step as a successful autonomous cycle. Confirm the candidate can be safely resumed without duplicate draft PRs.
+- Bootstrap #114 has a workflow on `main`, but its safety changes have not been reconciled with this PR #112. Compare and port hardened baseline SHA, review TOCTOU and branch validation before enabling recurring schedules.
+- Dedicated provider keys and enforced API budgets are not verified through the current connector. Do not set `DAJC_CLAUDE_AUTONOMY_ENABLED=true` or run paid manual trials until an authorized owner verifies the spend caps and approves a bounded test.
