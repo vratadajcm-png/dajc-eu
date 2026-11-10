@@ -42,3 +42,13 @@ Develop source adapters behind a versioned retrieval interface: `discover → fe
 All documentation must distinguish **supported protocol** from **discovered endpoint**, **tested authenticated sandbox** and **production authority**. Live official research needs current URLs, provider documents and licences; don't assume mail/Drive permissions in Claude Code. If missing a source, create `OWNER_DECISION_REQUIRED` with the exact agency/provider issue and continue other safe work.
 
 No legal source is newly downloaded or licensed by this markdown file.
+
+## Machine-readable companion (2026-11-10)
+
+For source discovery and future contract tests, consult
+[DAJC_AI_SOURCE_INTEGRATION_REGISTER.json](DAJC_AI_SOURCE_INTEGRATION_REGISTER.json).
+All 22 entries begin with rights, effective legal scope and live access
+**unverified**; this catalogue does not promote any integration to
+production. Missing decisions should follow the
+[owner-decision protocol](OWNER_DECISIONS.md), never undocumented
+model assumptions.

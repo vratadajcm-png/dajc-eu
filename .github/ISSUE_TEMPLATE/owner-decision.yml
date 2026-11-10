@@ -1,0 +1,51 @@
+name: Rozhodnutí vlastníka DAJC
+description: Zablokované rozhodnutí nebo nedoložené API/licenční oprávnění
+title: "[OWNER DECISION] "
+assignees:
+  - vratadajcm-png
+body:
+  - type: input
+    id: id
+    attributes:
+      label: Stabilní ID a produkt
+      placeholder: "AI-OPEN-01 / Platform / TAR"
+    validations:
+      required: true
+  - type: dropdown
+    id: status
+    attributes:
+      label: Typ blokace
+      options:
+        - BLOCKED_OWNER
+        - DECISION_REQUIRED
+        - NEEDS_EVIDENCE
+        - SAFETY_BLOCK
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Jedna otázka a možnosti A/B/C
+      description: Bez hesel, osobních údajů a neveřejných smluvních detailů.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Ověřený důkaz a chybějící důkaz
+      description: URL masteru, issue/PR, veřejný úřední zdroj; ne tvrzení o partnerství.
+    validations:
+      required: true
+  - type: textarea
+    id: recommendation
+    attributes:
+      label: Doporučení, dopady a náklady
+    validations:
+      required: true
+  - type: textarea
+    id: safe
+    attributes:
+      label: Co může vývoj dělat bez schválení
+      placeholder: "Pouze mock/test; žádná produkční integrace."
+    validations:
+      required: true

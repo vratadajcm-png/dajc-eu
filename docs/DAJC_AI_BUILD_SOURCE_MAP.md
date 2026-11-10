@@ -60,3 +60,15 @@ Samostatné logy/API budget DAJC AI; vývojové API modely, provider API pro zna
 Agent má vytvořit issue `[DAJC AI][OWNER DECISION]` s přesnou otázkou, variantami, doporučeným bezpečným výchozím nastavením, linkem na podklad a dopadem na cenu/bezpečnost. Pokud nemá issue-write, vloží `OWNER_DECISION_REQUIRED` do PR nebo závěrečného reportu. Na čekající rozhodnutí neobcházet ochrany; pokračovat v nezávislých mock/test úlohách.
 
 **Tento soubor je informační implementační mapa, nemění master sám a neopravňuje k nasazení, financování ani placenému provozu uživatelů.**
+
+## Machine-readable evidence and owner escalation — 2026-11-10
+
+The [22-family JSON registry](DAJC_AI_SOURCE_INTEGRATION_REGISTER.json)
+adds machine-readable fail-closed source entries to the existing official
+source dossier. Its entries are NOT confirmed access, legal effect,
+licensing, live API connectivity or production approval. The
+[owner-decision protocol](OWNER_DECISIONS.md) specifies stable IDs,
+A/B alternatives, cost/privacy impact and notification/issue handling;
+the [AI-OPEN-01 decision](https://github.com/vratadajcm-png/dajc-eu/issues/121)
+is pending. The current build source map above stays authoritative as
+implementation navigation subordinate to the private draft AI master.
