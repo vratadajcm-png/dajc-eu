@@ -19,7 +19,7 @@ export const POST:APIRoute=async ({request})=>{
   }catch{return response(400,{ok:false,error:'Invalid verification request.'});}
   if(!tokenValid(input))return response(400,{ok:false,error:'Invalid or expired verification link.'});
   const accessToken=token();
-  let result:unknown[];
+  let result:readonly object[];
   try{
     const sql=db();
     result=await sql`
