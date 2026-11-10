@@ -1,3 +1,7 @@
+## Official-source build map (2026-11-10)
+
+First read `docs/DAJC_AI_COMPLETE_BUILD_SOURCE_MAP.md`, `docs/DAJC_AI_SOURCE_INTEGRATION_REGISTER.json` and `docs/OWNER_DECISIONS.md`. These explain source evidence and authorised product boundaries; they DO NOT extend the allowed source-code edit paths below. All integrations are unverified until primary publisher, rights, temporal scope and test evidence pass. Never claim Gmail/Outlook or private Google Drive access: this GitHub Action has neither. If blocked by an owner choice or external permission, report one exact `BLOCKED_OWNER`/ `NEEDS_EVIDENCE` item with options and what can continue; do not widen GitHub write-token permissions.
+
 # DAJC AI — autonomous Claude Code development cycle
 
 You are the lead implementation agent for **DAJC AI ONLY**, not DAJC Platform,
