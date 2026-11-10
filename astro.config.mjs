@@ -54,9 +54,14 @@ export default defineConfig({
       // The Partner Portal is a private, ungated-by-default governance
       // surface - it must never appear in the public sitemap regardless of
       // DAJC_PARTNER_PORTAL_ENABLED. See docs/PARTNER_PORTAL.md.
-      filter: (page) => !/^\/(?:platform|partners|integration-ecosystem|partner-portal|investor)(?:\/|$)/.test(new URL(page).pathname),
+      filter: (page) => {
+        const pathname = new URL(page).pathname.replace(/\/+$/, '') || '/';
+        const publicPlatform = pathname === '/platform' || pathname === '/platform/integrations';
+        if (/^\/platform(?:\/|$)/i.test(pathname) && !publicPlatform) return false;
+        return !/^\/(?:partners|integration-ecosystem|partner-portal|investor)(?:\/|$)/i.test(pathname);
+      },
       // On-demand public pages are not discovered automatically.
-      customPages: [`${SITE}/driving-bans`, ...newsArticles.filter(({ url }) => url.includes('/news/eu-oversize/')).map(({ url }) => url)],
+      customPages: [`${SITE}/driving-bans`, `${SITE}/platform`, `${SITE}/tar`, `${SITE}/integrations`, `${SITE}/platform/integrations`, `${SITE}/tar/integrations`, ...newsArticles.filter(({ url }) => url.includes('/news/eu-oversize/')).map(({ url }) => url)],
       // Search engines see when an article was published or last corrected.
       serialize: (item) => (newsLastmod.has(item.url) ? { ...item, lastmod: newsLastmod.get(item.url) } : item),
     }),

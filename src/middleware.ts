@@ -13,7 +13,12 @@ import { isPartnerPortalEnabled, isPartnerPortalPath } from './portal/config/gat
 export const onRequest = defineMiddleware(async (context, next) => {
   // These sections are deliberately private, regardless of navigation or
   // indexing settings. Never invoke their page handlers on the public site.
-  if (/^\/(?:platform|partners|integration-ecosystem)(?:\/|$)/i.test(context.url.pathname)) {
+  const pathname = context.url.pathname.replace(/\/+$/, '') || '/';
+  // Product presentations are public, but any other legacy /platform/* URL
+  // remains private by default. Never widen this allowlist implicitly.
+  const publicPlatform = pathname === '/platform' || pathname === '/platform/integrations';
+  if (/^\/(?:partners|integration-ecosystem)(?:\/|$)/i.test(pathname)
+    || (/^\/platform(?:\/|$)/i.test(pathname) && !publicPlatform)) {
     return new Response(null, {
       status: 302,
       headers: {

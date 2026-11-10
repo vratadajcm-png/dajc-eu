@@ -1,18 +1,18 @@
 ---
 const audiences = [
-  { icon: '01', title: 'Carriers & fleets', description: 'Explore connected planning and prepare to test real transport workflows.', href: '/testing', action: 'Join testing' },
-  { icon: '02', title: 'Assistance networks', description: 'Discuss future information handoffs with insurers, dispatchers and recovery operators.', href: '/assistance', action: 'Explore Assistance' },
+  { icon: '01', title: 'Carriers & fleets', description: 'Understand the proposed DAJC Platform workflow and share operational feedback.', href: '/platform', action: 'Explore Platform' },
+  { icon: '02', title: 'Towing & recovery providers', description: 'Explore DAJC TAR for towing, roadside assistance and mixed recovery operations.', href: '/tar', action: 'Explore TAR' },
   { icon: '03', title: 'Investors', description: 'Understand the opportunity, the current stage and how to request materials.', href: '/investors', action: 'Investor overview' },
   { icon: '04', title: 'Media', description: 'Get accurate background, project updates and the official DAJC brand mark.', href: '/press', action: 'Press room' },
 ];
 const resources = [
   { number: '01', title: 'Driving Bans', description: 'European HGV restrictions, with transparent verification status.', href: '/driving-bans', action: 'Open calendar' },
-  { number: '02', title: 'Live Demo', description: 'Explore Platform workflows with synthetic data and no live integrations.', href: 'https://demo.dajc.eu/', action: 'Explore demo ↗' },
+  { number: '02', title: 'European transport news', description: 'Official updates and European transport intelligence from DAJC.', href: '/news', action: 'Read news' },
   { number: '03', title: 'DAJC Intelligence', description: 'Public information today; a wider operational layer in development.', href: '/intelligence', action: 'Learn more' },
   { number: '04', title: 'Testing 2027', description: 'Registration is open for pre-production testing planned for Q3 2027 (July–September).', href: '/testing', action: 'Register now' },
 ];
 ---
-<main class="home-redesign" id="platform">
+<main class="home-redesign" id="home">
   <section class="hero" aria-labelledby="home-title">
     <div class="hero-visual" aria-hidden="true">
       <svg viewBox="0 0 740 590" fill="none" xmlns="http://www.w3.org/2000/svg" class="hero-svg">
@@ -55,13 +55,14 @@ const resources = [
     </div>
     <div class="hero-copy">
       <p class="eyebrow">European digital coordination ecosystem</p>
-      <h1 id="home-title">Connecting European <em>transport</em> and vehicle assistance.</h1>
-      <p class="hero-lead">DAJC Platform is developing coordination for complex transport. DAJC Assistance is a related capability in research and design, all under one DAJC brand.</p>
-      <div class="platform-links hero-actions"><a class="solid-link" href="/testing#register">Register for Testing 2027</a><a class="line-link" href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">View Platform Demo ↗</a><a class="line-link" href="/demo-guide">Demo walkthrough →</a></div>
-      <p class="hero-status">Demo uses synthetic data. Pre-production testing is planned for Q3 2027; this is not a commercial launch.</p>
-      <p class="hero-status">Built from real operations. Developed step by step. No unannounced commercial services or integrations implied.</p>
+      <h1 id="home-title">Connecting European <em>transport</em> and recovery operations.</h1>
+      <p class="hero-lead">Two separate DAJC products for Europe: Platform coordinates heavy and oversized transport; TAR connects towing, assistance and recovery operations. Discover each product on its own page.</p>
+      
+      <p class="hero-status">DAJC Platform and DAJC TAR are separate products in development. Explore their dedicated pages for the complete capabilities and research questionnaire.</p>
+      
     </div>
 
+    <div class="solution-intro"><p class="eyebrow">THE DAJC PRODUCTS</p><h2>Two products. Two industries. One connected way of working.</h2><p>Explore the full capability of each product and help shape its final priorities.</p></div>
     <div class="solution-grid" aria-label="Explore DAJC solutions">
       <article class="solution-card solution-card--primary">
         <div class="solution-card__top">
@@ -70,23 +71,23 @@ const resources = [
           </span>
           <div><h2>DAJC Platform</h2><p>Heavy &amp; oversized transport coordination</p></div>
         </div>
-        <p class="solution-card__description">A provider-neutral workflow being designed to connect participants, D-ID transport context, routes, permits and documents.</p>
+        <p class="solution-card__description">One coordinated process for heavy and oversized transport, connecting every participant while preserving existing software.</p>
         <span class="solution-card__status"><i aria-hidden="true"></i>In development · Testing planned Q3 2027</span>
-        <a class="solution-card__button" href="/testing#register">Register for Testing 2027 <span aria-hidden="true">↗</span></a>
+        <a class="solution-card__button" href="/platform">Discover DAJC Platform <span aria-hidden="true">↗</span></a>
       </article>
-      <article class="solution-card">
+      <article class="solution-card solution-card--primary">
         <div class="solution-card__top">
           <span class="solution-card__icon" aria-hidden="true">
             <svg viewBox="0 0 56 40" fill="none"><path d="M4 22h26V9H18M30 20h12l9 8v7H30V20Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 10h21M15 4v12M22 11h11" stroke="currentColor" stroke-width="2.5"/><circle cx="13" cy="34" r="5" stroke="currentColor" stroke-width="2.5"/><circle cx="42" cy="34" r="5" stroke="currentColor" stroke-width="2.5"/></svg>
           </span>
-          <div><h2>DAJC Assistance</h2><p>Vehicle recovery &amp; assistance coordination</p></div>
+          <div><h2>DAJC TAR</h2><p>Tow, Assistance &amp; Recovery coordination</p></div>
         </div>
-        <p class="solution-card__description">Research into better handoffs between motorists or fleets, authorised assistance networks and recovery providers.</p>
-        <span class="solution-card__status solution-card__status--muted"><i aria-hidden="true"></i>Research &amp; design · Not a live service</span>
-        <a class="solution-card__button solution-card__button--outline" href="/assistance">Explore DAJC Assistance <span aria-hidden="true">↗</span></a>
+        <p class="solution-card__description">One operational workspace for towing, assistance and recovery, from the first call through dispatch, evidence and billing.</p>
+        <span class="solution-card__status"><i aria-hidden="true"></i>In development · Not a live service</span>
+        <a class="solution-card__button" href="/tar">Discover DAJC TAR <span aria-hidden="true">↗</span></a>
       </article>
     </div>
-    <div class="hero-meta"><span>One DAJC brand · Platform and Assistance</span><a href="/testing">Registration open: Testing 2027 <span aria-hidden="true">→</span></a></div>
+    <div class="hero-meta"><span>One DAJC brand · Two distinct products: Platform and TAR</span><a href="/testing">Registration open: Testing 2027 <span aria-hidden="true">→</span></a></div>
   </section>
 
   <section class="home-section real-operations" aria-labelledby="operations-heading">
@@ -96,31 +97,6 @@ const resources = [
       <article><span class="proof-number">02 / Provider-neutral</span><h3>Connect, do not replace</h3><p>Designed to work alongside existing carriers, assistance providers and their established systems.</p></article>
       <article><span class="proof-number">03 / Trust by design</span><h3>Clear roles, data and responsibilities</h3><p>Development aims to make permissions, documents and operational handoffs more transparent.</p></article>
     </div>
-  </section>
-
-  <section class="home-section platform-overview" id="platform-overview" aria-labelledby="platform-heading">
-    <div class="platform-overview__copy">
-      <p class="section-eyebrow">DAJC Platform · In development</p>
-      <h2 id="platform-heading">One transport context. Many participants. Clearer coordination.</h2>
-      <p>DAJC Platform is being developed around a D-ID transport identity so authorised participants can work with the relevant order, route, permits, documents and progress in one coordinated environment. The planned product is not a transport broker or marketplace.</p>
-      <div class="platform-links"><a class="solid-link" href="/testing">Register for Testing 2027 ↗</a><a class="line-link" href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">View Platform Demo ↗</a></div>
-    </div>
-    <div class="workflow" aria-label="Illustrative DAJC Platform workflow">
-      <div><span>01</span><strong>D-ID transport context</strong><small>One shared operational reference</small></div>
-      <div><span>02</span><strong>Routes, permits &amp; documents</strong><small>Relevant information in one workflow</small></div>
-      <div><span>03</span><strong>Coordinated execution</strong><small>Permissioned status and handoffs</small></div>
-      <p>Illustrative intended workflow. Not a claim of production availability.</p>
-    </div>
-  </section>
-
-  <section class="home-section dispatch-section" aria-labelledby="dispatch-heading">
-    <div class="section-heading"><div><p class="section-eyebrow">A dispatcher’s day</p><h2 id="dispatch-heading">Less searching. A clearer handover.</h2></div><p>Illustrative scenario · to be validated in testing</p></div>
-    <div class="comparison-grid">
-      <article><p class="section-eyebrow">Today</p><h3>A change arrives in three places.</h3><p>A revised loading time is in an email, the permit is in a shared folder and the driver has an older message. The dispatcher checks each source and calls everyone again.</p></article>
-      <article><p class="section-eyebrow">With DAJC · planned workflow</p><h3>One transport identity links the change.</h3><p>The D-ID brings the relevant documents, approved changes and handover status together for authorised participants. The aim is less repeated entry and a traceable record of who confirmed what.</p></article>
-    </div>
-    <p class="resources-caveat">Example only: avoiding four repeated five-minute lookups would save 20 minutes on one transport. This is an illustrative calculation, not a measured DAJC result or a guaranteed saving.</p>
-    <div class="platform-links"><a class="solid-link" href="/testing#register">Help test this workflow →</a></div>
   </section>
 
   <section class="home-section audience-section" aria-labelledby="audiences-heading">
@@ -146,14 +122,14 @@ const resources = [
         </a>
       ))}
     </div>
-    <p class="resources-caveat">Driving restrictions must always be verified with official authorities before a real transport. The demo contains synthetic operational data.</p>
+    <p class="resources-caveat">Driving restrictions must always be verified with official authorities before a real transport.</p>
   </section>
 
   <section class="home-section update-section" aria-label="Latest DAJC project update">
     <div class="update-card">
-      <p class="section-eyebrow">Latest project update · 13 October 2026</p>
+      <p class="section-eyebrow">Archived project announcement · 13 October 2026</p>
       <h2>DAJC invites European heavy-transport professionals to test the Platform in 2027.</h2>
-      <p>Registration is open for pre-production testing planned for Q3 2027 (July–September). DAJC Assistance remains a separate research direction.</p>
+      <p>The October announcement covered Platform testing. Since then, the planned assistance and towing/recovery capabilities have been consolidated into DAJC TAR; see the current product page for details.</p>
       <a href="/news/platform/dajc-testing-2027-and-assistance">Read the official update →</a>
     </div>
     <div class="update-aside"><p>“Less fragmentation. Clearer coordination. A more connected Europe.”</p><a href="/news">Explore the latest DAJC updates →</a></div>
@@ -161,11 +137,6 @@ const resources = [
 </main>
 
 <style>
-  .comparison-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;}
-  .comparison-grid article {padding:1.5rem;border:1px solid #3a5673;border-radius:12px;background:rgba(10,36,65,.7);}
-  .comparison-grid h3 {font:700 1.2rem/1.3 'Space Grotesk',sans-serif;}
-  .comparison-grid p:not(.section-eyebrow) {color:#abc0d7;line-height:1.75;}
-  .dispatch-section {border-top:1px solid rgba(124,141,166,.18);}
   .home-redesign {position:relative;z-index:1;overflow:hidden;color:#f5f7fa;}
   .home-redesign :is(a):focus-visible {outline:2px solid var(--dajc-orange);outline-offset:4px;}
   .hero {position:relative;max-width:1300px;margin:0 auto;padding:clamp(4rem,7vw,6.7rem) clamp(1.2rem,4vw,3rem) 4rem;isolation:isolate;}
@@ -180,7 +151,10 @@ const resources = [
   .hero-visual {position:absolute;z-index:0;pointer-events:none;top:0;right:-1.5rem;width:min(65%,790px);height:590px;opacity:.86;}
   .hero-svg {width:100%;height:100%;object-fit:contain;}
   .hero-visual__label {position:absolute;bottom:1.7rem;right:3rem;color:#7d9db6;font: .59rem 'IBM Plex Mono',monospace;letter-spacing:.18em;white-space:nowrap;}
-  .solution-grid {position:relative;z-index:3;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.2rem;max-width:1020px;margin:clamp(3rem,5vw,4.5rem) 0 0;}
+  .solution-intro {position:relative;z-index:3;max-width:830px;margin:clamp(3rem,5vw,4.5rem) 0 0;}
+  .solution-intro h2 {margin:.4rem 0 .7rem;max-width:20ch;font:700 clamp(1.8rem,3.5vw,3rem)/1.12 'Space Grotesk',sans-serif;color:#f5f7fa;letter-spacing:-.025em;}
+  .solution-intro > p:last-child {font-size:.95rem;line-height:1.6;color:#b5c8db;}
+  .solution-grid {position:relative;z-index:3;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.2rem;max-width:1020px;margin:1.6rem 0 0;}
   .solution-card {display:flex;flex-direction:column;gap:1.15rem;padding:clamp(1.3rem,2vw,2rem);border:1px solid #49617a;border-radius:16px;background:linear-gradient(145deg,rgba(15,44,74,.96),rgba(7,26,49,.97));box-shadow:0 25px 55px rgba(0,0,0,.28);min-width:0;}
   .solution-card--primary {border-color:rgba(255,159,0,.8);background:linear-gradient(145deg,rgba(26,54,78,.98),rgba(7,26,49,.98));}
   .solution-card__top {display:flex;align-items:flex-start;gap:1rem;}
@@ -199,7 +173,7 @@ const resources = [
   .hero-meta a {color:#ffb542;text-decoration:none;}
   .home-section {position:relative;max-width:1300px;margin:0 auto;padding:clamp(3.1rem,5vw,4.6rem) clamp(1.2rem,4vw,3rem);}
   .section-heading {display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;margin-bottom:2rem;}
-  .section-heading h2,.platform-overview h2 {font:700 clamp(1.7rem,2.8vw,2.5rem)/1.13 'Space Grotesk',sans-serif;letter-spacing:-.025em;margin:.35rem 0 0;}
+  .section-heading h2 {font:700 clamp(1.7rem,2.8vw,2.5rem)/1.13 'Space Grotesk',sans-serif;letter-spacing:-.025em;margin:.35rem 0 0;}
   .section-heading>p {max-width:34ch;text-align:right;font-size:.8rem;letter-spacing:.08em;color:#91abc7;text-transform:uppercase;}
   .section-eyebrow {margin:0 0 .6rem;}
   .real-operations {border-top:1px solid rgba(124,141,166,.2);}
@@ -208,18 +182,6 @@ const resources = [
   .proof-number,.audience-number {color:var(--dajc-orange);font:.69rem 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;}
   .proof-grid h3 {margin:.9rem 0 .6rem;font:700 1.1rem/1.3 'Space Grotesk',sans-serif;}
   .proof-grid p {margin:0;color:#a6b8cd;font-size:.88rem;line-height:1.75;}
-  .platform-overview {display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:clamp(2rem,7vw,6rem);align-items:center;border-top:1px solid rgba(124,141,166,.18);}
-  .platform-overview__copy>p:not(.section-eyebrow) {color:#abc0d7;line-height:1.75;max-width:62ch;font-size:.98rem;}
-  .platform-links {display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;margin-top:1.6rem;}
-  .solid-link,.line-link {font:700 .75rem/1.35 'IBM Plex Mono',monospace;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:.75rem 1rem;border-radius:8px;}
-  .solid-link {background:var(--dajc-orange);color:#061a33;}
-  .line-link {border:1px solid #6283a4;color:#e6eff9;}
-  .workflow {border:1px solid #3d5673;background:linear-gradient(125deg,rgba(24,58,89,.55),rgba(6,26,51,.7));padding:1.3rem;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.16);}
-  .workflow>div {display:grid;grid-template-columns:38px 1fr;gap:.12rem .85rem;align-items:center;padding:.9rem .5rem;border-bottom:1px solid rgba(124,141,166,.17);}
-  .workflow>div span {grid-row:span 2;color:var(--dajc-orange);font:700 .86rem 'IBM Plex Mono',monospace;}
-  .workflow strong {font-size:.94rem;}
-  .workflow small {color:#9fb4ce;font-size:.76rem;line-height:1.6;}
-  .workflow>p {color:#8ea6c1;font-size:.72rem;line-height:1.6;padding:.7rem .5rem 0;margin:0;}
   .audience-section,.resources-section {border-top:1px solid rgba(124,141,166,.18);}
   .audience-grid,.resource-grid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem;}
   .audience-card,.resource-card {display:flex;flex-direction:column;align-items:flex-start;min-height:215px;padding:1.3rem;border:1px solid #3a5673;border-radius:12px;background:rgba(10,36,65,.7);text-decoration:none;color:#f5f7fa;transition:transform .2s ease,border-color .2s ease,background .2s ease;}
@@ -252,7 +214,6 @@ const resources = [
     .section-heading {align-items:flex-start;flex-direction:column;gap:.3rem;}
     .section-heading>p {text-align:left;}
     .proof-grid {grid-template-columns:1fr;gap:1.4rem;}
-    .platform-overview,.comparison-grid {grid-template-columns:1fr;}
     .update-section {grid-template-columns:1fr;}
   }
   @media(max-width:440px){

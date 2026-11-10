@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Integration architecture | DAJC Platform & TAR" description="How DAJC Platform and DAJC TAR are designed to exchange authorised data with existing enterprise and operational systems.">
+  <main class="integrations-hub">
+    <p class="eyebrow">DAJC / INTEGRATION ARCHITECTURE</p>
+    <h1>Keep your systems. Connect the work.</h1>
+    <p class="intro">DAJC is designed to link authorised workflows and information across existing software. Explore the integration principles of each separate product and request its technical architecture document.</p>
+    <div class="product-cards">
+      <article><p class="eyebrow">HEAVY &amp; OVERSIZED TRANSPORT</p><h2>DAJC Platform</h2><p>TMS and ERP, routes, permits, telematics, cargo and transport documents, connected through a shared D-ID.</p><a href="/platform/integrations">Explore Platform integrations →</a></article>
+      <article><p class="eyebrow">TOW, ASSISTANCE &amp; RECOVERY</p><h2>DAJC TAR</h2><p>Assistance and insurer intake, mixed-fleet dispatch, technical recovery evidence and settlement through one Recovery Passport.</p><a href="/tar/integrations">Explore TAR integrations →</a></article>
+    </div>
+    <p class="disclaimer">These pages describe an intended technical architecture, not a catalogue of active third-party integrations, partnerships or certifications.</p>
+  </main>
+</BaseLayout>
+<style>
+ .integrations-hub{position:relative;z-index:2;width:min(1100px,calc(100% - 3rem));margin:auto;padding:clamp(4rem,8vw,7rem) 0 6rem}
+ .eyebrow{color:var(--dajc-orange);font:.72rem 'IBM Plex Mono',monospace;letter-spacing:.14em}
+ h1,h2{color:var(--dajc-white);font-family:'Space Grotesk',sans-serif}
+ h1{font-size:clamp(2.3rem,5vw,4.5rem);line-height:1.1;max-width:15ch}
+ .intro{color:#ccdaea;line-height:1.75;max-width:75ch;font-size:1.1rem}
+ .product-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.2rem;margin:3rem 0 1.5rem}
+ article{border:1px solid #47617f;border-radius:15px;background:rgba(8,34,64,.8);padding:2rem}
+ article h2{font-size:1.65rem}article p:not(.eyebrow){color:#b7c8d9;line-height:1.7;min-height:5.5rem}
+ article a{display:inline-flex;min-height:44px;align-items:center;color:var(--dajc-orange);font-weight:700;text-decoration:none}
+ .disclaimer{font-size:.8rem;color:#9db1c8;line-height:1.65}
+ a:focus-visible{outline:2px solid var(--dajc-orange);outline-offset:3px}
+ @media(max-width:700px){.product-cards{grid-template-columns:1fr}article p:not(.eyebrow){min-height:0}}
+</style>

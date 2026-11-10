@@ -1,0 +1,79 @@
+---
+interface Props { product: 'platform'|'tar' }
+const {product}=Astro.props;
+const available=Boolean(process.env.RESEND_API_KEY && process.env.DAJC_INTEGRATIONS_DATABASE_URL && process.env.DAJC_INTEGRATIONS_TOKEN_KEY);
+const categories=product==='platform'?
+  [['tms-erp','TMS or ERP'],['routing-permits','Routing and permits'],['telematics','Telematics'],['documents','Documents and data exchange'],['other','Other integration area']]:
+  [['assistance','Assistance network / insurance systems'],['dispatch','Dispatch and operations'],['telematics','Vehicle and positioning data'],['documents','Field evidence and accounting'],['other','Other integration area']];
+---
+<section class="request-section" id="request-documentation" aria-labelledby="document-request-title">
+  <div class="introduction">
+    <p class="eyebrow">PRIVATE TECHNICAL BRIEF</p>
+    <h2 id="document-request-title">Request the integration architecture PDF.</h2>
+    <p>Receive the {product==='platform'?'DAJC Platform':'DAJC TAR'} architecture overview with diagrams, proposed data exchange patterns, safeguards and a worked example.</p>
+    <p>We send a verification link first. After you confirm your address, a seven-day PDF download link is emailed automatically. This does not subscribe you to marketing.</p>
+  </div>
+  <form id="integration-document-form" class="form" data-product={product}>
+    <input type="hidden" name="product" value={product}/>
+    <label><span>Company *</span><input name="company" required maxlength="160" autocomplete="organization" placeholder="Company name"/></label>
+    <label><span>Work email *</span><input type="email" name="email" required maxlength="254" autocomplete="email" placeholder="name@company.com"/></label>
+    <label><span>Area of interest *</span><select name="integrationArea" required><option value="">Select one</option>{categories.map(([value,label])=><option value={value}>{label}</option>)}</select></label>
+    <label class="privacy"><input type="checkbox" name="privacy" required/><span>I have read the <a href="/privacy" target="_blank" rel="noopener noreferrer">privacy notice</a> and understand that DAJC will process this request and email technical documentation. *</span></label>
+    <label class="trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"/></label>
+    <button type="submit" disabled={!available}>{available?'Request PDF documentation':'Email requests temporarily unavailable'}</button>
+    {!available&&<p class="notice">Automatic email delivery is not enabled yet. For a manual technical enquiry, write to <a href="mailto:team@dajc.eu?subject=DAJC%20integration%20documentation">team@dajc.eu</a>.</p>}
+    <p class="status" id="integration-request-status" role="status" aria-live="polite"></p>
+    <p class="notice">This brief describes a proposed architecture, not a production API contract, supplier certification or active commercial partnership.</p>
+  </form>
+</section>
+<script>
+  const f=document.querySelector<HTMLFormElement>('#integration-document-form');
+  const status=document.querySelector<HTMLElement>('#integration-request-status');
+  f?.addEventListener('submit',async event=>{
+    event.preventDefault();
+    if(!status)return;
+    const data=new FormData(f);
+    const button=f.querySelector<HTMLButtonElement>('button[type=submit]');
+    if(button)button.disabled=true;
+    status.textContent='Sending your verification email...';
+    status.dataset.state='';
+    try{
+      const res=await fetch('/api/integrations/request',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          product:data.get('product'),company:data.get('company'),email:data.get('email'),
+          integrationArea:data.get('integrationArea'),
+          privacyAcknowledged:data.get('privacy')==='on',website:data.get('website')
+        }),signal:AbortSignal.timeout(25000)
+      });
+      const body=await res.json();
+      if(!res.ok||!body.ok)throw new Error(body.error||'Request could not be sent.');
+      f.reset();status.textContent='Check your inbox for a verification email. The link is valid for 24 hours.';
+      status.dataset.state='success';
+    }catch(error){
+      status.textContent=error instanceof Error?error.message:'Request could not be processed.';
+      status.dataset.state='error';
+    }finally{if(button)button.disabled=false;}
+  });
+</script>
+<style>
+  .request-section{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(2rem,5vw,5rem);border-top:1px solid var(--dajc-line);padding:3rem 0;align-items:start}
+  .eyebrow{color:var(--dajc-orange);font:500 .72rem 'IBM Plex Mono',monospace;letter-spacing:.13em}
+  h2{font:700 clamp(1.8rem,3vw,2.45rem)/1.15 'Space Grotesk',sans-serif;margin:.6rem 0 1.1rem}
+  .introduction p:not(.eyebrow){color:#b9c9da;line-height:1.75;font-size:.94rem}
+  .form{background:rgba(9,33,62,.84);border:1px solid #415d7c;border-radius:16px;padding:clamp(1.2rem,3vw,2rem);display:grid;gap:1.1rem}
+  .form label:not(.privacy){display:grid;gap:.5rem}
+  .form label span{font:.84rem 'IBM Plex Sans',sans-serif;color:#ebf3ff}
+  input,select{background:#08182e;border:1px solid #657b95;color:#fff;font:inherit;border-radius:8px;padding:.85rem;min-height:44px;width:100%}
+  input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--dajc-orange);outline-offset:3px}
+  .privacy{display:flex;align-items:start;gap:.8rem}
+  .privacy input{width:18px;min-width:18px;height:18px;min-height:18px;margin:.2rem 0;accent-color:var(--dajc-orange)}
+  .privacy span{font-size:.8rem;line-height:1.6}
+  a{color:var(--dajc-orange)}
+  button{min-height:48px;background:var(--dajc-orange);color:#071c35;font:700 .75rem 'IBM Plex Mono',monospace;text-transform:uppercase;border:0;border-radius:8px;cursor:pointer;padding:.8rem}
+  button:disabled{opacity:.6;cursor:not-allowed}
+  .notice,.status{color:#a8bad0;font-size:.8rem;line-height:1.6;margin:0}
+  .status[data-state=error]{color:#ffb3a8}.status[data-state=success]{color:#89dfad}
+  .trap{position:absolute!important;left:-9999px!important}
+  @media(max-width:760px){.request-section{grid-template-columns:1fr}}
+</style>
