@@ -87,6 +87,7 @@ const content = platform ? {
       ))}
     </div>
     <p class="system-principle"><strong>Existing-system preservation:</strong> DAJC is designed to connect specialist applications and authorised partners, not to force every company to replace its software.</p>
+    <p class="integration-cta"><a href={platform?"/platform/integrations":"/tar/integrations"}>Explore integration architecture and request the technical PDF →</a></p>
   </section>
 
   <ProductFeatureCatalogue product={product} />
@@ -132,4 +133,8 @@ const content = platform ? {
   .system-principle strong{color:var(--dajc-white);}
   @media(max-width:1040px){.benefits{grid-template-columns:repeat(3,minmax(0,1fr));}}
   @media(max-width:660px){.landing{width:min(100% - 2rem,1160px)}.comparison{grid-template-columns:1fr}.benefits{grid-template-columns:1fr}.benefits article{padding:1.1rem}.hero{padding-bottom:3.6rem}.audiences{margin-top:1.3rem}}
+  .integration-cta{margin:1.3rem 0 0}
+  .integration-cta a{color:var(--dajc-orange);font:700 .8rem/1.55 'IBM Plex Mono',monospace;text-decoration:none}
+  .integration-cta a:hover{text-decoration:underline}
+  .integration-cta a:focus-visible{outline:2px solid var(--dajc-orange);outline-offset:3px}
 </style>
