@@ -9,7 +9,7 @@
 - /api/integrations/request - send verification email.
 - /api/integrations/verify - verify single-use token and email document access link.
 - /api/integrations/download?t=... - serve programmatically generated, branded PDF on a valid 7-day token.
-- /api/integrations/maintenance - Vercel Cron daily cleanup, authenticated with CRON_SECRET.
+- /api/integrations/cleanup - Vercel Cron daily cleanup, authenticated with CRON_SECRET.
 
 No public vendor/partner names, integration-completion percentages, pipeline statuses or disclosures of current partner negotiations. Pages describe intended architecture, not guaranteed production connections.
 
