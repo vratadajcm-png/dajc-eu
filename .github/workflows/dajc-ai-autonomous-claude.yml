@@ -27,7 +27,7 @@ jobs:
     outputs:
       has_patch: ${{ steps.patch.outputs.has_patch }}
       base_ref: ${{ steps.resume.outputs.ref }}
-      base_sha: ${{ steps.patch.outputs.base_sha }}
+      base_sha: ${{ steps.baseline.outputs.sha }}
       existing_pr: ${{ steps.resume.outputs.pr_number }}
     steps:
       - name: Find a single existing autonomous DAJC AI draft
@@ -39,6 +39,10 @@ jobs:
           prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --base "$DAJC_TARGET_BASE" --limit 100 \
             --json number,headRefName,isDraft \
             --jq '[.[] | select(.isDraft and (.headRefName | startswith("claude/autonomous-ai-")))]')
+          # Branch names are untrusted API data; reject before any shell use.
+          jq -e 'all(.[]; (.headRefName | test("^claude/autonomous-ai-[0-9]+-[0-9]+$")))' <<< "$prs" >/dev/null || {
+            echo "::error::Invalid autonomous branch name"; exit 1;
+          }
           count=$(jq length <<< "$prs")
           if [ "$count" -gt 1 ]; then
             echo "::error::Multiple Claude AI drafts; owner must reconcile them."
@@ -56,6 +60,9 @@ jobs:
           ref: ${{ steps.resume.outputs.ref }}
           persist-credentials: false
           fetch-depth: 0
+      - name: Capture immutable baseline before running the developer
+        id: baseline
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -85,9 +92,13 @@ jobs:
           allowed_tools: "Read,Glob,Grep,Edit,Write,Bash(npm test),Bash(npm run typecheck),Bash(npm run build)"
       - name: Export bounded source patch without pushing
         id: patch
+        env:
+          EXPECTED_BASE_SHA: ${{ steps.baseline.outputs.sha }}
         shell: bash
         run: |
-          echo "base_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_BASE_SHA" || {
+            echo "::error::Developer changed Git HEAD; refuse patch"; exit 1;
+          }
           # Claude beta action writes its result transcript to output.txt in
           # the checkout root. It is not an application source modification.
           # Discard only that known, untracked regular file; other out-of-scope

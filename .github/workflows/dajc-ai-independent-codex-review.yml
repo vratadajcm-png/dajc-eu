@@ -64,6 +64,10 @@ jobs:
             files.push(...batch);
             if (batch.length < 100) break;
           }
+          const afterDiff = await get('pulls/' + num);
+          if (afterDiff.head.sha !== pr.head.sha || afterDiff.base.sha !== pr.base.sha) {
+            throw new Error('PR changed while collecting review evidence');
+          }
           if (!files.length || files.length > 50) throw new Error('Diff has excessive number of files');
           const text = files.map(f => {
             if (typeof f.patch !== 'string' || f.patch.length > 20000 ||
@@ -75,7 +79,7 @@ jobs:
           if (Buffer.byteLength(text) > 110000) throw new Error('Diff exceeds review limit');
           fs.writeFileSync('review-diff.txt', text + '\n');
           fs.writeFileSync('review-meta.json', JSON.stringify({
-            sha: pr.head.sha, number: num, ref: pr.head.ref
+            sha: pr.head.sha, base_sha: pr.base.sha, number: num, ref: pr.head.ref
           }));
           JS
       - name: Require explicit Codex API model
@@ -166,7 +170,7 @@ jobs:
             try {
               const meta = JSON.parse(fs.readFileSync('review-meta.json', 'utf8'));
               const report = JSON.parse(fs.readFileSync('review.json', 'utf8'));
-              if (meta.sha !== pr.head.sha || meta.number !== num) {
+              if (meta.sha !== pr.head.sha || meta.base_sha !== pr.base.sha || meta.number !== num) {
                 throw new Error('PR was updated during the review');
               }
               if (!['approve', 'request_changes'].includes(report.verdict) ||
