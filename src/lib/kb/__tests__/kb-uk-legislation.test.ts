@@ -48,9 +48,11 @@ describe('legislation.gov.uk', () => {
   });
   it('refuses a data.xml redirect that leaves legislation.gov.uk without following it', async () => {
     const requested: string[] = [];
+    const redirectModes: unknown[] = [];
     const redirecting = new PoliteClient({
-      fetchImpl: (async (u: string) => {
+      fetchImpl: (async (u: string, init?: { redirect?: unknown }) => {
         requested.push(u);
+        redirectModes.push(init?.redirect);
         return { ok: false, status: 302, headers: new Headers({ location: 'https://evil.example/ukpga/1999/12/data.xml' }), arrayBuffer: async () => new ArrayBuffer(0) };
       }) as never,
       robots: { admit: async () => undefined } as never, sleep: async () => undefined, minIntervalMs: 0,
@@ -58,6 +60,9 @@ describe('legislation.gov.uk', () => {
     const cand = { id: 'ukpga/1999/12', title: 'x', path: 'ukpga', year: '1999', number: '12', topics: [], areas: [] };
     await expect(acquireUkDocument(redirecting, cand)).rejects.toThrow(/redirect leaves www\.legislation\.gov\.uk/);
     expect(requested).toEqual(['https://www.legislation.gov.uk/ukpga/1999/12/data.xml']);
+    // The client must never let fetch follow redirects itself: with 'follow' the
+    // off-host target would be contacted before any check could run.
+    expect(redirectModes).toEqual(['manual']);
   });
   it('acquires, validates and dry-runs a document with SHA-256; skips one that is repealed', async () => {
     const c = client((u) => (u.pathname.endsWith('data.xml') ? ACT : ''));
