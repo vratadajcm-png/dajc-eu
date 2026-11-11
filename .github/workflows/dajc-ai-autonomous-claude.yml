@@ -36,12 +36,25 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           DAJC_ENABLED: ${{ vars.DAJC_CLAUDE_AUTONOMY_ENABLED }}
+          EVENT_NAME: ${{ github.event_name }}
         shell: bash
         run: |
           echo "Kill switch DAJC_CLAUDE_AUTONOMY_ENABLED: '${DAJC_ENABLED:-<unset>}' (false/0/off/no stops schedules)" >> "$GITHUB_STEP_SUMMARY"
+          # Evaluated here, not in a job-level expression: there an unset
+          # variable is null, and null == '0' is true, which silently stopped
+          # every schedule (Platform run 43007242960).
+          switch=$(printf '%s' "$DAJC_ENABLED" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+          if [ "$EVENT_NAME" != "workflow_dispatch" ]; then
+            case "$switch" in
+              false|0|off|no)
+                echo "ready=false" >> "$GITHUB_OUTPUT"
+                echo "::notice::Scheduled run stopped by the kill switch DAJC_CLAUDE_AUTONOMY_ENABLED."
+                echo "Scheduled run stopped by the kill switch before any provider call." >> "$GITHUB_STEP_SUMMARY"
+                exit 0;;
+            esac
+          fi
           private=$(gh api "repos/$GITHUB_REPOSITORY" --jq .private)
-          enabled=$(printf '%s' "$DAJC_ENABLED" | tr '[:upper:]' '[:lower:]')
-          if [ "$private" = "true" ] || [ "$enabled" = "true" ]; then
+          if [ "$private" = "true" ] || [ "$switch" = "true" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
             echo "Repository private: $private; output visibility accepted" >> "$GITHUB_STEP_SUMMARY"
           else
@@ -51,12 +64,12 @@ jobs:
           fi
 
   develop:
-    # Paid work needs the free preflight gate, and schedules stop at once when
-    # DAJC_CLAUDE_AUTONOMY_ENABLED is false/0/off/no (per-product kill switch).
-    # A re-run attempt never repeats the paid developer call; start a new,
-    # deliberate run instead.
+    # Paid work needs the free preflight gate, which also applies the
+    # per-product kill switch (DAJC_CLAUDE_AUTONOMY_ENABLED=false/0/off/no
+    # stops schedules; a manual dispatch is a deliberate maintainer run). A
+    # re-run attempt never repeats the paid developer call; start a new run.
     needs: preflight
-    if: ${{ needs.preflight.outputs.ready == 'true' && (github.event_name == 'workflow_dispatch' || !contains(fromJSON('["false","0","off","no"]'), vars.DAJC_CLAUDE_AUTONOMY_ENABLED)) && github.run_attempt == 1 }}
+    if: ${{ needs.preflight.outputs.ready == 'true' && github.run_attempt == 1 }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:

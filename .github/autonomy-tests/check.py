@@ -62,40 +62,54 @@ class GuardTests(unittest.TestCase):
         start = WORKFLOW.index('\n  develop:')
         develop = WORKFLOW[start:WORKFLOW.index('    runs-on:', start)]
         self.assertIn('github.run_attempt == 1', develop)
-        self.assertIn("vars.DAJC_", develop)  # schedule kill switch remains
+        preflight = WORKFLOW[WORKFLOW.index('\n  preflight:'):start]
+        self.assertIn("vars.DAJC_", preflight)  # schedule kill switch remains
         if not PLATFORM:
             review = (ROOT / '.github/workflows/dajc-ai-independent-codex-review.yml').read_text()
             job = review[review.index('  codex-review:'):review.index('    runs-on:')]
             self.assertIn('github.run_attempt == 1', job)
 
-    def test_preflight_gate_stops_paid_work_before_any_provider_call(self):
+    def test_preflight_gate_and_kill_switch_stop_paid_work_before_any_provider_call(self):
         start = WORKFLOW.index('\n  develop:')
         develop = WORKFLOW[start:WORKFLOW.index('    runs-on:', start)]
         self.assertIn('needs: preflight', develop)
-        self.assertIn("needs.preflight.outputs.ready == 'true' && ", develop)
-        # Explicit off values stop schedules; manual dispatch stays possible.
-        self.assertIn("""github.event_name == 'workflow_dispatch' || !contains(fromJSON('["false","0","off","no"]'), vars.DAJC_""", develop)
+        self.assertIn("if: ${{ needs.preflight.outputs.ready == 'true' && github.run_attempt == 1 }}", develop)
+        # Job-level expressions treat an unset variable as null and null == '0'
+        # as true; the kill switch must stay in the tested shell below.
+        self.assertNotIn('contains(', develop)
+        self.assertNotIn('vars.', develop)
         preflight = WORKFLOW[WORKFLOW.index('\n  preflight:'):start]
         self.assertNotRegex(preflight, r'\$\{\{\s*secrets\.')
         self.assertNotIn('contents: write', preflight)
+        self.assertIn('EVENT_NAME: ${{ github.event_name }}', preflight)
         self.assertLess(WORKFLOW.index('\n  preflight:'), WORKFLOW.index('      - name: ' + PAID_STEP))
         script = self._step_script('          echo "Kill switch', '\n  develop:')
+        S, D = 'schedule', 'workflow_dispatch'
+        # (event, kill switch value, gh output, gh exit code, expected ready, gh called)
         if PLATFORM:
             endpoint = 'repos/o/r/actions/workflows/dajc-autonomy-pr-probe.yml/runs?branch=main&status=completed&per_page=1'
-            cases = [('success', '', 0, 'true'), ('failure', '', 0, 'false'), ('cancelled', '', 0, 'false'),
-                     ('none', 'true', 0, 'false'), ('', '', 1, None)]
+            cases = [(S, '', 'success', 0, 'true', True),  # unset switch: schedules run
+                     (S, 'true', 'success', 0, 'true', True),
+                     (S, 'false', 'success', 0, 'false', False), (S, ' OFF ', 'success', 0, 'false', False),
+                     (S, '0', 'success', 0, 'false', False), (S, 'No', 'success', 0, 'false', False),
+                     (D, 'false', 'success', 0, 'true', True),  # deliberate manual run
+                     (S, '', 'failure', 0, 'false', True), (S, '', 'cancelled', 0, 'false', True),
+                     (D, '', 'none', 0, 'false', True), (S, '', '', 1, None, True)]
         else:
             endpoint = 'repos/o/r --jq .private'
-            cases = [('true', '', 0, 'true'), ('false', '', 0, 'false'), ('false', 'false', 0, 'false'),
-                     ('false', 'true', 0, 'true'), ('false', 'TRUE', 0, 'true'), ('null', '', 0, 'false'),
-                     ('', 'true', 1, None)]
+            cases = [(S, '', 'true', 0, 'true', True),  # private, unset switch: schedules run
+                     (S, 'false', 'true', 0, 'false', False), (S, '0', 'true', 0, 'false', False),
+                     (D, 'false', 'true', 0, 'true', True),
+                     (S, '', 'false', 0, 'false', True), (D, '', 'false', 0, 'false', True),
+                     (S, 'true', 'false', 0, 'true', True), (S, ' TRUE ', 'false', 0, 'true', True),
+                     (S, '', 'null', 0, 'false', True), (S, 'true', '', 1, None, True)]
         with tempfile.TemporaryDirectory() as directory:
             fake = Path(directory) / 'gh'
             fake.write_text('#!/usr/bin/env bash\nprintf "%s\\n" "$*" >> "$FAKE_LOG"\n'
                             '[ "$FAKE_RC" = 0 ] || exit "$FAKE_RC"\nprintf "%s\\n" "$FAKE_OUT"\n')
             fake.chmod(0o755)
-            for out, enabled, rc, ready in cases:
-                with self.subTest(out=out, enabled=enabled, rc=rc):
+            for event, enabled, out, rc, ready, called in cases:
+                with self.subTest(event=event, enabled=enabled, out=out, rc=rc):
                     files = {name: Path(directory) / name for name in ('log', 'output', 'summary')}
                     for path in files.values():
                         path.write_text('')
@@ -103,11 +117,11 @@ class GuardTests(unittest.TestCase):
                         capture_output=True, text=True,
                         env={**os.environ, 'PATH': f'{directory}:{os.environ["PATH"]}',
                              'FAKE_OUT': out, 'FAKE_RC': str(rc), 'FAKE_LOG': str(files['log']),
-                             'DAJC_ENABLED': enabled, 'GITHUB_REPOSITORY': 'o/r',
+                             'DAJC_ENABLED': enabled, 'EVENT_NAME': event, 'GITHUB_REPOSITORY': 'o/r',
                              'PROBE_WORKFLOW': 'dajc-autonomy-pr-probe.yml',
                              'GITHUB_OUTPUT': str(files['output']),
                              'GITHUB_STEP_SUMMARY': str(files['summary'])})
-                    self.assertIn(endpoint, files['log'].read_text())
+                    self.assertEqual(endpoint in files['log'].read_text(), called)
                     if ready is None:  # API failure fails closed: develop never starts
                         self.assertNotEqual(result.returncode, 0)
                         self.assertNotIn('ready=true', files['output'].read_text())
@@ -116,7 +130,7 @@ class GuardTests(unittest.TestCase):
                     self.assertEqual(files['output'].read_text(), f'ready={ready}\n')
                     self.assertIn('Kill switch', files['summary'].read_text())
                     if ready == 'false':
-                        self.assertIn('::warning::', result.stdout)
+                        self.assertRegex(result.stdout, '::(warning|notice)::')
 
     def test_weekly_paid_run_cap(self):
         # The cap must identify the real paid step; renaming it must break this test.
@@ -211,19 +225,17 @@ class GuardTests(unittest.TestCase):
                 self.assertIn('run: sudo chown -R -h "$(id -u):$(id -g)" -- "$GITHUB_WORKSPACE"', text)
                 self.assertNotRegex(text, r'chown -R (?!-h)')
 
-    @unittest.skipUnless(PLATFORM, 'DAJC AI reviewer is tested by its own evidence test')
-    def test_platform_review_uses_pinned_import_context(self):
-        sha = 'c' * 40
-        test_file = "import { handleIdentityLoss } from '@/lib/offline/tenant-guard';\nvi.mock('@/lib/client-state-purge', () => ({}));\n"
+    def _platform_review_prompt(self, sha, changed, head_files):
+        """Run the trusted reviewer against a mocked GitHub/Anthropic API and
+        return the prompt it sends plus its final commit status."""
         github = {
             'pulls/31': {'state': 'open', 'draft': True, 'base': {'ref': 'dev', 'sha': 'd' * 40},
                          'head': {'sha': sha, 'ref': 'codex/autonomous-1-1', 'repo': {'full_name': 'o/r'}}},
-            'pulls/31/files?per_page=100&page=1': [{'filename': 'tests/regression/x.test.ts', 'status': 'modified',
-                                                    'patch': '@@ -1 +1 @@\n-a\n+b'}],
-            f'contents/tests/regression/x.test.ts?ref={sha}': test_file,
-            f'contents/lib/offline/tenant-guard.ts?ref={sha}': 'export async function handleIdentityLoss(): Promise<boolean> { return true; }\n',
-            f'contents/lib/client-state-purge.ts?ref={sha}': 'export const OFFLINE_DB_NAME = "x";\n',
+            'pulls/31/files?per_page=100&page=1': [{'filename': name, 'status': 'modified',
+                                                    'patch': '@@ -1 +1 @@\n-a\n+b'} for name in changed],
         }
+        for path, content in head_files.items():
+            github[f'contents/{path}?ref={sha}'] = content
         verdict = '```json\n' + json.dumps({'verdict': 'approve', 'summary': 'ok', 'findings': []}) + '\n```'
         with tempfile.TemporaryDirectory() as directory:
             sent = Path(directory) / 'sent.json'
@@ -238,7 +250,7 @@ class GuardTests(unittest.TestCase):
                 "    return { ok: true, json: async () => ({ stop_reason: 'end_turn', content: [{ type: 'text', text: "
                 + json.dumps(verdict) + ' }] }) };\n'
                 '  }\n'
-                "  const key = url.replace('https://api.github.com/repos/o/r/', '');\n"
+                "  const key = decodeURIComponent(url.replace('https://api.github.com/repos/o/r/', ''));\n"
                 "  if (init.method === 'POST') { posts.push([key, init.body]);\n"
                 f'    fs.writeFileSync({json.dumps(str(Path(directory) / "posts.json"))}, JSON.stringify(posts));\n'
                 '    return { ok: true, json: async () => ({}) }; }\n'
@@ -248,20 +260,63 @@ class GuardTests(unittest.TestCase):
                 "    content: Buffer.from(value).toString('base64') } : value;\n"
                 '  return { ok: true, json: async () => body };\n'
                 '};\n')
-            subprocess.run(['node', '--import', mock.as_uri(), str(ROOT / '.github/autonomy/independent-review.mjs')],
+            result = subprocess.run(['node', '--import', mock.as_uri(), str(ROOT / '.github/autonomy/independent-review.mjs')],
                            check=True, capture_output=True, text=True,
                            env={**os.environ, 'GITHUB_REPOSITORY': 'o/r', 'GITHUB_TOKEN': 'x', 'PR_NUMBER': '31',
                                 'ANTHROPIC_API_KEY': 'x', 'DAJC_REVIEW_MODEL': 'm', 'DAJC_TARGET_BASE': 'dev',
                                 'GITHUB_SERVER_URL': 'https://github.com', 'GITHUB_RUN_ID': '1'})
             prompt = json.loads(sent.read_text())['messages'][0]['content']
-            self.assertIn('FILE: tests/regression/x.test.ts', prompt)
-            self.assertIn('CONTEXT FILE: tests/regression/x.test.ts (full content at head ' + sha + ', changed', prompt)
-            self.assertIn('CONTEXT FILE: lib/offline/tenant-guard.ts (full content at head ' + sha + ', unchanged', prompt)
-            self.assertIn('Promise<boolean>', prompt)
-            self.assertIn('CONTEXT FILE: lib/client-state-purge.ts', prompt)
             posts = json.loads((Path(directory) / 'posts.json').read_text())
             final_status = [json.loads(body) for key, body in posts if key == 'statuses/' + sha][-1]
-            self.assertEqual(final_status['state'], 'success')
+            return prompt, final_status, result.stdout
+
+    @unittest.skipUnless(PLATFORM, 'DAJC AI reviewer is tested by its own evidence test')
+    def test_platform_review_uses_pinned_import_context(self):
+        sha = 'c' * 40
+        test_file = "import { handleIdentityLoss } from '@/lib/offline/tenant-guard';\nvi.mock('@/lib/client-state-purge', () => ({}));\n"
+        prompt, status, _ = self._platform_review_prompt(sha, ['tests/regression/x.test.ts'], {
+            'tests/regression/x.test.ts': test_file,
+            'lib/offline/tenant-guard.ts': 'export async function handleIdentityLoss(): Promise<boolean> { return true; }\n',
+            'lib/client-state-purge.ts': 'export const OFFLINE_DB_NAME = "x";\n',
+        })
+        self.assertIn('FILE: tests/regression/x.test.ts', prompt)
+        self.assertIn('CONTEXT FILE: tests/regression/x.test.ts (full content at head ' + sha + ', changed', prompt)
+        self.assertIn('CONTEXT FILE: lib/offline/tenant-guard.ts (full content at head ' + sha + ', unchanged', prompt)
+        self.assertIn('Promise<boolean>', prompt)
+        self.assertIn('CONTEXT FILE: lib/client-state-purge.ts', prompt)
+        self.assertNotIn('OMITTED CONTEXT (not supplied', prompt)
+        self.assertEqual(status['state'], 'success')
+
+    @unittest.skipUnless(PLATFORM, 'DAJC AI reviewer is tested by its own evidence test')
+    def test_platform_review_follows_real_imports_before_mocks(self):
+        # PR #31 at 5d93da9: a test mocks many modules and runs replay.ts, which
+        # imports tenant-guard.ts. The reviewer must see tenant-guard.ts.
+        sha = 'e' * 40
+        mocks = ['@/lib/offline/db'] + [f'@/app/(app)/m{i}/actions' for i in range(16)]
+        test_file = ('import type { QueuedAction } from "@/lib/offline/types";\n'
+                     + ''.join(f'vi.mock("{spec}", () => ({{}}));\n' for spec in mocks)
+                     + 'import { replayQueue } from "@/lib/offline/replay";\n')
+        head = {'tests/regression/replay.test.ts': test_file,
+                'lib/offline/types.ts': 'export type QueuedAction = { id: string };\n',
+                'lib/offline/replay.ts': ('import { handleIdentityLoss } from "./tenant-guard";\n'
+                                          'import { listActions } from "@/lib/offline/db";\n'),
+                'lib/offline/tenant-guard.ts': 'export async function handleIdentityLoss() { await purge(); return true; }\n',
+                'lib/offline/db.ts': 'export function listActions() {}\n'}
+        head.update({f'app/(app)/m{i}/actions.ts': f'export const action{i} = 1;\n' for i in range(16)})
+        prompt, status, stdout = self._platform_review_prompt(sha, ['tests/regression/replay.test.ts'], head)
+        self.assertIn('CONTEXT FILE: lib/offline/replay.ts (full content at head ' + sha + ', unchanged, imported by a changed file)', prompt)
+        self.assertIn('CONTEXT FILE: lib/offline/tenant-guard.ts (full content at head ' + sha + ', unchanged, imported by lib/offline/replay.ts)', prompt)
+        self.assertIn('await purge()', prompt)
+        self.assertIn('CONTEXT FILE: lib/offline/db.ts (full content at head ' + sha + ', unchanged, replaced by vi.mock', prompt)
+        # Real imports come first; mocked modules fill the remaining slots and the
+        # rest is named instead of silently dropped.
+        self.assertLess(prompt.index('CONTEXT FILE: lib/offline/tenant-guard.ts'), prompt.index('CONTEXT FILE: app/(app)/m0/actions.ts'))
+        self.assertIn('OMITTED CONTEXT (not supplied', prompt)
+        omitted = prompt.split('OMITTED CONTEXT (not supplied', 1)[1]
+        self.assertIn('app/(app)/m15/actions', omitted)
+        self.assertNotIn('tenant-guard', omitted)
+        self.assertIn('Review context supplied: tests/regression/replay.test.ts, lib/offline/types.ts, lib/offline/replay.ts, lib/offline/tenant-guard.ts', stdout)
+        self.assertEqual(status['state'], 'success')
 
     @unittest.skipUnless(PLATFORM, 'Only the Platform publisher has the optional PR App path')
     def test_pr_app_token_is_publisher_only_and_least_privilege(self):
