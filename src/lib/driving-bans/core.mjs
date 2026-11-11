@@ -2,6 +2,8 @@ import { dajcEuropeCoverage, geographicScopePolicy, COVERAGE_VERSION, corridorOn
 /** Pure canonical Driving Bans engine. No network, no guessed prohibitions. */
 export const VERIFICATION_STATES = ['PRIMARY_VERIFIED', 'CROSSCHECKED', 'UNVERIFIED', 'SOURCE_UNAVAILABLE'];
 export const BAN_STATES = ['HAS_BAN', 'NO_BAN', 'UNKNOWN'];
+/** HUMAN: a person verified the primary text. AUTOMATED: the PDF auto-approval gate did, pending human review. */
+export const VERIFICATION_METHODS = ['HUMAN', 'AUTOMATED'];
 /** Only LEGAL_DRIVING_BAN rules become public calendar events or HAS_BAN evidence; the other classes are never merged into it. */
 export const RESTRICTION_CLASSES = Object.freeze(['LEGAL_DRIVING_BAN', 'TEMPORARY_TRAFFIC_RESTRICTION', 'INFRASTRUCTURE_CONSTRAINT', 'PERMIT_CONDITION']);
 export const restrictionClassOf = rule => rule.restriction_class ?? 'LEGAL_DRIVING_BAN';
@@ -127,6 +129,16 @@ export function validateCanonical(data, identities) {
       assert(rule.evidence_ids.length && rule.evidence_ids.every(id => sources.has(id)), `Missing source evidence ${rule.ban_id}`);
       if (rule.verification_state === 'PRIMARY_VERIFIED') assert(rule.evidence_ids.some(id => sources.get(id).role === 'PRIMARY' && sources.get(id).url === rule.source_url), `No primary source ${rule.ban_id}`);
     }
+    // Automatic approval from an official PDF (research/auto-approve.mjs) is labelled and awaits a human review;
+    // after that review the rule is HUMAN and keeps the approval record as history.
+    const method = rule.verification_method ?? 'HUMAN';
+    assert(VERIFICATION_METHODS.includes(method), `Invalid verification method ${rule.ban_id}`);
+    if (method === 'AUTOMATED' || rule.auto_approval) {
+      const auto = rule.auto_approval;
+      assert(auto && /^dba-\d+$/.test(auto.gate_version) && validInstant(auto.approved_at) && validInstant(auto.human_review_due) && /^[0-9a-f]{64}$/.test(auto.document_sha256) && /^rdraft-[0-9a-f]{16}$/.test(auto.draft_id), `Invalid automatic approval record ${rule.ban_id}`);
+      if (method === 'AUTOMATED') assert(rule.verification_state === 'PRIMARY_VERIFIED' && auto.human_reviewed_at === null, `Automatic approval must be pending human review ${rule.ban_id}`);
+      else assert(validInstant(auto.human_reviewed_at) && typeof auto.human_reviewer === 'string' && auto.human_reviewer.trim(), `Reviewed automatic approval needs reviewer and time ${rule.ban_id}`);
+    }
     const schedule = rule.schedule;
     assert(['daily','weekly','dates'].includes(schedule?.kind), `Unsupported recurrence ${rule.ban_id}`);
     assert(/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(schedule.start_time) && /^(?:(?:[01]\d|2[0-3]):[0-5]\d|24:00)$/.test(schedule.end_time), `Invalid times ${rule.ban_id}`);
@@ -240,8 +252,8 @@ export function toIcs(view, { countries = [], type = 'all', upcoming = true } = 
   const selected = view.jurisdictions.filter(r => !countries.length || countries.includes(r.jurisdiction));
   const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DAJC//Canonical Driving Bans//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:DAJC HGV Driving Bans',`X-DAJC-WINDOW:${view.window.from}/${view.window.to}`,`X-DAJC-DATASET:${esc(view.dataset_version)}`,`X-DAJC-COVERAGE-VERSION:${COVERAGE_VERSION}`,`X-DAJC-JURISDICTIONS:${esc(selected.map(r => r.jurisdiction).join(','))}`,`X-DAJC-EVENT-SCOPE:${upcoming ? 'UPCOMING' : 'WHOLE-WINDOW'}`,`X-DAJC-COVERAGE-COMPLETE:${selected.every(r => r.coverage_complete) ? 'TRUE':'FALSE'}`,`X-DAJC-UNKNOWN:${esc(selected.filter(r => r.ban_state === 'UNKNOWN').map(r => r.jurisdiction).join(','))}`,'X-WR-CALDESC:Verified ban events only. Missing events are NOT evidence of no ban. Consult the DAJC coverage status and official sources.','REFRESH-INTERVAL;VALUE=DURATION:PT1H','X-PUBLISHED-TTL:PT1H'];
   for (const e of events) {
-    const description = [`Local time: ${e.date} ${e.start_time} to ${e.end_date} ${e.end_time} (${e.timezone})`, `Vehicles: ${e.vehicle_scope}`, `Weight condition: ${JSON.stringify(e.weight_threshold)}`, `Roads: ${e.roads.join('; ')}`, `Regions: ${e.regions.join('; ')}`, `Direction: ${e.direction}`, `Exceptions: ${e.exceptions.join('; ')}`, `ADR: ${e.adr_relevance}`, `Exceptional transport: ${e.exceptional_relevance}`, `Legal basis: ${e.legal_basis}`, `Authority: ${e.source_authority}`, `Verified: ${e.verified_at}`, `Version: ${e.source_version}`, e.notes, 'Coverage may be incomplete. Check permits and current official instructions.'].join('\n');
-    lines.push('BEGIN:VEVENT',`UID:${esc(e.uid)}`,`DTSTAMP:${stamp(e.verified_at)}`,`LAST-MODIFIED:${stamp(e.verified_at)}`,`SEQUENCE:${e.sequence}`,`DTSTART:${stamp(e.starts_at)}`,`DTEND:${stamp(e.ends_at)}`,`SUMMARY:${esc(`${e.jurisdiction} — ${e.title}`)}`,`DESCRIPTION:${esc(description)}`,`URL:${e.source_url}`,`X-DAJC-TIMEZONE:${e.timezone}`,`X-DAJC-VERIFICATION:${e.verification_state}`,'STATUS:CONFIRMED','TRANSP:TRANSPARENT','END:VEVENT');
+    const description = [`Local time: ${e.date} ${e.start_time} to ${e.end_date} ${e.end_time} (${e.timezone})`, `Vehicles: ${e.vehicle_scope}`, `Weight condition: ${JSON.stringify(e.weight_threshold)}`, `Roads: ${e.roads.join('; ')}`, `Regions: ${e.regions.join('; ')}`, `Direction: ${e.direction}`, `Exceptions: ${e.exceptions.join('; ')}`, `ADR: ${e.adr_relevance}`, `Exceptional transport: ${e.exceptional_relevance}`, `Legal basis: ${e.legal_basis}`, `Authority: ${e.source_authority}`, `Verified: ${e.verified_at}`, ...(e.verification_method === 'AUTOMATED' ? [`Verified automatically from an official PDF document; human review due ${e.auto_approval.human_review_due}`] : []), `Version: ${e.source_version}`, e.notes, 'Coverage may be incomplete. Check permits and current official instructions.'].join('\n');
+    lines.push('BEGIN:VEVENT',`UID:${esc(e.uid)}`,`DTSTAMP:${stamp(e.verified_at)}`,`LAST-MODIFIED:${stamp(e.verified_at)}`,`SEQUENCE:${e.sequence}`,`DTSTART:${stamp(e.starts_at)}`,`DTEND:${stamp(e.ends_at)}`,`SUMMARY:${esc(`${e.jurisdiction} — ${e.title}`)}`,`DESCRIPTION:${esc(description)}`,`URL:${e.source_url}`,`X-DAJC-TIMEZONE:${e.timezone}`,`X-DAJC-VERIFICATION:${e.verification_state}`,...(e.verification_method === 'AUTOMATED' ? ['X-DAJC-VERIFICATION-METHOD:AUTOMATED'] : []),'STATUS:CONFIRMED','TRANSP:TRANSPARENT','END:VEVENT');
   }
   lines.push('END:VCALENDAR');
   return lines.map(foldLine).join('\r\n') + '\r\n';
