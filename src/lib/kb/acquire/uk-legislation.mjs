@@ -63,7 +63,7 @@ export async function discoverUkCandidates(client, { queries = UK_QUERIES, maxPa
   for (const q of queries) {
     for await (const e of listFeed(client, q.path, { title: q.title }, { maxPages })) {
       const path = TYPE_PATH[e.type];
-      if (!path || NOT_BASE.test(e.title) || !e.year || !e.number) continue;
+      if (!path || path !== q.path || NOT_BASE.test(e.title) || !/^[0-9]{4}$/.test(e.year ?? '') || !/^[1-9][0-9]*$/.test(e.number ?? '')) continue;
       const id = `${path}/${e.year}/${e.number}`;
       const known = byId.get(id);
       if (known) { known.topics = [...new Set([...known.topics, ...q.topics])]; known.areas = [...new Set([...known.areas, ...q.areas])]; continue; }
@@ -80,7 +80,12 @@ export async function discoverUkNew(client, { maxPages = 3 } = {}) {
   return out;
 }
 
-export const ukDataUrl = (id) => `${UK_BASE}/${id}/data.xml`;
+export const ukDataUrl = (id) => {
+  if (typeof id !== 'string' || !/^(?:ukpga|uksi|wsi|ssi|nisr)\/[0-9]{4}\/[1-9][0-9]*$/.test(id)) {
+    throw new Error('invalid UK legislation identifier');
+  }
+  return `${UK_BASE}/${id}/data.xml`;
+};
 
 /** Legislation XML -> metadata and citable provisions (sections/regulations and schedules). */
 export function parseLegislationXml(xml) {
@@ -113,7 +118,9 @@ export function parseLegislationXml(xml) {
 
 /** Downloads data.xml of a candidate and builds the validated entry plus the structured download. */
 export async function acquireUkDocument(client, candidate, { today = new Date().toISOString().slice(0, 10) } = {}) {
-  const url = ukDataUrl(candidate.id);
+  // Fail closed before any request: only type/yyyy/n identifiers reach the fixed UK_BASE origin.
+  // PoliteClient then refuses non-HTTPS URLs and redirects that leave www.legislation.gov.uk.
+  const url = ukDataUrl(candidate?.id);
   const got = await client.get(url, { accept: 'application/xml', maxBytes: 60 * 1024 * 1024 });
   const { meta, provisions } = parseLegislationXml(new TextDecoder().decode(got.bytes));
   if (/repealed|revoked/i.test(meta.title) || meta.validTo) return { skip: `not in force (${meta.validTo ? `valid to ${meta.validTo}` : 'title says repealed/revoked'})` };

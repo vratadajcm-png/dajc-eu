@@ -29,6 +29,41 @@ describe('legislation.gov.uk', () => {
     expect(provisions[0].text).toContain('7.5 t');
     expect(() => parseLegislationXml('<x/>')).toThrow();
   });
+  it('fails closed on feed identifiers that could redirect the data.xml fetch', async () => {
+    const hostile = (year: string, number: string) => `<feed><leg:page>1</leg:page><leg:morePages>0</leg:morePages><entry><id>x</id><title>Road Traffic Act</title><ukm:DocumentMainType Value="UnitedKingdomPublicGeneralAct"/><ukm:Year Value="${year}"/><ukm:Number Value="${number}"/></entry></feed>`;
+    const q = [{ path: 'ukpga', title: '"road traffic"', topics: ['hgv_traffic_rules'], areas: ['E.checks_sanctions'] }];
+    for (const [year, number] of [['1999/../../uksi', '12'], ['1999', '12/data.xml?x='], ['1999', '../12'], ['99', '12'], ['1999', '']]) {
+      expect(await discoverUkCandidates(client(() => hostile(year, number)), { queries: q })).toEqual([]);
+    }
+    expect(() => ukDataUrl('ukpga/1999/../../uksi/2000/1')).toThrow(/invalid/);
+    expect(() => ukDataUrl('ukpga/1999/12?x=1')).toThrow(/invalid/);
+    expect(() => ukDataUrl('other/1999/12')).toThrow(/invalid/);
+    const requested: string[] = [];
+    const c = client((u) => { requested.push(u.href); return ACT; });
+    await expect(acquireUkDocument(c, { id: 'ukpga/1999/../../uksi/2000/1', title: 'x', path: 'ukpga', year: '1999', number: '12', topics: [], areas: [] })).rejects.toThrow(/invalid/);
+    for (const bad of [undefined, null, {}, { id: 42 }, { id: 'https://evil.example/ukpga/1999/12' }]) {
+      await expect(acquireUkDocument(c, bad as never)).rejects.toThrow(/invalid/);
+    }
+    expect(requested).toEqual([]);
+  });
+  it('refuses a data.xml redirect that leaves legislation.gov.uk without following it', async () => {
+    const requested: string[] = [];
+    const redirectModes: unknown[] = [];
+    const redirecting = new PoliteClient({
+      fetchImpl: (async (u: string, init?: { redirect?: unknown }) => {
+        requested.push(u);
+        redirectModes.push(init?.redirect);
+        return { ok: false, status: 302, headers: new Headers({ location: 'https://evil.example/ukpga/1999/12/data.xml' }), arrayBuffer: async () => new ArrayBuffer(0) };
+      }) as never,
+      robots: { admit: async () => undefined } as never, sleep: async () => undefined, minIntervalMs: 0,
+    });
+    const cand = { id: 'ukpga/1999/12', title: 'x', path: 'ukpga', year: '1999', number: '12', topics: [], areas: [] };
+    await expect(acquireUkDocument(redirecting, cand)).rejects.toThrow(/redirect leaves www\.legislation\.gov\.uk/);
+    expect(requested).toEqual(['https://www.legislation.gov.uk/ukpga/1999/12/data.xml']);
+    // The client must never let fetch follow redirects itself: with 'follow' the
+    // off-host target would be contacted before any check could run.
+    expect(redirectModes).toEqual(['manual']);
+  });
   it('acquires, validates and dry-runs a document with SHA-256; skips one that is repealed', async () => {
     const c = client((u) => (u.pathname.endsWith('data.xml') ? ACT : ''));
     const cand = { id: 'ukpga/1999/12', title: 'x', path: 'ukpga', year: '1999', number: '12', topics: ['hgv_traffic_rules'], areas: ['E.checks_sanctions'] };
