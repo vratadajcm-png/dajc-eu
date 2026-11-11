@@ -15,6 +15,24 @@ For overall product design and sources read
 **The remaining text is the original pipeline design record and is
 historical where it calls the workflow "staged" or "not tested".**
 
+## Operating controls — 11 Nov 2026
+
+| Control | Where | Effect |
+|---|---|---|
+| Schedule kill switch | repo variable `DAJC_CLAUDE_AUTONOMY_ENABLED` | Only `true` lets the weekday 03:30 UTC schedule run; unset/`false` stops it at once. Disabling the workflow in Actions also stops manual runs. Independent of Platform's `DAJC_AUTONOMY_ENABLED`. |
+| Weekly paid-run cap | `DAJC_CLAUDE_WEEKLY_RUN_CAP` (default 6) | Counts runs in the last 7 days whose Claude step actually started; at the cap the job fails before any provider call. |
+| No paid re-runs | `github.run_attempt == 1` | "Re-run" never repeats the Claude developer call or the Codex review; start a new run deliberately. |
+| Per-run bounds | workflow | 30 turns (16 were exhausted by reading in run 42965067963, USD 0.35, no patch), action timeout 20 min, step timeout 25 min, job 45 min, one run at a time (concurrency group). |
+| Usage evidence | job summary + artifact `dajc-ai-claude-usage` (90 days) | Cost and turns reported by Claude Code. Provider billing stays authoritative. |
+| Owner documents | `.dajc-main-reference/` | Read-only copies of `AGENTS.md` and the AI source/decision docs from `main`, because the development branch lacks them. Deleted before the patch is exported. |
+| Codex reviewer isolation | `safety-strategy: unprivileged-user` | codex-action v1.13 `drop-sudo` fails on hosted runners (`/run/dbus/system_bus_socket`). Codex now runs as a separate account without sudo and with read-only ACL access to the checkout. The runner writes `review.json` from the action output. |
+
+| No deployments from autonomous work | `vercel.json` | `claude/autonomous-ai-*` branches never create a Vercel deployment (`git.deploymentEnabled`). An infrastructure-only commit whose message contains `[vercel skip]` is not built (`ignoreCommand`, opt-in per commit); every other commit, including all content and site changes, deploys exactly as before. |
+
+These limits do not cap spend in dollars. Hard monthly limits must be set in
+the Anthropic Console and OpenAI project settings; this workflow could not
+verify them.
+
 ## Product and repository boundaries
 
 - Product: **DAJC AI only** (Ask DAJC and official-source knowledge base).

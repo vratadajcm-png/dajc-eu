@@ -16,18 +16,22 @@ concurrency:
 
 jobs:
   develop:
-    if: ${{ github.event_name == 'workflow_dispatch' || vars.DAJC_CLAUDE_AUTONOMY_ENABLED == 'true' }}
+    # Schedules stay off unless DAJC_CLAUDE_AUTONOMY_ENABLED=true (instant,
+    # per-product kill switch). A re-run attempt never repeats the paid
+    # developer call; start a new, deliberate run instead.
+    if: ${{ (github.event_name == 'workflow_dispatch' || vars.DAJC_CLAUDE_AUTONOMY_ENABLED == 'true') && github.run_attempt == 1 }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
       DAJC_TARGET_BASE: ${{ vars.DAJC_AI_AUTONOMY_BASE || 'claude/dajc-ai-neon-knowledge-base' }}
     permissions:
+      actions: read
       contents: read
       pull-requests: read
     outputs:
       has_patch: ${{ steps.patch.outputs.has_patch }}
       base_ref: ${{ steps.resume.outputs.ref }}
-      base_sha: ${{ steps.patch.outputs.base_sha }}
+      base_sha: ${{ steps.baseline.outputs.sha }}
       existing_pr: ${{ steps.resume.outputs.pr_number }}
     steps:
       - name: Find a single existing autonomous DAJC AI draft
@@ -39,6 +43,10 @@ jobs:
           prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --base "$DAJC_TARGET_BASE" --limit 100 \
             --json number,headRefName,isDraft \
             --jq '[.[] | select(.isDraft and (.headRefName | startswith("claude/autonomous-ai-")))]')
+          # Branch names are untrusted API data; reject before any shell use.
+          jq -e 'all(.[]; (.headRefName | test("^claude/autonomous-ai-[0-9]+-[0-9]+$")))' <<< "$prs" >/dev/null || {
+            echo "::error::Invalid autonomous branch name"; exit 1;
+          }
           count=$(jq length <<< "$prs")
           if [ "$count" -gt 1 ]; then
             echo "::error::Multiple Claude AI drafts; owner must reconcile them."
@@ -50,12 +58,42 @@ jobs:
             echo "ref=$DAJC_TARGET_BASE" >> "$GITHUB_OUTPUT"
             echo "pr_number=" >> "$GITHUB_OUTPUT"
           fi
+      - name: Enforce the weekly paid-run cap before any provider call
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_CAP: ${{ vars.DAJC_CLAUDE_WEEKLY_RUN_CAP || '6' }}
+          WORKFLOW_FILE: dajc-ai-autonomous-claude.yml
+          PAID_STEP_PREFIX: Claude Code
+        shell: bash
+        run: |
+          case "$RUN_CAP" in ''|*[!0-9]*) echo "::error::Invalid DAJC_CLAUDE_WEEKLY_RUN_CAP"; exit 1;; esac
+          since=$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)
+          ids=$(gh api --paginate \
+            "repos/$GITHUB_REPOSITORY/actions/workflows/$WORKFLOW_FILE/runs?per_page=100&created=%3E%3D$since" \
+            --jq '.workflow_runs[].id')
+          used=0
+          for id in $ids; do
+            [ "$id" = "$GITHUB_RUN_ID" ] && continue
+            jobs=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$id/jobs?filter=all&per_page=100")
+            # Paid-step filter: a run counts once its paid developer step has
+            # started or is pending in a started job; skipped steps are free.
+            paid=$(jq --arg prefix "$PAID_STEP_PREFIX" '[.jobs[] | select(.name == "develop") | .steps[]? | select(.name | startswith($prefix)) | select(.conclusion != "skipped")] | length' <<< "$jobs")
+            [ "$paid" -gt 0 ] && used=$((used + 1))
+          done
+          echo "Paid autonomous developer runs in the last 7 days: $used (cap $RUN_CAP)" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$used" -ge "$RUN_CAP" ]; then
+            echo "::error::Weekly paid-run cap reached ($used/$RUN_CAP). No provider call was made."
+            exit 1
+          fi
       - name: Checkout candidate baseline; never expose GitHub credentials to Claude
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.resume.outputs.ref }}
           persist-credentials: false
           fetch-depth: 0
+      - name: Capture immutable baseline before running the developer
+        id: baseline
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -71,9 +109,43 @@ jobs:
         run: |
           test -n "$ANTHROPIC_API_KEY" || { echo "::error::Missing ANTHROPIC_API_KEY"; exit 1; }
           test -n "$CLAUDE_DEV_MODEL" || { echo "::error::Missing DAJC_CLAUDE_DEV_MODEL"; exit 1; }
-      - name: Load owner-controlled development instructions from main
-        run: git show origin/main:.github/ai-autonomy/claude-developer.md > "$RUNNER_TEMP/dajc-ai-developer.md"
+      - name: Load owner-controlled instructions and documents from main
+        shell: bash
+        run: |
+          # The development branch can lag behind main and lack the documents
+          # the developer policy requires. Provide read-only copies from main;
+          # they are deleted before patch export and never become a change.
+          ref=.dajc-main-reference
+          if [ -e "$ref" ] || [ -L "$ref" ] || git ls-files --error-unmatch -- "$ref" >/dev/null 2>&1; then
+            echo "::error::$ref already exists in the candidate checkout"; exit 1
+          fi
+          mkdir -p "$ref/docs"
+          for f in AGENTS.md docs/DAJC_AI_BUILD_SOURCE_MAP.md \
+                   docs/DAJC_AI_SOURCE_AND_CONNECTOR_REGISTRY.md \
+                   docs/DAJC_AI_SOURCE_INTEGRATION_REGISTER.json \
+                   docs/OWNER_DECISIONS.md docs/DAJC_AI_AUTONOMOUS_DEVELOPMENT.md; do
+            git show "origin/main:$f" > "$ref/$f"
+          done
+          chmod -R a-w "$ref"
+          {
+            echo "## Runtime note from the trusted workflow (read first)"
+            echo
+            echo "Read-only copies of the owner-controlled files named below were exported from \`main\`"
+            echo "into \`$ref/\` with the same relative paths (for example \`$ref/AGENTS.md\`)."
+            echo "Use those copies; they take precedence over any same-named file on this branch."
+            echo "Never edit \`$ref/\`: it is removed before your patch is exported."
+            echo
+            echo "Turn budget: at most 30 turns in total. Use Read, Glob and Grep for all exploration and"
+            echo "batch independent reads into one turn. Bash allows only \`npm test\`, \`npm run typecheck\`,"
+            echo "\`npm run build\` and \`npx vitest run <path>\`; any other command is denied and wastes a turn."
+            echo "Spend at most 6 turns reading, then write the failing test, the fix and run focused tests."
+            echo "If no safe task fits this budget, leave the checkout unchanged and explain why."
+            echo
+            git show origin/main:.github/ai-autonomy/claude-developer.md
+          } > "$RUNNER_TEMP/dajc-ai-developer.md"
       - name: Claude Code — one bounded DAJC AI development cycle
+        id: claude
+        timeout-minutes: 25
         uses: anthropics/claude-code-base-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -81,13 +153,56 @@ jobs:
           # The pinned @beta action recognizes model/max_turns/allowed_tools.
           # It silently ignores claude_args and falls back to a retired model.
           model: ${{ vars.DAJC_CLAUDE_DEV_MODEL || 'claude-sonnet-5-5' }}
-          max_turns: '12'
-          allowed_tools: "Read,Glob,Grep,Edit,Write,Bash(npm test),Bash(npm run typecheck),Bash(npm run build)"
-      - name: Export bounded source patch without pushing
-        id: patch
+          max_turns: '30'
+          timeout_minutes: '20'
+          allowed_tools: "Read,Glob,Grep,Edit,Write,Bash(npm test),Bash(npm run typecheck),Bash(npm run build),Bash(npx vitest run:*)"
+      - name: Record provider usage reported by Claude Code
+        if: ${{ always() && steps.claude.outcome != 'skipped' }}
+        env:
+          EXECUTION_FILE: ${{ steps.claude.outputs.execution_file }}
         shell: bash
         run: |
-          echo "base_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          usage="$RUNNER_TEMP/dajc-ai-claude-usage.json"
+          if [ -n "$EXECUTION_FILE" ] && [ -s "$EXECUTION_FILE" ] &&
+             jq -e 'type == "array"' "$EXECUTION_FILE" >/dev/null 2>&1; then
+            jq '[.[] | select(type == "object" and .type == "result")] | last // {} |
+                {subtype, is_error, num_turns, duration_ms,
+                 total_cost_usd: (.total_cost_usd // .cost_usd), usage}' "$EXECUTION_FILE" > "$usage"
+          else
+            echo '{"total_cost_usd": null, "note": "no execution log"}' > "$usage"
+          fi
+          cost=$(jq -r '.total_cost_usd // "UNKNOWN"' "$usage")
+          turns=$(jq -r '.num_turns // "UNKNOWN"' "$usage")
+          echo "Claude API usage reported by Claude Code: USD $cost, turns $turns (provider billing remains authoritative)" >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice::Claude API usage USD $cost, turns $turns"
+      - name: Preserve provider usage evidence
+        if: ${{ always() && steps.claude.outcome != 'skipped' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dajc-ai-claude-usage
+          path: ${{ runner.temp }}/dajc-ai-claude-usage.json
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Export bounded source patch without pushing
+        id: patch
+        env:
+          EXPECTED_BASE_SHA: ${{ steps.baseline.outputs.sha }}
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_BASE_SHA" || {
+            echo "::error::Developer changed Git HEAD; refuse patch"; exit 1;
+          }
+          # Remove the trusted read-only reference copies from main; they are
+          # never part of a candidate. Refuse anything unexpected.
+          ref=.dajc-main-reference
+          if git ls-files --error-unmatch -- "$ref" >/dev/null 2>&1 || [ -L "$ref" ]; then
+            echo "::error::Unexpected tracked or symlinked $ref"; exit 1
+          fi
+          if [ -e "$ref" ]; then
+            chmod -R u+w -- "$ref"
+            rm -rf -- "$ref"
+          fi
+          # end-reference-cleanup
           # Claude beta action writes its result transcript to output.txt in
           # the checkout root. It is not an application source modification.
           # Discard only that known, untracked regular file; other out-of-scope
@@ -222,7 +337,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           HEAD_BRANCH: ${{ steps.pr.outputs.branch }}
           PR_NUMBER: ${{ steps.pr.outputs.number }}
+          # Scheduled runs always come from main. A maintainer-dispatched run
+          # uses the reviewer definition from the same trusted ref as itself;
+          # the reviewer still checks out main for its prompt and schema.
+          REVIEW_REF: ${{ github.ref_name }}
         shell: bash
         run: |
           gh workflow run application-ci.yml --ref "$HEAD_BRANCH"
-          gh workflow run dajc-ai-independent-codex-review.yml --ref main -f pr_number="$PR_NUMBER"
+          gh workflow run dajc-ai-independent-codex-review.yml --ref "$REVIEW_REF" -f pr_number="$PR_NUMBER"

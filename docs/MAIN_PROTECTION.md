@@ -27,6 +27,15 @@ read-only, with explicit job permissions where writes are needed. Repair
 PRs `dajc-eu#35` and `dajc-cz#2` are merged with passing CI. X authentication,
 profile completion and the private HaulBoard protection gate remain open.
 
+## Infrastructure-only merges without deployment
+
+Every push to `main` normally deploys to Vercel production. A merge that changes
+only workflows or internal docs may carry the explicit marker `[vercel skip]` in
+its commit title; `vercel.json` `ignoreCommand` then cancels that one build
+("Canceled by Ignored Build Step"). Without the marker every commit builds and
+deploys as before. Autonomous `claude/autonomous-ai-*` branches never deploy
+(`git.deploymentEnabled`).
+
 ## Automation paths
 
 | Work | Destination | Review before public release |
