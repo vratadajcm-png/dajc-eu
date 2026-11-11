@@ -27,6 +27,8 @@ historical where it calls the workflow "staged" or "not tested".**
 | Owner documents | `.dajc-main-reference/` | Read-only copies of `AGENTS.md` and the AI source/decision docs from `main`, because the development branch lacks them. Deleted before the patch is exported. |
 | Codex reviewer isolation | `safety-strategy: unprivileged-user` | codex-action v1.13 `drop-sudo` fails on hosted runners (`/run/dbus/system_bus_socket`). Codex now runs as a separate account without sudo and with read-only ACL access to the checkout. The runner writes `review.json` from the action output. |
 
+| No deployments from autonomous work | `vercel.json` | `claude/autonomous-ai-*` branches never create a Vercel deployment (`git.deploymentEnabled`). An infrastructure-only commit whose message contains `[vercel skip]` is not built (`ignoreCommand`, opt-in per commit); every other commit, including all content and site changes, deploys exactly as before. |
+
 These limits do not cap spend in dollars. Hard monthly limits must be set in
 the Anthropic Console and OpenAI project settings; this workflow could not
 verify them.
