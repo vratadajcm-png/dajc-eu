@@ -118,7 +118,9 @@ export function parseLegislationXml(xml) {
 
 /** Downloads data.xml of a candidate and builds the validated entry plus the structured download. */
 export async function acquireUkDocument(client, candidate, { today = new Date().toISOString().slice(0, 10) } = {}) {
-  const url = ukDataUrl(candidate.id);
+  // Fail closed before any request: only type/yyyy/n identifiers reach the fixed UK_BASE origin.
+  // PoliteClient then refuses non-HTTPS URLs and redirects that leave www.legislation.gov.uk.
+  const url = ukDataUrl(candidate?.id);
   const got = await client.get(url, { accept: 'application/xml', maxBytes: 60 * 1024 * 1024 });
   const { meta, provisions } = parseLegislationXml(new TextDecoder().decode(got.bytes));
   if (/repealed|revoked/i.test(meta.title) || meta.validTo) return { skip: `not in force (${meta.validTo ? `valid to ${meta.validTo}` : 'title says repealed/revoked'})` };
