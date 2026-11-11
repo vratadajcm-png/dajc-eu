@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { MemoryArchive } from '../archive.mjs';
 import { PoliteClient } from '../acquire/polite-fetch.mjs';
-import { actPdfUrl, changedActs, discoverPlCandidates, latestConsolidation, planPlEntry, searchActs } from '../acquire/pl-eli.mjs';
+import { actDetails, actPdfUrl, actReferences, changedActs, discoverPlCandidates, latestConsolidation, planPlEntry, searchActs } from '../acquire/pl-eli.mjs';
 import { runImportQueue } from '../acquire/queue.mjs';
 import { splitProvisions } from '../provisions.mjs';
 import { makePdf } from './pdf-fixture';
@@ -52,6 +52,29 @@ describe('Polish ELI API client', () => {
     expect(plan.entry.version.effectiveFrom).toBe('2024-06-21');
     expect(plan.entry.version.validity).toBe('IN_FORCE');
     expect(plan.entry.version.validityEvidenceUrl).toBe('https://api.sejm.gov.pl/eli/acts/DU/1997/602');
+  });
+  it.each(['../../changes/acts', 'DU/1997/602/../../../../acts/search', 'DU/1997/602?x=1', 'DU/1997/602#f', 'DU/1997/0', 'DU/97/602', 'du/1997/602', 'DU/1997/602/', '/DU/1997/602', 'DU\\1997\\602', 'DU/1997/602%2f..', '', undefined, 42])(
+    'fails closed on an unsafe ELI %j before any request',
+    async (eli) => {
+      let requests = 0;
+      const client = mk((u) => { requests++; return api(u); });
+      expect(() => actPdfUrl(eli as never)).toThrow(/invalid ELI/);
+      await expect(actDetails(client, eli as never)).rejects.toThrow(/invalid ELI/);
+      await expect(actReferences(client, eli as never)).rejects.toThrow(/invalid ELI/);
+      await expect(latestConsolidation(client, eli as never)).rejects.toThrow(/invalid ELI/);
+      await expect(planPlEntry(client, { eli, topics: [], areas: [] } as never)).rejects.toThrow(/invalid ELI/);
+      expect(requests).toBe(0);
+    },
+  );
+  it('refuses a consolidated-text notice whose ELI is unsafe instead of building a PDF URL from it', async () => {
+    const evil = { ...NOTICE_NEW, ELI: 'DU/2024/1251/../../../../changes/acts' };
+    const client = mk((u) => (u.pathname.endsWith('/602/references') ? ok({ 'Inf. o tekście jednolitym': [{ act: evil }] }) : api(u)));
+    await expect(planPlEntry(client, { eli: 'DU/1997/602', topics: ['hgv_traffic_rules'], areas: [] })).rejects.toThrow(/invalid ELI/);
+  });
+  it('does not discover candidates with an unsafe ELI', async () => {
+    const bad = { ...BASE, ELI: 'DU/1997/602/../../../x' };
+    const c = await discoverPlCandidates(mk((u) => (u.pathname.endsWith('/acts/search') ? ok({ items: [bad, BASE], totalCount: 2 }) : api(u))), { queries: [{ q: 'ruchu drogowym', topics: ['hgv_traffic_rules'], areas: [] }] });
+    expect(c.map((x: { eli: string }) => x.eli)).toEqual(['DU/1997/602']);
   });
   it('does not import an act that is not in force', async () => {
     const plan = await planPlEntry(mk((u) => (u.pathname.endsWith('/602') ? ok({ ...BASE, inForce: 'REPEALED' }) : api(u))), { eli: 'DU/1997/602', topics: ['hgv_traffic_rules'], areas: [] });
