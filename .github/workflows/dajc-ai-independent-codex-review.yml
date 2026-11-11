@@ -79,7 +79,69 @@ jobs:
             return 'FILE ' + f.filename + '\nSTATUS ' + f.status + '\nPATCH\n' + f.patch;
           }).join('\n\n');
           if (Buffer.byteLength(text) > 110000) throw new Error('Diff exceeds review limit');
-          fs.writeFileSync('review-diff.txt', text + '\n');
+          // Read-only context pinned to the reviewed head SHA: the full content of
+          // changed source files and of the repository files they import directly
+          // (a diff alone hides e.g. the HTTP client a change relies on). Untrusted
+          // data like the patch; nothing is executed. Missing context is omitted.
+          const SOURCE = /\.(?:mjs|cjs|js|ts|tsx)$/;
+          async function headFile(path) {
+            if (!/^src\/[A-Za-z0-9._\/-]+$/.test(path) || path.split('/').includes('..')) return null;
+            try {
+              const data = await get('contents/' + path.split('/').map(encodeURIComponent).join('/') +
+                '?ref=' + pr.head.sha);
+              if (data.type !== 'file' || data.encoding !== 'base64' || typeof data.content !== 'string') return null;
+              const content = Buffer.from(data.content, 'base64').toString('utf8');
+              return content.length > 40000 ? null : content;
+            } catch {
+              return null;
+            }
+          }
+          function relativeImports(fromPath, source) {
+            const targets = new Set();
+            for (const m of source.matchAll(/(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s+)['"](\.{1,2}\/[^'"]+)['"]/g)) {
+              const parts = fromPath.split('/').slice(0, -1);
+              for (const segment of m[1].split('/')) {
+                if (segment === '..') parts.pop();
+                else if (segment !== '.' && segment !== '') parts.push(segment);
+              }
+              targets.add(parts.join('/'));
+            }
+            return targets;
+          }
+          const changedSources = files.filter(f => f.status !== 'removed' && SOURCE.test(f.filename))
+            .map(f => f.filename).slice(0, 10);
+          const contextFiles = new Map();
+          for (const path of changedSources) {
+            const content = await headFile(path);
+            if (content !== null) contextFiles.set(path, content);
+          }
+          let importedCount = 0;
+          for (const path of [...contextFiles.keys()]) {
+            for (const target of relativeImports(path, contextFiles.get(path))) {
+              if (importedCount >= 8) break;
+              const candidates = SOURCE.test(target) ? [target] : [target + '.ts', target + '.mjs', target + '.js'];
+              for (const candidate of candidates) {
+                if (contextFiles.has(candidate)) break;
+                const content = await headFile(candidate);
+                if (content !== null) {
+                  contextFiles.set(candidate, content);
+                  importedCount++;
+                  break;
+                }
+              }
+            }
+          }
+          let context = '';
+          for (const [path, content] of contextFiles) {
+            const block = '\n\nCONTEXT FILE ' + path + ' (full content at head ' + pr.head.sha + ', ' +
+              (changedSources.includes(path) ? 'changed in this PR' : 'unchanged, imported by a changed file') +
+              '; untrusted read-only data)\n' + content;
+            if (Buffer.byteLength(text) + Buffer.byteLength(context) + Buffer.byteLength(block) > 200000) continue;
+            context += block;
+          }
+          const header = 'This evidence file contains the exact PR patch (FILE sections) followed by ' +
+            'read-only CONTEXT FILE sections pinned to the same head commit.\n\n';
+          fs.writeFileSync('review-diff.txt', header + text + context + '\n');
           fs.writeFileSync('review-meta.json', JSON.stringify({
             sha: pr.head.sha, base_sha: pr.base.sha, number: num, ref: pr.head.ref
           }));
@@ -137,6 +199,7 @@ jobs:
           path: |
             review.json
             review-meta.json
+            review-diff.txt
           retention-days: 7
           if-no-files-found: ignore
 

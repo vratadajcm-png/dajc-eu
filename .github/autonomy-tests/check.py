@@ -156,6 +156,47 @@ class GuardTests(unittest.TestCase):
             self.assertIn('codex-user: dajc-codex', text)
             self.assertIn('unexpectedly has sudo', text)
 
+    @unittest.skipIf(PLATFORM, 'Platform reviewer embeds the patch in its own script')
+    def test_review_evidence_includes_pinned_import_context(self):
+        review = (ROOT / '.github/workflows/dajc-ai-independent-codex-review.yml').read_text()
+        script = review.split("<<'JS'\n")[1].split('\n          JS', 1)[0]
+        script = '\n'.join(line[10:] for line in script.splitlines())
+        sha = 'a' * 40
+        changed = "import { X } from './client.mjs';\nimport y from '../util/y';\nexport const f = 1;\n"
+        api = {
+            'pulls/7': {'state': 'open', 'draft': True, 'base': {'ref': 'dev', 'sha': 'b' * 40},
+                        'head': {'sha': sha, 'ref': 'claude/autonomous-ai-1-1',
+                                 'repo': {'full_name': 'o/r'}}},
+            'pulls/7/files?per_page=100&page=1': [{'filename': 'src/lib/kb/a.mjs', 'status': 'modified',
+                                                   'patch': '@@ -1 +1 @@\n-x\n+export const f = 1;'}],
+            f'contents/src/lib/kb/a.mjs?ref={sha}': changed,
+            f'contents/src/lib/kb/client.mjs?ref={sha}': "export const X = 'redirect: manual';\n",
+            f'contents/src/lib/util/y.ts?ref={sha}': 'export default 2;\n',
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            mock = Path(directory) / 'mock.mjs'
+            mock.write_text('const api = ' + json.dumps(api) + ';\n'
+                'globalThis.fetch = async (url) => {\n'
+                "  const key = String(url).replace('https://api.github.com/repos/o/r/', '');\n"
+                '  if (!(key in api)) return { ok: false, status: 404, json: async () => ({}) };\n'
+                '  const value = api[key];\n'
+                "  const body = typeof value === 'string' ? { type: 'file', encoding: 'base64',\n"
+                "    content: Buffer.from(value).toString('base64') } : value;\n"
+                '  return { ok: true, status: 200, json: async () => body };\n'
+                '};\n')
+            subprocess.run(['node', '--import', mock.as_uri(), '--input-type=module'], input=script,
+                           text=True, check=True, cwd=directory,
+                           env={**os.environ, 'GITHUB_REPOSITORY': 'o/r', 'PR_NUMBER': '7',
+                                'GITHUB_TOKEN': 'x', 'DAJC_TARGET_BASE': 'dev'})
+            evidence = (Path(directory) / 'review-diff.txt').read_text()
+            self.assertIn('FILE src/lib/kb/a.mjs\nSTATUS modified', evidence)
+            self.assertIn('CONTEXT FILE src/lib/kb/a.mjs (full content at head ' + sha + ', changed', evidence)
+            self.assertIn('CONTEXT FILE src/lib/kb/client.mjs (full content at head ' + sha + ', unchanged', evidence)
+            self.assertIn("redirect: manual", evidence)
+            self.assertIn('CONTEXT FILE src/lib/util/y.ts', evidence)
+            meta = json.loads((Path(directory) / 'review-meta.json').read_text())
+            self.assertEqual(meta['sha'], sha)
+
     def test_review_javascript_syntax(self):
         if PLATFORM:
             subprocess.run(['node', '--check', str(ROOT / '.github/autonomy/independent-review.mjs')], check=True)
