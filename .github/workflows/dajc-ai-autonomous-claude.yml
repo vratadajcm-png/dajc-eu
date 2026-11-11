@@ -1,0 +1,230 @@
+name: DAJC AI autonomous Claude Code development
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # Disabled unless repo variable DAJC_CLAUDE_AUTONOMY_ENABLED=true.
+    # 03:30 UTC Mon-Fri; GitHub schedules may run late.
+    - cron: '30 3 * * 1-5'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dajc-ai-claude-development
+  cancel-in-progress: false
+
+jobs:
+  develop:
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.DAJC_CLAUDE_AUTONOMY_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      has_patch: ${{ steps.patch.outputs.has_patch }}
+      base_ref: ${{ steps.resume.outputs.ref }}
+      base_sha: ${{ steps.baseline.outputs.sha }}
+      existing_pr: ${{ steps.resume.outputs.pr_number }}
+    steps:
+      - name: Find a single existing autonomous DAJC AI draft
+        id: resume
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --base main --limit 100 \
+            --json number,headRefName,isDraft \
+            --jq '[.[] | select(.isDraft and (.headRefName | startswith("claude/autonomous-ai-")))]')
+          # Branch names are untrusted API data; reject before any shell use.
+          jq -e 'all(.[]; (.headRefName | test("^claude/autonomous-ai-[0-9]+-[0-9]+$")))' <<< "$prs" >/dev/null || {
+            echo "::error::Invalid autonomous branch name"; exit 1;
+          }
+          count=$(jq length <<< "$prs")
+          if [ "$count" -gt 1 ]; then
+            echo "::error::Multiple Claude AI drafts; owner must reconcile them."
+            exit 1
+          elif [ "$count" -eq 1 ]; then
+            echo "ref=$(jq -r '.[0].headRefName' <<< "$prs")" >> "$GITHUB_OUTPUT"
+            echo "pr_number=$(jq -r '.[0].number' <<< "$prs")" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=main" >> "$GITHUB_OUTPUT"
+            echo "pr_number=" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Checkout candidate baseline; never expose GitHub credentials to Claude
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.resume.outputs.ref }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Capture immutable baseline before running the developer
+        id: baseline
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies without lifecycle execution
+        run: npm ci --ignore-scripts --no-fund
+      - name: Explicit Claude API configuration preflight
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_DEV_MODEL: ${{ vars.DAJC_CLAUDE_DEV_MODEL || 'claude-sonnet-5-5' }}
+        shell: bash
+        run: |
+          test -n "$ANTHROPIC_API_KEY" || { echo "::error::Missing ANTHROPIC_API_KEY"; exit 1; }
+          test -n "$CLAUDE_DEV_MODEL" || { echo "::error::Missing DAJC_CLAUDE_DEV_MODEL"; exit 1; }
+      - name: Claude Code — one bounded DAJC AI development cycle
+        uses: anthropics/claude-code-base-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt_file: .github/ai-autonomy/claude-developer.md
+          # @beta currently recognizes these inputs; claude_args is ignored.
+          model: ${{ vars.DAJC_CLAUDE_DEV_MODEL || 'claude-sonnet-5-5' }}
+          max_turns: '12'
+          allowed_tools: "Read,Glob,Grep,Edit,Write,Bash(npm test),Bash(npm run typecheck),Bash(npm run build)"
+      - name: Export bounded source patch without pushing
+        id: patch
+        env:
+          EXPECTED_BASE_SHA: ${{ steps.baseline.outputs.sha }}
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_BASE_SHA" || {
+            echo "::error::Developer changed Git HEAD; refuse patch"; exit 1;
+          }
+          # Remove only the Claude beta action's untracked result transcript.
+          # Keep the strict publisher whitelist unchanged for all other files.
+          if [ -e output.txt ] || [ -L output.txt ]; then
+            if git ls-files --error-unmatch -- output.txt >/dev/null 2>&1; then
+              echo "::error::Unexpected tracked output.txt: refuse cleanup"
+              exit 1
+            fi
+            if [ ! -f output.txt ] || [ -L output.txt ]; then
+              echo "::error::Unexpected output.txt type; refuse cleanup"
+              exit 1
+            fi
+            rm -- output.txt
+          fi
+          git add -N -- .
+          git diff --binary HEAD > /tmp/dajc-claude.patch
+          if [ ! -s /tmp/dajc-claude.patch ]; then
+            echo "has_patch=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          test "$(wc -c < /tmp/dajc-claude.patch)" -le 196608 || {
+            echo "::error::Patch exceeds 192 KiB"; exit 1;
+          }
+          cp /tmp/dajc-claude.patch dajc-claude.patch
+          echo "has_patch=true" >> "$GITHUB_OUTPUT"
+      - name: Preserve patch for separate restricted publisher
+        if: steps.patch.outputs.has_patch == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dajc-ai-claude-patch
+          path: dajc-claude.patch
+          retention-days: 7
+          if-no-files-found: error
+
+  publish-draft:
+    needs: develop
+    if: needs.develop.outputs.has_patch == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    # GitHub write token exists ONLY here and not in Claude Code job.
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      - name: Checkout exact candidate baseline
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.develop.outputs.base_ref }}
+          fetch-depth: 0
+      - name: Ensure branch was not changed after Claude ran
+        env:
+          EXPECTED_BASE_SHA: ${{ needs.develop.outputs.base_sha }}
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_BASE_SHA" || {
+            echo "::error::Candidate branch moved; refuse stale patch."; exit 1;
+          }
+      - uses: actions/download-artifact@v4
+        with:
+          name: dajc-ai-claude-patch
+      - name: Strict source-only patch validation
+        shell: bash
+        run: |
+          test -s dajc-claude.patch
+          test "$(wc -c < dajc-claude.patch)" -le 196608
+          git apply --check --whitespace=error dajc-claude.patch
+          git apply --whitespace=error dajc-claude.patch
+          rm dajc-claude.patch
+          python3 - <<'PY'
+          import pathlib
+          import subprocess
+          files = set(subprocess.check_output(
+              ["git", "diff", "--name-only", "--no-renames", "HEAD"], text=True
+          ).splitlines())
+          files.update(subprocess.check_output(
+              ["git", "ls-files", "--others", "--exclude-standard"], text=True
+          ).splitlines())
+          allowed = ("src/lib/ask/", "src/lib/ai/", "src/lib/kb/",
+                     "src/pages/api/ask/")
+          blocked = ("/payment", "/billing", "/subscription", "/legal",
+                     "/migrations", "/schema", "/entitlements")
+          if not files or len(files) > 20:
+              raise SystemExit("Empty or excessive patch")
+          for raw in sorted(files):
+              path = pathlib.PurePosixPath(raw)
+              if (path.is_absolute() or ".." in path.parts
+                      or not raw.startswith(allowed)
+                      or any(b in "/" + raw.lower() for b in blocked)):
+                  raise SystemExit("Prohibited Claude change: " + raw)
+              if pathlib.Path(raw).is_symlink():
+                  raise SystemExit("Symlinks are not permitted: " + raw)
+          print("Allowed DAJC AI source files:", len(files))
+          PY
+      - name: Create or update isolated draft PR, never merge
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXISTING_PR: ${{ needs.develop.outputs.existing_pr }}
+          BASE_REF: ${{ needs.develop.outputs.base_ref }}
+        shell: bash
+        run: |
+          if [ "$BASE_REF" = "main" ]; then
+            branch="claude/autonomous-ai-${{ github.run_id }}-${{ github.run_attempt }}"
+            git switch -c "$branch"
+          else
+            branch="$BASE_REF"
+            test -n "$EXISTING_PR" || { echo "::error::Missing existing PR"; exit 1; }
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(dajc-ai): autonomous Claude development candidate"
+          git push origin "$branch"
+          if [ -n "$EXISTING_PR" ]; then
+            number="$EXISTING_PR"
+            url="https://github.com/$GITHUB_REPOSITORY/pull/$number"
+          else
+            url=$(gh pr create --draft --base main --head "$branch" \
+              --title "DAJC AI: autonomous Claude candidate #${{ github.run_id }}" \
+              --body "Unreviewed Claude Code patch, **no release**. Independent Codex review, CI and explicit human merge approval required.")
+            number="${url##*/}"
+          fi
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+          echo "Autonomous draft: $url" >> "$GITHUB_STEP_SUMMARY"
+      - name: Explicitly dispatch CI and independent Codex review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_BRANCH: ${{ steps.pr.outputs.branch }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        shell: bash
+        run: |
+          gh workflow run application-ci.yml --ref "$HEAD_BRANCH"
+          gh workflow run dajc-ai-independent-codex-review.yml --ref main -f pr_number="$PR_NUMBER"

@@ -1,0 +1,214 @@
+name: DAJC AI independent Codex review
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Autonomous Claude draft PR number"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dajc-ai-independent-codex-${{ inputs.pr_number }}
+  cancel-in-progress: false
+
+jobs:
+  codex-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout trusted default branch, never execute PR code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Prepare exact immutable PR diff as UNTRUSTED DATA
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+        shell: bash
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const repo = process.env.GITHUB_REPOSITORY;
+          const num = Number(process.env.PR_NUMBER);
+          if (!Number.isSafeInteger(num) || num <= 0) throw new Error('Invalid PR number');
+          async function get(path) {
+            const response = await fetch('https://api.github.com/repos/' + repo + '/' + path, {
+              headers: {
+                'Authorization': 'Bearer ' + process.env.GITHUB_TOKEN,
+                'Accept': 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28'
+              },
+              signal: AbortSignal.timeout(30000)
+            });
+            if (!response.ok) throw new Error('GitHub API HTTP ' + response.status);
+            return response.json();
+          }
+          const pr = await get('pulls/' + num);
+          if (pr.state !== 'open' || !pr.draft || pr.base.ref !== 'main' ||
+              pr.head.repo.full_name !== repo ||
+              !/^claude\/autonomous-ai-[0-9]+-[0-9]+$/.test(pr.head.ref)) {
+            throw new Error('Only same-repository autonomous Claude draft PRs can be reviewed');
+          }
+          const files = [];
+          for (let page = 1; page <= 2; page++) {
+            const batch = await get('pulls/' + num + '/files?per_page=100&page=' + page);
+            files.push(...batch);
+            if (batch.length < 100) break;
+          }
+          const afterDiff = await get('pulls/' + num);
+          if (afterDiff.head.sha !== pr.head.sha || afterDiff.base.sha !== pr.base.sha) {
+            throw new Error('PR changed while collecting review evidence');
+          }
+          if (!files.length || files.length > 50) throw new Error('Diff has excessive number of files');
+          const text = files.map(f => {
+            if (typeof f.patch !== 'string' || f.patch.length > 20000 ||
+                !['modified', 'added', 'removed'].includes(f.status)) {
+              throw new Error('Cannot review binary, oversized or unsupported patch: ' + f.filename);
+            }
+            return 'FILE ' + f.filename + '\nSTATUS ' + f.status + '\nPATCH\n' + f.patch;
+          }).join('\n\n');
+          if (Buffer.byteLength(text) > 110000) throw new Error('Diff exceeds review limit');
+          fs.writeFileSync('review-diff.txt', text + '\n');
+          fs.writeFileSync('review-meta.json', JSON.stringify({
+            sha: pr.head.sha, base_sha: pr.base.sha, number: num, ref: pr.head.ref
+          }));
+          JS
+      - name: Require explicit Codex API model
+        env:
+          MODEL: ${{ vars.DAJC_CODEX_REVIEW_MODEL }}
+          API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        shell: bash
+        run: |
+          test -n "$API_KEY" || { echo "::error::Missing OPENAI_API_KEY"; exit 1; }
+      - name: Independent Codex review with constrained JSON output
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          model: ${{ vars.DAJC_CODEX_REVIEW_MODEL }}
+          prompt-file: .github/ai-autonomy/codex-review-prompt.md
+          sandbox: read-only
+          safety-strategy: drop-sudo
+          allow-bots: "true"
+          output-schema-file: .github/ai-autonomy/review-schema.json
+          output-file: review.json
+      - name: Preserve immutable review result for isolated publisher
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dajc-ai-independent-codex-review
+          path: |
+            review.json
+            review-meta.json
+          retention-days: 7
+          if-no-files-found: ignore
+
+  publish-review:
+    needs: codex-review
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+      issues: write
+      statuses: write
+      contents: read
+    steps:
+      - name: Download review result (if Codex completed)
+        if: needs.codex-review.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: dajc-ai-independent-codex-review
+      - name: Publish advisory status — always fail closed on missing evidence
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          REVIEW_JOB_RESULT: ${{ needs.codex-review.result }}
+          MODEL: ${{ vars.DAJC_CODEX_REVIEW_MODEL }}
+        shell: bash
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const repo = process.env.GITHUB_REPOSITORY;
+          const num = Number(process.env.PR_NUMBER);
+          if (!Number.isSafeInteger(num) || num <= 0) throw new Error('Invalid PR number');
+          async function request(path, method = 'GET', data) {
+            const res = await fetch('https://api.github.com/repos/' + repo + '/' + path, {
+              method,
+              headers: {
+                'Authorization': 'Bearer ' + process.env.GITHUB_TOKEN,
+                'Accept': 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28',
+                'Content-Type': 'application/json'
+              },
+              body: data === undefined ? undefined : JSON.stringify(data),
+              signal: AbortSignal.timeout(30000)
+            });
+            if (!res.ok) throw new Error('GitHub API ' + method + ' HTTP ' + res.status);
+            return res.json();
+          }
+          const pr = await request('pulls/' + num);
+          if (pr.state !== 'open' || !pr.draft || pr.base.ref !== 'main' ||
+              pr.head.repo.full_name !== repo ||
+              !/^claude\/autonomous-ai-[0-9]+-[0-9]+$/.test(pr.head.ref)) {
+            throw new Error('Unexpected PR target for review status');
+          }
+          let approved = false;
+          let reason = 'Codex review failed or returned incomplete evidence';
+          let details = [];
+          if (process.env.REVIEW_JOB_RESULT === 'success' &&
+              fs.existsSync('review.json') && fs.existsSync('review-meta.json')) {
+            try {
+              const meta = JSON.parse(fs.readFileSync('review-meta.json', 'utf8'));
+              const report = JSON.parse(fs.readFileSync('review.json', 'utf8'));
+              if (meta.sha !== pr.head.sha || meta.base_sha !== pr.base.sha || meta.number !== num) {
+                throw new Error('PR was updated during the review');
+              }
+              if (!['approve', 'request_changes'].includes(report.verdict) ||
+                  typeof report.summary !== 'string' || !Array.isArray(report.findings) ||
+                  report.findings.length > 25 ||
+                  !report.findings.every(f => typeof f.file === 'string' &&
+                    typeof f.detail === 'string' &&
+                    ['critical','high','medium','low'].includes(f.severity))) {
+                throw new Error('Invalid structured review');
+              }
+              approved = report.verdict === 'approve' &&
+                !report.findings.some(f => ['critical','high','medium'].includes(f.severity));
+              reason = report.summary.slice(0, 1300);
+              details = report.findings.slice(0, 20).map(f =>
+                '- **' + f.severity + ' — ' + f.file.slice(0, 180) + '**: ' +
+                f.detail.slice(0, 500));
+            } catch (error) {
+              reason = 'Review evidence rejected: ' + String(error).slice(0, 260);
+            }
+          }
+          const sha = pr.head.sha;
+          await request('statuses/' + sha, 'POST', {
+            state: approved ? 'success' : 'failure',
+            context: 'DAJC AI / independent Codex review',
+            description: approved ? 'Codex approved diff; human approval still required'
+                                  : 'Independent Codex review blocked or requests changes',
+            target_url: process.env.GITHUB_SERVER_URL + '/' + repo +
+              '/actions/runs/' + process.env.GITHUB_RUN_ID
+          });
+          const body = [
+            '### Independent Codex review — ' + (approved ? 'ADVISORY PASS' : 'BLOCKED / CHANGES REQUESTED'),
+            '',
+            'Commit: `' + sha + '`',
+            'Model: `' + (process.env.MODEL || 'not configured') + '`',
+            '',
+            reason,
+            ...details,
+            '',
+            'This is not release approval. CI and human review are mandatory.'
+          ].join('\n');
+          await request('issues/' + num + '/comments', 'POST', {body: body.slice(0, 16000)});
+          if (!approved) process.exitCode = 1;
+          JS
