@@ -134,7 +134,12 @@ jobs:
             echo "into \`$ref/\` with the same relative paths (for example \`$ref/AGENTS.md\`)."
             echo "Use those copies; they take precedence over any same-named file on this branch."
             echo "Never edit \`$ref/\`: it is removed before your patch is exported."
-            echo "Spend at most a few turns on reading; reserve turns for the test, fix and checks."
+            echo
+            echo "Turn budget: at most 30 turns in total. Use Read, Glob and Grep for all exploration and"
+            echo "batch independent reads into one turn. Bash allows only \`npm test\`, \`npm run typecheck\`,"
+            echo "\`npm run build\` and \`npx vitest run <path>\`; any other command is denied and wastes a turn."
+            echo "Spend at most 6 turns reading, then write the failing test, the fix and run focused tests."
+            echo "If no safe task fits this budget, leave the checkout unchanged and explain why."
             echo
             git show origin/main:.github/ai-autonomy/claude-developer.md
           } > "$RUNNER_TEMP/dajc-ai-developer.md"
@@ -148,9 +153,9 @@ jobs:
           # The pinned @beta action recognizes model/max_turns/allowed_tools.
           # It silently ignores claude_args and falls back to a retired model.
           model: ${{ vars.DAJC_CLAUDE_DEV_MODEL || 'claude-sonnet-5-5' }}
-          max_turns: '16'
+          max_turns: '30'
           timeout_minutes: '20'
-          allowed_tools: "Read,Glob,Grep,Edit,Write,Bash(npm test),Bash(npm run typecheck),Bash(npm run build)"
+          allowed_tools: "Read,Glob,Grep,Edit,Write,Bash(npm test),Bash(npm run typecheck),Bash(npm run build),Bash(npx vitest run:*)"
       - name: Record provider usage reported by Claude Code
         if: ${{ always() && steps.claude.outcome != 'skipped' }}
         env:
