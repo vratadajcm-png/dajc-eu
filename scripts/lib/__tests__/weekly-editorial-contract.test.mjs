@@ -60,6 +60,17 @@ describe('quality over count', () => {
   });
 });
 
+describe('Weekly audience scope (from W46 2026)', () => {
+  it('uses the 3.5-t tachograph audience in editorial spec, research and synthesis', () => {
+    for (const file of ['docs/DAJC_WEEKLY_INTELLIGENCE_SPEC.md', 'scripts/lib/article-writer.mjs', 'scripts/lib/web-search.mjs']) {
+      const source = read(file);
+      expect(source, file).toMatch(/3\.5 t|3\.5 tonnes/);
+      expect(source, file).toMatch(/tachograph/i);
+      expect(source, file).not.toMatch(/vehicles over 12 t(?:onnes)?|goods vehicles over 12 t/i);
+    }
+  });
+});
+
 describe('Driving Bans isolation', () => {
   it('no Weekly pipeline file imports the DAJC Driving Bans calendar', () => {
     for (const file of WEEKLY_FILES) {
