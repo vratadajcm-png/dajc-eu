@@ -31,9 +31,17 @@ export async function* pagedItems(client, path, params, { pageSize = 500, maxIte
 
 export const searchActs = (client, params, options) => pagedItems(client, '/acts/search', params, options);
 export const changedActs = (client, since, options) => pagedItems(client, '/changes/acts', { since }, options);
-export const actDetails = (client, eli) => json(client, `${ELI_BASE}/acts/${eli}`);
-export const actReferences = (client, eli) => json(client, `${ELI_BASE}/acts/${eli}/references`);
-export const actPdfUrl = (eli) => `${ELI_BASE}/acts/${eli}/text.pdf`;
+const ELI_PATTERN = /^[A-Z]{2,4}\/[0-9]{4}\/[1-9][0-9]*$/;
+export const isValidEli = (eli) => typeof eli === 'string' && ELI_PATTERN.test(eli);
+// Fail closed before any request: only publisher/year/position reaches the fixed ELI_BASE path.
+const safeEli = (eli) => {
+  if (!isValidEli(eli)) throw new Error('invalid ELI identifier');
+  return eli;
+};
+
+export const actDetails = async (client, eli) => json(client, `${ELI_BASE}/acts/${safeEli(eli)}`);
+export const actReferences = async (client, eli) => json(client, `${ELI_BASE}/acts/${safeEli(eli)}/references`);
+export const actPdfUrl = (eli) => `${ELI_BASE}/acts/${safeEli(eli)}/text.pdf`;
 
 // Relevance policy for road freight: API title queries mapped to the DAJC taxonomy.
 export const PL_QUERIES = Object.freeze([
@@ -59,7 +67,7 @@ export async function discoverPlCandidates(client, { queries = PL_QUERIES, perQu
   const byEli = new Map();
   for (const query of queries) {
     for await (const a of searchActs(client, { title: query.q, inForce: '1' }, { maxItems: perQueryMax })) {
-      if (!BASE_TYPES.has(a.type) || AMENDING.test(a.title) || !a.ELI) continue;
+      if (!BASE_TYPES.has(a.type) || AMENDING.test(a.title) || !isValidEli(a.ELI)) continue;
       const known = byEli.get(a.ELI);
       if (known) { known.topics = [...new Set([...known.topics, ...query.topics])]; known.areas = [...new Set([...known.areas, ...query.areas])]; continue; }
       byEli.set(a.ELI, { eli: a.ELI, title: a.title, type: a.type, displayAddress: a.displayAddress, status: a.status, textPDF: a.textPDF === true, topics: [...query.topics], areas: [...query.areas] });
