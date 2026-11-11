@@ -59,13 +59,64 @@ class GuardTests(unittest.TestCase):
         return '\n'.join(line[10:] for line in WORKFLOW[start:end].splitlines())
 
     def test_paid_developer_call_is_never_repeated_by_rerun(self):
-        develop = WORKFLOW[WORKFLOW.index('  develop:'):WORKFLOW.index('    runs-on:')]
+        start = WORKFLOW.index('\n  develop:')
+        develop = WORKFLOW[start:WORKFLOW.index('    runs-on:', start)]
         self.assertIn('github.run_attempt == 1', develop)
         self.assertIn("vars.DAJC_", develop)  # schedule kill switch remains
         if not PLATFORM:
             review = (ROOT / '.github/workflows/dajc-ai-independent-codex-review.yml').read_text()
             job = review[review.index('  codex-review:'):review.index('    runs-on:')]
             self.assertIn('github.run_attempt == 1', job)
+
+    def test_preflight_gate_stops_paid_work_before_any_provider_call(self):
+        start = WORKFLOW.index('\n  develop:')
+        develop = WORKFLOW[start:WORKFLOW.index('    runs-on:', start)]
+        self.assertIn('needs: preflight', develop)
+        self.assertIn("needs.preflight.outputs.ready == 'true' && ", develop)
+        # Explicit off values stop schedules; manual dispatch stays possible.
+        self.assertIn("""github.event_name == 'workflow_dispatch' || !contains(fromJSON('["false","0","off","no"]'), vars.DAJC_""", develop)
+        preflight = WORKFLOW[WORKFLOW.index('\n  preflight:'):start]
+        self.assertNotRegex(preflight, r'\$\{\{\s*secrets\.')
+        self.assertNotIn('contents: write', preflight)
+        self.assertLess(WORKFLOW.index('\n  preflight:'), WORKFLOW.index('      - name: ' + PAID_STEP))
+        script = self._step_script('          echo "Kill switch', '\n  develop:')
+        if PLATFORM:
+            endpoint = 'repos/o/r/actions/workflows/dajc-autonomy-pr-probe.yml/runs?branch=main&status=completed&per_page=1'
+            cases = [('success', '', 0, 'true'), ('failure', '', 0, 'false'), ('cancelled', '', 0, 'false'),
+                     ('none', 'true', 0, 'false'), ('', '', 1, None)]
+        else:
+            endpoint = 'repos/o/r --jq .private'
+            cases = [('true', '', 0, 'true'), ('false', '', 0, 'false'), ('false', 'false', 0, 'false'),
+                     ('false', 'true', 0, 'true'), ('false', 'TRUE', 0, 'true'), ('null', '', 0, 'false'),
+                     ('', 'true', 1, None)]
+        with tempfile.TemporaryDirectory() as directory:
+            fake = Path(directory) / 'gh'
+            fake.write_text('#!/usr/bin/env bash\nprintf "%s\\n" "$*" >> "$FAKE_LOG"\n'
+                            '[ "$FAKE_RC" = 0 ] || exit "$FAKE_RC"\nprintf "%s\\n" "$FAKE_OUT"\n')
+            fake.chmod(0o755)
+            for out, enabled, rc, ready in cases:
+                with self.subTest(out=out, enabled=enabled, rc=rc):
+                    files = {name: Path(directory) / name for name in ('log', 'output', 'summary')}
+                    for path in files.values():
+                        path.write_text('')
+                    result = subprocess.run(['bash', '-e', '-o', 'pipefail', '-c', script],
+                        capture_output=True, text=True,
+                        env={**os.environ, 'PATH': f'{directory}:{os.environ["PATH"]}',
+                             'FAKE_OUT': out, 'FAKE_RC': str(rc), 'FAKE_LOG': str(files['log']),
+                             'DAJC_ENABLED': enabled, 'GITHUB_REPOSITORY': 'o/r',
+                             'PROBE_WORKFLOW': 'dajc-autonomy-pr-probe.yml',
+                             'GITHUB_OUTPUT': str(files['output']),
+                             'GITHUB_STEP_SUMMARY': str(files['summary'])})
+                    self.assertIn(endpoint, files['log'].read_text())
+                    if ready is None:  # API failure fails closed: develop never starts
+                        self.assertNotEqual(result.returncode, 0)
+                        self.assertNotIn('ready=true', files['output'].read_text())
+                        continue
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(files['output'].read_text(), f'ready={ready}\n')
+                    self.assertIn('Kill switch', files['summary'].read_text())
+                    if ready == 'false':
+                        self.assertIn('::warning::', result.stdout)
 
     def test_weekly_paid_run_cap(self):
         # The cap must identify the real paid step; renaming it must break this test.
@@ -211,6 +262,28 @@ class GuardTests(unittest.TestCase):
             posts = json.loads((Path(directory) / 'posts.json').read_text())
             final_status = [json.loads(body) for key, body in posts if key == 'statuses/' + sha][-1]
             self.assertEqual(final_status['state'], 'success')
+
+    @unittest.skipUnless(PLATFORM, 'Only the Platform publisher has the optional PR App path')
+    def test_pr_app_token_is_publisher_only_and_least_privilege(self):
+        develop = WORKFLOW[WORKFLOW.index('  develop:'):WORKFLOW.index('  publish-draft:')]
+        publish = WORKFLOW[WORKFLOW.index('  publish-draft:'):]
+        self.assertNotIn('create-github-app-token', develop)
+        self.assertNotIn('DAJC_PR_APP', develop)
+        step = publish[publish.index('      - name: Mint a short-lived PR-only token'):
+                       publish.index('      - name: Create one draft PR')]
+        # Pinned to a full commit SHA, optional, and limited to pull requests.
+        self.assertRegex(step, r'uses: actions/create-github-app-token@[0-9a-f]{40} ')
+        self.assertIn("if: ${{ vars.DAJC_PR_APP_CLIENT_ID != '' }}", step)
+        permissions = [line.strip() for line in step.splitlines() if line.strip().startswith('permission-')]
+        self.assertEqual(permissions, ['permission-pull-requests: write'])
+        self.assertNotIn('owner:', step)
+        self.assertNotIn('repositories:', step)
+        self.assertNotIn('skip-token-revoke', step)
+        # The App token is only used to open the PR, never to push or merge.
+        self.assertEqual(publish.count('steps.pr-app.outputs.token'), 2)
+        self.assertIn('GH_TOKEN="$PR_TOKEN" gh pr create --draft', publish)
+        self.assertNotIn('gh pr merge', WORKFLOW)
+        self.assertNotIn('--auto', WORKFLOW)
 
     def test_review_javascript_syntax(self):
         if PLATFORM:

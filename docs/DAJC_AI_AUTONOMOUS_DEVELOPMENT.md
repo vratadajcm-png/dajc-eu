@@ -19,14 +19,14 @@ historical where it calls the workflow "staged" or "not tested".**
 
 | Control | Where | Effect |
 |---|---|---|
-| Schedule kill switch | repo variable `DAJC_CLAUDE_AUTONOMY_ENABLED` | Only `true` lets the weekday 03:30 UTC schedule run; unset/`false` stops it at once. Disabling the workflow in Actions also stops manual runs. Independent of Platform's `DAJC_AUTONOMY_ENABLED`. |
+| Schedule kill switch | repo variable `DAJC_CLAUDE_AUTONOMY_ENABLED` | Schedules are on (owner activation, 11 Nov 2026): the weekday 03:30 UTC run starts unless the variable is `false`, `0`, `off` or `no`, which stops it at once. Disabling the workflow in Actions also stops manual runs. Independent of Platform's `DAJC_AUTONOMY_ENABLED`. |
+| Internal-output gate | `preflight` job | Free, no secrets. While this repository is public, its commits, draft PRs, reviews and artifacts are public, so a paid Claude run (scheduled or manual) starts only when the repository is private or the owner has explicitly accepted public output with `DAJC_CLAUDE_AUTONOMY_ENABLED=true`. Otherwise the run ends green with a warning before any provider call. |
 | Weekly paid-run cap | `DAJC_CLAUDE_WEEKLY_RUN_CAP` (default 6) | Counts runs in the last 7 days whose Claude step actually started; at the cap the job fails before any provider call. |
 | No paid re-runs | `github.run_attempt == 1` | "Re-run" never repeats the Claude developer call or the Codex review; start a new run deliberately. |
 | Per-run bounds | workflow | 30 turns (16 were exhausted by reading in run 42965067963, USD 0.35, no patch), action timeout 20 min, step timeout 25 min, job 45 min, one run at a time (concurrency group). |
 | Usage evidence | job summary + artifact `dajc-ai-claude-usage` (90 days) | Cost and turns reported by Claude Code. Provider billing stays authoritative. |
 | Owner documents | `.dajc-main-reference/` | Read-only copies of `AGENTS.md` and the AI source/decision docs from `main`, because the development branch lacks them. Deleted before the patch is exported. |
 | Codex reviewer isolation | `safety-strategy: unprivileged-user` | codex-action v1.13 `drop-sudo` fails on hosted runners (`/run/dbus/system_bus_socket`). Codex now runs as a separate account without sudo and with read-only ACL access to the checkout. The runner writes `review.json` from the action output. |
-
 | No deployments from autonomous work | `vercel.json` | `claude/autonomous-ai-*` branches never create a Vercel deployment (`git.deploymentEnabled`). An infrastructure-only commit whose message contains `[vercel skip]` is not built (`ignoreCommand`, opt-in per commit); every other commit, including all content and site changes, deploys exactly as before. |
 
 These limits do not cap spend in dollars. Hard monthly limits must be set in
@@ -47,8 +47,8 @@ verify them.
 ## Architecture
 
 1. `dajc-ai-autonomous-claude.yml` can be manually dispatched by a repository
-   maintainer or scheduled on weekdays at **03:30 UTC**. Scheduled runs remain
-   disabled until repository variable `DAJC_CLAUDE_AUTONOMY_ENABLED=true`.
+   maintainer or scheduled on weekdays at **03:30 UTC**. See *Operating
+   controls* above for the kill switch and the internal-output gate.
 2. A read-only-permission **Claude Code development job** runs one bounded cycle,
    with no GitHub write token or production/Neon credentials. Its only permitted
    source edit paths are DAJC AI internals in `src/lib/{ask,ai,kb}/` and
@@ -80,9 +80,9 @@ verify them.
   published `claude-sonnet-5-5` model ID; set to override.
 - Optional repository variable `DAJC_CODEX_REVIEW_MODEL`: when unset the
   Codex Action selects its supported default model.
-- Repository variable `DAJC_CLAUDE_AUTONOMY_ENABLED`: leave unset or false
-  until a **supervised manually triggered run** passes and owner explicitly
-  approves recurring API spend.
+- Repository variable `DAJC_CLAUDE_AUTONOMY_ENABLED`: `false` stops schedules;
+  `true` is the owner's explicit acceptance of public autonomous output while
+  the repository is public (supervised run 42965444471 produced PR #125 on 11 Nov 2026).
 - The repository must permit GitHub Actions to create draft pull requests
   using the workflow token (enable specifically after review).
 - Set independent spending caps and alerts in Anthropic Console, OpenAI API
