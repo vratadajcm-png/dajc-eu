@@ -155,56 +155,62 @@ class GuardTests(unittest.TestCase):
             self.assertIn('safety-strategy: unprivileged-user', text)
             self.assertIn('codex-user: dajc-codex', text)
             self.assertIn('unexpectedly has sudo', text)
+            if PLATFORM:
+                # Ownership returns without following developer-created symlinks.
+                self.assertIn('run: sudo chown -R -h "$(id -u):$(id -g)" -- "$GITHUB_WORKSPACE"', text)
+                self.assertNotRegex(text, r'chown -R (?!-h)')
 
-    @unittest.skipIf(PLATFORM, 'Platform reviewer embeds the patch in its own script')
-    def test_review_evidence_includes_pinned_import_context(self):
-        review = (ROOT / '.github/workflows/dajc-ai-independent-codex-review.yml').read_text()
-        script = review.split("<<'JS'\n")[1].split('\n          JS', 1)[0]
-        script = '\n'.join(line[10:] for line in script.splitlines())
-        sha = 'a' * 40
-        changed = "import { X } from './client.mjs';\nimport y from '../util/y';\nexport const f = 1;\n"
-        api = {
-            'pulls/7': {'state': 'open', 'draft': True, 'base': {'ref': 'dev', 'sha': 'b' * 40},
-                        'head': {'sha': sha, 'ref': 'claude/autonomous-ai-1-1',
-                                 'repo': {'full_name': 'o/r'}}},
-            'pulls/7/files?per_page=100&page=1': [{'filename': 'src/lib/kb/a.mjs', 'status': 'modified',
-                                                   'patch': '@@ -1 +1 @@\n-x\n+export const f = 1;'}],
-            f'contents/src/lib/kb/a.mjs?ref={sha}': changed,
-            f'contents/src/lib/kb/client.mjs?ref={sha}': "export const X = 'redirect: manual';\n",
-            f'contents/src/lib/util/y.ts?ref={sha}': 'export default 2;\n',
+    @unittest.skipUnless(PLATFORM, 'DAJC AI reviewer is tested by its own evidence test')
+    def test_platform_review_uses_pinned_import_context(self):
+        sha = 'c' * 40
+        test_file = "import { handleIdentityLoss } from '@/lib/offline/tenant-guard';\nvi.mock('@/lib/client-state-purge', () => ({}));\n"
+        github = {
+            'pulls/31': {'state': 'open', 'draft': True, 'base': {'ref': 'dev', 'sha': 'd' * 40},
+                         'head': {'sha': sha, 'ref': 'codex/autonomous-1-1', 'repo': {'full_name': 'o/r'}}},
+            'pulls/31/files?per_page=100&page=1': [{'filename': 'tests/regression/x.test.ts', 'status': 'modified',
+                                                    'patch': '@@ -1 +1 @@\n-a\n+b'}],
+            f'contents/tests/regression/x.test.ts?ref={sha}': test_file,
+            f'contents/lib/offline/tenant-guard.ts?ref={sha}': 'export async function handleIdentityLoss(): Promise<boolean> { return true; }\n',
+            f'contents/lib/client-state-purge.ts?ref={sha}': 'export const OFFLINE_DB_NAME = "x";\n',
         }
+        verdict = '```json\n' + json.dumps({'verdict': 'approve', 'summary': 'ok', 'findings': []}) + '\n```'
         with tempfile.TemporaryDirectory() as directory:
+            sent = Path(directory) / 'sent.json'
             mock = Path(directory) / 'mock.mjs'
-            mock.write_text('const api = ' + json.dumps(api) + ';\n'
-                'globalThis.fetch = async (url) => {\n'
-                "  const key = String(url).replace('https://api.github.com/repos/o/r/', '');\n"
+            mock.write_text('import fs from "node:fs";\n'
+                'const api = ' + json.dumps(github) + ';\n'
+                'const posts = [];\n'
+                'globalThis.fetch = async (url, init = {}) => {\n'
+                '  url = String(url);\n'
+                "  if (url === 'https://api.anthropic.com/v1/messages') {\n"
+                f'    fs.writeFileSync({json.dumps(str(sent))}, init.body);\n'
+                "    return { ok: true, json: async () => ({ stop_reason: 'end_turn', content: [{ type: 'text', text: "
+                + json.dumps(verdict) + ' }] }) };\n'
+                '  }\n'
+                "  const key = url.replace('https://api.github.com/repos/o/r/', '');\n"
+                "  if (init.method === 'POST') { posts.push([key, init.body]);\n"
+                f'    fs.writeFileSync({json.dumps(str(Path(directory) / "posts.json"))}, JSON.stringify(posts));\n'
+                '    return { ok: true, json: async () => ({}) }; }\n'
                 '  if (!(key in api)) return { ok: false, status: 404, json: async () => ({}) };\n'
                 '  const value = api[key];\n'
                 "  const body = typeof value === 'string' ? { type: 'file', encoding: 'base64',\n"
                 "    content: Buffer.from(value).toString('base64') } : value;\n"
-                '  return { ok: true, status: 200, json: async () => body };\n'
+                '  return { ok: true, json: async () => body };\n'
                 '};\n')
-            subprocess.run(['node', '--import', mock.as_uri(), '--input-type=module'], input=script,
-                           text=True, check=True, cwd=directory,
-                           env={**os.environ, 'GITHUB_REPOSITORY': 'o/r', 'PR_NUMBER': '7',
-                                'GITHUB_TOKEN': 'x', 'DAJC_TARGET_BASE': 'dev',
-                                'GITHUB_OUTPUT': str(Path(directory) / 'output')})
-            evidence = (Path(directory) / 'review-diff.txt').read_text()
-            self.assertIn('FILE src/lib/kb/a.mjs\nSTATUS modified', evidence)
-            self.assertIn('CONTEXT FILE src/lib/kb/a.mjs (full content at head ' + sha + ', changed', evidence)
-            self.assertIn('CONTEXT FILE src/lib/kb/client.mjs (full content at head ' + sha + ', unchanged', evidence)
-            self.assertIn("redirect: manual", evidence)
-            self.assertIn('CONTEXT FILE src/lib/util/y.ts', evidence)
-            meta = json.loads((Path(directory) / 'review-meta.json').read_text())
-            self.assertEqual(meta['sha'], sha)
-            self.assertEqual((Path(directory) / 'output').read_text(), 'head_sha=' + sha + '\n')
-        # The context checkout is pinned to that SHA, credential-free and verified.
-        checkout = review[review.index('      - name: Read-only checkout of exactly the reviewed head'):
-                          review.index('      - name: Require explicit Codex API model')]
-        for expected in ('ref: ${{ steps.evidence.outputs.head_sha }}', 'path: pr-head',
-                         'persist-credentials: false', 'test "$(git -C pr-head rev-parse HEAD)" = "$HEAD_SHA"'):
-            self.assertIn(expected, checkout)
-        self.assertLess(review.index('path: pr-head'), review.index('sudo setfacl -R -m u:dajc-codex:rX'))
+            subprocess.run(['node', '--import', mock.as_uri(), str(ROOT / '.github/autonomy/independent-review.mjs')],
+                           check=True, capture_output=True, text=True,
+                           env={**os.environ, 'GITHUB_REPOSITORY': 'o/r', 'GITHUB_TOKEN': 'x', 'PR_NUMBER': '31',
+                                'ANTHROPIC_API_KEY': 'x', 'DAJC_REVIEW_MODEL': 'm', 'DAJC_TARGET_BASE': 'dev',
+                                'GITHUB_SERVER_URL': 'https://github.com', 'GITHUB_RUN_ID': '1'})
+            prompt = json.loads(sent.read_text())['messages'][0]['content']
+            self.assertIn('FILE: tests/regression/x.test.ts', prompt)
+            self.assertIn('CONTEXT FILE: tests/regression/x.test.ts (full content at head ' + sha + ', changed', prompt)
+            self.assertIn('CONTEXT FILE: lib/offline/tenant-guard.ts (full content at head ' + sha + ', unchanged', prompt)
+            self.assertIn('Promise<boolean>', prompt)
+            self.assertIn('CONTEXT FILE: lib/client-state-purge.ts', prompt)
+            posts = json.loads((Path(directory) / 'posts.json').read_text())
+            final_status = [json.loads(body) for key, body in posts if key == 'statuses/' + sha][-1]
+            self.assertEqual(final_status['state'], 'success')
 
     def test_review_javascript_syntax(self):
         if PLATFORM:
