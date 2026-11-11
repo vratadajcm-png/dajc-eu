@@ -1,6 +1,6 @@
 {
   "week": "2026-W46",
-  "checkedAt": "2026-11-09T14:30:23.224Z",
+  "checkedAt": "2026-11-11T13:03:49.267Z",
   "coverageVersion": "2026-10-22.50",
   "jurisdictions": [
     {
@@ -37,11 +37,11 @@
       "code": "AT",
       "name": "Austria",
       "sourceScope": "AT",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "at",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "AZ",
@@ -117,11 +117,11 @@
       "code": "CZ",
       "name": "Czechia",
       "sourceScope": "CZ",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "cz",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "DE",
@@ -137,11 +137,11 @@
       "code": "DK",
       "name": "Denmark",
       "sourceScope": "DK",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "EE",
@@ -157,18 +157,18 @@
       "code": "ES",
       "name": "Spain",
       "sourceScope": "ES",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "FI",
       "name": "Finland",
       "sourceScope": "FI",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "nordics",
       "candidateFindings": 0
@@ -217,8 +217,8 @@
       "code": "HU",
       "name": "Hungary",
       "sourceScope": "HU",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "hu",
       "candidateFindings": 0
@@ -231,7 +231,7 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 1
+      "candidateFindings": 3
     },
     {
       "code": "IS",
@@ -251,7 +251,7 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "it",
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "KZ",
@@ -277,8 +277,8 @@
       "code": "LT",
       "name": "Lithuania",
       "sourceScope": "LT",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "baltics",
       "candidateFindings": 0
@@ -361,14 +361,14 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 3
+      "candidateFindings": 4
     },
     {
       "code": "NO",
       "name": "Norway",
       "sourceScope": "NO",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "nordics",
       "candidateFindings": 0
@@ -387,11 +387,11 @@
       "code": "PT",
       "name": "Portugal",
       "sourceScope": "PT",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "RO",
@@ -401,7 +401,7 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "RS",
@@ -411,7 +411,7 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "balkans",
-      "candidateFindings": 1
+      "candidateFindings": 3
     },
     {
       "code": "RU",
@@ -447,8 +447,8 @@
       "code": "SK",
       "name": "Slovakia",
       "sourceScope": "SK",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "sk",
       "candidateFindings": 0
@@ -477,8 +477,8 @@
       "code": "UA",
       "name": "Ukraine",
       "sourceScope": "UA",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "east",
       "candidateFindings": 0
@@ -491,7 +491,7 @@
       "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "XK",
