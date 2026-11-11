@@ -1,0 +1,9 @@
+{
+ "$comment": "Change monitoring of the legal library. ONE audit: monthly, all acts (scripts/kb-monthly-audit.mjs, workflow kb-monthly-audit). No daily or weekly legislative checks. Driving Bans weekly monitoring is separate and untouched.",
+ "tiers": {
+  "monthly": {
+   "everyDays": 31,
+   "description": "Every stored EUR-Lex act (delta against the stored consolidation)."
+  }
+ }
+}

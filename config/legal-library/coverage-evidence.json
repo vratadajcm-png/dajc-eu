@@ -1,0 +1,4 @@
+{
+ "$comment": "Audits of the coverage matrix (src/lib/kb/coverage.mjs). Only an audit can mark a cell COVERED, NOT_APPLICABLE or CONFLICTED, and only with official legal evidence: [{ jurisdiction, area, status, assessedOn, evidence: [{ url (registered official source), explanation }], documents: [officialNumber] }]. Empty until a jurisdiction has been audited.",
+ "entries": []
+}

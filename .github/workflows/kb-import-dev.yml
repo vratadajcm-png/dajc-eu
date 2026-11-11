@@ -1,0 +1,116 @@
+name: DAJC legal library import (Neon dev)
+
+# Imports the official documents of config/legal-library/manifest.json into the
+# DAJC legal library on the Neon DEVELOPMENT branch (docs/DAJC_AI_LEGAL_LIBRARY.md).
+# The Claude Code sandbox cannot open PostgreSQL connections, so the import
+# runs here, where TCP to Neon works. No AI is called and nothing is paid.
+#
+# Security - the repository is public, so this log is public:
+#   * runs only when the repository OWNER adds the label "kb-import-dev" to a
+#     pull request of this repository (or dispatches it once merged), and only
+#     after the owner approves the deployment to the GitHub environment
+#     "kb-import-dev" (required reviewer). Never on push or on a schedule.
+#   * the connection string is an ENVIRONMENT secret of "kb-import-dev"
+#     (DAJC_KB_DEV_IMPORT_DB_URL), never a repository secret, so no other
+#     workflow or branch can read it without the owner's approval. It belongs to
+#     the role dajc_kb_importer, which can add machine-checked versions only and
+#     can never record a human verification (drizzle-kb/0001).
+#   * the import refuses any other role, a role with administrative attributes,
+#     and any database whose marker dajc_kb.deployment is not 'dev'. Host and
+#     password are masked, and every error message is redacted.
+#   * third-party actions are pinned to full commit SHAs, dependencies are
+#     installed without lifecycle scripts and before the secret is present, and
+#     no git credentials stay on the runner.
+# Imported versions are AUTO_CHECKED: DAJC AI in production answers only from
+# HUMAN_VERIFIED versions, recorded by a person (scripts/kb-review.mjs).
+# The downloaded originals are kept as a workflow artifact for 14 days (public
+# law texts; EUR-Lex reuse under Commission Decision 2011/833/EU).
+
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'Import only this officialNumber (empty = all EUR-Lex entries)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kb-import-dev
+  cancel-in-progress: false
+
+jobs:
+  import:
+    if: >-
+      github.actor == github.repository_owner &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.label.name == 'kb-import-dev' && github.event.pull_request.head.repo.full_name == github.repository))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    environment: kb-import-dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+
+      - name: Install dependencies (no lifecycle scripts, no secret present)
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Import official documents into the Neon dev branch
+        id: import
+        env:
+          DAJC_KB_IMPORT_DB_URL: ${{ secrets.DAJC_KB_DEV_IMPORT_DB_URL }}
+          DAJC_KB_ARCHIVE: local:${{ runner.temp }}/kb-archive
+          ONLY: ${{ inputs.only }}
+        run: |
+          if [ -z "$DAJC_KB_IMPORT_DB_URL" ]; then
+            echo "::error::Environment secret DAJC_KB_DEV_IMPORT_DB_URL of the environment kb-import-dev is not set (Neon branch dev, role dajc_kb_importer)."
+            exit 1
+          fi
+          set -- --source eu-eurlex --expect-role dajc_kb_importer --expect-environment dev --report "$RUNNER_TEMP/kb-import.json"
+          if [ -n "$ONLY" ]; then set -- "$@" --only "$ONLY"; fi
+          node scripts/kb-import.mjs "$@"
+
+      # Read-only: source, validity at EUR-Lex, SHA-256 of the archived and the
+      # official original, re-extracted content, production search and the
+      # citation of every imported version (scripts/kb-verify.mjs).
+      - name: Verify every imported version
+        if: ${{ !cancelled() && steps.import.outcome != 'skipped' }}
+        env:
+          DAJC_KB_VERIFY_DB_URL: ${{ secrets.DAJC_KB_DEV_IMPORT_DB_URL }}
+          DAJC_KB_ARCHIVE: local:${{ runner.temp }}/kb-archive
+          ONLY: ${{ inputs.only }}
+        run: |
+          # Only the versions imported in this run: each official download is one more request to EUR-Lex
+          # (crawl delay, bot protection); versions stored earlier were verified when they were imported.
+          set -- --source eu-eurlex --online --expect-role dajc_kb_importer --expect-environment dev --report "$RUNNER_TEMP/kb-verification.json" --entries-from "$RUNNER_TEMP/kb-import.json"
+          if [ -n "$ONLY" ]; then set -- "$@" --only "$ONLY"; fi
+          node scripts/kb-verify.mjs "$@"
+
+      - name: Keep the verification report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kb-verification-${{ github.run_id }}
+          path: ${{ runner.temp }}/kb-verification.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Keep the downloaded originals
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kb-archive-${{ github.run_id }}
+          path: ${{ runner.temp }}/kb-archive
+          if-no-files-found: warn
+          retention-days: 14
