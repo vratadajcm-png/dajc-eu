@@ -69,6 +69,7 @@ Vše je zakázáno, dokud neplatí všechny tři podmínky:
    | history | `DAJC_INTELLIGENCE_HISTORY_ENABLED` |
    | organisation-preferences | `DAJC_INTELLIGENCE_PREFERENCES_ENABLED` |
    | ai-assistant | `DAJC_AI_DRIVING_BANS_ENABLED` |
+   | personal-calendar (osobní kalendář, `driving-bans-calendar.ts`) | `DAJC_INTELLIGENCE_CALENDAR_ENABLED` |
    | driving-bans-query (vyhledávání, pravidla, výjimky, zdroje; zároveň vypínač celého modulu) | `DAJC_INTELLIGENCE_BANS_ENABLED` |
 
 3. Ověřený subjekt má oprávnění své organizace, které funkci obsahuje a nevypršelo.
@@ -100,6 +101,57 @@ subjektu, nikdy z URL, dotazu nebo těla požadavku. `requireSameTenant` a
 
 Jurisdikce, která není úplně ověřená, nebo čas mimo ověřené období dá
 `INSUFFICIENT_VERIFIED_DATA`, nikdy „bez zákazu“.
+
+Pravidla shody silnic jsou ve sdílené funkci `matchRoadScope`. Používá ji `findRouteConflicts`
+i osobní kalendář.
+
+## Osobní kalendář (`driving-bans-calendar.ts`)
+
+Placená funkce `personal-calendar` (`DAJC_INTELLIGENCE_CALENDAR_ENABLED`). Je vypnutá a žádná
+routa ji nepřipojuje. Veřejná stránka, JSON a ICS zůstávají zdarma a beze změny.
+
+**Proč tajná adresa:** Google, Apple ani Outlook se do odebíraného kalendáře nepřihlašují, jen
+stahují adresu. Přístup proto dává osobní tajná adresa
+`/api/intelligence/calendar/dcal_<token>.ics` (budoucí routa).
+
+**Bezpečnost:**
+- Token má 256 náhodných bitů a ukáže se jen jednou, při vydání. Úložiště
+  (`CalendarTokenStore`) drží jen jeho SHA-256.
+- Organizace i uživatel se berou z uloženého tokenu, nikdy z požadavku.
+- Každé stažení znovu ověří vypínač modulu, vypínač kalendáře a oprávnění organizace:
+  - `personal-calendar` vždy;
+  - `vehicle-aware`, když filtr obsahuje vozidlo;
+  - `route-aware`, když filtr obsahuje koridor.
+- Neznámý, poškozený nebo zrušený token vrací 404 jako neexistující routa.
+- Počet stažení na token je omezený (výchozí 60 za hodinu, pak 429).
+- Odpověď nese `Cache-Control: private, no-store`, `X-Robots-Tag: noindex` a
+  `Referrer-Policy: no-referrer`.
+- Kalendář zruší jen jeho vlastník (stejná organizace i uživatel), i bez platného předplatného.
+  Na uživatele je nejvýše 10 aktivních kalendářů.
+
+**Po skončení předplatného:** stažení vrátí platný prázdný kalendář s názvem
+„DAJC personal calendar (inactive)“ a popisem důvodu. Dříve stažené placené události tak
+z kalendáře zmizí. Informační pseudo-událost se nepíše, stejně jako ve veřejném ICS.
+
+**Filtr:**
+- jurisdikce a druh omezení;
+- vozidlo (`evaluateVehicleApplicability`):
+  - `DOES_NOT_APPLY` se vynechá;
+  - `UNDETERMINED` zůstane s označením „(check vehicle)“ a důvodem;
+- koridor bez časů (jurisdikce, region, silnice, `matchRoadScope`): pravidla po celé síti nebo
+  pro třídu silnic zůstávají, pravidla jiných jmenovaných silnic se vynechají.
+
+Kalendář píše stejný `toIcs` jako veřejný feed, jen s vlastním názvem. Výjimky se nevyhodnocují.
+
+**Omezení kalendářů:** Google obnovuje odebírané kalendáře zhruba po 12–24 hodinách, Outlook
+nepravidelně. Kalendář proto doplňuje upozornění (`alerts`), nenahrazuje je.
+
+**Před spuštěním chybí:**
+- zákaznické účty a přihlášení;
+- platby;
+- úložiště oprávnění a databázový adaptér `CalendarTokenStore`;
+- routa a stránka pro vydání, zobrazení a zrušení kalendáře;
+- revidovaná změna `DRIVING_BANS_INTELLIGENCE_RELEASED`.
 
 ## Upozornění a historie (`driving-bans-alerts.ts`)
 
