@@ -187,7 +187,8 @@ class GuardTests(unittest.TestCase):
             subprocess.run(['node', '--import', mock.as_uri(), '--input-type=module'], input=script,
                            text=True, check=True, cwd=directory,
                            env={**os.environ, 'GITHUB_REPOSITORY': 'o/r', 'PR_NUMBER': '7',
-                                'GITHUB_TOKEN': 'x', 'DAJC_TARGET_BASE': 'dev'})
+                                'GITHUB_TOKEN': 'x', 'DAJC_TARGET_BASE': 'dev',
+                                'GITHUB_OUTPUT': str(Path(directory) / 'output')})
             evidence = (Path(directory) / 'review-diff.txt').read_text()
             self.assertIn('FILE src/lib/kb/a.mjs\nSTATUS modified', evidence)
             self.assertIn('CONTEXT FILE src/lib/kb/a.mjs (full content at head ' + sha + ', changed', evidence)
@@ -196,6 +197,14 @@ class GuardTests(unittest.TestCase):
             self.assertIn('CONTEXT FILE src/lib/util/y.ts', evidence)
             meta = json.loads((Path(directory) / 'review-meta.json').read_text())
             self.assertEqual(meta['sha'], sha)
+            self.assertEqual((Path(directory) / 'output').read_text(), 'head_sha=' + sha + '\n')
+        # The context checkout is pinned to that SHA, credential-free and verified.
+        checkout = review[review.index('      - name: Read-only checkout of exactly the reviewed head'):
+                          review.index('      - name: Require explicit Codex API model')]
+        for expected in ('ref: ${{ steps.evidence.outputs.head_sha }}', 'path: pr-head',
+                         'persist-credentials: false', 'test "$(git -C pr-head rev-parse HEAD)" = "$HEAD_SHA"'):
+            self.assertIn(expected, checkout)
+        self.assertLess(review.index('path: pr-head'), review.index('sudo setfacl -R -m u:dajc-codex:rX'))
 
     def test_review_javascript_syntax(self):
         if PLATFORM:
