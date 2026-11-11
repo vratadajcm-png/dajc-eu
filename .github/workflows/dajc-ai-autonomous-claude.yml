@@ -3,8 +3,10 @@ name: DAJC AI autonomous Claude Code development
 on:
   workflow_dispatch: {}
   schedule:
-    # Disabled unless repo variable DAJC_CLAUDE_AUTONOMY_ENABLED=true.
-    # 03:30 UTC Mon-Fri; GitHub schedules may run late.
+    # Scheduled runs are ON (owner activation, 11 Nov 2026), behind the
+    # preflight visibility gate. Instant kill switch: repository variable
+    # DAJC_CLAUDE_AUTONOMY_ENABLED=false (or 0/off/no), or disable this
+    # workflow in the Actions tab. 03:30 UTC Mon-Fri; GitHub may run late.
     - cron: '30 3 * * 1-5'
 
 permissions:
@@ -15,11 +17,46 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  preflight:
+    # Free gate, no secrets. Commits, draft PRs, reviews and artifacts of a
+    # public repository are public. The owner's rule: autonomous output stays
+    # internal unless the owner decides otherwise. So a paid Claude run starts
+    # only when this repository is private, or when the owner has explicitly
+    # accepted public output with DAJC_CLAUDE_AUTONOMY_ENABLED=true. Otherwise
+    # the run ends green with a warning before any provider call.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      ready: ${{ steps.gate.outputs.ready }}
+    steps:
+      - name: Keep autonomous output internal unless the owner accepted a public repository
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DAJC_ENABLED: ${{ vars.DAJC_CLAUDE_AUTONOMY_ENABLED }}
+        shell: bash
+        run: |
+          echo "Kill switch DAJC_CLAUDE_AUTONOMY_ENABLED: '${DAJC_ENABLED:-<unset>}' (false/0/off/no stops schedules)" >> "$GITHUB_STEP_SUMMARY"
+          private=$(gh api "repos/$GITHUB_REPOSITORY" --jq .private)
+          enabled=$(printf '%s' "$DAJC_ENABLED" | tr '[:upper:]' '[:lower:]')
+          if [ "$private" = "true" ] || [ "$enabled" = "true" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "Repository private: $private; output visibility accepted" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::No paid Claude run: this repository is public (private=$private) and the owner has not accepted public autonomous output (DAJC_CLAUDE_AUTONOMY_ENABLED=true)."
+            echo "Paid Claude run skipped before any provider call: public repository, owner decision pending." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   develop:
-    # Schedules stay off unless DAJC_CLAUDE_AUTONOMY_ENABLED=true (instant,
-    # per-product kill switch). A re-run attempt never repeats the paid
-    # developer call; start a new, deliberate run instead.
-    if: ${{ (github.event_name == 'workflow_dispatch' || vars.DAJC_CLAUDE_AUTONOMY_ENABLED == 'true') && github.run_attempt == 1 }}
+    # Paid work needs the free preflight gate, and schedules stop at once when
+    # DAJC_CLAUDE_AUTONOMY_ENABLED is false/0/off/no (per-product kill switch).
+    # A re-run attempt never repeats the paid developer call; start a new,
+    # deliberate run instead.
+    needs: preflight
+    if: ${{ needs.preflight.outputs.ready == 'true' && (github.event_name == 'workflow_dispatch' || !contains(fromJSON('["false","0","off","no"]'), vars.DAJC_CLAUDE_AUTONOMY_ENABLED)) && github.run_attempt == 1 }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
