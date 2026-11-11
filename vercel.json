@@ -1,5 +1,5 @@
 {
-  "git": { "deploymentEnabled": { "fix/geographic-coverage-50-20261022": false } },
+  "git": { "deploymentEnabled": { "fix/geographic-coverage-50-20261022": false, "claude/autonomous-ai-*": false } },
   "regions": ["fra1"],
   "headers": [{
     "source": "/(.*)",
