@@ -47,6 +47,12 @@ jobs:
       - name: Build site
         run: npm run build
 
+      - name: Check client bundle for Ask DAJC AI secrets
+        # Offline and deterministic: fails if an Ask DAJC AI secret name,
+        # secret value or AI provider endpoint reaches files served to browsers.
+        timeout-minutes: 1
+        run: timeout 30 node scripts/check-ask-bundle.mjs
+
       - name: Upload Driving Bans evidence
         if: always()
         uses: actions/upload-artifact@v4

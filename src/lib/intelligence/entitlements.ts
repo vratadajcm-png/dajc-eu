@@ -20,6 +20,8 @@ export const DRIVING_BANS_INTELLIGENCE_FEATURES = [
   'history',
   'organisation-preferences',
   'ai-assistant',
+  // A personal calendar feed (secret URL per subscriber) filtered by vehicle and corridor.
+  'personal-calendar',
   // The Intelligence Driving Bans query module itself (search, rules, exceptions, sources).
   // It is also the module switch: no Intelligence Driving Bans tool runs without it.
   'driving-bans-query',
@@ -33,6 +35,7 @@ export const FEATURE_FLAG_ENV: Record<DrivingBansIntelligenceFeature, string> = 
   history: 'DAJC_INTELLIGENCE_HISTORY_ENABLED',
   'organisation-preferences': 'DAJC_INTELLIGENCE_PREFERENCES_ENABLED',
   'ai-assistant': 'DAJC_AI_DRIVING_BANS_ENABLED',
+  'personal-calendar': 'DAJC_INTELLIGENCE_CALENDAR_ENABLED',
   'driving-bans-query': 'DAJC_INTELLIGENCE_BANS_ENABLED',
 };
 
