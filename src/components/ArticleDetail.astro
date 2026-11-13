@@ -3,6 +3,7 @@ import { render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { formatNewsDate } from '../config/news';
 import { socialImageForNews } from '../config/social-image';
+import { canonicalSiteUrl } from '../lib/site/canonical';
 
 interface Props {
   entry: CollectionEntry<'eu-oversize'> | CollectionEntry<'platform'>;
