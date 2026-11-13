@@ -18,7 +18,7 @@ const publishedLabel = formatNewsDate(data.publishedAt);
 const updatedLabel = data.updatedAt ? formatNewsDate(data.updatedAt) : undefined;
 const articleStructuredData = {
   '@context': 'https://schema.org',
-  '@type': 'Article',
+  '@type': entry.collection === 'eu-oversize' ? 'NewsArticle' : 'Article',
   headline: data.title,
   description: data.description,
   url: new URL(Astro.url.pathname, Astro.site).toString(),
