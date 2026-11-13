@@ -15,7 +15,7 @@ describe('DAJC public SEO consistency', () => {
   });
   it('serializes a normalized public sitemap without private routes', () => {
     const config = file('astro.config.mjs');
-    expect(config).toContain("value.pathname.replace(new RegExp('/+$'), '')");
+    expect(config).toContain("value.pathname = value.pathname.replace(");
     expect(config).toContain("return !/^\\/(?:partners|integration-ecosystem|partner-portal|investor)");
     const robots = file('public/robots.txt');
     expect(robots).toContain('Allow: /platform/integrations');
