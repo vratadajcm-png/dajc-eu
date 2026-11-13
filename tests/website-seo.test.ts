@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-const file = (path: string) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
+const file = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 
 describe('DAJC public SEO consistency', () => {
   it('uses the canonical helper in layout and articles', () => {
