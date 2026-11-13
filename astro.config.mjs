@@ -65,7 +65,7 @@ export default defineConfig({
       // Sitemap addresses must agree with BaseLayout and ArticleDetail canonical URLs.
       serialize: (item) => {
         const value = new URL(item.url);
-        if (value.pathname !== '/') value.pathname = value.pathname.replace(new RegExp('/+;
+        if (value.pathname !== '/') value.pathname = value.pathname.replace(/\/+$/, '');
         const url = value.toString();
         return newsLastmod.has(url) ? { ...item, url, lastmod: newsLastmod.get(url) } : { ...item, url };
       },
