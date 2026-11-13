@@ -3,7 +3,9 @@ Allow: /
 Disallow: /api/
 Disallow: /partner-portal/
 Disallow: /investor/
-Disallow: /platform
+Disallow: /platform/
+Allow: /platform/$
+Allow: /platform/integrations
 Disallow: /partners
 Disallow: /integration-ecosystem
 
