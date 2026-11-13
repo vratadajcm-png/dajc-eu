@@ -1,0 +1,70 @@
+---
+const enabled = import.meta.env.DAJC_UPDATES_ENABLED === 'true';
+const purposes = [
+  {id:'launch', title:'One launch notification', copy:'A single email if DAJC announces commercial availability. Not a newsletter.', consent:'I request one commercial launch notification only.'},
+  {id:'newsletter',title:'Project newsletter',copy:'Occasional DAJC project updates and public EU Oversize Weekly information.',consent:'I consent to recurring DAJC project updates until I unsubscribe.'},
+];
+---
+<div class="updates-options">
+{purposes.map((item) => (
+  <section class="updates-card">
+    <h2>{item.title}</h2>
+    <p>{item.copy}</p>
+    {enabled ? <form data-updates-form data-purpose={item.id} method="post" action="/api/updates/subscribe">
+      <label>Business email <input type="email" name="email" maxlength="254" autocomplete="email" required placeholder="you@company.eu" /></label>
+      <label class="check"><input type="checkbox" name="consent" required /> {item.consent} <a href="/privacy">Privacy notice</a>.</label>
+      <div class="honeypot" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off" /></label></div>
+      <button type="submit">Request email confirmation</button>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </form> : <a href={'mailto:team@dajc.eu?subject='+encodeURIComponent('DAJC '+item.id+' request')+'&body='+encodeURIComponent(item.consent+' Please send details about this purpose only.')}>Prepare email request →</a>}
+  </section>
+))}
+</div>
+{enabled ? <p class="updates-help">A confirmation link will be sent to your inbox. No subscription is active until you confirm. The email includes an unsubscribe link.</p> : <p class="updates-help">Requests are currently handled manually. Opening the email draft does not register you. Review and send it yourself; withdraw by emailing <a href="mailto:team@dajc.eu">team@dajc.eu</a>.</p>}
+<script>
+  for (const form of document.querySelectorAll<HTMLFormElement>('[data-updates-form]')) {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const feedback = form.querySelector<HTMLElement>('.feedback');
+      const submit = form.querySelector<HTMLButtonElement>('button[type=submit]');
+      if (!feedback || !submit) return;
+      feedback.textContent = 'Submitting…';
+      submit.disabled = true;
+      try {
+        const response = await fetch('/api/updates/subscribe', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            email:data.get('email'), purpose:form.dataset.purpose,
+            consent:data.get('consent')==='on', website:data.get('website')||'',
+          }),
+        });
+        const result = await response.json();
+        feedback.textContent = response.ok
+          ? 'If eligible, check your email for a confirmation link.'
+          : (result.error || 'Could not submit. Contact team@dajc.eu.');
+        if (response.ok) form.reset();
+      } catch {
+        feedback.textContent = 'Could not submit. Contact team@dajc.eu.';
+      } finally {submit.disabled = false;}
+    });
+  }
+</script>
+<style>
+.updates-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:2rem 0}
+.updates-card{padding:1.5rem;border:1px solid var(--dajc-line);border-radius:10px;background:rgba(0,38,92,.2)}
+h2{font-family:'Space Grotesk',sans-serif;margin:0 0 1rem;color:var(--dajc-white)}
+p{color:var(--dajc-muted);line-height:1.7}a{color:var(--dajc-orange)}
+form{display:grid;gap:1rem;margin-top:1.5rem}
+label{display:grid;gap:.5rem;font-size:14px;color:var(--dajc-white)}
+label.check{display:block;color:var(--dajc-muted);line-height:1.7}
+label.check input{margin-right:.55rem;width:18px;height:18px}
+input[type=email]{box-sizing:border-box;width:100%;min-height:44px;padding:.7rem;background:#0b2742;color:#fff;border:1px solid #74869b;border-radius:6px}
+button{min-height:44px;padding:.7rem;background:var(--dajc-orange);color:var(--dajc-dark);border:0;border-radius:6px;font-weight:700;cursor:pointer}
+button:disabled{opacity:.55}
+.feedback{min-height:1.6rem;margin:0}
+.honeypot{position:absolute!important;left:-9999px!important;max-width:1px;overflow:hidden}
+:where(button,input,a):focus-visible{outline:3px solid var(--dajc-orange);outline-offset:3px}
+@media(max-width:700px){.updates-options{grid-template-columns:1fr}}
+</style>
