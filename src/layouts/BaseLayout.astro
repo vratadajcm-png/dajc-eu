@@ -14,7 +14,7 @@ interface Props {
 }
 
 const { title, description, socialImage = 'default' } = Astro.props;
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const canonicalURL = canonicalSiteUrl(Astro.url.pathname);
 
 const siteName = 'DAJC';
 const siteURL = 'https://www.dajc.eu/';
