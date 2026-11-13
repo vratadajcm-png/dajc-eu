@@ -72,10 +72,3 @@ export default defineConfig({
     }),
   ],
 });
-), '');
-        const url = value.toString();
-        return newsLastmod.has(url) ? { ...item, url, lastmod: newsLastmod.get(url) } : { ...item, url };
-      },
-    }),
-  ],
-});
