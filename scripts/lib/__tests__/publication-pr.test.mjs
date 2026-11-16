@@ -23,7 +23,7 @@ function fixture() {
   execFileSync('git', ['clone', remote, root], { stdio: 'ignore' });
   git(root, ['config', 'user.name', 'Test']);
   git(root, ['config', 'user.email', 'test@example.invalid']);
-  for (const relative of ['scripts/check-weekly-publication.mjs', 'scripts/publish-gate-commit.mjs', 'scripts/lib/publish-gate.mjs', 'scripts/lib/automation-data.mjs', 'scripts/lib/geographic-scope.mjs', 'config/europe-coverage.mjs', 'config/oversize-sources/index.mjs', 'scripts/lib/next-publication.mjs', 'scripts/lib/week.mjs', 'scripts/lib/source-policy.mjs', 'config/official-authority-domains.mjs']) {
+  for (const relative of ['scripts/check-weekly-publication.mjs', 'scripts/publish-gate-commit.mjs', 'scripts/lib/publish-gate.mjs', 'scripts/lib/weekly-recovery.mjs', 'scripts/lib/automation-data.mjs', 'scripts/lib/geographic-scope.mjs', 'config/europe-coverage.mjs', 'config/oversize-sources/index.mjs', 'scripts/lib/next-publication.mjs', 'scripts/lib/week.mjs', 'scripts/lib/source-policy.mjs', 'config/official-authority-domains.mjs']) {
     mkdirSync(path.dirname(path.join(root, relative)), { recursive: true });
     copyFileSync(path.join(sourceRoot, relative), path.join(root, relative));
   }

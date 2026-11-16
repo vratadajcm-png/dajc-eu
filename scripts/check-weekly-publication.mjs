@@ -41,7 +41,7 @@ async function main() {
     if (!process.env.GH_TOKEN || !/^[\w.-]+\/[\w.-]+$/.test(process.env.GITHUB_REPOSITORY || '')) throw new Error('Publication PR access is not configured');
     const branch = publicationBranchFor(target.nextWeekLabel, { preview: process.env.OVERSIZE_PREVIEW === '1', correction });
     const allPulls = JSON.parse(execFileSync('gh', ['pr', 'list', '--repo', process.env.GITHUB_REPOSITORY, '--base', 'main', '--state', 'all', '--limit', '100', '--json', 'url,headRefName,body,createdAt,updatedAt,state'], { encoding: 'utf8' }));
-    const pulls = allPulls.filter((pull) => pull.state === 'OPEN');
+    const pulls = allPulls.filter((pull) => !pull.state || pull.state === 'OPEN');
     const editionPulls = classifyEditionPulls(pulls, { branch, targetWeek: target.nextWeekLabel });
     stalePrs = editionPulls.stale.map((pull) => pull.url);
     for (const url of stalePrs) console.log(`::warning::Edition PR for a week that has already passed is still open: ${url}`);
