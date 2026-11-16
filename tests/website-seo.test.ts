@@ -21,4 +21,13 @@ describe('DAJC public SEO consistency', () => {
     expect(robots).toContain('Allow: /platform/integrations');
     expect(robots).toContain('Disallow: /partner-portal/');
   });
+  it('links only equivalent Czech product, testing and demo routes', () => {
+    const layout = file('src/layouts/BaseLayout.astro');
+    const header = file('src/components/Header.astro');
+    expect(layout).toContain('hreflang="cs-CZ"');
+    expect(layout).toContain("'/platform': '/platform'");
+    expect(layout).toContain("'/testing': '/testovani'");
+    expect(header).toContain('czechEquivalent');
+  });
+
 });
