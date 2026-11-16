@@ -31,4 +31,21 @@ describe('public site audit regressions', () => {
   it('does not point updates visitors to a nonexistent Czech contact route', () => {
     expect(source('src/pages/updates.astro')).not.toContain('dajc.cz/kontakt');
   });
+  it('keeps detailed workflows and full feature catalogues on dedicated product pages', () => {
+    const home = source('src/components/HomeRedesign.astro');
+    const landing = source('src/components/ProductLanding.astro');
+    expect(home).not.toContain('workflow-section');
+    expect(home).not.toContain('workflow-grid');
+    expect(home).toContain('href="/platform"');
+    expect(home).toContain('href="/tar"');
+    expect(landing).toContain('id="workflow"');
+    expect(landing).toContain('END-TO-END WORKFLOW');
+    expect(landing).toContain('href="#capabilities"');
+    expect(landing).toContain('<ProductFeatureCatalogue product={product} />');
+    expect(landing).toContain('<MarketResearchForm product={product} />');
+    const catalogue = source('src/data/product-capabilities.ts');
+    expect(catalogue).toContain('Historical Permit Matching');
+    expect(catalogue).toContain('Bluetooth OBD-II and assisted troubleshooting');
+  });
+
 });

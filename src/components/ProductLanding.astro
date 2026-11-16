@@ -41,6 +41,19 @@ const content = platform ? {
     { title: 'Complete the job and the accounts', copy: 'Connect performed work, time, equipment, agreed extra costs, final reports and accounting-system handovers.' },
   ],
 };
+const workflowSteps = platform ? [
+  { name:'Transport enquiry', detail:'A shipper enters a cargo request, timing and initial constraints.' },
+  { name:'Cargo, equipment and quotation', detail:'The transport profile, proposed equipment and accepted commercial terms are linked to one D-ID.' },
+  { name:'Routing, permits and evidence', detail:'Specialists verify route restrictions, permit requirements and authoritative documents.' },
+  { name:'Approval and execution', detail:'The approved plan reaches dispatch, escorts and drivers; changes are versioned and acknowledged.' },
+  { name:'Delivery and settlement', detail:'Proof of delivery, reported exceptions, agreed extra costs and final accounting close the transport.' },
+] : [
+  { name:'Incident intake', detail:'A call, assistance request, partner API or other authorised channel creates a case with source references.' },
+  { name:'Qualified dispatch', detail:'The provider selects a suitable crew, recovery vehicle and any authorised partner.' },
+  { name:'Field intervention', detail:'Technicians record safety checks, recovery decisions, progress and supporting evidence.' },
+  { name:'Vehicle handover', detail:'Photographs, signatures and transfer of custody are attached to the Recovery Passport.' },
+  { name:'Case closure and billing', detail:'Approved work and extra costs are reconciled and transferred to accounting where supported.' },
+];
 ---
 <main class="landing">
   <section class="hero" aria-labelledby="hero-title">
@@ -91,6 +104,23 @@ const content = platform ? {
     <p class="integration-cta"><a href={platform?"/platform/integrations":"/tar/integrations"}>Explore integration architecture and request the technical PDF →</a></p>
   </section>
 
+  <section class="product-workflow" id="workflow" aria-labelledby="workflow-title">
+    <p class="eyebrow">END-TO-END WORKFLOW</p>
+    <h2 id="workflow-title">{platform ? 'One D-ID from enquiry to delivery.' : 'One Recovery Passport from first call to final report.'}</h2>
+    <p class="section-intro">An illustrative target process for the complete product, not a live operating service or evidence of completed external integrations.</p>
+    <ol class="product-workflow__steps">
+      {workflowSteps.map((step,index) => (
+        <li>
+          <span class="product-workflow__number">{String(index+1).padStart(2,'0')}</span>
+          <h3>{step.name}</h3>
+          <p>{step.detail}</p>
+        </li>
+      ))}
+    </ol>
+    <p class="note">{platform ? 'Transport permits are granted only by competent authorities. Vehicle and route suitability requires qualified verification.' : 'Coverage, technical recovery decisions and scene safety remain with the responsible insurer, provider and qualified crew.'}</p>
+    <a class="product-workflow__link" href="#capabilities">Explore the full product capabilities ↓</a>
+  </section>
+
   <ProductFeatureCatalogue product={product} />
   <MarketResearchForm product={product} />
 </main>
@@ -138,4 +168,13 @@ const content = platform ? {
   .integration-cta a{color:var(--dajc-orange);font:700 .8rem/1.55 'IBM Plex Mono',monospace;text-decoration:none}
   .integration-cta a:hover{text-decoration:underline}
   .integration-cta a:focus-visible{outline:2px solid var(--dajc-orange);outline-offset:3px}
+  .product-workflow{padding:3rem 0 4rem;border-top:1px solid var(--dajc-line);scroll-margin-top:5rem}
+  .product-workflow__steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.85rem;padding:0;list-style:none;margin:2rem 0 1rem}
+  .product-workflow__steps li{padding:1.2rem 1rem;border-radius:12px;border:1px solid var(--dajc-line);border-top:2px solid var(--dajc-orange);background:rgba(8,32,59,.75)}
+  .product-workflow__number{font:500 .7rem 'IBM Plex Mono',monospace;color:var(--dajc-orange)}
+  .product-workflow__steps h3{font-size:1.02rem;line-height:1.35;margin:.9rem 0 .6rem}
+  .product-workflow__steps p{font-size:.82rem;line-height:1.65;color:var(--dajc-muted);margin:0}
+  .product-workflow__link{display:inline-flex;margin-top:.4rem;color:var(--dajc-orange);font:700 .82rem 'IBM Plex Mono',monospace}
+  @media(max-width:1000px){.product-workflow__steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media(max-width:660px){.product-workflow__steps{grid-template-columns:1fr}}
 </style>
