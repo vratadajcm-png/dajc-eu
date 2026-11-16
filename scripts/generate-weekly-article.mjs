@@ -403,11 +403,12 @@ async function main() {
   // The model writes the checklist, title, description and intro for every
   // candidate it saw (W42-W44 promised Ukrainian, Irish, tachograph and
   // Hungarian items that were not in the edition). The checklist always comes
-  // from the published reports; summary text naming an unpublished country is
-  // replaced.
+  // from the retained reports; title, description and intro are also always
+  // rebuilt from their facts, including when a dropped story shares a country
+  // with a retained report.
   const { fixed: summaryFixes } = alignEditionSummary(article, { weekRangeLabel });
   if (summaryFixes.length > 0) {
-    console.log(`Edition copy rebuilt from the published reports: ${summaryFixes.join(', ')} named a country without a report.`);
+    console.log(`Edition copy rebuilt from the published reports: ${summaryFixes.join(', ')}.`);
   }
 
   console.log(`Lead reports: ${article.developments.length}`);

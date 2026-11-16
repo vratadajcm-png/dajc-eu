@@ -63,7 +63,7 @@ async function main() {
       const refresh = shouldReplaceBlockedEditionPr(candidate, allPulls, now);
       if (refresh && process.env.OVERSIZE_RECOVERY_ALLOWED === '1') {
         replacesPr = candidate.url;
-        console.log(`Rejected edition PR ${candidate.url} will remain archived until a reviewed replacement exists.`);
+        console.log(`EDITORIAL_REJECTED: ${candidate.url} is an audit, not a prepared publication. Source-fingerprint deduplication must pass before a new generation.`);
       } else if (refresh && process.env.OVERSIZE_RECOVERY_ALLOWED !== '1') {
         // The watchdog is read-only: the primary publisher creates and verifies a replacement.
         console.log(`Rejected edition PR is eligible for a new safe attempt: ${candidate.url}`);
