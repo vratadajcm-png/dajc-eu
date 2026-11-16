@@ -21,6 +21,14 @@ const siteURL = 'https://www.dajc.eu/';
 const brandLogoURL = 'https://www.dajc.eu/assets/dajc-google-brand.svg';
 const preview = SOCIAL_IMAGES[socialImage];
 const isHomePage = Astro.url.pathname === '/';
+const czechPaths: Record<string, string> = {
+  '/': '/',
+  '/platform': '/platform',
+  '/tar': '/tar',
+  '/testing': '/testovani',
+  '/demo-guide': '/demo',
+};
+const czechEquivalent = czechPaths[Astro.url.pathname.replace(/\/$/, '') || '/'];
 const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 
 const homeStructuredData = {
@@ -67,7 +75,7 @@ const homeStructuredData = {
   {googleSiteVerification && <meta name="google-site-verification" content={googleSiteVerification} />}
   <link rel="canonical" href={canonicalURL} />
   <link rel="alternate" type="application/rss+xml" title="DAJC News" href="/news/rss.xml" />
-  {isHomePage && <><link rel="alternate" hreflang="en" href={siteURL} /><link rel="alternate" hreflang="cs" href="https://www.dajc.cz/" /></>}
+  {czechEquivalent && <><link rel="alternate" hreflang="en" href={canonicalURL} /><link rel="alternate" hreflang="cs-CZ" href={`https://www.dajc.cz${czechEquivalent}`} /></>}
   <link rel="icon" href="/assets/favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

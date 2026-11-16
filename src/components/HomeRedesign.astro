@@ -59,6 +59,11 @@ const resources = [
       <p class="hero-lead">Two separate DAJC products for Europe: Platform coordinates heavy and oversized transport; TAR connects towing, assistance and recovery operations. Discover each product on its own page.</p>
       
       <p class="hero-status">DAJC Platform and DAJC TAR are separate products in development. Explore their dedicated pages for the complete capabilities and research questionnaire.</p>
+      <div class="hero-ctas" aria-label="Next steps">
+        <a class="hero-cta-primary" href="/testing">Register for Platform testing · Q3 2027</a>
+        <a href="/tar#research">TAR: share operational feedback</a>
+        <a href="/demo-guide">Explore the illustrative demo</a>
+      </div>
       
     </div>
 
@@ -88,6 +93,14 @@ const resources = [
       </article>
     </div>
     <div class="hero-meta"><span>One DAJC brand · Two distinct products: Platform and TAR</span><a href="/testing">Registration open: Testing 2027 <span aria-hidden="true">→</span></a></div>
+  </section>
+
+  <section class="home-section workflow-section" aria-labelledby="workflow-heading">
+    <div class="section-heading"><div><p class="section-eyebrow">ILLUSTRATIVE WORKFLOWS</p><h2 id="workflow-heading">One record. Clear handovers.</h2></div><p>Concept diagrams, not live integrations or measured operational results.</p></div>
+    <div class="workflow-grid">
+      <article><h3>Platform · D-ID</h3><ol><li>Transport request</li><li>Cargo and equipment</li><li>Route and permit checks</li><li>Approved execution</li><li>Delivery evidence</li></ol><p>A shared transport context; official authorisations remain with the responsible authorities.</p><a href="/platform">Explore Platform →</a></article>
+      <article><h3>TAR · Recovery Passport</h3><ol><li>Incident intake</li><li>Dispatch and partners</li><li>Technician updates</li><li>Recovery evidence</li><li>Case and billing closure</li></ol><p>A proposed case workflow; qualified providers remain responsible for on-scene work.</p><a href="/tar">Explore TAR →</a></article>
+    </div>
   </section>
 
   <section class="home-section real-operations" aria-labelledby="operations-heading">
@@ -230,4 +243,15 @@ const resources = [
     .home-section {padding-left:1.1rem;padding-right:1.1rem;}
   }
   @media(prefers-reduced-motion:reduce){.solution-card__button,.audience-card,.resource-card{transition:none;}}
+.hero-ctas{display:flex;flex-wrap:wrap;align-items:center;gap:.65rem;margin:1.25rem 0 1.5rem;position:relative;z-index:4}
+.hero-ctas a{display:inline-flex;min-height:46px;align-items:center;padding:.65rem .9rem;border:1px solid #627e99;border-radius:8px;color:#eaf2fa;text-decoration:none;font:700 .73rem/1.45 'IBM Plex Mono',monospace}
+.hero-ctas .hero-cta-primary{background:var(--dajc-orange);border-color:var(--dajc-orange);color:#061a33}
+.workflow-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.workflow-grid article{padding:1.4rem;border:1px solid var(--dajc-line);border-radius:12px;background:rgba(7,31,60,.72)}
+.workflow-grid h3{font:700 1.3rem 'Space Grotesk',sans-serif;color:#fff}
+.workflow-grid ol{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.5rem;list-style:none;padding:0;margin:1.5rem 0}
+.workflow-grid li{border-top:2px solid var(--dajc-orange);padding:.65rem .2rem;color:#d5e1ed;font-size:.78rem;line-height:1.45}
+.workflow-grid p{font-size:.8rem;line-height:1.6;color:#bacad9}
+.workflow-grid a{color:var(--dajc-orange);font-weight:700}
+@media(max-width:760px){.workflow-grid{grid-template-columns:1fr}.workflow-grid ol{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-ctas{align-items:stretch}.hero-ctas a{flex:1 1 100%}}
 </style>
