@@ -26,7 +26,7 @@ export function selectRejectedSourceUrls(review, allowedUrls) {
 export function shouldReplaceBlockedEditionPr(pending, allPulls, now, {
   minHours = RETRY_AFTER_HOURS, maxAttempts = MAX_EDITION_ATTEMPTS,
 } = {}) {
-  if (!pending || !String(pending.body || '').includes(REJECTION_MARKER)) return false;
+  if (!pending || !(String(pending.body || '').includes(REJECTION_MARKER) || /DAJC_WEEKLY_STATE:\s*BLOCKED/.test(String(pending.body || '')))) return false;
   const created = new Date(pending.createdAt || NaN);
   const lastUpdate = new Date(pending.updatedAt || pending.createdAt || NaN);
   if (!Number.isFinite(created.getTime()) || !Number.isFinite(lastUpdate.getTime())) return false;

@@ -25,6 +25,7 @@ permissions:
   actions: write
   deployments: read
   checks: read
+  statuses: read
   issues: write
 concurrency:
   group: oversize-weekly-watchdog

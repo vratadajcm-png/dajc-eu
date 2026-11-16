@@ -55,6 +55,7 @@ permissions:
   actions: write
   # Lets the release step read the PR's required checks.
   checks: read
+  statuses: read
   deployments: read
   issues: write
 

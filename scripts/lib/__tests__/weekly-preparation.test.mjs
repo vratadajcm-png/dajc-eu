@@ -19,7 +19,7 @@ describe('source-aware deduplication before paid generation', () => {
   it('recognizes bounded retry identity including workflow reruns and the BLOCKED state', () => {
     const retry = { ...draft, headRefName: draft.headRefName + '-retry-12345-2', body: `<!-- DAJC_WEEKLY_STATE:BLOCKED -->\n<!-- DAJC_WEEKLY_SOURCES: ${fingerprint} -->` };
     expect(identicalRejectedPreparation([retry], '2026-W47', fingerprint)).toBe(retry);
-    expect(shouldReplaceBlockedEditionPr({ ...retry, body: REJECTION_MARKER }, [draft, retry], new Date('2026-11-16'))).toBe(true);
+    expect(shouldReplaceBlockedEditionPr(retry, [draft, retry], new Date('2026-11-16'))).toBe(true);
   });
   it('does not mistake an approved editorial preparation for a veto', () => {
     expect(identicalRejectedPreparation([{ ...draft, body: `<!-- DAJC_WEEKLY_STATE:EDITORIAL_APPROVED -->\n<!-- DAJC_WEEKLY_SOURCES:${fingerprint} -->` }], '2026-W47', fingerprint)).toBeNull();
