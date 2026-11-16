@@ -11,7 +11,7 @@
 // for the pure decision logic and why this exists.
 
 import { execFileSync } from 'node:child_process';
-import { appendFileSync, mkdtempSync, rmSync, writeFileSync, readFileSync } from 'node:fs';
+import { appendFileSync, mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -98,6 +98,10 @@ const articleReplaced = articleAdded && isArticleReplacement(articleStatusOutput
 const autonomousFinal = process.env.DAJC_AUTONOMOUS_WEEKLY === '1' &&
   process.env.OVERSIZE_PREVIEW !== '1' && process.env.OVERSIZE_CORRECTION !== '1' && !articleReplaced;
 let autoMerge = autonomousFinal;
+// Only a structured editorial veto may be automatically retried; API outages and
+// other review failures always remain a human-visible hard block.
+const structuredEditorialVeto = autonomousFinal && Boolean(process.env.RUNNER_TEMP) &&
+  existsSync(path.join(process.env.RUNNER_TEMP || '', 'dajc-weekly-review-veto.json'));
 
 if (articleAdded && autonomousFinal) {
   if (!process.env.RUNNER_TEMP) throw new Error('Trusted Claude receipt directory unavailable');
@@ -188,7 +192,7 @@ const temporary = mkdtempSync(path.join(tmpdir(), 'dajc-publication-pr-'));
 try {
   const bodyFile = path.join(temporary, 'body.md');
   const openPr = (env, releasedUnattended) => {
-    writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\n${releasedUnattended ? 'Claude approved the exact final article. The workflow merges it once application-validate and news-validate pass; the site shows it from its Friday 12:00 Europe/Prague slot. ' : autoMerge ? 'Claude approved the exact final article. Waiting for human review: approve the pending workflows, then merge to publish. This run has not published the article. ' : 'Waiting for human review: merge to publish. This run has not published the article. '}Only approved article/data paths are changed.\n${!autoMerge && autonomousFinal ? '\n' + REJECTION_MARKER + '\n' : ''}`);
+    writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\n${releasedUnattended ? 'Claude approved the exact final article. The workflow merges it once application-validate and news-validate pass; the site shows it from its Friday 12:00 Europe/Prague slot. ' : autoMerge ? 'Claude approved the exact final article. Waiting for human review: approve the pending workflows, then merge to publish. This run has not published the article. ' : 'Waiting for human review: merge to publish. This run has not published the article. '}Only approved article/data paths are changed.\n${!autoMerge && structuredEditorialVeto ? '\n' + REJECTION_MARKER + '\n' : ''}`);
     return execFileSync('gh', ['pr', 'create', '--repo', repository, '--base', 'main', '--head', branch, '--title', decision.message, '--body-file', bodyFile], { encoding: 'utf8', env }).trim();
   };
   let prUrl = '';
