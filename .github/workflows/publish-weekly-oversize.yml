@@ -124,6 +124,16 @@ jobs:
           OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
         run: node scripts/check-weekly-publication.mjs
 
+      - name: Resume approved PR after interrupted release without regeneration
+        id: resume
+        if: steps.publish-needed.outputs.approved_pr != '' && env.DAJC_AUTONOMOUS_WEEKLY == '1' && inputs.dry_run != true && inputs.preview != true && inputs.correction != true
+        timeout-minutes: 30
+        env:
+          PR_URL: ${{ steps.publish-needed.outputs.approved_pr }}
+          EXPECTED_PR_HEAD: ${{ steps.publish-needed.outputs.pr_head }}
+          TARGET_WEEK: ${{ steps.publish-needed.outputs.week }}
+        run: node scripts/resume-reviewed-weekly.mjs
+
       - name: Pin edition identity for every downstream gate
         if: steps.publish-needed.outputs.needed == 'true'
         env:
@@ -237,6 +247,15 @@ jobs:
           CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}
         run: node scripts/recover-weekly-after-veto.mjs "${{ steps.publish-needed.outputs.target }}"
 
+      - name: Preserve immutable independent approval before opening PR
+        if: steps.review.outcome == 'success' || steps.recovery.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-approval-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/dajc-weekly-review-approved.json
+          if-no-files-found: ignore
+          retention-days: 90
+
       - name: Open reviewed publication PR or persist data-only refresh
         id: gate
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true'
@@ -265,7 +284,7 @@ jobs:
         run: node scripts/merge-reviewed-weekly.mjs
 
       - name: Verify production deployment and public release
-        if: steps.gate.outputs.auto_merge == 'true' && steps.gate.outputs.unattended == 'true'
+        if: (steps.gate.outputs.auto_merge == 'true' && steps.gate.outputs.unattended == 'true') || steps.resume.outcome == 'success'
         timeout-minutes: 12
         env:
           TARGET_WEEK: ${{ steps.publish-needed.outputs.week }}
@@ -325,6 +344,8 @@ jobs:
           echo "Preview: ${{ steps.trigger.outputs.preview || 'false' }}"
           if [ "${{ steps.trigger.outputs.should_run }}" != "true" ]; then
             echo "Outcome: intentional no-op."
+          elif [ "${{ steps.resume.outcome }}" = "success" ]; then
+            echo "Outcome: resumed protected merge of the approved PR and verified delivery without paid generation."
           elif [ "${{ steps.publish-needed.outputs.needed }}" = "false" ]; then
             echo "Outcome: article already exists or its PR awaits review; no generation repeated."
           elif [ "${{ job.status }}" = "success" ]; then

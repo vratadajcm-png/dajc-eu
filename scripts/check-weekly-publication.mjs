@@ -48,10 +48,12 @@ async function main() {
   let pendingPr = null;
   let stalePrs = [];
   let replacesPr = '';
+  let approvedPr = '';
+  let approvedPrHead = '';
   if (process.env.GITHUB_ACTIONS === 'true') {
     if (!process.env.GH_TOKEN || !/^[\w.-]+\/[\w.-]+$/.test(process.env.GITHUB_REPOSITORY || '')) throw new Error('Publication PR access is not configured');
     const branch = publicationBranchFor(target.nextWeekLabel, { preview: process.env.OVERSIZE_PREVIEW === '1', correction });
-    const allPulls = JSON.parse(execFileSync('gh', ['pr', 'list', '--repo', process.env.GITHUB_REPOSITORY, '--base', 'main', '--state', 'all', '--limit', '100', '--json', 'url,headRefName,body,createdAt,updatedAt,state'], { encoding: 'utf8' }));
+    const allPulls = JSON.parse(execFileSync('gh', ['pr', 'list', '--repo', process.env.GITHUB_REPOSITORY, '--base', 'main', '--state', 'all', '--limit', '100', '--json', 'url,headRefName,headRefOid,body,createdAt,updatedAt,state,isDraft'], { encoding: 'utf8' }));
     const pulls = allPulls.filter((pull) => !pull.state || pull.state === 'OPEN');
     const editionPulls = classifyEditionPulls(pulls, { branch, targetWeek: target.nextWeekLabel });
     stalePrs = editionPulls.stale.map((pull) => pull.url);
@@ -68,6 +70,15 @@ async function main() {
       } else {
         needed = false;
         pendingPr = candidate.url;
+        const approvalMarkers = [...String(candidate.body || '').matchAll(/<!-- DAJC_WEEKLY_STATE:([A-Z_]+) -->/g)];
+        const attemptMarkers = [...String(candidate.body || '').matchAll(/<!-- DAJC_WEEKLY_ATTEMPT:([0-9]+-[0-9]+) -->/g)];
+        if (!correction && process.env.OVERSIZE_PREVIEW !== '1' && !candidate.isDraft &&
+            approvalMarkers.length === 1 && approvalMarkers[0][1] === 'EDITORIAL_APPROVED' &&
+            attemptMarkers.length === 1 && /^[a-f0-9]{40}$/.test(candidate.headRefOid || '')) {
+          approvedPr = candidate.url;
+          approvedPrHead = candidate.headRefOid;
+          console.log(`Independently approved pending edition can resume protected merge without generation: ${approvedPr}`);
+        }
         console.log(`Edition already awaits review in ${pendingPr}; no regeneration or additional AI spend.`);
       }
     }
@@ -92,7 +103,7 @@ async function main() {
   if (process.env.GITHUB_OUTPUT) {
     await appendFile(
       process.env.GITHUB_OUTPUT,
-      `needed=${needed ? 'true' : 'false'}\nreplaces_pr=${replacesPr}\npending_pr=${pendingPr ? 'true' : 'false'}\npublic_due=${publicDue ? 'true' : 'false'}\narticle_exists=${exists ? 'true' : 'false'}\noverdue=${overdue ? 'true' : 'false'}\nstale_prs=${stalePrs.join(' ')}\ntarget=${target.relativePath}\nweek=${target.nextWeekLabel}\n`
+      `needed=${needed ? 'true' : 'false'}\napproved_pr=${approvedPr}\npr_head=${approvedPrHead}\nreplaces_pr=${replacesPr}\npending_pr=${pendingPr ? 'true' : 'false'}\npublic_due=${publicDue ? 'true' : 'false'}\narticle_exists=${exists ? 'true' : 'false'}\noverdue=${overdue ? 'true' : 'false'}\nstale_prs=${stalePrs.join(' ')}\ntarget=${target.relativePath}\nweek=${target.nextWeekLabel}\n`
     );
   }
 

@@ -217,3 +217,5 @@ The owner's standing instruction is to run the Weekly at the lowest cost without
 - Focuses share one Search request whenever every language's terms fit (Search bills per request, not per query).
 - The monitor runs on Monday and Wednesday; Thursday's preparation refreshes the data once, and scheduled retries reuse findings written in the last 18 hours. A manual correction or preview run always searches again.
 - Writing the edition, the final editorial review and social copy keep the stronger `CLAUDE_REVIEW_MODEL` / `CLAUDE_SOCIAL_MODEL`: they run once or twice a week and decide what readers see.
+
+Approved interrupted releases resume from the pinned PR head without a new research or writing call. The resume path reads PR git objects as data and runs only reviewed main code. Before CI accepts an article, and before resume/public verification, its full independent review must match the immutable `weekly-approval-<run>-<attempt>` artifact from the main publishing workflow. A PR-local JSON assertion alone cannot authorize publication.

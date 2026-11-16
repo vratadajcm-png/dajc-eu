@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   news-validate:
@@ -19,6 +20,8 @@ jobs:
 
       - name: Validate exact-byte independent approval for changed final articles
         if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: node scripts/validate-weekly-approval.mjs --base origin/main
 
       - name: Setup Node

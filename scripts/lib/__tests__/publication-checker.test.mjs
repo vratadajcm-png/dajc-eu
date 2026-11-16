@@ -34,8 +34,14 @@ describe('publication idempotency and read-only recovery decisions', () => {
     const f = fixture(); expect(() => f.run(['--target-week', '2027-W53'])).toThrow();
   });
   it('keeps an approved open PR pending without another generation', () => {
-    const f = fixture({ PULLS: JSON.stringify([{ state: 'OPEN', url: 'https://github.test/pull/1', headRefName: 'automation/weekly-2026-w48', body: '<!-- DAJC_WEEKLY_STATE:EDITORIAL_APPROVED -->' }]) });
-    f.run(); expect(f.outputs()).toContain('needed=false'); expect(f.outputs()).toContain('pending_pr=true');
+    const f = fixture({ PULLS: JSON.stringify([{ state: 'OPEN', url: 'https://github.test/pull/1', headRefName: 'automation/weekly-2026-w48', headRefOid: 'a'.repeat(40), body: '<!-- DAJC_WEEKLY_STATE:EDITORIAL_APPROVED -->\n<!-- DAJC_WEEKLY_ATTEMPT:123-1 -->' }]) });
+    f.run(); expect(f.outputs()).toContain('needed=false'); expect(f.outputs()).toContain('pending_pr=true'); expect(f.outputs()).toContain('approved_pr=https://github.test/pull/1'); expect(f.outputs()).toContain(`pr_head=${'a'.repeat(40)}`);
+  });
+  it('never resumes rejected, forged-marker or draft publication PRs', () => {
+    for (const override of [{ body: '<!-- DAJC_WEEKLY_STATE:EDITORIAL_REJECTED -->' }, { isDraft: true }, { headRefOid: '' }, { body: '<!-- DAJC_WEEKLY_STATE:EDITORIAL_APPROVED -->' }]) {
+      const f = fixture({ PULLS: JSON.stringify([{ state: 'OPEN', url: 'https://github.test/pull/1', headRefName: 'automation/weekly-2026-w48', headRefOid: 'a'.repeat(40), body: '<!-- DAJC_WEEKLY_STATE:EDITORIAL_APPROVED -->\n<!-- DAJC_WEEKLY_ATTEMPT:123-1 -->', ...override }]) });
+      f.run(); expect(f.outputs()).toContain('approved_pr=\n'); expect(f.outputs()).toContain('pr_head=\n');
+    }
   });
   it('allows controlled replacement of a rejected PR and keeps the original open for audit', () => {
     const url = 'https://github.test/pull/1';

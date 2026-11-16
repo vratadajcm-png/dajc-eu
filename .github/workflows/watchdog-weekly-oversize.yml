@@ -48,6 +48,17 @@ jobs:
         env:
           OVERSIZE_TARGET_WEEK: ${{ inputs.target_week || '' }}
         run: node scripts/check-weekly-publication.mjs
+      - name: Check latest due edition for interrupted approved release
+        id: due
+        env:
+          OVERSIZE_CHECK_MODE: watchdog
+          OVERSIZE_TARGET_WEEK: ${{ inputs.target_week || '' }}
+        run: node scripts/check-weekly-publication.mjs
+      - name: Resume approved overdue PR through the primary pipeline
+        if: steps.due.outputs.approved_pr != '' && steps.due.outputs.week != steps.publication.outputs.week
+        env:
+          TARGET_WEEK: ${{ steps.due.outputs.week }}
+        run: gh workflow run publish-weekly-oversize.yml --repo "$GITHUB_REPOSITORY" --ref main -f "target_week=$TARGET_WEEK"
       - name: Determine preparation window
         id: window
         env:
@@ -60,7 +71,7 @@ jobs:
             echo "prepare=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Dispatch only the primary pipeline
-        if: steps.publication.outputs.needed == 'true' && steps.window.outputs.prepare == 'true'
+        if: (steps.publication.outputs.needed == 'true' || steps.publication.outputs.approved_pr != '') && steps.window.outputs.prepare == 'true'
         env:
           TARGET_WEEK: ${{ steps.publication.outputs.week }}
         run: |

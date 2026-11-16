@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { editionPlan } from './lib/edition-plan.mjs';
+import { assertTrustedApproval } from './lib/trusted-weekly-approval.mjs';
 import { publicationSlotFor, targetWeekDateFor } from './lib/next-publication.mjs';
 import { isoWeekLabel } from './lib/week.mjs';
 import { articleMetadata, approvedPublicationReceipt, approvedMergedPr, validatePublicationChecks, checkPublicDelivery, verifyWithRetry } from './lib/publication-verification.mjs';
@@ -42,6 +43,7 @@ async function main() {
   const receipt = approvedPublicationReceipt(receipts, metadata, plan.targetWeek);
   const repo = process.env.GITHUB_REPOSITORY;
   if (!/^[\w.-]+\/[\w.-]+$/.test(repo || '') || !process.env.GH_TOKEN) throw new Error('GITHUB_ACCESS: repository/token required to prove protected merge and deployment');
+  assertTrustedApproval(receipt, { repo, articlePath, targetWeek: plan.targetWeek, raw });
   const pulls = gh(['pr', 'list', '--repo', repo, '--base', 'main', '--state', 'merged', '--limit', '100', '--json', 'url,body,state,mergedAt,mergeCommit,statusCheckRollup']);
   const merged = approvedMergedPr(pulls, receipt);
   validatePublicationChecks(merged);
