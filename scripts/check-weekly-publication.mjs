@@ -64,7 +64,8 @@ async function main() {
   }
   // The edition is overdue when its Friday 12:00 slot has passed while its PR
   // still waits for review: the site shows nothing for the week.
-  const overdue = Boolean(pendingPr) && process.env.OVERSIZE_PREVIEW !== '1' && now.getTime() >= publicationSlotFor(now).getTime();
+  const publicDue = process.env.OVERSIZE_PREVIEW !== '1' && now.getTime() >= publicationSlotFor(now).getTime();
+  const overdue = Boolean(pendingPr) && publicDue;
   if (overdue) console.log(`::error::EU Oversize Weekly ${target.nextWeekLabel} is past its Friday 12:00 Europe/Prague slot but its PR is not merged: ${pendingPr}`);
 
   console.log(`Target weekly article: ${target.relativePath}`);
@@ -81,7 +82,7 @@ async function main() {
   if (process.env.GITHUB_OUTPUT) {
     await appendFile(
       process.env.GITHUB_OUTPUT,
-      `needed=${needed ? 'true' : 'false'}\npending_pr=${pendingPr ? 'true' : 'false'}\noverdue=${overdue ? 'true' : 'false'}\nstale_prs=${stalePrs.join(' ')}\ntarget=${target.relativePath}\nweek=${target.nextWeekLabel}\n`
+      `needed=${needed ? 'true' : 'false'}\npending_pr=${pendingPr ? 'true' : 'false'}\npublic_due=${publicDue ? 'true' : 'false'}\narticle_exists=${exists ? 'true' : 'false'}\noverdue=${overdue ? 'true' : 'false'}\nstale_prs=${stalePrs.join(' ')}\ntarget=${target.relativePath}\nweek=${target.nextWeekLabel}\n`
     );
   }
 

@@ -36,6 +36,24 @@ jobs:
         run: |
           gh workflow run publish-weekly-oversize.yml --repo "$GITHUB_REPOSITORY" --ref main
           echo "One primary workflow dispatched. Does not establish successful publication."
+      - name: Confirm the published edition is accessible on DAJC.eu
+        if: steps.publication.outputs.public_due == 'true' && steps.publication.outputs.article_exists == 'true'
+        timeout-minutes: 3
+        env:
+          TARGET_WEEK: ${{ steps.publication.outputs.week }}
+        shell: bash
+        run: |
+          slug="eu-oversize-weekly-${TARGET_WEEK,,}"
+          url="https://www.dajc.eu/news/eu-oversize/$slug?watchdog-check=${GITHUB_RUN_ID}"
+          html=$(curl --location --fail --silent --show-error --max-time 20 "$url") || {
+            echo "::error::Live article unavailable: $url"
+            exit 1
+          }
+          if ! printf '%s' "$html" | grep -q "EU Oversize Weekly" || ! printf '%s' "$html" | grep -q "$slug"; then
+            echo "::error::Article exists in main but not on the public website: $url"
+            exit 1
+          fi
+          echo "Public article verified: $url" >> "$GITHUB_STEP_SUMMARY"
       - name: Alert on an overdue edition or open PRs of past weeks
         if: steps.publication.outputs.overdue == 'true' || steps.publication.outputs.stale_prs != ''
         env:
