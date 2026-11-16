@@ -4,7 +4,7 @@ const czechEquivalent: Record<string,string> = {
   "/testing":"/testovani", "/demo-guide":"/demo",
   "/news":"/aktuality", "/privacy":"/soukromi",
 };
-const current=Astro.url.pathname.replace(/\\/$/, "") || "/";
+const current=Astro.url.pathname.replace(/\/$/, "") || "/";
 const czechUrl="https://www.dajc.cz"+(czechEquivalent[current]??"/");
 ---
 <header class="site-header">
