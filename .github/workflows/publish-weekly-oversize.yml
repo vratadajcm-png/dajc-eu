@@ -69,6 +69,7 @@ jobs:
       DAJC_AUTONOMOUS_WEEKLY: ${{ vars.DAJC_WEEKLY_AUTO_MERGE != 'false' && '1' || '0' }}
       OVERSIZE_PREVIEW: ${{ github.event.inputs.preview == 'true' && '1' || '' }}
       OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
+      OVERSIZE_RECOVERY_ALLOWED: '1'
     steps:
       - name: Resolve scheduled trigger
         id: trigger
@@ -188,6 +189,19 @@ jobs:
             echo "::warning::No qualified article generated this week; no approval or publication."
           fi
 
+      # A rejected edition may receive one strictly bounded rewrite that
+      # excludes ONLY URLs the reviewer marked unsupported. All deterministic
+      # gates, live-source verification, build and independent review repeat.
+      - name: One safe regeneration after structured Claude veto
+        id: recovery
+        continue-on-error: true
+        if: steps.review.outcome == 'failure' && steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true' && env.DAJC_AUTONOMOUS_WEEKLY == '1'
+        timeout-minutes: 25
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}
+        run: node scripts/recover-weekly-after-veto.mjs "${{ steps.publish-needed.outputs.target }}"
+
       - name: Open reviewed publication PR or persist data-only refresh
         id: gate
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true'
@@ -237,8 +251,35 @@ jobs:
           echo "::error::The ruleset did not allow the merge within 25 minutes; the edition waits for human review: $PR_URL"
           exit 1
 
+      # Only a completed protected merge is eligible for a public-site check.
+      # The content pages have a short CDN cache and Vercel deployment may lag.
+      - name: Verify the released article on the public website
+        if: steps.gate.outputs.auto_merge == 'true' && steps.gate.outputs.unattended == 'true'
+        timeout-minutes: 12
+        shell: bash
+        env:
+          TARGET_WEEK: ${{ steps.publish-needed.outputs.week }}
+        run: |
+          slug="eu-oversize-weekly-${TARGET_WEEK,,}"
+          url="https://www.dajc.eu/news/eu-oversize/$slug?release-check=${GITHUB_RUN_ID}"
+          seen=false
+          for attempt in $(seq 1 24); do
+            html=$(curl --location --fail --silent --show-error --max-time 18 "$url" || true)
+            if printf '%s' "$html" | grep -q "EU Oversize Weekly" && printf '%s' "$html" | grep -q "$slug"; then
+              seen=true
+              break
+            fi
+            echo "Article not yet visible (attempt $attempt); checking again."
+            sleep 20
+          done
+          if [ "$seen" != true ]; then
+            echo "::error::Merged edition is not verifiably public at $url"
+            exit 1
+          fi
+          echo "Verified live article at $url" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Alert when Claude withheld the release
-        if: steps.review.outcome == 'failure'
+        if: steps.review.outcome == 'failure' && steps.recovery.outcome != 'success'
         run: |
           echo "::error::Claude did not approve this edition (see the review step). It waits for human review: ${{ steps.gate.outputs.pr_url || 'no PR was opened' }}"
           exit 1
