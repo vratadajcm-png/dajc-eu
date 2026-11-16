@@ -45,7 +45,7 @@ describe('publication idempotency and read-only recovery decisions', () => {
   });
   it('allows controlled replacement of a rejected PR and keeps the original open for audit', () => {
     const url = 'https://github.test/pull/1';
-    const f = fixture({ OVERSIZE_TARGET_WEEK: '2026-W47', PULLS: JSON.stringify([{ state: 'OPEN', url, headRefName: 'automation/weekly-2026-w47', body: 'Editorial status: REJECTED_BY_CLAUDE', createdAt: '2026-11-12T12:00:00Z', updatedAt: '2026-11-12T12:00:00Z' }]) });
+    const f = fixture({ OVERSIZE_TARGET_WEEK: '2026-W47', PULLS: JSON.stringify([{ state: 'OPEN', url, headRefName: 'automation/weekly-2026-w47', body: 'Editorial status: REJECTED_BY_CLAUDE', createdAt: '2026-11-16T11:59:00Z', updatedAt: '2026-11-16T11:59:00Z' }]) });
     f.run(); expect(f.outputs()).toContain('needed=true'); expect(f.outputs()).toContain(`replaces_pr=${url}`);
     const calls = readFileSync(f.env.CALLS, 'utf8').trim().split('\n').map(JSON.parse);
     expect(calls.every(call => call[0] === 'pr' && call[1] === 'list')).toBe(true);

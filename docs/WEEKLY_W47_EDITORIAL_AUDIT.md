@@ -51,3 +51,14 @@ short edition; zero verified developments means a blocked publication.
 This document does not certify API access, a replacement article, a successful
 merge, Vercel deployment or public availability. Those require separate live
 evidence from the replacement run and the public domain.
+
+## Live verification after #138 (16 November 2026)
+
+- Repair system merged as `3fe064576f3ea60e508ada1694b8a997008ca175`; Vercel production `dpl_BprqNUBBEc6PKk4faw23VLhXeqhN` READY.
+- Main publisher run [43919182436](https://github.com/vratadajcm-png/dajc-eu/actions/runs/43919182436) explicitly targeted W47. Existing monitoring from 14:10 UTC was reused without a duplicate Perplexity search. It considered 60 source records, rechecked 17 reachable candidates and generated one report. Independent Claude rejected its unsupported Italy draft-reform claim, unsupported 3.5 t campaign threshold and unproven sanctions/ferry and abnormal-load consequences. The sole cited source was unsupported; removing it left no edition, so repair stopped without padding.
+- [Draft #139](https://github.com/vratadajcm-png/dajc-eu/pull/139) archives the exact rejected version/review (`43919182436-1`, SHA-256 `7dd7be0c68ed8058df8be0f1c2b44def304853dc758815a22c8a2f3b2fba5050`) as JSON only. It includes no public article path. Both required checks passed on the audit PR; it remains a draft and must not be used to publish the rejected content. Its owner-authored PR demonstrates the configured PR token can trigger normal CI.
+- Independent watchdog [43919491095](https://github.com/vratadajcm-png/dajc-eu/actions/runs/43919491095) correctly failed `ARTICLE_MISSING` and updated [operational alert #140](https://github.com/vratadajcm-png/dajc-eu/issues/140). The public W47 URL returned 404, while /news returned 200.
+- Duplicate publisher [43919713380](https://github.com/vratadajcm-png/dajc-eu/actions/runs/43919713380) did no research, synthesis, review, merge or publication.
+- The live veto exposed an additional deterministic issue: a filtered Italian legislation story could survive in the intro because another Italian report remained. The follow-up rebuilds all summary metadata from retained reports, preserving exact limits/qualifiers. Rejected source evidence remains rejected; this code change does not authorize republishing or rerolling the same source snapshot.
+
+W47 remains editorially BLOCKED. A future attempt needs actual additional/corrected evidence and a new independent approval, protected CI and production/public verification. Successful live automatic merge of an approved content edition is not established by these rejection/duplicate tests.

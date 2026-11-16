@@ -4,7 +4,9 @@ import { createHash } from 'node:crypto';
 // Never turn a blocking reason into permission to edit, publish or relax a quality gate.
 export const REJECTION_MARKER = 'Editorial status: REJECTED_BY_CLAUDE';
 export const MAX_EDITION_ATTEMPTS = 3;
-export const RETRY_AFTER_HOURS = 8;
+// New actual evidence, not elapsed time, permits a fresh preparation.
+// The semantic fingerprint guard runs before every paid writing call.
+export const RETRY_AFTER_HOURS = 0;
 
 export function selectRejectedSourceUrls(review, allowedUrls) {
   if (!review || review.verdict !== 'reject' || !Array.isArray(review.sourceChecks) ||
@@ -26,7 +28,7 @@ export function selectRejectedSourceUrls(review, allowedUrls) {
 export function shouldReplaceBlockedEditionPr(pending, allPulls, now, {
   minHours = RETRY_AFTER_HOURS, maxAttempts = MAX_EDITION_ATTEMPTS,
 } = {}) {
-  if (!pending || !(String(pending.body || '').includes(REJECTION_MARKER) || /DAJC_WEEKLY_STATE:\s*BLOCKED/.test(String(pending.body || '')))) return false;
+  if (!pending || !(String(pending.body || '').includes(REJECTION_MARKER) || /DAJC_WEEKLY_STATE:\s*(?:EDITORIAL_REJECTED|BLOCKED)/.test(String(pending.body || '')))) return false;
   const created = new Date(pending.createdAt || NaN);
   const lastUpdate = new Date(pending.updatedAt || pending.createdAt || NaN);
   if (!Number.isFinite(created.getTime()) || !Number.isFinite(lastUpdate.getTime())) return false;
