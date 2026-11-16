@@ -12,11 +12,21 @@ on:
     # nothing for the week (W43 waited nine days without an alert).
     - cron: '37 11 * * 5'
     - cron: '37 8 * * 6'
+    - cron: '37 7 * * 0-4' # detect missing current editions throughout the week
   workflow_dispatch:
+    inputs:
+      target_week:
+        description: 'Optional explicit edition to verify; default is the latest due Friday edition.'
+        type: string
+        default: ''
 permissions:
   contents: read
   pull-requests: read
   actions: write
+  deployments: read
+  checks: read
+  statuses: read
+  issues: write
 concurrency:
   group: oversize-weekly-watchdog
   cancel-in-progress: false
@@ -28,32 +38,57 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
-      - name: Check target edition or pending PR
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check upcoming preparation or pending PR
         id: publication
+        env:
+          OVERSIZE_TARGET_WEEK: ${{ inputs.target_week || '' }}
         run: node scripts/check-weekly-publication.mjs
-      - name: Dispatch only the primary pipeline
-        if: steps.publication.outputs.needed == 'true'
+      - name: Check latest due edition for interrupted approved release
+        id: due
+        env:
+          OVERSIZE_CHECK_MODE: watchdog
+          OVERSIZE_TARGET_WEEK: ${{ inputs.target_week || '' }}
+        run: node scripts/check-weekly-publication.mjs
+      - name: Resume approved overdue PR through the primary pipeline
+        if: steps.due.outputs.approved_pr != '' && steps.due.outputs.week != steps.publication.outputs.week
+        env:
+          TARGET_WEEK: ${{ steps.due.outputs.week }}
+        run: gh workflow run publish-weekly-oversize.yml --repo "$GITHUB_REPOSITORY" --ref main -f "target_week=$TARGET_WEEK"
+      - name: Determine preparation window
+        id: window
+        env:
+          EXPLICIT_WEEK: ${{ inputs.target_week || '' }}
         run: |
-          gh workflow run publish-weekly-oversize.yml --repo "$GITHUB_REPOSITORY" --ref main
-          echo "One primary workflow dispatched. Does not establish successful publication."
-      - name: Confirm the published edition is accessible on DAJC.eu
-        if: steps.publication.outputs.public_due == 'true' && steps.publication.outputs.article_exists == 'true'
-        timeout-minutes: 3
+          weekday=$(TZ=Europe/Prague date +%u)
+          if [ -n "$EXPLICIT_WEEK" ] || { [ "$weekday" -ge 4 ] && [ "$weekday" -le 6 ]; }; then
+            echo "prepare=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prepare=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Dispatch only the primary pipeline
+        if: (steps.publication.outputs.needed == 'true' || steps.publication.outputs.approved_pr != '') && steps.window.outputs.prepare == 'true'
         env:
           TARGET_WEEK: ${{ steps.publication.outputs.week }}
-        shell: bash
         run: |
-          slug="eu-oversize-weekly-${TARGET_WEEK,,}"
-          url="https://www.dajc.eu/news/eu-oversize/$slug?watchdog-check=${GITHUB_RUN_ID}"
-          html=$(curl --location --fail --silent --show-error --max-time 20 "$url") || {
-            echo "::error::Live article unavailable: $url"
-            exit 1
-          }
-          if ! printf '%s' "$html" | grep -q "EU Oversize Weekly" || ! printf '%s' "$html" | grep -q "$slug"; then
-            echo "::error::Article exists in main but not on the public website: $url"
-            exit 1
-          fi
-          echo "Public article verified: $url" >> "$GITHUB_STEP_SUMMARY"
+          gh workflow run publish-weekly-oversize.yml --repo "$GITHUB_REPOSITORY" --ref main -f "target_week=$TARGET_WEEK"
+          echo "One primary workflow dispatched. Does not establish successful publication."
+      - name: Verify latest due edition on production independently
+        id: verification
+        timeout-minutes: 12
+        env:
+          OVERSIZE_TARGET_WEEK: ${{ inputs.target_week || '' }}
+        run: node scripts/verify-weekly-publication.mjs
+      - name: Verify prepared edition stays hidden until its slot
+        if: always() && steps.publication.outputs.article_exists == 'true' && steps.publication.outputs.public_due != 'true'
+        timeout-minutes: 12
+        env:
+          TARGET_WEEK: ${{ steps.publication.outputs.week }}
+        run: node scripts/verify-weekly-publication.mjs
       - name: Alert on an overdue edition or open PRs of past weeks
         if: steps.publication.outputs.overdue == 'true' || steps.publication.outputs.stale_prs != ''
         env:
@@ -67,6 +102,11 @@ jobs:
             echo "::error::Edition PR for a week that has already passed is still open: $pr - close it or merge it as a correction."
           done
           exit 1
+      - name: Report blocked publication
+        if: failure()
+        env:
+          TARGET_WEEK: ${{ steps.verification.outputs.week || inputs.target_week || '' }}
+        run: node scripts/report-weekly-failure.mjs
       - name: Outcome
         if: always()
         run: |

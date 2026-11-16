@@ -29,13 +29,21 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run: generate, verify and build the article but do not commit/push.'
+        description: 'Full live simulation: generate, build, independently review and repair in the disposable runner; never commit/push.'
+        type: boolean
+        default: false
+      force_refresh:
+        description: 'Force fresh paid source discovery despite a successful refresh in the last 18 hours.'
         type: boolean
         default: false
       preview:
         description: 'Publish a separate preview article using Friday quality gates; never consumes the final weekly slug.'
         type: boolean
         default: false
+      target_week:
+        description: 'Optional explicit ISO edition, e.g. 2026-W47. Late release retains its original scheduled slot.'
+        type: string
+        default: ''
       correction:
         description: 'Regenerate the current target edition from source data; replaces an existing article only if the new edition passes every gate and the build (stamps updatedAt).'
         type: boolean
@@ -47,9 +55,12 @@ permissions:
   actions: write
   # Lets the release step read the PR's required checks.
   checks: read
+  statuses: read
+  deployments: read
+  issues: write
 
 concurrency:
-  group: oversize-weekly-publish
+  group: oversize-data
   # Let an in-flight primary publication finish. Later recovery schedules wait
   # and then become cheap idempotent no-ops once the target article exists.
   cancel-in-progress: false
@@ -70,6 +81,7 @@ jobs:
       OVERSIZE_PREVIEW: ${{ github.event.inputs.preview == 'true' && '1' || '' }}
       OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
       OVERSIZE_RECOVERY_ALLOWED: '1'
+      OVERSIZE_TARGET_WEEK: ${{ inputs.target_week || '' }}
     steps:
       - name: Resolve scheduled trigger
         id: trigger
@@ -102,6 +114,8 @@ jobs:
       - name: Checkout
         if: steps.trigger.outputs.should_run == 'true'
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Check whether target week is already published
         if: steps.trigger.outputs.should_run == 'true'
@@ -109,6 +123,22 @@ jobs:
         env:
           OVERSIZE_CORRECTION: ${{ github.event.inputs.correction == 'true' && '1' || '' }}
         run: node scripts/check-weekly-publication.mjs
+
+      - name: Resume approved PR after interrupted release without regeneration
+        id: resume
+        if: steps.publish-needed.outputs.approved_pr != '' && env.DAJC_AUTONOMOUS_WEEKLY == '1' && inputs.dry_run != true && inputs.preview != true && inputs.correction != true
+        timeout-minutes: 30
+        env:
+          PR_URL: ${{ steps.publish-needed.outputs.approved_pr }}
+          EXPECTED_PR_HEAD: ${{ steps.publish-needed.outputs.pr_head }}
+          TARGET_WEEK: ${{ steps.publish-needed.outputs.week }}
+        run: node scripts/resume-reviewed-weekly.mjs
+
+      - name: Pin edition identity for every downstream gate
+        if: steps.publish-needed.outputs.needed == 'true'
+        env:
+          TARGET_WEEK: ${{ steps.publish-needed.outputs.week }}
+        run: echo "OVERSIZE_TARGET_WEEK=$TARGET_WEEK" >> "$GITHUB_ENV"
 
       - name: Determine dry-run mode
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
@@ -120,17 +150,23 @@ jobs:
             echo "dry_run=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Pre-flight - check Perplexity and Claude API credentials
+      - name: Pre-flight - check publication credentials
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         env:
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DAJC_WEEKLY_PR_TOKEN: ${{ secrets.DAJC_WEEKLY_PR_TOKEN }}
+          DRY_RUN: ${{ steps.dry-run-mode.outputs.dry_run }}
         run: |
           if [ -z "$PERPLEXITY_API_KEY" ] || [ -z "$ANTHROPIC_API_KEY" ]; then
             echo "::error::PERPLEXITY_API_KEY (research) and ANTHROPIC_API_KEY (classification and writing) are both required. No article will be generated."
             exit 1
           fi
-          echo "Required research/editor credentials present (values never printed)."
+          if [ "$DAJC_AUTONOMOUS_WEEKLY" = "1" ] && [ "$DRY_RUN" != "true" ] && [ "$OVERSIZE_PREVIEW" != "1" ] && [ -z "$DAJC_WEEKLY_PR_TOKEN" ]; then
+            echo "::error::DAJC_WEEKLY_PR_TOKEN missing: unattended content PR CI cannot be guaranteed. No paid research or publication attempted."
+            exit 1
+          fi
+          echo "Required credentials present (values never printed)."
 
       - name: Setup Node
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
@@ -155,10 +191,17 @@ jobs:
           CLAUDE_CLASSIFIER_MODEL: ${{ vars.CLAUDE_CLASSIFIER_MODEL || 'claude-haiku-5-5' }}
           # Scheduled retries reuse findings from a run in the last 18 h
           # instead of paying for the same search again (Thursday retries,
-          # Friday 12:17). A manual run (correction, preview) always searches
-          # again: it exists because the stored findings were not good enough.
-          OVERSIZE_REFRESH_MAX_AGE_HOURS: ${{ github.event_name == 'schedule' && '18' || '' }}
+          # Friday recoveries). A manual force_refresh can request new evidence.
+          OVERSIZE_REFRESH_MAX_AGE_HOURS: ${{ inputs.force_refresh && '0' || '18' }}
         run: npm run oversize:monitor
+
+      - name: Persist source refresh before editorial preparation
+        if: steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true'
+        run: node scripts/automation-data.mjs save findings
+
+      - name: Check source preparation deduplication
+        if: steps.publish-needed.outputs.needed == 'true'
+        run: node scripts/check-weekly-preparation.mjs
 
       - name: Generate weekly article
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
@@ -169,15 +212,17 @@ jobs:
         # One generation attempt. Quality > count: an edition contains exactly
         # the items that pass every editorial rule, so there is nothing to
         # retry for (no lead/Rest-of-Europe minimum, no padding loop).
-        run: node scripts/generate-weekly-article.mjs ${{ steps.dry-run-mode.outputs.dry_run == 'true' && '--dry-run' || '' }} ${{ steps.trigger.outputs.preview == 'true' && '--preview' || '' }} ${{ github.event.inputs.correction == 'true' && '--correction' || '' }}
+        # Simulation writes only into this disposable runner so that the final
+        # independent reviewer sees the exact bytes. All push/PR steps stay off.
+        run: node scripts/generate-weekly-article.mjs ${{ steps.trigger.outputs.preview == 'true' && '--preview' || '' }} ${{ github.event.inputs.correction == 'true' && '--correction' || '' }}
 
-      # Needed only for autonomous release; a PR for human review skips it
-      # (one Claude call less). A veto must not lose the edition: the next
-      # step still opens it for human review, and the run is marked failed.
+      # Every final article requires independent approval, including simulations
+      # and corrections.
+      # A veto must not lose the audit; rejected content stays off public routes.
       - name: Claude final editorial approval for autonomous release
         id: review
         continue-on-error: true
-        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true' && env.DAJC_AUTONOMOUS_WEEKLY == '1'
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.trigger.outputs.preview != 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}
@@ -189,18 +234,27 @@ jobs:
             echo "::warning::No qualified article generated this week; no approval or publication."
           fi
 
-      # A rejected edition may receive one strictly bounded rewrite that
+      # A rejected edition may receive at most two source-safe repairs that
       # excludes ONLY URLs the reviewer marked unsupported. All deterministic
       # gates, live-source verification, build and independent review repeat.
-      - name: One safe regeneration after structured Claude veto
+      - name: Bounded source-safe regeneration after structured Claude veto
         id: recovery
         continue-on-error: true
-        if: steps.review.outcome == 'failure' && steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true' && github.event.inputs.correction != 'true' && env.DAJC_AUTONOMOUS_WEEKLY == '1'
+        if: steps.review.outcome == 'failure' && steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.trigger.outputs.preview != 'true'
         timeout-minutes: 25
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_REVIEW_MODEL: ${{ vars.CLAUDE_REVIEW_MODEL || 'claude-sonnet-5-5' }}
         run: node scripts/recover-weekly-after-veto.mjs "${{ steps.publish-needed.outputs.target }}"
+
+      - name: Preserve immutable independent approval before opening PR
+        if: steps.review.outcome == 'success' || steps.recovery.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-approval-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/dajc-weekly-review-approved.json
+          if-no-files-found: ignore
+          retention-days: 90
 
       - name: Open reviewed publication PR or persist data-only refresh
         id: gate
@@ -210,6 +264,7 @@ jobs:
           # read, Pull requests: read and write). A PR it opens runs its CI at
           # once; a PR opened by github-actions[bot] waits for workflow approval.
           DAJC_WEEKLY_PR_TOKEN: ${{ secrets.DAJC_WEEKLY_PR_TOKEN }}
+          OVERSIZE_REPLACES_PR: ${{ steps.publish-needed.outputs.replaces_pr }}
         run: node scripts/publish-gate-commit.mjs
 
       # Autonomous release of a Claude-approved final edition: merge within
@@ -222,61 +277,21 @@ jobs:
       - name: Release the approved edition after required checks
         if: steps.gate.outputs.auto_merge == 'true'
         timeout-minutes: 30
-        shell: bash
         env:
           PR_URL: ${{ steps.gate.outputs.pr_url }}
+          EXPECTED_PR_HEAD: ${{ steps.gate.outputs.pr_head }}
           UNATTENDED: ${{ steps.gate.outputs.unattended }}
-        run: |
-          if [ "$UNATTENDED" != "true" ]; then
-            echo "::error::Claude approved this edition, but GitHub holds the CI of a PR opened by github-actions[bot] until a user with write access approves it. Approve the pending workflows on $PR_URL and merge it, or add the DAJC_WEEKLY_PR_TOKEN secret so the edition is released unattended."
-            exit 1
-          fi
-          for attempt in $(seq 1 50); do
-            if result=$(gh pr merge "$PR_URL" --squash 2>&1); then
-              echo "$result"
-              echo "### EU Oversize Weekly released" >> "$GITHUB_STEP_SUMMARY"
-              echo "$PR_URL merged after required checks; public from its Friday 12:00 Europe/Prague slot." >> "$GITHUB_STEP_SUMMARY"
-              exit 0
-            fi
-            echo "attempt $attempt: not mergeable yet: $(printf '%s' "$result" | tr '\n' ' ' | cut -c1-300)"
-            # gh exits non-zero while checks are pending; the count is still printed.
-            failed=$(gh pr checks "$PR_URL" --required --json bucket \
-              --jq '[.[] | select(.bucket == "fail" or .bucket == "cancel")] | length' 2>/dev/null || true)
-            if [ "${failed:-0}" != "0" ]; then
-              echo "::error::A required check failed; the edition waits for human review: $PR_URL"
-              exit 1
-            fi
-            sleep 30
-          done
-          echo "::error::The ruleset did not allow the merge within 25 minutes; the edition waits for human review: $PR_URL"
-          exit 1
+        run: node scripts/merge-reviewed-weekly.mjs
 
-      # Only a completed protected merge is eligible for a public-site check.
-      # The content pages have a short CDN cache and Vercel deployment may lag.
-      - name: Verify the released article on the public website
-        if: steps.gate.outputs.auto_merge == 'true' && steps.gate.outputs.unattended == 'true'
+      - name: Verify production deployment and public release
+        if: (steps.gate.outputs.auto_merge == 'true' && steps.gate.outputs.unattended == 'true') || steps.resume.outcome == 'success'
         timeout-minutes: 12
-        shell: bash
         env:
           TARGET_WEEK: ${{ steps.publish-needed.outputs.week }}
         run: |
-          slug="eu-oversize-weekly-${TARGET_WEEK,,}"
-          url="https://www.dajc.eu/news/eu-oversize/$slug?release-check=${GITHUB_RUN_ID}"
-          seen=false
-          for attempt in $(seq 1 24); do
-            html=$(curl --location --fail --silent --show-error --max-time 18 "$url" || true)
-            if printf '%s' "$html" | grep -q "EU Oversize Weekly" && printf '%s' "$html" | grep -q "$slug"; then
-              seen=true
-              break
-            fi
-            echo "Article not yet visible (attempt $attempt); checking again."
-            sleep 20
-          done
-          if [ "$seen" != true ]; then
-            echo "::error::Merged edition is not verifiably public at $url"
-            exit 1
-          fi
-          echo "Verified live article at $url" >> "$GITHUB_STEP_SUMMARY"
+          git fetch origin main
+          git checkout --detach origin/main
+          node scripts/verify-weekly-publication.mjs
 
       - name: Alert when Claude withheld the release
         if: steps.review.outcome == 'failure' && steps.recovery.outcome != 'success'
@@ -290,7 +305,7 @@ jobs:
       # Friday-early retry on - and on manual runs - a still-missing edition
       # fails the run so GitHub e-mails the owner before the 12:00 release.
       - name: Alert when no edition was produced
-        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.dry-run-mode.outputs.dry_run != 'true' && steps.trigger.outputs.preview != 'true'
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true' && steps.trigger.outputs.preview != 'true'
         shell: bash
         run: |
           target="${{ steps.publish-needed.outputs.target }}"
@@ -304,6 +319,24 @@ jobs:
             *) echo "::error::$msg"; exit 1 ;;
           esac
 
+      - name: Archive editorial evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-editorial-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/dajc-weekly-*.json
+            ${{ runner.temp }}/dajc-weekly-recovery/
+            data/oversize/*/publication/
+          if-no-files-found: ignore
+          retention-days: 90
+
+      - name: Report blocked publication
+        if: failure()
+        env:
+          TARGET_WEEK: ${{ steps.publish-needed.outputs.week }}
+        run: node scripts/report-weekly-failure.mjs
+
       - name: Publication outcome
         if: always()
         run: |
@@ -311,6 +344,8 @@ jobs:
           echo "Preview: ${{ steps.trigger.outputs.preview || 'false' }}"
           if [ "${{ steps.trigger.outputs.should_run }}" != "true" ]; then
             echo "Outcome: intentional no-op."
+          elif [ "${{ steps.resume.outcome }}" = "success" ]; then
+            echo "Outcome: resumed protected merge of the approved PR and verified delivery without paid generation."
           elif [ "${{ steps.publish-needed.outputs.needed }}" = "false" ]; then
             echo "Outcome: article already exists or its PR awaits review; no generation repeated."
           elif [ "${{ job.status }}" = "success" ]; then

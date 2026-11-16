@@ -11,14 +11,17 @@
 // for the pure decision logic and why this exists.
 
 import { execFileSync } from 'node:child_process';
-import { appendFileSync, mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { appendFileSync, mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { nonOfficialSources, decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from './lib/publish-gate.mjs';
 import { saveAutomationData } from './lib/automation-data.mjs';
 import { sourceTier } from './lib/source-policy.mjs';
-import { REJECTION_MARKER } from './lib/weekly-recovery.mjs';
+import { loadWeekFindings } from './lib/store.mjs';
+import { editionPlan } from './lib/edition-plan.mjs';
+import { REJECTION_MARKER, findingsFingerprint } from './lib/weekly-recovery.mjs';
+import { publicationApprovalValid } from './lib/publication-approval.mjs';
 
 function git(args) {
   return execFileSync('git', args, { encoding: 'utf-8' });
@@ -49,6 +52,7 @@ git(['config', 'user.email', 'bot@users.noreply.github.com']);
 
 const ALLOWED_AUTOMATION_PATHS = [
   /^data\/oversize\/\d{4}-W\d{2}\/(?:findings|coverage)\.json$/,
+  /^data\/oversize\/\d{4}-W\d{2}\/publication\/\d+-\d+\.json$/,
   /^src\/content\/news\/eu-oversize\/eu-oversize-weekly-(?:preview-)?\d{4}-w\d{2}\.md$/,
 ];
 const approvedPath = (relative) => ALLOWED_AUTOMATION_PATHS.some((pattern) => pattern.test(relative));
@@ -95,18 +99,18 @@ if (articleAdded) {
 }
 
 const articleReplaced = articleAdded && isArticleReplacement(articleStatusOutput);
-const autonomousFinal = process.env.DAJC_AUTONOMOUS_WEEKLY === '1' &&
-  process.env.OVERSIZE_PREVIEW !== '1' && process.env.OVERSIZE_CORRECTION !== '1' && !articleReplaced;
+const finalArticle = process.env.OVERSIZE_PREVIEW !== '1';
+const autonomousFinal = process.env.DAJC_AUTONOMOUS_WEEKLY === '1' && finalArticle;
 let autoMerge = autonomousFinal;
+let receipt = null;
 // Only a structured editorial veto may be automatically retried; API outages and
 // other review failures always remain a human-visible hard block.
-const structuredEditorialVeto = autonomousFinal && Boolean(process.env.RUNNER_TEMP) &&
+const structuredEditorialVeto = finalArticle && Boolean(process.env.RUNNER_TEMP) &&
   existsSync(path.join(process.env.RUNNER_TEMP || '', 'dajc-weekly-review-veto.json'));
 
-if (articleAdded && autonomousFinal) {
+if (articleAdded && finalArticle) {
   if (!process.env.RUNNER_TEMP) throw new Error('Trusted Claude receipt directory unavailable');
   const receiptPath = path.join(process.env.RUNNER_TEMP, 'dajc-weekly-review-approved.json');
-  let receipt = null;
   try {
     receipt = JSON.parse(readFileSync(receiptPath, 'utf8'));
   } catch {
@@ -115,13 +119,12 @@ if (articleAdded && autonomousFinal) {
   }
   if (!receipt) {
     autoMerge = false;
-    summary('Claude did not approve this edition: it is opened for human review and will not be released automatically.');
+    summary('Claude did not approve this edition: its bytes will be archived in a blocked draft; no public article route will be committed.');
     console.log('::warning::Claude did not approve the edition; publication waits for human review.');
   }
 }
 
-if (articleAdded && autoMerge) {
-  const receipt = JSON.parse(readFileSync(path.join(process.env.RUNNER_TEMP, 'dajc-weekly-review-approved.json'), 'utf8'));
+if (articleAdded && receipt) {
   const pathFromStatus = 'src/content/news/eu-oversize/' + extractArticleWeekFromStatus(articleStatusOutput).filename;
   const hash = createHash('sha256').update(readFileSync(pathFromStatus)).digest('hex');
   if (receipt.articlePath !== pathFromStatus || receipt.targetWeek !== week ||
@@ -159,6 +162,46 @@ if (dataChanged) {
   }
 }
 
+// Durable evidence travels with the content through protected CI and main.
+// A rejected candidate is archived as data, never as a publicly routable article.
+const attemptId = `${process.env.GITHUB_RUN_ID || ''}-${process.env.GITHUB_RUN_ATTEMPT || '1'}`;
+if (!/^\d+-\d+$/.test(attemptId)) throw new Error('Missing unique GitHub preparation identity');
+const candidatePath = 'src/content/news/eu-oversize/' + extractArticleWeekFromStatus(articleStatusOutput).filename;
+const candidateMarkdown = readFileSync(candidatePath, 'utf8');
+let veto = null;
+if (structuredEditorialVeto) veto = JSON.parse(readFileSync(path.join(process.env.RUNNER_TEMP, 'dajc-weekly-review-veto.json'), 'utf8'));
+const editorialState = receipt ? 'EDITORIAL_APPROVED' : veto ? 'EDITORIAL_REJECTED' : 'BLOCKED';
+const auditPath = `data/oversize/${week}/publication/${attemptId}.json`;
+const plan = editionPlan({ now: process.env.OVERSIZE_NOW ? new Date(process.env.OVERSIZE_NOW) : new Date(), targetWeek: week });
+const inputFindings = new Map();
+for (const dataWeek of plan.findingsWeeks) for (const finding of (await loadWeekFindings(dataWeek)).values()) inputFindings.set(finding.sourceUrl, finding);
+const sourceFingerprint = findingsFingerprint([...inputFindings.values()]);
+const recoveryDir = path.join(process.env.RUNNER_TEMP || '', 'dajc-weekly-recovery');
+let recovery = null;
+if (existsSync(path.join(recoveryDir, 'manifest.json'))) {
+  recovery = { manifest: JSON.parse(readFileSync(path.join(recoveryDir, 'manifest.json'), 'utf8')),
+    versions: readdirSync(recoveryDir).filter(n => /^attempt-\d+\.(?:md)$/.test(n)).map(n => ({ name: n, candidateMarkdown: readFileSync(path.join(recoveryDir, n), 'utf8') })) };
+}
+const lifecycle = [{ state: 'PREPARING' }, { state: 'GENERATED' },
+  ...(recovery ? recovery.manifest.attempts.flatMap(a => [ ...(a.startedAt ? [{ state: 'REPAIRING', at: a.startedAt, attempt: a.attempt }] : []), { state: a.state, ...(a.completedAt ? { at: a.completedAt } : {}), attempt: a.attempt }]) : []),
+  { state: editorialState, ...(receipt?.approvedAt ? { at: receipt.approvedAt } : {}) }];
+const audit = {
+  schemaVersion: 1, attemptId, targetWeek: week, state: editorialState, sourceFingerprint, lifecycle, ...(recovery ? { recovery } : {}),
+  articlePath: candidatePath, sha256: createHash('sha256').update(candidateMarkdown).digest('hex'),
+  runUrl: `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+  preparedAt: new Date().toISOString(), ...(receipt || {}),
+  ...(!receipt ? { candidateMarkdown, review: veto?.review || null, reason: veto ? 'Independent editorial rejection' : 'Independent review unavailable or failed' } : {}),
+};
+if (receipt && !publicationApprovalValid(audit, { articlePath: candidatePath, targetWeek: week, raw: candidateMarkdown })) throw new Error('Independent review receipt is incomplete or invalid; refusing publication');
+mkdirSync(path.dirname(auditPath), { recursive: true });
+writeFileSync(auditPath, JSON.stringify(audit, null, 2) + '\n', { flag: 'wx' });
+if (finalArticle && !receipt) {
+  if (git(['ls-files', '--', candidatePath]).trim()) git(['restore', '--staged', '--worktree', '--', candidatePath]);
+  else rmSync(candidatePath);
+  decision.addPaths = ['data/oversize'];
+  decision.message = `editorial: archive blocked EU Oversize Weekly ${week} (${attemptId})`;
+}
+
 const repository = process.env.GITHUB_REPOSITORY;
 if (!/^[\w.-]+\/[\w.-]+$/.test(repository || '') || !process.env.GH_TOKEN) throw new Error('GitHub publication PR access is not configured');
 let branch = publicationBranchFor(week, { preview: process.env.OVERSIZE_PREVIEW === '1', correction: process.env.OVERSIZE_CORRECTION === '1' || articleReplaced });
@@ -167,7 +210,7 @@ let branch = publicationBranchFor(week, { preview: process.env.OVERSIZE_PREVIEW 
 if (git(['ls-remote', '--heads', 'origin', 'refs/heads/' + branch]).trim()) {
   const run = process.env.GITHUB_RUN_ID;
   if (!/^[0-9]+$/.test(run || '')) throw new Error('Cannot safely name regenerated publication branch');
-  branch += '-retry-' + run;
+  branch += '-retry-' + run + '-' + (process.env.GITHUB_RUN_ATTEMPT || '1');
 }
 git(['switch', '-c', branch]);
 for (const addPath of decision.addPaths) git(['add', addPath]);
@@ -177,6 +220,7 @@ const stagedPaths = git(['diff', '--cached', '--no-renames', '--name-only', '-z'
 if (stagedPaths.some((relative) => !approvedPath(relative))) throw new Error('Publication commit contains an unapproved staged path');
 git(['commit', '-m', decision.message]);
 git(['push', 'origin', `HEAD:refs/heads/${branch}`]);
+const prHead = git(['rev-parse', 'HEAD']).trim();
 
 // A standard PR respects the main rules; this script never approves or
 // merges it. GitHub holds the pull_request CI of a PR opened by
@@ -192,8 +236,11 @@ const temporary = mkdtempSync(path.join(tmpdir(), 'dajc-publication-pr-'));
 try {
   const bodyFile = path.join(temporary, 'body.md');
   const openPr = (env, releasedUnattended) => {
-    writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\n${releasedUnattended ? 'Claude approved the exact final article. The workflow merges it once application-validate and news-validate pass; the site shows it from its Friday 12:00 Europe/Prague slot. ' : autoMerge ? 'Claude approved the exact final article. Waiting for human review: approve the pending workflows, then merge to publish. This run has not published the article. ' : 'Waiting for human review: merge to publish. This run has not published the article. '}Only approved article/data paths are changed.\n${!autoMerge && structuredEditorialVeto ? '\n' + REJECTION_MARKER + '\n' : ''}`);
-    return execFileSync('gh', ['pr', 'create', '--repo', repository, '--base', 'main', '--head', branch, '--title', decision.message, '--body-file', bodyFile], { encoding: 'utf8', env }).trim();
+    const state = receipt ? 'EDITORIAL_APPROVED' : editorialState;
+    writeFileSync(bodyFile, `EU Oversize Weekly ${week}: ${state}.\n\n${receipt ? 'Claude approved the exact article bytes; protected application and news CI must pass before merge. The site releases it at its Friday 12:00 Europe/Prague slot.' : 'Publication is BLOCKED. The rejected/unreviewed article is archived only as JSON evidence; no article route is included. A replacement requires new source verification and independent approval.'}\n\nAudit: ${auditPath}\nAttempt: ${attemptId}\nSHA-256: ${audit.sha256}\n\n<!-- DAJC_WEEKLY_STATE:${state} -->\n<!-- DAJC_WEEKLY_ATTEMPT:${attemptId} -->\n<!-- DAJC_WEEKLY_SOURCES:${sourceFingerprint} -->\n${receipt ? '<!-- DAJC_WEEKLY_LIFECYCLE:CI_PENDING -->\n' : ''}${!receipt && structuredEditorialVeto ? '\n' + REJECTION_MARKER + '\n' : ''}`);
+    const args = ['pr', 'create', '--repo', repository, '--base', 'main', '--head', branch, '--title', decision.message, '--body-file', bodyFile];
+    if (finalArticle && !receipt) args.push('--draft');
+    return execFileSync('gh', args, { encoding: 'utf8', env }).trim();
   };
   let prUrl = '';
   let unattended = false;
@@ -209,12 +256,23 @@ try {
     prUrl = openPr(process.env, false);
     for (const workflow of ['application-ci.yml', 'news-ci.yml']) execFileSync('gh', ['workflow', 'run', workflow, '--repo', repository, '--ref', branch], { stdio: 'inherit' });
   }
-  summary(`### EU Oversize Weekly - prepared\n\n${prUrl}\n\n${unattended ? 'Claude-approved: the release step merges it after required CI.' : autoMerge ? 'Claude-approved, but opened by github-actions[bot]: approve the pending workflows and merge to publish. Article published this run: **no**.' : 'Opened for human review: merge to publish. Article published this run: **no**.'}`);
+  // Preserve rejected history until a fully approved replacement is reviewable.
+  const replaced = process.env.OVERSIZE_REPLACES_PR;
+  if (receipt && replaced) {
+    if (!new RegExp('^https://github\\.com/' + repository.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '/pull/\\d+$').test(replaced)) throw new Error('Invalid superseded PR URL');
+    const prior = JSON.parse(execFileSync('gh', ['pr', 'view', replaced, '--repo', repository, '--json', 'body,state,headRefName'], { encoding: 'utf8' }));
+    if (prior.state === 'OPEN' && String(prior.body || '').includes(REJECTION_MARKER) &&
+        String(prior.headRefName || '').startsWith(publicationBranchFor(week))) {
+      const message = `Superseded by independently approved replacement ${prUrl}. Original rejected bytes and source review remain archived on this PR; it was never published.`;
+      execFileSync('gh', ['pr', 'close', replaced, '--repo', repository, '--comment', message], { stdio: 'inherit' });
+    }
+  }
+  summary(`### EU Oversize Weekly - prepared\n\n${prUrl}\n\n${unattended ? 'Claude-approved: the release step merges it after required CI.' : autoMerge ? 'Claude-approved, but opened by github-actions[bot]: approve the pending workflows and merge to publish. Article published this run: **no**.' : 'Publication BLOCKED. Candidate bytes and reasons are archived in a draft PR without any public article route. Article published this run: **no**.'}`);
   // The workflow's release step merges an approved edition once the required
   // checks pass, within the main ruleset (owner decision, 24 October 2026:
   // the Weekly publishes autonomously every Friday at 12:00).
   if (process.env.GITHUB_OUTPUT) {
-    appendFileSync(process.env.GITHUB_OUTPUT, `pr_url=${prUrl}\nauto_merge=${autoMerge ? 'true' : 'false'}\nunattended=${unattended ? 'true' : 'false'}\n`);
+    appendFileSync(process.env.GITHUB_OUTPUT, `pr_url=${prUrl}\npr_head=${prHead}\nstate=${editorialState}\naudit_path=${auditPath}\nauto_merge=${autoMerge ? 'true' : 'false'}\nunattended=${unattended ? 'true' : 'false'}\n`);
   }
 } finally {
   rmSync(temporary, { recursive: true, force: true });
