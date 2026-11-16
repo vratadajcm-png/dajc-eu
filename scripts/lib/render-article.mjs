@@ -148,10 +148,11 @@ const CATEGORY_LABELS = {
   other: 'Operational development',
 };
 
-export function renderArticleMarkdown(article, { slug, publishedAt, updatedAt = null, nextPublicationLabel, weekEnd = null }) {
+export function renderArticleMarkdown(article, { slug, publishedAt, updatedAt = null, nextPublicationLabel, weekEnd = null, targetWeek = null, preparedAt = null, scheduledPublicationAt = null, late = false }) {
   const sections = [];
 
   sections.push(`## Intro\n\n${mdEscape(article.intro)}`);
+  if (late) sections.push(`This edition was prepared after its scheduled release on ${mdEscape(scheduledPublicationAt)}. It covers ${mdEscape(targetWeek)}; the publication date above records the delayed release.`);
 
   if (article.developments.length > 0) {
     const parts = ['## Lead reports', ''];
@@ -203,6 +204,9 @@ export function renderArticleMarkdown(article, { slug, publishedAt, updatedAt = 
     category: 'eu-oversize',
     publishedAt,
     ...(updatedAt ? { updatedAt } : {}),
+    ...(targetWeek ? { targetWeek } : {}),
+    ...(preparedAt ? { preparedAt } : {}),
+    ...(scheduledPublicationAt ? { scheduledPublicationAt } : {}),
     language: 'en',
     author: 'DAJC',
     status: 'published',
@@ -220,6 +224,9 @@ export function toFrontmatterYaml(frontmatter) {
   lines.push(`category: ${JSON.stringify(frontmatter.category)}`);
   lines.push(`publishedAt: ${frontmatter.publishedAt}`);
   if (frontmatter.updatedAt) lines.push(`updatedAt: ${frontmatter.updatedAt}`);
+  for (const key of ['targetWeek', 'preparedAt', 'scheduledPublicationAt']) {
+    if (frontmatter[key]) lines.push(`${key}: ${JSON.stringify(frontmatter[key])}`);
+  }
   lines.push(`language: ${JSON.stringify(frontmatter.language)}`);
   lines.push(`author: ${JSON.stringify(frontmatter.author)}`);
   lines.push(`status: ${JSON.stringify(frontmatter.status)}`);

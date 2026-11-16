@@ -11,7 +11,7 @@ The Weekly covers **commercial road freight and the practical work of European t
 ## 1. Geographic research coverage
 
 - Every research cycle checks the complete canonical matrix in `config/europe-coverage.mjs`.
-- The matrix includes the full DAJC-approved state/territory list, MPZ aliases and additional transport-relevant sub-jurisdictions retained by DAJC.
+- The matrix contains exactly the 50 DAJC-approved monitoring jurisdictions. MPZ aliases and regional scope labels do not create additional monitoring identities or transfer legal applicability.
 - A country/territory does not need to appear in the published article when no material development exists.
 - Absence from the article must mean **checked — no material development found**, never **not searched**.
 - `data/oversize/<ISO-WEEK>/coverage.json` records the status of every jurisdiction.
@@ -38,10 +38,10 @@ Research coverage remains Europe-wide, but the published lead order is operator-
 
 A well-supplied week has room for:
 
-- **Lead reports: typically 20–30, maximum 30.**
-- **Rest of Europe: typically 10–15 concise short updates, maximum 15.**
+- **Lead reports: maximum 30.**
+- **Rest of Europe: maximum 15 concise short updates.**
 
-These numbers are **capacities, never quotas**. An edition contains exactly the items that pass every rule in this specification — 17 + 8, 9 + 0 or 25 + 12 are all correct editions. There is **no minimum** number of lead reports, no Rest-of-Europe minimum and no country/jurisdiction quota.
+These numbers are **capacities, never quotas**. An edition contains exactly the items that pass every rule in this specification — 4 + 0, 17 + 8, 9 + 0 or 25 + 12 are all correct editions. There is **no minimum** number of lead reports, no Rest-of-Europe minimum and no country/jurisdiction quota.
 
 Never satisfy a number with filler. The pipeline has no supplement, repair or retry step that asks for "more" items, never moves items between sections to reach a count, and never relaxes a rule because an edition is short. If nothing qualifies *after official and broader media searches*, no edition is published that week — a weak edition is never published instead.
 
@@ -94,11 +94,44 @@ These rules are deterministic (`scripts/lib/weekly-eligibility.mjs`) and are app
 
 - Normal final edition: Friday at **12:00 Europe/Prague**, covering the upcoming Monday–Sunday week.
 - The edition is prepared on Thursday and committed with `publishedAt` set to Friday 12:00 Europe/Prague; the site shows it only from that instant. Thursday/Friday-morning retries, the watchdog and a Saturday catch-up are idempotent recovery layers that run only if the final week article is missing.
+- An explicit `--target-week YYYY-Www` (or `OVERSIZE_TARGET_WEEK`) pins a repair to its covered ISO week, even after the default target has advanced. `scheduledPublicationAt` preserves the original Friday slot, `preparedAt` records the real preparation time, and a delayed edition's `publishedAt` cannot precede that late preparation. Its visible delayed-release note distinguishes it from an on-time edition. Actual deployment/public availability is verified separately; no timestamp may create a false claim of an earlier public release.
 - Final publication is idempotent; an existing final week file is not automatically overwritten.
 - A manual **correction** run (workflow input `correction`) regenerates the current target edition from source data and replaces the published file atomically — only after the regenerated edition has passed every gate and the build, stamped with `updatedAt`. If the regenerated edition does not qualify, the published edition is left untouched and the run fails with the blocker.
 - A manually requested **preview** uses the same research, verification, counts, quality gates and article layout, but a separate preview slug. It never consumes or blocks Friday's final slug.
 - The final edition is built from the complete monitoring data available at Thursday preparation. The findings behind a prepared edition are also persisted on `automation/oversize-data`, so closing a rejected PR never discards them.
-- The watchdog fails loudly when an edition PR is still unmerged after its Friday 12:00 slot, and while any edition PR for an already passed week remains open.
+- The watchdog fails loudly when an edition PR is still unmerged after its Friday 12:00 slot, and while any edition PR for an already passed week remains open. Repository existence, editorial approval, protected merge, Vercel deployment and public availability are distinct checks. A file or a green Actions run alone is not publication.
+
+### Editorial Recovery and evidence
+
+An independent Claude rejection is final for the reviewed bytes. Recovery may
+remove only sources explicitly marked unsupported by a complete, structured,
+SHA-bound veto. It must not infer a new fact, change a legal threshold or
+exception, or replace a source with invented corroboration. Every new candidate
+must pass the same source checks, deterministic eligibility, build and a fresh
+independent Claude review. There is no recovery exception for a critical-news
+floor: an edition missing still-required verified coverage remains blocked.
+
+A preparation permits at most **three total generations** (the original plus
+two repairs). API/network/build failure is not an editorial veto and must not
+trigger a paid repair loop. Repeated rejection or no safely removable source
+stops publication and preserves the rejected bytes and reasons for audit. A
+later run may start a new controlled preparation only after source facts have
+actually changed; monitoring timestamps alone do not justify more API calls.
+
+Rejected/unreviewed candidates are archived as data in draft PRs, never as
+publicly routable Markdown articles. An approved replacement gets a new attempt
+identity and requires its own exact-byte receipt and protected CI. Keep the old
+PR as the audit trail and link its replacement; never overwrite a published
+edition or reinterpret a rejection as approval.
+
+Publication lifecycle evidence distinguishes PREPARING, GENERATED,
+EDITORIAL_REJECTED, REPAIRING, EDITORIAL_APPROVED, CI_PENDING, READY_TO_MERGE,
+MERGED, PUBLICATION_SCHEDULED, PUBLISHED_VERIFIED and BLOCKED. Intermediate
+workflow stages are not proof of publication; only independent observation of
+the canonical article, `/news` listing and RSS after the release slot can
+establish PUBLISHED_VERIFIED. Approval and merge evidence must refer to the
+current article hash and PR head, and ordinary main protection must remain in
+force.
 
 ## 9. Article structure
 
@@ -132,7 +165,7 @@ This is a permanent rule: **Perplexity Sonar research and article synthesis → 
 
 - Sonar discovers links in the existing official-first open-European-media search and synthesizes an English article only from verified source candidates. Hard checks on dates, geography, ISO week, duplicate stories, binding weight/permit limits, source provenance and the no-general-Driving-Bans exclusion remain.
 - Claude checks the exact article plus original source excerpts **and the publisher's own current page text, host and source tier**, and emits one structured approve/reject verdict with blocking reasons and coverage of every cited URL. It rejects weight/permit/legal/route claims resting on second- or third-hand relays, general-interest outlets or evergreen guides. A missing/rejecting verdict, unsupported source or altered SHA-256 receipt fails closed.
-- **Autonomous Friday release (owner decision, 24 October 2026).** The final article of a content-only PR is merged by the publishing workflow once Claude has approved it and `application-validate` and `news-validate` pass, within the main ruleset; the site shows it from its Friday 12:00 Europe/Prague slot. Industry-report sources no longer block release (until 24 October only all-official editions could auto-merge); each is labelled in the article and listed in the run summary, and Claude's source-by-source check against the publisher's own page is the gate. A Claude veto or a failed check leaves the edition as a PR for human review and fails the run, so the owner is e-mailed. Corrections, previews, code, security and workflow changes never auto-merge.
+- **Autonomous Friday release (owner decision, 24 October 2026).** The final article of a content-only PR is merged by the publishing workflow once Claude has approved it and `application-validate` and `news-validate` pass, within the main ruleset; the site shows it from its Friday 12:00 Europe/Prague slot. Industry-report sources no longer block release (until 24 October only all-official editions could auto-merge); each is labelled in the article and listed in the run summary, and Claude's source-by-source check against the publisher's own page is the gate. A Claude veto enters bounded Editorial Recovery (§8); exhausted or unsafe recovery archives the rejected candidate as data in a blocked draft PR and fails the run. A failed CI check leaves an approved candidate unmerged. Neither case authorizes a release. Corrections, previews, code, security and workflow changes never auto-merge.
 - Public release means the actual accessible DAJC.eu article; a green CI run or prepared PR is not publication.
 - Once an article is verified public, Claude prepares distinct factual English short copy for X and an industry-oriented post for the DAJC LinkedIn company page, each with the exact URL. The existing persistent ledger blocks duplicate attempts. Buffer is used only with explicitly connected/authorized company channels.
 - Never post unpublished Platform / Integration Ecosystem material. Platform updates require explicit socialPublish=true.

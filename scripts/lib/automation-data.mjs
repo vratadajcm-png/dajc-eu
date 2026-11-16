@@ -80,7 +80,10 @@ export function loadAutomationData(kind, root = process.cwd()) {
     console.log(`${config.branch} is not initialized; using the reviewed data from main.`);
     return;
   }
-  const entries = git(root, ['ls-tree', '-r', '-z', sha, '--', config.prefix]).split('\0').filter(Boolean);
+  const entries = git(root, ['ls-tree', '-r', '-z', sha, '--', config.prefix]).split('\0').filter(Boolean)
+    // A branch bootstrapped from main can inherit audit records. Never import
+    // them: only the protected main copy is trusted by the publication gate.
+    .filter(entry => !(kind === 'findings' && /^data\/oversize\/\d{4}-W\d{2}\/publication\/[0-9]+-[0-9]+\.json$/.test(entry.split('\t')[1] || '')));
   if ((kind === 'x' || kind === 'linkedin') && entries.length !== 1) throw new Error('X ledger branch is missing its ledger; refusing to use an empty fallback');
   const files = entries.map((entry) => {
     const [metadata, relative] = entry.split('\t');
@@ -95,7 +98,10 @@ export function loadAutomationData(kind, root = process.cwd()) {
 
 export function saveAutomationData(kind, root = process.cwd()) {
   const config = configFor(kind);
-  const relatives = git(root, ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', config.prefix]).split('\0').filter(Boolean);
+  // Publication receipts/archives live on protected main/content PRs only.
+  // The monitoring branch must neither import nor overwrite these records.
+  const relatives = git(root, ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', config.prefix]).split('\0').filter(Boolean)
+    .filter((relative) => !(kind === 'findings' && /^data\/oversize\/\d{4}-W\d{2}\/publication\/[0-9]+-[0-9]+\.json$/.test(relative)));
   if ((kind === 'x' || kind === 'linkedin') && relatives.length !== 1) throw new Error('Missing X ledger');
   const files = [...new Set(relatives)].map((relative) => {
     if (!config.pattern.test(relative)) throw new Error('Unapproved automation data path');
@@ -116,7 +122,7 @@ export function saveAutomationData(kind, root = process.cwd()) {
     git(root, ['worktree', 'add', '--detach', worktree, remote || 'HEAD']);
     attached = true;
     for (const file of files) safeWrite(worktree, file.relative, file.content);
-    git(worktree, ['add', '--', config.prefix]);
+    for (const file of files) git(worktree, ['add', '--', file.relative]);
     const changed = git(worktree, ['diff', '--cached', '--no-renames', '--name-only', '-z']).split('\0').filter(Boolean);
     if (changed.some((relative) => !config.pattern.test(relative))) throw new Error('Refusing a data-branch commit outside its allowed paths');
     if (!changed.length && remote) {

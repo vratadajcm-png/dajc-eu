@@ -10,8 +10,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
-import { isoWeekLabel } from './lib/week.mjs';
+import { editionPlan } from './lib/edition-plan.mjs';
 import { publicationSlotFor, targetWeekDateFor } from './lib/next-publication.mjs';
+import { isoWeekLabel } from './lib/week.mjs';
 import { classifyEditionPulls, publicationBranchFor } from './lib/publish-gate.mjs';
 import { shouldReplaceBlockedEditionPr } from './lib/weekly-recovery.mjs';
 
@@ -21,10 +22,19 @@ const ROOT = path.resolve(__dirname, '..');
 function targetFor(now = new Date()) {
   // Same target as generate-weekly-article.mjs: the week after this run's
   // Friday 12:00 Europe/Prague publication slot.
-  const nextWeekLabel = isoWeekLabel(targetWeekDateFor(publicationSlotFor(now)));
+  const argIndex = process.argv.indexOf('--target-week');
+  if (argIndex >= 0 && !process.argv[argIndex + 1]) throw new Error('Missing --target-week YYYY-Www value');
+  let explicitWeek = argIndex >= 0 ? process.argv[argIndex + 1] : process.env.OVERSIZE_TARGET_WEEK || '';
+  if (!explicitWeek && process.env.OVERSIZE_CHECK_MODE === 'watchdog') {
+    let dueSlot = publicationSlotFor(now);
+    if (dueSlot > now) dueSlot = publicationSlotFor(new Date(dueSlot.getTime() - 7 * 86400000));
+    explicitWeek = isoWeekLabel(targetWeekDateFor(dueSlot));
+  }
+  const plan = editionPlan({ now, targetWeek: explicitWeek });
+  const nextWeekLabel = plan.targetWeek;
   const slug = `eu-oversize-weekly-${process.env.OVERSIZE_PREVIEW === '1' ? 'preview-' : ''}${nextWeekLabel.toLowerCase()}`;
   const relativePath = path.join('src', 'content', 'news', 'eu-oversize', `${slug}.md`);
-  return { nextWeekLabel, relativePath, absolutePath: path.join(ROOT, relativePath) };
+  return { nextWeekLabel, relativePath, absolutePath: path.join(ROOT, relativePath), publicationSlot: plan.publicationSlot };
 }
 
 async function main() {
@@ -37,6 +47,7 @@ async function main() {
   let needed = !exists || correction;
   let pendingPr = null;
   let stalePrs = [];
+  let replacesPr = '';
   if (process.env.GITHUB_ACTIONS === 'true') {
     if (!process.env.GH_TOKEN || !/^[\w.-]+\/[\w.-]+$/.test(process.env.GITHUB_REPOSITORY || '')) throw new Error('Publication PR access is not configured');
     const branch = publicationBranchFor(target.nextWeekLabel, { preview: process.env.OVERSIZE_PREVIEW === '1', correction });
@@ -49,11 +60,10 @@ async function main() {
       const candidate = editionPulls.pending;
       const refresh = shouldReplaceBlockedEditionPr(candidate, allPulls, now);
       if (refresh && process.env.OVERSIZE_RECOVERY_ALLOWED === '1') {
-        execFileSync('gh', ['pr', 'close', candidate.url, '--repo', process.env.GITHUB_REPOSITORY,
-          '--comment', 'Superseded automatically after a documented Claude editorial veto. No article was published; the next attempt must pass every original source, Claude and protected CI gate.'], { stdio: 'inherit' });
-        console.log(`Closed rejected edition PR ${candidate.url}; preparing one fresh, fully reviewed attempt.`);
+        replacesPr = candidate.url;
+        console.log(`Rejected edition PR ${candidate.url} will remain archived until a reviewed replacement exists.`);
       } else if (refresh && process.env.OVERSIZE_RECOVERY_ALLOWED !== '1') {
-        // The watchdog is read-only: ask the primary publisher to do the closure.
+        // The watchdog is read-only: the primary publisher creates and verifies a replacement.
         console.log(`Rejected edition PR is eligible for a new safe attempt: ${candidate.url}`);
       } else {
         needed = false;
@@ -62,11 +72,11 @@ async function main() {
       }
     }
   }
-  // The edition is overdue when its Friday 12:00 slot has passed while its PR
-  // still waits for review: the site shows nothing for the week.
-  const publicDue = process.env.OVERSIZE_PREVIEW !== '1' && now.getTime() >= publicationSlotFor(now).getTime();
-  const overdue = Boolean(pendingPr) && publicDue;
-  if (overdue) console.log(`::error::EU Oversize Weekly ${target.nextWeekLabel} is past its Friday 12:00 Europe/Prague slot but its PR is not merged: ${pendingPr}`);
+  // A missing article is overdue after its own edition slot even without a PR.
+  // File existence still needs the separate independent delivery verification.
+  const publicDue = process.env.OVERSIZE_PREVIEW !== '1' && now.getTime() >= target.publicationSlot.getTime();
+  const overdue = !exists && publicDue;
+  if (overdue) console.log(`::error::EU Oversize Weekly ${target.nextWeekLabel} is past its Friday 12:00 Europe/Prague slot but its article is not merged: ${pendingPr || replacesPr || 'no publication PR'}`);
 
   console.log(`Target weekly article: ${target.relativePath}`);
   if (pendingPr) {
@@ -82,7 +92,7 @@ async function main() {
   if (process.env.GITHUB_OUTPUT) {
     await appendFile(
       process.env.GITHUB_OUTPUT,
-      `needed=${needed ? 'true' : 'false'}\npending_pr=${pendingPr ? 'true' : 'false'}\npublic_due=${publicDue ? 'true' : 'false'}\narticle_exists=${exists ? 'true' : 'false'}\noverdue=${overdue ? 'true' : 'false'}\nstale_prs=${stalePrs.join(' ')}\ntarget=${target.relativePath}\nweek=${target.nextWeekLabel}\n`
+      `needed=${needed ? 'true' : 'false'}\nreplaces_pr=${replacesPr}\npending_pr=${pendingPr ? 'true' : 'false'}\npublic_due=${publicDue ? 'true' : 'false'}\narticle_exists=${exists ? 'true' : 'false'}\noverdue=${overdue ? 'true' : 'false'}\nstale_prs=${stalePrs.join(' ')}\ntarget=${target.relativePath}\nweek=${target.nextWeekLabel}\n`
     );
   }
 
@@ -91,7 +101,7 @@ async function main() {
       process.env.GITHUB_STEP_SUMMARY,
       pendingPr
         ? `### EU Oversize Weekly - awaiting review\n\n${pendingPr}\n\nNo article was published by this run; no generation was repeated.\n`
-        : `### EU Oversize Weekly - already published\n\nTarget \u0060${target.relativePath}\u0060 already exists. This delayed/duplicate/catch-up run correctly did no publication work.\n`
+        : `### EU Oversize Weekly - already prepared in main\n\nTarget \u0060${target.relativePath}\u0060 already exists in main. Public delivery requires the independent watchdog; this check proves only idempotency.\n`
     );
   }
 }

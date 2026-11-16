@@ -45,7 +45,8 @@ import { generateArticleMock, generateRequiredItemsMock } from './lib/mock-gener
 import { renderArticleMarkdown, toFrontmatterYaml } from './lib/render-article.mjs';
 import { runQualityGate, MAX_REPORTS, MAX_ROUNDUP_REPORTS } from './lib/quality-gate.mjs';
 import { checkClaudeKeyPreflight } from './lib/preflight.mjs';
-import { formatNextPublicationLabel, publicationSlotFor, targetWeekDateFor } from './lib/next-publication.mjs';
+import { formatNextPublicationLabel } from './lib/next-publication.mjs';
+import { editionPlan } from './lib/edition-plan.mjs';
 import { crossValidateDevelopments } from './lib/cross-validate.mjs';
 import { attachCriticalGroupSources, criticalWeeklyGroups, missingCriticalGroups } from './lib/critical-floor.mjs';
 import { filterGeneratedItems } from './lib/generated-item-filter.mjs';
@@ -69,7 +70,10 @@ function parseArgs(argv) {
   // A manually requested regeneration of an edition whose earlier version was
   // withdrawn: stamps `updatedAt` so readers can see the edition changed.
   const correction = argv.includes('--correction') || process.env.OVERSIZE_CORRECTION === '1';
-  return { mock, skipBuild, dryRun, refreshExisting, preview, correction };
+  const targetIndex = argv.indexOf('--target-week');
+  if (targetIndex >= 0 && (!argv[targetIndex + 1] || argv[targetIndex + 1].startsWith('--'))) throw new Error('--target-week requires YYYY-Www');
+  const targetWeek = targetIndex >= 0 ? argv[targetIndex + 1] : (process.env.OVERSIZE_TARGET_WEEK || '');
+  return { mock, skipBuild, dryRun, refreshExisting, preview, correction, targetWeek };
 }
 
 async function appendSummary(markdown) {
@@ -127,7 +131,7 @@ function logRejections(rejected) {
 }
 
 async function main() {
-  const { mock, skipBuild, dryRun, refreshExisting, preview, correction } = parseArgs(process.argv.slice(2));
+  const { mock, skipBuild, dryRun, refreshExisting, preview, correction, targetWeek } = parseArgs(process.argv.slice(2));
   if (refreshExisting && !dryRun) {
     await fail('--refresh-existing is allowed only together with --dry-run; it must never overwrite a published article directly.');
     return;
@@ -155,8 +159,9 @@ async function main() {
   // (normally on Thursday) and carries that slot as `publishedAt`; the site
   // only shows it from that instant on. The target week is the one after the
   // publication Friday, whatever day this run happens on.
-  const publicationSlot = publicationSlotFor(now);
-  const nextWeekDate = targetWeekDateFor(publicationSlot);
+  const plan = editionPlan({ now, targetWeek });
+  const { publicationSlot } = plan;
+  const nextWeekDate = plan.targetDate;
   const nextWeekLabel = isoWeekLabel(nextWeekDate);
   const weekRangeLabel = isoWeekRangeLabel(nextWeekDate);
   const targetWeekStart = isoWeekStart(nextWeekDate);
@@ -203,7 +208,14 @@ async function main() {
     ? path.join(ARTICLES_DIR, `_dry-run-${slug}-${Date.now()}.md`)
     : filePath;
 
-  const findingsMap = await loadWeekFindings(thisWeek);
+  // Late repair can use both the original preparation data and newly refreshed
+  // evidence. Newer records replace older records for the same source URL.
+  const findingsMap = new Map();
+  for (const week of plan.findingsWeeks) {
+    for (const finding of (await loadWeekFindings(week)).values()) {
+      findingsMap.set(finding.sourceUrl, finding);
+    }
+  }
   // Source exclusions come only from a SHA-bound, fail-closed Claude veto in
   // recover-weekly-after-veto.mjs; one bounded retry, never a weakened gate.
   const excludedInput = JSON.parse(process.env.OVERSIZE_EXCLUDE_SOURCE_URLS || '[]');
@@ -212,7 +224,9 @@ async function main() {
     throw new Error('Invalid editorial-recovery source exclusions');
   }
   const excludedSourceUrls = new Set(excludedInput);
-  const findings = [...findingsMap.values()].filter((f) => !excludedSourceUrls.has(f.sourceUrl));
+  const findings = [...findingsMap.values()].filter((f) => !excludedSourceUrls.has(f.sourceUrl) &&
+    // A retrospective edition cannot import news first published after its covered week.
+    (!f.publishedAt || f.publishedAt.slice(0, 10) <= targetWeekEndIso));
   console.log(`Monitor-derived findings on file for ${thisWeek}: ${findingsMap.size}; excluded after editorial veto: ${excludedSourceUrls.size}`);
   // The Weekly never imports the DAJC Driving Bans calendar as a topic
   // source: general HGV bans live in the separate Driving Bans service.
@@ -421,10 +435,11 @@ async function main() {
 
   // A preview is public as soon as it is deployed; the final edition waits
   // for its Friday slot.
-  const publishedAt = (preview ? now : publicationSlot).toISOString();
+  const publishedAt = preview ? now.toISOString() : plan.publishedAt;
   const updatedAt = correctionOfExisting ? now.toISOString() : null;
   const nextPublicationLabel = formatNextPublicationLabel(publicationSlot);
-  const { frontmatter, body } = renderArticleMarkdown(article, { slug, publishedAt, updatedAt, nextPublicationLabel, weekEnd: targetWeekEndIso });
+  const { frontmatter, body } = renderArticleMarkdown(article, { slug, publishedAt, updatedAt, nextPublicationLabel, weekEnd: targetWeekEndIso,
+    targetWeek: nextWeekLabel, preparedAt: plan.preparedAt, scheduledPublicationAt: publicationSlot.toISOString(), late: !preview && plan.late });
 
   console.log('\nRunning quality gate...');
   const gate = runQualityGate({
