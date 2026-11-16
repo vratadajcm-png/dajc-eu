@@ -18,6 +18,7 @@ import path from 'node:path';
 import { nonOfficialSources, decidePublishCommit, extractArticleWeekFromStatus, isArticleReplacement, publicationBranchFor } from './lib/publish-gate.mjs';
 import { saveAutomationData } from './lib/automation-data.mjs';
 import { sourceTier } from './lib/source-policy.mjs';
+import { REJECTION_MARKER } from './lib/weekly-recovery.mjs';
 
 function git(args) {
   return execFileSync('git', args, { encoding: 'utf-8' });
@@ -187,7 +188,7 @@ const temporary = mkdtempSync(path.join(tmpdir(), 'dajc-publication-pr-'));
 try {
   const bodyFile = path.join(temporary, 'body.md');
   const openPr = (env, releasedUnattended) => {
-    writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\n${releasedUnattended ? 'Claude approved the exact final article. The workflow merges it once application-validate and news-validate pass; the site shows it from its Friday 12:00 Europe/Prague slot. ' : autoMerge ? 'Claude approved the exact final article. Waiting for human review: approve the pending workflows, then merge to publish. This run has not published the article. ' : 'Waiting for human review: merge to publish. This run has not published the article. '}Only approved article/data paths are changed.\n`);
+    writeFileSync(bodyFile, `Prepared EU Oversize Weekly ${week} after the source, editorial and build gates.\n\n${releasedUnattended ? 'Claude approved the exact final article. The workflow merges it once application-validate and news-validate pass; the site shows it from its Friday 12:00 Europe/Prague slot. ' : autoMerge ? 'Claude approved the exact final article. Waiting for human review: approve the pending workflows, then merge to publish. This run has not published the article. ' : 'Waiting for human review: merge to publish. This run has not published the article. '}Only approved article/data paths are changed.\n${!autoMerge && autonomousFinal ? '\\n' + REJECTION_MARKER + '\\n' : ''}`);
     return execFileSync('gh', ['pr', 'create', '--repo', repository, '--base', 'main', '--head', branch, '--title', decision.message, '--body-file', bodyFile], { encoding: 'utf8', env }).trim();
   };
   let prUrl = '';

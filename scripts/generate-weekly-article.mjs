@@ -204,8 +204,16 @@ async function main() {
     : filePath;
 
   const findingsMap = await loadWeekFindings(thisWeek);
-  const findings = [...findingsMap.values()];
-  console.log(`Monitor-derived findings on file for ${thisWeek}: ${findings.length}`);
+  // Source exclusions come only from a SHA-bound, fail-closed Claude veto in
+  // recover-weekly-after-veto.mjs; one bounded retry, never a weakened gate.
+  const excludedInput = JSON.parse(process.env.OVERSIZE_EXCLUDE_SOURCE_URLS || '[]');
+  if (!Array.isArray(excludedInput) || excludedInput.length > 60 ||
+      excludedInput.some((url) => typeof url !== 'string' || !/^https?:\/\//.test(url))) {
+    throw new Error('Invalid editorial-recovery source exclusions');
+  }
+  const excludedSourceUrls = new Set(excludedInput);
+  const findings = [...findingsMap.values()].filter((f) => !excludedSourceUrls.has(f.sourceUrl));
+  console.log(`Monitor-derived findings on file for ${thisWeek}: ${findingsMap.size}; excluded after editorial veto: ${excludedSourceUrls.size}`);
   // The Weekly never imports the DAJC Driving Bans calendar as a topic
   // source: general HGV bans live in the separate Driving Bans service.
   if (findings.length === 0) {

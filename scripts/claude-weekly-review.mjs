@@ -10,6 +10,7 @@ import { isoWeekLabel } from './lib/week.mjs';
 import { extractDetailText, fetchTextWithRetry } from './lib/fetch-source.mjs';
 import { sourceTier } from './lib/source-policy.mjs';
 import { providerErrorDetail } from './lib/provider-error.mjs';
+import { selectRejectedSourceUrls } from './lib/weekly-recovery.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ARTICLE_PATH = /^src\/content\/news\/eu-oversize\/eu-oversize-weekly-(\d{4}-w\d{2})\.md$/;
@@ -195,7 +196,19 @@ async function main() {
   const article = parseCandidateArticle(p, raw, now);
   const evidence = await sourceEvidence(article.links);
   const claude = await reviewClaude(article, evidence);
-  if (!reviewApproved(claude, article.links)) throw new Error('Claude veto: ' + JSON.stringify(claude.blockingReasons || claude).slice(0, 2400));
+  if (!reviewApproved(claude, article.links)) {
+    // A second attempt is permitted only when the reviewer explicitly marks
+    // identified cited source URLs unsupported. No unverifiable free-text
+    // instructions can determine which sources to drop.
+    if (process.env.RUNNER_TEMP && claude?.verdict === 'reject') {
+      const rejected = selectRejectedSourceUrls(claude, article.links);
+      const veto = { articlePath: p, sha256: createHash('sha256').update(raw).digest('hex'),
+        sourceUrls: article.links, rejectedUrls: rejected, review: claude };
+      await writeFile(path.join(process.env.RUNNER_TEMP, 'dajc-weekly-review-veto.json'), JSON.stringify(veto), { mode: 0o600 });
+      console.log('Structured editorial veto: ' + rejected.length + ' source URL(s) explicitly unsupported.');
+    }
+    throw new Error('Claude veto: ' + JSON.stringify(claude.blockingReasons || claude).slice(0, 2400));
+  }
   const receipt = { articlePath: p, sha256: createHash('sha256').update(raw).digest('hex'),
     targetWeek: article.week, researchProvider: 'perplexity-search', claudeModel: process.env.CLAUDE_REVIEW_MODEL,
     leadCount: article.leadCount, restCount: article.restCount, sourceCount: article.links.length };

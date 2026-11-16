@@ -13,6 +13,7 @@ import { execFileSync } from 'node:child_process';
 import { isoWeekLabel } from './lib/week.mjs';
 import { publicationSlotFor, targetWeekDateFor } from './lib/next-publication.mjs';
 import { classifyEditionPulls, publicationBranchFor } from './lib/publish-gate.mjs';
+import { shouldReplaceBlockedEditionPr } from './lib/weekly-recovery.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -39,14 +40,26 @@ async function main() {
   if (process.env.GITHUB_ACTIONS === 'true') {
     if (!process.env.GH_TOKEN || !/^[\w.-]+\/[\w.-]+$/.test(process.env.GITHUB_REPOSITORY || '')) throw new Error('Publication PR access is not configured');
     const branch = publicationBranchFor(target.nextWeekLabel, { preview: process.env.OVERSIZE_PREVIEW === '1', correction });
-    const pulls = JSON.parse(execFileSync('gh', ['pr', 'list', '--repo', process.env.GITHUB_REPOSITORY, '--base', 'main', '--state', 'open', '--limit', '100', '--json', 'url,headRefName'], { encoding: 'utf8' }));
+    const allPulls = JSON.parse(execFileSync('gh', ['pr', 'list', '--repo', process.env.GITHUB_REPOSITORY, '--base', 'main', '--state', 'all', '--limit', '100', '--json', 'url,headRefName,body,createdAt,updatedAt,state'], { encoding: 'utf8' }));
+    const pulls = allPulls.filter((pull) => pull.state === 'OPEN');
     const editionPulls = classifyEditionPulls(pulls, { branch, targetWeek: target.nextWeekLabel });
     stalePrs = editionPulls.stale.map((pull) => pull.url);
     for (const url of stalePrs) console.log(`::warning::Edition PR for a week that has already passed is still open: ${url}`);
     if (needed && editionPulls.pending) {
-      needed = false;
-      pendingPr = editionPulls.pending.url;
-      console.log(`Edition already awaits review in ${pendingPr}; no regeneration or additional AI spend.`);
+      const candidate = editionPulls.pending;
+      const refresh = shouldReplaceBlockedEditionPr(candidate, allPulls, now);
+      if (refresh && process.env.OVERSIZE_RECOVERY_ALLOWED === '1') {
+        execFileSync('gh', ['pr', 'close', candidate.url, '--repo', process.env.GITHUB_REPOSITORY,
+          '--comment', 'Superseded automatically after a documented Claude editorial veto. No article was published; the next attempt must pass every original source, Claude and protected CI gate.'], { stdio: 'inherit' });
+        console.log(`Closed rejected edition PR ${candidate.url}; preparing one fresh, fully reviewed attempt.`);
+      } else if (refresh && process.env.OVERSIZE_RECOVERY_ALLOWED !== '1') {
+        // The watchdog is read-only: ask the primary publisher to do the closure.
+        console.log(`Rejected edition PR is eligible for a new safe attempt: ${candidate.url}`);
+      } else {
+        needed = false;
+        pendingPr = candidate.url;
+        console.log(`Edition already awaits review in ${pendingPr}; no regeneration or additional AI spend.`);
+      }
     }
   }
   // The edition is overdue when its Friday 12:00 slot has passed while its PR
