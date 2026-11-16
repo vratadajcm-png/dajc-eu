@@ -5,7 +5,7 @@ import { Resend } from 'resend';
 import { allowRegistrationAttempt } from '../../lib/testing-registration/throttle';
 
 export const prerender = false;
-const ALLOWED_ORIGINS = new Set(['https://www.dajc.eu', 'https://dajc.eu']);
+const ALLOWED_ORIGINS = new Set(['https://www.dajc.eu', 'https://dajc.eu', 'https://www.dajc.cz', 'https://dajc.cz']);
 const ROLES = new Set(['owner','dispatcher','driver','customer','other']);
 const INTEREST = new Set(['yes','maybe','no']);
 const FEATURES = {
@@ -13,8 +13,20 @@ const FEATURES = {
   tar: new Set(['dispatch','case','partners','billing','none']),
 } as const;
 const JSON_HEADERS = { 'content-type':'application/json; charset=utf-8', 'cache-control':'no-store' };
-const reply = (status:number, value:Record<string,unknown>) =>
-  new Response(JSON.stringify(value), { status, headers: JSON_HEADERS });
+function corsHeaders(origin:string|null):Record<string,string> {
+  return origin && ALLOWED_ORIGINS.has(origin)
+    ? {'Access-Control-Allow-Origin':origin,'Vary':'Origin'}
+    : {};
+}
+export const OPTIONS:APIRoute = async ({request}) => {
+  const origin = request.headers.get('origin');
+  if (!origin || !ALLOWED_ORIGINS.has(origin)) return new Response(null,{status:403});
+  return new Response(null,{status:204,headers:{
+    ...corsHeaders(origin),
+    'Access-Control-Allow-Methods':'POST, OPTIONS',
+    'Access-Control-Allow-Headers':'Content-Type',
+  }});
+};
 
 const clean = (value:unknown, limit:number) =>
   typeof value === 'string' ? value.replace(/\0/g,'').trim().slice(0,limit) : '';
@@ -39,31 +51,34 @@ function connection() {
 class RateLimitError extends Error {}
 
 export const POST:APIRoute = async ({ request, clientAddress }) => {
-  if (!originAllowed(request.headers.get('origin'), request.url)) {
-    return reply(403,{ok:false,error:'Origin not allowed.'});
+  const origin = request.headers.get('origin');
+  const respond = (status:number, value:Record<string,unknown>) =>
+    new Response(JSON.stringify(value),{status,headers:{...JSON_HEADERS,...corsHeaders(origin)}});
+  if (!originAllowed(origin, request.url)) {
+    return respond(403,{ok:false,error:'Origin not allowed.'});
   }
   if (!request.headers.get('content-type')?.includes('application/json')) {
-    return reply(415,{ok:false,error:'Expected JSON.'});
+    return respond(415,{ok:false,error:'Expected JSON.'});
   }
   if (!allowRegistrationAttempt(clientAddress || 'unknown')) {
-    return reply(429,{ok:false,error:'Too many submissions. Please try again later.'});
+    return respond(429,{ok:false,error:'Too many submissions. Please try again later.'});
   }
   let data:Record<string,unknown>;
   try {
     const raw = await request.text();
-    if (raw.length > 12000) return reply(413,{ok:false,error:'Submission too large.'});
+    if (raw.length > 12000) return respond(413,{ok:false,error:'Submission too large.'});
     const parsed:unknown = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-      return reply(400,{ok:false,error:'Invalid submission.'});
+      return respond(400,{ok:false,error:'Invalid submission.'});
     }
     data = parsed as Record<string,unknown>;
-  } catch { return reply(400,{ok:false,error:'Invalid submission.'}); }
+  } catch { return respond(400,{ok:false,error:'Invalid submission.'}); }
 
   // Honeypot: silently discard non-human submissions.
-  if (clean(data.website,150)) return reply(200,{ok:true});
+  if (clean(data.website,150)) return respond(200,{ok:true});
   const product = data.product;
   if (product !== 'platform' && product !== 'tar') {
-    return reply(400,{ok:false,error:'Invalid product.'});
+    return respond(400,{ok:false,error:'Invalid product.'});
   }
   const company = single(data.company,160);
   const country = single(data.country,100);
@@ -84,11 +99,11 @@ export const POST:APIRoute = async ({ request, clientAddress }) => {
       !INTEREST.has(usageInterest) || !INTEREST.has(paymentInterest) || !acknowledged ||
       (email !== '' && !isEmail(email)) || (followUp && !email) ||
       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
-    return reply(400,{ok:false,error:'Please complete all required fields and check your contact details.'});
+    return respond(400,{ok:false,error:'Please complete all required fields and check your contact details.'});
   }
 
   const hashKey = process.env.DAJC_RESEARCH_HASH_KEY;
-  if (!hashKey) return reply(503,{ok:false,error:'Research service is temporarily unavailable.'});
+  if (!hashKey) return respond(503,{ok:false,error:'Research service is temporarily unavailable.'});
   const hash = createHmac('sha256',hashKey).update(clientAddress || 'unknown').digest('hex');
   const bucket = new Date(Math.floor(Date.now()/900000)*900000).toISOString();
 
@@ -125,10 +140,10 @@ export const POST:APIRoute = async ({ request, clientAddress }) => {
     ]);
   } catch(error) {
     if (error instanceof RateLimitError) {
-      return reply(429,{ok:false,error:'Too many submissions. Please try again later.'});
+      return respond(429,{ok:false,error:'Too many submissions. Please try again later.'});
     }
     console.error('DAJC research database write failed');
-    return reply(503,{ok:false,error:'Your answer could not be saved. Please try again.'});
+    return respond(503,{ok:false,error:'Your answer could not be saved. Please try again.'});
   }
 
   // Email is optional best-effort, not the primary research store.
@@ -164,5 +179,5 @@ export const POST:APIRoute = async ({ request, clientAddress }) => {
       console.error('DAJC research notification not delivered');
     }
   }
-  return reply(200,{ok:true,saved:true});
+  return respond(200,{ok:true,saved:true});
 };

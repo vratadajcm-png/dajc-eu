@@ -51,11 +51,12 @@ const content = platform ? {
       {content.audience.map(item => <span>{item}</span>)}
     </div>
     <div class="actions">
-      <a class="primary" href="#value">See how it changes daily work <span aria-hidden="true">↓</span></a>
-      <a class="secondary" href="#research">Share your feedback <span aria-hidden="true">↓</span></a>
+      <a class="primary" href={platform?'/testing':'#research'}>{platform?'Register for Platform testing Q3 2027':'Share TAR research feedback'} <span aria-hidden="true">→</span></a>
+      <a class="secondary" href="#value">See the workflow <span aria-hidden="true">↓</span></a>
+      <a class="secondary" href={platform?'https://www.dajc.cz/platform':'https://www.dajc.cz/tar'} lang="cs" hreflang="cs">Česky · DAJC.cz ↗</a>
     </div>
     <p class="status"><span aria-hidden="true">●</span> {content.status}</p>
-    {platform && <div class="demo-entry" id="platform-demo"><a href="https://demo.dajc.eu/" class="demo-button" target="_blank" rel="noopener noreferrer">Open DAJC Platform demo ↗</a><p>Illustrative demonstration using synthetic data — not live permits, routing or customer integrations.</p></div>}
+    {platform && <div class="demo-entry" id="platform-demo"><a href="https://demo.dajc.eu/" class="demo-button" target="_blank" rel="noopener noreferrer">Open DAJC Platform demo ↗</a><p>Illustrative demonstration using synthetic data — not live permits, routing or customer integrations. <a href="/demo-guide">Follow the guided tour →</a></p></div>}
   </section>
 
   <section id="value" class="value" aria-labelledby="value-title">
