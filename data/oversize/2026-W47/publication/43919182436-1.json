@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "attemptId": "43919182436-1",
+  "targetWeek": "2026-W47",
+  "state": "EDITORIAL_REJECTED",
+  "sourceFingerprint": "dd08368ebc9224b9d4512149e680131264281aa8d58af1944a82601f9fda1069",
+  "lifecycle": [
+    {
+      "state": "PREPARING"
+    },
+    {
+      "state": "GENERATED"
+    },
+    {
+      "state": "EDITORIAL_REJECTED",
+      "attempt": 1
+    },
+    {
+      "state": "EDITORIAL_REJECTED"
+    }
+  ],
+  "recovery": {
+    "manifest": {
+      "articlePath": "src/content/news/eu-oversize/eu-oversize-weekly-2026-w47.md",
+      "initialSha256": "7dd7be0c68ed8058df8be0f1c2b44def304853dc758815a22c8a2f3b2fba5050",
+      "maxAttempts": 3,
+      "attempts": [
+        {
+          "attempt": 1,
+          "state": "EDITORIAL_REJECTED",
+          "sha256": "7dd7be0c68ed8058df8be0f1c2b44def304853dc758815a22c8a2f3b2fba5050",
+          "review": {
+            "verdict": "reject",
+            "blockingReasons": [
+              "The intro says Italy is reviewing a draft Highway Code reform that would bar goods vehicles above 3.5 t from overtaking in motorway roadworks. The only evidence is the Trasporti Italia enforcement-week article, which says nothing about this. The claim and its 3.5 t threshold are unsupported.",
+              "The impact section says infringements can lead to fines, prohibitions and delays to delivery and ferry schedules. The source excerpt is truncated at 'In caso di violazioni, scatter', so the stated consequences cannot be verified. The ferry-schedule delay is not in the source at all.",
+              "The article says tachograph-using goods vehicles from 3.5 t are covered by the checks. The source states no weight threshold. This is the editorial audience scope presented as if it were a property of the campaign, which risks blurring legal thresholds.",
+              "The article says abnormal-load operators should expect checks on documents, load securing and vehicle condition. The source does not mention abnormal or oversize transport, so this is extrapolation. It also omits the source's explicit mention of weight and dimension checks and of checks on transport documents and authorisations.",
+              "The only source is a single Italian trade-media report, not the Polizia di Stato or ROADPOL. The article does attribute it as an industry report. However, the source is dated 2026-10-23 and the article was published 2026-11-16, after the 2026-11-13 scheduled release. With the unsupported draft-reform claim in the lead summary, the piece cannot be approved."
+            ],
+            "sourceChecks": [
+              {
+                "url": "https://www.trasporti-italia.com/camion/controlli-polizia-mezzi-pesanti-dal-16-al-22-novembre/1523438/",
+                "supported": false,
+                "reason": "The source supports the ROADPOL Truck and Bus week (16-22 November 2026), Italian Police participation, and checks on tachograph, driving and rest times, vehicle condition, load and documents. It does not support the draft Highway Code overtaking ban for goods vehicles above 3.5 t, the fines/prohibitions/ferry-delay consequences (the excerpt is truncated), or any targeting of abnormal transports."
+              }
+            ]
+          }
+        }
+      ],
+      "outcome": "BLOCKED",
+      "error": "Reviewer rejected every cited source; no safe automatic edition remains"
+    },
+    "versions": [
+      {
+        "name": "attempt-1.md",
+        "candidateMarkdown": "---\ntitle: \"European Heavy Transport Weekly 16-22 November 2026: ROADPOL Truck & Bus Week and Italy Roadworks Overtaking Ban Proposal\"\ndescription: \"DAJC weekly intelligence for 16-22 November 2026: Europe-wide ROADPOL Truck & Bus enforcement week targeting tachographs, driving and rest times and loads, plus Italy's proposed roadworks overtaking ban for goods vehicles over 3.5 t.\"\nslug: \"eu-oversize-weekly-2026-w47\"\ncategory: \"eu-oversize\"\npublishedAt: 2026-11-16T17:31:20.025Z\ntargetWeek: \"2026-W47\"\npreparedAt: \"2026-11-16T17:31:20.025Z\"\nscheduledPublicationAt: \"2026-11-13T11:00:00.000Z\"\nlanguage: \"en\"\nauthor: \"DAJC\"\nstatus: \"published\"\nsources:\n  - name: \"Trasporti Italia\"\n    url: \"https://www.trasporti-italia.com/camion/controlli-polizia-mezzi-pesanti-dal-16-al-22-novembre/1523438/\"\n---\n\n## Intro\n\nThis week's most relevant change for tachograph-using goods vehicles is the Europe-wide ROADPOL Truck &amp; Bus enforcement week, running 16-22 November 2026 with Italian Police participation. Italy is also reviewing a draft Highway Code reform that would bar goods vehicles above 3.5 t from overtaking in motorway roadworks. It is not yet in force. No verified new abnormal-load permit, escort or route rule was identified for the period.\n\nThis edition was prepared after its scheduled release on 2026-11-13T11:00:00.000Z. It covers 2026-W47; the publication date above records the delayed release.\n\n## Lead reports\n\n### ROADPOL Truck and Bus enforcement week: Italian Police check tachographs, driving and rest times, loads and vehicle condition (Italy)\n\nItalian Police will take part in the European Truck and Bus operation coordinated by ROADPOL from Monday 16 to Sunday 22 November 2026. Checks focus on tachographs, driving and rest times, loads and vehicle condition, with particular attention to heavy goods vehicles. This is an industry report (Trasporti Italia) on the campaign.\n\n**Category:** Operational development  \n**Where:** Italy, as a participant in the ROADPOL Truck and Bus campaign. The source does not specify roads or locations.  \n**Affected vehicles:** Professional goods and passenger transport, with particular attention to heavy goods vehicles. Tachograph-using goods vehicles from 3.5 t are covered by the checks. The source states no exact weight threshold.  \n**When:** 16 November 2026 to 22 November 2026\n\n**Impact:** A higher likelihood of roadside inspections in Italy during the week. Tachograph, driving and rest-time, load-securing or vehicle-condition infringements can lead to fines, prohibitions and delays to delivery and ferry schedules. Abnormal-load operators should expect their documents, load securing and vehicle condition to be checked as well; the source does not say whether abnormal transports are specifically targeted.\n\n**Recommended action:** Before departure, check tachograph calibration and data downloads, driver card and record completeness, compliance with driving and rest times, and load securing and vehicle condition. Brief drivers on Italy-bound trips about the enforcement week and allow extra time for roadside checks.\n\n**Exemptions/conditions:** None stated in the source.\n\n*Source: [Trasporti Italia](https://www.trasporti-italia.com/camion/controlli-polizia-mezzi-pesanti-dal-16-al-22-novembre/1523438/) — Industry report — not an official authority notice*\n\n## Operator checklist\n\n- Italy: Before departure, check tachograph calibration and data downloads, driver card and record completeness, compliance with driving and rest times, and load securing and vehicle condition. Brief drivers on Italy-bound trips about the enforcement week and allow extra time for roadside checks.\n\n## Sources\n\n- [Trasporti Italia](https://www.trasporti-italia.com/camion/controlli-polizia-mezzi-pesanti-dal-16-al-22-novembre/1523438/)\n\n## Next EU Oversize Weekly\n\nFriday, 20 November 2026 at 12:00 CET.\n"
+      }
+    ]
+  },
+  "articlePath": "src/content/news/eu-oversize/eu-oversize-weekly-2026-w47.md",
+  "sha256": "7dd7be0c68ed8058df8be0f1c2b44def304853dc758815a22c8a2f3b2fba5050",
+  "runUrl": "https://github.com/vratadajcm-png/dajc-eu/actions/runs/43919182436",
+  "preparedAt": "2026-11-16T17:32:14.087Z",
+  "candidateMarkdown": "---\ntitle: \"European Heavy Transport Weekly 16-22 November 2026: ROADPOL Truck & Bus Week and Italy Roadworks Overtaking Ban Proposal\"\ndescription: \"DAJC weekly intelligence for 16-22 November 2026: Europe-wide ROADPOL Truck & Bus enforcement week targeting tachographs, driving and rest times and loads, plus Italy's proposed roadworks overtaking ban for goods vehicles over 3.5 t.\"\nslug: \"eu-oversize-weekly-2026-w47\"\ncategory: \"eu-oversize\"\npublishedAt: 2026-11-16T17:31:20.025Z\ntargetWeek: \"2026-W47\"\npreparedAt: \"2026-11-16T17:31:20.025Z\"\nscheduledPublicationAt: \"2026-11-13T11:00:00.000Z\"\nlanguage: \"en\"\nauthor: \"DAJC\"\nstatus: \"published\"\nsources:\n  - name: \"Trasporti Italia\"\n    url: \"https://www.trasporti-italia.com/camion/controlli-polizia-mezzi-pesanti-dal-16-al-22-novembre/1523438/\"\n---\n\n## Intro\n\nThis week's most relevant change for tachograph-using goods vehicles is the Europe-wide ROADPOL Truck &amp; Bus enforcement week, running 16-22 November 2026 with Italian Police participation. Italy is also reviewing a draft Highway Code reform that would bar goods vehicles above 3.5 t from overtaking in motorway roadworks. It is not yet in force. No verified new abnormal-load permit, escort or route rule was identified for the period.\n\nThis edition was prepared after its scheduled release on 2026-11-13T11:00:00.000Z. It covers 2026-W47; the publication date above records the delayed release.\n\n## Lead reports\n\n### ROADPOL Truck and Bus enforcement week: Italian Police check tachographs, driving and rest times, loads and vehicle condition (Italy)\n\nItalian Police will take part in the European Truck and Bus operation coordinated by ROADPOL from Monday 16 to Sunday 22 November 2026. Checks focus on tachographs, driving and rest times, loads and vehicle condition, with particular attention to heavy goods vehicles. This is an industry report (Trasporti Italia) on the campaign.\n\n**Category:** Operational development  \n**Where:** Italy, as a participant in the ROADPOL Truck and Bus campaign. The source does not specify roads or locations.  \n**Affected vehicles:** Professional goods and passenger transport, with particular attention to heavy goods vehicles. Tachograph-using goods vehicles from 3.5 t are covered by the checks. The source states no exact weight threshold.  \n**When:** 16 November 2026 to 22 November 2026\n\n**Impact:** A higher likelihood of roadside inspections in Italy during the week. Tachograph, driving and rest-time, load-securing or vehicle-condition infringements can lead to fines, prohibitions and delays to delivery and ferry schedules. Abnormal-load operators should expect their documents, load securing and vehicle condition to be checked as well; the source does not say whether abnormal transports are specifically targeted.\n\n**Recommended action:** Before departure, check tachograph calibration and data downloads, driver card and record completeness, compliance with driving and rest times, and load securing and vehicle condition. Brief drivers on Italy-bound trips about the enforcement week and allow extra time for roadside checks.\n\n**Exemptions/conditions:** None stated in the source.\n\n*Source: [Trasporti Italia](https://www.trasporti-italia.com/camion/controlli-polizia-mezzi-pesanti-dal-16-al-22-novembre/1523438/) — Industry report — not an official authority notice*\n\n## Operator checklist\n\n- Italy: Before departure, check tachograph calibration and data downloads, driver card and record completeness, compliance with driving and rest times, and load securing and vehicle condition. Brief drivers on Italy-bound trips about the enforcement week and allow extra time for roadside checks.\n\n## Sources\n\n- [Trasporti Italia](https://www.trasporti-italia.com/camion/controlli-polizia-mezzi-pesanti-dal-16-al-22-novembre/1523438/)\n\n## Next EU Oversize Weekly\n\nFriday, 20 November 2026 at 12:00 CET.\n",
+  "review": {
+    "verdict": "reject",
+    "blockingReasons": [
+      "The intro says Italy is reviewing a draft Highway Code reform that would bar goods vehicles above 3.5 t from overtaking in motorway roadworks. The only evidence is the Trasporti Italia enforcement-week article, which says nothing about this. The claim and its 3.5 t threshold are unsupported.",
+      "The impact section says infringements can lead to fines, prohibitions and delays to delivery and ferry schedules. The source excerpt is truncated at 'In caso di violazioni, scatter', so the stated consequences cannot be verified. The ferry-schedule delay is not in the source at all.",
+      "The article says tachograph-using goods vehicles from 3.5 t are covered by the checks. The source states no weight threshold. This is the editorial audience scope presented as if it were a property of the campaign, which risks blurring legal thresholds.",
+      "The article says abnormal-load operators should expect checks on documents, load securing and vehicle condition. The source does not mention abnormal or oversize transport, so this is extrapolation. It also omits the source's explicit mention of weight and dimension checks and of checks on transport documents and authorisations.",
+      "The only source is a single Italian trade-media report, not the Polizia di Stato or ROADPOL. The article does attribute it as an industry report. However, the source is dated 2026-10-23 and the article was published 2026-11-16, after the 2026-11-13 scheduled release. With the unsupported draft-reform claim in the lead summary, the piece cannot be approved."
+    ],
+    "sourceChecks": [
+      {
+        "url": "https://www.trasporti-italia.com/camion/controlli-polizia-mezzi-pesanti-dal-16-al-22-novembre/1523438/",
+        "supported": false,
+        "reason": "The source supports the ROADPOL Truck and Bus week (16-22 November 2026), Italian Police participation, and checks on tachograph, driving and rest times, vehicle condition, load and documents. It does not support the draft Highway Code overtaking ban for goods vehicles above 3.5 t, the fines/prohibitions/ferry-delay consequences (the excerpt is truncated), or any targeting of abnormal transports."
+      }
+    ]
+  },
+  "reason": "Independent editorial rejection"
+}
