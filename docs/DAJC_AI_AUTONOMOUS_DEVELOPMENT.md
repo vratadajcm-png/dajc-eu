@@ -1,5 +1,15 @@
 # DAJC AI — Autonomous Claude Development Pipeline
 
+> **11 Nov 2026 — moved out of this public repository.** The owner approved
+> separating internal DAJC AI development into the private repository
+> `vratadajcm-png/dajc-ai-private`. Its autonomous Claude workflow, the
+> independent Codex reviewer, the offline validation and the developer prompt
+> were removed here, so no autonomous DAJC AI run, draft PR, review or artifact
+> is produced in public. The DAJC AI weekly paid-run budget is shared: the
+> private workflow still counts paid runs made here in the last 7 days. The
+> public website, its deployment and publication workflows are unchanged. The
+> text below is the historical design record.
+
 **Current runtime status (10 Nov 2026): REGISTERED ON MAIN, SCHEDULE OFF.**
 Bootstrap PR #114, Claude action model fix #115 and output.txt publisher fix
 #116 are merged. First three manual trials rejected an old ignored CLI model

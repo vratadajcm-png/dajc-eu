@@ -4,7 +4,9 @@
 1. [AI Build Source Map](docs/DAJC_AI_BUILD_SOURCE_MAP.md).
 2. [Official Source and Connector Registry](docs/DAJC_AI_SOURCE_AND_CONNECTOR_REGISTRY.md).
 3. [DAJC AI draft master on controlled Drive](https://docs.google.com/document/d/1gP65j89QtZCvtoLBVNrCLH0gJDkuC8h-YryYYBs4lP8/edit) when a trusted authorized connector is actually available; do not fabricate its contents.
-4. [Autonomous developer policy](.github/ai-autonomy/claude-developer.md) and existing product/source code.
+4. Existing product/source code. The autonomous developer policy and pipeline moved to the private DAJC AI
+   development repository `vratadajcm-png/dajc-ai-private` on 11 Nov 2026 (see
+   [DAJC AI autonomous development](docs/DAJC_AI_AUTONOMOUS_DEVELOPMENT.md)).
 
 Approved free-user model is 3 questions per registered person per day and **voluntary donations never increase that quota**. No paid AI plans, per-organization license transfer, AI-issued permits or unverified transport/legal advice. Keep dated official citations; UNKNOWN/UNVERIFIED must be explicit.
 
