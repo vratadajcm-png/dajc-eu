@@ -67,7 +67,11 @@ concurrency:
 
 jobs:
   publish:
-    if: ${{ github.ref == 'refs/heads/main' }}
+    # Publication runs only from main. A manual dry run may also run from a
+    # repair branch so a fix can be exercised live BEFORE merge: dry runs skip
+    # every persist/commit/push/PR/merge/alert-issue step below, and preview
+    # or correction (which can publish) stay main-only.
+    if: ${{ github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && inputs.dry_run == true && inputs.preview != true && inputs.correction != true) }}
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
@@ -234,9 +238,13 @@ jobs:
             echo "::warning::No qualified article generated this week; no approval or publication."
           fi
 
-      # A rejected edition may receive at most two source-safe repairs that
-      # excludes ONLY URLs the reviewer marked unsupported. All deterministic
-      # gates, live-source verification, build and independent review repeat.
+      # A rejected edition may receive at most two repairs (three drafts in
+      # total). A repair excludes the URLs the reviewer marked unsupported -
+      # even all of them, leaving only the remaining verified pool - or, with
+      # no unsupported URL, rewrites under the bounded blocking reasons. All
+      # deterministic gates, the legal-claim guard, live-source verification,
+      # build and a fresh independent review of the new bytes repeat. Nothing
+      # left to publish blocks the edition; it is never padded.
       - name: Bounded source-safe regeneration after structured Claude veto
         id: recovery
         continue-on-error: true
@@ -331,8 +339,10 @@ jobs:
           if-no-files-found: ignore
           retention-days: 90
 
+      # A dry run is a simulation: its outcome stays in this run's log and
+      # artifacts and must never edit the edition's operational alert issue.
       - name: Report blocked publication
-        if: failure()
+        if: failure() && inputs.dry_run != true
         env:
           TARGET_WEEK: ${{ steps.publish-needed.outputs.week }}
         run: node scripts/report-weekly-failure.mjs

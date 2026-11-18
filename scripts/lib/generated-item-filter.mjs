@@ -10,6 +10,7 @@ import { checkLongRoadClosure } from './closure-duration.mjs';
 import { checkTransportDomainRelevance } from './transport-domain.mjs';
 import { checkWeeklyDrivingBanPolicy } from './weekly-driving-ban-policy.mjs';
 import { checkWeeklyEligibility, OUTLOOK_DAYS } from './weekly-eligibility.mjs';
+import { checkLegalClaimGrounding } from './legal-claim-guard.mjs';
 
 /**
  * Checks one generated item. `candidate` is the verified record behind the
@@ -37,7 +38,14 @@ export function checkGeneratedItem(item, { weekStart, weekEnd, candidate = null,
   if (candidate && eligibilityContext) {
     const eligibility = checkWeeklyEligibility(candidate, eligibilityContext);
     if (!eligibility.ok) return eligibility;
-  } else {
+  }
+  // The model's wording may never upgrade the legal status its own evidence
+  // states (draft -> adopted, report -> official confirmation).
+  if (candidate) {
+    const legal = checkLegalClaimGrounding(item, candidate);
+    if (!legal.ok) return legal;
+  }
+  if (!(candidate && eligibilityContext)) {
     const domain = checkTransportDomainRelevance(item);
     if (!domain.ok) return domain;
   }
