@@ -59,10 +59,14 @@ const resources = [
       <p class="hero-lead">Two separate DAJC products for Europe: Platform coordinates heavy and oversized transport; TAR connects towing, assistance and recovery operations. Discover each product on its own page.</p>
       
       <p class="hero-status">DAJC Platform and DAJC TAR are separate products in development. Explore their dedicated pages for the complete capabilities and research questionnaire.</p>
+      <div class="hero-ctas" aria-label="Explore the DAJC products">
+        <a class="hero-cta-primary" href="/platform">Explore DAJC Platform →</a>
+        <a href="/tar">Explore DAJC TAR →</a>
+      </div>
       
     </div>
 
-    <div class="solution-intro"><p class="eyebrow">THE DAJC PRODUCTS</p><h2>Two products. Two industries. One connected way of working.</h2><p>Explore the full capability of each product and help shape its final priorities.</p></div>
+    <div class="solution-intro"><p class="eyebrow">THE DAJC PRODUCTS</p><h2>Two products. Two industries. One connected way of working.</h2><p>Choose a product to see its workflows, complete feature catalogue, integration approach and dedicated research form.</p></div>
     <div class="solution-grid" aria-label="Explore DAJC solutions">
       <article class="solution-card solution-card--primary">
         <div class="solution-card__top">
@@ -87,7 +91,7 @@ const resources = [
         <a class="solution-card__button" href="/tar">Discover DAJC TAR <span aria-hidden="true">↗</span></a>
       </article>
     </div>
-    <div class="hero-meta"><span>One DAJC brand · Two distinct products: Platform and TAR</span><a href="/testing">Registration open: Testing 2027 <span aria-hidden="true">→</span></a></div>
+    <div class="hero-meta"><span>DAJC Platform and DAJC TAR are separate products in development.</span><a href="/platform">Full Platform details <span aria-hidden="true">→</span></a></div>
   </section>
 
   <section class="home-section real-operations" aria-labelledby="operations-heading">
@@ -230,4 +234,8 @@ const resources = [
     .home-section {padding-left:1.1rem;padding-right:1.1rem;}
   }
   @media(prefers-reduced-motion:reduce){.solution-card__button,.audience-card,.resource-card{transition:none;}}
+.hero-ctas{display:flex;flex-wrap:wrap;align-items:center;gap:.65rem;margin:1.25rem 0 1.5rem;position:relative;z-index:4}
+.hero-ctas a{display:inline-flex;min-height:46px;align-items:center;padding:.65rem .9rem;border:1px solid #627e99;border-radius:8px;color:#eaf2fa;text-decoration:none;font:700 .73rem/1.45 'IBM Plex Mono',monospace}
+.hero-ctas .hero-cta-primary{background:var(--dajc-orange);border-color:var(--dajc-orange);color:#061a33}
+@media(max-width:760px){.hero-ctas{align-items:stretch}.hero-ctas a{flex:1 1 100%}}
 </style>

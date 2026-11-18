@@ -135,6 +135,14 @@ describe('classifyEditionPulls', () => {
     expect(classifyEditionPulls(pulls, { branch: 'automation/weekly-2026-w44', targetWeek: '2026-W44' }).stale.map((p) => p.url)).toEqual(['https://example/pull/39']);
   });
 
+  it('prioritizes an approved replacement while preserving the rejected PR for audit', () => {
+    const old = { url: 'old', headRefName: 'automation/weekly-2026-w44', body: 'Editorial status: REJECTED_BY_CLAUDE' };
+    const replacement = { url: 'new', headRefName: 'automation/weekly-2026-w44-retry-123', body: '<!-- DAJC_WEEKLY_STATE:EDITORIAL_APPROVED -->' };
+    const result = classifyEditionPulls([old, replacement], { branch: 'automation/weekly-2026-w44', targetWeek: '2026-W44' });
+    expect(result.pending).toBe(replacement);
+    expect(result.rejected).toEqual([old]);
+  });
+
   it('does not treat a different week as pending', () => {
     expect(classifyEditionPulls(pulls, { branch: 'automation/weekly-2026-w45', targetWeek: '2026-W45' }).pending).toBeNull();
   });

@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+export const prerender = false;
+const action = Astro.params.action === 'confirm' ? 'confirm' : Astro.params.action === 'unsubscribe' ? 'unsubscribe' : null;
+if (!action) Astro.response.status = 404;
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+const title = action === 'confirm' ? 'Confirm your DAJC email request' : 'Cancel DAJC email updates';
+---
+<BaseLayout title={title+' — DAJC'} description="Manage a voluntary DAJC updates request.">
+<main class="manage" id="updates-action" data-action={action || 'invalid'}>
+  <p class="eyebrow">DAJC · EMAIL PREFERENCES</p>
+  <h1>{action ? title : 'This request is unavailable.'}</h1>
+  {action ? <>
+    <p>{action === 'confirm' ? 'Confirm only if you personally requested this DAJC notification or newsletter. Opening the email link alone does not subscribe you.' : 'Use this action to cancel the pending request or unsubscribe from the selected DAJC emails.'}</p>
+    <button id="updates-submit" type="button">{action === 'confirm' ? 'Confirm my email request' : 'Unsubscribe / cancel request'}</button>
+    <p id="updates-message" role="status" aria-live="polite"></p>
+    <noscript><p>To manage this request without JavaScript, email <a href="mailto:team@dajc.eu">team@dajc.eu</a>.</p></noscript>
+  </> : <p><a href="/updates">Return to updates</a>.</p>}
+  <p>For questions or manual removal requests: <a href="mailto:team@dajc.eu">team@dajc.eu</a>.</p>
+</main>
+</BaseLayout>
+<script>
+  const root = document.getElementById('updates-action');
+  const action = root?.dataset.action;
+  const token = new URL(window.location.href).searchParams.get('token');
+  // Prevent accidental reuse in browser history and exposure to later referrers.
+  if (window.location.search) window.history.replaceState(null, '', window.location.pathname);
+  const button = document.getElementById('updates-submit') as HTMLButtonElement | null;
+  const message = document.getElementById('updates-message');
+  if (button && message && (action === 'confirm' || action === 'unsubscribe')) {
+    if (!token) {
+      button.disabled = true;
+      message.textContent = 'The link is missing or invalid. Contact team@dajc.eu.';
+    } else {
+      button.addEventListener('click', async () => {
+        button.disabled = true;
+        message.textContent = 'Processing your request…';
+        try {
+          const response = await fetch('/api/updates/' + action, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token }),
+          });
+          const body = await response.json();
+          message.textContent = body.message || body.error || (response.ok ? 'Request completed.' : 'Request could not be processed.');
+        } catch {
+          message.textContent = 'Request could not be processed. Contact team@dajc.eu.';
+        }
+      });
+    }
+  }
+</script>
+<style>
+.manage{position:relative;z-index:2;max-width:680px;min-height:55vh;margin:5rem auto;padding:0 1.5rem;color:var(--dajc-white)}
+.eyebrow{font:500 12px 'IBM Plex Mono',monospace;color:var(--dajc-orange);letter-spacing:.1em}
+h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.8rem,4vw,2.7rem)}
+p{line-height:1.8;color:var(--dajc-muted)}
+button{padding:.85rem 1.3rem;background:var(--dajc-orange);color:var(--dajc-dark);border:0;border-radius:7px;font-weight:700;cursor:pointer}
+button:disabled{opacity:.6;cursor:default}
+a{color:var(--dajc-orange)}
+</style>
