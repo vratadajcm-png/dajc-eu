@@ -17,6 +17,11 @@ on:
   schedule:
     # Thursday 09:17 UTC (10:17 CET / 11:17 CEST), after the sweep window.
     - cron: '17 9 * * 4'
+    # Official-source monitor: before the Thursday sweep and again in the
+    # evening. Both slots are outside Austrian office hours (RIS OGD terms:
+    # automated access 20:00-05:00 Vienna time); a delayed run defers RIS.
+    - cron: '37 2 * * 4'
+    - cron: '37 19 * * 4'
   workflow_dispatch: {}
 
 permissions:
@@ -28,8 +33,12 @@ concurrency:
 
 jobs:
   gate:
+    if: ${{ github.event_name != 'schedule' || github.event.schedule == '17 9 * * 4' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -89,3 +98,79 @@ jobs:
           path: artifacts/driving-bans/
           if-no-files-found: warn
           retention-days: 90
+
+      # A failing Thursday gate used to be visible only as a red run. It now
+      # updates one operational issue (main only; never on a branch dispatch).
+      - name: Alert on failed Thursday gate
+        if: failure() && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/report-driving-bans-alert.mjs gate
+
+  # Automated official-source monitor (read-only for the registry): retrieves
+  # every PRIMARY source over the safe, allowlisted fetcher (or the official
+  # RIS OGD mirror), compares it with the reviewed hash and with the previous
+  # run, and builds the re-verification queue. It never edits canonical.json,
+  # never refreshes verification dates and never produces NO_BAN.
+  source-monitor:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '37 2 * * 4' || github.event.schedule == '37 19 * * 4' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      # Only the automation/driving-bans-monitor data branch is written.
+      contents: write
+      issues: write
+    concurrency:
+      group: driving-bans-source-monitor
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Load previous monitor state (history)
+        run: node scripts/automation-data.mjs load driving-bans-monitor
+
+      - name: Retrieve and compare official sources
+        id: monitor
+        continue-on-error: true
+        run: node scripts/driving-bans-source-monitor.mjs --previous data/driving-bans-monitor/latest.json --state-dir data/driving-bans-monitor --fail-on-change
+
+      - name: Persist monitor history (main only)
+        if: ${{ always() && github.ref == 'refs/heads/main' && hashFiles('data/driving-bans-monitor/latest.json') != '' }}
+        run: node scripts/automation-data.mjs save driving-bans-monitor
+
+      - name: Upload monitor evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: driving-bans-source-monitor-${{ github.run_id }}
+          path: |
+            artifacts/driving-bans/source-monitor.json
+            artifacts/driving-bans/source-monitor.md
+            artifacts/driving-bans/reverification-queue.json
+            artifacts/driving-bans/text-baseline.proposed.json
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Alert on changed sources or degraded retrieval (main only)
+        if: ${{ steps.monitor.outcome == 'failure' && github.ref == 'refs/heads/main' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/report-driving-bans-alert.mjs monitor artifacts/driving-bans/source-monitor.md
+
+      - name: Fail visibly when the monitor needs attention
+        if: ${{ steps.monitor.outcome == 'failure' }}
+        run: |
+          echo "::error::Driving Bans source monitor needs attention (changed official source or degraded retrieval). The registry was not changed."
+          exit 1
