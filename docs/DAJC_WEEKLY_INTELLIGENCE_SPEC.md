@@ -105,9 +105,12 @@ These rules are deterministic (`scripts/lib/weekly-eligibility.mjs`) and are app
 
 An independent Claude rejection is final for the reviewed bytes, not for the
 edition. A rejected report is repaired or removed and the edition continues
-(18 November 2026, after W47): recovery excludes every source explicitly marked
-unsupported by a complete, structured, SHA-bound veto - including all cited
-sources, in which case only the remaining verified pool may be used - and
+(18 November 2026, after W47): the first repair keeps a source the reviewer
+rejected only because the article misstated it and rewrites that report under
+the reviewer's reasons; a source rejected for its quality (relay, general
+outlet, old/evergreen page) and any source rejected again is excluded -
+including all cited sources, in which case only the remaining verified pool
+may be used - and
 passes the bounded blocking reasons to the writer as inert correction
 constraints (remove or qualify; never add). A veto with no unsupported source
 gets one rewrite of the same verified pool under those constraints. Recovery

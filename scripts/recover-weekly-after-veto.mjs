@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 // At most three total editorial generations per preparation (initial + two repairs).
 // A rejected report is repaired or removed; the edition is not abandoned:
-//   - sources the reviewer marked unsupported are excluded (even when that is
+//   - first repair: a source rejected only because the article misstated it
+//     stays, with the reviewer's reasons as correction constraints; a source
+//     rejected for its quality (relay, general outlet, old page...) goes;
+//   - later repairs: sources the reviewer marked unsupported are excluded (even when that is
 //     every cited source) and the writer works only from the REMAINING
 //     verified pool; nothing left = blocked edition, never padding;
 //   - without an unsupported source, the bounded blocking reasons become
@@ -63,14 +66,14 @@ export function recoverEditorialEdition({ articlePath, root = ROOT, runnerTemp =
   try {
     while (ledger.attempts.length < maxAttempts) {
       const veto = boundVeto();
-      const plan = planEditorialRepair(veto.review, veto.sourceUrls);
+      const plan = planEditorialRepair(veto.review, veto.sourceUrls, { attempt: ledger.attempts.length + 1 });
       if (!plan.ok) throw new Error('Editorial veto cannot be repaired automatically (' + plan.reason + '); fail closed for human review');
       for (const url of plan.excludeUrls) excluded.add(url);
       // Feedback accumulates across attempts so a later rewrite cannot
       // reintroduce a claim an earlier review already rejected.
       feedback = sanitizeEditorialFeedback([...feedback, ...plan.feedback]);
       const number = ledger.attempts.length + 1;
-      const record = { attempt: number, state: 'REPAIRING', mode: plan.mode, allSourcesRejected: plan.allSourcesRejected,
+      const record = { attempt: number, state: 'REPAIRING', mode: plan.mode, allSourcesRejected: plan.allSourcesRejected, correctedSourceUrls: plan.correctUrls,
         excludedSourceUrls: [...excluded], editorialFeedback: feedback, blockingReasons: veto.review.blockingReasons, startedAt: new Date().toISOString() };
       ledger.attempts.push(record); persist();
       console.log(`Editorial recovery attempt ${number}/${maxAttempts} (${plan.mode}): excluding ${excluded.size} unsupported source URL(s), ${feedback.length} correction constraint(s).` +

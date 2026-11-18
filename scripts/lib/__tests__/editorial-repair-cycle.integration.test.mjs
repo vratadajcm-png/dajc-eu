@@ -63,7 +63,7 @@ const reviews = (f) => f.calls.filter((c) => c.args?.[0] === 'scripts/claude-wee
 describe('Weekly repair cycle continues after a rejected report instead of stopping the edition', () => {
   it('W47 regression: the only cited source is rejected, the edition is rebuilt from the remaining verified pool and freshly approved', () => {
     const f = harness({
-      initialChecks: [{ url: ITALY, supported: false, reason: 'Source describes a draft scheme, not adopted law' }],
+      initialChecks: [{ url: ITALY, supported: false, reason: 'Trade relay, not the competent authority; it describes a draft scheme, not adopted law' }],
       generator: (n) => `repaired draft ${n} from remaining verified candidates`,
       reviewer: () => ({ approve: true }),
     });
@@ -81,7 +81,7 @@ describe('Weekly repair cycle continues after a rejected report instead of stopp
 
   it('blocks without padding when nothing verified remains after removal, and never calls the reviewer', () => {
     const f = harness({
-      initialChecks: [{ url: ITALY, supported: false, reason: 'Unsupported legal claim' }],
+      initialChecks: [{ url: ITALY, supported: false, reason: 'Second-hand relay of an unsupported legal claim' }],
       generator: () => null, // generator abort(): no qualified report remains
       reviewer: () => { throw new Error('must not review'); },
     });
@@ -117,9 +117,9 @@ describe('Weekly repair cycle continues after a rejected report instead of stopp
   it('accumulates exclusions and constraints, and stops at the three-draft budget', () => {
     const urls = ['https://a.example/1', 'https://b.example/2', 'https://c.example/3'];
     const f = harness({
-      initialChecks: urls.map((url, i) => ({ url, supported: i !== 0, reason: i ? 'Confirmed' : 'Wrong date' })),
+      initialChecks: urls.map((url, i) => ({ url, supported: i !== 0, reason: i ? 'Confirmed' : 'Evergreen guide page, not a dated notice' })),
       generator: (n) => `draft ${n}`,
-      reviewer: (n) => ({ reasons: [`problem ${n}`], checks: urls.slice(n - 1).map((url, i) => ({ url, supported: i !== 0, reason: i ? 'Confirmed' : 'Unsupported' })) }),
+      reviewer: (n) => ({ reasons: [`problem ${n}`], checks: urls.slice(n - 1).map((url, i) => ({ url, supported: i !== 0, reason: i ? 'Confirmed' : 'General-interest outlet relaying the notice' })) }),
     });
     const result = recoverEditorialEdition(f);
     expect(result.ok).toBe(false);
@@ -130,6 +130,29 @@ describe('Weekly repair cycle continues after a rejected report instead of stopp
     expect(JSON.parse(second.env.OVERSIZE_EDITORIAL_FEEDBACK)).toEqual(expect.arrayContaining(['Draft reform presented as adopted law', 'problem 2']));
     expect(existsSync(f.approvalPath)).toBe(false);
     expect(readFileSync(f.target, 'utf8')).toBe(f.initial);
+  });
+
+  it('repairs before removing: a misstated (not low-quality) source is rewritten first and removed only if rejected again', () => {
+    const sk = 'https://sita.sk/nds-toll';
+    const other = 'https://authority.example/b';
+    const omitted = 'Article denies the exemption for European toll service providers that the source states';
+    const f = harness({
+      initialChecks: [{ url: sk, supported: false, reason: omitted }, { url: other, supported: true, reason: 'Confirmed' }],
+      initialReasons: ['Slovakia: exemption omitted and wrongly denied'],
+      generator: (n) => `draft ${n}`,
+      reviewer: (n) => n === 2
+        ? { reasons: ['Slovakia: impact still overstated'], checks: [{ url: sk, supported: false, reason: 'Impact overstated again' }, { url: other, supported: true, reason: 'Confirmed' }] }
+        : { approve: true },
+    });
+    const result = recoverEditorialEdition(f);
+    expect(result.ok).toBe(true);
+    const [first, second] = generations(f);
+    expect(JSON.parse(first.env.OVERSIZE_EXCLUDE_SOURCE_URLS)).toEqual([]); // kept for a corrected rewrite
+    expect(JSON.parse(first.env.OVERSIZE_EDITORIAL_FEEDBACK).some((x) => x.startsWith('Correct the report citing ' + sk) && x.includes('exemption'))).toBe(true);
+    expect(JSON.parse(second.env.OVERSIZE_EXCLUDE_SOURCE_URLS)).toEqual([sk]); // rejected again: removed
+    const ledger = JSON.parse(readFileSync(result.ledgerPath, 'utf8'));
+    expect(ledger.attempts.map((a) => a.mode).slice(1)).toEqual(['correct-claims', 'remove-unsupported-sources']);
+    expect(ledger.attempts[1].correctedSourceUrls).toEqual([sk]);
   });
 
   it('does not pay for a second review of bytes identical to an already rejected draft', () => {
@@ -167,8 +190,13 @@ describe('Weekly repair cycle continues after a rejected report instead of stopp
 describe('repair plan and feedback sanitisation', () => {
   const links = ['https://authority.example/valid', 'https://publisher.example/unsupported'];
   it('excludes every rejected source, including all of them', () => {
-    const plan = planEditorialRepair({ verdict: 'reject', blockingReasons: ['x issue'], sourceChecks: links.map((url) => ({ url, supported: false, reason: 'Not supported' })) }, links);
+    const plan = planEditorialRepair({ verdict: 'reject', blockingReasons: ['x issue'], sourceChecks: links.map((url) => ({ url, supported: false, reason: 'Second-hand relay' })) }, links);
     expect(plan).toMatchObject({ ok: true, mode: 'remove-unsupported-sources', allSourcesRejected: true, excludeUrls: links });
+    // A merely misstated source is removed on the final repair at the latest.
+    const late = planEditorialRepair({ verdict: 'reject', blockingReasons: ['x issue'], sourceChecks: links.map((url) => ({ url, supported: false, reason: 'Date misstated' })) }, links, { attempt: 3 });
+    expect(late.excludeUrls).toEqual(links);
+    const early = planEditorialRepair({ verdict: 'reject', blockingReasons: ['x issue'], sourceChecks: links.map((url) => ({ url, supported: false, reason: 'Date misstated' })) }, links, { attempt: 2 });
+    expect(early).toMatchObject({ mode: 'correct-claims', excludeUrls: [], correctUrls: links });
   });
   it('never treats an approval, missing reasons or unknown URLs as repairable', () => {
     expect(planEditorialRepair({ verdict: 'approve', blockingReasons: [], sourceChecks: [] }, links).ok).toBe(false);

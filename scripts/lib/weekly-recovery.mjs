@@ -58,7 +58,12 @@ export function sanitizeEditorialFeedback(values) {
  * A repair is only ever a new draft: deterministic gates, live source checks,
  * the build and a fresh independent review still decide.
  */
-export function planEditorialRepair(review, allowedUrls) {
+// A source the reviewer rejects for its QUALITY (relay, general outlet, old or
+// evergreen page, own publication...) is removed at once. A source rejected
+// only because the article misstated it is first given one rewrite.
+export const SOURCE_QUALITY_REJECTION = /relay|second[- ]?hand|third[- ]?hand|not (?:a |the )?(?:first[- ]?hand|competent authority|primary|official)|general[- ](?:interest|automotive|consumer|news)|consumer outlet|aggregat|evergreen|guide\b|blog|unrelated|outdated|not current|old (?:page|announcement|article|news)|sponsored|advertorial|promotional|dajc\.(?:eu|cz)|landing page|homepage|unavailable|could not be fetched/i;
+
+export function planEditorialRepair(review, allowedUrls, { attempt = 2 } = {}) {
   const fail = (reason) => ({ ok: false, reason, excludeUrls: [], feedback: [] });
   if (!review || review.verdict !== 'reject') return fail('not a structured editorial rejection');
   if (!Array.isArray(review.blockingReasons) || review.blockingReasons.length === 0 ||
@@ -67,12 +72,19 @@ export function planEditorialRepair(review, allowedUrls) {
   if (!known.size || !Array.isArray(review.sourceChecks) || review.sourceChecks.length !== known.size) return fail('rejection does not check every cited source exactly once');
   const seen = new Set();
   const excludeUrls = [];
+  const correctUrls = [];
   const sourceNotes = [];
   for (const item of review.sourceChecks) {
     if (!item || !known.has(item.url) || seen.has(item.url) || typeof item.supported !== 'boolean' ||
         typeof item.reason !== 'string' || item.reason.trim().length < 4) return fail('rejection contains an incomplete, duplicate or unknown source check');
     seen.add(item.url);
-    if (item.supported === false) {
+    if (item.supported !== false) continue;
+    // Only the first repair may keep a source whose content was misstated;
+    // any later rejection of the same source removes it.
+    if (attempt <= 2 && !SOURCE_QUALITY_REJECTION.test(item.reason)) {
+      correctUrls.push(item.url);
+      sourceNotes.push('Correct the report citing ' + item.url + ' strictly to its evidence: ' + item.reason);
+    } else {
       excludeUrls.push(item.url);
       sourceNotes.push('Removed source ' + item.url + ': ' + item.reason);
     }
@@ -80,7 +92,8 @@ export function planEditorialRepair(review, allowedUrls) {
   if (seen.size !== known.size) return fail('rejection does not check every cited source');
   const feedback = sanitizeEditorialFeedback([...review.blockingReasons, ...sourceNotes]);
   if (!excludeUrls.length && !feedback.length) return fail('rejection gives nothing concrete to repair');
-  return { ok: true, mode: excludeUrls.length ? 'remove-unsupported-sources' : 'correct-claims', excludeUrls, feedback, allSourcesRejected: excludeUrls.length === known.size };
+  return { ok: true, mode: excludeUrls.length ? 'remove-unsupported-sources' : 'correct-claims', excludeUrls, correctUrls, feedback,
+    allSourcesRejected: excludeUrls.length === known.size };
 }
 
 export function shouldReplaceBlockedEditionPr(pending, allPulls, now, {
