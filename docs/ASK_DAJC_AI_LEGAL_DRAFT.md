@@ -74,7 +74,7 @@ locations of a specific vehicle). To produce the answer:
 | Anthropic | the drafted statements, quotes and source excerpts — independent check; not the question itself | processor [LAWYER] | USA — [VERIFY WITH PROVIDER: DPF / SCC, retention] |
 | Perplexity | short search keywords derived from the question, never the question itself | processor [LAWYER] | USA — [VERIFY WITH PROVIDER] |
 | Resend | your e-mail address and the sign-in e-mail | processor | [VERIFY WITH PROVIDER: region, DPF / SCC] |
-| Supabase (database) | fingerprints, counters, sessions (no e-mail address, no questions) | processor | EU (Frankfurt, eu-central-1) [OPERATOR: project to be created in EU] |
+| Neon (database) | fingerprints, counters, sessions (no e-mail address, no questions); the legal library holds public-law documents only | processor | EU (Frankfurt, aws-eu-central-1) [VERIFY WITH PROVIDER: DPA, sub-processors] |
 | Vercel (hosting) | request data needed to run the service, as for the rest of the website | processor | functions in the EU (Frankfurt, `fra1`); [VERIFY WITH PROVIDER: DPF / SCC for support access] |
 
 The AI providers do not use API data to train their models
@@ -190,7 +190,7 @@ team@dajc.eu.
   vypnuto), tvrzení se zdroji nezávisle zkontroluje Anthropic (bez samotného
   dotazu), Perplexity dostane jen krátká klíčová slova. Jde o předání do USA
   [VERIFY WITH PROVIDER: DPF/SCC, doba uchování, zákaz trénování].
-  Databáze (Supabase) a funkce (Vercel) běží v EU (Frankfurt).
+  Databáze (Neon) a funkce (Vercel) běží v EU (Frankfurt).
 - **Doby uchování:** otisk e-mailu do žádosti o výmaz [OPERATOR: případně
   nejdéle 12 měsíců od posledního přihlášení – vyžaduje doplnit mazání po neaktivitě]; přihlašovací token
   15 minut; relace 7 dní; denní počty 35 dní; záznamy proti zneužití 1 den;

@@ -1,0 +1,58 @@
+{
+  "$comment": "Search checks of scripts/kb-verify.mjs. For every imported language version, a driver's question in that language goes through the production search exactly as DAJC AI sends it (src/lib/ask/library.ts: the classifier's search terms plus the question, the Ask topic mapped by ASK_TOPIC_TO_KB, the asked country CZ) and the named provision must be among the sources the model receives (modelSources = LIBRARY_MAX_SOURCES). anchorNumber is the article number in the official text.",
+  "modelSources": 4,
+  "checks": [
+    {
+      "officialNumber": "Regulation (EC) No 561/2006",
+      "anchorNumber": "7",
+      "askTopic": "other",
+      "about": "break after four and a half hours of driving",
+      "questions": {
+        "en": { "question": "After how many hours of driving must I take a break?", "terms": ["uninterrupted break", "four and a half hours driving"] },
+        "cs": { "question": "Po kolika hodinách řízení musím mít přestávku?", "terms": ["přestávka", "čtyřech a půl hodinách řízení"] },
+        "de": { "question": "Nach wie vielen Stunden Lenkzeit muss ich eine Pause machen?", "terms": ["Fahrtunterbrechung", "viereinhalb Stunden Lenkdauer"] },
+        "pl": { "question": "Po ilu godzinach jazdy muszę zrobić przerwę?", "terms": ["przerwa", "cztery i pół godziny prowadzenia"] },
+        "sk": { "question": "Po koľkých hodinách jazdy musím mať prestávku?", "terms": ["prestávka", "štyroch a pol hodinách jazdy"] }
+      }
+    },
+    {
+      "officialNumber": "Regulation (EU) No 165/2014",
+      "anchorNumber": "34",
+      "askTopic": "other",
+      "about": "use of driver cards and record sheets",
+      "questions": {
+        "en": { "question": "How must I use my driver card and the record sheets?", "terms": ["use of driver cards", "record sheets"] },
+        "cs": { "question": "Jak mám používat kartu řidiče a záznamové listy?", "terms": ["používání karet řidiče", "záznamové listy"] },
+        "de": { "question": "Wie muss ich die Fahrerkarte und die Schaublätter benutzen?", "terms": ["Benutzung von Fahrerkarten", "Schaublätter"] },
+        "pl": { "question": "Jak mam używać karty kierowcy i wykresówek?", "terms": ["użytkowanie kart kierowcy", "wykresówki"] },
+        "sk": { "question": "Ako mám používať kartu vodiča a záznamové listy?", "terms": ["používanie kariet vodiča", "záznamové listy"] }
+      }
+    },
+    {
+      "officialNumber": "Council Directive 96/53/EC",
+      "anchorNumber": "3",
+      "askTopic": "dimensions_weights",
+      "about": "a Member State may not refuse a vehicle that complies with the EU weights and dimensions",
+      "questions": {
+        "en": { "question": "Can a Member State refuse my truck if it complies with the EU weights and dimensions?", "terms": ["reject or prohibit the use", "vehicles registered", "weights and dimensions"] },
+        "cs": { "question": "Může členský stát odmítnout můj kamion, který splňuje hmotnosti a rozměry EU?", "terms": ["odmítnout nebo zakázat", "použití vozidel", "hmotnosti a rozměry"] },
+        "de": { "question": "Darf ein Mitgliedstaat mein Fahrzeug ablehnen, wenn es die EU-Gewichte und Abmessungen einhält?", "terms": ["Einsatz von Fahrzeugen", "ablehnen oder verbieten", "Gewichte und Abmessungen"] },
+        "pl": { "question": "Czy państwo członkowskie może odmówić mojej ciężarówce, która spełnia masy i wymiary UE?", "terms": ["odmówić lub zabronić", "używania pojazdów", "masy i wymiary"] },
+        "sk": { "question": "Môže členský štát odmietnuť môj kamión, ktorý spĺňa hmotnosti a rozmery EÚ?", "terms": ["odmietnuť alebo zakázať", "použitie vozidiel", "hmotnosti a rozmery"] }
+      }
+    },
+    {
+      "officialNumber": "Regulation (EC) No 1072/2009",
+      "anchorNumber": "8",
+      "askTopic": "other",
+      "about": "cabotage after an international carriage",
+      "questions": {
+        "en": { "question": "How many cabotage operations may I perform after an international carriage?", "terms": ["cabotage operations", "international carriage"] },
+        "cs": { "question": "Kolik kabotáží smím provést po mezinárodní přepravě?", "terms": ["kabotáž", "mezinárodní přeprava"] },
+        "de": { "question": "Wie viele Kabotagebeförderungen darf ich nach einer grenzüberschreitenden Beförderung durchführen?", "terms": ["Kabotagebeförderungen", "grenzüberschreitende Beförderung"] },
+        "pl": { "question": "Ile przewozów kabotażowych mogę wykonać po przewozie międzynarodowym?", "terms": ["przewozy kabotażowe", "przewóz międzynarodowy"] },
+        "sk": { "question": "Koľko kabotážnych prepráv môžem vykonať po medzinárodnej preprave?", "terms": ["kabotážne prepravy", "medzinárodná preprava"] }
+      }
+    }
+  ]
+}

@@ -1,0 +1,899 @@
+{
+ "$comment": "Connector plan of the DAJC legal library. 'basis' = DECLARED_FROM_PUBLISHER_KNOWLEDGE: the publisher format and access listed here are NOT yet verified by a live check or by correspondence; status stays PLANNED until an adapter has downloaded at least one document, and a NATIONAL legal gazette is never assumed to be the same thing as the national transport-data access point (NAP). Regional and specialised transport sources (e.g. Länder, ES CAT/BAS, road authorities) are added as separate connectors per jurisdiction when found. 'kind' separates legal collections from transport NAPs, permit authorities and licensed data services; every connector here is a LEGAL_COLLECTION until correspondence conclusions are recorded in the PRIVATE register. Private agreements are not stored in this public repository.",
+ "connectors": [
+  {
+   "id": "eu-eurlex-consolidated",
+   "jurisdiction": "EU",
+   "name": "EUR-Lex consolidated PDFs and status pages",
+   "baseUrl": "https://eur-lex.europa.eu/",
+   "format": "PDF",
+   "scope": "supranational",
+   "status": "IMPLEMENTED",
+   "adapter": "eurlex",
+   "access": {
+    "registration": "NONE_REQUIRED",
+    "permission": "REUSE_TERMS_READ"
+   },
+   "basis": "VERIFIED_LIVE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "de-gesetze-html-pdf",
+   "jurisdiction": "DE",
+   "name": "Gesetze im Internet - official bytes",
+   "baseUrl": "https://www.gesetze-im-internet.de/",
+   "format": "PDF",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": "official-bytes",
+   "access": {
+    "registration": "NONE_REQUIRED",
+    "permission": "TO_CONFIRM"
+   },
+   "basis": "VERIFIED_LIVE",
+   "lastFailure": {
+    "on": "2026-11-09",
+    "outcome": "HTTP_ERROR",
+    "reason": 503
+   },
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "at-national-gazette",
+   "jurisdiction": "AT",
+   "name": "RIS Bundesrecht (OGD API v2.6)",
+   "baseUrl": "https://data.bka.gv.at/ris/api/v2.6/",
+   "format": "REST_API",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "NONE_REQUIRED",
+    "permission": "TO_CONFIRM"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "lastFailure": {
+    "on": "2026-11-09",
+    "outcome": "ROBOTS_REFUSED",
+    "reason": "robots.txt of data.bka.gv.at does not allow this download (disallowed)"
+   },
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "de-gesetze-xml",
+   "jurisdiction": "DE",
+   "name": "Gesetze im Internet (BMJ) XML",
+   "baseUrl": "https://www.gesetze-im-internet.de/",
+   "format": "XML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "NONE_REQUIRED",
+    "permission": "TO_CONFIRM"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "lastFailure": {
+    "on": "2026-11-09",
+    "outcome": "ROBOTS_REFUSED",
+    "reason": "robots.txt of www.gesetze-im-internet.de does not allow this download (HTTP 503 for robots.txt)"
+   },
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "cz-national-gazette",
+   "jurisdiction": "CZ",
+   "name": "e-Sbírka / e-Legislativa",
+   "baseUrl": "https://www.e-sbirka.cz/",
+   "format": "REST_API",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "sk-national-gazette",
+   "jurisdiction": "SK",
+   "name": "Slov-Lex",
+   "baseUrl": "https://www.slov-lex.sk/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "pl-national-gazette",
+   "jurisdiction": "PL",
+   "name": "ISAP / Sejm ELI API",
+   "baseUrl": "https://api.sejm.gov.pl/eli/",
+   "format": "REST_API",
+   "scope": "national",
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
+   "access": {
+    "registration": "NONE_REQUIRED",
+    "permission": "TO_CONFIRM"
+   },
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "1a8a4174d16f909ac973fa34bb8cb0a75dd6e5b5f7d7022785850d9a79dbc1d3"
+   },
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "fr-national-gazette",
+   "jurisdiction": "FR",
+   "name": "Légifrance (PISTE API)",
+   "baseUrl": "https://piste.gouv.fr/",
+   "format": "AUTHORIZED",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "REGISTRATION_REQUIRED",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "it-national-gazette",
+   "jurisdiction": "IT",
+   "name": "Normattiva",
+   "baseUrl": "https://www.normattiva.it/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "es-national-gazette",
+   "jurisdiction": "ES",
+   "name": "BOE datos abiertos API",
+   "baseUrl": "https://www.boe.es/datosabiertos/api/",
+   "format": "REST_API",
+   "scope": "national",
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
+   "access": {
+    "registration": "NONE_REQUIRED",
+    "permission": "TO_CONFIRM"
+   },
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "d02a0db992e6646cec67505bc30ac78b1467723bb552b142347b35f018a71ca1"
+   },
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "nl-national-gazette",
+   "jurisdiction": "NL",
+   "name": "wetten.overheid.nl / KOOP repositories",
+   "baseUrl": "https://repository.overheid.nl/",
+   "format": "XML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "NONE_REQUIRED",
+    "permission": "TO_CONFIRM"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "be-national-gazette",
+   "jurisdiction": "BE",
+   "name": "Belgisch Staatsblad / Justel",
+   "baseUrl": "https://www.ejustice.just.fgov.be/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "lu-national-gazette",
+   "jurisdiction": "LU",
+   "name": "Legilux (ELI, RSS)",
+   "baseUrl": "https://legilux.public.lu/",
+   "format": "RSS",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "hu-national-gazette",
+   "jurisdiction": "HU",
+   "name": "Nemzeti Jogszabálytár",
+   "baseUrl": "https://njt.hu/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "si-national-gazette",
+   "jurisdiction": "SI",
+   "name": "PISRS",
+   "baseUrl": "https://pisrs.si/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "hr-national-gazette",
+   "jurisdiction": "HR",
+   "name": "Narodne novine",
+   "baseUrl": "https://narodne-novine.nn.hr/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "lastFailure": {
+    "on": "2026-11-09",
+    "outcome": "ROBOTS_REFUSED",
+    "reason": "robots.txt of narodne-novine.nn.hr does not allow this download (HTTP 503 for robots.txt)"
+   },
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "ro-national-gazette",
+   "jurisdiction": "RO",
+   "name": "Portal legislativ",
+   "baseUrl": "https://legislatie.just.ro/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "bg-national-gazette",
+   "jurisdiction": "BG",
+   "name": "Държавен вестник / Lex",
+   "baseUrl": "https://dv.parliament.bg/",
+   "format": "PDF",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "dk-national-gazette",
+   "jurisdiction": "DK",
+   "name": "Retsinformation",
+   "baseUrl": "https://www.retsinformation.dk/",
+   "format": "REST_API",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "se-national-gazette",
+   "jurisdiction": "SE",
+   "name": "Riksdagen öppna data / SFS",
+   "baseUrl": "https://data.riksdagen.se/",
+   "format": "REST_API",
+   "scope": "national",
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
+   "access": {
+    "registration": "NONE_REQUIRED",
+    "permission": "TO_CONFIRM"
+   },
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "9f7c481c8904b3b107f011ccb75301284ddaa800f864fe6a84a597ad79b5944d"
+   },
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "fi-national-gazette",
+   "jurisdiction": "FI",
+   "name": "Finlex open data",
+   "baseUrl": "https://opendata.finlex.fi/",
+   "format": "REST_API",
+   "scope": "national",
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
+   "access": {
+    "registration": "NONE_REQUIRED",
+    "permission": "TO_CONFIRM"
+   },
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "143b14e0048b0743f628c3ba1775d79104b9ddeecb4a1caaa177a41a57bbe012"
+   },
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "ee-national-gazette",
+   "jurisdiction": "EE",
+   "name": "Riigi Teataja",
+   "baseUrl": "https://www.riigiteataja.ee/",
+   "format": "XML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "lastFailure": {
+    "on": "2026-11-09",
+    "outcome": "MARKER_MISSING",
+    "reason": [
+     "Liiklusseadus"
+    ]
+   },
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "lv-national-gazette",
+   "jurisdiction": "LV",
+   "name": "Latvijas Vēstnesis / likumi.lv",
+   "baseUrl": "https://likumi.lv/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "f95863ab38e39e160d6822862e6e1ff68fc154c90a1b5b82778838ce0f089cc1"
+   },
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "lt-national-gazette",
+   "jurisdiction": "LT",
+   "name": "e-TAR",
+   "baseUrl": "https://e-seimas.lrs.lt/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "ie-national-gazette",
+   "jurisdiction": "IE",
+   "name": "Irish Statute Book",
+   "baseUrl": "https://www.irishstatutebook.ie/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "874db9c6bd41e54c54d69c20f2f347619a982fe4b0797a9b621f56727305dea1"
+   },
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "pt-national-gazette",
+   "jurisdiction": "PT",
+   "name": "Diário da República",
+   "baseUrl": "https://diariodarepublica.pt/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "gr-national-gazette",
+   "jurisdiction": "GR",
+   "name": "ΕΤ / Εθνικό Τυπογραφείο",
+   "baseUrl": "https://www.et.gr/",
+   "format": "PDF",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "ch-national-gazette",
+   "jurisdiction": "CH",
+   "name": "Fedlex",
+   "baseUrl": "https://www.fedlex.admin.ch/",
+   "format": "XML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "NONE_REQUIRED",
+    "permission": "TO_CONFIRM"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "lastFailure": {
+    "on": "2026-11-09",
+    "outcome": "MARKER_MISSING",
+    "reason": [
+     "Strassenverkehr"
+    ]
+   },
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "li-national-gazette",
+   "jurisdiction": "LI",
+   "name": "gesetze.li",
+   "baseUrl": "https://www.gesetze.li/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "no-national-gazette",
+   "jurisdiction": "NO",
+   "name": "Lovdata (public API)",
+   "baseUrl": "https://api.lovdata.no/",
+   "format": "REST_API",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "uk-national-gazette",
+   "jurisdiction": "UK",
+   "name": "legislation.gov.uk",
+   "baseUrl": "https://www.legislation.gov.uk/",
+   "format": "XML",
+   "scope": "national",
+   "status": "IMPLEMENTED",
+   "adapter": "probe-fetch",
+   "access": {
+    "registration": "NONE_REQUIRED",
+    "permission": "TO_CONFIRM"
+   },
+   "basis": "VERIFIED_LIVE",
+   "lastProof": {
+    "on": "2026-11-09",
+    "sha256": "0b2cc5c2bafbf154e086b9c24b1fae62be5f8d734a2c134b8ecbe026fa8845bf"
+   },
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "mt-national-gazette",
+   "jurisdiction": "MT",
+   "name": "Laws of Malta",
+   "baseUrl": "https://legislation.mt/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "ad-national-gazette",
+   "jurisdiction": "AD",
+   "name": "BOPA",
+   "baseUrl": "https://www.bopa.ad/",
+   "format": "PDF",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "al-national-gazette",
+   "jurisdiction": "AL",
+   "name": "Fletorja Zyrtare",
+   "baseUrl": "https://qbz.gov.al/",
+   "format": "PDF",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "am-national-gazette",
+   "jurisdiction": "AM",
+   "name": "Arlis",
+   "baseUrl": "https://www.arlis.am/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "az-national-gazette",
+   "jurisdiction": "AZ",
+   "name": "e-qanun",
+   "baseUrl": "https://e-qanun.az/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "ba-national-gazette",
+   "jurisdiction": "BA",
+   "name": "Službeni glasnici (state, FBiH, RS, Brčko)",
+   "baseUrl": "https://www.sluzbenilist.ba/",
+   "format": "PDF",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "by-national-gazette",
+   "jurisdiction": "BY",
+   "name": "Pravo.by (National Legal Portal)",
+   "baseUrl": "https://pravo.by/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "cy-national-gazette",
+   "jurisdiction": "CY",
+   "name": "CyLaw",
+   "baseUrl": "https://www.cylaw.org/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "ge-national-gazette",
+   "jurisdiction": "GE",
+   "name": "Matsne",
+   "baseUrl": "https://matsne.gov.ge/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "is-national-gazette",
+   "jurisdiction": "IS",
+   "name": "Alþingi / Stjórnartíðindi",
+   "baseUrl": "https://www.althingi.is/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "kz-national-gazette",
+   "jurisdiction": "KZ",
+   "name": "Adilet",
+   "baseUrl": "https://adilet.zan.kz/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "mc-national-gazette",
+   "jurisdiction": "MC",
+   "name": "Journal de Monaco",
+   "baseUrl": "https://journaldemonaco.gouv.mc/",
+   "format": "PDF",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "md-national-gazette",
+   "jurisdiction": "MD",
+   "name": "Legis.md",
+   "baseUrl": "https://www.legis.md/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "me-national-gazette",
+   "jurisdiction": "ME",
+   "name": "Službeni list Crne Gore",
+   "baseUrl": "https://www.slglasnik.com/",
+   "format": "PDF",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "mk-national-gazette",
+   "jurisdiction": "MK",
+   "name": "Службен весник",
+   "baseUrl": "https://www.slvesnik.com.mk/",
+   "format": "PDF",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "rs-national-gazette",
+   "jurisdiction": "RS",
+   "name": "Pravno-informacioni sistem",
+   "baseUrl": "https://www.pravno-informacioni-sistem.rs/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "ru-national-gazette",
+   "jurisdiction": "RU",
+   "name": "Official publication of legal acts",
+   "baseUrl": "http://publication.pravo.gov.ru/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "sm-national-gazette",
+   "jurisdiction": "SM",
+   "name": "Repubblica di San Marino leggi",
+   "baseUrl": "https://www.consigliograndeegenerale.sm/",
+   "format": "PDF",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "tr-national-gazette",
+   "jurisdiction": "TR",
+   "name": "Resmî Gazete / Mevzuat",
+   "baseUrl": "https://www.mevzuat.gov.tr/",
+   "format": "HTML",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "ua-national-gazette",
+   "jurisdiction": "UA",
+   "name": "Verkhovna Rada data portal",
+   "baseUrl": "https://data.rada.gov.ua/",
+   "format": "REST_API",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  },
+  {
+   "id": "xk-national-gazette",
+   "jurisdiction": "XK",
+   "name": "Gazeta Zyrtare",
+   "baseUrl": "https://gzk.rks-gov.net/",
+   "format": "PDF",
+   "scope": "national",
+   "status": "PLANNED",
+   "adapter": null,
+   "access": {
+    "registration": "TO_CONFIRM",
+    "permission": "REQUIRED_IF_NOT_OPEN"
+   },
+   "basis": "DECLARED_FROM_PUBLISHER_KNOWLEDGE",
+   "kind": "LEGAL_COLLECTION"
+  }
+ ]
+}

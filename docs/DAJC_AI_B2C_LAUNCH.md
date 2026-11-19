@@ -8,6 +8,12 @@ unverified or blocking.
 merge (everything stays off), but the database, the AI provider keys, e-mail,
 approved legal texts and a budget decision are missing. Details in sections 4–7.
 
+> **Update 2026-11-08 (branch `claude/dajc-ai-neon-knowledge-base`):** the database is now
+> **Neon PostgreSQL** (project `dajc-ai`, Frankfurt, branch `dev` with the migrations; the
+> production branch is empty) — see `docs/DAJC_AI_NEON.md`. Supabase is unchanged. A European
+> library of official legal documents was added (`docs/DAJC_AI_LEGAL_LIBRARY.md`). The points
+> below about Supabase apply to Supabase; for Neon, the blocking conditions in that document apply.
+
 ## 1. What DAJC AI is in this version
 
 The existing "Ask DAJC AI" (Ask, PR #78) as a free work assistant for

@@ -1,0 +1,96 @@
+{
+ "$comment": "One real acquisition test per connector: an official road-traffic or road-transport law and a text marker that must appear in the body. Reachability is not proof. Public data only.",
+ "probes": [
+  {
+   "id": "at-national-gazette",
+   "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Titel=Stra%C3%9Fenverkehrsordnung&DokumenteProSeite=Ten",
+   "markers": [
+    "Straßenverkehrsordnung"
+   ]
+  },
+  {
+   "id": "de-gesetze-html-pdf",
+   "url": "https://www.gesetze-im-internet.de/stvo_2013/BJNR036710013.html",
+   "markers": [
+    "Straßenverkehrs-Ordnung"
+   ]
+  },
+  {
+   "id": "de-gesetze-xml",
+   "url": "https://www.gesetze-im-internet.de/stvo_2013/xml.zip",
+   "markers": [
+    "ZIP:"
+   ]
+  },
+  {
+   "id": "pl-national-gazette",
+   "url": "https://api.sejm.gov.pl/eli/acts/DU/1997/602/text.html",
+   "markers": [
+    "ruchu drogowym"
+   ]
+  },
+  {
+   "id": "uk-national-gazette",
+   "url": "https://www.legislation.gov.uk/ukpga/1988/52/data.xml",
+   "markers": [
+    "Road Traffic Act 1988"
+   ]
+  },
+  {
+   "id": "es-national-gazette",
+   "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2015-11722",
+   "markers": [
+    "Tráfico"
+   ]
+  },
+  {
+   "id": "se-national-gazette",
+   "url": "https://data.riksdagen.se/dokument/sfs-1998-1276.text",
+   "markers": [
+    "Trafikförordning (1998:1276)"
+   ]
+  },
+  {
+   "id": "ee-national-gazette",
+   "url": "https://www.riigiteataja.ee/akt/liiklusseadus",
+   "markers": [
+    "Liiklusseadus"
+   ]
+  },
+  {
+   "id": "ie-national-gazette",
+   "url": "https://www.irishstatutebook.ie/eli/2010/act/25/enacted/en/html",
+   "markers": [
+    "Road Traffic"
+   ]
+  },
+  {
+   "id": "lv-national-gazette",
+   "url": "https://likumi.lv/ta/en/en/id/45467",
+   "markers": [
+    "Road Traffic"
+   ]
+  },
+  {
+   "id": "hr-national-gazette",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2008_06_67_2108.html",
+   "markers": [
+    "sigurnosti prometa"
+   ]
+  },
+  {
+   "id": "ch-national-gazette",
+   "url": "https://www.fedlex.admin.ch/eli/cc/1959/1229_1293_1311/de",
+   "markers": [
+    "Strassenverkehr"
+   ]
+  },
+  {
+   "id": "fi-national-gazette",
+   "url": "https://www.finlex.fi/fi/lainsaadanto/1981/267",
+   "markers": [
+    "tieliikennelaki"
+   ]
+  }
+ ]
+}

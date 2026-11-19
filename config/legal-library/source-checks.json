@@ -1,0 +1,1374 @@
+{
+ "$comment": "Reachability and robots.txt of the registered official legal sources, checked by scripts/kb-sources-check.mjs from the environment named here. Not a statement about reuse terms.",
+ "checkedOn": "2026-11-09",
+ "environment": "DAJC development sandbox (Claude Code, egress through a proxy)",
+ "userAgent": "DAJC legal library importer (+https://www.dajc.eu)",
+ "summary": {
+  "REACHABLE": 54,
+  "ROBOTS_RESTRICTED": 4,
+  "BLOCKED_FROM_DEV": 22,
+  "UNREACHABLE": 0
+ },
+ "results": [
+  {
+   "sourceId": "eu-eurlex",
+   "jurisdiction": "EU",
+   "region": null,
+   "domain": "eur-lex.europa.eu",
+   "origin": "https://eur-lex.europa.eu",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": 10
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "eu-commission-transport",
+   "jurisdiction": "EU",
+   "region": null,
+   "domain": "transport.ec.europa.eu",
+   "origin": "https://transport.ec.europa.eu",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "eu-commission-transport",
+   "jurisdiction": "EU",
+   "region": null,
+   "domain": "ec.europa.eu",
+   "origin": "https://ec.europa.eu",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "int-unece",
+   "jurisdiction": "INT",
+   "region": null,
+   "domain": "unece.org",
+   "origin": "https://unece.org",
+   "home": {
+    "status": 403,
+    "error": null
+   },
+   "robots": {
+    "status": 403,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "int-itf",
+   "jurisdiction": "INT",
+   "region": null,
+   "domain": "itf-oecd.org",
+   "origin": "https://itf-oecd.org",
+   "home": {
+    "status": 403,
+    "error": null
+   },
+   "robots": {
+    "status": 403,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "cz-esbirka",
+   "jurisdiction": "CZ",
+   "region": null,
+   "domain": "e-sbirka.gov.cz",
+   "origin": "https://e-sbirka.gov.cz",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "cz-esbirka",
+   "jurisdiction": "CZ",
+   "region": null,
+   "domain": "e-sbirka.cz",
+   "origin": "https://e-sbirka.cz",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "cz-md",
+   "jurisdiction": "CZ",
+   "region": null,
+   "domain": "md.gov.cz",
+   "origin": "https://md.gov.cz",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 404,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "cz-md",
+   "jurisdiction": "CZ",
+   "region": null,
+   "domain": "gov.cz",
+   "origin": "https://gov.cz",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "cz-rsd",
+   "jurisdiction": "CZ",
+   "region": null,
+   "domain": "rsd.cz",
+   "origin": "https://rsd.cz",
+   "home": {
+    "status": 503,
+    "error": null
+   },
+   "robots": {
+    "status": 503,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "cz-rsd",
+   "jurisdiction": "CZ",
+   "region": null,
+   "domain": "dopravniinfo.cz",
+   "origin": "https://dopravniinfo.cz",
+   "home": {
+    "status": 503,
+    "error": null
+   },
+   "robots": {
+    "status": 503,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "sk-slovlex",
+   "jurisdiction": "SK",
+   "region": null,
+   "domain": "slov-lex.sk",
+   "origin": "https://slov-lex.sk",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "sk-mindop",
+   "jurisdiction": "SK",
+   "region": null,
+   "domain": "mindop.sk",
+   "origin": "https://mindop.sk",
+   "home": {
+    "status": 503,
+    "error": null
+   },
+   "robots": {
+    "status": 503,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "sk-mindop",
+   "jurisdiction": "SK",
+   "region": null,
+   "domain": "ssc.sk",
+   "origin": "https://ssc.sk",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "sk-mindop",
+   "jurisdiction": "SK",
+   "region": null,
+   "domain": "ndsas.sk",
+   "origin": "https://ndsas.sk",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "pl-isap",
+   "jurisdiction": "PL",
+   "region": null,
+   "domain": "isap.sejm.gov.pl",
+   "origin": "https://isap.sejm.gov.pl",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": false,
+    "crawlDelaySec": null
+   },
+   "outcome": "ROBOTS_RESTRICTED"
+  },
+  {
+   "sourceId": "pl-isap",
+   "jurisdiction": "PL",
+   "region": null,
+   "domain": "dziennikustaw.gov.pl",
+   "origin": "https://dziennikustaw.gov.pl",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": false,
+    "crawlDelaySec": null
+   },
+   "outcome": "ROBOTS_RESTRICTED"
+  },
+  {
+   "sourceId": "pl-gddkia",
+   "jurisdiction": "PL",
+   "region": null,
+   "domain": "gov.pl",
+   "origin": "https://gov.pl",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "de-gesetze",
+   "jurisdiction": "DE",
+   "region": null,
+   "domain": "gesetze-im-internet.de",
+   "origin": "https://www.gesetze-im-internet.de",
+   "home": {
+    "status": 503,
+    "error": null
+   },
+   "robots": {
+    "status": 503,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "de-bgbl",
+   "jurisdiction": "DE",
+   "region": null,
+   "domain": "recht.bund.de",
+   "origin": "https://recht.bund.de",
+   "home": {
+    "status": 503,
+    "error": null
+   },
+   "robots": {
+    "status": 503,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "de-road",
+   "jurisdiction": "DE",
+   "region": null,
+   "domain": "autobahn.de",
+   "origin": "https://autobahn.de",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "de-road",
+   "jurisdiction": "DE",
+   "region": null,
+   "domain": "bast.de",
+   "origin": "https://bast.de",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": 30
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "de-road",
+   "jurisdiction": "DE",
+   "region": null,
+   "domain": "vemags.de",
+   "origin": "https://vemags.de",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": false,
+    "crawlDelaySec": null
+   },
+   "outcome": "ROBOTS_RESTRICTED"
+  },
+  {
+   "sourceId": "at-ris",
+   "jurisdiction": "AT",
+   "region": null,
+   "domain": "ris.bka.gv.at",
+   "origin": "https://ris.bka.gv.at",
+   "home": {
+    "status": 503,
+    "error": null
+   },
+   "robots": {
+    "status": 503,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "fr-legislation",
+   "jurisdiction": "FR",
+   "region": null,
+   "domain": "legifrance.gouv.fr",
+   "origin": "https://legifrance.gouv.fr",
+   "home": {
+    "status": 403,
+    "error": null
+   },
+   "robots": {
+    "status": 403,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "it-legislation",
+   "jurisdiction": "IT",
+   "region": null,
+   "domain": "normattiva.it",
+   "origin": "https://www.normattiva.it",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "es-legislation",
+   "jurisdiction": "ES",
+   "region": null,
+   "domain": "boe.es",
+   "origin": "https://boe.es",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "nl-legislation",
+   "jurisdiction": "NL",
+   "region": null,
+   "domain": "wetten.overheid.nl",
+   "origin": "https://wetten.overheid.nl",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "be-legislation",
+   "jurisdiction": "BE",
+   "region": null,
+   "domain": "ejustice.just.fgov.be",
+   "origin": "https://ejustice.just.fgov.be",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "lu-legislation",
+   "jurisdiction": "LU",
+   "region": null,
+   "domain": "legilux.public.lu",
+   "origin": "https://legilux.public.lu",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "hu-legislation",
+   "jurisdiction": "HU",
+   "region": null,
+   "domain": "njt.hu",
+   "origin": "https://njt.hu",
+   "home": {
+    "status": 503,
+    "error": null
+   },
+   "robots": {
+    "status": 503,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "si-legislation",
+   "jurisdiction": "SI",
+   "region": null,
+   "domain": "pisrs.si",
+   "origin": "https://pisrs.si",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "hr-legislation",
+   "jurisdiction": "HR",
+   "region": null,
+   "domain": "narodne-novine.nn.hr",
+   "origin": "https://narodne-novine.nn.hr",
+   "home": {
+    "status": 503,
+    "error": null
+   },
+   "robots": {
+    "status": 503,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "ro-legislation",
+   "jurisdiction": "RO",
+   "region": null,
+   "domain": "legislatie.just.ro",
+   "origin": "https://legislatie.just.ro",
+   "home": {
+    "status": 502,
+    "error": null
+   },
+   "robots": {
+    "status": 502,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "bg-legislation",
+   "jurisdiction": "BG",
+   "region": null,
+   "domain": "dv.parliament.bg",
+   "origin": "https://dv.parliament.bg",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 404,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "dk-legislation",
+   "jurisdiction": "DK",
+   "region": null,
+   "domain": "retsinformation.dk",
+   "origin": "https://retsinformation.dk",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "se-legislation",
+   "jurisdiction": "SE",
+   "region": null,
+   "domain": "svenskforfattningssamling.se",
+   "origin": "https://svenskforfattningssamling.se",
+   "home": {
+    "status": 403,
+    "error": null
+   },
+   "robots": {
+    "status": 404,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "fi-legislation",
+   "jurisdiction": "FI",
+   "region": null,
+   "domain": "finlex.fi",
+   "origin": "https://finlex.fi",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "ee-legislation",
+   "jurisdiction": "EE",
+   "region": null,
+   "domain": "riigiteataja.ee",
+   "origin": "https://riigiteataja.ee",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "lv-legislation",
+   "jurisdiction": "LV",
+   "region": null,
+   "domain": "likumi.lv",
+   "origin": "https://likumi.lv",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": 1
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "lt-legislation",
+   "jurisdiction": "LT",
+   "region": null,
+   "domain": "e-tar.lt",
+   "origin": "https://e-tar.lt",
+   "home": {
+    "status": 403,
+    "error": null
+   },
+   "robots": {
+    "status": 403,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "ie-legislation",
+   "jurisdiction": "IE",
+   "region": null,
+   "domain": "irishstatutebook.ie",
+   "origin": "https://www.irishstatutebook.ie",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 404,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "pt-legislation",
+   "jurisdiction": "PT",
+   "region": null,
+   "domain": "diariodarepublica.pt",
+   "origin": "https://diariodarepublica.pt",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "gr-legislation",
+   "jurisdiction": "GR",
+   "region": null,
+   "domain": "et.gr",
+   "origin": "https://et.gr",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "ch-legislation",
+   "jurisdiction": "CH",
+   "region": null,
+   "domain": "fedlex.admin.ch",
+   "origin": "https://fedlex.admin.ch",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "li-legislation",
+   "jurisdiction": "LI",
+   "region": null,
+   "domain": "gesetze.li",
+   "origin": "https://gesetze.li",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 404,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "no-legislation",
+   "jurisdiction": "NO",
+   "region": null,
+   "domain": "lovdata.no",
+   "origin": "https://lovdata.no",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": false,
+    "crawlDelaySec": null
+   },
+   "outcome": "ROBOTS_RESTRICTED"
+  },
+  {
+   "sourceId": "uk-legislation",
+   "jurisdiction": "UK",
+   "region": null,
+   "domain": "legislation.gov.uk",
+   "origin": "https://legislation.gov.uk",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": 5
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "mt-legislation",
+   "jurisdiction": "MT",
+   "region": null,
+   "domain": "legislation.mt",
+   "origin": "https://legislation.mt",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "ad-legislation",
+   "jurisdiction": "AD",
+   "region": null,
+   "domain": "bopa.ad",
+   "origin": "https://bopa.ad",
+   "home": {
+    "status": 503,
+    "error": null
+   },
+   "robots": {
+    "status": 503,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "al-legislation",
+   "jurisdiction": "AL",
+   "region": null,
+   "domain": "qbz.gov.al",
+   "origin": "https://qbz.gov.al",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "am-legislation",
+   "jurisdiction": "AM",
+   "region": null,
+   "domain": "arlis.am",
+   "origin": "https://arlis.am",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 404,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "az-legislation",
+   "jurisdiction": "AZ",
+   "region": null,
+   "domain": "e-qanun.az",
+   "origin": "https://e-qanun.az",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 404,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "ba-legislation",
+   "jurisdiction": "BA",
+   "region": null,
+   "domain": "sllist.ba",
+   "origin": "https://sllist.ba",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "by-legislation",
+   "jurisdiction": "BY",
+   "region": null,
+   "domain": "pravo.by",
+   "origin": "https://pravo.by",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "cy-legislation",
+   "jurisdiction": "CY",
+   "region": null,
+   "domain": "mof.gov.cy",
+   "origin": "https://mof.gov.cy",
+   "home": {
+    "status": 403,
+    "error": null
+   },
+   "robots": {
+    "status": 403,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "ge-legislation",
+   "jurisdiction": "GE",
+   "region": null,
+   "domain": "matsne.gov.ge",
+   "origin": "https://matsne.gov.ge",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": 10
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "is-legislation",
+   "jurisdiction": "IS",
+   "region": null,
+   "domain": "althingi.is",
+   "origin": "https://althingi.is",
+   "home": {
+    "status": 403,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": 5
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "is-legislation",
+   "jurisdiction": "IS",
+   "region": null,
+   "domain": "stjornartidindi.is",
+   "origin": "https://stjornartidindi.is",
+   "home": {
+    "status": 403,
+    "error": null
+   },
+   "robots": {
+    "status": 403,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "kz-legislation",
+   "jurisdiction": "KZ",
+   "region": null,
+   "domain": "adilet.zan.kz",
+   "origin": "https://adilet.zan.kz",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "mc-legislation",
+   "jurisdiction": "MC",
+   "region": null,
+   "domain": "legimonaco.mc",
+   "origin": "https://legimonaco.mc",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 404,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "mc-legislation",
+   "jurisdiction": "MC",
+   "region": null,
+   "domain": "journaldemonaco.gouv.mc",
+   "origin": "https://journaldemonaco.gouv.mc",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "md-legislation",
+   "jurisdiction": "MD",
+   "region": null,
+   "domain": "legis.md",
+   "origin": "https://legis.md",
+   "home": {
+    "status": 403,
+    "error": null
+   },
+   "robots": {
+    "status": 403,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "me-legislation",
+   "jurisdiction": "ME",
+   "region": null,
+   "domain": "sluzbenilist.me",
+   "origin": "https://sluzbenilist.me",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "mk-legislation",
+   "jurisdiction": "MK",
+   "region": null,
+   "domain": "slvesnik.com.mk",
+   "origin": "https://slvesnik.com.mk",
+   "home": {
+    "status": 503,
+    "error": null
+   },
+   "robots": {
+    "status": 503,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "rs-legislation",
+   "jurisdiction": "RS",
+   "region": null,
+   "domain": "pravno-informacioni-sistem.rs",
+   "origin": "https://pravno-informacioni-sistem.rs",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "ru-legislation",
+   "jurisdiction": "RU",
+   "region": null,
+   "domain": "pravo.gov.ru",
+   "origin": "https://pravo.gov.ru",
+   "home": {
+    "status": 503,
+    "error": null
+   },
+   "robots": {
+    "status": 503,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "sm-legislation",
+   "jurisdiction": "SM",
+   "region": null,
+   "domain": "consigliograndeegenerale.sm",
+   "origin": "https://consigliograndeegenerale.sm",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 403,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "tr-legislation",
+   "jurisdiction": "TR",
+   "region": null,
+   "domain": "mevzuat.gov.tr",
+   "origin": "https://mevzuat.gov.tr",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "tr-legislation",
+   "jurisdiction": "TR",
+   "region": null,
+   "domain": "resmigazete.gov.tr",
+   "origin": "https://resmigazete.gov.tr",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "ua-legislation",
+   "jurisdiction": "UA",
+   "region": null,
+   "domain": "zakon.rada.gov.ua",
+   "origin": "https://zakon.rada.gov.ua",
+   "home": {
+    "status": 503,
+    "error": null
+   },
+   "robots": {
+    "status": 503,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "BLOCKED_FROM_DEV"
+  },
+  {
+   "sourceId": "xk-legislation",
+   "jurisdiction": "XK",
+   "region": null,
+   "domain": "gzk.rks-gov.net",
+   "origin": "https://gzk.rks-gov.net",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "ba-fbih-legislation",
+   "jurisdiction": "BA",
+   "region": "FBIH",
+   "domain": "sluzbenenovine.ba",
+   "origin": "https://sluzbenenovine.ba",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 404,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "ba-rs-legislation",
+   "jurisdiction": "BA",
+   "region": "RS",
+   "domain": "slglasnik.org",
+   "origin": "https://slglasnik.org",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "ba-bd-legislation",
+   "jurisdiction": "BA",
+   "region": "BD",
+   "domain": "skupstinabd.ba",
+   "origin": "https://skupstinabd.ba",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "be-vlg-legislation",
+   "jurisdiction": "BE",
+   "region": "VLG",
+   "domain": "codex.vlaanderen.be",
+   "origin": "https://codex.vlaanderen.be",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "be-wal-legislation",
+   "jurisdiction": "BE",
+   "region": "WAL",
+   "domain": "wallex.wallonie.be",
+   "origin": "https://wallex.wallonie.be",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 404,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "de-by-legislation",
+   "jurisdiction": "DE",
+   "region": "BY",
+   "domain": "gesetze-bayern.de",
+   "origin": "https://gesetze-bayern.de",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "de-nw-legislation",
+   "jurisdiction": "DE",
+   "region": "NW",
+   "domain": "recht.nrw.de",
+   "origin": "https://recht.nrw.de",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 200,
+    "rootAllowed": true,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  },
+  {
+   "sourceId": "de-bw-legislation",
+   "jurisdiction": "DE",
+   "region": "BW",
+   "domain": "landesrecht-bw.de",
+   "origin": "https://landesrecht-bw.de",
+   "home": {
+    "status": 200,
+    "error": null
+   },
+   "robots": {
+    "status": 503,
+    "rootAllowed": null,
+    "crawlDelaySec": null
+   },
+   "outcome": "REACHABLE"
+  }
+ ]
+}

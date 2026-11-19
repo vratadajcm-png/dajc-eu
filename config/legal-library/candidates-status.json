@@ -1,0 +1,317 @@
+{
+ "$comment": "Result of scripts/kb-eurlex-discover.mjs: DISCOVERED (listed), SOURCE_CONFIRMED (official page read, not importable automatically yet: reason), MANIFESTED (entries in the manifest), BLOCKED (official page not readable).",
+ "checkedOn": "2026-11-09",
+ "candidates": [
+  {
+   "celex": "32002L0015",
+   "officialNumber": "Directive 2002/15/EC",
+   "legalAreas": [
+    "A.working_time"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32002L0015",
+   "publisherStatus": "In force",
+   "currentConsolidated": null,
+   "dateOfDocument": "2002-03-11",
+   "form": "Directive",
+   "status": "SOURCE_CONFIRMED",
+   "reason": "EUR-Lex shows no current consolidated version (original act only; dates need a manual check)"
+  },
+  {
+   "celex": "32009R1071",
+   "officialNumber": "Regulation (EC) No 1071/2009",
+   "legalAreas": [
+    "A.operator_licensing"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009R1071",
+   "publisherStatus": "In force: This act has been changed. Current consolidated version: 21/02/2022",
+   "currentConsolidated": "02009R1071-20220221",
+   "dateOfDocument": "2009-10-21",
+   "form": "Regulation",
+   "status": "MANIFESTED",
+   "languages": [
+    "cs",
+    "de",
+    "en",
+    "pl",
+    "sk"
+   ],
+   "newEntries": 5
+  },
+  {
+   "celex": "32006L0022",
+   "officialNumber": "Directive 2006/22/EC",
+   "legalAreas": [
+    "E.checks_sanctions"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0022",
+   "publisherStatus": "In force: This act has been changed. Current consolidated version: 20/06/2024",
+   "currentConsolidated": "02006L0022-20240620",
+   "dateOfDocument": "2006-03-15",
+   "form": "Directive",
+   "status": "MANIFESTED",
+   "languages": [
+    "cs",
+    "de",
+    "en",
+    "pl",
+    "sk"
+   ],
+   "newEntries": 5
+  },
+  {
+   "celex": "32020L1057",
+   "officialNumber": "Directive (EU) 2020/1057",
+   "legalAreas": [
+    "A.posting_of_drivers"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32020L1057",
+   "publisherStatus": "In force",
+   "currentConsolidated": null,
+   "dateOfDocument": "2020-07-15",
+   "form": "Directive",
+   "status": "SOURCE_CONFIRMED",
+   "reason": "EUR-Lex shows no current consolidated version (original act only; dates need a manual check)"
+  },
+  {
+   "celex": "32022L2561",
+   "officialNumber": "Directive (EU) 2022/2561",
+   "legalAreas": [
+    "A.driver_qualification"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32022L2561",
+   "publisherStatus": "In force",
+   "currentConsolidated": null,
+   "dateOfDocument": "2022-12-14",
+   "form": "Directive",
+   "status": "SOURCE_CONFIRMED",
+   "reason": "EUR-Lex shows no current consolidated version (original act only; dates need a manual check)"
+  },
+  {
+   "celex": "32006L0126",
+   "officialNumber": "Directive 2006/126/EC",
+   "legalAreas": [
+    "A.driving_licences"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0126",
+   "publisherStatus": "In force: This act has been changed. Current consolidated version: 01/11/2020",
+   "currentConsolidated": "02006L0126-20201101",
+   "dateOfDocument": "2006-12-20",
+   "form": "Directive",
+   "status": "MANIFESTED",
+   "languages": [
+    "cs",
+    "de",
+    "en",
+    "pl",
+    "sk"
+   ],
+   "newEntries": 5
+  },
+  {
+   "celex": "32008L0068",
+   "officialNumber": "Directive 2008/68/EC",
+   "legalAreas": [
+    "E.adr",
+    "D.adr_restrictions"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32008L0068",
+   "publisherStatus": "In force: This act has been changed. Current consolidated version: 12/05/2026",
+   "currentConsolidated": "02008L0068-20260512",
+   "dateOfDocument": "2008-09-24",
+   "form": "Directive",
+   "status": "MANIFESTED",
+   "languages": [
+    "cs",
+    "de",
+    "en",
+    "pl",
+    "sk"
+   ],
+   "newEntries": 5
+  },
+  {
+   "celex": "32014L0047",
+   "officialNumber": "Directive 2014/47/EU",
+   "legalAreas": [
+    "B.roadside_technical_inspections",
+    "B.load_securing"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014L0047",
+   "publisherStatus": "In force: This act has been changed. Current consolidated version: 27/09/2022",
+   "currentConsolidated": "02014L0047-20220927",
+   "dateOfDocument": "2014-04-03",
+   "form": "Directive",
+   "status": "MANIFESTED",
+   "languages": [
+    "cs",
+    "de",
+    "en",
+    "pl",
+    "sk"
+   ],
+   "newEntries": 5
+  },
+  {
+   "celex": "32014L0045",
+   "officialNumber": "Directive 2014/45/EU",
+   "legalAreas": [
+    "B.roadworthiness"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014L0045",
+   "publisherStatus": "In force: This act has been changed. Current consolidated version: 20/05/2023",
+   "currentConsolidated": "02014L0045-20230520",
+   "dateOfDocument": "2014-04-03",
+   "form": "Directive",
+   "status": "MANIFESTED",
+   "languages": [
+    "cs",
+    "de",
+    "en",
+    "pl",
+    "sk"
+   ],
+   "newEntries": 5
+  },
+  {
+   "celex": "31999L0062",
+   "officialNumber": "Directive 1999/62/EC",
+   "legalAreas": [
+    "E.tolls_charges"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:31999L0062",
+   "publisherStatus": "In force: This act has been changed. Current consolidated version: 24/12/2025",
+   "currentConsolidated": "01999L0062-20251224",
+   "dateOfDocument": "1999-06-17",
+   "form": "Directive",
+   "status": "MANIFESTED",
+   "languages": [
+    "cs",
+    "de",
+    "en",
+    "pl",
+    "sk"
+   ],
+   "newEntries": 5
+  },
+  {
+   "celex": "32020R1056",
+   "officialNumber": "Regulation (EU) 2020/1056",
+   "legalAreas": [
+    "E.efti"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32020R1056",
+   "publisherStatus": "In force: This act has been changed. Current consolidated version: 09/01/2025",
+   "currentConsolidated": "02020R1056-20250109",
+   "dateOfDocument": "2020-07-15",
+   "form": "Regulation",
+   "status": "MANIFESTED",
+   "languages": [
+    "cs",
+    "de",
+    "en",
+    "pl",
+    "sk"
+   ],
+   "newEntries": 5
+  },
+  {
+   "celex": "32009L0103",
+   "officialNumber": "Directive 2009/103/EC",
+   "legalAreas": [
+    "E.insurance"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32009L0103",
+   "publisherStatus": "In force: This act has been changed. Current consolidated version: 23/12/2023",
+   "currentConsolidated": "02009L0103-20231223",
+   "dateOfDocument": "2009-09-16",
+   "form": "Directive",
+   "status": "MANIFESTED",
+   "languages": [
+    "cs",
+    "de",
+    "en",
+    "pl",
+    "sk"
+   ],
+   "newEntries": 5
+  },
+  {
+   "celex": "32004L0054",
+   "officialNumber": "Directive 2004/54/EC",
+   "legalAreas": [
+    "D.tunnel_bridge_restrictions"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32004L0054",
+   "publisherStatus": "In force: This act has been changed. Current consolidated version: 07/08/2009",
+   "currentConsolidated": "02004L0054-20090807",
+   "dateOfDocument": "2004-04-29",
+   "form": "Directive",
+   "status": "MANIFESTED",
+   "languages": [
+    "cs",
+    "de",
+    "en",
+    "pl",
+    "sk"
+   ],
+   "newEntries": 5
+  },
+  {
+   "celex": "32006L0001",
+   "officialNumber": "Directive 2006/1/EC",
+   "legalAreas": [
+    "A.operator_licensing"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0001",
+   "publisherStatus": "In force: This act has been changed. Current consolidated version: 05/06/2022",
+   "currentConsolidated": "02006L0001-20220605",
+   "dateOfDocument": "2006-01-18",
+   "form": "Directive",
+   "status": "MANIFESTED",
+   "languages": [
+    "cs",
+    "de",
+    "en",
+    "pl",
+    "sk"
+   ],
+   "newEntries": 5
+  },
+  {
+   "celex": "32015L0413",
+   "officialNumber": "Directive (EU) 2015/413",
+   "legalAreas": [
+    "E.checks_sanctions"
+   ],
+   "checkedOn": "2026-11-09",
+   "evidenceUrl": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32015L0413",
+   "publisherStatus": "In force: This act has been changed. Current consolidated version: 19/01/2025",
+   "currentConsolidated": "02015L0413-20250119",
+   "dateOfDocument": "2015-03-11",
+   "form": "Directive",
+   "status": "MANIFESTED",
+   "languages": [
+    "cs",
+    "de",
+    "en",
+    "pl",
+    "sk"
+   ],
+   "newEntries": 5
+  }
+ ]
+}

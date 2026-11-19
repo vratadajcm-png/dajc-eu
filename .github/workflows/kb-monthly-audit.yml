@@ -1,0 +1,41 @@
+name: DAJC legal library monthly audit
+
+# The only scheduled legislative check of the legal library: monthly, all 50
+# jurisdictions (scripts/kb-monthly-audit.mjs). Read-only: no secret, no
+# database write. Runs from the default branch only, so it is inactive until
+# the pull request is merged. Weekly Driving Bans monitoring is separate.
+
+on:
+  schedule:
+    - cron: '17 4 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kb-monthly-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Monthly audit
+        run: node scripts/kb-monthly-audit.mjs --report "$RUNNER_TEMP/kb-monthly-audit.json"
+      - name: Keep the report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kb-monthly-audit-${{ github.run_id }}
+          path: ${{ runner.temp }}/kb-monthly-audit.json
+          if-no-files-found: warn
+          retention-days: 90

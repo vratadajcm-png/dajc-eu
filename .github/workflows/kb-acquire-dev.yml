@@ -1,0 +1,74 @@
+name: DAJC legal library acquisition (Neon dev)
+
+# Official acquisition into the Neon DEV branch and the private Neon Object
+# Storage bucket (dajc-kb-originals-dev): discovery -> acquisition -> text ->
+# SHA-256 -> archive -> PostgreSQL -> read-back -> audit (scripts/kb-acquire.mjs).
+# Same protection as kb-import-dev: only the repository OWNER (label
+# "kb-acquire-dev" on a pull request of this repository, or manual dispatch once
+# merged), only after the owner approves the GitHub environment "kb-import-dev".
+# Never on push or on a schedule. Secrets are ENVIRONMENT secrets of "kb-import-dev":
+#   DAJC_KB_DEV_IMPORT_DB_URL        role dajc_kb_importer, Neon branch dev
+#   DAJC_KB_S3_ENDPOINT, DAJC_KB_S3_BUCKET (dajc-kb-originals-dev), DAJC_KB_S3_REGION (eu-central-1),
+#   DAJC_KB_S3_ACCESS_KEY_ID, DAJC_KB_S3_SECRET_ACCESS_KEY   private bucket credentials
+#   DAJC_KB_AT_RIS_AUTHORIZATION_REF  (optional) reference of an access arrangement granted by the RIS operator
+# Nothing is written to production; robots.txt of the publishers is respected.
+
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      jurisdiction:
+        description: 'PL, UK, DE, AT or HR'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kb-acquire-dev
+  cancel-in-progress: false
+
+jobs:
+  acquire:
+    if: >-
+      github.actor == github.repository_owner &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.label.name == 'kb-acquire-dev' && github.event.pull_request.head.repo.full_name == github.repository))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    environment: kb-import-dev
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      - name: Install dependencies (no lifecycle scripts, no secret present)
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Acquire and store
+        env:
+          DAJC_KB_IMPORT_DB_URL: ${{ secrets.DAJC_KB_DEV_IMPORT_DB_URL }}
+          DAJC_KB_ARCHIVE: s3
+          DAJC_KB_S3_ENDPOINT: ${{ secrets.DAJC_KB_S3_ENDPOINT }}
+          DAJC_KB_S3_BUCKET: ${{ secrets.DAJC_KB_S3_BUCKET }}
+          DAJC_KB_S3_REGION: ${{ secrets.DAJC_KB_S3_REGION }}
+          DAJC_KB_S3_ACCESS_KEY_ID: ${{ secrets.DAJC_KB_S3_ACCESS_KEY_ID }}
+          DAJC_KB_S3_SECRET_ACCESS_KEY: ${{ secrets.DAJC_KB_S3_SECRET_ACCESS_KEY }}
+          DAJC_KB_AT_RIS_AUTHORIZATION_REF: ${{ secrets.DAJC_KB_AT_RIS_AUTHORIZATION_REF }}
+          JURISDICTION: ${{ inputs.jurisdiction || 'DE' }}
+        run: |
+          for v in DAJC_KB_IMPORT_DB_URL DAJC_KB_S3_ENDPOINT DAJC_KB_S3_BUCKET DAJC_KB_S3_ACCESS_KEY_ID DAJC_KB_S3_SECRET_ACCESS_KEY; do
+            if [ -z "${!v}" ]; then echo "::error::Environment secret for $v of the environment kb-import-dev is not set."; exit 1; fi
+          done
+          node scripts/kb-acquire.mjs --jurisdiction "$JURISDICTION" --expect-role dajc_kb_importer --expect-environment dev --report "$RUNNER_TEMP/kb-acquire.json"
+      - name: Keep the report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kb-acquire-${{ github.run_id }}
+          path: ${{ runner.temp }}/kb-acquire.json
+          if-no-files-found: warn
+          retention-days: 30

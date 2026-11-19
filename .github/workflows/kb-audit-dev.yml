@@ -1,0 +1,73 @@
+name: DAJC legal library audit (one-off, read-only)
+
+# One-off, READ-ONLY run of the complete legal library audit
+# (scripts/kb-monthly-audit.mjs) from a real GitHub runner, without merging.
+#   * Trigger: label "kb-audit-dev" on a pull request of THIS repository, added by
+#     the repository OWNER (or a manual dispatch once merged). `pull_request`, never
+#     `pull_request_target`: the code of the pull request runs without any credential.
+#   * Gate: the GitHub environment "kb-audit-dev" must hold a required reviewer
+#     (the owner approves each run). The environment holds no credentials.
+#   * No database, no archive, no AI, no paid service: the job has no credentials and
+#     contents: read only. It cannot write to Neon.
+#   * The detailed JSON report is uploaded as an artifact also when the audit exits
+#     with rc=1 (unreadable sources are expected and reported, never hidden).
+# An unreadable source (ROBOTS_DISALLOWED, ROBOTS_UNAVAILABLE, RATE_LIMITED,
+# WAF_BLOCKED, NETWORK_ERROR) is never evidence that legislation is unchanged.
+
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kb-audit-dev
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: >-
+      github.actor == github.repository_owner &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.label.name == 'kb-audit-dev' && github.event.pull_request.head.repo.full_name == github.repository))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    environment: kb-audit-dev
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Probes (acquisition proofs) from the runner
+        id: proof
+        continue-on-error: true
+        run: node scripts/kb-connector-proof.mjs --out "$RUNNER_TEMP/connector-proofs.json"
+      - name: Source availability and robots.txt from the runner
+        id: sources
+        continue-on-error: true
+        run: node scripts/kb-sources-check.mjs --out "$RUNNER_TEMP/source-checks.json"
+      - name: Complete audit (read-only)
+        id: audit
+        continue-on-error: true
+        run: node scripts/kb-monthly-audit.mjs --report "$RUNNER_TEMP/kb-audit-report.json"
+      - name: Keep the reports (also when the audit failed)
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kb-audit-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/kb-audit-report.json
+            ${{ runner.temp }}/connector-proofs.json
+            ${{ runner.temp }}/source-checks.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Reflect the audit result
+        if: ${{ !cancelled() && steps.audit.outcome == 'failure' }}
+        run: |
+          echo "::warning::The audit exited with rc=1 (incomplete coverage or unreadable sources). The report is attached as an artifact."

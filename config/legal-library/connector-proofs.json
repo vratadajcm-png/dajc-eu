@@ -1,0 +1,138 @@
+{
+ "provenOn": "2026-11-09",
+ "results": [
+  {
+   "id": "at-national-gazette",
+   "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Titel=Stra%C3%9Fenverkehrsordnung&DokumenteProSeite=Ten",
+   "retrievedAt": "2026-11-09T08:05:25.040Z",
+   "outcome": "ROBOTS_REFUSED",
+   "reason": "robots.txt of data.bka.gv.at does not allow this download (disallowed)"
+  },
+  {
+   "id": "de-gesetze-html-pdf",
+   "url": "https://www.gesetze-im-internet.de/stvo_2013/BJNR036710013.html",
+   "retrievedAt": "2026-11-09T08:05:25.867Z",
+   "outcome": "HTTP_ERROR",
+   "status": 503
+  },
+  {
+   "id": "de-gesetze-xml",
+   "url": "https://www.gesetze-im-internet.de/stvo_2013/xml.zip",
+   "retrievedAt": "2026-11-09T08:05:42.728Z",
+   "outcome": "ROBOTS_REFUSED",
+   "reason": "robots.txt of www.gesetze-im-internet.de does not allow this download (HTTP 503 for robots.txt)"
+  },
+  {
+   "id": "pl-national-gazette",
+   "url": "https://api.sejm.gov.pl/eli/acts/DU/1997/602/text.html",
+   "retrievedAt": "2026-11-09T08:05:57.787Z",
+   "finalUrl": "https://api.sejm.gov.pl/eli/acts/DU/1997/602/text.html",
+   "status": 200,
+   "contentType": "text/html;charset=utf-8",
+   "bytes": 1175317,
+   "sha256": "1a8a4174d16f909ac973fa34bb8cb0a75dd6e5b5f7d7022785850d9a79dbc1d3",
+   "outcome": "PROVEN"
+  },
+  {
+   "id": "uk-national-gazette",
+   "url": "https://www.legislation.gov.uk/ukpga/1988/52/data.xml",
+   "retrievedAt": "2026-11-09T08:06:02.415Z",
+   "finalUrl": "https://www.legislation.gov.uk/ukpga/1988/52/data.xml",
+   "status": 200,
+   "contentType": "application/xml;charset=utf-8",
+   "bytes": 4567063,
+   "sha256": "0b2cc5c2bafbf154e086b9c24b1fae62be5f8d734a2c134b8ecbe026fa8845bf",
+   "outcome": "PROVEN"
+  },
+  {
+   "id": "es-national-gazette",
+   "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2015-11722",
+   "retrievedAt": "2026-11-09T08:06:02.691Z",
+   "finalUrl": "https://www.boe.es/buscar/act.php?id=BOE-A-2015-11722",
+   "status": 200,
+   "contentType": "text/html; charset=UTF-8",
+   "bytes": 521991,
+   "sha256": "d02a0db992e6646cec67505bc30ac78b1467723bb552b142347b35f018a71ca1",
+   "outcome": "PROVEN"
+  },
+  {
+   "id": "se-national-gazette",
+   "url": "https://data.riksdagen.se/dokument/sfs-1998-1276.text",
+   "retrievedAt": "2026-11-09T08:06:04.677Z",
+   "finalUrl": "https://data.riksdagen.se/dokument/sfs-1998-1276.text",
+   "status": 200,
+   "contentType": "text/plain; charset=utf-8",
+   "bytes": 193201,
+   "sha256": "9f7c481c8904b3b107f011ccb75301284ddaa800f864fe6a84a597ad79b5944d",
+   "outcome": "PROVEN"
+  },
+  {
+   "id": "ee-national-gazette",
+   "url": "https://www.riigiteataja.ee/akt/liiklusseadus",
+   "retrievedAt": "2026-11-09T08:06:05.811Z",
+   "finalUrl": "https://www.riigiteataja.ee/akt/liiklusseadus",
+   "status": 200,
+   "contentType": "text/html",
+   "bytes": 61752,
+   "sha256": "7bcdf01e1a9abf78c83c36f1ded0ce0f661ee027afb3c0daaab9f36054bbb1ce",
+   "outcome": "MARKER_MISSING",
+   "missing": [
+    "Liiklusseadus"
+   ]
+  },
+  {
+   "id": "ie-national-gazette",
+   "url": "https://www.irishstatutebook.ie/eli/2010/act/25/enacted/en/html",
+   "retrievedAt": "2026-11-09T08:06:06.961Z",
+   "finalUrl": "https://www.irishstatutebook.ie/eli/2010/act/25/enacted/en/html",
+   "status": 200,
+   "contentType": "text/html",
+   "bytes": 76330,
+   "sha256": "874db9c6bd41e54c54d69c20f2f347619a982fe4b0797a9b621f56727305dea1",
+   "outcome": "PROVEN"
+  },
+  {
+   "id": "lv-national-gazette",
+   "url": "https://likumi.lv/ta/en/en/id/45467",
+   "retrievedAt": "2026-11-09T08:06:07.999Z",
+   "finalUrl": "https://likumi.lv/ta/en/en/id/45467",
+   "status": 200,
+   "contentType": "text/html; charset=UTF-8",
+   "bytes": 396044,
+   "sha256": "f95863ab38e39e160d6822862e6e1ff68fc154c90a1b5b82778838ce0f089cc1",
+   "outcome": "PROVEN"
+  },
+  {
+   "id": "hr-national-gazette",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2008_06_67_2108.html",
+   "retrievedAt": "2026-11-09T08:06:09.264Z",
+   "outcome": "ROBOTS_REFUSED",
+   "reason": "robots.txt of narodne-novine.nn.hr does not allow this download (HTTP 503 for robots.txt)"
+  },
+  {
+   "id": "ch-national-gazette",
+   "url": "https://www.fedlex.admin.ch/eli/cc/1959/1229_1293_1311/de",
+   "retrievedAt": "2026-11-09T08:06:10.212Z",
+   "finalUrl": "https://www.fedlex.admin.ch/eli/cc/1959/1229_1293_1311/de",
+   "status": 200,
+   "contentType": "text/html",
+   "bytes": 77151,
+   "sha256": "39d0c4d52bf6c1140a7d5b1848e1a625375891aecc22869089e1361f1fd8b3be",
+   "outcome": "MARKER_MISSING",
+   "missing": [
+    "Strassenverkehr"
+   ]
+  },
+  {
+   "id": "fi-national-gazette",
+   "url": "https://www.finlex.fi/fi/lainsaadanto/1981/267",
+   "retrievedAt": "2026-11-09T08:06:11.545Z",
+   "finalUrl": "https://www.finlex.fi/fi/lainsaadanto/1981/267",
+   "status": 200,
+   "contentType": "text/html; charset=utf-8",
+   "bytes": 2609790,
+   "sha256": "143b14e0048b0743f628c3ba1775d79104b9ddeecb4a1caaa177a41a57bbe012",
+   "outcome": "PROVEN"
+  }
+ ]
+}
