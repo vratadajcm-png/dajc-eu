@@ -6,6 +6,8 @@ export const BAN_STATES = ['HAS_BAN', 'NO_BAN', 'UNKNOWN'];
 export const RESTRICTION_CLASSES = Object.freeze(['LEGAL_DRIVING_BAN', 'TEMPORARY_TRAFFIC_RESTRICTION', 'INFRASTRUCTURE_CONSTRAINT', 'PERMIT_CONDITION']);
 export const restrictionClassOf = rule => rule.restriction_class ?? 'LEGAL_DRIVING_BAN';
 const isLegalBan = rule => restrictionClassOf(rule) === 'LEGAL_DRIVING_BAN';
+/** Public status of each calendar-month portion of the rolling horizon. */
+export const MONTH_STATES = ['VERIFIED', 'PARTIAL', 'UNVERIFIED', 'AWAITING_OFFICIAL_PUBLICATION'];
 export const SCOPE_CHECKS = ['weekend', 'holidays', 'holiday_eves', 'seasonal', 'summer_winter', 'regional', 'corridors', 'directional', 'night', 'weight_specific', 'special_calendar', 'exceptional'];
 const DAY = 86400000;
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
@@ -152,6 +154,8 @@ export function validateCanonical(data, identities) {
     assert(expected.get(row.jurisdiction) === row.name && !seen.has(row.jurisdiction), `Duplicate or changed Coverage identity ${row.jurisdiction}`); seen.add(row.jurisdiction);
     assert(VERIFICATION_STATES.includes(row.verification_state) && BAN_STATES.includes(row.ban_state), 'Invalid jurisdiction state');
     assert(row.period?.from === data.window.from && row.period?.to === data.window.to, `Missing active window ${row.jurisdiction}`);
+    if (row.reviewed_through !== undefined) assert(isDate(row.reviewed_through) && row.reviewed_through >= data.window.from && row.reviewed_through <= data.window.to, `Invalid reviewed_through ${row.jurisdiction}`);
+    for (const awaited of row.awaiting_publication || []) assert(isDate(awaited.from) && isDate(awaited.to) && awaited.from <= awaited.to && typeof awaited.instrument === 'string' && awaited.instrument.trim(), `Invalid awaiting_publication ${row.jurisdiction}`);
     if (row.ban_state === 'NO_BAN' || row.coverage_complete) {
       assert(row.verification_state === 'PRIMARY_VERIFIED' && row.coverage_complete === true && validInstant(row.last_verified), `NO_BAN/full coverage requires primary verification ${row.jurisdiction}`);
       assert(SCOPE_CHECKS.every(key => row.scope_checks?.[key]?.state === 'PRIMARY_VERIFIED' && row.scope_checks[key].evidence_ids?.length && row.scope_checks[key].evidence_ids.every(id => sources.get(id)?.role === 'PRIMARY')), `Incomplete full-scope primary evidence ${row.jurisdiction}`);
@@ -204,18 +208,26 @@ export function snapshot(data, identities, now = new Date()) {
   const events = expandRules(data, window);
   // A rolling year may cross legal instruments that have not yet been issued.
   // Keep the horizon visible but never extend legal verification or infer NO_BAN.
-  const staleWindow = !includesWindow(data.window, window);
   const jurisdictions = data.jurisdictions.map(row => {
+    // A jurisdiction is verified only within its own reviewed span: the dataset window, optionally ended earlier by
+    // reviewed_through. Extending the dataset window for one country must not verify the others.
+    const reviewedSpan = { from: data.window.from, to: row.reviewed_through || data.window.to };
+    const staleWindow = !includesWindow(reviewedSpan, window);
+    const rules = events.filter(e => e.jurisdiction === row.jurisdiction);
     const monthly_coverage = [];
     for (let monthStart = window.from.slice(0, 7) + '-01'; monthStart <= window.to;) {
       const [year, month] = monthStart.slice(0, 7).split('-').map(Number);
       const monthEnd = new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10);
       const period = { from: monthStart < window.from ? window.from : monthStart, to: monthEnd > window.to ? window.to : monthEnd };
-      const verified = row.coverage_complete && row.verification_state === 'PRIMARY_VERIFIED' && includesWindow(data.window, period);
-      monthly_coverage.push({ ...period, coverage_complete: verified, verification_state: verified ? 'PRIMARY_VERIFIED' : 'UNVERIFIED' });
+      const reviewed = includesWindow(reviewedSpan, period);
+      const verified = row.coverage_complete && row.verification_state === 'PRIMARY_VERIFIED' && reviewed;
+      // An event ending exactly at 00:00 on the first day does not reach into that month.
+      const event_count = rules.filter(e => e.date <= period.to && (e.end_date > period.from || (e.end_date === period.from && e.end_time > '00:00'))).length;
+      const awaited = !reviewed && (row.awaiting_publication || []).find(a => a.from <= period.to && a.to >= period.from);
+      const status = verified ? 'VERIFIED' : awaited ? 'AWAITING_OFFICIAL_PUBLICATION' : event_count ? 'PARTIAL' : 'UNVERIFIED';
+      monthly_coverage.push({ ...period, coverage_complete: verified, verification_state: verified ? 'PRIMARY_VERIFIED' : 'UNVERIFIED', status, event_count, ...(awaited ? { awaiting_publication: awaited.instrument } : {}) });
       monthStart = shiftDate(monthEnd, 1);
     }
-    const rules = events.filter(e => e.jurisdiction === row.jurisdiction);
     const canKeepNoBan = !staleWindow && row.ban_state === 'NO_BAN' && row.verification_state === 'PRIMARY_VERIFIED';
     assert(!(canKeepNoBan && rules.length), `NO_BAN conflicts with an actual ban ${row.jurisdiction}`);
     const failures = [...row.coverage_failures];
@@ -226,19 +238,21 @@ export function snapshot(data, identities, now = new Date()) {
 }
 const esc = value => String(value ?? '').replaceAll('\\','\\\\').replaceAll('\r','').replaceAll('\n','\\n').replaceAll(';','\\;').replaceAll(',','\\,');
 const stamp = value => value.replaceAll('-','').replaceAll(':','').replace(/\.\d{3}Z$/, 'Z');
+/** iCalendar TEXT escaping, shared by every DAJC calendar writer. */
+export const escapeIcsText = esc;
 const utf8Length = c => { const cp = c.codePointAt(0); return cp < 0x80 ? 1 : cp < 0x800 ? 2 : cp < 0x10000 ? 3 : 4; };
 export function foldLine(line) {
   let out = '', length = 0;
   for (const c of line) { const bytes = utf8Length(c); if (length + bytes > 75) { out += '\r\n '; length = 1; } out += c; length += bytes; }
   return out;
 }
-export function toIcs(view, { countries = [], type = 'all', upcoming = true } = {}) {
+export function toIcs(view, { countries = [], type = 'all', upcoming = true, name = 'DAJC HGV Driving Bans' } = {}) {
   assert(['all','general','exceptional'].includes(type), 'Invalid restriction type');
   const valid = new Set(view.jurisdictions.map(r => r.jurisdiction));
   assert(countries.every(c => valid.has(c)), 'Unknown jurisdiction');
   const events = (upcoming ? view.upcoming_events : view.events).filter(e => (!countries.length || countries.includes(e.jurisdiction)) && (type !== 'general' || e.restriction_types.includes('general')));
   const selected = view.jurisdictions.filter(r => !countries.length || countries.includes(r.jurisdiction));
-  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DAJC//Canonical Driving Bans//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:DAJC HGV Driving Bans',`X-DAJC-WINDOW:${view.window.from}/${view.window.to}`,`X-DAJC-DATASET:${esc(view.dataset_version)}`,`X-DAJC-COVERAGE-VERSION:${COVERAGE_VERSION}`,`X-DAJC-JURISDICTIONS:${esc(selected.map(r => r.jurisdiction).join(','))}`,`X-DAJC-EVENT-SCOPE:${upcoming ? 'UPCOMING' : 'WHOLE-WINDOW'}`,`X-DAJC-COVERAGE-COMPLETE:${selected.every(r => r.coverage_complete) ? 'TRUE':'FALSE'}`,`X-DAJC-UNKNOWN:${esc(selected.filter(r => r.ban_state === 'UNKNOWN').map(r => r.jurisdiction).join(','))}`,'X-WR-CALDESC:Verified ban events only. Missing events are NOT evidence of no ban. Consult the DAJC coverage status and official sources.','REFRESH-INTERVAL;VALUE=DURATION:PT1H','X-PUBLISHED-TTL:PT1H'];
+  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DAJC//Canonical Driving Bans//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH',`X-WR-CALNAME:${esc(name)}`,`X-DAJC-WINDOW:${view.window.from}/${view.window.to}`,`X-DAJC-DATASET:${esc(view.dataset_version)}`,`X-DAJC-COVERAGE-VERSION:${COVERAGE_VERSION}`,`X-DAJC-JURISDICTIONS:${esc(selected.map(r => r.jurisdiction).join(','))}`,`X-DAJC-EVENT-SCOPE:${upcoming ? 'UPCOMING' : 'WHOLE-WINDOW'}`,`X-DAJC-COVERAGE-COMPLETE:${selected.every(r => r.coverage_complete) ? 'TRUE':'FALSE'}`,`X-DAJC-UNKNOWN:${esc(selected.filter(r => r.ban_state === 'UNKNOWN').map(r => r.jurisdiction).join(','))}`,'X-WR-CALDESC:Verified ban events only. Missing events are NOT evidence of no ban. Consult the DAJC coverage status and official sources.','REFRESH-INTERVAL;VALUE=DURATION:PT1H','X-PUBLISHED-TTL:PT1H'];
   for (const e of events) {
     const description = [`Local time: ${e.date} ${e.start_time} to ${e.end_date} ${e.end_time} (${e.timezone})`, `Vehicles: ${e.vehicle_scope}`, `Weight condition: ${JSON.stringify(e.weight_threshold)}`, `Roads: ${e.roads.join('; ')}`, `Regions: ${e.regions.join('; ')}`, `Direction: ${e.direction}`, `Exceptions: ${e.exceptions.join('; ')}`, `ADR: ${e.adr_relevance}`, `Exceptional transport: ${e.exceptional_relevance}`, `Legal basis: ${e.legal_basis}`, `Authority: ${e.source_authority}`, `Verified: ${e.verified_at}`, `Version: ${e.source_version}`, e.notes, 'Coverage may be incomplete. Check permits and current official instructions.'].join('\n');
     lines.push('BEGIN:VEVENT',`UID:${esc(e.uid)}`,`DTSTAMP:${stamp(e.verified_at)}`,`LAST-MODIFIED:${stamp(e.verified_at)}`,`SEQUENCE:${e.sequence}`,`DTSTART:${stamp(e.starts_at)}`,`DTEND:${stamp(e.ends_at)}`,`SUMMARY:${esc(`${e.jurisdiction} — ${e.title}`)}`,`DESCRIPTION:${esc(description)}`,`URL:${e.source_url}`,`X-DAJC-TIMEZONE:${e.timezone}`,`X-DAJC-VERIFICATION:${e.verification_state}`,'STATUS:CONFIRMED','TRANSP:TRANSPARENT','END:VEVENT');
