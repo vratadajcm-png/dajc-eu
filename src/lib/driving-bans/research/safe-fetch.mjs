@@ -145,7 +145,10 @@ export async function safeFetch(rawUrl, { allowedHosts, resolve = systemResolve,
       redirects.push(current.href);
       continue;
     }
-    if (response.status !== 200) return { ok: false, url: rawUrl, final_url: current.href, availability: 'SOURCE_UNAVAILABLE', code: 'HTTP_STATUS', http_status: response.status, redirects };
+    // A short, capped text snippet lets callers recognise bot/security-check
+    // pages; it is never treated as document content.
+    if (response.status !== 200) return { ok: false, url: rawUrl, final_url: current.href, availability: 'SOURCE_UNAVAILABLE', code: 'HTTP_STATUS', http_status: response.status, redirects,
+      snippet: Buffer.isBuffer(response.body) ? response.body.subarray(0, 4096).toString('utf8') : '' };
     const contentType = String(header(response.headers, 'content-type') || '').split(';')[0].trim().toLowerCase();
     const kind = ALLOWED_CONTENT_TYPES[contentType];
     if (!kind) return { ok: false, url: rawUrl, final_url: current.href, availability: 'REJECTED', code: 'CONTENT_TYPE_NOT_ALLOWED', message: `Content type ${contentType || 'missing'} is not processed`, redirects };

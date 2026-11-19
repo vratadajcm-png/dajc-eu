@@ -10,6 +10,8 @@ export const DATA_BRANCHES = {
   findings: { branch: 'automation/oversize-data', prefix: 'data/oversize/', pattern: /^data\/oversize\/\d{4}-W\d{2}\/(?:findings|coverage)\.json$/ },
   x: { branch: 'automation/x-publications', prefix: 'data/x-publications.json', pattern: /^data\/x-publications\.json$/ },
   linkedin: { branch: 'automation/linkedin-publications', prefix: 'data/linkedin-publications.json', pattern: /^data\/linkedin-publications\.json$/ },
+  // Driving Bans source-monitor history: hashes/states only, never registry data.
+  'driving-bans-monitor': { branch: 'automation/driving-bans-monitor', prefix: 'data/driving-bans-monitor/', pattern: /^data\/driving-bans-monitor\/(?:latest|history\/\d{4}-\d{2}-\d{2}T\d{4}Z)\.json$/ },
 };
 
 function git(root, args) {
@@ -40,6 +42,9 @@ function validateJson(content, kind) {
     throw new Error('Invalid X publication ledger (fail closed)');
   }
   if (kind === 'findings') return JSON.stringify(scopeMonitoringDocument(value).value, null, 2) + '\n';
+  if (kind === 'driving-bans-monitor' && (value.schema_version !== 1 || !Array.isArray(value.results) || value.results.some((r) => !r || typeof r.source_id !== 'string' || typeof r.state !== 'string'))) {
+    throw new Error('Invalid Driving Bans monitor state (fail closed)');
+  }
   return content;
 }
 
