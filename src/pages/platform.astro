@@ -1,9 +1,10 @@
 ---
-// Platform and its development material are intentionally not public.
-// Keep this route server-rendered so direct URLs run through the request gate.
-export const prerender = false;
-return new Response(null, {
-  status: 302,
-  headers: { Location: '/', 'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet', 'Cache-Control': 'no-store' },
-});
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductLanding from '../components/ProductLanding.astro';
 ---
+<BaseLayout
+  title="DAJC Platform | Heavy & Oversized Transport Coordination"
+  description="DAJC Platform connects complex transport from enquiry to delivery. Explore the complete product, current workflows, permits, routing, D-ID, integration with existing software and share industry feedback."
+>
+  <ProductLanding product="platform" />
+</BaseLayout>

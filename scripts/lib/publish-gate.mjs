@@ -112,10 +112,15 @@ export function nonOfficialSources(articleMarkdown, tierOf) {
  */
 export function classifyEditionPulls(pulls, { branch, targetWeek }) {
   const isTarget = (head) => head === branch || head.startsWith(`${branch}-retry-`);
-  const pending = pulls.find((pull) => isTarget(String(pull.headRefName || ''))) || null;
+  const targetPulls = pulls.filter(pull => isTarget(String(pull.headRefName || '')));
+  // A retained rejected audit must not hide a newer, approved replacement.
+  const rejected = targetPulls.filter(pull => /REJECTED_BY_CLAUDE|DAJC_WEEKLY_STATE:(?:EDITORIAL_REJECTED|BLOCKED)/.test(String(pull.body || '')));
+  const pending = targetPulls.find(pull => /DAJC_WEEKLY_STATE:EDITORIAL_APPROVED/.test(String(pull.body || ''))) ||
+    targetPulls.find(pull => !rejected.includes(pull)) ||
+    rejected.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))[0] || null;
   const stale = pulls.filter((pull) => {
     const match = String(pull.headRefName || '').match(/^automation\/weekly-(\d{4})-w(\d{2})(?:-|$)/);
     return match && `${match[1]}-W${match[2]}` < targetWeek;
   });
-  return { pending, stale };
+  return { pending, stale, rejected };
 }

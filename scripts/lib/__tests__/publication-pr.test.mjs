@@ -23,7 +23,7 @@ function fixture() {
   execFileSync('git', ['clone', remote, root], { stdio: 'ignore' });
   git(root, ['config', 'user.name', 'Test']);
   git(root, ['config', 'user.email', 'test@example.invalid']);
-  for (const relative of ['scripts/check-weekly-publication.mjs', 'scripts/publish-gate-commit.mjs', 'scripts/lib/publish-gate.mjs', 'scripts/lib/automation-data.mjs', 'scripts/lib/geographic-scope.mjs', 'config/europe-coverage.mjs', 'config/oversize-sources/index.mjs', 'scripts/lib/next-publication.mjs', 'scripts/lib/week.mjs', 'scripts/lib/source-policy.mjs', 'config/official-authority-domains.mjs']) {
+  for (const relative of ['scripts/check-weekly-publication.mjs', 'scripts/publish-gate-commit.mjs', 'scripts/lib/publish-gate.mjs', 'scripts/lib/publication-approval.mjs', 'scripts/lib/store.mjs', 'scripts/lib/edition-plan.mjs', 'scripts/lib/weekly-recovery.mjs', 'scripts/lib/automation-data.mjs', 'scripts/lib/geographic-scope.mjs', 'config/europe-coverage.mjs', 'config/oversize-sources/index.mjs', 'scripts/lib/next-publication.mjs', 'scripts/lib/week.mjs', 'scripts/lib/source-policy.mjs', 'config/official-authority-domains.mjs']) {
     mkdirSync(path.dirname(path.join(root, relative)), { recursive: true });
     copyFileSync(path.join(sourceRoot, relative), path.join(root, relative));
   }
@@ -38,7 +38,7 @@ function fixture() {
   mkdirSync(bin);
   const log = path.join(base, 'gh.jsonl');
   writeFileSync(path.join(bin, 'gh'), `#!${process.execPath}\nimport { appendFileSync, readFileSync } from 'node:fs';\nconst args = process.argv.slice(2);\nconst bodyIndex = args.indexOf('--body-file');\nappendFileSync(process.env.GH_TEST_LOG, JSON.stringify({args, token: process.env.GH_TOKEN, body: bodyIndex < 0 ? null : readFileSync(args[bodyIndex + 1], 'utf8')}) + '\\n');\nif(args[0] === 'pr' && args[1] === 'create') { if (process.env.GH_TOKEN === 'expired-owner-token') process.exit(1); console.log('https://github.com/example/dajc/pull/9001'); }\nif(args[0] === 'pr' && args[1] === 'list') console.log(process.env.GH_TEST_PULLS || (process.env.GH_TEST_PENDING === '1' ? '[{"url":"https://github.com/example/dajc/pull/9001","headRefName":"automation/weekly-2026-w43"}]' : '[]'));\n`, { mode: 0o755 });
-  const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, GH_TOKEN: 'synthetic-test-token', GITHUB_REPOSITORY: 'example/dajc', GH_TEST_LOG: log, GITHUB_ACTIONS: 'true', GITHUB_OUTPUT: path.join(base, 'outputs'), GITHUB_STEP_SUMMARY: path.join(base, 'summary'), OVERSIZE_NOW: '2026-10-15T10:00:00Z', OVERSIZE_CORRECTION: '', OVERSIZE_PREVIEW: '' };
+  const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, GH_TOKEN: 'synthetic-test-token', GITHUB_REPOSITORY: 'example/dajc', GH_TEST_LOG: log, GITHUB_ACTIONS: 'true', GITHUB_OUTPUT: path.join(base, 'outputs'), GITHUB_STEP_SUMMARY: path.join(base, 'summary'), OVERSIZE_NOW: '2026-10-15T10:00:00Z', OVERSIZE_CORRECTION: '', OVERSIZE_PREVIEW: '', GITHUB_RUN_ID: '12345', GITHUB_RUN_ATTEMPT: '1' };
   return { base, root, remote, main, env, log };
 }
 function run(f, script, env = {}) {
@@ -49,23 +49,22 @@ afterEach(() => { for (const directory of cleanup.splice(0)) rmSync(directory, {
 describe('reviewed weekly publication', () => {
   it('opens a PR and explicitly dispatches CI, without writing protected main', () => {
     const f = fixture();
-    loadAutomationData('findings', f.root);
-    put(f.root, 'src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md', 'validated article fixture');
-    const output = run(f, 'publish-gate-commit.mjs');
+    const runnerTemp = approvedEdition(f);
+    const output = run(f, 'publish-gate-commit.mjs', { RUNNER_TEMP: runnerTemp });
     const calls = readFileSync(f.log, 'utf8').trim().split('\n').map(JSON.parse);
     expect(calls[0].args.slice(0, 2)).toEqual(['pr', 'create']);
-    expect(calls[0].body).toContain('Waiting for human review');
-    expect(calls[0].body).toContain('This run has not published the article');
+    expect(calls[0].body).toContain('EDITORIAL_APPROVED');
+    expect(calls[0].body).toContain('protected application and news CI must pass');
     expect(calls.slice(1).map((call) => call.args)).toEqual([
       ['workflow', 'run', 'application-ci.yml', '--repo', 'example/dajc', '--ref', 'automation/weekly-2026-w43'],
       ['workflow', 'run', 'news-ci.yml', '--repo', 'example/dajc', '--ref', 'automation/weekly-2026-w43'],
     ]);
     expect(output).toContain('Article published this run: **no**');
     expect(git(f.remote, ['rev-parse', 'main']).trim()).toBe(f.main);
-    expect(git(f.remote, ['diff', '--name-only', 'main', 'automation/weekly-2026-w43']).trim()).toBe('src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md');
+    expect(git(f.remote, ['diff', '--name-only', 'main', 'automation/weekly-2026-w43']).trim().split('\n')).toEqual(['data/oversize/2026-W43/publication/12345-1.json', 'src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md']);
   });
 
-  it('opens a vetoed autonomous edition for human review instead of losing it', () => {
+  it('archives an unreviewed autonomous edition as a draft with no public article route', () => {
     const f = fixture();
     loadAutomationData('findings', f.root);
     put(f.root, 'src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md', 'validated article fixture');
@@ -74,18 +73,23 @@ describe('reviewed weekly publication', () => {
     expect(output).toContain('::warning::Claude did not approve the edition');
     expect(readFileSync(f.env.GITHUB_OUTPUT, 'utf8')).toContain('auto_merge=false');
     const calls = readFileSync(f.log, 'utf8').trim().split('\n').map(JSON.parse);
-    expect(calls[0].body).toContain('Waiting for human review');
+    expect(calls[0].body).toContain('Publication is BLOCKED');
+    expect(calls[0].args).toContain('--draft');
+    const changes = git(f.remote, ['diff', '--name-only', 'main', 'automation/weekly-2026-w43']);
+    expect(changes).toContain('publication/12345-1.json');
+    expect(changes).not.toContain('src/content/news');
   });
 
   function approvedEdition(f) {
     loadAutomationData('findings', f.root);
-    const article = 'validated article fixture';
+    const article = '---\nstatus: published\nsources:\n  - name: S\n    url: "https://authority.example/notice"\n---\nverified article fixture';
     const relative = 'src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md';
     put(f.root, relative, article);
     const runnerTemp = mkdtempSync(path.join(f.base, 'runner-temp-'));
     writeFileSync(path.join(runnerTemp, 'dajc-weekly-review-approved.json'), JSON.stringify({
       articlePath: relative, targetWeek: '2026-W43', sha256: createHash('sha256').update(article).digest('hex'),
-      researchProvider: 'perplexity-search', claudeModel: 'claude-sonnet-5-5', leadCount: 1, sourceCount: 1,
+      researchProvider: 'perplexity-search', claudeModel: 'claude-sonnet-5-5', leadCount: 1, sourceCount: 1, approvedAt: '2026-10-15T09:00:00Z',
+      review: { verdict: 'approve', blockingReasons: [], sourceChecks: [{ url: 'https://authority.example/notice', supported: true, reason: 'Original authority page confirms all claims' }] },
     }));
     return runnerTemp;
   }
@@ -101,7 +105,7 @@ describe('reviewed weekly publication', () => {
     const calls = readFileSync(f.log, 'utf8').trim().split('\n').map(JSON.parse);
     const create = calls.find((call) => call.args[0] === 'pr' && call.args[1] === 'create');
     expect(create.token).toBe('synthetic-owner-token');
-    expect(create.body).toContain('The workflow merges it once application-validate and news-validate pass');
+    expect(create.body).toContain('protected application and news CI must pass');
     // The PR's own pull_request CI is what the ruleset counts.
     expect(calls.some((call) => call.args[0] === 'workflow')).toBe(false);
     expect(calls.some((call) => call.args[0] === 'pr' && call.args[1] === 'merge')).toBe(false);
@@ -117,7 +121,7 @@ describe('reviewed weekly publication', () => {
     const calls = readFileSync(f.log, 'utf8').trim().split('\n').map(JSON.parse);
     const opened = calls.filter((call) => call.args[0] === 'pr' && call.args[1] === 'create');
     expect(opened.map((call) => call.token)).toEqual(['expired-owner-token', 'synthetic-test-token']);
-    expect(opened[1].body).toContain('approve the pending workflows, then merge to publish');
+    expect(opened[1].body).toContain('protected application and news CI must pass');
     expect(calls.filter((call) => call.args[0] === 'workflow').map((call) => call.args[2])).toEqual(['application-ci.yml', 'news-ci.yml']);
   });
 
@@ -130,8 +134,8 @@ describe('reviewed weekly publication', () => {
     expect(outputs).toContain('unattended=false');
     const calls = readFileSync(f.log, 'utf8').trim().split('\n').map(JSON.parse);
     expect(calls[0].token).toBe('synthetic-test-token');
-    expect(calls[0].body).toContain('Claude approved the exact final article');
-    expect(calls[0].body).toContain('approve the pending workflows, then merge to publish');
+    expect(calls[0].body).toContain('Claude approved the exact article bytes');
+    expect(calls[0].body).toContain('protected application and news CI must pass');
     expect(calls.slice(1).map((call) => call.args[2])).toEqual(['application-ci.yml', 'news-ci.yml']);
     expect(output).toContain('Article published this run: **no**');
     expect(git(f.remote, ['rev-parse', 'main']).trim()).toBe(f.main);
@@ -171,10 +175,9 @@ describe('reviewed weekly publication', () => {
 
   it('keeps the findings of a prepared edition on the data branch as well', () => {
     const f = fixture();
-    loadAutomationData('findings', f.root);
+    const runnerTemp = approvedEdition(f);
     put(f.root, 'data/oversize/2026-W42/findings.json', '{"findings":[{"id":"n307","country":"Netherlands","jurisdiction":"NL"}]}');
-    put(f.root, 'src/content/news/eu-oversize/eu-oversize-weekly-2026-w43.md', 'validated article fixture');
-    run(f, 'publish-gate-commit.mjs');
+    run(f, 'publish-gate-commit.mjs', { RUNNER_TEMP: runnerTemp });
     expect(git(f.remote, ['show', 'automation/oversize-data:data/oversize/2026-W42/findings.json'])).toContain('n307');
     expect(git(f.remote, ['rev-parse', 'main']).trim()).toBe(f.main);
   });
