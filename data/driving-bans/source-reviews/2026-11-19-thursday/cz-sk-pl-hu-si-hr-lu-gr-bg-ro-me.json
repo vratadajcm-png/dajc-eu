@@ -1,0 +1,867 @@
+{
+  "review_id": "ev-east-2026-11-19",
+  "generated_utc": "2026-11-19T06:00:00Z",
+  "timezone_context": "Europe/Prague; today 2026-11-19",
+  "dataset": "data/driving-bans/canonical.json dataset_version 2026-11-02.r5-es-de-targeted.geo50 (window 2026-09-01..2026-12-31)",
+  "horizon": "2026-11-19..2027-11-19",
+  "method": "curl via configured agent proxy, TLS verified (CA bundle), no bot-protection bypass; SHA-256 over raw response body; raw bodies in ev-east/raw/; fetch log ev-east/fetchlog.tsv. Text comparisons on tag-stripped normalised text. WebSearch used only for discovery, never as evidence.",
+  "classification_legend": {
+    "PROMULGATED_RECURRING_LAW": "dates derivable from standing law + statutory holidays",
+    "ANNUAL_PUBLISHED": "annual instrument for 2027 published",
+    "AWAITING_PUBLICATION": "annual instrument required; not found as of retrieval",
+    "UNVERIFIED": "not determinable from primary evidence obtained",
+    "SOURCE_UNAVAILABLE": "primary source could not be retrieved"
+  },
+  "caveats": [
+    "Absence of a found instrument is NOT evidence of no ban or cancellation.",
+    "zakonyprolidi.cz is a commercial mirror; e-Sbírka metadata API used for official confirmation.",
+    "A parallel task overwrote a shared helper script at scratchpad/ev-tools/f.sh during this run; all evidence here was re-fetched with ev-east-tools/f.sh into ev-east/raw."
+  ],
+  "jurisdictions": [
+    {
+      "jurisdiction": "CZ",
+      "regime_2027": "PROMULGATED_RECURRING_LAW",
+      "regime_basis": "Act 361/2000 Sb. §43(1) + Act 245/2000 Sb. days of rest; no annual instrument",
+      "dec_2026_instrument_unchanged": true,
+      "dec_2026_change_vs_dataset": "NO_CHANGE",
+      "months_2027": {
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW",
+        "2027-12": "PROMULGATED_RECURRING_LAW"
+      },
+      "evidence": [
+        {
+          "file": "cz-esb-api.json",
+          "authority": "e-Sbírka (official Collection of Laws) metadata API",
+          "document_version": "361/2000 Sb. future version effective 2027-01-01 (typZneni BUDOUCI), only novela 130/2025 Sb.; full amendment list ends 236/2025 Sb.",
+          "finding": "No amendment to 361/2000 published in 2026; the only scheduled change from 2027-01-01 comes from 130/2025 Sb.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://www.e-sbirka.cz/sbr-cache/dokumenty-sbirky/%2Fsb%2F2000%2F361%2F2027-01-01",
+          "retrieved_utc": "2026-11-19T05:51:20Z",
+          "http_status": 200,
+          "bytes": 3118,
+          "sha256": "3e81cd644d0e426999f0ddb2f3720e24f7c24c5fda3586294a1ad59ed069c46b"
+        },
+        {
+          "file": "cz-361-historie.html",
+          "authority": "zakonyprolidi.cz consolidation (non-official mirror)",
+          "document_version": "verze 63 01.01.2026-31.12.2026; verze 64 from 01.01.2027 (130/2025 Sb.)",
+          "finding": "Version history corroborates e-Sbírka.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://www.zakonyprolidi.cz/cs/2000-361/historie",
+          "retrieved_utc": "2026-11-19T05:51:10Z",
+          "http_status": 200,
+          "bytes": 69417,
+          "sha256": "31c0b57193ca896ffaf74fed73ed93da62b5bfaa3260f38c60d84fcec2a21b3c"
+        },
+        {
+          "file": "cz-361-zpl.html",
+          "authority": "zakonyprolidi.cz consolidation of 361/2000 Sb.",
+          "document_version": "verze 63",
+          "finding": "§43(1): motorways + class I roads; N/special vehicles >7.5 t and >3.5 t with trailer; (a) Sundays and days of rest 13:00-22:00; (b) Sat 07:00-13:00 and (c) Fri 17:00-21:00 only 1 Jul-31 Aug. §43(3) exemptions (combined transport, perishables >=1/2 load, live animals, fuel supply, post, empty runs etc.).",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://www.zakonyprolidi.cz/cs/2000-361",
+          "retrieved_utc": "2026-11-19T05:50:05Z",
+          "http_status": 200,
+          "bytes": 650683,
+          "sha256": "1ddefb5eab0eeab665db8948b6a883429f2107edc201352242b2b15353bc959c"
+        },
+        {
+          "file": "cz-361-2027.html",
+          "authority": "zakonyprolidi.cz consolidation of 361/2000 Sb.",
+          "document_version": "verze 64 from 01.01.2027",
+          "finding": "§43 text byte-identical (normalised text) to verze 63.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://www.zakonyprolidi.cz/cs/2000-361/zneni-20270101",
+          "retrieved_utc": "2026-11-19T05:51:19Z",
+          "http_status": 200,
+          "bytes": 651279,
+          "sha256": "0d69eeb34beacdf5bfa8c70321857cc65bbe9f38dcdca99a4737a484be2eff60"
+        },
+        {
+          "file": "cz-245-esb-api.json",
+          "authority": "e-Sbírka metadata API",
+          "document_version": "245/2000 Sb. current version 2026-05-13 (59/2026 Sb.), no future version for 2027",
+          "finding": "Holiday law unchanged since the dataset's 2026-10-27 review.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://www.e-sbirka.cz/sbr-cache/dokumenty-sbirky/%2Fsb%2F2000%2F245%2F2027-01-01",
+          "retrieved_utc": "2026-11-19T05:51:27Z",
+          "http_status": 200,
+          "bytes": 1861,
+          "sha256": "d3e6dddb53c077cb432c53d0001312ec99263dfb290837503e85bf00e9e5e184"
+        },
+        {
+          "file": "cz-245-historie.html",
+          "authority": "zakonyprolidi.cz",
+          "document_version": "verze 12 from 13.05.2026",
+          "finding": "No newer version.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://www.zakonyprolidi.cz/cs/2000-245/historie",
+          "retrieved_utc": "2026-11-19T05:51:10Z",
+          "http_status": 200,
+          "bytes": 40628,
+          "sha256": "f7adeb560e1cfba1f6bd24c92c8fb6406dade9ab23708cb0880172e1e30fb8ca"
+        }
+      ],
+      "notes": "e-Sbírka web UI is an SPA (cz-361-esb.html is an empty shell); the e-Sbírka sbr-cache metadata API was used instead. §43 text compared on the zakonyprolidi mirror, not on e-Sbírka fragments."
+    },
+    {
+      "jurisdiction": "SK",
+      "regime_2027": "PROMULGATED_RECURRING_LAW",
+      "regime_basis": "Act 8/2009 Z.z. §39(1)-(2) + Act 241/1993 Z.z. days of rest",
+      "dec_2026_instrument_unchanged": true,
+      "dec_2026_change_vs_dataset": "NO_CHANGE",
+      "months_2027": {
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW",
+        "2027-12": "PROMULGATED_RECURRING_LAW"
+      },
+      "evidence": [
+        {
+          "file": "sk-8-index.html",
+          "authority": "Slov-Lex static portal (official)",
+          "document_version": "consolidations listed up to 20290101",
+          "finding": "Future consolidations exist: 20261201, 20270101, 20270401, 20270901, 20290101.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://static.slov-lex.sk/static/SK/ZZ/2009/8/",
+          "retrieved_utc": "2026-11-19T05:51:36Z",
+          "http_status": 200,
+          "bytes": 27249,
+          "sha256": "63a57057cc9428a43ccd5cb6c411a4e5f6b5833e2e2fa6f71f6b3a859afdc909"
+        },
+        {
+          "file": "sk-8-20261201.html",
+          "authority": "Slov-Lex",
+          "document_version": "8/2009 consolidation from 2026-12-01",
+          "finding": "§39(1): motorways, expressways, class I roads; >7.5 t and >3.5 t with trailer; (a) first day of rest and Saturday after a working day 1 Jul-31 Aug 09:00-19:00; (b) Sunday and last day of rest 06:00-22:00. §39(2): single day of rest after a working day 06:00-22:00.",
+          "change_vs_dataset": "NO_CHANGE",
+          "http_status": "NOT_FETCHED"
+        },
+        {
+          "file": "sk-8-20270101.html",
+          "authority": "Slov-Lex",
+          "document_version": "from 2027-01-01",
+          "finding": "§39 differs from 20261201 only in §39(7) (special vehicles: adds 'necestné pojazdné stroje'); §39(1)-(3) unchanged.",
+          "change_vs_dataset": "NO_CHANGE",
+          "http_status": "NOT_FETCHED"
+        },
+        {
+          "file": "sk-8-20270401.html",
+          "authority": "Slov-Lex",
+          "document_version": "from 2027-04-01",
+          "finding": "§39 identical to 20270101.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://static.slov-lex.sk/static/SK/ZZ/2009/8/20270401.html",
+          "retrieved_utc": "2026-11-19T05:51:46Z",
+          "http_status": 200,
+          "bytes": 2098573,
+          "sha256": "c4071ba3ca1d39618f3bc86ba436cc6ca779f6e39d501ed73e5caa77a86f18d6"
+        },
+        {
+          "file": "sk-8-20270901.html",
+          "authority": "Slov-Lex",
+          "document_version": "from 2027-09-01",
+          "finding": "§39 identical to 20270101.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://static.slov-lex.sk/static/SK/ZZ/2009/8/20270901.html",
+          "retrieved_utc": "2026-11-19T05:51:46Z",
+          "http_status": 200,
+          "bytes": 2117169,
+          "sha256": "2907afd8737b42340e805957c10c92a997a81e86db0545b9b6d669ded2c6669f"
+        },
+        {
+          "file": "sk-8-20290101.html",
+          "authority": "Slov-Lex",
+          "document_version": "from 2029-01-01",
+          "finding": "§39 identical to 20270101.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://static.slov-lex.sk/static/SK/ZZ/2009/8/20290101.html",
+          "retrieved_utc": "2026-11-19T05:51:46Z",
+          "http_status": 200,
+          "bytes": 2117947,
+          "sha256": "986e99b61df06dd07e12bf073334971c6ec5dfb63ab36fcd6d01db09900077c6"
+        },
+        {
+          "file": "sk-241-index.html",
+          "authority": "Slov-Lex",
+          "document_version": "consolidations up to 20261029",
+          "finding": "NEW consolidation 241/1993 effective 2026-10-29 (Act 256/2026 Z.z.) appeared after the dataset review.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://static.slov-lex.sk/static/SK/ZZ/1993/241/",
+          "retrieved_utc": "2026-11-19T05:51:36Z",
+          "http_status": 200,
+          "bytes": 11203,
+          "sha256": "e57abba6cd3bc73d6f17d9a816d4f78f076a16fcec1d8d67fc3129e95055063e"
+        },
+        {
+          "file": "sk-241-20261029.html",
+          "authority": "Slov-Lex",
+          "document_version": "241/1993 effective from 2026-10-29",
+          "finding": "Act 256/2026 only adds memorial day 18 Sep (Deň štátnej vlajky) to §3; §1, §2 (days of rest incl. 24-26 Dec) and §4b unchanged. §4b removes 15 Sep and 8 May as days of rest ONLY 'v roku 2026'. Hence under the law as currently consolidated, 8 May and 15 Sep are days of rest again in 2027: 15 Sep 2027 (Wednesday) = single day of rest -> §39(2) ban 06:00-22:00; 8 May 2027 is a Saturday (no extra ban outside Jul-Aug, Sunday 9 May covered by §39(1)(b)).",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://static.slov-lex.sk/static/SK/ZZ/1993/241/20261029.html",
+          "retrieved_utc": "2026-11-19T05:52:05Z",
+          "http_status": 200,
+          "bytes": 46274,
+          "sha256": "fcbc7050cd2121800e71ec6813c9a42860e71703b89d42854a457f287506bbc5"
+        }
+      ],
+      "notes": "2027 derivation flag: 15 Sep 2027 ban arises because the 2026-only §4b suspension lapses; a further consolidation amendment extending §4b to 2027 is not visible in Slov-Lex as of retrieval (no consolidation after 20261029) -> verify again before Sep 2027."
+    },
+    {
+      "jurisdiction": "PL",
+      "regime_2027": "PROMULGATED_RECURRING_LAW",
+      "regime_basis": "Regulation of 31 Jul 2007 (consolidated Dz.U. 2023 poz. 2423, amended Dz.U. 2026 poz. 1110) — closed list of holiday dates + summer school-holiday regime",
+      "dec_2026_instrument_unchanged": true,
+      "dec_2026_change_vs_dataset": "NO_CHANGE",
+      "months_2027": {
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW",
+        "2027-12": "PROMULGATED_RECURRING_LAW"
+      },
+      "evidence": [
+        {
+          "file": "pl-2423-eli.json",
+          "authority": "Sejm ELI API (official Dziennik Ustaw)",
+          "document_version": "Dz.U. 2023 poz. 2423, status obowiązujący, changeDate 2026-08-20",
+          "finding": "Only post-consolidation amendment: Dz.U. 2026 poz. 1110.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://api.sejm.gov.pl/eli/acts/DU/2023/2423",
+          "retrieved_utc": "2026-11-19T05:50:05Z",
+          "http_status": 200,
+          "bytes": 1146,
+          "sha256": "303149793914e105d28a942a8bbea0c7ab0be12c7ce0590eeea371336195ff90"
+        },
+        {
+          "file": "pl-1040-refs.json",
+          "authority": "Sejm ELI API",
+          "document_version": "base act Dz.U. 2007 nr 147 poz. 1040 references",
+          "finding": "Amending acts end with Dz.U. 2026 poz. 1110 (17 Aug 2026); nothing newer.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://api.sejm.gov.pl/eli/acts/DU/2007/1040/references",
+          "retrieved_utc": "2026-11-19T05:52:33Z",
+          "http_status": 200,
+          "bytes": 8684,
+          "sha256": "a8f5b6acc0a1d4e850c181f466292c863a64a9c0ed4756e46f5cea3a080a561c"
+        },
+        {
+          "file": "pl-2423-refs.json",
+          "authority": "Sejm ELI API",
+          "document_version": "references",
+          "finding": "Confirms single amendment 2026/1110.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://api.sejm.gov.pl/eli/acts/DU/2023/2423/references",
+          "retrieved_utc": "2026-11-19T05:52:27Z",
+          "http_status": 200,
+          "bytes": 1743,
+          "sha256": "1487edfa37328e10fe4d2658c2dd709231c7fe8df8e0e5aed9b841ad119ab727"
+        },
+        {
+          "file": "pl-2423-text.pdf",
+          "authority": "Sejm ELI",
+          "document_version": "D20232423.pdf",
+          "finding": "Byte-identical to dataset hash 9721dda7...: >12 t; listed holidays 08:00-22:00 incl. 25/26 Dec; eves 18:00-22:00 only before listed days (not before 25/26 Dec, 1 Jan); 24 Dec not listed.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://api.sejm.gov.pl/eli/acts/DU/2023/2423/text.pdf",
+          "retrieved_utc": "2026-11-19T05:52:27Z",
+          "http_status": 200,
+          "bytes": 209905,
+          "sha256": "9721dda73d1b45b6300f3e636b9db37504908cd8d4c54c2f5092b6bdb3f5457a"
+        },
+        {
+          "file": "pl-1110.pdf",
+          "authority": "Sejm ELI",
+          "document_version": "Dz.U. 2026 poz. 1110",
+          "finding": "Byte-identical to dataset hash; exemptions only.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://api.sejm.gov.pl/eli/acts/DU/2026/1110/text.pdf",
+          "retrieved_utc": "2026-11-19T05:59:05Z",
+          "http_status": 200,
+          "bytes": 159231,
+          "sha256": "9d42c6528bcd6b1d08055ba7c1a7de218193bf9110ef6cc967244d6501032d39"
+        },
+        {
+          "file": "pl-1951-refs.json",
+          "authority": "Sejm ELI API",
+          "document_version": "Act of 18 Jan 1951 on days off",
+          "finding": "No amendment after Dz.U. 2024 poz. 1965 (consolidated 2025 poz. 296).",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://api.sejm.gov.pl/eli/acts/DU/1951/28/references",
+          "retrieved_utc": "2026-11-19T05:52:43Z",
+          "http_status": 200,
+          "bytes": 5123,
+          "sha256": "adfa7946f0e76b5765a70cb6ec380225a46a3483fb4469bd4b7269e4ab3229a2"
+        }
+      ],
+      "notes": "Summer Fri/Sat/Sun regime 2027 depends on school-holiday dates set by the education regulation (recurring rule); not re-read here."
+    },
+    {
+      "jurisdiction": "HU",
+      "regime_2027": "PROMULGATED_RECURRING_LAW",
+      "regime_basis": "Govt Decree 190/2008 §2 + Labour Code (Act I of 2012) §102(1) munkaszüneti napok",
+      "dec_2026_instrument_unchanged": false,
+      "dec_2026_change_vs_dataset": "CHANGED",
+      "months_2027": {
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW",
+        "2027-12": "PROMULGATED_RECURRING_LAW"
+      },
+      "evidence": [
+        {
+          "file": "hu-190.html",
+          "authority": "Nemzeti Jogszabálytár (official)",
+          "document_version": "190/2008 consolidated state 2025.01.01 (still current)",
+          "finding": "Byte-identical to dataset (sha 4b3cd0e4...). §2(1)(b) 1 Sep-30 Jun: from 22:00 on the day before to 22:00 on Sundays and munkaszüneti napok, >7.5 t; §2(2) if a holiday falls on the day before Sunday (Sep-Jun), restriction applies continuously 'a korlátozott időszak első nap 8 órától az utolsó nap 22 óráig'; §2(3) 4 Nov-1 Mar exemption for international-traffic trucks of env. class >=7 (EURO 3); §2(1)(a) Jul-Aug Saturday 15:00 regime.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://njt.jog.gov.hu/jogszabaly/2008-190-20-22",
+          "retrieved_utc": "2026-11-19T05:50:05Z",
+          "http_status": 200,
+          "bytes": 84858,
+          "sha256": "4b3cd0e4d19d508dcbbf769e9549feb1b96601c85d4a0c84b74ccb93d681b313"
+        },
+        {
+          "file": "hu-mt.html",
+          "authority": "Nemzeti Jogszabálytár",
+          "document_version": "Act I of 2012 consolidated state 2026.11.14",
+          "finding": "§102(1) NOW: 'január 1., március 15., nagypéntek, húsvéthétfő, május 1., pünkösdhétfő, augusztus 20., október 23., november 1. és december 24–26.' Text established by Act LXXII of 2026 §3.",
+          "change_vs_dataset": "CHANGED",
+          "url": "https://njt.jog.gov.hu/jogszabaly/2012-1-00-00",
+          "retrieved_utc": "2026-11-19T05:59:05Z",
+          "http_status": 200,
+          "bytes": 766196,
+          "sha256": "10a8bdef3ba758694273614c01355f4228ec8c3f5db9100940701aaabae3857c"
+        },
+        {
+          "file": "hu-2026-72.html",
+          "authority": "Nemzeti Jogszabálytár",
+          "document_version": "Act LXXII of 2026, adopted 3 Nov 2026, promulgated 13 Nov 2026, in force the following day (14 Nov 2026)",
+          "finding": "Declares 24 December a permanent munkaszüneti nap (public holiday).",
+          "change_vs_dataset": "CHANGED",
+          "url": "https://njt.jog.gov.hu/jogszabaly/2026-72-00-00",
+          "retrieved_utc": "2026-11-19T05:59:22Z",
+          "http_status": 200,
+          "bytes": 53610,
+          "sha256": "0f5e415cf4454f54f10963c6946fba41cb85f4505a1482252736f30422d2b866"
+        }
+      ],
+      "dec_2026_effect": "24 Dec 2026 (Thu) is now a munkaszüneti nap -> Decree 190/2008 ban starts 23 Dec 2026 22:00 and runs continuously to Sun 27 Dec 22:00 (dataset rule hu-holiday-2026-12-25-26 starts 24 Dec 22:00 and its source note says 24 Dec is not a public holiday — now outdated). The §2(3) EURO3+ international-traffic winter exemption still applies.",
+      "notes": "2027: 24 Dec 2027 (Fri) also a holiday -> 23 Dec 22:00 to Sun 26 Dec 22:00. Easter/Whit Sunday wording in §102(1) not compared word-by-word with the previous state; Sundays are banned anyway. The 2027 working-day rearrangement decree (relevant to the Jul-Aug 'Saturday unless working day' clause) was not checked: UNVERIFIED."
+    },
+    {
+      "jurisdiction": "SI",
+      "regime_2027": "PROMULGATED_RECURRING_LAW",
+      "regime_basis": "Standing Odredba o omejitvi prometa na cestah v RS (UL 75/2011, am. 195/2021, 67/2025) + ZPDPD holidays — per dataset's prior review; not re-read today",
+      "dec_2026_instrument_unchanged": null,
+      "dec_2026_change_vs_dataset": "UNKNOWN",
+      "months_2027": {
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "UNVERIFIED",
+        "2027-07": "UNVERIFIED",
+        "2027-08": "UNVERIFIED",
+        "2027-09": "UNVERIFIED",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW",
+        "2027-12": "PROMULGATED_RECURRING_LAW"
+      },
+      "evidence": [
+        {
+          "file": "si-pisrs-zpdpd-i.pdf",
+          "authority": "PISRS / Uradni list RS",
+          "document_version": "ZPDPD-I (2 Oct 2026)",
+          "finding": "Byte-identical to dataset hash e9b77caa...; 25 and 26 Dec non-working days unchanged.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://pisrs.si/api/uradni-list/objava/u20261567.pdf",
+          "retrieved_utc": "2026-11-19T05:54:39Z",
+          "http_status": 200,
+          "bytes": 154413,
+          "sha256": "e9b77caa3961e54775dd00485f6a71ede2e7661c275be7b81ee9927a58775a76"
+        },
+        {
+          "file": "si-odredba-2011.html",
+          "authority": "Uradni list RS",
+          "document_version": "UL 75/2011",
+          "finding": "SOURCE_UNAVAILABLE: TLS verification failure ('self-signed certificate in certificate chain') via configured proxy; TLS not disabled.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.uradni-list.si/glasilo-uradni-list-rs/vsebina/105152",
+          "retrieved_utc": "2026-11-19T05:54:01Z",
+          "http_status": 0,
+          "bytes": 0,
+          "sha256": null
+        },
+        {
+          "file": "si-ul-pdf-2011.pdf",
+          "authority": "Uradni list RS",
+          "document_version": "PDF",
+          "finding": "SOURCE_UNAVAILABLE (same TLS failure).",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.uradni-list.si/_pdf/2011/Ur/u2011075.pdf",
+          "retrieved_utc": "2026-11-19T05:54:39Z",
+          "http_status": 0,
+          "bytes": 0,
+          "sha256": null
+        },
+        {
+          "file": "si-ul-search.html",
+          "authority": "Uradni list RS search",
+          "document_version": "-",
+          "finding": "SOURCE_UNAVAILABLE (same TLS failure) — could not search for 2026 amendments to the Odredba.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.uradni-list.si/iskalnik?q=odredba+o+omejitvi+prometa+na+cestah",
+          "retrieved_utc": "2026-11-19T05:54:01Z",
+          "http_status": 0,
+          "bytes": 0,
+          "sha256": null
+        },
+        {
+          "file": "si-promet.html",
+          "authority": "promet.si (DRSI)",
+          "document_version": "-",
+          "finding": "SOURCE_UNAVAILABLE: connection reset (proxy ws_closed_mid_exchange), repeated 4x.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.promet.si/sl/splosne-omejitve",
+          "retrieved_utc": "2026-11-19T05:54:01Z",
+          "http_status": 0,
+          "bytes": 0,
+          "sha256": null
+        },
+        {
+          "file": "si-dars.html",
+          "authority": "DARS",
+          "document_version": "-",
+          "finding": "SOURCE_UNAVAILABLE: connection reset.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.dars.si/",
+          "retrieved_utc": "2026-11-19T05:54:39Z",
+          "http_status": 0,
+          "bytes": 0,
+          "sha256": null
+        }
+      ],
+      "notes": "pisrs.si other paths (register/search) returned HTTP 407 from the egress proxy (policy) — not retried/bypassed. Summer 2027 tourist-season Saturday dates (2026: 27 Jun-6 Sep from promet.si) could not be re-derived from the Odredba text today -> Jun-Sep UNVERIFIED."
+    },
+    {
+      "jurisdiction": "HR",
+      "regime_2027": "PROMULGATED_RECURRING_LAW",
+      "regime_basis": "Standing Naredba o ograničenju prometa na cestama NN 64/2009 + Zakon o blagdanima NN 110/2019 (am. 72/2025)",
+      "dec_2026_instrument_unchanged": true,
+      "dec_2026_change_vs_dataset": "NO_CHANGE",
+      "months_2027": {
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW",
+        "2027-12": "PROMULGATED_RECURRING_LAW"
+      },
+      "evidence": [
+        {
+          "file": "hr-naredba.html",
+          "authority": "Narodne novine (official gazette)",
+          "document_version": "NN 64/2009 text",
+          "finding": "Text unchanged in substance (page hash differs from dataset due to page chrome): >7.5 t or >14 m; point I roads (D8 etc.) 15 Jun-15 Sep Sat 04-14, Sun 12-23; Good Friday and holiday eves 15-23, last holiday day 14-23; holiday on Fri/Sat -> Sunday 12-23; holiday on Sun/Mon -> preceding Friday 15-23; point III D2 Varaždin-Dubrava Križovljanska Sundays 06-22 all year.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2009_06_64_1440.html",
+          "retrieved_utc": "2026-11-19T05:50:05Z",
+          "http_status": 200,
+          "bytes": 30458,
+          "sha256": "fe854d2f1b21162fcd3823437ea8239cb31ebbf8dcc8cc364cb45f3962ab4307"
+        },
+        {
+          "file": "hr-hak.html",
+          "authority": "HAK (secondary)",
+          "document_version": "retrieved 2026-11-19",
+          "finding": "Still reproduces the 2009 Naredba (wording 'ograničenje') and the permanent >7.5 t Pravilnik; no new annual order listed.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://www.hak.hr/info/korisne-informacije/zabrane-za-teretna-vozila/",
+          "retrieved_utc": "2026-11-19T05:53:41Z",
+          "http_status": 200,
+          "bytes": 45915,
+          "sha256": "50b5b33a9424749f3a1b5230292a514c752bc72355ea6867dca6c4ba37a60ab5",
+          "role": "SECONDARY"
+        },
+        {
+          "file": "hr-blagdani.html",
+          "authority": "Narodne novine",
+          "document_version": "NN 110/2019",
+          "finding": "Art.1 holiday list unchanged (incl. 18 Nov, 25, 26 Dec).",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+          "retrieved_utc": "2026-11-19T05:59:05Z",
+          "http_status": 200,
+          "bytes": 65701,
+          "sha256": "b33ae7348962af8408314ccbe10986aebc8eac8515baf4382208e6e3059fd550"
+        },
+        {
+          "file": "hr-nn-search.html",
+          "authority": "Narodne novine search",
+          "document_version": "-",
+          "finding": "Search query was not applied server-side (returned latest issue list NN 132/2026) — no conclusion drawn on absence of a newer Naredba.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://narodne-novine.nn.hr/search.aspx?sortiraj=4&kategorija=1&rpp=50&qtype=1&pretraga=da&naslovi=da&upit=Naredba+o+ograni%C4%8Denju+prometa",
+          "retrieved_utc": "2026-11-19T05:53:41Z",
+          "http_status": 200,
+          "bytes": 772551,
+          "sha256": "79ab5b3a830f69237495135cce285d5ac4846bd06d523acf67a6fefa891da7d4"
+        }
+      ],
+      "notes": "Absence of a newer Naredba not proven via NN search; HAK corroborates."
+    },
+    {
+      "jurisdiction": "LU",
+      "regime_2027": "PROMULGATED_RECURRING_LAW",
+      "regime_basis": "Grand-Ducal regulation of 19 July 1997 (transit to DE/FR on Sundays and listed holidays), per Police page",
+      "dec_2026_instrument_unchanged": true,
+      "dec_2026_change_vs_dataset": "NO_CHANGE",
+      "months_2027": {
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW",
+        "2027-12": "PROMULGATED_RECURRING_LAW"
+      },
+      "evidence": [
+        {
+          "file": "lu-police.html",
+          "authority": "Police Grand-Ducale",
+          "document_version": "page 'Dernière mise à jour 31/07/2025' (unchanged)",
+          "finding": ">7.5 t transit towards DE and FR; FR-bound 21:30 Sat/eve -> 21:45 Sun/holiday; DE-bound 23:30 -> 21:45. DE-bound holidays: 1 Jan, Good Friday, Easter Mon, 1 May, Ascension, Whit Mon, Corpus Christi, 3 Oct, 25, 26 Dec. FR-bound: 1 Jan, Easter Mon, 1 May, 8 May, Ascension, Whit Mon, 14 Jul, 15 Aug, 1 Nov, 11 Nov, 25 Dec. Exemptions: live animals, perishables, flowers, events, harvest, press, removals, markets, combined transport <=200 km (DE-bound), emergency. Hash differs from dataset because of page chrome; content and last-update date same.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://police.public.lu/en/legislation/code-de-la-route/routiers-poids-lourds1.html",
+          "retrieved_utc": "2026-11-19T05:50:05Z",
+          "http_status": 200,
+          "bytes": 64043,
+          "sha256": "13a5365b272dbddd245ecd6e5d81df0da1d9f4547b3935042290d49c6e7e0c6c"
+        },
+        {
+          "file": "lu-rgd-1997.html",
+          "authority": "Legilux",
+          "document_version": "ELI guess /eli/etat/leg/rgd/1997/07/19/n1/jo",
+          "finding": "SOURCE_UNAVAILABLE for content: JS single-page app shell only; primary regulation text not read.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://legilux.public.lu/eli/etat/leg/rgd/1997/07/19/n1/jo",
+          "retrieved_utc": "2026-11-19T05:53:24Z",
+          "http_status": 200,
+          "bytes": 2503,
+          "sha256": "b03eb88566e178ac97f9ba2f95252559d1dae2b5cbf893f595cd5d0a595af3ad"
+        }
+      ],
+      "notes": "Holiday list on the Police page appears to be a fixed list (mirrors DE/FR national holidays) — 2027 dates derivable; Police page last updated 2025, primary RGD not re-read."
+    },
+    {
+      "jurisdiction": "GR",
+      "regime_2027": "ANNUAL_PUBLISHED_ORDER (annual ΚΥΑ in ΦΕΚ Β΄)",
+      "regime_basis": "Annual joint ministerial decision; 2026 = ΦΕΚ Β΄ 912/18.02.2026 (ΚΥΑ Δ30/Δ5α/27316), which also covers 1, 3 and 6 Jan 2027",
+      "dec_2026_instrument_unchanged": true,
+      "dec_2026_change_vs_dataset": "NEW_BAN",
+      "months_2027": {
+        "2027-01": "ANNUAL_PUBLISHED",
+        "2027-02": "AWAITING_PUBLICATION",
+        "2027-03": "AWAITING_PUBLICATION",
+        "2027-04": "AWAITING_PUBLICATION",
+        "2027-05": "AWAITING_PUBLICATION",
+        "2027-06": "AWAITING_PUBLICATION",
+        "2027-07": "AWAITING_PUBLICATION",
+        "2027-08": "AWAITING_PUBLICATION",
+        "2027-09": "AWAITING_PUBLICATION",
+        "2027-10": "AWAITING_PUBLICATION",
+        "2027-11": "AWAITING_PUBLICATION",
+        "2027-12": "AWAITING_PUBLICATION"
+      },
+      "evidence": [
+        {
+          "file": "gr-fek-912b-2026.pdf",
+          "authority": "Εθνικό Τυπογραφείο / ΦΕΚ Β΄ 912/18.02.2026",
+          "document_version": "official PDF, digitally signed 19.02.2026",
+          "finding": ">3.5 t on listed motorway/national-road sections (A1 = outbound list, A2 = return list). B8 Christmas/New Year/Epiphany 2026-2027: Thu 24 Dec 2026 16:00-22:00 (A1); Sun 27 Dec 2026 15:00-22:00 (A2); Thu 31 Dec 2026 15:00-21:00 (A1); Fri 1 Jan 2027 16:00-22:00 (A1); Sun 3 Jan 2027 15:00-21:00 (A2); Wed 6 Jan 2027 15:00-21:00 (A2). In force from publication.",
+          "change_vs_dataset": "NEW_BAN",
+          "url": "https://ia37rg02wpsa01.blob.core.windows.net/fek/02/2026/20260200912.pdf",
+          "retrieved_utc": "2026-11-19T05:55:08Z",
+          "http_status": 200,
+          "bytes": 739347,
+          "sha256": "31404788b69181136c1e4715dfb53aec864bc2e3d36fd502ddc6e3301ee150b3"
+        },
+        {
+          "file": "gr-s-078684.json",
+          "authority": "et.gr search backend (official National Printing Office search)",
+          "document_version": "full-text search 2026-2027, Issue B, operative phrase 'κυκλοφορίας φορτηγών αυτοκινήτων μέγιστου επιτρεπόμενου βάρους άνω των 3,5 τόνων'",
+          "finding": "Only hit: Β 912/2026. No amending decision and no 2027 decision indexed as of retrieval.",
+          "change_vs_dataset": "NO_CHANGE",
+          "url": "https://searchetv99.azurewebsites.net/api/simplesearch (POST, backend of et.gr search; years 2026-2027, issue B, exact operative phrase)",
+          "retrieved_utc": "2026-11-19T05:55:40Z",
+          "http_status": 200,
+          "bytes": 4096,
+          "sha256": "040d93591212a469128e8db5f0ea154f0b5e1a3cadd62b51ba7fac7907b49b7c"
+        }
+      ],
+      "dec_2026_effect": "Dataset has no GR rules after 28 Oct 2026; the B8 Dec 2026 dates (24, 27, 31 Dec) were already published in ΦΕΚ Β΄ 912/2026 but are not encoded -> NEW_BAN relative to dataset (not a newly published instrument). Jan 2027 dates 1, 3, 6 Jan also in the same ΦΕΚ.",
+      "notes": "2027 annual ΚΥΑ (Clean Monday onwards) not yet published; the 2026 one appeared 18 Feb 2026. Search-index lag possible. Permanent 2017 decision (B 3769) network and exceptional-transport regime remain unreviewed."
+    },
+    {
+      "jurisdiction": "BG",
+      "regime_2027": "ANNUAL_PUBLISHED_ORDER (annual API order for holiday peaks, plus ad-hoc and heat-triggered orders)",
+      "regime_basis": "Annual order of the Road Infrastructure Agency (API), draft published for consultation (2026 draft: 10 Nov 2025)",
+      "dec_2026_instrument_unchanged": null,
+      "dec_2026_change_vs_dataset": "UNKNOWN",
+      "months_2027": {
+        "2027-01": "AWAITING_PUBLICATION",
+        "2027-02": "AWAITING_PUBLICATION",
+        "2027-03": "AWAITING_PUBLICATION",
+        "2027-04": "AWAITING_PUBLICATION",
+        "2027-05": "AWAITING_PUBLICATION",
+        "2027-06": "AWAITING_PUBLICATION",
+        "2027-07": "AWAITING_PUBLICATION",
+        "2027-08": "AWAITING_PUBLICATION",
+        "2027-09": "AWAITING_PUBLICATION",
+        "2027-10": "AWAITING_PUBLICATION",
+        "2027-11": "AWAITING_PUBLICATION",
+        "2027-12": "AWAITING_PUBLICATION"
+      },
+      "evidence": [
+        {
+          "file": "bg-api-draft2026.html",
+          "authority": "API official message via BTA (Art. 5 BTA Act)",
+          "document_version": "10 Nov 2025, DRAFT 2026 order",
+          "finding": ">12 t on AM Trakia, AM Hemus km 0-87, AM Struma, I-1 Simitli km 376-Kresna km 402. Draft Christmas/New Year 2026: 23.12.2026 14:00-20:00, 24.12.2026 09:00-14:00, 28.12.2026 12:00-20:00; last-day restriction only towards Sofia. Exemptions: public passenger transport; on Hemus/Struma/I-1 also ADR, live animals, perishables, temperature-controlled, carcass trucks; Trakia ADR exemption Ihtiman-Vakarel towards Sofia.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.bta.bg/bg/news/bulgaria/oficial-messages/1005565-api-pri-ofitsialni-praznitsi-prez-2026-g-v-pikovite-chasove-se-predvizhda-vrem",
+          "retrieved_utc": "2026-11-19T05:56:13Z",
+          "http_status": 200,
+          "bytes": 358259,
+          "sha256": "48c6f4169a70c7c221304f6b99fbf4961c6fd9fdddaa95b5173a821b16478894",
+          "role": "SECONDARY (draft)"
+        },
+        {
+          "file": "bg-bta-om.html",
+          "authority": "BTA official messages index",
+          "document_version": "latest page 2026-11-19",
+          "finding": "No API 2027 holiday draft or December 2026 truck message visible on the first index page.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.bta.bg/bg/news/bulgaria/oficial-messages",
+          "retrieved_utc": "2026-11-19T05:56:13Z",
+          "http_status": 200,
+          "bytes": 378076,
+          "sha256": "fa9026bc36327c9b1f4d297e5adb2a92690e12a0c1b68063f3286dd9a759b390"
+        },
+        {
+          "file": "bg-bta-search-2027.html",
+          "authority": "BTA search",
+          "document_version": "-",
+          "finding": "Search results are JS-rendered; page returned generic latest news only — no conclusion drawn.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.bta.bg/bg/search?q=%D0%90%D0%9F%D0%98+%D1%82%D0%B5%D0%B6%D0%BA%D0%BE%D1%82%D0%BE%D0%B2%D0%B0%D1%80%D0%BD%D0%B8+2027",
+          "retrieved_utc": "2026-11-19T05:56:45Z",
+          "http_status": 200,
+          "bytes": 344050,
+          "sha256": "91d2d6a963d9b602690625e2ea1219b95481f1159c35deb71efbcd82c9d80860"
+        },
+        {
+          "file": "bg-api-home.html",
+          "authority": "API (api.bg)",
+          "document_version": "-",
+          "finding": "SOURCE_UNAVAILABLE: connection reset (also via HTTP/1.1 retry).",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.api.bg/",
+          "retrieved_utc": "2026-11-19T05:56:13Z",
+          "http_status": 0,
+          "bytes": 0,
+          "sha256": null
+        }
+      ],
+      "dec_2026_effect": "Dataset encodes no BG Dec 2026 restriction. The 2026 draft order foresaw 23, 24 and 28 Dec 2026; the final 2026 order text was never retrieved (final Sept times differed from the draft). Potential NEW_BAN, UNVERIFIED — needs the final order or the API December bulletin.",
+      "notes": "2027 draft/final not found; web search (secondary discovery) found nothing for 2027. AWAITING_PUBLICATION means 'not found as of retrieval', not 'no ban'."
+    },
+    {
+      "jurisdiction": "RO",
+      "regime_2027": "SOURCE_UNAVAILABLE",
+      "regime_basis": "CNAIR holiday/heat restriction orders; legal text not retrieved",
+      "dec_2026_instrument_unchanged": null,
+      "dec_2026_change_vs_dataset": "UNKNOWN",
+      "months_2027": {
+        "2027-01": "SOURCE_UNAVAILABLE",
+        "2027-02": "SOURCE_UNAVAILABLE",
+        "2027-03": "SOURCE_UNAVAILABLE",
+        "2027-04": "SOURCE_UNAVAILABLE",
+        "2027-05": "SOURCE_UNAVAILABLE",
+        "2027-06": "SOURCE_UNAVAILABLE",
+        "2027-07": "SOURCE_UNAVAILABLE",
+        "2027-08": "SOURCE_UNAVAILABLE",
+        "2027-09": "SOURCE_UNAVAILABLE",
+        "2027-10": "SOURCE_UNAVAILABLE",
+        "2027-11": "SOURCE_UNAVAILABLE",
+        "2027-12": "SOURCE_UNAVAILABLE"
+      },
+      "evidence": [
+        {
+          "file": "ro-cnadnr-home.html",
+          "authority": "CNAIR (cnadnr.ro)",
+          "document_version": "-",
+          "finding": "SOURCE_UNAVAILABLE: connection reset by peer.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.cnadnr.ro/",
+          "retrieved_utc": "2026-11-19T05:57:35Z",
+          "http_status": 0,
+          "bytes": 0,
+          "sha256": null
+        },
+        {
+          "file": "ro-cnadnr-comunicate.html",
+          "authority": "CNAIR press releases",
+          "document_version": "-",
+          "finding": "SOURCE_UNAVAILABLE: connection reset by peer.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.cnadnr.ro/ro/comunicate-de-presa",
+          "retrieved_utc": "2026-11-19T05:57:46Z",
+          "http_status": 0,
+          "bytes": 0,
+          "sha256": null
+        },
+        {
+          "file": "ro-legis-search.html",
+          "authority": "legislatie.just.ro",
+          "document_version": "-",
+          "finding": "SOURCE_UNAVAILABLE: HTTP/2 PROTOCOL_ERROR; HTTP/1.1 retry empty reply.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://legislatie.just.ro/Public/RezultateCautare?titlu=restrictionare+circulatie&an=2018",
+          "retrieved_utc": "2026-11-19T05:57:10Z",
+          "http_status": 0,
+          "bytes": 0,
+          "sha256": null
+        },
+        {
+          "file": "ro-cnair-home.html",
+          "authority": "cnair.ro",
+          "document_version": "-",
+          "finding": "WARNING: cnair.ro is NOT the Romanian road company (unrelated 'Cloud Network Applications Integration Router' WordPress site). Do not use as a source.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.cnair.ro/",
+          "retrieved_utc": "2026-11-19T05:57:10Z",
+          "http_status": 200,
+          "bytes": 40313,
+          "sha256": "fb98eb4e6b78a0868b23d54809a4fba7d6a8d4a1bdcbeda26b6de84e40e94f77",
+          "role": "NOT_AUTHORITATIVE"
+        }
+      ],
+      "notes": "Web search (secondary, discovery only) found a Profit.ro item about CNAIR restrictions on A2 for 24-26 December of an unidentified year and references to joint order MT-MAI 1249/132/2018; none verified from primary text. No primary evidence obtained."
+    },
+    {
+      "jurisdiction": "ME",
+      "regime_2027": "ANNUAL_PUBLISHED_ORDER for the summer season (Police/Government naredba); standing weekend/holiday regime UNVERIFIED",
+      "regime_basis": "Seasonal naredba (2026 order published 2026-06-12, valid to 15 Sep/15 Oct 2026)",
+      "dec_2026_instrument_unchanged": null,
+      "dec_2026_change_vs_dataset": "UNKNOWN",
+      "months_2027": {
+        "2027-01": "UNVERIFIED",
+        "2027-02": "UNVERIFIED",
+        "2027-03": "UNVERIFIED",
+        "2027-04": "UNVERIFIED",
+        "2027-05": "UNVERIFIED",
+        "2027-06": "AWAITING_PUBLICATION",
+        "2027-07": "AWAITING_PUBLICATION",
+        "2027-08": "AWAITING_PUBLICATION",
+        "2027-09": "AWAITING_PUBLICATION",
+        "2027-10": "AWAITING_PUBLICATION",
+        "2027-11": "UNVERIFIED",
+        "2027-12": "UNVERIFIED"
+      },
+      "evidence": [
+        {
+          "file": "me-police-order.html",
+          "authority": "Government of Montenegro / Police Directorate (gov.me)",
+          "document_version": "-",
+          "finding": "SOURCE_UNAVAILABLE: connection reset (curl, HTTP/1.1 retry); WebFetch HTTP 503.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.gov.me/clanak/obavjestenje-naredba-o-privremenoj-zabrani-saobracaja-teretnih-motornih-vozila-i-ogranicavanju-saobracaja-svih-kategorija-vozila-na-odredenim-putnim-pravcima-2",
+          "retrieved_utc": "2026-11-19T05:57:10Z",
+          "http_status": 0,
+          "bytes": 0,
+          "sha256": null
+        },
+        {
+          "file": "me-gov-search.html",
+          "authority": "gov.me search",
+          "document_version": "-",
+          "finding": "SOURCE_UNAVAILABLE: connection reset.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.gov.me/pretraga?q=zabrana+saobra%C4%87aja+teretnih",
+          "retrieved_utc": "2026-11-19T05:57:10Z",
+          "http_status": 0,
+          "bytes": 0,
+          "sha256": null
+        },
+        {
+          "file": "me-sluzbeni.html",
+          "authority": "Službeni list Crne Gore",
+          "document_version": "home page",
+          "finding": "Reachable, but the order register was not searched (search is not server-rendered); no finding.",
+          "change_vs_dataset": "UNKNOWN",
+          "url": "https://www.sluzbenilist.me/",
+          "retrieved_utc": "2026-11-19T05:58:35Z",
+          "http_status": 200,
+          "bytes": 38259,
+          "sha256": "123ace28a477a51ee57e606bb0a82628e188fcc4e139236fa245c41f93d9bc66"
+        }
+      ],
+      "notes": "Summer 2027 order would normally be published around May-June 2027. No primary evidence on Nov-Dec 2026 or non-summer months."
+    }
+  ],
+  "priority_actions": [
+    "HU: update hu-holiday-2026-12-25-26 to start 2026-12-23 22:00 (24 Dec now public holiday by Act LXXII of 2026, in force 14 Nov 2026); update hu-mt source note.",
+    "GR: encode ΦΕΚ Β΄ 912/2026 B8 dates 24/27/31 Dec 2026 and 1/3/6 Jan 2027 (directional A1/A2 lists, >3.5 t).",
+    "BG: obtain final 2026 API order / December bulletin for 23, 24, 28 Dec 2026 (draft-only evidence).",
+    "SK: note 15 Sep 2027 (Wed) is a day of rest again unless §4b of 241/1993 is extended.",
+    "SI, RO, ME, LU-legilux: re-attempt sources (TLS failure / resets / SPA)."
+  ]
+}

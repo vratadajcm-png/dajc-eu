@@ -4,6 +4,9 @@ import {canonicalDrivingBans as current, drivingBanCalendars} from '../config/dr
 import {snapshot, toIcs, validateCanonical, validWeight, publicationWindow, SCOPE_CHECKS} from '../src/lib/driving-bans/core.mjs';
 // Regression cases against the maintained production dataset (2026-09-26 sweep).
 const SWEEP = new Date('2026-09-01T08:00:00Z');
+// Sources re-retrieved by the 19 Nov 2026 corrections must match that later evidence log instead of the earlier one.
+const LATER_LOG = JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-11-19-thursday/r6-registry-corrections.json', import.meta.url), 'utf8'));
+const LATEST_SHA = new Map(LATER_LOG.retrievals.map(r => [r.source_id, r.sha256]));
 const at = (clock = SWEEP) => snapshot(structuredClone(current), coverage, clock);
 const ev = (v, id) => v.events.filter(e => e.ban_id === id);
 const one = (v, id, date) => v.events.find(e => e.ban_id === id && e.date === date);
@@ -211,10 +214,15 @@ export function registerProductionDrivingBanTests(test, a) {
     a.deepEqual(ev(v, 'lu-germany-christmas-2026').map(e => e.date), ['2026-12-24', '2026-12-25']);
     a.deepEqual(ev(v, 'lu-france-christmas-2026').map(e => e.date), ['2026-12-24']);
   });
-  test('27 Oct 2026 — Hungary: continuous ban from 24 Dec 22:00 to 27 Dec 22:00', () => {
+  test('19 Nov 2026 — Hungary: 24 Dec is a public holiday (Act LXXII of 2026), continuous ban 23 Dec 22:00 to 27 Dec 22:00', () => {
     const v = at(NOVDEC);
-    const hu = v.events.filter(e => e.jurisdiction === 'HU' && e.ends_at > '2026-12-24T00:00:00Z' && e.starts_at < '2026-12-28T00:00:00Z').sort((x, y) => x.starts_at.localeCompare(y.starts_at));
-    a.equal(hu[0].starts_at, '2026-12-24T21:00:00.000Z');
+    const hu = v.events.filter(e => e.jurisdiction === 'HU' && e.ends_at > '2026-12-23T00:00:00Z' && e.starts_at < '2026-12-28T00:00:00Z').sort((x, y) => x.starts_at.localeCompare(y.starts_at));
+    a.equal(hu[0].starts_at, '2026-12-23T21:00:00.000Z');
+    const block = ev(v, 'hu-holiday-2026-12-25-26');
+    a.equal(block.length, 1);
+    a.equal(block[0].uid, 'hu-holiday-2026-12-25-26-2026-12-24@dajc.eu', 'occurrence identity stays stable across the correction');
+    a.equal(block[0].sequence, 1, 'correction increments the revision sequence');
+    a.ok(block[0].evidence_ids.includes('hu-act-2026-72'));
     a.equal(hu.at(-1).ends_at, '2026-12-27T21:00:00.000Z');
     for (let i = 1; i < hu.length; i++) a.ok(hu[i].starts_at <= hu[i - 1].ends_at, 'no gap in the holiday block');
   });
@@ -237,13 +245,51 @@ export function registerProductionDrivingBanTests(test, a) {
   test('27 Oct 2026 — unreviewed jurisdictions publish nothing in December and say why', () => {
     const v = at(NOVDEC);
     const reviewed = new Set(['CH', 'CZ', 'FR', 'HR', 'HU', 'IT', 'LI', 'LU', 'PL', 'SI', 'SK', 'AT', 'DE']);
-    a.ok(!v.events.some(e => !reviewed.has(e.jurisdiction) && e.date >= '2026-12-01'));
+    // 19 Nov 2026: only the three GR B8 rules re-read from ΦΕΚ Β΄ 912/2026 may publish December events for an otherwise unreviewed jurisdiction.
+    const grB8 = new Set(['gr-christmas-eve-outbound-2026', 'gr-christmas-return-2026', 'gr-new-year-eve-outbound-2026']);
+    a.ok(!v.events.some(e => !reviewed.has(e.jurisdiction) && e.date >= '2026-12-01' && !grB8.has(e.ban_id)));
     for (const j of v.jurisdictions.filter(row => !reviewed.has(row.jurisdiction))) a.ok(j.coverage_failures.includes('NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED'), j.jurisdiction);
     const log = JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-10-27-nov-dec.json', import.meta.url), 'utf8'));
     a.equal(log.full_registry_sweep, false);
     a.deepEqual(log.coverage_matrix.map(row => row.jurisdiction), coverage.map(([code]) => code));
     const sources = new Map(current.sources.map(s => [s.source_id, s]));
-    for (const r of log.retrievals.filter(row => row.source_id)) a.equal(sources.get(r.source_id)?.content_sha256, r.sha256, r.source_id);
+    for (const r of log.retrievals.filter(row => row.source_id)) a.equal(sources.get(r.source_id)?.content_sha256, LATEST_SHA.get(r.source_id) ?? r.sha256, r.source_id);
+  });
+  // 19 Nov 2026 Thursday sweep corrections (data/driving-bans/source-reviews/2026-11-19-thursday/).
+  test('19 Nov 2026 — France: New Year ban 31 Dec 22:00 to 1 Jan 22:00 and Île-de-France eve restriction', () => {
+    const v = at(NOVDEC);
+    const ny = ev(v, 'fr-holiday-2027-01-01');
+    a.equal(ny.length, 1);
+    a.equal(ny[0].starts_at, '2026-12-31T21:00:00.000Z');
+    a.equal(ny[0].ends_at, '2027-01-01T21:00:00.000Z', 'carry-out past the reviewed span is kept as the real interval');
+    a.deepEqual(ny[0].weight_threshold, {operator: '>', value: 7500, unit: 'kg', applies_to: 'GVW (PTAC) of goods vehicle or combination'});
+    a.deepEqual(ev(v, 'fr-idf-out-eve-2026-12-31').map(e => [e.date, e.start_time, e.end_time, e.direction]), [['2026-12-31', '16:00', '22:00', 'Paris to province']]);
+    a.ok(!v.events.some(e => e.jurisdiction === 'FR' && e.date > '2026-12-31'), 'nothing after the reviewed span is published');
+  });
+  test('19 Nov 2026 — Greece: B8 December dates only, >3.5 t, A1/A2 direction lists, jurisdiction stays incomplete', () => {
+    const v = at(NOVDEC);
+    a.deepEqual(['gr-christmas-eve-outbound-2026', 'gr-christmas-return-2026', 'gr-new-year-eve-outbound-2026'].map(id => ev(v, id).map(e => [e.date, e.start_time, e.end_time])),
+      [[['2026-12-24', '16:00', '22:00']], [['2026-12-27', '15:00', '22:00']], [['2026-12-31', '15:00', '21:00']]]);
+    a.ok(ev(v, 'gr-christmas-return-2026')[0].roads.every(r => /\(to /.test(r)) && /^Return/.test(ev(v, 'gr-christmas-return-2026')[0].direction));
+    a.equal(ev(v, 'gr-christmas-eve-outbound-2026')[0].weight_threshold.value, 3500);
+    a.ok(!v.events.some(e => e.jurisdiction === 'GR' && e.date > '2026-12-31'), '1, 3 and 6 Jan 2027 stay unpublished until the span is reviewed');
+    const gr = v.jurisdictions.find(j => j.jurisdiction === 'GR');
+    a.equal(gr.coverage_complete, false);
+    a.notEqual(gr.ban_state, 'NO_BAN');
+    a.ok(gr.coverage_failures.includes('GR_PERMANENT_2017_DECISION_B3769_NETWORK_NOT_REVIEWED'));
+  });
+  test('19 Nov 2026 — every re-retrieved source carries the SHA-256 of its evidence log', () => {
+    const sources = new Map(current.sources.map(s => [s.source_id, s]));
+    a.equal(LATER_LOG.full_registry_sweep, false);
+    for (const [id, sha] of LATEST_SHA) a.equal(sources.get(id)?.content_sha256, sha, id);
+  });
+  test('19 Nov 2026 — targeted corrections do not move the reviewed window or refresh jurisdiction verification', () => {
+    a.deepEqual(current.window, {from: '2026-09-01', to: '2026-12-31'});
+    const last = current.review_log.at(-1);
+    a.equal(last.full_registry_sweep, false);
+    a.equal(current.jurisdiction_reviews.HU.last_verified, '2026-10-27T11:20:00.000Z');
+    a.equal(current.jurisdiction_reviews.FR.last_verified, '2026-10-27T11:20:00.000Z');
+    a.equal(current.jurisdiction_reviews.GR.last_verified, null);
   });
   // 2 Nov 2026 targeted review of ES and DE (data/driving-bans/source-reviews/2026-11-02-es-de.json).
   test('2 Nov 2026 — Spain: Annex VII, Catalonia and Basque Country November rows; ES stays fail-closed', () => {
@@ -270,6 +316,6 @@ export function registerProductionDrivingBanTests(test, a) {
     const log = JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-11-02-es-de.json', import.meta.url), 'utf8'));
     a.equal(log.full_registry_sweep, false);
     const sources = new Map(current.sources.map(s => [s.source_id, s]));
-    for (const r of log.retrievals.filter(row => row.source_id)) a.equal(sources.get(r.source_id)?.content_sha256, r.sha256, r.source_id);
+    for (const r of log.retrievals.filter(row => row.source_id)) a.equal(sources.get(r.source_id)?.content_sha256, LATEST_SHA.get(r.source_id) ?? r.sha256, r.source_id);
   });
 }

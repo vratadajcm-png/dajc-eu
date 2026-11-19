@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "dataset_version": "2026-11-02.r5-es-de-targeted.geo50",
+ "dataset_version": "2026-11-19.r6-thursday-hu-fr-gr.geo50",
  "window": {
   "from": "2026-09-01",
   "to": "2026-12-31"
@@ -843,14 +843,14 @@
      "evidence_ids": [
       "fr-arrete-2021"
      ],
-     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 11 Nov and 25 Dec (eve 22:00 to day 22:00); 1 Nov is a Sunday."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 11 Nov and 25 Dec (eve 22:00 to day 22:00); 1 Nov is a Sunday. Corrected 2026-11-19.r6-thursday-hu-fr-gr (2026-11-19): New Year eve 31 Dec 22:00 to 1 Jan 2027 22:00 was missing and is now encoded."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
      "evidence_ids": [
       "fr-arrete-2021"
      ],
-     "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
+     "note": "Île-de-France Art. 3 II a) holiday-eve 16:00-22:00 on 10 Nov, 24 Dec and (added 2026-11-19.r6-thursday-hu-fr-gr) 31 Dec 2026."
     },
     "seasonal": {
      "state": "PRIMARY_VERIFIED",
@@ -1534,6 +1534,7 @@
    "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
     "hu-190",
+    "hu-act-2026-72",
     "hu-mt"
    ],
    "no_ban_evidence": [],
@@ -1551,9 +1552,10 @@
      "state": "PRIMARY_VERIFIED",
      "evidence_ids": [
       "hu-190",
-      "hu-mt"
+      "hu-mt",
+      "hu-act-2026-72"
      ],
-     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 1 Nov (Sunday), 25 and 26 Dec (continuous 24 Dec 22:00 to 27 Dec 22:00); 24 Dec is not a public holiday."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026; corrected 2026-11-19.r6-thursday-hu-fr-gr (2026-11-19): 1 Nov (Sunday); 24, 25 and 26 Dec are public holidays (24 Dec since Act LXXII of 2026, in force 14 Nov 2026) -> continuous ban 23 Dec 22:00 to 27 Dec 22:00."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
@@ -2014,7 +2016,7 @@
      "evidence_ids": [
       "gr-fek-912b-2026"
      ],
-     "note": "ΦΕΚ Β΄ 912/2026 reviewed."
+     "note": "ΦΕΚ Β΄ 912/2026 reviewed; B8 December 2026 dates (24, 27, 31 Dec) re-read from the official PDF and encoded 2026-11-19.r6-thursday-hu-fr-gr. Jurisdiction remains incomplete (see coverage_failures)."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
@@ -4807,9 +4809,9 @@
    "authority": "Journal officiel / Arrêté du 16 avril 2021 (TRAT2031119A)",
    "role": "PRIMARY",
    "version": "JO 24 April 2021, texte 37 (official PDF via Bison Futé), retrieved 2026-10-27",
-   "checked_at": "2026-10-27T11:03:21.000Z",
+   "checked_at": "2026-11-19T11:19:47.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Art.1: >7.5t GVW goods vehicles banned Saturday/holiday-eve 22:00 to Sunday/holiday 22:00 on the whole network. Art.3 Ile-de-France motorway sections. Art.4 exemptions. | Review 2026-10-27.r4-nov-dec-priority: Art. 1: Christmas 2026 ban from Thursday 24 Dec 22:00 to Friday 25 Dec 22:00. Art. 3 II: Île-de-France holiday-eve 16:00-22:00 (24 Dec), holiday 22:00-24:00 both directions (25 Dec), day after holiday 06:00-10:00 province-Paris (26 Dec).",
+   "findings": "Art.1: >7.5t GVW goods vehicles banned Saturday/holiday-eve 22:00 to Sunday/holiday 22:00 on the whole network. Art.3 Ile-de-France motorway sections. Art.4 exemptions. | Review 2026-10-27.r4-nov-dec-priority: Art. 1: Christmas 2026 ban from Thursday 24 Dec 22:00 to Friday 25 Dec 22:00. Art. 3 II: Île-de-France holiday-eve 16:00-22:00 (24 Dec), holiday 22:00-24:00 both directions (25 Dec), day after holiday 06:00-10:00 province-Paris (26 Dec). | Review 2026-11-19.r6-thursday-hu-fr-gr: re-read 2026-11-19 (same SHA-256). 1 January 2027 (Friday) is a jour férié: Art. 1 ban from Thursday 31 Dec 2026 22:00 to Friday 1 Jan 2027 22:00; Art. 3 II a) Île-de-France Paris-province veille 31 Dec 16:00-22:00. Art. 3 II 1 Jan 22:00-24:00 (both directions) and II b) Saturday 2 Jan 06:00-10:00 lie after the reviewed span (2026-12-31) and are not yet published.",
    "content_sha256": "7e9a0a0c19f06e8721367681c9289c03eac6be1181d023237a9a22acf954d26c"
   },
   {
@@ -4938,9 +4940,9 @@
    "authority": "Nemzeti Jogszabálytár / Govt. Decree 190/2008 (VII.29.)",
    "role": "PRIMARY",
    "version": "Consolidated state 2025.01.01 (in force), retrieved 2026-10-27",
-   "checked_at": "2026-10-27T11:03:53.000Z",
+   "checked_at": "2026-11-19T11:19:45.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "§2(1)(b) Sep 1-Jun 30: from 22:00 the day before to 22:00 on Sundays and public holidays, >7.5t. §2(3): from 4 Nov to 1 Mar not applicable to international-traffic trucks of at least environmental class 7 (EURO 3). | Review 2026-10-27.r4-nov-dec-priority: §2(1)(b) and §2(2): 25 Dec (Fri) and 26 Dec (Sat) are public holidays; the ban runs from 24 Dec 22:00 continuously to Sunday 27 Dec 22:00. §2(3): from 4 Nov to 1 Mar not applicable to international-traffic trucks of environmental class >= 7 (EURO 3).",
+   "findings": "§2(1)(b) Sep 1-Jun 30: from 22:00 the day before to 22:00 on Sundays and public holidays, >7.5t. §2(3): from 4 Nov to 1 Mar not applicable to international-traffic trucks of at least environmental class 7 (EURO 3). | Review 2026-10-27.r4-nov-dec-priority: §2(1)(b) and §2(2): 25 Dec (Fri) and 26 Dec (Sat) are public holidays; the ban runs from 24 Dec 22:00 continuously to Sunday 27 Dec 22:00. §2(3): from 4 Nov to 1 Mar not applicable to international-traffic trucks of environmental class >= 7 (EURO 3). | Review 2026-11-19.r6-thursday-hu-fr-gr: re-read 2026-11-19 (content unchanged, same SHA-256). With 24, 25, 26 Dec 2026 (Thu-Sat) public holidays and 27 Dec a Sunday, §2(1)(b) bans from 23 Dec 22:00 continuously to 27 Dec 22:00. §2(2) wording \"a korlátozott időszak első nap 8 órától\" read as in the 27 Oct review (first restricted day = first holiday, so 08:00 on 24 Dec is already inside the interval).",
    "content_sha256": "4b3cd0e4d19d508dcbbf769e9549feb1b96601c85d4a0c84b74ccb93d681b313"
   },
   {
@@ -4948,11 +4950,11 @@
    "url": "https://njt.jog.gov.hu/jogszabaly/2012-1-00-00",
    "authority": "Nemzeti Jogszabálytár / Labour Code (Act I of 2012) §102(1)",
    "role": "PRIMARY",
-   "version": "Mt. §102(1), retrieved 2026-10-27",
-   "checked_at": "2026-10-27T11:03:56.000Z",
+   "version": "Mt. §102(1) as amended by Act LXXII of 2026 §3 (consolidated state in force from 2026-11-14), retrieved 2026-11-19",
+   "checked_at": "2026-11-19T11:19:46.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Public holidays in window: 23 October, 1 November. | Review 2026-10-27.r4-nov-dec-priority: Public holidays (munkaszüneti nap) in the window: 1 November, 25 and 26 December; 24 December is not a public holiday.",
-   "content_sha256": "cd04286e7d9402ec86808ac24554704faacf1df1c3936b6afd22a9d623f96bc2"
+   "findings": "Public holidays in window: 23 October, 1 November. | Review 2026-10-27.r4-nov-dec-priority: Public holidays (munkaszüneti nap) in the window: 1 November, 25 and 26 December; 24 December is not a public holiday. | Review 2026-11-19.r6-thursday-hu-fr-gr: §102(1) now reads \"január 1., március 15., nagypéntek, húsvéthétfő, május 1., pünkösdhétfő, augusztus 20., október 23., november 1. és december 24–26.\" (text established by Act LXXII of 2026 §3). 24 December is a public holiday from 2026; the earlier note that it is not is superseded.",
+   "content_sha256": "10a8bdef3ba758694273614c01355f4228ec8c3f5db9100940701aaabae3857c"
   },
   {
    "source_id": "si-odredba-2011",
@@ -5024,9 +5026,10 @@
    "authority": "Εθνικό Τυπογραφείο / ΦΕΚ Β΄ 912/18.02.2026 (ΚΥΑ Δ30/Δ5α/27316)",
    "role": "PRIMARY",
    "version": "Official gazette PDF",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "checked_at": "2026-11-19T11:21:15.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": ">3.5t. B9 summer Fridays 16-21 (A1 roads) and Sundays 16-23 (A2 roads) until 6 Sep; B11 Thessaloniki ring and EO18 until 6 Sep; B7 27 Oct 16-22 (A1) and 28 Oct 16-23 (A2)."
+   "findings": ">3.5t. B9 summer Fridays 16-21 (A1 roads) and Sundays 16-23 (A2 roads) until 6 Sep; B11 Thessaloniki ring and EO18 until 6 Sep; B7 27 Oct 16-22 (A1) and 28 Oct 16-23 (A2). | Review 2026-11-19.r6-thursday-hu-fr-gr: B8 (Christmas/New Year/Epiphany 2026-2027): Thu 24 Dec 2026 16:00-22:00 Chapter A1; Sun 27 Dec 2026 15:00-22:00 Chapter A2; Thu 31 Dec 2026 15:00-21:00 Chapter A1; Fri 1 Jan 2027 16:00-22:00 A1; Sun 3 Jan 2027 15:00-21:00 A2; Wed 6 Jan 2027 15:00-21:00 A2 (January dates after the reviewed span, not yet published). No amending ΚΥΑ found by the 2026-11-19 morning et.gr search (evidence only, search lag possible).",
+   "content_sha256": "31404788b69181136c1e4715dfb53aec864bc2e3d36fd502ddc6e3301ee150b3"
   },
   {
    "source_id": "ro-cnair-note",
@@ -5248,6 +5251,17 @@
    "retrieval_method": "direct-retrieval",
    "findings": "Point 8: the conference proposes extending the suspension of the Sunday and public-holiday HGV ban until and including 20 December 2026 and asks for monitoring of the low-water situation. This is a recommendation to the Länder, not a Land decree. On 2026-11-02 the official BW (28 Sep), RP (28 Sep) and NRW (28 Sep) pages still end the exemptions on 31 Oct 2026; an NRW decree to 20 Dec is reported only by dpa (23 Oct). saarland.de returns HTTP 403 to automated clients.",
    "content_sha256": "9f2fb667cf18b7f76e846309fcd783b45f33ec607cfda2a7a96242f3212eeec6"
+  },
+  {
+   "source_id": "hu-act-2026-72",
+   "url": "https://njt.jog.gov.hu/jogszabaly/2026-72-00-00",
+   "authority": "Nemzeti Jogszabálytár / Act LXXII of 2026 (2026. évi LXXII. törvény)",
+   "role": "PRIMARY",
+   "version": "Adopted 2026-11-03, promulgated 2026-11-13, in force 2026-11-14 (amending act; spent provisions repealed 2026-11-16 under Act CXXX of 2010 §12, amendments remain in the consolidated Mt.), retrieved 2026-11-19",
+   "checked_at": "2026-11-19T11:19:45.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "§3 amends Mt. §102(1): 24 December becomes a permanent public holiday (munkaszüneti nap). §10: in force the day after promulgation.",
+   "content_sha256": "0f5e415cf4454f54f10963c6946fba41cb85f4505a1482252736f30422d2b866"
   }
  ],
  "rule_profiles": {
@@ -8511,22 +8525,33 @@
   {
    "ban_id": "hu-holiday-2026-12-25-26",
    "profile": "hu-standing",
-   "title": "Public-holiday driving ban (25-26 December)",
-   "valid_from": "2026-12-24",
+   "title": "Public-holiday driving ban (24-26 December)",
+   "valid_from": "2026-12-23",
    "valid_to": "2026-12-26",
    "schedule": {
     "kind": "dates",
     "start_time": "22:00",
     "end_time": "22:00",
-    "end_day_offset": 2,
+    "end_day_offset": 4,
     "dates": [
      {
-      "date": "2026-12-24",
+      "date": "2026-12-23",
       "occurrence_id": "2026-12-24"
      }
     ]
    },
-   "notes": "Govt. Decree 190/2008 §2(1)(b) and §2(2): from 24 December 22:00; the Saturday-Sunday rule continues it to Sunday 27 December 22:00. §2(3) EURO 3+ international-traffic exemption applies (4 Nov-1 Mar)."
+   "notes": "Correction 2026-11-19.r6-thursday-hu-fr-gr: Act LXXII of 2026 (in force 14 Nov 2026) makes 24 December a public holiday. Govt. Decree 190/2008 §2(1)(b): ban from 23 December 22:00 continuously to Sunday 27 December 22:00 (24, 25, 26 December holidays, 27 December Sunday; §2(2)). §2(3) EURO 3+ international-traffic exemption applies (4 Nov-1 Mar). Ban and occurrence IDs kept stable; previous start 24 December 22:00 (sequence 0).",
+   "sequence": 1,
+   "verified_at": "2026-11-19T11:25:00.000Z",
+   "evidence_ids": [
+    "hu-190",
+    "hu-mt",
+    "hu-act-2026-72"
+   ],
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-12-31"
+   }
   },
   {
    "ban_id": "si-sunday",
@@ -11808,6 +11833,158 @@
    ],
    "direction": "As stated per road section (towards France / Irún / Behobia, Vitoria-Gasteiz, Andoain, Donostia)",
    "vehicle_scope": "Goods vehicles/combinations above 7,500 kg MMA/MMC in cross-border transport only (\"Esta restricción sólo afecta al transporte transfronterizo\")."
+  },
+  {
+   "ban_id": "fr-holiday-2027-01-01",
+   "profile": "fr-general",
+   "title": "Public-holiday driving ban (New Year's Day)",
+   "valid_from": "2026-12-31",
+   "valid_to": "2027-01-01",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "22:00",
+    "end_time": "22:00",
+    "end_day_offset": 1,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-19T11:25:00.000Z",
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-12-31"
+   },
+   "notes": "Added 2026-11-19.r6-thursday-hu-fr-gr: omitted from the 27 Oct priority review. Holiday eve Thursday 31 Dec 2026 22:00 to Friday 1 Jan 2027 22:00 (Arrêté du 16 avril 2021, art. 1). The weekend ban follows from Saturday 2 Jan 22:00 (outside the reviewed span)."
+  },
+  {
+   "ban_id": "fr-idf-out-eve-2026-12-31",
+   "profile": "fr-idf",
+   "title": "Ile-de-France Paris-province holiday-eve restriction (New Year's Eve)",
+   "valid_from": "2026-12-31",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "direction": "Paris to province",
+   "legal_basis": "Arrêté du 16 avril 2021, art. 3 II a) veilles de jours fériés",
+   "sequence": 0,
+   "verified_at": "2026-11-19T11:25:00.000Z",
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-12-31"
+   },
+   "notes": "Added 2026-11-19.r6-thursday-hu-fr-gr. The 1 Jan 2027 22:00-24:00 (both directions) and 2 Jan 06:00-10:00 province-Paris restrictions are after the reviewed span and are not published yet."
+  },
+  {
+   "ban_id": "gr-christmas-eve-outbound-2026",
+   "profile": "gr-kya",
+   "title": "Christmas Eve outbound restriction (Chapter A1 roads)",
+   "valid_from": "2026-12-24",
+   "valid_to": "2026-12-24",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-24",
+      "occurrence_id": "2026-12-24"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-19T11:25:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "legal_basis": "ΦΕΚ Β΄ 912/2026 B8(a)",
+   "notes": "Added 2026-11-19.r6-thursday-hu-fr-gr from the official ΦΕΚ PDF (B8 already published 18 Feb 2026; previously not encoded). GR remains incomplete: permanent 2017 network decision and exceptional-transport regime not reviewed.",
+   "direction": "Outbound, per Chapter A1 segment"
+  },
+  {
+   "ban_id": "gr-christmas-return-2026",
+   "profile": "gr-kya",
+   "title": "Christmas return restriction (Chapter A2 roads)",
+   "valid_from": "2026-12-27",
+   "valid_to": "2026-12-27",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "15:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-27",
+      "occurrence_id": "2026-12-27"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-19T11:25:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "legal_basis": "ΦΕΚ Β΄ 912/2026 B8(b)",
+   "notes": "Added 2026-11-19.r6-thursday-hu-fr-gr from the official ΦΕΚ PDF (B8 already published 18 Feb 2026; previously not encoded). GR remains incomplete: permanent 2017 network decision and exceptional-transport regime not reviewed.",
+   "direction": "Return, per Chapter A2 segment",
+   "roads": [
+    "A8 Rio toll - Elefsina toll (to Athens)",
+    "A1 Leptokarya - Makrychori and Rachon - Ag. Stefanos (to Athens)",
+    "N. Moudania - Thermi (to Thessaloniki)",
+    "A11 Chalkida - A1 junction (to Athens)",
+    "Kavala - Thessaloniki: Leon Amfipolis - km 11.34 (to Thessaloniki)",
+    "A5 Ionia Odos km 200.99 - Rio-Antirrio bridge (to Rio)",
+    "A7 Sparti - Korinthos (to Athens)",
+    "A71 Sparti - Leuktro (to Leuktro)",
+    "Ioannina - Arta - Antirrio (to Antirrio)",
+    "EO16 Ag. Anastasia - Thermi (to Thessaloniki)",
+    "A3 Kalambaka - A1 (to Lamia/Athens)",
+    "A52 Aktio - Amvrakia (to Ionia Odos)"
+   ]
+  },
+  {
+   "ban_id": "gr-new-year-eve-outbound-2026",
+   "profile": "gr-kya",
+   "title": "New Year's Eve outbound restriction (Chapter A1 roads)",
+   "valid_from": "2026-12-31",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "15:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-19T11:25:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "legal_basis": "ΦΕΚ Β΄ 912/2026 B8(c)",
+   "notes": "Added 2026-11-19.r6-thursday-hu-fr-gr from the official ΦΕΚ PDF (B8 already published 18 Feb 2026; previously not encoded). GR remains incomplete: permanent 2017 network decision and exceptional-transport regime not reviewed.",
+   "direction": "Outbound, per Chapter A1 segment"
   }
  ],
  "coverage_version": "2026-10-22.50",
@@ -11855,6 +12032,24 @@
     "ES"
    ],
    "evidence_log": "data/driving-bans/source-reviews/2026-11-02-es-de.json"
+  },
+  {
+   "review_id": "2026-11-19.r6-thursday-hu-fr-gr",
+   "reviewed_at": "2026-11-19T11:25:00.000Z",
+   "kind": "TARGETED_PRIMARY_REVIEW",
+   "full_registry_sweep": false,
+   "period": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "full_scope_jurisdictions": [],
+   "individual_rule_jurisdictions": [
+    "FR",
+    "GR",
+    "HU"
+   ],
+   "evidence_log": "data/driving-bans/source-reviews/2026-11-19-thursday/",
+   "notes": "Thursday sweep 19 Nov 2026 (manual re-run after PR #45 closed). Corrections only; window.to unchanged; jurisdiction last_verified/last_checked dates not refreshed."
   }
  ]
 }
