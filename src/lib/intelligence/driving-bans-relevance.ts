@@ -105,6 +105,8 @@ export type PublishedEvent = {
   weight_threshold: Weight; vehicle_scope: string; exceptions: string[]; restriction_types: string[];
   source_id: string; source_url: string; source_authority: string; source_version: string; legal_basis: string;
   verified_at: string; sequence: number; adr_relevance?: string; exceptional_relevance?: string;
+  /** AUTOMATED: approved by the PDF auto-approval gate and awaiting human review. */
+  verification_method?: 'HUMAN' | 'AUTOMATED'; auto_approval?: { human_review_due: string } | null;
 };
 
 export function evaluateVehicleApplicability(event: Pick<PublishedEvent, 'weight_threshold' | 'exceptions' | 'restriction_types' | 'adr_relevance' | 'exceptional_relevance'>, input: VehicleQuery) {

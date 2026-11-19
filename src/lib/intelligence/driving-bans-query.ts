@@ -85,7 +85,9 @@ function envelope<Tool extends string>(tool: Tool, view: PublishedView, events: 
   const versions = [...new Map(events.map(e => [e.ban_id, { ban_id: e.ban_id, sequence: e.sequence, verified_at: e.verified_at }])).values()];
   const exceptions = events.some(e => e.exceptions.length);
   if (exceptions) warnings.push('Exceptions are listed but not evaluated; their conditions must be checked for the actual vehicle and load.');
-  const authority = status !== 'OK' || undetermined || completeness.some(row => !row.coverage_complete) || exceptions;
+  const automated = events.some(e => e.verification_method === 'AUTOMATED');
+  if (automated) warnings.push('Some rules were verified automatically from official PDF documents and await human review.');
+  const authority = status !== 'OK' || undetermined || completeness.some(row => !row.coverage_complete) || exceptions || automated;
   return {
     status, tool, dataset_version: view.dataset_version, facts, sources, validity: view.window, rule_versions: versions, completeness, warnings: [...new Set(warnings)],
     authority_check_required: authority,
@@ -94,7 +96,7 @@ function envelope<Tool extends string>(tool: Tool, view: PublishedView, events: 
   };
 }
 
-const factOf = (e: PublishedEvent) => ({ classification: 'LEGAL_DRIVING_BAN', uid: e.uid, ban_id: e.ban_id, jurisdiction: e.jurisdiction, title: e.title, starts_at: e.starts_at, ends_at: e.ends_at, local_time: `${e.date} ${e.start_time}-${e.end_time} (${e.timezone})`, roads: e.roads, regions: e.regions, direction: e.direction, vehicle_scope: e.vehicle_scope, legal_basis: e.legal_basis });
+const factOf = (e: PublishedEvent) => ({ classification: 'LEGAL_DRIVING_BAN', uid: e.uid, ban_id: e.ban_id, jurisdiction: e.jurisdiction, title: e.title, starts_at: e.starts_at, ends_at: e.ends_at, local_time: `${e.date} ${e.start_time}-${e.end_time} (${e.timezone})`, roads: e.roads, regions: e.regions, direction: e.direction, vehicle_scope: e.vehicle_scope, legal_basis: e.legal_basis, ...(e.verification_method === 'AUTOMATED' ? { verification_method: 'AUTOMATED', human_review_due: e.auto_approval?.human_review_due ?? null } : {}) });
 
 /** True when [from, to) lies inside the published period, measured in Europe/Prague. */
 function insidePublishedPeriod(view: PublishedView, from: string, to: string): boolean {
