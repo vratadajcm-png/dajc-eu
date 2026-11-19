@@ -130,6 +130,26 @@ const GENERIC = /\b(network|whole|entire|all public roads|all roads)\b/i;
 const roadToken = (value: string) => value.toUpperCase().replace(/[\s-]/g, '');
 const roadIds = (text: string) => (text.match(/\b(?:[A-Z]{1,3}[- ]?\d{1,4}[A-Z]?)\b/g) || []).map(roadToken);
 
+export type RoadScopeMatch = 'NETWORK_WIDE' | 'ROAD_CLASS_SCOPE' | 'ROAD_MATCH' | 'ROADS_NOT_SPECIFIED_BY_ROUTE';
+
+/**
+ * How a rule's road scope meets a route segment (jurisdiction, optional region, road numbers);
+ * null when the rule is elsewhere or names other specific roads. Only a rule that names specific
+ * roads can be excluded by road numbers; a road-class scope ("Motorways", "Class I roads") cannot
+ * be matched against numbers and stays a possible match.
+ */
+export function matchRoadScope(event: Pick<PublishedEvent, 'jurisdiction' | 'roads' | 'regions'>, segment: { jurisdiction?: string; region?: string; roads?: string[] }): RoadScopeMatch | null {
+  if (event.jurisdiction !== segment.jurisdiction) return null;
+  if (segment.region && event.regions.length && !event.regions.includes(segment.region)) return null;
+  const wanted = new Set((segment.roads ?? []).flatMap(roadIds));
+  const network = !event.roads.length || event.roads.some(road => GENERIC.test(road));
+  const eventRoads = new Set(event.roads.flatMap(roadIds));
+  const specific = !network && eventRoads.size > 0;
+  const roadMatch = [...wanted].some(id => eventRoads.has(id));
+  if (specific && wanted.size && !roadMatch) return null;
+  return network ? 'NETWORK_WIDE' : !specific ? 'ROAD_CLASS_SCOPE' : roadMatch ? 'ROAD_MATCH' : 'ROADS_NOT_SPECIFIED_BY_ROUTE';
+}
+
 export type JurisdictionView = { jurisdiction: string; coverage_complete: boolean; verification_state: string; ban_state: string; monthly_coverage?: Array<{ from: string; to: string; coverage_complete: boolean }> };
 
 /** Legal completeness is scoped to the exact requested UTC interval, not the whole planning year.
@@ -159,20 +179,12 @@ export function findRouteConflicts(view: { events: PublishedEvent[]; jurisdictio
     const coverage = view.jurisdictions.find(row => row.jurisdiction === segment.jurisdiction);
     if (!isVerifiedForPeriod(coverage, segment.enterAt, segment.exitAt)) gaps.push({ segment: index, jurisdiction: segment.jurisdiction, verification_state: coverage?.verification_state ?? 'UNVERIFIED', reason: 'Jurisdiction coverage is not completely verified for this segment; missing events are not evidence of no ban.' });
     if (segment.enterAt.slice(0, 10) < view.window.from || segment.exitAt.slice(0, 10) > view.window.to) gaps.push({ segment: index, jurisdiction: segment.jurisdiction, reason: `Segment time is outside the published window ${view.window.from}-${view.window.to}.` });
-    const wanted = new Set(segment.roads.flatMap(roadIds));
     for (const event of view.events) {
       if (event.jurisdiction !== segment.jurisdiction || event.ends_at <= segment.enterAt || event.starts_at >= segment.exitAt) continue;
-      if (segment.region && event.regions.length && !event.regions.includes(segment.region)) continue;
-      const network = !event.roads.length || event.roads.some(road => GENERIC.test(road));
-      const eventRoads = new Set(event.roads.flatMap(roadIds));
-      // Only a rule that names specific roads can be excluded by road numbers; a road-class scope
-      // ("Motorways", "Class I roads") cannot be matched against numbers and stays a possible conflict.
-      const specific = !network && eventRoads.size > 0;
-      const roadMatch = [...wanted].some(id => eventRoads.has(id));
-      if (specific && wanted.size && !roadMatch) continue;
+      const match = matchRoadScope(event, segment);
+      if (!match) continue;
       const vehicle = vehicleInput ? evaluateVehicleApplicability(event, vehicleInput) : null;
       if (vehicle?.status === 'DOES_NOT_APPLY') continue;
-      const match = network ? 'NETWORK_WIDE' : !specific ? 'ROAD_CLASS_SCOPE' : roadMatch ? 'ROAD_MATCH' : 'ROADS_NOT_SPECIFIED_BY_ROUTE';
       conflicts.push({
         segment: index, uid: event.uid, ban_id: event.ban_id, jurisdiction: event.jurisdiction, title: event.title,
         starts_at: event.starts_at, ends_at: event.ends_at, local_time: `${event.date} ${event.start_time}-${event.end_time} (${event.timezone})`,
