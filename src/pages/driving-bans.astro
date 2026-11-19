@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getDrivingBansSnapshot } from '../../config/driving-ban-calendars/runtime.mjs';
-import { banStateText, verificationStateText, openItemTexts } from '../lib/driving-bans/public-labels.mjs';
+import { banStateText, verificationStateText, openItemTexts, monthStatusText, monthName } from '../lib/driving-bans/public-labels.mjs';
 export const prerender = false;
 const view = getDrivingBansSnapshot();
 const tracked = view.jurisdictions.length;
@@ -12,6 +12,9 @@ const label = (en: string, cz: string) => cs ? cz : en;
 const title = label('European HGV Driving Bans', 'Evropské zákazy jízd nákladních vozidel');
 const format = (value: string | null) => value ? new Intl.DateTimeFormat(cs ? 'cs-CZ' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Prague' }).format(new Date(value)) : label('Not completed', 'Nedokončeno');
 const count = (state: string) => view.jurisdictions.filter(j => j.ban_state === state).length;
+const eventsWord = (n: number) => cs ? (n === 1 ? 'událost' : n <= 4 ? 'události' : 'událostí') : (n === 1 ? 'event' : 'events');
+// The rolling year starts and ends mid-month; show the dates of those partial portions.
+const wholeMonth = (m: { from: string; to: string }) => m.from.endsWith('-01') && m.to === new Date(Date.UTC(Number(m.from.slice(0, 4)), Number(m.from.slice(5, 7)), 0)).toISOString().slice(0, 10);
 const eventsByCountry = new Map<string, typeof view.events>(view.jurisdictions.map(j => [j.jurisdiction, view.events.filter(e => e.jurisdiction === j.jurisdiction)]));
 type Weight = { any_of?: Weight[]; all_of?: Weight[]; operator?: string; value?: number; unit?: string; applies_to?: string };
 const weightText = (w: Weight): string => w.any_of ? w.any_of.map(weightText).join(label(' OR ', ' NEBO ')) : w.all_of ? w.all_of.map(weightText).join(label(' AND ', ' A ')) : w.operator === 'any' ? `${w.applies_to} (${label('any mass', 'bez hmotnostní hranice')})` : `${w.applies_to} ${w.operator} ${w.unit === 'kg' ? `${(w.value ?? 0) / 1000} t` : `${w.value} ${w.unit}`}`;
@@ -31,7 +34,7 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
       <p>{label('Verified individual bans can be available while the full country review is incomplete. Missing events never mean unrestricted travel. “No driving bans” is shown only after a complete primary-source review of this entire period.', 'Jednotlivé zákazy mohou být ověřené, i když celková kontrola země není dokončena. Chybějící události nikdy neznamenají volný průjezd. „Bez zákazu“ se zobrazí pouze po úplném ověření celého období z primárních zdrojů.')}</p>
       <p>{label('The rolling 12-month calendar is checked weekly on Thursday; future annual decrees may not yet have been published. Urgent changes may trigger a targeted recheck. Always confirm the current official source and your transport permit before departure.', 'Klouzavý dvanáctiměsíční kalendář se kontroluje každý čtvrtek; budoucí roční předpisy ještě nemusely vyjít. Naléhavá změna může vyvolat cílené ověření. Před jízdou vždy zkontrolujte aktuální úřední zdroj a své povolení.')}</p>
     </aside>
-    <p class="stats">{tracked} / {tracked} {label('tracked', 'sledováno')} · {banStateText('HAS_BAN', cs)}: {count('HAS_BAN')} · {banStateText('NO_BAN', cs)}: {count('NO_BAN')} · {banStateText('UNKNOWN', cs)}: {count('UNKNOWN')} · {view.jurisdictions.filter(j => j.coverage_complete).length} / {tracked} {label('fully verified', 'úplně ověřeno')}</p>
+    <p class="stats">{tracked} / {tracked} {label('tracked', 'sledováno')} · {banStateText('HAS_BAN', cs)}: {count('HAS_BAN')} · {banStateText('NO_BAN', cs)}: {count('NO_BAN')} · {banStateText('UNKNOWN', cs)}: {count('UNKNOWN')} · {view.jurisdictions.filter(j => j.coverage_complete).length} / {tracked} {label('fully verified for the whole 12 months', 'úplně ověřeno na celých 12 měsíců')} · {view.jurisdictions.filter(j => j.monthly_coverage[0]?.coverage_complete).length} / {tracked} {label('verified for the current month', 'ověřeno pro aktuální měsíc')}</p>
     <form id="ban-filters" class="controls">
       <label>{label('Find a jurisdiction', 'Vyhledat jurisdikci')} <input id="country-search" type="search" placeholder={label('Name or code', 'Název nebo kód')} /></label>
       <label>{label('Restrictions', 'Omezení')} <select id="ban-type"><option value="all">{label('All HGV / exceptional', 'Všechny nákladní / nadrozměrné')}</option><option value="general">{label('General HGV', 'Běžná nákladní vozidla')}</option><option value="exceptional">{label('Exceptional, including relevant HGV bans', 'Nadměrné, včetně příslušných běžných zákazů')}</option></select></label>
@@ -48,7 +51,8 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
         <summary><strong>{j.name}</strong> <span class="code">{j.jurisdiction}</span> <span class="status">{statusText(j)}</span></summary>
         <div class="country-body">
           <p>{label('Period', 'Období')}: {j.period.from} — {j.period.to}. <strong>{verificationStateText(j.verification_state, cs)}</strong></p>
-          <p>{label('Verified month portions', 'Ověřené části měsíců')}: {j.monthly_coverage.filter(m => m.coverage_complete).length} / {j.monthly_coverage.length}. {label('A future period awaiting publication or review is not NO_BAN.', 'Budoucí období čekající na vydání předpisu nebo ověření neznamená bez zákazu.')}</p>
+          <ul class="months small">{j.monthly_coverage.map(m => <li data-month-status={m.status}>{monthName(m.from.slice(0, 7), cs)}{!wholeMonth(m) && ` (${m.from} — ${m.to})`}: {monthStatusText(m.status, cs)}{m.event_count > 0 && ` · ${m.event_count} ${eventsWord(m.event_count)}`}</li>)}</ul>
+          <p class="small">{label('A future period awaiting publication or review does not mean “No driving bans”.', 'Budoucí období čekající na vydání předpisu nebo ověření neznamená bez zákazu.')}</p>
           <p>{label('Last checked', 'Poslední kontrola')}: {format(j.last_checked)} · {label('Full-period verification', 'Ověření celého období')}: {format(j.last_verified)}</p>
           {!j.coverage_complete && <p class="notice">{label('Full jurisdiction verification is incomplete. Additional restrictions may exist; do not interpret missing events as “no ban”.', 'Ověření celé jurisdikce není dokončeno. Mohou existovat další omezení; chybějící události neznamenají „Bez zákazu“.')}</p>}
           {j.coverage_failures.length > 0 && <div class="small"><p>{label('Open review items', 'Otevřené body ověření')}:</p><ul>{openItemTexts(j.coverage_failures, cs).map(text => <li>{text}</li>)}</ul></div>}
@@ -129,6 +133,7 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
   .country-body { padding: .75rem .2rem; }
   .ban-event { border-top: 1px solid #71809655; padding: .8rem 0; }
   .ban-event h3 { font-size: 1.1rem; }
+  .months { columns: 2 240px; padding-left: 1.1rem; }
   .sources a { display: inline-block; margin: .25rem .7rem .25rem 0; }
   .calendar-link[aria-disabled=true] { opacity: .5; pointer-events: none; }
   [hidden] { display: none !important; }

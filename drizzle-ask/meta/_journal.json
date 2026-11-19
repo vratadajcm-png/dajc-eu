@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792916466475,
+      "tag": "0000_dajc_ask_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792916471706,
+      "tag": "0001_dajc_ask_security",
+      "breakpoints": true
+    }
+  ]
+}
