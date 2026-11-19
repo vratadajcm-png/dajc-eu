@@ -47,3 +47,29 @@ nepotvrzeno (UNVERIFIED, nikoli zrušení).
 lint:driving-bans PASS; typecheck PASS (0 chyb); test PASS (97 souborů, 1013 testů); build PASS;
 `driving-bans:audit --mode full --max-sweep-age-days 8` **FAIL**: `active_window_reviewed=false`,
 `sweep_age_days=16.6` – registr nelze bez úpravy canonical.json obnovit.
+
+## Navazující běh 19. 11. 2026 (~11:15 UTC) – oprava registru `2026-11-19.r6-thursday-hu-fr-gr`
+
+PR #45 byl vlastníkem uzavřen bez sloučení. Kontrola jediného zapisovatele zopakována: 25 otevřených PR,
+`git diff --quiet origin/main...<head> -- data/driving-bans/canonical.json` čisté pro všechny → registr
+odblokován. Ranní důkazy (9f58f36) sloužily jen jako vodítko; níže uvedené zdroje byly znovu staženy
+z primárních zdrojů (`source-reviews/2026-11-19-thursday/r6-registry-corrections.json`, SHA-256 u každého).
+Snímek před změnou: SHA-256 `6b8cbcc1…988c` (shodný s ranním).
+
+| Země | Změna | ID / sekvence | Primární důkaz |
+| --- | --- | --- | --- |
+| HU | CHANGED: vánoční zákaz začíná **st 23. 12. 2026 22:00** (dříve 24. 12. 22:00), trvá nepřetržitě do ne 27. 12. 22:00 | `hu-holiday-2026-12-25-26`, UID beze změny, sequence 0→1 | zákon 2026. évi LXXII. (účinný 14. 11.), Mt. §102(1), nař. 190/2008 §2 |
+| FR | NEW_BAN: čt 31. 12. 22:00 – pá 1. 1. 2027 22:00 (>7,5 t); Île-de-France Paříž→provincie 31. 12. 16–22 | `fr-holiday-2027-01-01`, `fr-idf-out-eve-2026-12-31` | Arrêté 16. 4. 2021 čl. 1, čl. 3 II a) |
+| GR | NEW_BAN: 24. 12. 16–22 (A1), 27. 12. 15–22 (A2), 31. 12. 15–21 (A1), >3,5 t | `gr-christmas-eve-outbound-2026`, `gr-christmas-return-2026`, `gr-new-year-eve-outbound-2026` | ΦΕΚ Β΄ 912/2026 B8 |
+
+Neposunuto: `window.to` = 2026-12-31; `last_verified` jurisdikcí neobnoveno; GR zůstává neúplné
+(`coverage_failures` zachovány). Lednové výskyty (FR IdF 1.–2. 1., GR 1., 3., 6. 1. 2027) jsou mimo
+ověřené období – jen důkaz. HU §2(2) „első nap 8 órától“: ponechán výklad z 27. 10. (první den = první svátek);
+23. 12. 22:00 je minimum vyplývající přímo z §2(1)(b).
+
+Stále jen důkazy (nezakódováno v tomto běhu): ES/CAT/BAS prosincové řádky, AT A12/A13 sjezdy >12 m,
+BE nadrozměrné přepravy, PT VCI svátky/ADR, LI odkaz v59, BG (jen návrh). 29 identit nezkontrolováno.
+
+Technické kontroly na větvi: lint PASS, typecheck PASS (0 chyb), test PASS (97 souborů, 1017 testů),
+build PASS, `driving-bans:audit --mode full --max-sweep-age-days 8` **FAIL** (`active_window_reviewed=false`,
+`sweep_age_days=16.8`) – očekávané, brána nebyla oslabena.
