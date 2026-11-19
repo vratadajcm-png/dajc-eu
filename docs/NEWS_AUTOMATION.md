@@ -69,7 +69,7 @@ The original editorial maximums (30 lead + 15 Rest), zero filler requirement, ex
 
 ## Editorial rules
 
-All editorial rules - scope (freight vehicles over 12 t, oversize/abnormal
+All editorial rules - scope (tachograph-using goods vehicles from 3.5 t, oversize/abnormal
 transport first), freshness (7 days back, one month ahead), exclusions,
 closure duration, driving-ban scope, counts and article structure - are
 stated once, in [`DAJC_WEEKLY_INTELLIGENCE_SPEC.md`](DAJC_WEEKLY_INTELLIGENCE_SPEC.md).
@@ -272,7 +272,7 @@ the normal monitor and eligibility rules.
    country first) and classifies the leads with Claude Haiku. OpenAI is not
    used. Every returned URL is fetched;
    the finding's title, text and publication date come from that page, not
-   from the model. Unreachable pages, PDFs and pages without freight (>12 t)
+   from the model. Unreachable pages, PDFs and pages without relevant road freight (tachograph-using vehicles from 3.5 t)
    or oversize context are dropped with a logged reason; a failed search is
    logged as `UNAVAILABLE` and the jurisdictions it covers are recorded as
    `checked-source-availability-limited`. Classifier model:
@@ -386,17 +386,22 @@ The pipeline is split instead:
    `s-maxage=60, stale-while-revalidate=60`, so the edition appears within
    about two minutes of 12:00.
 
-If the quality gate rejects the edition on Thursday, the failed run notifies
-by email and there is a day left to fix it and re-run the workflow
-manually. A recovery run on Friday after 12:00 or on Saturday still uses the
-same Friday slot as `publishedAt`, which is then already in the past, so the
-article goes live after review, merge and deployment.
+If the quality gate rejects the edition, publication stops. A structured
+Claude veto can trigger the bounded recovery described below. A late edition
+retains its intended Friday slot as `scheduledPublicationAt`, but its
+`publishedAt` is no earlier than the actual late preparation. Its public copy
+discloses the delayed release. The GitHub merge/deployment and first successful
+public verification provide the separate evidence of real availability; the
+original missed slot must never be presented as an on-time publication.
 
 Every trigger runs `scripts/check-weekly-publication.mjs` first (before
 dependency installation or any paid API work). It checks for the target
 week's article - the ISO week after the run's publication Friday - and
-turns the run into a reported idempotent no-op if it already exists or its
-publication PR is awaiting review. The latter is reported as not published.
+turns the run into a reported idempotent no-op if a valid article already exists
+or an approved publication PR is still progressing through required CI.
+A rejected or unreviewed draft is not a prepared publication. An eligible
+replacement uses a distinct attempt and PR; the old draft remains an audit
+record. A waiting PR is reported as not published.
 `workflow_dispatch` remains available for manual dry-runs, previews (public
 immediately) or emergency publication.
 
@@ -411,6 +416,75 @@ no separate deployment step exists or is needed in this repository (see
 "Vercel: skipping data-only deployments" above for why a *data-only*
 commit is prevented from triggering a wasted rebuild; a real article
 commit always proceeds to a normal build+deploy).
+
+### Editorial Recovery and audit (16 November 2026)
+
+The binding recovery policy is in [the canonical specification, §8](DAJC_WEEKLY_INTELLIGENCE_SPEC.md#8-publication-schedule-and-preview).
+`recover-weekly-after-veto.mjs` permits at most three total generations per
+preparation: the initial candidate and two repairs. It consumes a complete
+structured Claude veto bound to the exact article SHA-256 and removes only
+exact cited URLs with `supported=false`. Each repair reruns the ordinary
+generator, source verification, deterministic gates, build and an independent
+Claude review. It cannot repair by inventing claims or lowering source quality.
+All sources rejected, an ambiguous veto, or API/network/build failure stops
+recovery. Nothing asks the model for more reports to reach a count.
+
+The runner archive is `RUNNER_TEMP/dajc-weekly-recovery/manifest.json` plus
+`attempt-N.md` and `attempt-N-veto.json`. The manifest records attempt numbers,
+hashes, exclusions, review reasons and results. A repeated invocation does not
+reset its budget. The publication gate carries durable evidence at
+`data/oversize/<target-week>/publication/<run-id>-<run-attempt>.json` in the PR.
+That receipt binds the exact article path, covered week and hash to the complete
+independent verdict. News CI independently validates that receipt for added or
+changed final Weekly articles.
+
+A rejected or unreviewed article is removed from the publishable content diff
+and retained only as audit data in a draft PR. The PR has machine-readable
+`DAJC_WEEKLY_STATE`, `DAJC_WEEKLY_ATTEMPT` and source-fingerprint markers.
+Rejected bytes never become a normal content PR that a generic merge path
+could accidentally release. New attempts preserve old PRs and branch history;
+there is no force-push over an earlier rejection. Approved replacements close
+the superseded rejected PR only once the replacement has its own valid receipt
+and reviewable PR.
+
+Scheduled retries deduplicate semantic source facts. Changes to collection
+timestamps alone do not justify another paid preparation. A new controlled
+preparation requires genuinely changed source data and remains subject to the
+same per-preparation budget. Concurrent publication runs share the workflow
+concurrency group. Before merge the release script rechecks required CI, the
+approval marker and expected current PR head, then uses GitHub's atomic
+`--match-head-commit` guard within normal main protection.
+
+For an explicit late repair, use `node scripts/generate-weekly-article.mjs
+--target-week 2026-W47` or set `OVERSIZE_TARGET_WEEK=2026-W47` through the
+workflow input. The shared `edition-plan.mjs` validates real ISO weeks and
+calculates the original Friday noon in Europe/Prague across CET/CEST. It reads
+the original preparation-week findings together with refreshed current-week
+findings. It excludes source publications later than the covered week. Covered
+week, scheduled slot, real preparation and observed public availability remain
+separate facts; historical publication dates are never forged.
+
+`node scripts/verify-weekly-publication.mjs` independently checks the matching
+durable approval, merged PR, required CI and Vercel deployment before checking
+the canonical direct article URL, a single `/news` card and a single RSS item.
+The headline, publication date and citations must match. Before the release
+slot those public surfaces must omit the article. By default it verifies the
+latest due edition: the previous Friday's edition on Monday–Thursday, then the
+new edition from Friday 12:00 Prague. `--target-week YYYY-Www` or
+`OVERSIZE_TARGET_WEEK` pins a check to a specific edition. The separate cheap
+idempotency checker uses `OVERSIZE_CHECK_MODE=watchdog` for due-week selection.
+
+Verification makes eight attempts by default with 20-second delays and
+20-second request timeouts. `WEEKLY_VERIFY_ATTEMPTS` is capped at 24 and
+`WEEKLY_VERIFY_DELAY_MS` at 30000. Unique verification query parameters and
+`Cache-Control: no-cache, no-store` / `Pragma: no-cache` avoid stale cached
+observations. An early exposure fails immediately. A failed deployment or
+public check identifies the failed step and cannot invoke another publication
+route.
+
+The original W47 withdrawal and scope-PR integration are recorded in
+[WEEKLY_W47_EDITORIAL_AUDIT.md](WEEKLY_W47_EDITORIAL_AUDIT.md). That audit is
+evidence of rejection, not certification of a replacement or production release.
 
 `scripts/generate-weekly-article.mjs` (`npm run oversize:publish`):
 
@@ -955,3 +1029,7 @@ Single-source rule: all news articles live only at https://www.dajc.eu/news/. DA
 ## Temporary LinkedIn personal channel (24 October 2026)
 
 Owner explicitly approved posting DAJC news teasers on their connected personal LinkedIn profile until the DAJC company page is available in Buffer. This is a temporary exception to the earlier company-only rule. The LinkedIn GitHub workflow uses only the specifically verified Buffer personal channel `6adc3c32778b240e2fa9f0bc` and `DAJC_LINKEDIN_TARGET=personal`; all other personal profiles fail closed. Publishing is on by owner decision (24 October 2026); `DAJC_LINKEDIN_ENABLED=false` switches it off. Posts are factual, Claude-adapted teasers pointing to the full publicly verified English article on DAJC.eu. The same anti-duplicate ledger and live-article check remain. Switch to the company page only after verifying its distinct Buffer channel and updating the explicit target policy; never silently switch identities.
+
+Approved interrupted releases resume from the pinned PR head without a new research or writing call. The resume path reads PR git objects as data and runs only reviewed main code. Before CI accepts an article, and before resume/public verification, its full independent review must match the immutable `weekly-approval-<run>-<attempt>` artifact from the main publishing workflow. A PR-local JSON assertion alone cannot authorize publication.
+
+A rejected audit PR never represents a prepared publication and imposes no time-only lock on genuine new evidence. The semantic source fingerprint, not an elapsed-hours timer, decides whether another paid preparation is allowed. Summaries are rebuilt from retained report titles, including when a different story from the same country was removed. Operational alerts retain bounded run history, editorial reasons and exact failed steps.

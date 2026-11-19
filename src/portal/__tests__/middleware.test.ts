@@ -24,9 +24,9 @@ afterEach(() => {
   delete process.env[ENV_KEY];
 });
 
-describe('private Platform and Integration Ecosystem sections', () => {
+describe('private legacy Platform and Integration Ecosystem sections', () => {
   it.each([
-    '/platform', '/platform/', '/platform/development', '/platform/development/notes',
+    '/platform/development', '/platform/development/notes', '/platform/private-data',
     '/partners', '/partners/providers', '/integration-ecosystem', '/integration-ecosystem/internal',
   ])('blocks direct access to %s without rendering content', async (path) => {
     const next = vi.fn(async () => new Response('private content'));
@@ -38,6 +38,15 @@ describe('private Platform and Integration Ecosystem sections', () => {
     expect(response.headers.get('Cache-Control')).toBe('no-store');
     expect(next).not.toHaveBeenCalled();
   });
+
+  it.each(['/platform', '/platform/', '/platform/integrations', '/platform/integrations/', '/tar', '/tar/integrations'])(
+    'permits the explicitly approved public product route %s', async path => {
+      const next = vi.fn(async () => new Response('public product information'));
+      const response = await callMiddleware(path, next);
+      expect(response.status).toBe(200);
+      expect(next).toHaveBeenCalledOnce();
+    },
+  );
 
   it.each(['/testing', '/news/platform/dajc-testing-2027-and-assistance', '/investors'])(
     'preserves the explicitly public information at %s', async (path) => {

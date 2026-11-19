@@ -1,4 +1,11 @@
 ---
+const czechEquivalent: Record<string,string> = {
+  "/":"/", "/platform":"/platform", "/tar":"/tar",
+  "/testing":"/testovani", "/demo-guide":"/demo",
+  "/news":"/aktuality", "/privacy":"/soukromi",
+};
+const current=Astro.url.pathname.replace(/\/$/, "") || "/";
+const czechUrl="https://www.dajc.cz"+(czechEquivalent[current]??"/");
 ---
 <header class="site-header">
   <div class="site-header__inner">
@@ -8,13 +15,13 @@
     </a>
 
     <nav class="desktop-nav" aria-label="Primary navigation">
-      <a href="/assistance">Assistance</a>
+      <a href="/platform">Platform</a>
+      <a href="/tar">TAR</a>
       <details class="tools-dropdown">
         <summary>Tools <span aria-hidden="true">⌄</span></summary>
         <div class="tools-dropdown__panel">
           <a href="/driving-bans">Driving Bans</a>
           <a href="/intelligence">DAJC Intelligence</a>
-          <a href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">Live Demo ↗</a>
           <a href="/pricing">Access &amp; Availability</a>
         </div>
       </details>
@@ -24,6 +31,7 @@
     <div class="header-actions">
       <a class="header-secondary" href="/investors">Investors</a>
       <a class="header-secondary" href="/press">Press</a>
+      <a class="header-secondary" href={czechUrl} lang="cs" hreflang="cs" aria-label="Česká verze webu DAJC">Česky · DAJC.cz</a>
       <a class="testing-link" href="/testing">Testing <span class="testing-year">2027</span><span aria-hidden="true"> ↗</span></a>
       <details class="mobile-navigation">
         <summary aria-label="Open navigation menu">
@@ -32,13 +40,14 @@
           </svg>
         </summary>
         <nav aria-label="Mobile navigation" class="mobile-navigation__panel">
-          <a href="/assistance">DAJC Assistance</a>
+          <a href="/platform">DAJC Platform</a>
+          <a href="/tar">DAJC TAR</a>
           <a href="/driving-bans">Driving Bans</a>
           <a href="/intelligence">DAJC Intelligence</a>
-          <a href="https://demo.dajc.eu/" target="_blank" rel="noopener noreferrer">Live Demo ↗</a>
           <a href="/news">News</a>
           <a href="/investors">Investors</a>
           <a href="/press">Press &amp; Media</a>
+          <a href={czechUrl} lang="cs" hreflang="cs">Česky · DAJC.cz</a>
           <a href="/pricing">Access &amp; Availability</a>
           <a href="/support">Support DAJC</a>
           <a href="/testing" class="mobile-navigation__testing">Register for Testing 2027</a>

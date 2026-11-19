@@ -1,0 +1,48 @@
+---
+interface Props {
+  label?: string;
+}
+
+const { label = 'X' } = Astro.props;
+const profileURL = 'https://x.com/DAJCeu';
+---
+<a
+  class="x-link"
+  href={profileURL}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="DAJC on X (opens in a new tab)"
+>
+  <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.829L0 1.153h7.594l5.243 6.932L18.901 1.153Zm-1.29 19.49h2.039L6.486 3.24H4.298l13.313 17.403Z" />
+  </svg>
+  <span>{label}</span>
+</a>
+
+<style>
+  .x-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    vertical-align: middle;
+    color: var(--dajc-muted);
+    text-decoration: none;
+    border-radius: 3px;
+  }
+
+  .x-link svg {
+    flex-shrink: 0;
+  }
+
+  .x-link:hover,
+  .x-link:focus-visible {
+    color: var(--dajc-orange);
+    text-decoration: underline;
+  }
+
+  .x-link:focus-visible {
+    outline: 2px solid var(--dajc-orange);
+    outline-offset: 4px;
+  }
+</style>

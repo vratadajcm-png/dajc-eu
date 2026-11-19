@@ -141,7 +141,7 @@ describe('edition copy matches the published reports', () => {
       developments: [report], europeRoundup: [],
     };
     const { fixed } = alignEditionSummary(article, { weekRangeLabel: '26 October - 1 November 2026' });
-    expect(fixed).toEqual(['metaDescription', 'intro']);
+    expect(fixed).toEqual(['seoTitle', 'metaDescription', 'intro']);
     expect(`${article.metaDescription} ${article.intro}`).not.toMatch(/Czech/);
   });
 
@@ -154,11 +154,12 @@ describe('edition copy matches the published reports', () => {
       operatorChecklist: ['Verify winter equipment compliance for vehicles over 3.5 tonnes.'],
     };
     const { fixed } = alignEditionSummary(article, { weekRangeLabel: '26 October - 1 November 2026' });
-    expect(fixed).toEqual(['metaDescription']);
+    expect(fixed).toEqual(['seoTitle', 'metaDescription', 'intro']);
     expect(article.metaDescription).not.toMatch(/Hungary/);
     expect(article.metaDescription).toContain('N307 Markerwaarddijk');
     expect(article.operatorChecklist).toEqual(['Netherlands: Check gross and axle weights before assigning the N307.']);
-    expect(article.intro).toBe('Developments relevant to heavy transport.');
+    expect(article.intro).toContain(report.title);
+    expect(article.intro).not.toBe('Developments relevant to heavy transport.');
   });
 
   it('builds one checklist line per report with an action', () => {
