@@ -12,7 +12,7 @@ import { canonicalDrivingBans } from '../config/driving-ban-calendars/runtime.mj
 import { officialAuthorityDomains } from '../config/official-authority-domains.mjs';
 import { MONITOR_DEFAULTS } from '../config/driving-ban-sources/monitor-policy.mjs';
 import { safeFetch } from '../src/lib/driving-bans/research/safe-fetch.mjs';
-import { monitorSources, buildReverificationQueue, verifiedTextBaseline, monitorMarkdown } from '../src/lib/driving-bans/source-monitor.mjs';
+import { monitorSources, buildReverificationQueue, verifiedTextBaseline, monitorMarkdown, monitorAllowedHosts, NORMALIZER_VERSION } from '../src/lib/driving-bans/source-monitor.mjs';
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); if (i < 0) return fallback; if (!args[i + 1] || args[i + 1].startsWith('--')) throw new Error(`Missing value: ${name}`); return args[i + 1]; };
@@ -27,13 +27,11 @@ if (previous && (previous.schema_version !== 1 || !Array.isArray(previous.result
 const baselinePath = resolve('data/driving-bans/source-monitor/text-baseline.json');
 const baseline = existsSync(baselinePath) ? JSON.parse(readFileSync(baselinePath, 'utf8')).sources || {} : {};
 
-// The allowlist is exactly the hosts of human-reviewed canonical sources plus
-// the configured national authorities and the RIS OGD mirror.
-const allowedHosts = [...new Set([
-  ...canonicalDrivingBans.sources.map((source) => { try { return new URL(source.url).hostname; } catch { return null; } }).filter(Boolean),
-  ...Object.values(officialAuthorityDomains).flat(),
-  'ogd.ris.bka.gv.at',
-])];
+// The allowlist is exactly the hosts of human-reviewed PRIMARY (official)
+// canonical sources plus the configured national authorities and the RIS OGD
+// mirror. Secondary hosts (press, associations, aggregators) are excluded so a
+// redirect can never turn third-party content into official evidence.
+const allowedHosts = monitorAllowedHosts(canonicalDrivingBans, [...Object.values(officialAuthorityDomains).flat(), 'ogd.ris.bka.gv.at']);
 
 const report = await monitorSources({
   canonical: canonicalDrivingBans, baseline, previous, only, maxSources,
@@ -43,7 +41,7 @@ const queue = buildReverificationQueue({ canonical: canonicalDrivingBans, report
 mkdirSync(out, { recursive: true });
 writeFileSync(join(out, 'source-monitor.json'), JSON.stringify(report, null, 2) + '\n');
 writeFileSync(join(out, 'reverification-queue.json'), JSON.stringify(queue, null, 2) + '\n');
-writeFileSync(join(out, 'text-baseline.proposed.json'), JSON.stringify({ schema_version: 1, generated_at: report.generated_at,
+writeFileSync(join(out, 'text-baseline.proposed.json'), JSON.stringify({ schema_version: 1, normalizer_version: NORMALIZER_VERSION, generated_at: report.generated_at,
   note: 'Only sources whose retrieved bytes equal the reviewed content_sha256. Commit through a reviewed PR.', sources: verifiedTextBaseline(report) }, null, 2) + '\n');
 if (stateDir) {
   // History and provenance for the data branch: latest state plus one

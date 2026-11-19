@@ -19,8 +19,9 @@ on:
     - cron: '17 9 * * 4'
     # Official-source monitor: before the Thursday sweep and again in the
     # evening. Both slots are outside Austrian office hours (RIS OGD terms:
-    # automated access 20:00-05:00 Vienna time); a delayed run defers RIS.
-    - cron: '37 2 * * 4'
+    # automated access 20:00-05:00 Vienna time) with ~2.5 h margin in summer
+    # for GitHub's scheduling delay; a later start defers RIS only.
+    - cron: '37 0 * * 4'
     - cron: '37 19 * * 4'
   workflow_dispatch: {}
 
@@ -113,7 +114,7 @@ jobs:
   # run, and builds the re-verification queue. It never edits canonical.json,
   # never refreshes verification dates and never produces NO_BAN.
   source-monitor:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '37 2 * * 4' || github.event.schedule == '37 19 * * 4' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '37 0 * * 4' || github.event.schedule == '37 19 * * 4' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -146,10 +147,6 @@ jobs:
         continue-on-error: true
         run: node scripts/driving-bans-source-monitor.mjs --previous data/driving-bans-monitor/latest.json --state-dir data/driving-bans-monitor --fail-on-change
 
-      - name: Persist monitor history (main only)
-        if: ${{ always() && github.ref == 'refs/heads/main' && hashFiles('data/driving-bans-monitor/latest.json') != '' }}
-        run: node scripts/automation-data.mjs save driving-bans-monitor
-
       - name: Upload monitor evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -163,11 +160,20 @@ jobs:
           if-no-files-found: warn
           retention-days: 90
 
-      - name: Alert on changed sources or degraded retrieval (main only)
-        if: ${{ steps.monitor.outcome == 'failure' && github.ref == 'refs/heads/main' }}
+      # Any failure of this job (install, history load, monitor) alerts, not
+      # only a monitor exit code. Main only; never from a branch dispatch.
+      - name: Alert on changed sources, degraded retrieval or a failed monitor job (main only)
+        id: alert
+        if: ${{ github.ref == 'refs/heads/main' && (failure() || steps.monitor.outcome == 'failure') }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: node scripts/report-driving-bans-alert.mjs monitor artifacts/driving-bans/source-monitor.md
+
+      # History is persisted only after a needed alert was delivered, so a
+      # CHANGED_SINCE_LAST_RUN signal is never consumed silently.
+      - name: Persist monitor history (main only)
+        if: ${{ always() && github.ref == 'refs/heads/main' && steps.monitor.outcome != 'skipped' && steps.alert.outcome != 'failure' && hashFiles('data/driving-bans-monitor/latest.json') != '' }}
+        run: node scripts/automation-data.mjs save driving-bans-monitor
 
       - name: Fail visibly when the monitor needs attention
         if: ${{ steps.monitor.outcome == 'failure' }}

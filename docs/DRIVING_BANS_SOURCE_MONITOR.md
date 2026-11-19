@@ -39,12 +39,20 @@ active window, including unpromulgated annual calendars),
 ## Schedule, history and alerts
 
 `.github/workflows/driving-bans-thursday.yml`, job `source-monitor`: Thursday
-02:37 UTC and 19:37 UTC (both outside Austrian office hours) plus manual
+00:37 UTC and 19:37 UTC (both outside Austrian office hours) plus manual
 dispatch. History (`latest.json` and one record per run, hashes and states
 only) is persisted on the data branch `automation/driving-bans-monitor`
 through `scripts/automation-data.mjs` (main only, non-force push, fixed JSON
-paths). A changed official source or a success rate below 0.6 updates the
-single issue `[Driving Bans] monitoring alert`; so does a failed Thursday gate.
+paths), after any needed alert was delivered. Sources that were unavailable,
+blocked or deferred keep their last good fingerprint (`last_retrieved`), and a
+comparison is made only against the same URL and normaliser version
+(`NORMALIZER_VERSION`; normalisation removes only scripts, styles, templates,
+comments and markup, never visible form/header/navigation text, and short
+texts are compared by bytes). A changed official source, a success rate below
+0.6, any failure of the monitor job or a failed Thursday gate adds a new
+comment to the single issue `[Driving Bans] monitoring alert` (earlier alerts
+are never overwritten). The fetch allowlist contains only PRIMARY source hosts,
+configured authority domains and the RIS OGD mirror.
 Artifacts: `source-monitor.json`, `source-monitor.md`, `reverification-queue.json`,
 `text-baseline.proposed.json` (90 days).
 

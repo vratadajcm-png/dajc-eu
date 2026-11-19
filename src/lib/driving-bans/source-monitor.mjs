@@ -32,10 +32,18 @@ const OGD_DOCUMENT = /https:\/\/ogd\.ris\.bka\.gv\.at\/Dokumente\/[A-Za-z]+\/[A-
 export const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 
 const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", sect: '§', ndash: '–', mdash: '—' };
+// Bump when normalisation changes: text hashes of another version are never
+// compared (the committed baseline and the previous run carry the version).
+export const NORMALIZER_VERSION = 2;
+// Shorter normalised text is not a reliable fingerprint of a legal document.
+export const MIN_COMPARABLE_TEXT = 200;
+const codePoint = (value, original) => (Number.isInteger(value) && value >= 0 && value <= 0x10ffff ? String.fromCodePoint(value) : original);
 /**
  * Deterministic legal-text normalisation used only to ignore page chrome
- * (scripts, styles, navigation markup, whitespace). PDFs are compared by
- * bytes only: their text is not re-derived here.
+ * (scripts, styles, comments, markup, whitespace). It never removes visible
+ * element content (forms, headers and navigation may wrap the legal text),
+ * never throws on malformed entities, and returns null when the remaining
+ * text is too short to compare. PDFs are compared by bytes only.
  */
 export function normalizeDocumentText(bytes, contentType = 'text/html') {
   if (!bytes || /pdf/i.test(contentType)) return null;
@@ -43,17 +51,20 @@ export function normalizeDocumentText(bytes, contentType = 'text/html') {
   if (/html|xml/i.test(contentType)) {
     text = text
       .replace(/<!--[\s\S]*?-->/g, ' ')
-      .replace(/<(script|style|noscript|svg|template|head|nav|footer|header|form|button)\b[\s\S]*?<\/\1\s*>/gi, ' ')
+      .replace(/<(script|style|noscript|template)\b[^>]*\/>/gi, ' ')
+      .replace(/<(script|style|noscript|template)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, ' ')
       .replace(/<[^>]+>/g, ' ')
-      .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
-      .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+      .replace(/&#(\d+);/g, (m, n) => codePoint(Number(n), m))
+      .replace(/&#x([0-9a-f]+);/gi, (m, n) => codePoint(parseInt(n, 16), m))
       .replace(/&([a-z]+);/gi, (m, name) => ENTITIES[name.toLowerCase()] ?? m);
   }
-  return text.replace(/\s+/g, ' ').trim();
+  text = text.replace(/\s+/g, ' ').trim();
+  return text.length >= MIN_COMPARABLE_TEXT ? text : null;
 }
 
 export function isBotChallenge(status, text = '') {
-  return [401, 403, 405, 429, 503].includes(Number(status)) && /security check|captcha|access denied|are you a robot|bot protection|cloudflare|ddos|forbidden/i.test(String(text).slice(0, 20000));
+  if (Number(status) === 429) return true; // rate limited: back off, never retry around it
+  return [401, 403, 405, 503].includes(Number(status)) && /security check|captcha|access denied|are you a robot|bot protection|cloudflare|ddos|forbidden/i.test(String(text).slice(0, 20000));
 }
 
 /** Which official URL the monitor may read for a canonical source, and how. */
@@ -117,6 +128,14 @@ export async function monitorSources({
   // branch) detects content changes between weekly runs even for dynamic pages
   // whose reviewed raw hash can never match again.
   const prior = new Map((previous?.results || []).filter((r) => r && typeof r.source_id === 'string').map((r) => [r.source_id, r]));
+  // Last successfully retrieved fingerprint per source, carried through runs
+  // where the source was unavailable, blocked or deferred.
+  const lastGood = (id) => {
+    const before = prior.get(id);
+    if (!before) return null;
+    if (before.raw_sha256) return { raw_sha256: before.raw_sha256, text_sha256: before.text_sha256 ?? null, url: before.url, checked_at: before.checked_at, normalizer_version: before.normalizer_version ?? 1 };
+    return before.last_retrieved ?? null;
+  };
   const lastRequest = new Map();
   const results = [];
   for (const source of selected) {
@@ -127,9 +146,10 @@ export async function monitorSources({
       reviewed_sha256: source.content_sha256 ?? null, reviewed_at: source.checked_at ?? null, licence: target.policy?.licence ?? null,
     };
     const checkedAt = now().toISOString();
-    if (target.blocked) { results.push({ ...base, state: target.blocked.state, reason: target.blocked.reason, checked_at: checkedAt }); continue; }
+    const carried = { last_retrieved: lastGood(source.source_id) };
+    if (target.blocked) { results.push({ ...base, ...carried, state: target.blocked.state, reason: target.blocked.reason, checked_at: checkedAt }); continue; }
     if (target.policy?.allowedWindow && !withinAllowedWindow(target.policy.allowedWindow, now())) {
-      results.push({ ...base, state: 'DEFERRED_PROVIDER_TERMS', reason: `Provider terms allow automated access only ${target.policy.allowedWindow.weekdayFrom}-${target.policy.allowedWindow.weekdayTo} ${target.policy.allowedWindow.timezone} on weekdays${target.policy.allowedWindow.weekends ? ' or at weekends' : ''}.`, checked_at: checkedAt });
+      results.push({ ...base, ...carried, state: 'DEFERRED_PROVIDER_TERMS', reason: `Provider terms allow automated access only ${target.policy.allowedWindow.weekdayFrom}-${target.policy.allowedWindow.weekdayTo} ${target.policy.allowedWindow.timezone} on weekdays${target.policy.allowedWindow.weekends ? ' or at weekends' : ''}.`, checked_at: checkedAt });
       continue;
     }
     const interval = target.policy?.hostIntervalMs ?? defaultIntervalMs;
@@ -139,29 +159,33 @@ export async function monitorSources({
     let response;
     try { response = await fetcher(target.url); } catch (error) { response = { ok: false, availability: 'SOURCE_UNAVAILABLE', code: 'FETCH_ERROR', message: String(error?.message || error) }; }
     if (!response?.ok) {
-      const text = response?.bytes ? Buffer.from(response.bytes).toString('utf8') : (response?.message || '');
+      const text = response?.bytes ? Buffer.from(response.bytes).toString('utf8') : (response?.snippet || response?.message || '');
       const state = isBotChallenge(response?.http_status, text) || (response?.http_status === 403) ? 'ACCESS_BLOCKED'
         : response?.availability === 'REJECTED' ? 'REJECTED' : 'SOURCE_UNAVAILABLE';
-      results.push({ ...base, state, http_status: response?.http_status ?? null, reason: response?.code || response?.message || 'Retrieval failed', checked_at: checkedAt });
+      results.push({ ...base, ...carried, state, http_status: response?.http_status ?? null, reason: response?.code || response?.message || 'Retrieval failed', checked_at: checkedAt });
       continue;
     }
     const rawSha = sha256(response.bytes);
-    const text = normalizeDocumentText(response.bytes, response.content_type);
+    let text = null;
+    try { text = normalizeDocumentText(response.bytes, response.content_type); } catch { text = null; } // never let one page stop the run
     const textSha = text === null ? null : sha256(text);
     const reviewedText = baseline?.[source.source_id];
-    // A text baseline only counts when it vouches for the same reviewed bytes.
-    const textBaseline = reviewedText && reviewedText.raw_sha256 === source.content_sha256 ? reviewedText.text_sha256 : null;
+    // A text baseline only counts when it vouches for the same reviewed bytes
+    // and was produced by the same normaliser.
+    const textBaseline = reviewedText && reviewedText.raw_sha256 === source.content_sha256 && (reviewedText.normalizer_version ?? 1) === NORMALIZER_VERSION ? reviewedText.text_sha256 : null;
     let state;
     if (source.content_sha256 && rawSha === source.content_sha256) state = 'UNCHANGED';
-    else if (textBaseline && textSha === textBaseline) state = 'UNCHANGED_TEXT';
+    else if (textBaseline && textSha && textSha === textBaseline) state = 'UNCHANGED_TEXT';
     else if (!source.content_sha256) state = 'NO_BASELINE';
     else state = 'CHANGED';
-    const before = prior.get(source.source_id);
-    const comparable = before?.raw_sha256 ? (textSha && before.text_sha256 ? [textSha, before.text_sha256] : [rawSha, before.raw_sha256]) : null;
+    // Compare with the last good fingerprint of the SAME document only.
+    const before = carried.last_retrieved && carried.last_retrieved.url === target.url ? carried.last_retrieved : null;
+    const textComparable = textSha && before?.text_sha256 && (before.normalizer_version ?? 1) === NORMALIZER_VERSION;
+    const comparable = before?.raw_sha256 ? (textComparable ? [textSha, before.text_sha256] : [rawSha, before.raw_sha256]) : null;
     const sinceLastRun = !comparable ? 'FIRST_RUN' : comparable[0] === comparable[1] ? 'STABLE' : 'CHANGED_SINCE_LAST_RUN';
     results.push({ ...base, state, since_last_run: sinceLastRun, previous_checked_at: before?.checked_at ?? null,
       http_status: response.http_status ?? 200, content_type: response.content_type ?? null, final_url: response.final_url ?? target.url,
-      raw_sha256: rawSha, text_sha256: textSha, byte_length: response.bytes.length, checked_at: checkedAt });
+      raw_sha256: rawSha, text_sha256: textSha, normalizer_version: NORMALIZER_VERSION, byte_length: response.bytes.length, checked_at: checkedAt });
   }
   return summarizeMonitor(results, { canonical, generatedAt: now().toISOString() });
 }
@@ -241,11 +265,22 @@ export function buildReverificationQueue({ canonical, report, now = new Date() }
   };
 }
 
+/**
+ * Hosts the monitor may fetch: only human-reviewed PRIMARY (official) source
+ * hosts plus configured authority domains and mirrors. Secondary hosts are
+ * excluded so a redirect cannot turn press/aggregator content into evidence.
+ */
+export function monitorAllowedHosts(canonical, extraDomains = []) {
+  const hosts = (canonical?.sources || []).filter((source) => source.role === 'PRIMARY')
+    .map((source) => { try { return new URL(source.url).hostname; } catch { return null; } }).filter(Boolean);
+  return [...new Set([...hosts, ...extraDomains])];
+}
+
 /** Text baseline entries a reviewer may commit: only sources whose fetched bytes equal the reviewed hash. */
 export function verifiedTextBaseline(report) {
   return Object.fromEntries((report?.results || [])
     .filter((r) => r.state === 'UNCHANGED' && r.text_sha256 && r.reviewed_sha256 === r.raw_sha256)
-    .map((r) => [r.source_id, { raw_sha256: r.raw_sha256, text_sha256: r.text_sha256, captured_at: r.checked_at, url: r.url }]));
+    .map((r) => [r.source_id, { raw_sha256: r.raw_sha256, text_sha256: r.text_sha256, normalizer_version: r.normalizer_version ?? NORMALIZER_VERSION, captured_at: r.checked_at, url: r.url }]));
 }
 
 export function monitorMarkdown(report, queue) {

@@ -6,9 +6,10 @@ import { hostPolicyFor } from '../../../config/driving-ban-sources/monitor-polic
 import { toIcs } from './core.mjs';
 import { assessEvidence } from './legal-changes.mjs';
 import {
-  buildReverificationQueue, isBotChallenge, monitorSources, normalizeDocumentText, resolveMonitorTarget,
-  verifiedTextBaseline, withinAllowedWindow,
+  buildReverificationQueue, isBotChallenge, monitorAllowedHosts, monitorSources, normalizeDocumentText, resolveMonitorTarget,
+  verifiedTextBaseline, withinAllowedWindow, NORMALIZER_VERSION,
 } from './source-monitor.mjs';
+const LAW = ' Sonn- und Feiertagsfahrverbot fuer Lastkraftwagen ueber 7,5 t von 0 bis 22 Uhr. '.repeat(5);
 // @ts-ignore - plain ESM script helper
 import { formatDrivingBansAlert } from '../../../scripts/report-driving-bans-alert.mjs';
 
@@ -24,8 +25,8 @@ function dataset(sources: any[], rules: any[] = [], reviews: Record<string, any>
 
 describe('Driving Bans official-source monitor', () => {
   it('classifies reviewed, chrome-only, changed and baseline-less sources without touching the registry', async () => {
-    const reviewed = '<html><body><p>§ 30 Sonn- und Feiertagsfahrverbot 0-22 Uhr</p></body></html>';
-    const chrome = '<html><head><script>track()</script></head><body><nav>menu</nav><p>§ 30 Sonn- und Feiertagsfahrverbot 0-22 Uhr</p></body></html>';
+    const reviewed = `<html><body><p>§ 30 ${LAW}</p></body></html>`;
+    const chrome = `<html><head><script>track()</script><style>p{}</style></head><body><!-- build 42 --><p>§ 30 ${LAW}</p></body></html>`;
     const data = dataset([
       { source_id: 'same', url: 'https://law.example.gov/a', role: 'PRIMARY', content_sha256: sha(reviewed) },
       { source_id: 'chrome', url: 'https://law.example.gov/b', role: 'PRIMARY', content_sha256: sha(reviewed) },
@@ -34,9 +35,9 @@ describe('Driving Bans official-source monitor', () => {
       { source_id: 'press', url: 'https://press.example.com/e', role: 'SECONDARY' },
     ]);
     const before = JSON.stringify(data);
-    const pages: Record<string, string> = { a: reviewed, b: chrome, c: reviewed.replace('0-22', '0-24'), d: reviewed };
+    const pages: Record<string, string> = { a: reviewed, b: chrome, c: reviewed.replace('bis 22 Uhr', 'bis 24 Uhr'), d: reviewed };
     const fetched: string[] = [];
-    const baseline = { chrome: { raw_sha256: sha(reviewed), text_sha256: sha(normalizeDocumentText(Buffer.from(reviewed)) as string) } };
+    const baseline = { chrome: { raw_sha256: sha(reviewed), text_sha256: sha(normalizeDocumentText(Buffer.from(reviewed)) as string), normalizer_version: NORMALIZER_VERSION } };
     const report = await monitorSources({ canonical: data, baseline, sleep: noSleep, fetcher: async (url: string) => { fetched.push(url); return ok(pages[url.slice(-1)]); } });
     const state = Object.fromEntries(report.results.map((r: any) => [r.source_id, r.state]));
     expect(state).toEqual({ same: 'UNCHANGED', chrome: 'UNCHANGED_TEXT', changed: 'CHANGED', nobase: 'NO_BASELINE' });
@@ -98,16 +99,61 @@ describe('Driving Bans official-source monitor', () => {
   it('detects official text changes between runs, even for dynamic pages', async () => {
     const data = dataset([{ source_id: 'boe', url: 'https://www.boe.es/x', role: 'PRIMARY', content_sha256: sha('old reviewed bytes') }],
       [{ ban_id: 'es-a', jurisdiction: 'ES', source_id: 'boe', evidence_ids: [], status: 'ACTIVE' }]);
-    const first = await monitorSources({ canonical: data, sleep: noSleep, fetcher: async () => ok('<p>Domingo 8:00-22:00</p><script>1</script>') });
+    const page = (hours: string, chrome: string) => `<p>${'Restricción de circulación para vehículos de más de 7.500 kg. '.repeat(4)}Domingo ${hours}</p><script>${chrome}</script>`;
+    const first = await monitorSources({ canonical: data, sleep: noSleep, fetcher: async () => ok(page('8:00-22:00', '1')) });
     expect(first.results[0].since_last_run).toBe('FIRST_RUN');
-    const same = await monitorSources({ canonical: data, previous: first, sleep: noSleep, fetcher: async () => ok('<p>Domingo 8:00-22:00</p><script>2</script>') });
+    const same = await monitorSources({ canonical: data, previous: first, sleep: noSleep, fetcher: async () => ok(page('8:00-22:00', '2')) });
     expect(same.results[0].since_last_run).toBe('STABLE');
-    const amended = await monitorSources({ canonical: data, previous: same, sleep: noSleep, fetcher: async () => ok('<p>Domingo 8:00-24:00</p>') });
+    const amended = await monitorSources({ canonical: data, previous: same, sleep: noSleep, fetcher: async () => ok(page('8:00-24:00', '2')) });
     expect(amended.results[0].since_last_run).toBe('CHANGED_SINCE_LAST_RUN');
     expect(amended.summary.changed_since_last_run).toBe(1);
     const queue = buildReverificationQueue({ canonical: data, report: amended, now: new Date('2026-11-18T12:00:00Z') });
     expect(queue.items.some((q: any) => q.kind === 'SOURCE_CONTENT_CHANGED_SINCE_LAST_RUN')).toBe(true);
     expect(queue.items.some((q: any) => q.kind === 'SOURCE_CHANGED_LEGAL_REVIEW_REQUIRED' && q.ban_id === 'es-a')).toBe(true);
+  });
+});
+
+describe('independent review findings (19 Nov 2026)', () => {
+  const bigPage = (rule: string) => `<p>${LAW} ${rule}</p>`;
+  it('keeps the last good fingerprint through unavailable/deferred runs, so a later amendment is still detected', async () => {
+    const data = dataset([{ source_id: 'boe', url: 'https://www.boe.es/x', role: 'PRIMARY', content_sha256: sha('reviewed') }]);
+    const week1 = await monitorSources({ canonical: data, sleep: noSleep, fetcher: async () => ok(bigPage('Domingo 8-22')) });
+    const week2 = await monitorSources({ canonical: data, previous: week1, sleep: noSleep, fetcher: async () => { throw new Error('timeout'); } });
+    expect(week2.results[0]).toMatchObject({ state: 'SOURCE_UNAVAILABLE', last_retrieved: { raw_sha256: week1.results[0].raw_sha256 } });
+    const week3 = await monitorSources({ canonical: data, previous: week2, sleep: noSleep, fetcher: async () => ok(bigPage('Domingo 8-24')) });
+    expect(week3.results[0].since_last_run).toBe('CHANGED_SINCE_LAST_RUN');
+  });
+  it('never deletes visible legal text inside forms, headers or around self-closing svg, and never throws on bad entities', () => {
+    expect(normalizeDocumentText(Buffer.from(`<body><form id=aspnetForm><p>${LAW}</p></form></body>`))).toContain('Feiertagsfahrverbot');
+    const svg = normalizeDocumentText(Buffer.from(`<svg class=i/><header><h2>Art 1</h2></header><p>${LAW}</p><svg><path/></svg><p>rest</p>`)) as string;
+    expect(svg).toContain('Art 1'); expect(svg).toContain('Feiertagsfahrverbot');
+    expect(() => normalizeDocumentText(Buffer.from(`<p>a &#99999999; &#x110000; b ${LAW}</p>`))).not.toThrow();
+    expect(normalizeDocumentText(Buffer.from('<p>short</p>'))).toBeNull(); // too short to fingerprint: compared by bytes
+  });
+  it('a baseline from another normaliser version is ignored', async () => {
+    const reviewed = bigPage('x');
+    const data = dataset([{ source_id: 's', url: 'https://law.example.gov/s', role: 'PRIMARY', content_sha256: sha(reviewed) }]);
+    const stale = { s: { raw_sha256: sha(reviewed), text_sha256: sha(normalizeDocumentText(Buffer.from(reviewed)) as string), normalizer_version: 1 } };
+    const report = await monitorSources({ canonical: data, baseline: stale, sleep: noSleep, fetcher: async () => ok(`<script>a</script>${reviewed}`) });
+    expect(report.results[0].state).toBe('CHANGED');
+  });
+  it('fetches only PRIMARY hosts; secondary press/aggregator hosts are not allowlisted', () => {
+    const hosts = monitorAllowedHosts(canonicalDrivingBans, ['ogd.ris.bka.gv.at']);
+    expect(hosts).toContain('www.gesetze-im-internet.de');
+    expect(hosts).toContain('ogd.ris.bka.gv.at');
+    for (const secondary of ['trafficban.com', 'www.trafficban.com', 'informace.cesmad.cz', 'www.saarnews.com', 'www.wko.at']) expect(hosts).not.toContain(secondary);
+  });
+  it('recognises a security-check page from the non-200 snippet and treats 429 as blocked', async () => {
+    const data = dataset([{ source_id: 'a', url: 'https://law.example.gov/a', role: 'PRIMARY' }, { source_id: 'b', url: 'https://law.example.gov/b', role: 'PRIMARY' }]);
+    const report = await monitorSources({ canonical: data, sleep: noSleep, fetcher: async (url: string) => url.endsWith('a')
+      ? { ok: false, http_status: 503, code: 'HTTP_STATUS', snippet: '<title>Security Check</title>' }
+      : { ok: false, http_status: 429, code: 'HTTP_STATUS', snippet: '' } });
+    expect(report.results.map((r: any) => r.state)).toEqual(['ACCESS_BLOCKED', 'ACCESS_BLOCKED']);
+  });
+  it('a changed source URL starts a new comparison instead of a false change alert', async () => {
+    const before = await monitorSources({ canonical: dataset([{ source_id: 'at-lueg', url: 'https://law.example.gov/old', role: 'PRIMARY' }]), sleep: noSleep, fetcher: async () => ok(bigPage('A')) });
+    const after = await monitorSources({ canonical: dataset([{ source_id: 'at-lueg', url: 'https://law.example.gov/new', role: 'PRIMARY' }]), previous: before, sleep: noSleep, fetcher: async () => ok(bigPage('B')) });
+    expect(after.results[0].since_last_run).toBe('FIRST_RUN');
   });
 });
 
@@ -165,6 +211,7 @@ describe('committed text baseline', () => {
     for (const [id, entry] of Object.entries<any>(file.sources)) {
       expect(reviewed.get(id), id).toBe(entry.raw_sha256);
       expect(entry.text_sha256).toMatch(/^[a-f0-9]{64}$/);
+      expect(entry.normalizer_version, id).toBe(NORMALIZER_VERSION);
     }
   });
 });

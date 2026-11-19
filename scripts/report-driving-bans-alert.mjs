@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// One operational alert issue for Driving Bans monitoring. Updates the open
-// issue instead of creating duplicates. Contains only hashes, states, URLs of
+// One operational alert issue for Driving Bans monitoring. Each alert is added
+// as a new comment (which notifies watchers and keeps earlier evidence); the
+// issue body is only created once. Contains only hashes, states, URLs of
 // official sources and run links - never document bodies or credentials.
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, appendFileSync } from 'node:fs';
@@ -35,7 +36,9 @@ function main() {
   const gh = (args) => execFileSync('gh', args, { encoding: 'utf8', timeout: 30000, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   const issues = JSON.parse(gh(['issue', 'list', '--repo', repo, '--state', 'open', '--search', `in:title "${ALERT_TITLE}"`, '--json', 'number,title,url']));
   const existing = issues.find((issue) => issue.title === ALERT_TITLE);
-  const url = existing ? (gh(['issue', 'edit', String(existing.number), '--repo', repo, '--body', body]), existing.url) : gh(['issue', 'create', '--repo', repo, '--title', ALERT_TITLE, '--body', body]);
+  // Never overwrite: an earlier alert may hold the only record of a changed
+  // official source (the next run reports it as STABLE).
+  const url = existing ? gh(['issue', 'comment', String(existing.number), '--repo', repo, '--body', body]) : gh(['issue', 'create', '--repo', repo, '--title', ALERT_TITLE, '--body', body]);
   console.log(`::warning::Driving Bans alert updated: ${url}`);
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `\nDriving Bans alert: ${url}\n`);
 }
