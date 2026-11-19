@@ -244,6 +244,52 @@ describe('generate-weekly-article.mjs (mock, subprocess)', () => {
   );
 
   it(
+    'editorial repair: rebuilds from the remaining verified pool after the reviewer rejected a cited source',
+    () => {
+      writeFindings([...Array.from({ length: 3 }, (_, i) => qualifyingFinding(i + 1)), ...fillerFindings()]);
+      const rejected = 'https://example.test/news/integration-synthetic-1';
+      const result = runGenerate(['--mock', '--dry-run', '--skip-build'], {
+        OVERSIZE_EXCLUDE_SOURCE_URLS: JSON.stringify([rejected]),
+        OVERSIZE_EDITORIAL_FEEDBACK: JSON.stringify(['Removed source ' + rejected + ': date not supported']),
+      });
+      expect(result.code).toBe(0);
+      expect(result.stdout).toMatch(/excluded after editorial veto: 1/);
+      expect(result.stdout).toMatch(/1 correction constraint/);
+      expect(result.stdout).toMatch(/Lead reports: 2\b/);
+      const article = dryRunArticle(result.stdout);
+      expect(article).not.toContain(rejected);
+      expect(article).toContain('integration-synthetic-2');
+    },
+    30_000
+  );
+
+  it(
+    'editorial repair: blocks without padding when every verified candidate was rejected',
+    () => {
+      writeFindings([qualifyingFinding(1), ...fillerFindings()]);
+      const result = runGenerate(['--mock', '--dry-run', '--skip-build'], {
+        OVERSIZE_EXCLUDE_SOURCE_URLS: JSON.stringify(['https://example.test/news/integration-synthetic-1']),
+      });
+      expect(result.code).toBe(0);
+      expect(result.stdout).toMatch(/No article will be published/);
+      expect(result.stdout).not.toMatch(/DRY RUN - ARTICLE THAT WOULD BE PUBLISHED/);
+    },
+    30_000
+  );
+
+  it(
+    'editorial repair: refuses malformed or oversized correction constraints before any generation',
+    () => {
+      for (const value of ['{"x":1}', JSON.stringify(Array.from({ length: 40 }, () => 'reason')), JSON.stringify(['x'.repeat(5000)])]) {
+        const result = runGenerate(['--mock', '--dry-run', '--skip-build'], { OVERSIZE_EDITORIAL_FEEDBACK: value });
+        expect(result.code).not.toBe(0);
+        expect(result.stdout).toMatch(/Invalid editorial-recovery correction constraints/);
+      }
+    },
+    30_000
+  );
+
+  it(
     'fails hard (non-zero exit) without ANTHROPIC_API_KEY, before writing anything',
     () => {
       const result = runGenerate([], { ANTHROPIC_API_KEY: '' });

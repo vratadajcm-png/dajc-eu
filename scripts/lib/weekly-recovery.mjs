@@ -25,6 +25,85 @@ export function selectRejectedSourceUrls(review, allowedUrls) {
   return seen.size === known.size ? rejected : [];
 }
 
+// Reviewer findings are untrusted model text derived from untrusted source
+// pages. They are passed to the writer only as bounded, inert data describing
+// what to REMOVE or CORRECT; they can never add a source, fact or exception.
+// Only control/invisible characters are stripped: '>12 t' must survive intact.
+export const MAX_FEEDBACK_ITEMS = 16;
+export const MAX_FEEDBACK_CHARS = 600;
+export function sanitizeEditorialFeedback(values) {
+  if (!Array.isArray(values)) return [];
+  const out = [];
+  for (const value of values) {
+    if (typeof value !== 'string') continue;
+    const text = value
+      .replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, MAX_FEEDBACK_CHARS);
+    if (text.length >= 4 && !out.includes(text)) out.push(text);
+    if (out.length >= MAX_FEEDBACK_ITEMS) break;
+  }
+  return out;
+}
+
+/**
+ * Turns one complete, structured Claude veto into a bounded repair plan.
+ * - Every cited URL must have exactly one check; anything else fails closed.
+ * - URLs marked unsupported are excluded, even when that is every cited
+ *   source: the writer then works only from the REMAINING verified pool and
+ *   an empty result is a blocked edition, never padding.
+ * - Without an unsupported URL, the blocking reasons become correction
+ *   constraints for a rewrite of the same verified pool (claim-level repair).
+ * A repair is only ever a new draft: deterministic gates, live source checks,
+ * the build and a fresh independent review still decide.
+ */
+// A source the reviewer rejects for its QUALITY (relay, general outlet, old or
+// evergreen page, own publication...) is removed at once. A source rejected
+// only because the article misstated it is first given one rewrite.
+export const SOURCE_QUALITY_REJECTION = new RegExp([
+  'relay(?:s|ed|ing)?\\b', 'second[- ]?hand', 'third[- ]?hand', 'not (?:a |the )?(?:first[- ]?hand|primary) (?:source|publisher|report)',
+  'not (?:from )?the competent authority', 'not an official (?:source|publisher|notice)', 'general[- ](?:interest|automotive|consumer|news) (?:outlet|site|publication|media)',
+  'consumer outlet', 'aggregator', 'evergreen', 'guide page', '\\bblog\\b', 'unrelated (?:country|jurisdiction|language|outlet|publication|site)',
+  'outdated (?:page|source|article|notice)', 'old (?:page|announcement|article|news)', 'sponsored', 'advertorial', 'promotional',
+  'dajc\\.(?:eu|cz)', 'landing page', 'homepage', 'source (?:is |was )?unavailable', 'could not be fetched',
+].join('|'), 'i');
+
+export function planEditorialRepair(review, allowedUrls, { attempt = 2 } = {}) {
+  const fail = (reason) => ({ ok: false, reason, excludeUrls: [], feedback: [] });
+  if (!review || review.verdict !== 'reject') return fail('not a structured editorial rejection');
+  if (!Array.isArray(review.blockingReasons) || review.blockingReasons.length === 0 ||
+      review.blockingReasons.some((reason) => typeof reason !== 'string' || !reason.trim())) return fail('rejection lacks concrete blocking reasons');
+  const known = new Set(Array.isArray(allowedUrls) ? allowedUrls : []);
+  if (!known.size || !Array.isArray(review.sourceChecks) || review.sourceChecks.length !== known.size) return fail('rejection does not check every cited source exactly once');
+  const seen = new Set();
+  const excludeUrls = [];
+  const correctUrls = [];
+  const sourceNotes = [];
+  for (const item of review.sourceChecks) {
+    if (!item || !known.has(item.url) || seen.has(item.url) || typeof item.supported !== 'boolean' ||
+        typeof item.reason !== 'string' || item.reason.trim().length < 4) return fail('rejection contains an incomplete, duplicate or unknown source check');
+    seen.add(item.url);
+    if (item.supported !== false) continue;
+    // Only the first repair may keep a source whose content was misstated;
+    // on the final repair every source that is still rejected is removed.
+    if (attempt <= 2 && !SOURCE_QUALITY_REJECTION.test(item.reason)) {
+      correctUrls.push(item.url);
+      sourceNotes.push('Correct the report citing ' + item.url + ' strictly to its evidence: ' + item.reason);
+    } else {
+      excludeUrls.push(item.url);
+      sourceNotes.push('Removed source ' + item.url + ': ' + item.reason);
+    }
+  }
+  if (seen.size !== known.size) return fail('rejection does not check every cited source');
+  // Per-source notes first: the feedback cap must never cut the concrete
+  // instruction attached to a cited URL.
+  const feedback = sanitizeEditorialFeedback([...sourceNotes, ...review.blockingReasons]);
+  if (!excludeUrls.length && !feedback.length) return fail('rejection gives nothing concrete to repair');
+  return { ok: true, mode: excludeUrls.length ? 'remove-unsupported-sources' : 'correct-claims', excludeUrls, correctUrls, feedback,
+    allSourcesRejected: excludeUrls.length === known.size };
+}
+
 export function shouldReplaceBlockedEditionPr(pending, allPulls, now, {
   minHours = RETRY_AFTER_HOURS, maxAttempts = MAX_EDITION_ATTEMPTS,
 } = {}) {
