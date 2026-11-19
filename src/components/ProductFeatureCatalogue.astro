@@ -1,0 +1,93 @@
+---
+import { platformGroups, tarGroups, type ProductKey } from '../data/product-capabilities';
+interface Props { product: ProductKey }
+const { product } = Astro.props;
+const groups = product === 'platform' ? platformGroups : tarGroups;
+const count = groups.reduce((total, group) => total + group.features.length, 0);
+---
+<section class="catalogue" id="capabilities" aria-labelledby="capabilities-title">
+  <div class="head">
+    <p class="eyebrow">THE FULL PRODUCT · EXPLORE THE DETAILS</p>
+    <h2 id="capabilities-title">Every capability, explained.</h2>
+    <p class="lead">{count} product functions in {groups.length} areas. Open only the topics that matter to your business. Each function explains the current challenge, DAJC’s complete solution and the impact on your existing tools.</p>
+  </div>
+  <div class="areas">
+    {groups.map((group, index) => (
+      <details class="area">
+        <summary class="area-trigger">
+          <span class="area-number">{String(index + 1).padStart(2,'0')}</span>
+          <span class="area-heading">
+            <strong>{group.title}</strong>
+            <span class="area-description">{group.summary}</span>
+          </span>
+          <span class="area-count">{group.features.length} functions</span>
+          <span class="plus" aria-hidden="true">+</span>
+        </summary>
+        <div class="features">
+          {group.features.map((feature, featureIndex) => (
+            <details class="feature">
+              <summary class="feature-trigger">
+                <span class="feature-number">{String(featureIndex + 1).padStart(2,'0')}</span>
+                <strong>{feature.title}</strong>
+                <span class="plus" aria-hidden="true">+</span>
+              </summary>
+              <div class="feature-description">
+                <div class="detail">
+                  <span class="detail-label">TODAY’S CHALLENGE</span>
+                  <p>{feature.problem}</p>
+                </div>
+                <div class="detail">
+                  <span class="detail-label accent">THE COMPLETE DAJC SOLUTION</span>
+                  <p>{feature.solution}</p>
+                </div>
+                <div class="detail existing">
+                  <span class="detail-label">WHAT CHANGES FOR EXISTING SOFTWARE</span>
+                  <p>{feature.systems}</p>
+                </div>
+              </div>
+            </details>
+          ))}
+        </div>
+      </details>
+    ))}
+  </div>
+  <p class="availability">These are descriptions of the complete products, not a statement that all functions, external connections or services are currently available. DAJC Platform and DAJC TAR remain in development.</p>
+  <a class="feedback" href="#research">Have you seen something you would change? Tell us ↓</a>
+</section>
+<style>
+  .catalogue{padding:clamp(3rem,6vw,5rem) 0;border-top:1px solid var(--dajc-line);scroll-margin-top:1rem;}
+  .head{max-width:860px;margin-bottom:2rem;}
+  .eyebrow,.area-number,.feature-number,.detail-label{font:500 .7rem/1.5 'IBM Plex Mono',monospace;letter-spacing:.1em;color:var(--dajc-orange);}
+  .eyebrow,.detail-label{text-transform:uppercase;}
+  h2{font:700 clamp(2rem,4vw,3.15rem)/1.12 'Space Grotesk',sans-serif;color:var(--dajc-white);margin:.65rem 0 1.2rem;letter-spacing:-.025em;}
+  .lead{color:var(--dajc-muted);line-height:1.72;font-size:1.06rem;}
+  .areas{display:grid;gap:.9rem;}
+  details summary{list-style:none;cursor:pointer;}
+  details summary::-webkit-details-marker{display:none;}
+  details summary:focus-visible,.feedback:focus-visible{outline:2px solid var(--dajc-orange);outline-offset:3px;}
+  .area{background:rgba(7,29,58,.75);border:1px solid var(--dajc-line);border-radius:13px;overflow:hidden;}
+  .area[open]{border-color:rgba(255,159,0,.55);background:rgba(7,29,58,.95);}
+  .area-trigger{display:flex;align-items:center;gap:clamp(.7rem,2vw,1.5rem);padding:clamp(1rem,2.4vw,1.6rem);}
+  .area-number{font-size:1.02rem;align-self:flex-start;margin-top:.18rem;}
+  .area-heading{flex:1;display:grid;gap:.5rem;min-width:0;}
+  .area-heading strong{font:600 clamp(1.09rem,2vw,1.4rem)/1.35 'Space Grotesk',sans-serif;color:var(--dajc-white);}
+  .area-description{font-size:.84rem;line-height:1.6;color:var(--dajc-muted);}
+  .area-count{font:.71rem/1.5 'IBM Plex Mono',monospace;white-space:nowrap;color:#b8c8da;}
+  .plus{font:400 1.45rem/1 Arial,sans-serif;color:var(--dajc-orange);transition:transform .15s;}
+  .area[open]>.area-trigger .plus,.feature[open]>.feature-trigger .plus{transform:rotate(45deg);}
+  .features{padding:0 clamp(.8rem,2.4vw,1.6rem) clamp(.8rem,2.4vw,1.6rem);display:grid;gap:.65rem;}
+  .feature{border:1px solid rgba(124,141,166,.28);background:rgba(1,14,31,.58);border-radius:9px;overflow:hidden;}
+  .feature[open]{border-color:rgba(255,159,0,.52);}
+  .feature-trigger{padding:1rem;display:flex;gap:1rem;align-items:center;}
+  .feature-number{color:#a2b8cf;}
+  .feature-trigger strong{flex:1;color:#e7edf6;font:600 .97rem/1.5 'Space Grotesk',sans-serif;}
+  .feature-description{padding:0 1rem 1.4rem clamp(1rem,4vw,3.1rem);display:grid;gap:1.2rem;}
+  .detail-label{color:#a5b8d0;font-size:.65rem;}
+  .detail-label.accent{color:var(--dajc-orange);}
+  .detail p{font-size:.9rem;line-height:1.75;color:#cdd9e7;margin:.35rem 0 0;}
+  .detail.existing{padding:.9rem 1rem;border-left:3px solid #688aa6;background:rgba(14,35,62,.65);border-radius:0 8px 8px 0;}
+  .availability{max-width:90ch;margin:1.6rem 0 1rem;font-size:.77rem;line-height:1.7;color:var(--dajc-muted);}
+  .feedback{display:inline-block;color:var(--dajc-orange);font:.8rem/1.6 'IBM Plex Mono',monospace;text-underline-offset:4px;}
+  @media(max-width:640px){.area-count{display:none}.area-trigger{align-items:flex-start}.area-number{font-size:.88rem}.feature-description{padding:0 1rem 1rem}}
+  @media(prefers-reduced-motion:reduce){.plus{transition:none}}
+</style>

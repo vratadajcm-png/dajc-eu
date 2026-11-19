@@ -1,5 +1,6 @@
 ---
 import LinkedInLink from './LinkedInLink.astro';
+import XLink from './XLink.astro';
 ---
 <footer class="site-footer">
   <div class="site-footer__inner">
@@ -8,13 +9,15 @@ import LinkedInLink from './LinkedInLink.astro';
         <img src="/assets/dajc-logo-white-orange-official.png" alt="" width="40" height="40"/>
         <strong>DAJC</strong>
       </a>
-      <p>Provider-neutral coordination for European heavy transport, with vehicle-assistance coordination being researched as a related Platform capability.</p>
+      <p>Provider-neutral European coordination products for heavy and oversized transport (DAJC Platform) and towing, assistance and recovery (DAJC TAR). Both are in development.</p>
       <small>Founded and operated by Miroslav Dajč · Czech Republic</small>
     </div>
     <nav aria-label="Footer navigation">
       <div>
         <span class="footer-label">Explore</span>
-        <a href="/assistance">Assistance</a>
+        <a href="/platform">Platform</a>
+        <a href="/tar">TAR</a>
+        <a href="/integrations">Integrations</a>
         <a href="/driving-bans">Driving Bans</a>
         <a href="/intelligence">Intelligence</a>
       </div>
@@ -24,7 +27,6 @@ import LinkedInLink from './LinkedInLink.astro';
         <a href="/press">Press</a>
         <a href="/news">News</a>
         <a href="/updates">Launch notification &amp; newsletter</a>
-        <a href="/demo-guide">Demo walkthrough</a>
         <a href="https://www.dajc.cz/" lang="cs">Česky · DAJC.cz</a>
       </div>
       <div>
@@ -34,6 +36,7 @@ import LinkedInLink from './LinkedInLink.astro';
         <a href="/support">Support</a>
         <a href="mailto:team@dajc.eu">team@dajc.eu</a>
         <LinkedInLink />
+        <XLink />
       </div>
     </nav>
   </div>

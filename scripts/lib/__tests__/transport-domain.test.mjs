@@ -28,6 +28,20 @@ describe('heavy-transport domain relevance (publication gate)', () => {
     }).ok).toBe(true);
   });
 
+  it('accepts a 3.5-tonne tachograph-using freight vehicle update', () => {
+    expect(checkTransportDomainRelevance({
+      title: 'New rules for 3.5 t goods vehicles with a tachograph',
+      summary: 'Professional road haulage operators must update their tachograph compliance procedure.',
+    }).ok).toBe(true);
+  });
+
+  it('accepts a category N2 goods vehicle development', () => {
+    expect(checkTransportDomainRelevance({
+      title: 'Category N2 vehicles: revised loading procedures',
+      summary: 'New operational instructions for professional freight operators.',
+    }).ok).toBe(true);
+  });
+
   it('accepts a bridge weight limit for lorries', () => {
     expect(checkTransportDomainRelevance({
       title: 'Brücke Lennetal: Sperrung für Fahrzeuge über 7,5 t',
