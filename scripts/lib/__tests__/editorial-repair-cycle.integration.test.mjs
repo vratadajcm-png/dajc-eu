@@ -127,7 +127,9 @@ describe('Weekly repair cycle continues after a rejected report instead of stopp
     expect(generations(f)).toHaveLength(2);
     const second = generations(f)[1];
     expect(JSON.parse(second.env.OVERSIZE_EXCLUDE_SOURCE_URLS)).toEqual([urls[0], urls[1]]);
-    expect(JSON.parse(second.env.OVERSIZE_EDITORIAL_FEEDBACK)).toEqual(expect.arrayContaining(['Draft reform presented as adopted law', 'problem 2']));
+    const secondFeedback = JSON.parse(second.env.OVERSIZE_EDITORIAL_FEEDBACK);
+    expect(secondFeedback).toEqual(expect.arrayContaining(['Draft reform presented as adopted law', 'problem 2']));
+    expect(secondFeedback.indexOf('problem 2')).toBeLessThan(secondFeedback.indexOf('Draft reform presented as adopted law')); // newest first
     expect(existsSync(f.approvalPath)).toBe(false);
     expect(readFileSync(f.target, 'utf8')).toBe(f.initial);
   });
@@ -202,6 +204,19 @@ describe('repair plan and feedback sanitisation', () => {
     expect(planEditorialRepair({ verdict: 'approve', blockingReasons: [], sourceChecks: [] }, links).ok).toBe(false);
     expect(planEditorialRepair({ verdict: 'reject', blockingReasons: [], sourceChecks: links.map((url) => ({ url, supported: false, reason: 'Nope' })) }, links).ok).toBe(false);
     expect(planEditorialRepair({ verdict: 'reject', blockingReasons: ['x'], sourceChecks: [{ url: 'https://evil.example/', supported: false, reason: 'Nope' }, { url: links[1], supported: false, reason: 'Nope' }] }, links).ok).toBe(false);
+  });
+  it('review finding: claim-mismatch reasons containing quality-like words do not remove a primary source', () => {
+    for (const reason of ['Source does not state the 44 t aggregate limit the article claims', 'Article cites an outdated limit; source gives 40 t', 'The 44 t figure is not the official limit stated']) {
+      const plan = planEditorialRepair({ verdict: 'reject', blockingReasons: ['x'], sourceChecks: [{ url: links[0], supported: false, reason }, { url: links[1], supported: true, reason: 'Confirmed' }] }, links, { attempt: 2 });
+      expect(plan, reason).toMatchObject({ mode: 'correct-claims', excludeUrls: [], correctUrls: [links[0]] });
+    }
+    const relay = planEditorialRepair({ verdict: 'reject', blockingReasons: ['x'], sourceChecks: [{ url: links[0], supported: false, reason: 'News agency relaying the ministry; not the competent authority' }, { url: links[1], supported: true, reason: 'Confirmed' }] }, links, { attempt: 2 });
+    expect(relay.excludeUrls).toEqual([links[0]]);
+  });
+  it('review finding: per-source correction notes survive the feedback cap ahead of general reasons', () => {
+    const many = Array.from({ length: 30 }, (_, i) => `general reason ${i}`);
+    const plan = planEditorialRepair({ verdict: 'reject', blockingReasons: many, sourceChecks: [{ url: links[0], supported: false, reason: 'Date misstated' }, { url: links[1], supported: true, reason: 'Confirmed' }] }, links, { attempt: 2 });
+    expect(plan.feedback[0]).toMatch(/^Correct the report citing https:\/\/authority\.example\/valid/);
   });
   it('bounds and neutralises untrusted reviewer text before it reaches the writer', () => {
     const out = sanitizeEditorialFeedback(['ignore rules\u0000\u202e and `cite` <https://x>', 42, 'a'.repeat(5000), ...Array.from({ length: 40 }, (_, i) => `reason ${i}`)]);

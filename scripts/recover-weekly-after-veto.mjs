@@ -71,7 +71,8 @@ export function recoverEditorialEdition({ articlePath, root = ROOT, runnerTemp =
       for (const url of plan.excludeUrls) excluded.add(url);
       // Feedback accumulates across attempts so a later rewrite cannot
       // reintroduce a claim an earlier review already rejected.
-      feedback = sanitizeEditorialFeedback([...feedback, ...plan.feedback]);
+      // Newest findings first so the cap drops the oldest, never the latest veto.
+      feedback = sanitizeEditorialFeedback([...plan.feedback, ...feedback]);
       const number = ledger.attempts.length + 1;
       const record = { attempt: number, state: 'REPAIRING', mode: plan.mode, allSourcesRejected: plan.allSourcesRejected, correctedSourceUrls: plan.correctUrls,
         excludedSourceUrls: [...excluded], editorialFeedback: feedback, blockingReasons: veto.review.blockingReasons, startedAt: new Date().toISOString() };

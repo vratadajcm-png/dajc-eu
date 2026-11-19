@@ -60,7 +60,13 @@ permissions:
   issues: write
 
 concurrency:
-  group: oversize-data
+  # Production runs share oversize-data with the monitor. A branch dry run gets
+  # its own group: GitHub keeps one pending run per group, so a queued dry run
+  # must never displace a pending scheduled preparation or retry. (A branch
+  # dispatch runs that branch's code with the repository secrets, as any
+  # workflow_dispatch does; the job gate below is a safety rail, not a
+  # security boundary against users with write access.)
+  group: ${{ github.ref == 'refs/heads/main' && 'oversize-data' || format('oversize-dry-run-{0}', github.ref) }}
   # Let an in-flight primary publication finish. Later recovery schedules wait
   # and then become cheap idempotent no-ops once the target article exists.
   cancel-in-progress: false
