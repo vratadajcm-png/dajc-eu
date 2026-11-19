@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+export const prerender=false;
+Astro.response.headers.set('Cache-Control','no-store');
+Astro.response.headers.set('Referrer-Policy','no-referrer');
+Astro.response.headers.set('X-Robots-Tag','noindex, nofollow, noarchive');
+const token=Astro.url.searchParams.get('t')||'';
+const plausible=/^[0-9a-f]{64}$/i.test(token);
+---
+<BaseLayout title="Confirm documentation request | DAJC" description="Confirm your requested DAJC technical architecture document.">
+  <main class="confirm">
+    <p class="eyebrow">DAJC / EMAIL VERIFICATION</p>
+    <h1>Confirm your documentation request.</h1>
+    <p>For your privacy, the confirmation link does not activate automatically when an email application previews it. Press the button below to confirm your address.</p>
+    {plausible?(
+      <form id="confirm-form" data-token={token}>
+        <button type="submit">Confirm and email my PDF</button>
+        <p id="confirm-status" class="status" role="status" aria-live="polite"></p>
+        <a id="direct-download" hidden rel="noreferrer nofollow">Download PDF now</a>
+      </form>
+    ):(
+      <p class="error">This confirmation link is invalid. Please request another document through the relevant product page.</p>
+    )}
+    <p class="small">Verification links are valid for 24 hours. Verified document links remain available for seven days. No marketing subscription is created.</p>
+    <a href="/integrations">Back to integrations</a>
+  </main>
+</BaseLayout>
+<script>
+const f=document.querySelector<HTMLFormElement>('#confirm-form');
+f?.addEventListener('submit',async(event)=>{
+  event.preventDefault();
+  const status=document.querySelector<HTMLElement>('#confirm-status');
+  const button=f.querySelector<HTMLButtonElement>('button[type=submit]');
+  const download=document.querySelector<HTMLAnchorElement>('#direct-download');
+  if(!status||!button)return;
+  button.disabled=true;status.textContent='Verifying your address and preparing the document...';
+  try {
+    const r=await fetch('/api/integrations/verify',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({token:f.dataset.token}),signal:AbortSignal.timeout(25000)
+    });
+    const body=await r.json();
+    if(!r.ok||!body.ok)throw new Error(body.error||'Verification failed.');
+    status.textContent=body.message;
+    status.dataset.state='success';
+    if(download&&body.downloadUrl){
+      const url=new URL(body.downloadUrl,location.origin);
+      if(url.origin===location.origin && url.pathname==='/api/integrations/download'){
+        download.href=url.toString();download.hidden=false;
+      }
+    }
+  }catch(err){
+    status.textContent=err instanceof Error?err.message:'Unable to confirm the address.';
+    status.dataset.state='error';button.disabled=false;
+  }
+});
+</script>
+<style>
+.confirm{position:relative;z-index:2;width:min(650px,calc(100% - 3rem));margin:5rem auto 8rem;padding:2rem;border:1px solid #435c77;border-radius:16px;background:rgba(9,31,57,.8)}
+.eyebrow{color:var(--dajc-orange);font:.72rem 'IBM Plex Mono',monospace;letter-spacing:.14em}
+h1{font:700 clamp(2rem,4vw,3rem)/1.12 'Space Grotesk',sans-serif;margin:.6rem 0 1.2rem}
+p{color:#bdcde0;line-height:1.75}
+button{background:var(--dajc-orange);border:0;border-radius:8px;padding:1rem 1.4rem;font:700 .8rem 'IBM Plex Mono',monospace;color:#061a33;min-height:48px;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+a{display:inline-flex;align-items:center;min-height:44px;color:var(--dajc-orange)}
+.status[data-state=success]{color:#8be3b8}.status[data-state=error],.error{color:#ffb2ad}
+.small{font-size:.83rem}
+:where(button,a):focus-visible{outline:2px solid var(--dajc-orange);outline-offset:3px}
+</style>

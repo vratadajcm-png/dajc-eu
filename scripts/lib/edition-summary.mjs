@@ -5,8 +5,10 @@
 // validation, filters and its own selection. W43 shipped a tachograph
 // checklist line and W44's description promised "policy discussions in
 // Hungary" for reports that were never in the edition. The checklist is
-// therefore always rebuilt from the published reports, and any summary text
-// naming a country without a published report is replaced deterministically.
+// therefore always rebuilt from the retained reports. Country matching alone
+// cannot detect an unsupported second story from a country still represented
+// in the edition (W47: Italian draft legislation vs. retained enforcement news).
+// No model-written edition summary survives selection or filtering.
 
 import { dajcEuropeCoverage } from '../../config/europe-coverage.mjs';
 
@@ -58,29 +60,27 @@ function listCountries(names) {
 }
 
 /**
- * Rebuilds the checklist and replaces title/description/intro text that names
- * a country without a published report. Mutates and returns `article`;
- * `fixed` lists the replaced fields.
+ * Rebuilds ALL edition-level copy from the reports that survived every filter.
+ * Retained report titles are copied without paraphrasing or truncating legal
+ * qualifications. Their source claims still require the final independent
+ * review. Mutates and returns `article`; `fixed` lists changed summary fields.
  */
 export function alignEditionSummary(article, { weekRangeLabel }) {
   const items = [...(article.developments || []), ...(article.europeRoundup || [])];
-  const covered = new Set(items.flatMap((item) => mentionedCountries(`${item.country} ${item.where || ''} ${item.title || ''}`)));
-  const countries = [...new Set(items.map((item) => item.country).filter(Boolean))];
-  const strays = (text) => mentionedCountries(text).filter((name) => !covered.has(name));
+  const countries = [...new Set(items.map((item) => String(item.country || '').trim()).filter(Boolean))];
+  const titles = items.slice(0, 3).map((item) => String(item.title || '').trim()).filter(Boolean);
+  const headline = titles[0] || listCountries(countries);
+  const reports = titles.length ? ` Reports: ${titles.join('; ')}.` : '';
+  const geography = countries.length ? ` in ${listCountries(countries)}` : '';
+  const summary = {
+    seoTitle: `EU Oversize Weekly${headline ? `: ${headline}` : ''} | ${weekRangeLabel}`,
+    metaDescription: `European road freight briefing for ${weekRangeLabel}${geography}.${reports}`,
+    intro: `This edition covers the week of ${weekRangeLabel} and reports developments for commercial road freight${geography}, with priority for heavy, oversize and special transport.${reports}`,
+  };
   const fixed = [];
-
-  if (strays(article.seoTitle).length > 0) {
-    article.seoTitle = `EU Oversize Weekly: ${items[0]?.title || listCountries(countries)} | ${weekRangeLabel}`;
-    fixed.push('seoTitle');
-  }
-  if (strays(article.metaDescription).length > 0) {
-    const titles = items.slice(0, 3).map((item) => item.title).join('; ');
-    article.metaDescription = `Verified changes for heavy and oversize road transport in Europe for ${weekRangeLabel}: ${titles}.`;
-    fixed.push('metaDescription');
-  }
-  if (strays(article.intro).length > 0) {
-    article.intro = `This edition covers the week of ${weekRangeLabel} and reports verified developments for heavy and oversize road transport in ${listCountries(countries)}.`;
-    fixed.push('intro');
+  for (const [field, value] of Object.entries(summary)) {
+    if (article[field] !== value) fixed.push(field);
+    article[field] = value;
   }
   article.operatorChecklist = operatorChecklistFromReports(items);
   return { article, fixed };
