@@ -29,7 +29,10 @@ differs from a committed baseline that itself repeats the reviewed hash),
 `SOURCE_UNAVAILABLE`, `ACCESS_BLOCKED` (bot protection/provider block, never
 bypassed; also an HTTP 200 interstitial whose `<title>` or short body is a bot
 challenge or WAF rejection), `DEFERRED_PROVIDER_TERMS`, `REJECTED` (unsafe URL/content type).
-None of these states replaces the last good fingerprint (`last_retrieved`).
+`SOURCE_UNAVAILABLE`, `ACCESS_BLOCKED`, `DEFERRED_PROVIDER_TERMS` and `REJECTED` never replace the last good
+fingerprint (`last_retrieved`); retrieved states (`UNCHANGED`, `UNCHANGED_TEXT`, `CHANGED`, `NO_BASELINE`) become
+the next run's comparison point. Bytes equal to the reviewed or last good fingerprint are never treated as an
+interstitial. The monitor CLI writes `latest.json`/history only after the report and markdown exist.
 `since_last_run` is `FIRST_RUN`, `STABLE` or `CHANGED_SINCE_LAST_RUN`.
 
 Queue kinds: `DATASET_WINDOW_EXPIRED`, `EVIDENCE_UNCHANGED_READY_FOR_LEGAL_REVIEW`

@@ -68,18 +68,22 @@ export function isBotChallenge(status, text = '') {
 }
 
 // Some providers answer automated clients with HTTP 200 and an interstitial
-// (bot challenge or WAF rejection). Recorded as a retrieval, its hash
-// would replace the last good fingerprint of the real document. Only the page
-// <title> or a short body is inspected, so a legal text that merely mentions
-// such words is never discarded.
-const SOFT_BLOCK = /just a moment|attention required|security check|checking your browser|are you a (?:robot|human)|captcha|bot protection|ddos protection|access denied|request (?:was )?rejected|the requested url was rejected|enable javascript and cookies/i;
-export function isSoftBlockPage(bytes, contentType = 'text/html') {
-  if (!bytes || !/html/i.test(String(contentType || ''))) return false;
+// (bot challenge or WAF rejection). Recorded as a retrieval, its hash would
+// replace the last good fingerprint of the real document. Generic words count
+// only in the document <head> title; the body needs a vendor challenge marker,
+// so an official page that merely mentions "captcha" is never discarded.
+const SOFT_BLOCK_TITLE = /just a moment|attention required|security check|checking your browser|are you a (?:robot|human)|captcha|bot protection|ddos protection|access denied|request (?:was )?rejected|request unsuccessful/i;
+const SOFT_BLOCK_BODY = /cf-browser-verification|cf_chl_|challenge-platform|checking your browser before accessing|enable javascript and cookies to continue|ddos protection by|the requested url was rejected\. please consult with your administrator|request unsuccessful\. incapsula|_incapsula_resource|attention required! \| cloudflare/i;
+const decodeBasic = (text) => text.replace(/&nbsp;|&#160;/gi, ' ').replace(/&amp;/gi, '&').replace(/&#(\d+);/g, (m, n) => { const c = Number(n); return c > 0 && c < 0x110000 ? String.fromCodePoint(c) : ' '; });
+export function isSoftBlockPage(bytes, contentType = null) {
+  if (!bytes) return false;
   const html = Buffer.from(bytes).subarray(0, 200000).toString('utf8');
-  const title = html.match(/<title[^>]*>([\s\S]{0,300}?)<\/title>/i)?.[1] ?? '';
-  if (SOFT_BLOCK.test(title)) return true;
-  const visible = html.replace(/<(script|style|noscript|template)\b[\s\S]*?<\/\1\s*>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-  return visible.length < 600 && SOFT_BLOCK.test(visible);
+  const looksHtml = /html/i.test(String(contentType || '')) || (!contentType && /^\s*(?:<!doctype html|<html|<head)/i.test(html.slice(0, 512)));
+  if (!looksHtml) return false;
+  const head = html.match(/<head\b[\s\S]*?<\/head>/i)?.[0] ?? html.split(/<body\b/i)[0];
+  const title = decodeBasic(head.match(/<title[^>]*>([\s\S]{0,300}?)<\/title>/i)?.[1] ?? '').replace(/\s+/g, ' ');
+  if (SOFT_BLOCK_TITLE.test(title)) return true;
+  return SOFT_BLOCK_BODY.test(decodeBasic(html).replace(/\s+/g, ' '));
 }
 
 /** Which official URL the monitor may read for a canonical source, and how. */
@@ -183,7 +187,9 @@ export async function monitorSources({
     const rawSha = sha256(response.bytes);
     // A soft block is an outage, never a new document version: the last good
     // fingerprint is carried forward unchanged. Reviewed bytes are always kept.
-    if (rawSha !== source.content_sha256 && isSoftBlockPage(response.bytes, response.content_type)) {
+    // Bytes equal to the reviewed or the last good fingerprint are the document itself.
+    const lastGoodRaw = carried.last_retrieved && carried.last_retrieved.url === target.url ? carried.last_retrieved.raw_sha256 : null;
+    if (rawSha !== source.content_sha256 && rawSha !== lastGoodRaw && isSoftBlockPage(response.bytes, response.content_type)) {
       results.push({ ...base, ...carried, state: 'ACCESS_BLOCKED', http_status: response.http_status ?? 200,
         reason: 'HTTP 200 interstitial (bot challenge or WAF rejection) instead of the document; never bypassed', checked_at: checkedAt });
       continue;

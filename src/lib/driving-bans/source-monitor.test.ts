@@ -270,7 +270,7 @@ describe('outage never overwrites the last known good state (20 Nov 2026)', () =
   });
   it('legal text that merely mentions such words, and reviewed bytes, are never treated as a block page', async () => {
     expect(isSoftBlockPage(Buffer.from(page('Online-Antrag mit Captcha und Security Check im Portal'.repeat(20))))).toBe(false);
-    expect(isSoftBlockPage(Buffer.from('<title>Attention Required! | Cloudflare</title>'))).toBe(true);
+    expect(isSoftBlockPage(Buffer.from('<title>Attention Required! | Cloudflare</title>'), 'text/html')).toBe(true);
     expect(isSoftBlockPage(Buffer.from('%PDF-1.7 captcha'), 'application/pdf')).toBe(false);
     const reviewed = '<title>Access denied</title>';
     const data = dataset([{ source_id: 'r', url: 'https://law.example.gov/r', role: 'PRIMARY', content_sha256: sha(reviewed) }]);
@@ -289,10 +289,10 @@ describe('outage never overwrites the last known good state (20 Nov 2026)', () =
   it('a partial run is refused before any network access when it would replace the persisted state', () => {
     const dir = mkdtempSync(join(tmpdir(), 'dajc-monitor-state-'));
     try {
-      for (const partial of [['--only', 'AT'], ['--max-sources', '2']]) {
+      for (const partial of [['--only', 'AT'], ['--max-sources', '2'], ['--max-sources', 'all']]) {
         const result = spawnSync(process.execPath, ['scripts/driving-bans-source-monitor.mjs', ...partial, '--state-dir', dir, '--output', join(dir, 'out')], { encoding: 'utf8', timeout: 20000 });
         expect(result.status).not.toBe(0);
-        expect(result.stderr).toMatch(/--state-dir requires a full run/);
+        expect(result.stderr).toMatch(/--state-dir requires a full run|--max-sources must be a positive integer/);
       }
       expect(existsSync(join(dir, 'latest.json'))).toBe(false);
       expect(existsSync(join(dir, 'out'))).toBe(false);
@@ -318,5 +318,33 @@ describe('outage never overwrites the last known good state (20 Nov 2026)', () =
     expect(condition).toMatch(/steps\.alert\.outcome == 'success' \|\| \(steps\.alert\.outcome == 'skipped' && steps\.monitor\.outcome == 'success'\)/);
     expect(condition).not.toMatch(/steps\.alert\.outcome != 'failure'/);
     expect(condition).toMatch(/refs\/heads\/main/);
+  });
+});
+
+describe('independent review findings on the outage guard (20 Nov 2026)', () => {
+  it('a short official page that mentions a captcha, or has an inline svg title, is a retrieval, not a block page', async () => {
+    const notice = '<html><head><title>Bekanntmachung Fahrverbot</title></head><body><svg><title>Access denied icon</title></svg><p>Fahrverbot 7,5 t am 24.12.</p><form><label>Captcha</label></form></body></html>';
+    expect(isSoftBlockPage(Buffer.from(notice), 'text/html')).toBe(false);
+    const report = await monitorSources({ canonical: dataset([{ source_id: 'n', url: 'https://law.example.gov/n', role: 'PRIMARY' }]), sleep: noSleep, fetcher: async () => ok(notice) });
+    expect(report.results[0].state).toBe('NO_BASELINE');
+  });
+  it('recognises noscript, entity-encoded, vendor and content-type-less interstitials', () => {
+    expect(isSoftBlockPage(Buffer.from('<html><head><title>Un instant…</title></head><body><noscript>Enable JavaScript and cookies to continue</noscript></body></html>'), 'text/html')).toBe(true);
+    expect(isSoftBlockPage(Buffer.from('<html><head><title>Access&nbsp;denied</title></head><body></body></html>'), 'text/html')).toBe(true);
+    expect(isSoftBlockPage(Buffer.from('<html><head><title>x</title></head><body>Request unsuccessful. Incapsula incident ID: 1</body></html>'), 'text/html')).toBe(true);
+    expect(isSoftBlockPage(Buffer.from('<!DOCTYPE html><html><head><title>Just a moment...</title></head></html>'), null)).toBe(true);
+    expect(isSoftBlockPage(Buffer.from('%PDF-1.7 Just a moment'), null)).toBe(false);
+  });
+  it('bytes equal to the last good fingerprint are the document, whatever their title says', async () => {
+    const page = '<html><head><title>Security check of abnormal loads</title></head><body><p>' + LAW + '</p></body></html>';
+    const data = dataset([{ source_id: 's', url: 'https://law.example.gov/s', role: 'PRIMARY' }]);
+    const previous = { schema_version: 1, results: [{ source_id: 's', url: 'https://law.example.gov/s', state: 'NO_BASELINE', raw_sha256: sha(page), text_sha256: null, normalizer_version: NORMALIZER_VERSION, checked_at: '2026-11-19T00:37:00Z' }] };
+    const report = await monitorSources({ canonical: data, previous, sleep: noSleep, fetcher: async () => ok(page) });
+    expect(report.results[0]).toMatchObject({ state: 'NO_BASELINE', since_last_run: 'STABLE' });
+  });
+  it('the CLI writes persistable state only after the report and the alert markdown exist', () => {
+    const cli = readFileSync('scripts/driving-bans-source-monitor.mjs', 'utf8');
+    expect(cli.indexOf("join(dir, 'latest.json')")).toBeGreaterThan(cli.indexOf("join(out, 'source-monitor.md')"));
+    expect(cli.indexOf("join(dir, 'latest.json')")).toBeGreaterThan(cli.indexOf('console.log(markdown)'));
   });
 });
