@@ -75,22 +75,24 @@ export function isBotChallenge(status, text = '') {
 const SOFT_BLOCK_TITLE = /just a moment|attention required|security check|checking your browser|are you a (?:robot|human)|captcha|bot protection|ddos protection|access denied|request (?:was )?rejected|request unsuccessful/i;
 // Markers that appear only on interstitials. Cloudflare's challenge-platform
 // beacon and Incapsula's resource script are injected into ordinary pages too
-// (zakonyprolidi.cz, 20 Nov 2026) and are deliberately not markers.
-const SOFT_BLOCK_BODY = /cf-browser-verification|cf_chl_opt|checking your browser before accessing|enable javascript and cookies to continue|ddos protection by|the requested url was rejected\. please consult with your administrator|request unsuccessful\. incapsula|attention required! \| cloudflare/i;
+// (zakonyprolidi.cz, 20 Nov 2026) and are deliberately not markers, nor is a
+// "DDoS protection by ..." footer.
+const SOFT_BLOCK_BODY = /cf-browser-verification|cf_chl_opt|checking your browser before accessing|enable javascript and cookies to continue|the requested url was rejected\. please consult with your administrator|request unsuccessful\. incapsula|attention required! \| cloudflare/i;
 const MAX_INTERSTITIAL_TEXT = 1500;
-const decodeBasic = (text) => text.replace(/&nbsp;|&#160;/gi, ' ').replace(/&amp;/gi, '&').replace(/&#(\d+);/g, (m, n) => { const c = Number(n); return c > 0 && c < 0x110000 ? String.fromCodePoint(c) : ' '; });
+const decodeBasic = (text) => text.replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&#(x[0-9a-f]+|\d+);/gi, (m, n) => { const c = n[0].toLowerCase() === 'x' ? parseInt(n.slice(1), 16) : Number(n); return c > 0 && c < 0x110000 ? String.fromCodePoint(c) : ' '; });
 export function isSoftBlockPage(bytes, contentType = null) {
   if (!bytes) return false;
   const html = Buffer.from(bytes).subarray(0, 200000).toString('utf8');
-  const looksHtml = /html/i.test(String(contentType || '')) || (!contentType && /^\s*(?:<!doctype html|<html|<head)/i.test(html.slice(0, 512)));
+  const looksHtml = /html/i.test(String(contentType || '')) || (!contentType && /^\s*(?:<\?xml[^>]*>\s*)?(?:<!--[\s\S]*?-->\s*)*(?:<!doctype html|<html|<head)/i.test(html.slice(0, 2048)));
   if (!looksHtml) return false;
   const head = html.match(/<head\b[\s\S]*?<\/head>/i)?.[0] ?? html.split(/<body\b/i)[0];
   const title = decodeBasic(head.match(/<title[^>]*>([\s\S]{0,300}?)<\/title>/i)?.[1] ?? '').replace(/\s+/g, ' ');
-  if (SOFT_BLOCK_TITLE.test(title)) return true;
   // A real document has substantial visible text; an interstitial does not.
+  // This bound applies to the title test too, so a long page titled
+  // "Security check of abnormal loads" can still report a real change.
   const visible = decodeBasic(html.replace(/<(script|style|template)\b[\s\S]*?<\/\1\s*>/gi, ' ').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
   if (visible.length > MAX_INTERSTITIAL_TEXT) return false;
-  return SOFT_BLOCK_BODY.test(decodeBasic(html).replace(/\s+/g, ' '));
+  return SOFT_BLOCK_TITLE.test(title) || SOFT_BLOCK_BODY.test(decodeBasic(html).replace(/\s+/g, ' '));
 }
 
 /** Which official URL the monitor may read for a canonical source, and how. */
@@ -194,9 +196,9 @@ export async function monitorSources({
     const rawSha = sha256(response.bytes);
     // A soft block is an outage, never a new document version: the last good
     // fingerprint is carried forward unchanged. Reviewed bytes are always kept.
-    // Bytes equal to the reviewed or the last good fingerprint are the document itself.
-    const lastGoodRaw = carried.last_retrieved && carried.last_retrieved.url === target.url ? carried.last_retrieved.raw_sha256 : null;
-    if (rawSha !== source.content_sha256 && rawSha !== lastGoodRaw && isSoftBlockPage(response.bytes, response.content_type)) {
+    // Bytes equal to the reviewed hash are the document itself. A last good
+    // fingerprint is not trusted for this: it may stem from an earlier run.
+    if (rawSha !== source.content_sha256 && isSoftBlockPage(response.bytes, response.content_type)) {
       results.push({ ...base, ...carried, state: 'ACCESS_BLOCKED', http_status: response.http_status ?? 200,
         reason: 'HTTP 200 interstitial (bot challenge or WAF rejection) instead of the document; never bypassed', checked_at: checkedAt });
       continue;

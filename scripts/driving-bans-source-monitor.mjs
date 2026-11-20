@@ -22,6 +22,7 @@ const maxSourcesArg = option('--max-sources', 'Infinity');
 if (maxSourcesArg !== 'Infinity' && !/^[1-9]\d*$/.test(maxSourcesArg)) throw new Error('--max-sources must be a positive integer');
 const maxSources = Number(maxSourcesArg);
 const minSuccessRate = Number(option('--min-success-rate', String(MONITOR_DEFAULTS.minSuccessRate)));
+if (!Number.isFinite(minSuccessRate) || minSuccessRate < 0 || minSuccessRate > 1) throw new Error('--min-success-rate must be a number between 0 and 1');
 const previousPath = option('--previous', '');
 const stateDir = option('--state-dir', '');
 // A partial run (--only/--max-sources) lacks the other sources' last good

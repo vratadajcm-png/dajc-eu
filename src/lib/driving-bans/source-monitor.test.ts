@@ -289,10 +289,10 @@ describe('outage never overwrites the last known good state (20 Nov 2026)', () =
   it('a partial run is refused before any network access when it would replace the persisted state', () => {
     const dir = mkdtempSync(join(tmpdir(), 'dajc-monitor-state-'));
     try {
-      for (const partial of [['--only', 'AT'], ['--max-sources', '2'], ['--max-sources', 'all']]) {
+      for (const partial of [['--only', 'AT'], ['--max-sources', '2'], ['--max-sources', 'all'], ['--min-success-rate', '0,6']]) {
         const result = spawnSync(process.execPath, ['scripts/driving-bans-source-monitor.mjs', ...partial, '--state-dir', dir, '--output', join(dir, 'out')], { encoding: 'utf8', timeout: 20000 });
         expect(result.status).not.toBe(0);
-        expect(result.stderr).toMatch(/--state-dir requires a full run|--max-sources must be a positive integer/);
+        expect(result.stderr).toMatch(/--state-dir requires a full run|--max-sources must be a positive integer|--min-success-rate must be a number/);
       }
       expect(existsSync(join(dir, 'latest.json'))).toBe(false);
       expect(existsSync(join(dir, 'out'))).toBe(false);
@@ -343,8 +343,22 @@ describe('independent review findings on the outage guard (20 Nov 2026)', () => 
     expect(report.results[0].state).toBe('CHANGED');
     expect(isSoftBlockPage(Buffer.from('<html><head><title>x</title></head><body><noscript>Enable JavaScript and cookies to continue</noscript><script>window._cf_chl_opt={}</script></body></html>'), 'text/html')).toBe(true);
   });
-  it('bytes equal to the last good fingerprint are the document, whatever their title says', async () => {
-    const page = '<html><head><title>Security check of abnormal loads</title></head><body><p>' + LAW + '</p></body></html>';
+  it('second review: long pages with a generic title still report changes; footers and odd encodings are handled', async () => {
+    const titled = (rule: string) => '<html><head><title>Security check of abnormal loads</title></head><body><p>' + LAW.repeat(8) + rule + '</p></body></html>';
+    const data = dataset([{ source_id: 't', url: 'https://law.example.gov/t', role: 'PRIMARY', content_sha256: sha('reviewed') }]);
+    const w1 = await monitorSources({ canonical: data, sleep: noSleep, fetcher: async () => ok(titled('A')) });
+    const w2 = await monitorSources({ canonical: data, previous: w1, sleep: noSleep, fetcher: async () => ok(titled('B')) });
+    expect(w2.results[0]).toMatchObject({ state: 'CHANGED', since_last_run: 'CHANGED_SINCE_LAST_RUN' });
+    expect(isSoftBlockPage(Buffer.from('<html><head><title>Bekanntmachung</title></head><body><p>Fahrverbot am 24.12.</p><footer>DDoS protection by Cloudflare</footer></body></html>'), 'text/html')).toBe(false);
+    expect(isSoftBlockPage(Buffer.from('<html><head><title>Access&#x20;denied</title></head><body></body></html>'), 'text/html')).toBe(true);
+    expect(isSoftBlockPage(Buffer.from('<?xml version="1.0"?><!-- x --><html><head><title>Just a moment...</title></head></html>'), null)).toBe(true);
+    const waf = '<html><head><title>Request Rejected</title></head><body>The requested URL was rejected. Please consult with your administrator.</body></html>';
+    const previous = { schema_version: 1, results: [{ source_id: 't', url: 'https://law.example.gov/t', state: 'NO_BASELINE', raw_sha256: sha(waf), text_sha256: null, normalizer_version: NORMALIZER_VERSION, checked_at: '2026-11-19T00:37:00Z' }] };
+    const w3 = await monitorSources({ canonical: data, previous, sleep: noSleep, fetcher: async () => ok(waf) });
+    expect(w3.results[0].state).toBe('ACCESS_BLOCKED'); // an interstitial stored by an earlier run is not trusted as the document
+  });
+  it('a document with substantial text is the document, whatever its title says, and stays STABLE', async () => {
+    const page = '<html><head><title>Security check of abnormal loads</title></head><body><p>' + LAW.repeat(8) + '</p></body></html>';
     const data = dataset([{ source_id: 's', url: 'https://law.example.gov/s', role: 'PRIMARY' }]);
     const previous = { schema_version: 1, results: [{ source_id: 's', url: 'https://law.example.gov/s', state: 'NO_BASELINE', raw_sha256: sha(page), text_sha256: null, normalizer_version: NORMALIZER_VERSION, checked_at: '2026-11-19T00:37:00Z' }] };
     const report = await monitorSources({ canonical: data, previous, sleep: noSleep, fetcher: async () => ok(page) });
