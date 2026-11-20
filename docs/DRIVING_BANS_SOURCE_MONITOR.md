@@ -27,7 +27,9 @@ change extends review windows with real primary-source verification.
 differs from a committed baseline that itself repeats the reviewed hash),
 `CHANGED` (differs from the reviewed evidence: legal review), `NO_BASELINE`,
 `SOURCE_UNAVAILABLE`, `ACCESS_BLOCKED` (bot protection/provider block, never
-bypassed), `DEFERRED_PROVIDER_TERMS`, `REJECTED` (unsafe URL/content type).
+bypassed; also an HTTP 200 interstitial whose `<title>` or short body is a bot
+challenge or WAF rejection), `DEFERRED_PROVIDER_TERMS`, `REJECTED` (unsafe URL/content type).
+None of these states replaces the last good fingerprint (`last_retrieved`).
 `since_last_run` is `FIRST_RUN`, `STABLE` or `CHANGED_SINCE_LAST_RUN`.
 
 Queue kinds: `DATASET_WINDOW_EXPIRED`, `EVIDENCE_UNCHANGED_READY_FOR_LEGAL_REVIEW`
@@ -43,7 +45,9 @@ active window, including unpromulgated annual calendars),
 dispatch. History (`latest.json` and one record per run, hashes and states
 only) is persisted on the data branch `automation/driving-bans-monitor`
 through `scripts/automation-data.mjs` (main only, non-force push, fixed JSON
-paths), after any needed alert was delivered. Sources that were unavailable,
+paths), only when the monitor succeeded without needing an alert or the alert
+step succeeded; a cancelled or skipped monitor never persists, and a partial run
+(`--only`, `--max-sources`) is refused with `--state-dir`. Sources that were unavailable,
 blocked or deferred keep their last good fingerprint (`last_retrieved`), and a
 comparison is made only against the same URL and normaliser version
 (`NORMALIZER_VERSION`; normalisation removes only scripts, styles, templates,

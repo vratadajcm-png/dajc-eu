@@ -170,9 +170,12 @@ jobs:
         run: node scripts/report-driving-bans-alert.mjs monitor artifacts/driving-bans/source-monitor.md
 
       # History is persisted only after a needed alert was delivered, so a
-      # CHANGED_SINCE_LAST_RUN signal is never consumed silently.
+      # CHANGED_SINCE_LAST_RUN signal is never consumed silently: either the
+      # monitor succeeded and no alert was needed, or the alert step succeeded.
+      # A cancelled or skipped monitor never replaces the last state, and a
+      # monitor that crashed before writing leaves the loaded state unchanged.
       - name: Persist monitor history (main only)
-        if: ${{ always() && github.ref == 'refs/heads/main' && steps.monitor.outcome != 'skipped' && steps.alert.outcome != 'failure' && hashFiles('data/driving-bans-monitor/latest.json') != '' }}
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' && (steps.monitor.outcome == 'success' || steps.monitor.outcome == 'failure') && (steps.alert.outcome == 'success' || (steps.alert.outcome == 'skipped' && steps.monitor.outcome == 'success')) && hashFiles('data/driving-bans-monitor/latest.json') != '' }}
         run: node scripts/automation-data.mjs save driving-bans-monitor
 
       - name: Fail visibly when the monitor needs attention

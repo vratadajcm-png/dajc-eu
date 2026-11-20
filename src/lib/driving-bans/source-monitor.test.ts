@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { canonicalDrivingBans, getDrivingBansSnapshot } from '../../../config/driving-ban-calendars/runtime.mjs';
 import { hostPolicyFor } from '../../../config/driving-ban-sources/monitor-policy.mjs';
 import { toIcs } from './core.mjs';
 import { assessEvidence } from './legal-changes.mjs';
 import {
-  buildReverificationQueue, isBotChallenge, monitorAllowedHosts, monitorSources, normalizeDocumentText, resolveMonitorTarget,
+  buildReverificationQueue, isBotChallenge, isSoftBlockPage, monitorAllowedHosts, monitorSources, normalizeDocumentText, resolveMonitorTarget,
   verifiedTextBaseline, withinAllowedWindow, NORMALIZER_VERSION,
 } from './source-monitor.mjs';
 const LAW = ' Sonn- und Feiertagsfahrverbot fuer Lastkraftwagen ueber 7,5 t von 0 bis 22 Uhr. '.repeat(5);
@@ -249,5 +252,71 @@ describe('operational alert', () => {
     expect(body).toContain('last reviewed data stays in force');
     expect(() => formatDrivingBansAlert({ repo: 'o/r', runId: 'x', kind: 'monitor' })).toThrow();
     expect(() => formatDrivingBansAlert({ repo: 'o/r', runId: '1', kind: 'publish' })).toThrow();
+  });
+});
+
+describe('outage never overwrites the last known good state (20 Nov 2026)', () => {
+  const page = (rule: string) => `<html><head><title>Verordnung</title></head><body><p>${LAW} ${rule}</p></body></html>`;
+  it('an HTTP 200 bot challenge is an outage: the last good fingerprint is carried and the real page stays STABLE', async () => {
+    const data = dataset([{ source_id: 'law', url: 'https://law.example.gov/law', role: 'PRIMARY', content_sha256: sha('reviewed') }]);
+    const week1 = await monitorSources({ canonical: data, sleep: noSleep, fetcher: async () => ok(page('A')) });
+    const challenge = '<html><head><title>Just a moment...</title></head><body><noscript>Enable JavaScript and cookies to continue</noscript></body></html>';
+    const week2 = await monitorSources({ canonical: data, previous: week1, sleep: noSleep, fetcher: async () => ok(challenge) });
+    expect(week2.results[0]).toMatchObject({ state: 'ACCESS_BLOCKED', last_retrieved: { raw_sha256: week1.results[0].raw_sha256 } });
+    expect(week2.results[0].raw_sha256).toBeUndefined();
+    expect(week2.summary.changed_since_last_run).toBe(0);
+    const week3 = await monitorSources({ canonical: data, previous: week2, sleep: noSleep, fetcher: async () => ok(page('A')) });
+    expect(week3.results[0].since_last_run).toBe('STABLE');
+  });
+  it('legal text that merely mentions such words, and reviewed bytes, are never treated as a block page', async () => {
+    expect(isSoftBlockPage(Buffer.from(page('Online-Antrag mit Captcha und Security Check im Portal'.repeat(20))))).toBe(false);
+    expect(isSoftBlockPage(Buffer.from('<title>Attention Required! | Cloudflare</title>'))).toBe(true);
+    expect(isSoftBlockPage(Buffer.from('%PDF-1.7 captcha'), 'application/pdf')).toBe(false);
+    const reviewed = '<title>Access denied</title>';
+    const data = dataset([{ source_id: 'r', url: 'https://law.example.gov/r', role: 'PRIMARY', content_sha256: sha(reviewed) }]);
+    const report = await monitorSources({ canonical: data, sleep: noSleep, fetcher: async () => ok(reviewed) });
+    expect(report.results[0].state).toBe('UNCHANGED');
+  });
+  it('texts too short to normalise are compared by their bytes between runs', async () => {
+    const data = dataset([{ source_id: 'short', url: 'https://law.example.gov/short', role: 'PRIMARY', content_sha256: sha('reviewed') }]);
+    const run1 = await monitorSources({ canonical: data, sleep: noSleep, fetcher: async () => ok('<p>Fahrverbot ueber 7,5 t</p>') });
+    expect(run1.results[0].text_sha256).toBeNull();
+    const run2 = await monitorSources({ canonical: data, previous: run1, sleep: noSleep, fetcher: async () => ok('<p>Fahrverbot ueber 7,5 t</p>') });
+    expect(run2.results[0].since_last_run).toBe('STABLE');
+    const run3 = await monitorSources({ canonical: data, previous: run2, sleep: noSleep, fetcher: async () => ok('<p>Fahrverbot ueber 3,5 t</p>') });
+    expect(run3.results[0].since_last_run).toBe('CHANGED_SINCE_LAST_RUN');
+  });
+  it('a partial run is refused before any network access when it would replace the persisted state', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'dajc-monitor-state-'));
+    try {
+      for (const partial of [['--only', 'AT'], ['--max-sources', '2']]) {
+        const result = spawnSync(process.execPath, ['scripts/driving-bans-source-monitor.mjs', ...partial, '--state-dir', dir, '--output', join(dir, 'out')], { encoding: 'utf8', timeout: 20000 });
+        expect(result.status).not.toBe(0);
+        expect(result.stderr).toMatch(/--state-dir requires a full run/);
+      }
+      expect(existsSync(join(dir, 'latest.json'))).toBe(false);
+      expect(existsSync(join(dir, 'out'))).toBe(false);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+  it('the workflow alerts on any monitor-job failure and persists history only after a needed alert succeeded', () => {
+    const yml = readFileSync('.github/workflows/driving-bans-thursday.yml', 'utf8');
+    const step = (name: string) => {
+      const start = yml.indexOf(`- name: ${name}`);
+      expect(start, name).toBeGreaterThan(-1);
+      const next = yml.indexOf('\n      - name:', start + 1);
+      return { start, text: yml.slice(start, next < 0 ? undefined : next) };
+    };
+    const monitor = step('Retrieve and compare official sources');
+    const alert = step('Alert on changed sources, degraded retrieval or a failed monitor job (main only)');
+    const persist = step('Persist monitor history (main only)');
+    expect(monitor.text).toMatch(/continue-on-error: true/);
+    expect(alert.text).toMatch(/failure\(\) \|\| steps\.monitor\.outcome == 'failure'/);
+    expect(alert.start).toBeLessThan(persist.start);
+    const condition = persist.text.match(/if: \$\{\{(.*)\}\}/)?.[1] ?? '';
+    expect(condition).toMatch(/!cancelled\(\)/);
+    expect(condition).not.toMatch(/always\(\)/);
+    expect(condition).toMatch(/steps\.alert\.outcome == 'success' \|\| \(steps\.alert\.outcome == 'skipped' && steps\.monitor\.outcome == 'success'\)/);
+    expect(condition).not.toMatch(/steps\.alert\.outcome != 'failure'/);
+    expect(condition).toMatch(/refs\/heads\/main/);
   });
 });

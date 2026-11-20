@@ -67,6 +67,21 @@ export function isBotChallenge(status, text = '') {
   return [401, 403, 405, 503].includes(Number(status)) && /security check|captcha|access denied|are you a robot|bot protection|cloudflare|ddos|forbidden/i.test(String(text).slice(0, 20000));
 }
 
+// Some providers answer automated clients with HTTP 200 and an interstitial
+// (bot challenge or WAF rejection). Recorded as a retrieval, its hash
+// would replace the last good fingerprint of the real document. Only the page
+// <title> or a short body is inspected, so a legal text that merely mentions
+// such words is never discarded.
+const SOFT_BLOCK = /just a moment|attention required|security check|checking your browser|are you a (?:robot|human)|captcha|bot protection|ddos protection|access denied|request (?:was )?rejected|the requested url was rejected|enable javascript and cookies/i;
+export function isSoftBlockPage(bytes, contentType = 'text/html') {
+  if (!bytes || !/html/i.test(String(contentType || ''))) return false;
+  const html = Buffer.from(bytes).subarray(0, 200000).toString('utf8');
+  const title = html.match(/<title[^>]*>([\s\S]{0,300}?)<\/title>/i)?.[1] ?? '';
+  if (SOFT_BLOCK.test(title)) return true;
+  const visible = html.replace(/<(script|style|noscript|template)\b[\s\S]*?<\/\1\s*>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  return visible.length < 600 && SOFT_BLOCK.test(visible);
+}
+
 /** Which official URL the monitor may read for a canonical source, and how. */
 export function resolveMonitorTarget(source, { hostPolicy = hostPolicyFor } = {}) {
   const ogd = String(source?.retrieval_method || '').match(OGD_DOCUMENT)?.[0];
@@ -166,6 +181,13 @@ export async function monitorSources({
       continue;
     }
     const rawSha = sha256(response.bytes);
+    // A soft block is an outage, never a new document version: the last good
+    // fingerprint is carried forward unchanged. Reviewed bytes are always kept.
+    if (rawSha !== source.content_sha256 && isSoftBlockPage(response.bytes, response.content_type)) {
+      results.push({ ...base, ...carried, state: 'ACCESS_BLOCKED', http_status: response.http_status ?? 200,
+        reason: 'HTTP 200 interstitial (bot challenge or WAF rejection) instead of the document; never bypassed', checked_at: checkedAt });
+      continue;
+    }
     let text = null;
     try { text = normalizeDocumentText(response.bytes, response.content_type); } catch { text = null; } // never let one page stop the run
     const textSha = text === null ? null : sha256(text);

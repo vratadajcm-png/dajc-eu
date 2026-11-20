@@ -22,6 +22,10 @@ const maxSources = Number(option('--max-sources', 'Infinity'));
 const minSuccessRate = Number(option('--min-success-rate', String(MONITOR_DEFAULTS.minSuccessRate)));
 const previousPath = option('--previous', '');
 const stateDir = option('--state-dir', '');
+// A partial run (--only/--max-sources) lacks the other sources' last good
+// fingerprints; persisting it as latest.json would erase them. Refuse before
+// any network access.
+if (stateDir && (only || Number.isFinite(maxSources))) throw new Error('--state-dir requires a full run: a partial run must never replace the persisted monitor state');
 const previous = previousPath && existsSync(resolve(previousPath)) ? JSON.parse(readFileSync(resolve(previousPath), 'utf8')) : null;
 if (previous && (previous.schema_version !== 1 || !Array.isArray(previous.results))) throw new Error('Invalid previous monitor state');
 const baselinePath = resolve('data/driving-bans/source-monitor/text-baseline.json');
