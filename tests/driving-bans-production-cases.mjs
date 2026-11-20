@@ -247,7 +247,9 @@ export function registerProductionDrivingBanTests(test, a) {
     const reviewed = new Set(['CH', 'CZ', 'FR', 'HR', 'HU', 'IT', 'LI', 'LU', 'PL', 'SI', 'SK', 'AT', 'DE']);
     // 19 Nov 2026: only the three GR B8 rules re-read from ΦΕΚ Β΄ 912/2026 may publish December events for an otherwise unreviewed jurisdiction.
     const grB8 = new Set(['gr-christmas-eve-outbound-2026', 'gr-christmas-return-2026', 'gr-new-year-eve-outbound-2026']);
-    a.ok(!v.events.some(e => !reviewed.has(e.jurisdiction) && e.date >= '2026-12-01' && !grB8.has(e.ban_id)));
+    // 20 Nov 2026: Spanish December rules re-read row by row (review 2026-11-20.r7-es-dec-cat-bas) carry their own December review window.
+    const esDec = new Set(current.rules.filter(r => /2026-11-20\.r7-es-dec-cat-bas/.test(r.notes || '')).map(r => r.ban_id));
+    a.ok(!v.events.some(e => !reviewed.has(e.jurisdiction) && e.date >= '2026-12-01' && !grB8.has(e.ban_id) && !esDec.has(e.ban_id)));
     for (const j of v.jurisdictions.filter(row => !reviewed.has(row.jurisdiction))) a.ok(j.coverage_failures.includes('NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED'), j.jurisdiction);
     const log = JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-10-27-nov-dec.json', import.meta.url), 'utf8'));
     a.equal(log.full_registry_sweep, false);
@@ -299,17 +301,16 @@ export function registerProductionDrivingBanTests(test, a) {
     a.equal(basque[0].starts_at, '2026-11-10T21:00:00.000Z');
     a.equal(basque[0].ends_at, '2026-11-11T21:00:00.000Z');
     a.ok(/cross-border transport only/.test(basque[0].vehicle_scope));
-    a.deepEqual(ev(v, 'es-cat-n-ii-630-682-saturdays').map(e => e.date), ['2026-11-07', '2026-11-14', '2026-11-21', '2026-11-28']);
-    a.deepEqual(ev(v, 'es-cat-n-ii-630-682-sundays').map(e => [e.date, e.start_time, e.end_time]), ['01', '08', '15', '22', '29'].map(d => [`2026-11-${d}`, '17:00', '22:00']));
-    a.deepEqual(ev(v, 'es-cat-pyrenees-winter-saturdays-2026-11-12').map(e => e.date), ['2026-11-28']);
-    a.equal(ev(v, 'es-a7-n-340-957-997-mma-7500').length, 30);
+    const nov = (id) => ev(v, id).filter(e => e.date < '2026-12-01');
+    a.deepEqual(nov('es-cat-n-ii-630-682-saturdays').map(e => e.date), ['2026-11-07', '2026-11-14', '2026-11-21', '2026-11-28']);
+    a.deepEqual(nov('es-cat-n-ii-630-682-sundays').map(e => [e.date, e.start_time, e.end_time]), ['01', '08', '15', '22', '29'].map(d => [`2026-11-${d}`, '17:00', '22:00']));
+    a.deepEqual(nov('es-cat-pyrenees-winter-saturdays-2026-11-12').map(e => e.date), ['2026-11-28']);
+    a.equal(nov('es-a7-n-340-957-997-mma-7500').length, 30);
     a.deepEqual(one(v, 'es-a7-n-232-446-330-axles-4', '2026-11-15').weight_threshold, {operator: '>=', value: 4, unit: 'axles', applies_to: 'number of axles of the goods vehicle / combination'});
     a.equal(one(v, 'es-cat-gt26t-n-ii-n-240-n-340-permanent', '2026-11-15').weight_threshold.value, 26000);
-    a.ok(!v.events.some(e => e.jurisdiction === 'ES' && e.date >= '2026-12-01'), 'December 2026 not reviewed for ES');
     const es = v.jurisdictions.find(j => j.jurisdiction === 'ES');
     a.equal(es.coverage_complete, false);
     a.equal(es.scope_checks.corridors.state, 'UNVERIFIED');
-    a.ok(es.coverage_failures.includes('ES_DECEMBER_2026_ANNEX_II_AND_REGIONAL_ROWS_NOT_ENCODED'));
     const de = v.jurisdictions.find(j => j.jurisdiction === 'DE');
     a.equal(de.coverage_complete, false);
     a.ok(de.coverage_failures.includes('LOW_WATER_EXEMPTIONS_AFTER_2026_10_31_NOT_PRIMARY_CONFIRMED'));
@@ -317,5 +318,36 @@ export function registerProductionDrivingBanTests(test, a) {
     a.equal(log.full_registry_sweep, false);
     const sources = new Map(current.sources.map(s => [s.source_id, s]));
     for (const r of log.retrievals.filter(row => row.source_id)) a.equal(sources.get(r.source_id)?.content_sha256, LATEST_SHA.get(r.source_id) ?? r.sha256, r.source_id);
+  });
+  // 20 Nov 2026 targeted December review of ES (data/driving-bans/source-reviews/2026-11-20-es-december.json).
+  test('20 Nov 2026 — Spain December: DGT Annex II, Catalonia (Annex A, Aran) and Basque rows; ES stays fail-closed and not "fresh"', () => {
+    const v = at(new Date('2026-11-20T12:00:00Z'));
+    const dgt = v.events.filter(e => e.ban_id.startsWith('es-a2-2026-12-'));
+    a.equal(dgt.length, 72, 'every December Annex II row-date of BOE-A-2026-1255 is published once');
+    a.ok(dgt.every(e => e.date >= '2026-12-01' && e.date <= '2026-12-31'));
+    const a1 = one(v, 'es-a2-2026-12-a-1-11-8-50-16002200-salida-madrid', '2026-12-04');
+    a.equal(a1.starts_at, '2026-12-04T15:00:00.000Z'); a.equal(a1.ends_at, '2026-12-04T21:00:00.000Z'); a.equal(a1.direction, 'Salida Madrid');
+    a.deepEqual(a1.weight_threshold, {operator: '>', value: 7500, unit: 'kg', applies_to: 'maximum authorised mass of goods vehicle / combination'});
+    a.deepEqual(ev(v, 'es-a2-2026-12-n-230-64-1-116-1-17002400-frontera-francia').map(e => e.date), ['2026-12-04', '2026-12-11', '2026-12-18', '2026-12-24', '2026-12-31']);
+    a.deepEqual(ev(v, 'es-a2-2026-12-a-4-323-230-09002200-sentido-madrid').map(e => [e.date, e.start_time, e.end_time]), [['2026-12-08', '09:00', '22:00']]);
+    a.deepEqual(ev(v, 'es-cat-aran-2026-12-france').map(e => [e.date, e.start_time, hours(e)]), ['04', '11', '18', '24', '31'].map(d => [`2026-12-${d}`, '17:00', 7]), '17:00-24:00');
+    a.deepEqual(ev(v, 'es-cat-aran-2026-12-lleida').map(e => e.date), ['2026-12-06', '2026-12-08', '2026-12-13', '2026-12-20', '2026-12-27']);
+    a.ok(ev(v, 'es-cat-pyrenees-winter-sundays-holidays-2026-12').some(e => e.date === '2026-12-26'), 'Sant Esteve is a 2026 Catalan holiday outside Aran');
+    a.deepEqual(['es-cat-inmaculada-2026-12-a2-lleida-t', 'es-cat-inmaculada-2026-12-a2-barcelona-t'].map(id => ev(v, id).map(e => [e.date, e.direction])),
+      [[['2026-12-04', 'Hacia Lleida (L)']], [['2026-12-08', 'Hacia Barcelona (B)']]]);
+    a.deepEqual(ev(v, 'es-bas-a2-2026-12-06-08-bilbao').map(e => [e.date, e.start_time, e.end_time, e.direction]), [['2026-12-06', '16:00', '21:00', 'Bilbao'], ['2026-12-08', '16:00', '21:00', 'Bilbao']]);
+    a.deepEqual(ev(v, 'es-cat-pyrenees-winter-saturdays-2026-11-12').map(e => e.date), ['2026-11-28', '2026-12-05', '2026-12-12', '2026-12-19', '2026-12-26']);
+    a.ok(!v.events.some(e => e.jurisdiction === 'ES' && e.date > '2026-12-31'), 'January 2027 rows stay unpublished');
+    const es = v.jurisdictions.find(j => j.jurisdiction === 'ES');
+    a.equal(es.coverage_complete, false); a.notEqual(es.ban_state, 'NO_BAN'); a.equal(es.verification_state, 'UNVERIFIED');
+    a.ok(!es.coverage_failures.includes('ES_DECEMBER_2026_ANNEX_II_AND_REGIONAL_ROWS_NOT_ENCODED'));
+    for (const gap of ['ES_ANNEX_V_EXCEPTIONAL_ADR_RESTRICTIONS_NOT_EVENT_ENCODED', 'ES_BASQUE_ANNEX_I_AND_CATALONIA_SECTION_2_SPECIAL_TRANSPORT_DECEMBER_NOT_ENCODED']) a.ok(es.coverage_failures.includes(gap), gap);
+    a.equal(current.jurisdiction_reviews.ES.last_checked, '2026-11-02T15:20:00.000Z', 'a targeted review must not make the full-sweep age look fresh');
+    a.deepEqual(current.window, {from: '2026-09-01', to: '2026-12-31'});
+    const log = JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-11-20-es-december.json', import.meta.url), 'utf8'));
+    a.equal(log.full_registry_sweep, false);
+    const sources = new Map(current.sources.map(s => [s.source_id, s]));
+    for (const id of ['es-boe-2026-11-20', 'es-cat-isp-300-2026-11-20', 'cat-labour-holidays-2026', 'es-bas-2026', 'es-cat-isp-1933-2026']) a.equal(sources.get(id)?.content_sha256, log.retrievals.find(r => r.source_id === id).sha256, id);
+    for (const r of log.retrievals.filter(row => row.same_as_19_nov)) a.equal(sources.get(r.source_id)?.content_sha256, r.sha256, `${r.source_id}: PR #144 evidence re-read byte-identical`);
   });
 }

@@ -73,3 +73,17 @@ BE nadrozměrné přepravy, PT VCI svátky/ADR, LI odkaz v59, BG (jen návrh). 2
 Technické kontroly na větvi: lint PASS, typecheck PASS (0 chyb), test PASS (97 souborů, 1017 testů),
 build PASS, `driving-bans:audit --mode full --max-sweep-age-days 8` **FAIL** (`active_window_reviewed=false`,
 `sweep_age_days=16.8`) – očekávané, brána nebyla oslabena.
+
+## Nezávislá kontrola a prosinec ES (20. 11. 2026, `2026-11-20.r7-es-dec-cat-bas`)
+
+Důkazy: `data/driving-bans/source-reviews/2026-11-20-es-december.json` (SHA-256 každého staženého dokumentu).
+- HU, FR, GR: zdroje staženy znovu, bajtově shodné s 19. 11.; všech šest pravidel PR #144 odpovídá textu
+  (HU zákon LXXII/2026 + nař. 190/2008 §2(1)(b); FR arrêté 16. 4. 2021 čl. 1 a 3 II a); GR ΦΕΚ Β΄ 912/2026 B8).
+  `OWNER_DECISION_REQUIRED`: výklad HU §2(2) („első nap 8 órától“) – zakódovaný začátek 23. 12. 22:00 je nejdřívější
+  začátek výslovně daný §2(1)(b).
+- ES prosinec zakódován řádek po řádku: DGT příloha II (72 kombinací řádek×datum, 63 pravidel), Katalánsko
+  (příloha A Inmaculada, Pyreneje zimní neděle a svátky vč. 26. 12. podle Ordre EMT/66/2025, Arán 7.1), Baskicko
+  (příloha II body 1–2). Příloha VII a katalánské body 8–9 přečteny znovu (beze změny).
+- Nezakódováno: příloha V (ADR a vozidla se zvláštním povolením), katalánské body 2–4 a euromodulární AP-7,
+  baskická příloha I a ADR, leden 2027. ES zůstává `UNVERIFIED` a neúplné; `window.to` ani `last_checked`
+  se neposouvají (cílená kontrola není úplný sweep).
