@@ -248,7 +248,7 @@ export function registerProductionDrivingBanTests(test, a) {
     // 19 Nov 2026: only the three GR B8 rules re-read from ΦΕΚ Β΄ 912/2026 may publish December events for an otherwise unreviewed jurisdiction.
     const grB8 = new Set(['gr-christmas-eve-outbound-2026', 'gr-christmas-return-2026', 'gr-new-year-eve-outbound-2026']);
     // 20 Nov 2026: Spanish December rules re-read row by row (review 2026-11-20.r7-es-dec-cat-bas) carry their own December review window.
-    const esDec = new Set(current.rules.filter(r => /2026-11-20\.r7-es-dec-cat-bas/.test(r.notes || '')).map(r => r.ban_id));
+    const esDec = new Set(JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-11-20-es-december.json', import.meta.url), 'utf8')).december_rules);
     a.ok(!v.events.some(e => !reviewed.has(e.jurisdiction) && e.date >= '2026-12-01' && !grB8.has(e.ban_id) && !esDec.has(e.ban_id)));
     for (const j of v.jurisdictions.filter(row => !reviewed.has(row.jurisdiction))) a.ok(j.coverage_failures.includes('NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED'), j.jurisdiction);
     const log = JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-10-27-nov-dec.json', import.meta.url), 'utf8'));
@@ -322,13 +322,22 @@ export function registerProductionDrivingBanTests(test, a) {
   // 20 Nov 2026 targeted December review of ES (data/driving-bans/source-reviews/2026-11-20-es-december.json).
   test('20 Nov 2026 — Spain December: DGT Annex II, Catalonia (Annex A, Aran) and Basque rows; ES stays fail-closed and not "fresh"', () => {
     const v = at(new Date('2026-11-20T12:00:00Z'));
+    const esDecRules = new Set(JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-11-20-es-december.json', import.meta.url), 'utf8')).december_rules);
     const dgt = v.events.filter(e => e.ban_id.startsWith('es-a2-2026-12-'));
     a.equal(dgt.length, 72, 'every December Annex II row-date of BOE-A-2026-1255 is published once');
     a.ok(dgt.every(e => e.date >= '2026-12-01' && e.date <= '2026-12-31'));
     const a1 = one(v, 'es-a2-2026-12-a-1-11-8-50-16002200-salida-madrid', '2026-12-04');
     a.equal(a1.starts_at, '2026-12-04T15:00:00.000Z'); a.equal(a1.ends_at, '2026-12-04T21:00:00.000Z'); a.equal(a1.direction, 'Salida Madrid');
     a.deepEqual(a1.weight_threshold, {operator: '>', value: 7500, unit: 'kg', applies_to: 'maximum authorised mass of goods vehicle / combination'});
-    a.deepEqual(ev(v, 'es-a2-2026-12-n-230-64-1-116-1-17002400-frontera-francia').map(e => e.date), ['2026-12-04', '2026-12-11', '2026-12-18', '2026-12-24', '2026-12-31']);
+    const n230Fri = ev(v, 'es-a2-2026-12-n-230-64-1-116-1-17002400-frontera-francia-fridays');
+    a.deepEqual(n230Fri.map(e => e.date), ['2026-12-04', '2026-12-11', '2026-12-18']);
+    a.ok(n230Fri[0].exceptions.some(x => /habitual residence/.test(x)), 'generic Friday table exception');
+    const n230Xmas = ev(v, 'es-a2-2026-12-n-230-64-1-116-1-17002400-frontera-francia-24-31-dec');
+    a.deepEqual(n230Xmas.map(e => e.date), ['2026-12-24', '2026-12-31']);
+    a.ok(!n230Xmas[0].exceptions.some(x => /habitual residence/.test(x)), 'no residence exception is printed for 24/31 Dec');
+    a.ok(ev(v, 'es-cat-aran-2026-12-france')[0].exceptions.some(x => /7\.2 b\)/.test(x)) && !ev(v, 'es-cat-aran-2026-12-lleida')[0].exceptions.some(x => /7\.2 b\)/.test(x)));
+    a.ok(ev(v, 'es-cat-aran-2026-12-lleida')[0].exceptions.some(x => /at least half of the vehicle's load capacity/.test(x)), '7.2 c) half-load condition');
+    a.ok(v.events.filter(e => e.jurisdiction === 'ES' && e.date >= '2026-12-01').every(e => esDecRules.has(e.ban_id)), 'only the explicitly reviewed rules publish December events');
     a.deepEqual(ev(v, 'es-a2-2026-12-a-4-323-230-09002200-sentido-madrid').map(e => [e.date, e.start_time, e.end_time]), [['2026-12-08', '09:00', '22:00']]);
     a.deepEqual(ev(v, 'es-cat-aran-2026-12-france').map(e => [e.date, e.start_time, hours(e)]), ['04', '11', '18', '24', '31'].map(d => [`2026-12-${d}`, '17:00', 7]), '17:00-24:00');
     a.deepEqual(ev(v, 'es-cat-aran-2026-12-lleida').map(e => e.date), ['2026-12-06', '2026-12-08', '2026-12-13', '2026-12-20', '2026-12-27']);
@@ -341,13 +350,14 @@ export function registerProductionDrivingBanTests(test, a) {
     const es = v.jurisdictions.find(j => j.jurisdiction === 'ES');
     a.equal(es.coverage_complete, false); a.notEqual(es.ban_state, 'NO_BAN'); a.equal(es.verification_state, 'UNVERIFIED');
     a.ok(!es.coverage_failures.includes('ES_DECEMBER_2026_ANNEX_II_AND_REGIONAL_ROWS_NOT_ENCODED'));
-    for (const gap of ['ES_ANNEX_V_EXCEPTIONAL_ADR_RESTRICTIONS_NOT_EVENT_ENCODED', 'ES_BASQUE_ANNEX_I_AND_CATALONIA_SECTION_2_SPECIAL_TRANSPORT_DECEMBER_NOT_ENCODED']) a.ok(es.coverage_failures.includes(gap), gap);
+    for (const gap of ['ES_ANNEX_V_EXCEPTIONAL_ADR_RESTRICTIONS_NOT_EVENT_ENCODED', 'ES_BASQUE_ADR_AND_SPECIAL_TRANSPORT_RESTRICTIONS_NOT_ENCODED', 'ES_CATALONIA_EUROMODULAR_SPECIAL_AND_ADR_RESTRICTIONS_NOT_ENCODED']) a.ok(es.coverage_failures.includes(gap), gap);
+    a.equal(one(v, 'es-a7-n-340-957-997-mma-7500', '2026-12-15').verified_at, '2026-11-20T12:30:00.000Z', 'December events of extended profiles carry the 20 Nov evidence');
     a.equal(current.jurisdiction_reviews.ES.last_checked, '2026-11-02T15:20:00.000Z', 'a targeted review must not make the full-sweep age look fresh');
     a.deepEqual(current.window, {from: '2026-09-01', to: '2026-12-31'});
     const log = JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-11-20-es-december.json', import.meta.url), 'utf8'));
     a.equal(log.full_registry_sweep, false);
     const sources = new Map(current.sources.map(s => [s.source_id, s]));
-    for (const id of ['es-boe-2026-11-20', 'es-cat-isp-300-2026-11-20', 'cat-labour-holidays-2026', 'es-bas-2026', 'es-cat-isp-1933-2026']) a.equal(sources.get(id)?.content_sha256, log.retrievals.find(r => r.source_id === id).sha256, id);
+    for (const id of ['es-boe-2026-11-20', 'es-cat-isp-300-2026-11-20', 'cat-labour-holidays-2026', 'es-bas-2026-11-20', 'es-cat-isp-1933-2026']) a.equal(sources.get(id)?.content_sha256, log.retrievals.find(r => r.source_id === id).sha256, id);
     for (const r of log.retrievals.filter(row => row.same_as_19_nov)) a.equal(sources.get(r.source_id)?.content_sha256, r.sha256, `${r.source_id}: PR #144 evidence re-read byte-identical`);
   });
 }

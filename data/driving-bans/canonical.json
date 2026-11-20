@@ -561,7 +561,8 @@
     "es-bas-2026",
     "es-boe-2026-11-20",
     "es-cat-isp-300-2026-11-20",
-    "cat-labour-holidays-2026"
+    "cat-labour-holidays-2026",
+    "es-bas-2026-11-20"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [
@@ -570,8 +571,7 @@
     "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED",
     "ES_CATALONIA_EUROMODULAR_SPECIAL_AND_ADR_RESTRICTIONS_NOT_ENCODED",
     "ES_BASQUE_ADR_AND_SPECIAL_TRANSPORT_RESTRICTIONS_NOT_ENCODED",
-    "ES_CATALONIA_ANNUAL_ROW_DIRECTION_NOT_INTERPRETED",
-    "ES_BASQUE_ANNEX_I_AND_CATALONIA_SECTION_2_SPECIAL_TRANSPORT_DECEMBER_NOT_ENCODED"
+    "ES_CATALONIA_ANNUAL_ROW_DIRECTION_NOT_INTERPRETED"
    ],
    "scope_checks": {
     "weekend": {
@@ -5252,7 +5252,7 @@
    "version": "BOE text retrieved 2026-11-02; valid for 2026, prorogued until the 2027 resolution except date-specific restrictions of Annexes I and II",
    "checked_at": "2026-11-02T15:14:00.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Point 3.1 / Annex II (>7,500 kg MMA): item 2, 1 Nov 16:00-21:00 towards Bilbao on A-8 km 139.21-119.5, BI-734 km 136.14-128.12, BI-3724 km 128.12-120.69, N-634 km 120.69-107; item 6, from 22:00 on the eve to 22:00 on 11 Nov, cross-border transport only, on AP-8 km 100-0 (Behobia), GI-20 km 15.572-0 (France), A-15 km 139.7-156.56 (Andoain), AP-1 km 102.7-146.15 (Irún), A-1 km 321.4-329 and km 336-352 (Vitoria-Gasteiz), N-I km 405.45-454.47 (France), GI-636 km 0-17.235 (France), GI-11 km 0-2.523 (Donostia), N-121A km 68.46-75.02 (France). Exemptions Annex IV. ADR (2.1) and special-transport (4.1) restrictions not encoded. Review 2026-11-20: same bytes re-read for December: item 1 (4 Dec 17-21, 5 Dec 11-14 towards Cantabria) and item 2 (6 and 8 Dec 16-21 towards Bilbao) encoded; Annex I special-transport dates (4-8, 24, 25, 31 Dec) not encoded.",
+   "findings": "Point 3.1 / Annex II (>7,500 kg MMA): item 2, 1 Nov 16:00-21:00 towards Bilbao on A-8 km 139.21-119.5, BI-734 km 136.14-128.12, BI-3724 km 128.12-120.69, N-634 km 120.69-107; item 6, from 22:00 on the eve to 22:00 on 11 Nov, cross-border transport only, on AP-8 km 100-0 (Behobia), GI-20 km 15.572-0 (France), A-15 km 139.7-156.56 (Andoain), AP-1 km 102.7-146.15 (Irún), A-1 km 321.4-329 and km 336-352 (Vitoria-Gasteiz), N-I km 405.45-454.47 (France), GI-636 km 0-17.235 (France), GI-11 km 0-2.523 (Donostia), N-121A km 68.46-75.02 (France). Exemptions Annex IV. ADR (2.1) and special-transport (4.1) restrictions not encoded.",
    "content_sha256": "0d5117bf4b26b550d3c28b4f149a0a942e7e22e02d426948a2791ab2bb5aa098"
   },
   {
@@ -5309,6 +5309,17 @@
    "retrieval_method": "direct-retrieval",
    "findings": "Catalan 2026 labour holidays include 8 Dec (Tue), 25 Dec (Fri) and 26 Dec (Sat); in Aran 26 Dec is replaced by 17 Jun.",
    "content_sha256": "770867b3c3b8a777d91b614817a656a1e946700611832ee9ba13692b62dff738"
+  },
+  {
+   "source_id": "es-bas-2026-11-20",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-2625",
+   "authority": "Dirección de Tráfico, Gobierno Vasco – Resolución de 9 de enero de 2026 (BOPV 5 Feb 2026; BOE-A-2026-2625)",
+   "role": "PRIMARY",
+   "version": "BOE text retrieved 2026-11-20 04:09 UTC; byte-identical to the 2 Nov 2026 copy",
+   "checked_at": "2026-11-20T04:09:17.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Annex II 2.º item 1: 4 Dec 17-21 and 5 Dec 11-14 towards Cantabria (A-8 km 119.5-139.21, N-634 km 107-120.69, BI-3724 km 120.69-128.12, BI-734 km 128.12-136.14); item 2: 6 and 8 Dec 16-21 towards Bilbao (same sections). Point 4.1 (special transport: Sundays/holidays 08-24, non-Saturday holiday eves 16-24, CAPV) and 2.1 (ADR) not encoded. Annex I is the sporting-events calendar, not a goods-vehicle ban.",
+   "content_sha256": "0d5117bf4b26b550d3c28b4f149a0a942e7e22e02d426948a2791ab2bb5aa098"
   }
  ],
  "rule_profiles": {
@@ -6499,7 +6510,7 @@
   },
   "es-annex7": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-11-02T15:20:00.000Z",
+   "verified_at": "2026-11-20T12:30:00.000Z",
    "review_window": {
     "from": "2026-11-01",
     "to": "2026-12-31"
@@ -6519,9 +6530,10 @@
    "direction": "Ambos sentidos",
    "adr_relevance": "Annex VII applies to the listed vehicle classes regardless of cargo; ADR Annex V restrictions apply in addition and are not encoded.",
    "exceptional_relevance": "Vehicles with a special circulation authorisation whose itinerary includes the section are exempt (D.2.2).",
-   "notes": "Annex VII year-round restrictions (D.2.1), every day 00:00-24:00. Encoded in review 2026-11-02.r5-es-de-targeted; published only for the reviewed November window. Review 2026-11-20.r7-es-dec-cat-bas: re-read for December 2026 (same instrument in force to 31 Dec 2026); reviewed span extended to 31 Dec.",
-   "source_id": "es-boe-2026-11-02",
+   "notes": "Annex VII year-round restrictions (D.2.1), every day 00:00-24:00. Encoded in review 2026-11-02.r5-es-de-targeted; Review 2026-11-20.r7-es-dec-cat-bas: re-read for December 2026 (same instrument in force to 31 Dec 2026); reviewed span extended to 31 Dec.",
+   "source_id": "es-boe-2026-11-20",
    "evidence_ids": [
+    "es-boe-2026-11-20",
     "es-boe-2026-11-02"
    ],
    "legal_basis": "DGT 2026 resolution D.2.1, Annex VII",
@@ -6535,7 +6547,7 @@
   },
   "es-cat-2026": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-11-02T15:20:00.000Z",
+   "verified_at": "2026-11-20T12:30:00.000Z",
    "review_window": {
     "from": "2026-11-01",
     "to": "2026-12-31"
@@ -6558,9 +6570,10 @@
    "direction": "Not specified in the Annex A table for these rows (no B/L marker)",
    "adr_relevance": "ADR vehicles with orange plates have additional restrictions (sections 3-4, Annex C/D) that are not encoded.",
    "exceptional_relevance": "Special transport and special vehicles have additional restrictions (section 2) that are not encoded.",
-   "notes": "Catalonia (Servei Català de Trànsit) regional restrictions within ES. Encoded in review 2026-11-02.r5-es-de-targeted; published only for the reviewed November window. Review 2026-11-20.r7-es-dec-cat-bas: re-read for December 2026 (same instrument in force to 31 Dec 2026); reviewed span extended to 31 Dec.",
-   "source_id": "es-cat-isp-300-2026",
+   "notes": "Catalonia (Servei Català de Trànsit) regional restrictions within ES. Encoded in review 2026-11-02.r5-es-de-targeted; Review 2026-11-20.r7-es-dec-cat-bas: re-read for December 2026 (same instrument in force to 31 Dec 2026); reviewed span extended to 31 Dec.",
+   "source_id": "es-cat-isp-300-2026-11-20",
    "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
     "es-cat-isp-300-2026",
     "es-cat-isp-1933-2026",
     "es-cat-sct-2026"
@@ -6576,7 +6589,7 @@
   },
   "es-cat-permanent-2026": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-11-02T15:20:00.000Z",
+   "verified_at": "2026-11-20T12:30:00.000Z",
    "review_window": {
     "from": "2026-11-01",
     "to": "2026-12-31"
@@ -6598,9 +6611,10 @@
    "direction": "Ambos sentidos",
    "adr_relevance": "Applies by mass/vehicle class regardless of cargo; ADR route obligations (section 4) are separate and not encoded.",
    "exceptional_relevance": "Section 9.1 (C-153 Olot) also covers special transport and special vehicles; section 8 exempts >26 t vehicles with a special circulation authorisation.",
-   "notes": "Catalonia permanent restrictions (sections 8 and 9). Encoded in review 2026-11-02.r5-es-de-targeted; published only for the reviewed November window. Review 2026-11-20.r7-es-dec-cat-bas: re-read for December 2026 (same instrument in force to 31 Dec 2026); reviewed span extended to 31 Dec.",
-   "source_id": "es-cat-isp-300-2026",
+   "notes": "Catalonia permanent restrictions (sections 8 and 9). Encoded in review 2026-11-02.r5-es-de-targeted; Review 2026-11-20.r7-es-dec-cat-bas: re-read for December 2026 (same instrument in force to 31 Dec 2026); reviewed span extended to 31 Dec.",
+   "source_id": "es-cat-isp-300-2026-11-20",
    "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
     "es-cat-isp-300-2026",
     "es-cat-sct-2026"
    ],
@@ -6615,7 +6629,7 @@
   },
   "es-bas-2026": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-11-02T15:20:00.000Z",
+   "verified_at": "2026-11-20T12:30:00.000Z",
    "review_window": {
     "from": "2026-11-01",
     "to": "2026-12-31"
@@ -6638,9 +6652,10 @@
    "direction": "As stated per road section",
    "adr_relevance": "ADR vehicles: Sundays/holidays 08-24 and non-Saturday eves 16-24 across the CAPV (point 2.1) - not encoded; >7,500 kg ADR vehicles are also subject to Annex II.",
    "exceptional_relevance": "Vehicles needing a complementary circulation authorisation: Sundays/holidays 08-24 and non-Saturday eves 16-24 (point 4.1) - not encoded; Annex II also applies to them.",
-   "notes": "Basque Country (Dirección de Tráfico del Gobierno Vasco) regional restrictions within ES. Encoded in review 2026-11-02.r5-es-de-targeted; published only for the reviewed November window. Review 2026-11-20.r7-es-dec-cat-bas: re-read for December 2026 (same instrument in force to 31 Dec 2026); reviewed span extended to 31 Dec.",
-   "source_id": "es-bas-2026",
+   "notes": "Basque Country (Dirección de Tráfico del Gobierno Vasco) regional restrictions within ES. Encoded in review 2026-11-02.r5-es-de-targeted; Review 2026-11-20.r7-es-dec-cat-bas: re-read for December 2026 (same instrument in force to 31 Dec 2026); reviewed span extended to 31 Dec.",
+   "source_id": "es-bas-2026-11-20",
    "evidence_ids": [
+    "es-bas-2026-11-20",
     "es-bas-2026"
    ],
    "legal_basis": "Resolución de 9 de enero de 2026 de la Dirección de Tráfico, point 3.1 and Annex II",
@@ -6668,9 +6683,8 @@
    "jurisdiction": "ES",
    "timezone": "Europe/Madrid",
    "exceptions": [
-    "Section 7.2 a): exemptions of Annex B.",
-    "Section 7.2 b): on winter Fridays 17-24 on the N-230 towards France also trips to the driver's habitual residence, the vehicle's base or the company base.",
-    "Section 7.2 c): vehicles carrying the listed ATP Annex 3 perishables (raw milk, red meat, meat products, poultry, offal, minced meat, untreated fish and shellfish)."
+    "Section 7.2 a): the exemptions of Annex B.",
+    "Section 7.2 c): vehicles carrying perishable goods under ATP Annex 3 (I raw milk; II red meat and large game, except red offal; III meat products, pasteurised milk, fresh dairy products (yoghurt, kefir, cream, fresh cheese), ready meals (meat, fish, vegetables), ready-to-eat raw vegetables and vegetable preparations, concentrated fruit juices and fish products not listed below; IV game (except large game), poultry and rabbits; V red offal; VI minced meat; VII untreated fish, molluscs and crustaceans) and fresh fruit and vegetables under ATP Annex 1, provided this cargo is at least half of the vehicle's load capacity or occupies half of its useful load volume."
    ],
    "regions": [
     "Catalonia"
@@ -6678,7 +6692,7 @@
    "direction": "Per rule (Francia / Lleida)",
    "adr_relevance": "ADR vehicles with orange plates have additional restrictions (sections 3-4, Annex C/D) that are not encoded.",
    "exceptional_relevance": "Special transport and special vehicles have additional restrictions (section 2) that are not encoded.",
-   "notes": "Encoded in review 2026-11-20.r7-es-dec-cat-bas for December 2026 only.",
+   "notes": "Encoded in review 2026-11-20.r7-es-dec-cat-bas for December 2026 only (no Aran rows in the reviewed November span).",
    "source_id": "es-cat-isp-300-2026-11-20",
    "evidence_ids": [
     "es-cat-isp-300-2026-11-20",
@@ -12075,61 +12089,6 @@
    "direction": "Outbound, per Chapter A1 segment"
   },
   {
-   "ban_id": "es-a2-2026-12-n-230-64-1-116-1-17002400-frontera-francia",
-   "profile": "es-annex2",
-   "title": "Annex II: N-230 km 64,1 Benabarre - km 116,1 Santoréns",
-   "valid_from": "2026-12-04",
-   "valid_to": "2026-12-31",
-   "schedule": {
-    "kind": "dates",
-    "start_time": "17:00",
-    "end_time": "24:00",
-    "end_day_offset": 0,
-    "dates": [
-     {
-      "date": "2026-12-04",
-      "occurrence_id": "2026-12-04"
-     },
-     {
-      "date": "2026-12-11",
-      "occurrence_id": "2026-12-11"
-     },
-     {
-      "date": "2026-12-18",
-      "occurrence_id": "2026-12-18"
-     },
-     {
-      "date": "2026-12-24",
-      "occurrence_id": "2026-12-24"
-     },
-     {
-      "date": "2026-12-31",
-      "occurrence_id": "2026-12-31"
-     }
-    ]
-   },
-   "roads": [
-    "N-230 km 64,1 Benabarre - km 116,1 Santoréns",
-    "km 119,5 Buira - km 120,9 Bonansa",
-    "km 133,6 Ginaste - km 149,2 Aneto"
-   ],
-   "direction": "Frontera Francia",
-   "supersedes": [],
-   "sequence": 0,
-   "verified_at": "2026-11-20T12:30:00.000Z",
-   "review_window": {
-    "from": "2026-12-01",
-    "to": "2026-12-31"
-   },
-   "evidence_ids": [
-    "es-boe-2026-11-20",
-    "es-correction-feb",
-    "es-correction-mar",
-    "es-amendment-jun"
-   ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Todos los viernes comprendidos entre enero y marzo, y entre el 4 y 18 de diciembre; Jueves 24 y 31 de diciembre. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
-  },
-  {
    "ban_id": "es-a2-2026-12-n-230-149-2-133-6-13002000-benabarre",
    "profile": "es-annex2",
    "title": "Annex II: N-230 km 149,2 Aneto - km 133,6 Ginaste",
@@ -12182,7 +12141,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Todos los domingos comprendidos entre enero y marzo, y entre el 6 y 27 de diciembre; Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Todos los domingos comprendidos entre enero y marzo, y entre el 6 y 27 de diciembre; Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-6-ap-6-11-65-61-3-16002200-salida-madrid",
@@ -12219,7 +12179,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-ap-6-a-6-61-3-182-16002200-a-coruna",
@@ -12256,7 +12217,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-1-11-8-50-16002200-salida-madrid",
@@ -12293,7 +12255,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-2-18-3-38-7-16002200-salida-madrid",
@@ -12330,7 +12293,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-r-2-17-1-37-5-16002200-salida-madrid",
@@ -12367,7 +12331,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-3-13-80-4-16002200-salida-madrid",
@@ -12404,7 +12369,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-r-3-7-3-29-4-16002200-salida-madrid",
@@ -12441,7 +12407,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-4-17-3-62-16002200-salida-madrid",
@@ -12478,7 +12445,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-r-4-0-52-5-16002200-salida-madrid",
@@ -12515,7 +12483,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-5-15-6-106-16002200-ambos-sentidos",
@@ -12552,7 +12521,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-r-5-15-30-5-16002200-salida-madrid",
@@ -12589,7 +12559,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-n-6-42-5-62-5-16002200-salida-madrid",
@@ -12626,7 +12597,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-m-501-4-59-5-16002200-salida-madrid",
@@ -12663,7 +12635,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-62-113-151-15002300-frontera-portugal",
@@ -12700,7 +12673,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-n-631-0-0-57-0-15002400-ambos-sentidos",
@@ -12737,7 +12711,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-3-275-352-15002200-entrada-valencia",
@@ -12774,7 +12749,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-8-139-2-169-17002100-santander",
@@ -12811,7 +12787,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-6-ap-6-11-65-61-3-08001500-salida-madrid",
@@ -12848,7 +12825,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-ap-6-a-6-61-3-182-08001500-a-coruna",
@@ -12885,7 +12863,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-1-11-8-50-08001500-salida-madrid",
@@ -12922,7 +12901,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-2-18-3-38-7-08001300-salida-madrid",
@@ -12959,7 +12939,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-r-2-17-1-37-5-08001300-salida-madrid",
@@ -12996,7 +12977,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-3-13-80-4-08001300-salida-madrid",
@@ -13033,7 +13015,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-r-3-7-3-29-4-08001300-salida-madrid",
@@ -13070,7 +13053,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-4-17-3-62-08001300-salida-madrid",
@@ -13107,7 +13091,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-r-4-0-52-5-08001300-salida-madrid",
@@ -13144,7 +13129,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-5-15-6-106-08001500-ambos-sentidos",
@@ -13181,7 +13167,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-r-5-15-30-5-08001500-salida-madrid",
@@ -13218,7 +13205,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-n-6-42-5-62-5-08001500-salida-madrid",
@@ -13255,7 +13243,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-m-501-4-59-5-08001300-salida-madrid",
@@ -13292,7 +13281,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-62-113-151-08001500-frontera-portugal",
@@ -13329,7 +13319,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-8-139-2-169-11001400-santander",
@@ -13366,7 +13357,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-8-169-139-2-16002100-bilbao",
@@ -13407,7 +13399,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Domingo 6 de diciembre (festividad Constitución e Inmaculada); Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Domingo 6 de diciembre (festividad Constitución e Inmaculada); Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-1-118-3-11-8-16002200-entrada-madrid",
@@ -13444,7 +13437,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-2-107-10-8-16002200-entrada-madrid",
@@ -13481,7 +13475,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-3-177-6-9-16002400-entrada-madrid",
@@ -13518,7 +13513,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-3-25-80-4-16002400-salida-madrid",
@@ -13555,7 +13551,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-4-122-6-7-16002200-entrada-madrid",
@@ -13592,7 +13589,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-5-126-11-8-16002400-entrada-madrid",
@@ -13629,7 +13627,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-5-15-6-126-16002400-salida-madrid",
@@ -13666,7 +13665,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-6-184-123-16002300-entrada-madrid",
@@ -13703,7 +13703,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-6-123-110-16002400-entrada-madrid",
@@ -13740,7 +13741,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-ap-6-110-60-5-16002400-entrada-madrid",
@@ -13777,7 +13779,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-6-22-3-6-8-16002400-entrada-madrid",
@@ -13814,7 +13817,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-n-6-110-42-5-16002400-entrada-madrid",
@@ -13851,7 +13855,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-ap-51-104-8-81-8-16002400-entrada-madrid",
@@ -13888,7 +13893,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-ap-61-88-55-61-50-16002400-entrada-madrid",
@@ -13925,7 +13931,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-n-110-246-228-16002400-entrada-madrid",
@@ -13962,7 +13969,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-n-603-74-9-64-16002400-entrada-madrid",
@@ -13999,7 +14007,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-m-501-59-5-0-16002200-entrada-madrid",
@@ -14036,7 +14045,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-62-155-125-16002300-burgos",
@@ -14073,7 +14083,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-3-352-292-13002100-salida-valencia",
@@ -14110,7 +14121,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-3-275-352-17002100-entrada-valencia",
@@ -14147,7 +14159,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-4-323-230-09002200-sentido-madrid",
@@ -14184,7 +14197,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-4-230-300-09002200-sentido-sevilla",
@@ -14221,7 +14235,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-44-36-0-09002200-sentido-bailen",
@@ -14258,7 +14273,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-a-1-242-249-16002100-vitoria",
@@ -14295,7 +14311,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-ap-1-0-77-16002100-vitoria",
@@ -14332,7 +14349,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-n-1-249-321-45-16002100-vitoria",
@@ -14369,7 +14387,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-n-1-329-4-336-2-16002100-vitoria",
@@ -14406,7 +14425,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-a2-2026-12-n-631-0-0-57-0-07002400-ambos-sentidos",
@@ -14443,7 +14463,8 @@
     "es-correction-mar",
     "es-amendment-jun"
    ],
-   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   },
   {
    "ban_id": "es-cat-inmaculada-2026-12-t",
@@ -14486,7 +14507,8 @@
     "es-cat-isp-300-2026-11-20",
     "es-cat-isp-1933-2026"
    ],
-   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
   },
   {
    "ban_id": "es-cat-inmaculada-2026-12-m",
@@ -14525,7 +14547,8 @@
     "es-cat-isp-300-2026-11-20",
     "es-cat-isp-1933-2026"
    ],
-   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
   },
   {
    "ban_id": "es-cat-inmaculada-2026-12-a2-lleida-t",
@@ -14560,7 +14583,8 @@
     "es-cat-isp-300-2026-11-20",
     "es-cat-isp-1933-2026"
    ],
-   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
   },
   {
    "ban_id": "es-cat-inmaculada-2026-12-a2-lleida-m",
@@ -14595,7 +14619,8 @@
     "es-cat-isp-300-2026-11-20",
     "es-cat-isp-1933-2026"
    ],
-   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
   },
   {
    "ban_id": "es-cat-inmaculada-2026-12-a2-barcelona-t",
@@ -14630,7 +14655,8 @@
     "es-cat-isp-300-2026-11-20",
     "es-cat-isp-1933-2026"
    ],
-   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
   },
   {
    "ban_id": "es-cat-pyrenees-winter-sundays-holidays-2026-12",
@@ -14692,7 +14718,8 @@
     "es-cat-isp-1933-2026",
     "cat-labour-holidays-2026"
    ],
-   "notes": "ISP/300/2026 Annex A row \"Invierno: Domingos y festivos del 4/01 al 29/03 y del 6/12 al 27/12\" (T 17-22). Holidays per Ordre EMT/66/2025 (Catalan 2026 calendar): 8, 25 and 26 Dec (26 Dec is replaced only in Aran, outside this network). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "ISP/300/2026 Annex A row \"Invierno: Domingos y festivos del 4/01 al 29/03 y del 6/12 al 27/12\" (T 17-22). Holidays per Ordre EMT/66/2025 (Catalan 2026 calendar): 8, 25 and 26 Dec (26 Dec is replaced only in Aran, outside this network). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
   },
   {
    "ban_id": "es-cat-aran-2026-12-france",
@@ -14744,7 +14771,13 @@
     "es-cat-isp-300-2026-11-20",
     "es-cat-isp-1933-2026"
    ],
-   "notes": "ISP/300/2026 section 7.1 table, row \"Diciembre\". Exemptions section 7.2 (Annex B; on winter Fridays 17-24 towards France also trips to the driver's habitual residence or vehicle base; listed ATP perishables). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "ISP/300/2026 section 7.1 table, row \"Diciembre\". Exemptions section 7.2 a)-c). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "exceptions": [
+    "Section 7.2 a): the exemptions of Annex B.",
+    "Section 7.2 b): on winter Fridays 17-24 on the N-230 towards France, also trips whose destination is the driver's habitual residence, the vehicles' registered base or the transport company's base.",
+    "Section 7.2 c): vehicles carrying perishable goods under ATP Annex 3 (I raw milk; II red meat and large game, except red offal; III meat products, pasteurised milk, fresh dairy products (yoghurt, kefir, cream, fresh cheese), ready meals (meat, fish, vegetables), ready-to-eat raw vegetables and vegetable preparations, concentrated fruit juices and fish products not listed below; IV game (except large game), poultry and rabbits; V red offal; VI minced meat; VII untreated fish, molluscs and crustaceans) and fresh fruit and vegetables under ATP Annex 1, provided this cargo is at least half of the vehicle's load capacity or occupies half of its useful load volume."
+   ],
+   "source_id": "es-cat-isp-300-2026-11-20"
   },
   {
    "ban_id": "es-cat-aran-2026-12-lleida",
@@ -14796,7 +14829,8 @@
     "es-cat-isp-300-2026-11-20",
     "es-cat-isp-1933-2026"
    ],
-   "notes": "ISP/300/2026 section 7.1 table, row \"Diciembre\". Exemptions section 7.2 (Annex B; on winter Fridays 17-24 towards France also trips to the driver's habitual residence or vehicle base; listed ATP perishables). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "ISP/300/2026 section 7.1 table, row \"Diciembre\". Exemptions section 7.2 a) and c) (7.2 b) applies only towards France). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
   },
   {
    "ban_id": "es-bas-a2-2026-12-04-cantabria",
@@ -14831,9 +14865,10 @@
     "to": "2026-12-31"
    },
    "evidence_ids": [
-    "es-bas-2026"
+    "es-bas-2026-11-20"
    ],
-   "notes": "Resolución de 9 de enero de 2026 (BOE-A-2026-2625), Annex II 2.º item 1. Re-read 2026-11-20, unchanged bytes since 2 Nov (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "Resolución de 9 de enero de 2026 (BOE-A-2026-2625), Annex II 2.º item 1. Re-read 2026-11-20, unchanged bytes since 2 Nov (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-bas-2026-11-20"
   },
   {
    "ban_id": "es-bas-a2-2026-12-05-cantabria",
@@ -14868,9 +14903,10 @@
     "to": "2026-12-31"
    },
    "evidence_ids": [
-    "es-bas-2026"
+    "es-bas-2026-11-20"
    ],
-   "notes": "Resolución de 9 de enero de 2026 (BOE-A-2026-2625), Annex II 2.º item 1. Re-read 2026-11-20, unchanged bytes since 2 Nov (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "Resolución de 9 de enero de 2026 (BOE-A-2026-2625), Annex II 2.º item 1. Re-read 2026-11-20, unchanged bytes since 2 Nov (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-bas-2026-11-20"
   },
   {
    "ban_id": "es-bas-a2-2026-12-06-08-bilbao",
@@ -14909,9 +14945,107 @@
     "to": "2026-12-31"
    },
    "evidence_ids": [
-    "es-bas-2026"
+    "es-bas-2026-11-20"
    ],
-   "notes": "Resolución de 9 de enero de 2026 (BOE-A-2026-2625), Annex II 2.º item 2. Re-read 2026-11-20, unchanged bytes since 2 Nov (review 2026-11-20.r7-es-dec-cat-bas)."
+   "notes": "Resolución de 9 de enero de 2026 (BOE-A-2026-2625), Annex II 2.º item 2. Re-read 2026-11-20, unchanged bytes since 2 Nov (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-bas-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-230-64-1-116-1-17002400-frontera-francia-fridays",
+   "profile": "es-annex2",
+   "title": "Annex II: N-230 km 64,1 Benabarre - km 116,1 Santoréns",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-18",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     },
+     {
+      "date": "2026-12-11",
+      "occurrence_id": "2026-12-11"
+     },
+     {
+      "date": "2026-12-18",
+      "occurrence_id": "2026-12-18"
+     }
+    ]
+   },
+   "roads": [
+    "N-230 km 64,1 Benabarre - km 116,1 Santoréns",
+    "km 119,5 Buira - km 120,9 Bonansa",
+    "km 133,6 Ginaste - km 149,2 Aneto"
+   ],
+   "direction": "Frontera Francia",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II generic table \"Todos los viernes ... entre el 4 y 18 de diciembre\" with its residence/base exception. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "exceptions": [
+    "B.1.2: live livestock; qualifying ATP perishable goods or fresh fruit/vegetables occupying at least half payload capacity or cargo volume in compliant vehicles; universal postal service Monday-Friday; winter road-treatment supply; roadside assistance.",
+    "B.3.2: urgent fire/environment/road/life-saving operations require the specified notification; special roadside-assistance vehicles are exempt. Agricultural/work machinery and <=5-axle crane exemptions are limited to the stated Annex V provisions, NOT a blanket Annex II exemption.",
+    "Annex II generic Friday table (N-230): except trips whose destination is the driver's habitual residence, the vehicle's registered base or the company base."
+   ],
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-230-64-1-116-1-17002400-frontera-francia-24-31-dec",
+   "profile": "es-annex2",
+   "title": "Annex II: N-230 km 64,1 Benabarre - km 116,1 Santoréns",
+   "valid_from": "2026-12-24",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-24",
+      "occurrence_id": "2026-12-24"
+     },
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "roads": [
+    "N-230 km 64,1 Benabarre - km 116,1 Santoréns",
+    "km 119,5 Buira - km 120,9 Bonansa",
+    "km 133,6 Ginaste - km 149,2 Aneto"
+   ],
+   "direction": "Frontera Francia",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II table \"Jueves 24 y 31 de diciembre\" (no residence/base exception printed). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
   }
  ],
  "coverage_version": "2026-10-22.50",

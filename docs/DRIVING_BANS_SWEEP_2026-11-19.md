@@ -81,9 +81,10 @@ Důkazy: `data/driving-bans/source-reviews/2026-11-20-es-december.json` (SHA-256
   (HU zákon LXXII/2026 + nař. 190/2008 §2(1)(b); FR arrêté 16. 4. 2021 čl. 1 a 3 II a); GR ΦΕΚ Β΄ 912/2026 B8).
   `OWNER_DECISION_REQUIRED`: výklad HU §2(2) („első nap 8 órától“) – zakódovaný začátek 23. 12. 22:00 je nejdřívější
   začátek výslovně daný §2(1)(b).
-- ES prosinec zakódován řádek po řádku: DGT příloha II (72 kombinací řádek×datum, 63 pravidel), Katalánsko
+- ES prosinec zakódován řádek po řádku: DGT příloha II (72 kombinací řádek×datum, 64 pravidel; páteční N-230 s výjimkou cesty
+  domů/na základnu odděleně od 24. a 31. 12.), Katalánsko
   (příloha A Inmaculada, Pyreneje zimní neděle a svátky vč. 26. 12. podle Ordre EMT/66/2025, Arán 7.1), Baskicko
   (příloha II body 1–2). Příloha VII a katalánské body 8–9 přečteny znovu (beze změny).
 - Nezakódováno: příloha V (ADR a vozidla se zvláštním povolením), katalánské body 2–4 a euromodulární AP-7,
-  baskická příloha I a ADR, leden 2027. ES zůstává `UNVERIFIED` a neúplné; `window.to` ani `last_checked`
+  baskický bod 4.1 (zvláštní přeprava) a 2.1 (ADR; příloha I je kalendář sportovních akcí), leden 2027. ES zůstává `UNVERIFIED` a neúplné; `window.to` ani `last_checked`
   se neposouvají (cílená kontrola není úplný sweep).
