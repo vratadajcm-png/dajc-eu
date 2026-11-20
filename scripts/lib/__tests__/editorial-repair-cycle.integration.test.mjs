@@ -231,12 +231,15 @@ describe('repair plan and feedback sanitisation', () => {
   });
   it('review finding: a negated quality phrase keeps the source for a rewrite; common outlet wordings are quality rejections', () => {
     for (const reason of ['Specialist trade outlet, not a general-interest automotive outlet; the article misstated the validity date',
-      'This is first-hand reporting, not a relay; the article overstates the limit', 'The trade publisher reports first-hand rather than a second-hand summary']) {
+      'This is first-hand reporting, not a relay; the article overstates the limit', 'The trade publisher reports first-hand rather than a second-hand summary',
+      'Not a blog or a relay; the article misstated the limit', 'Neither a relay nor an aggregator; date wrong',
+      'The article misstates what the mainstream press reported', 'The source is fine; the article omitted the consumer site warning']) {
       expect(isSourceQualityRejection(reason), reason).toBe(false);
       expect(planEditorialRepair({ verdict: 'reject', blockingReasons: ['x'], sourceChecks: [{ url: links[0], supported: false, reason }, { url: links[1], supported: true, reason: 'Confirmed' }] }, links, { attempt: 2 }).correctUrls).toEqual([links[0]]);
     }
     for (const reason of ['general-interest motoring news site, not a freight trade publisher', 'a general-audience outlet', 'mainstream media report without authority confirmation',
-      'non-specialist publication', 'consumer motoring site', 'News agency relaying the ministry; not the competent authority']) expect(isSourceQualityRejection(reason), reason).toBe(true);
+      'non-specialist publication', 'consumer motoring site', 'News agency relaying the ministry; not the competent authority',
+      'The source is not first-hand but a relay']) expect(isSourceQualityRejection(reason), reason).toBe(true);
   });
   it('review finding: per-source correction notes survive the feedback cap ahead of general reasons', () => {
     const many = Array.from({ length: 30 }, (_, i) => `general reason ${i}`);

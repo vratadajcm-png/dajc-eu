@@ -67,28 +67,41 @@ const QUALITY_NEGATIVE_FORMS = [
   'not an official (?:source|publisher|notice)', 'source (?:is |was )?unavailable', 'could not be fetched',
 ];
 // Positive descriptions of a low-quality source; they count only when the same
-// clause does not negate them ("a trade outlet, not a general-interest outlet").
+// clause does not negate them ("a trade outlet, not a general-interest outlet",
+// "neither a relay nor an aggregator").
 const QUALITY_POSITIVE_FORMS = [
   'relay(?:s|ed|ing)?\\b', 'second[- ]?hand', 'third[- ]?hand',
-  '(?:general[- ](?:interest|audience|automotive|consumer|news)|mainstream|non[- ]?specialist|consumer)(?:[ -][a-z]+){0,3}? (?:outlet|site|publication|media|press|newspaper|magazine)',
   'aggregator', 'evergreen', 'guide page', '\\bblog\\b', 'unrelated (?:country|jurisdiction|language|outlet|publication|site)',
   'outdated (?:page|source|article|notice)', 'old (?:page|announcement|article|news)', 'sponsored', 'advertorial', 'promotional',
   'dajc\\.(?:eu|cz)', 'landing page', 'homepage',
 ];
-export const SOURCE_QUALITY_REJECTION = new RegExp([...QUALITY_NEGATIVE_FORMS, ...QUALITY_POSITIVE_FORMS].join('|'), 'i');
+// Outlet types describe the source only when introduced as such ("is a ...",
+// "a ...", or at the start of the clause), never "the mainstream press reported".
+const OUTLET_FORM = /(?:general[- ](?:interest|audience|automotive|consumer|news)(?:[ -][a-z]+){0,3}?|mainstream|non[- ]?specialist|consumer(?:[ -][a-z]+)?) (?:outlet|site|publication|media|press|newspaper|magazine)/gi;
 const NEGATIVE_FORM = new RegExp(QUALITY_NEGATIVE_FORMS.join('|'), 'i');
 const POSITIVE_FORM = new RegExp(QUALITY_POSITIVE_FORMS.join('|'), 'gi');
-const NEGATED = /(?:\bnot|\bno|\bnever|n't|\brather than|\binstead of|\bunlike)(?:\s+(?:a|an|the|just|merely|simply|actually))*\s*$/i;
+const NEGATION = /(?:\bnot|\bno|\bnever|n't|\bneither|\bnor|\brather than|\binstead of|\bunlike)\b/gi;
+const ASSERTION_BREAK = /\b(?:but|however|yet|although|though|whereas|is|are|was|were)\b/i;
+const OUTLET_INTRO = /(?:^|\b(?:a|an|is|was|are|were|as|from|by|on)\s+)$/i;
+
+function clauseBefore(text, index) { return text.slice(0, index).split(/[.;:!?,()\n]/).at(-1); }
+function negated(clause) {
+  const hits = [...clause.matchAll(NEGATION)];
+  if (!hits.length) return false;
+  const last = hits.at(-1);
+  // "not a blog or a relay": the negation carries over a coordinated list,
+  // but not over a new assertion ("not first-hand but a relay").
+  return !ASSERTION_BREAK.test(clause.slice(last.index + last[0].length));
+}
 
 /** True when a reviewer reason rejects the source itself (not a misstatement of it). */
 export function isSourceQualityRejection(reason) {
   const text = String(reason || '');
   if (NEGATIVE_FORM.test(text)) return true;
-  for (const match of text.matchAll(POSITIVE_FORM)) {
-    // The clause before the match: a negation there means the reviewer says
-    // the source is NOT of that kind.
-    const before = text.slice(0, match.index).split(/[.;:!?,()\n]/).at(-1);
-    if (!NEGATED.test(before.slice(-40))) return true;
+  for (const match of text.matchAll(POSITIVE_FORM)) if (!negated(clauseBefore(text, match.index))) return true;
+  for (const match of text.matchAll(OUTLET_FORM)) {
+    const clause = clauseBefore(text, match.index);
+    if (OUTLET_INTRO.test(clause.trim() ? clause : '') && !negated(clause)) return true;
   }
   return false;
 }
