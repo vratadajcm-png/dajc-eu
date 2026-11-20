@@ -4,7 +4,8 @@ description: "Poland's official Monitor Polski notice sets a temporary driving-t
 slug: "eu-oversize-weekly-2026-w48"
 category: "eu-oversize"
 targetWeek: "2026-W48"
-publishedAt: 2026-11-20T11:00:00.000Z
+publishedAt: 2026-11-20T14:04:31.573Z
+preparedAt: 2026-11-20T14:04:31.573Z
 scheduledPublicationAt: 2026-11-20T11:00:00.000Z
 language: "en"
 author: "DAJC"
@@ -16,7 +17,9 @@ sources:
 
 ## Intro
 
-This European road-freight briefing covers **23–29 November 2026 (ISO week 2026-W48)**. A temporary Polish legal derogation is in force during the target week for a narrowly defined category of drivers transporting liquefied petroleum gas (LPG) domestically in road tankers. The precise limits, recording duty and safety conditions are laid out in the original government notice. These rules must not be treated as a general exemption for every truck, every hazardous-goods load or international haulage.
+This European road-freight briefing covers **23–29 November 2026 (ISO week 2026-W48)**.
+
+This edition was prepared after its scheduled release on Friday 20 November 2026 at 12:00 CET. It reports verified changes for 2026-W48; the publication metadata records the delayed preparation, not an on-time release. A temporary Polish legal derogation is in force during the target week for a narrowly defined category of drivers transporting liquefied petroleum gas (LPG) domestically in road tankers. The precise limits, recording duty and safety conditions are laid out in the original government notice. These rules must not be treated as a general exemption for every truck, every hazardous-goods load or international haulage.
 
 ## Lead reports
 
