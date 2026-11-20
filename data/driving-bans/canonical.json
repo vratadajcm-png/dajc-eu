@@ -14722,64 +14722,6 @@
    "source_id": "es-cat-isp-300-2026-11-20"
   },
   {
-   "ban_id": "es-cat-aran-2026-12-france",
-   "profile": "es-cat-aran-2026",
-   "title": "Catalonia section 7.1: accesses to Aran towards France",
-   "valid_from": "2026-12-04",
-   "valid_to": "2026-12-31",
-   "schedule": {
-    "kind": "dates",
-    "start_time": "17:00",
-    "end_time": "24:00",
-    "end_day_offset": 0,
-    "dates": [
-     {
-      "date": "2026-12-04",
-      "occurrence_id": "2026-12-04"
-     },
-     {
-      "date": "2026-12-11",
-      "occurrence_id": "2026-12-11"
-     },
-     {
-      "date": "2026-12-18",
-      "occurrence_id": "2026-12-18"
-     },
-     {
-      "date": "2026-12-24",
-      "occurrence_id": "2026-12-24"
-     },
-     {
-      "date": "2026-12-31",
-      "occurrence_id": "2026-12-31"
-     }
-    ]
-   },
-   "roads": [
-    "N-230 km 116 - km 187 Bausen (frontera francesa), whole Catalan section",
-    "C-28 km 23 Vielha e Mijaran - km 34 Salardú"
-   ],
-   "direction": "Francia",
-   "supersedes": [],
-   "sequence": 0,
-   "verified_at": "2026-11-20T12:30:00.000Z",
-   "review_window": {
-    "from": "2026-12-01",
-    "to": "2026-12-31"
-   },
-   "evidence_ids": [
-    "es-cat-isp-300-2026-11-20",
-    "es-cat-isp-1933-2026"
-   ],
-   "notes": "ISP/300/2026 section 7.1 table, row \"Diciembre\". Exemptions section 7.2 a)-c). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
-   "exceptions": [
-    "Section 7.2 a): the exemptions of Annex B.",
-    "Section 7.2 b): on winter Fridays 17-24 on the N-230 towards France, also trips whose destination is the driver's habitual residence, the vehicles' registered base or the transport company's base.",
-    "Section 7.2 c): vehicles carrying perishable goods under ATP Annex 3 (I raw milk; II red meat and large game, except red offal; III meat products, pasteurised milk, fresh dairy products (yoghurt, kefir, cream, fresh cheese), ready meals (meat, fish, vegetables), ready-to-eat raw vegetables and vegetable preparations, concentrated fruit juices and fish products not listed below; IV game (except large game), poultry and rabbits; V red offal; VI minced meat; VII untreated fish, molluscs and crustaceans) and fresh fruit and vegetables under ATP Annex 1, provided this cargo is at least half of the vehicle's load capacity or occupies half of its useful load volume."
-   ],
-   "source_id": "es-cat-isp-300-2026-11-20"
-  },
-  {
    "ban_id": "es-cat-aran-2026-12-lleida",
    "profile": "es-cat-aran-2026",
    "title": "Catalonia section 7.1: accesses to Aran towards Lleida",
@@ -15046,6 +14988,101 @@
    ],
    "notes": "BOE-A-2026-1255 Annex II table \"Jueves 24 y 31 de diciembre\" (no residence/base exception printed). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
    "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-cat-aran-2026-12-france-fridays",
+   "profile": "es-cat-aran-2026",
+   "title": "Catalonia section 7.1: accesses to Aran towards France (winter Fridays)",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-18",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     },
+     {
+      "date": "2026-12-11",
+      "occurrence_id": "2026-12-11"
+     },
+     {
+      "date": "2026-12-18",
+      "occurrence_id": "2026-12-18"
+     }
+    ]
+   },
+   "roads": [
+    "N-230 km 116 - km 187 Bausen (frontera francesa), whole Catalan section",
+    "C-28 km 23 Vielha e Mijaran - km 34 Salardú"
+   ],
+   "direction": "Francia",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
+    "es-cat-isp-1933-2026"
+   ],
+   "notes": "ISP/300/2026 section 7.1 table, row \"Diciembre\". Exemptions section 7.2 a)-c). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "exceptions": [
+    "Section 7.2 a): the exemptions of Annex B.",
+    "Section 7.2 b): on winter Fridays 17-24 on the N-230 towards France, also trips whose destination is the driver's habitual residence, the vehicles' registered base or the transport company's base.",
+    "Section 7.2 c): vehicles carrying perishable goods under ATP Annex 3 (I raw milk; II red meat and large game, except red offal; III meat products, pasteurised milk, fresh dairy products (yoghurt, kefir, cream, fresh cheese), ready meals (meat, fish, vegetables), ready-to-eat raw vegetables and vegetable preparations, concentrated fruit juices and fish products not listed below; IV game (except large game), poultry and rabbits; V red offal; VI minced meat; VII untreated fish, molluscs and crustaceans) and fresh fruit and vegetables under ATP Annex 1, provided this cargo is at least half of the vehicle's load capacity or occupies half of its useful load volume."
+   ],
+   "source_id": "es-cat-isp-300-2026-11-20"
+  },
+  {
+   "ban_id": "es-cat-aran-2026-12-france-24-31-dec",
+   "profile": "es-cat-aran-2026",
+   "title": "Catalonia section 7.1: accesses to Aran towards France (24 and 31 Dec)",
+   "valid_from": "2026-12-24",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-24",
+      "occurrence_id": "2026-12-24"
+     },
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "roads": [
+    "N-230 km 116 - km 187 Bausen (frontera francesa), whole Catalan section",
+    "C-28 km 23 Vielha e Mijaran - km 34 Salardú"
+   ],
+   "direction": "Francia",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
+    "es-cat-isp-1933-2026"
+   ],
+   "notes": "ISP/300/2026 section 7.1 table, row \"Diciembre\". Exemptions section 7.2 a) and c) (7.2 b) covers only winter Fridays). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "exceptions": [
+    "Section 7.2 a): the exemptions of Annex B.",
+    "Section 7.2 c): vehicles carrying perishable goods under ATP Annex 3 (I raw milk; II red meat and large game, except red offal; III meat products, pasteurised milk, fresh dairy products (yoghurt, kefir, cream, fresh cheese), ready meals (meat, fish, vegetables), ready-to-eat raw vegetables and vegetable preparations, concentrated fruit juices and fish products not listed below; IV game (except large game), poultry and rabbits; V red offal; VI minced meat; VII untreated fish, molluscs and crustaceans) and fresh fruit and vegetables under ATP Annex 1, provided this cargo is at least half of the vehicle's load capacity or occupies half of its useful load volume."
+   ],
+   "source_id": "es-cat-isp-300-2026-11-20"
   }
  ],
  "coverage_version": "2026-10-22.50",

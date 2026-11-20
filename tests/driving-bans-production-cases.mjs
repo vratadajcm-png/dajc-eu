@@ -335,11 +335,17 @@ export function registerProductionDrivingBanTests(test, a) {
     const n230Xmas = ev(v, 'es-a2-2026-12-n-230-64-1-116-1-17002400-frontera-francia-24-31-dec');
     a.deepEqual(n230Xmas.map(e => e.date), ['2026-12-24', '2026-12-31']);
     a.ok(!n230Xmas[0].exceptions.some(x => /habitual residence/.test(x)), 'no residence exception is printed for 24/31 Dec');
-    a.ok(ev(v, 'es-cat-aran-2026-12-france')[0].exceptions.some(x => /7\.2 b\)/.test(x)) && !ev(v, 'es-cat-aran-2026-12-lleida')[0].exceptions.some(x => /7\.2 b\)/.test(x)));
+    a.ok(ev(v, 'es-cat-aran-2026-12-france-fridays')[0].exceptions.some(x => /7\.2 b\)/.test(x)));
+    for (const id of ['es-cat-aran-2026-12-france-24-31-dec', 'es-cat-aran-2026-12-lleida']) a.ok(!ev(v, id)[0].exceptions.some(x => /7\.2 b\)/.test(x)), id);
     a.ok(ev(v, 'es-cat-aran-2026-12-lleida')[0].exceptions.some(x => /at least half of the vehicle's load capacity/.test(x)), '7.2 c) half-load condition');
     a.ok(v.events.filter(e => e.jurisdiction === 'ES' && e.date >= '2026-12-01').every(e => esDecRules.has(e.ban_id)), 'only the explicitly reviewed rules publish December events');
+    for (const id of esDecRules) {
+      const rule = current.rules.find(r => r.ban_id === id);
+      a.ok(rule && rule.review_window.to >= '2026-12-31' && rule.verified_at === '2026-11-20T12:30:00.000Z', `${id} carries its own December re-read`);
+      a.ok(v.events.some(e => e.ban_id === id && e.date >= '2026-12-01'), `${id} is listed only if it publishes December events`);
+    }
     a.deepEqual(ev(v, 'es-a2-2026-12-a-4-323-230-09002200-sentido-madrid').map(e => [e.date, e.start_time, e.end_time]), [['2026-12-08', '09:00', '22:00']]);
-    a.deepEqual(ev(v, 'es-cat-aran-2026-12-france').map(e => [e.date, e.start_time, hours(e)]), ['04', '11', '18', '24', '31'].map(d => [`2026-12-${d}`, '17:00', 7]), '17:00-24:00');
+    a.deepEqual(['es-cat-aran-2026-12-france-fridays', 'es-cat-aran-2026-12-france-24-31-dec'].flatMap(id => ev(v, id)).map(e => [e.date, e.start_time, hours(e)]), ['04', '11', '18', '24', '31'].map(d => [`2026-12-${d}`, '17:00', 7]), '17:00-24:00');
     a.deepEqual(ev(v, 'es-cat-aran-2026-12-lleida').map(e => e.date), ['2026-12-06', '2026-12-08', '2026-12-13', '2026-12-20', '2026-12-27']);
     a.ok(ev(v, 'es-cat-pyrenees-winter-sundays-holidays-2026-12').some(e => e.date === '2026-12-26'), 'Sant Esteve is a 2026 Catalan holiday outside Aran');
     a.deepEqual(['es-cat-inmaculada-2026-12-a2-lleida-t', 'es-cat-inmaculada-2026-12-a2-barcelona-t'].map(id => ev(v, id).map(e => [e.date, e.direction])),
