@@ -335,6 +335,14 @@ describe('independent review findings on the outage guard (20 Nov 2026)', () => 
     expect(isSoftBlockPage(Buffer.from('<!DOCTYPE html><html><head><title>Just a moment...</title></head></html>'), null)).toBe(true);
     expect(isSoftBlockPage(Buffer.from('%PDF-1.7 Just a moment'), null)).toBe(false);
   });
+  it('integration finding: an ordinary page carrying the Cloudflare challenge-platform beacon or an Incapsula resource script is the document', async () => {
+    const law = '<html><head><title>245/2000 Sb. Zákon o státních svátcích</title></head><body><p>' + LAW.repeat(4) + '</p>'
+      + '<script src="/cdn-cgi/challenge-platform/scripts/jsd/main.js"></script><script src="/_Incapsula_Resource?SWJIYLWA=1"></script></body></html>';
+    expect(isSoftBlockPage(Buffer.from(law), 'text/html')).toBe(false);
+    const report = await monitorSources({ canonical: dataset([{ source_id: 'cz-245', url: 'https://law.example.gov/cz', role: 'PRIMARY', content_sha256: sha('older reviewed bytes') }]), sleep: noSleep, fetcher: async () => ok(law) });
+    expect(report.results[0].state).toBe('CHANGED');
+    expect(isSoftBlockPage(Buffer.from('<html><head><title>x</title></head><body><noscript>Enable JavaScript and cookies to continue</noscript><script>window._cf_chl_opt={}</script></body></html>'), 'text/html')).toBe(true);
+  });
   it('bytes equal to the last good fingerprint are the document, whatever their title says', async () => {
     const page = '<html><head><title>Security check of abnormal loads</title></head><body><p>' + LAW + '</p></body></html>';
     const data = dataset([{ source_id: 's', url: 'https://law.example.gov/s', role: 'PRIMARY' }]);
