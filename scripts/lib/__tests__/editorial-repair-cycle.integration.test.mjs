@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { recoverEditorialEdition } from '../../recover-weekly-after-veto.mjs';
-import { planEditorialRepair, sanitizeEditorialFeedback, MAX_FEEDBACK_ITEMS, MAX_FEEDBACK_CHARS } from '../weekly-recovery.mjs';
+import { planEditorialRepair, sanitizeEditorialFeedback, isSourceQualityRejection, MAX_FEEDBACK_ITEMS, MAX_FEEDBACK_CHARS } from '../weekly-recovery.mjs';
 
 // Regression for W47 (run 43919182436): the only cited source was rejected and
 // the whole edition stopped although 16 other verified candidates existed.
@@ -221,12 +221,22 @@ describe('repair plan and feedback sanitisation', () => {
         { url: pl, supported: false, reason: "The dates match the source. But it is a trade-media relay of a Monitor Polski notice, not the authority's own text." },
         { url: fr, supported: false, reason: 'The source is a general-interest automotive outlet, not a freight trade publication or the Region.' },
       ] };
-    const plan = planEditorialRepair(review, [pl, fr], { attempt: 1 });
+    // Production numbers the first repair 2 (the ledger already holds the original draft).
+    const plan = planEditorialRepair(review, [pl, fr], { attempt: 2 });
     expect(plan).toMatchObject({ ok: true, mode: 'remove-unsupported-sources', allSourcesRejected: true, correctUrls: [] });
     expect(plan.excludeUrls).toEqual([pl, fr]);
     // The general-outlet wording alone is a source-quality rejection, not a claim rewrite.
-    const outletOnly = planEditorialRepair({ ...review, sourceChecks: [review.sourceChecks[1]] }, [fr], { attempt: 1 });
+    const outletOnly = planEditorialRepair({ ...review, sourceChecks: [review.sourceChecks[1]] }, [fr], { attempt: 2 });
     expect(outletOnly.excludeUrls).toEqual([fr]);
+  });
+  it('review finding: a negated quality phrase keeps the source for a rewrite; common outlet wordings are quality rejections', () => {
+    for (const reason of ['Specialist trade outlet, not a general-interest automotive outlet; the article misstated the validity date',
+      'This is first-hand reporting, not a relay; the article overstates the limit', 'The trade publisher reports first-hand rather than a second-hand summary']) {
+      expect(isSourceQualityRejection(reason), reason).toBe(false);
+      expect(planEditorialRepair({ verdict: 'reject', blockingReasons: ['x'], sourceChecks: [{ url: links[0], supported: false, reason }, { url: links[1], supported: true, reason: 'Confirmed' }] }, links, { attempt: 2 }).correctUrls).toEqual([links[0]]);
+    }
+    for (const reason of ['general-interest motoring news site, not a freight trade publisher', 'a general-audience outlet', 'mainstream media report without authority confirmation',
+      'non-specialist publication', 'consumer motoring site', 'News agency relaying the ministry; not the competent authority']) expect(isSourceQualityRejection(reason), reason).toBe(true);
   });
   it('review finding: per-source correction notes survive the feedback cap ahead of general reasons', () => {
     const many = Array.from({ length: 30 }, (_, i) => `general reason ${i}`);

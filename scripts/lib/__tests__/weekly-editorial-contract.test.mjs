@@ -85,6 +85,7 @@ describe('independent reviewer scope (W48 regression, run 44517423552)', () => {
     const { reviewerPrompt } = await import('../../claude-weekly-review.mjs');
     const prompt = reviewerPrompt({ week: '2026-W48' }, []);
     expect(prompt).toMatch(/PRIORITY IS NOT ADMISSION/);
+    expect(prompt).toMatch(/require only fresh official or primary oversize regulatory changes/);
     expect(prompt).toMatch(/Never reject an edition, a report or a source only because it is not about oversize transport/);
     expect(prompt).toMatch(/3\.5 t inclusive using a tachograph/);
     // Legal and source strictness stays unchanged.

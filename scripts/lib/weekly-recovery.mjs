@@ -61,13 +61,37 @@ export function sanitizeEditorialFeedback(values) {
 // A source the reviewer rejects for its QUALITY (relay, general outlet, old or
 // evergreen page, own publication...) is removed at once. A source rejected
 // only because the article misstated it is first given one rewrite.
-export const SOURCE_QUALITY_REJECTION = new RegExp([
-  'relay(?:s|ed|ing)?\\b', 'second[- ]?hand', 'third[- ]?hand', 'not (?:a |the )?(?:first[- ]?hand|primary) (?:source|publisher|report)',
-  'not (?:from )?the competent authority', 'not an official (?:source|publisher|notice)', 'general[- ](?:interest|automotive|consumer|news)(?:[ -][a-z]+)? (?:outlet|site|publication|media)',
-  'consumer outlet', 'aggregator', 'evergreen', 'guide page', '\\bblog\\b', 'unrelated (?:country|jurisdiction|language|outlet|publication|site)',
+// Phrases that are themselves a negative finding ("not the competent authority").
+const QUALITY_NEGATIVE_FORMS = [
+  'not (?:a |the )?(?:first[- ]?hand|primary) (?:source|publisher|report)', 'not (?:from )?the competent authority',
+  'not an official (?:source|publisher|notice)', 'source (?:is |was )?unavailable', 'could not be fetched',
+];
+// Positive descriptions of a low-quality source; they count only when the same
+// clause does not negate them ("a trade outlet, not a general-interest outlet").
+const QUALITY_POSITIVE_FORMS = [
+  'relay(?:s|ed|ing)?\\b', 'second[- ]?hand', 'third[- ]?hand',
+  '(?:general[- ](?:interest|audience|automotive|consumer|news)|mainstream|non[- ]?specialist|consumer)(?:[ -][a-z]+){0,3}? (?:outlet|site|publication|media|press|newspaper|magazine)',
+  'aggregator', 'evergreen', 'guide page', '\\bblog\\b', 'unrelated (?:country|jurisdiction|language|outlet|publication|site)',
   'outdated (?:page|source|article|notice)', 'old (?:page|announcement|article|news)', 'sponsored', 'advertorial', 'promotional',
-  'dajc\\.(?:eu|cz)', 'landing page', 'homepage', 'source (?:is |was )?unavailable', 'could not be fetched',
-].join('|'), 'i');
+  'dajc\\.(?:eu|cz)', 'landing page', 'homepage',
+];
+export const SOURCE_QUALITY_REJECTION = new RegExp([...QUALITY_NEGATIVE_FORMS, ...QUALITY_POSITIVE_FORMS].join('|'), 'i');
+const NEGATIVE_FORM = new RegExp(QUALITY_NEGATIVE_FORMS.join('|'), 'i');
+const POSITIVE_FORM = new RegExp(QUALITY_POSITIVE_FORMS.join('|'), 'gi');
+const NEGATED = /(?:\bnot|\bno|\bnever|n't|\brather than|\binstead of|\bunlike)(?:\s+(?:a|an|the|just|merely|simply|actually))*\s*$/i;
+
+/** True when a reviewer reason rejects the source itself (not a misstatement of it). */
+export function isSourceQualityRejection(reason) {
+  const text = String(reason || '');
+  if (NEGATIVE_FORM.test(text)) return true;
+  for (const match of text.matchAll(POSITIVE_FORM)) {
+    // The clause before the match: a negation there means the reviewer says
+    // the source is NOT of that kind.
+    const before = text.slice(0, match.index).split(/[.;:!?,()\n]/).at(-1);
+    if (!NEGATED.test(before.slice(-40))) return true;
+  }
+  return false;
+}
 
 export function planEditorialRepair(review, allowedUrls, { attempt = 2 } = {}) {
   const fail = (reason) => ({ ok: false, reason, excludeUrls: [], feedback: [] });
@@ -87,7 +111,7 @@ export function planEditorialRepair(review, allowedUrls, { attempt = 2 } = {}) {
     if (item.supported !== false) continue;
     // Only the first repair may keep a source whose content was misstated;
     // on the final repair every source that is still rejected is removed.
-    if (attempt <= 2 && !SOURCE_QUALITY_REJECTION.test(item.reason)) {
+    if (attempt <= 2 && !isSourceQualityRejection(item.reason)) {
       correctUrls.push(item.url);
       sourceNotes.push('Correct the report citing ' + item.url + ' strictly to its evidence: ' + item.reason);
     } else {
