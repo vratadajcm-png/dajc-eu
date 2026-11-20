@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "attemptId": "44729835478-1",
+  "targetWeek": "2026-W48",
+  "state": "EDITORIAL_REJECTED",
+  "sourceFingerprint": "184f0dfb4bce71a42b925246d745a6954d271a20666d91e7457c58c0834cf7d0",
+  "lifecycle": [
+    {
+      "state": "PREPARING"
+    },
+    {
+      "state": "GENERATED"
+    },
+    {
+      "state": "EDITORIAL_REJECTED",
+      "attempt": 1
+    },
+    {
+      "state": "EDITORIAL_REJECTED"
+    }
+  ],
+  "recovery": {
+    "manifest": {
+      "articlePath": "src/content/news/eu-oversize/eu-oversize-weekly-2026-w48.md",
+      "initialSha256": "f0d71865e0d890c12455b756ac7fec78e91e5569bf8d45be266c91afd7e7d01e",
+      "maxAttempts": 3,
+      "attempts": [
+        {
+          "attempt": 1,
+          "state": "EDITORIAL_REJECTED",
+          "sha256": "f0d71865e0d890c12455b756ac7fec78e91e5569bf8d45be266c91afd7e7d01e",
+          "review": {
+            "verdict": "reject",
+            "blockingReasons": [
+              "The article says break and rest provisions beyond the 11-hour figure are \"not stated in the available excerpt\". The evidence does state them: weekly driving of at most 60 hours, driving over two consecutive weeks of at most 96 hours, and a break of at least 45 minutes after 5.5 hours of driving. The article omits these legally material limits, and that is a factual inaccuracy against the source.",
+              "The derogation is a high-impact legal change. The source is a Polish trade outlet reporting on Minister of Infrastructure notice no. 1107 in Monitor Polski, dated 6 November 2026. The official notice itself is not in the evidence, so the exact scope, conditions and legal basis cannot be verified. The article cannot present this as officially confirmed.",
+              "Parts of the operational guidance go beyond the source. The article says the derogation applies to tachograph-using vehicles, to goods vehicles carrying LPG in tanks, and not to non-LPG loads. It also says tachograph records and driver briefings should reflect the derogation, and that no wider exemption is confirmed. The source only says the rules apply to LPG tanker drivers and to domestic LPG carriage. It does not support the vehicle-type framing or the record-keeping and briefing advice, and the article gives no accurate statement of conditions to follow."
+            ],
+            "sourceChecks": [
+              {
+                "url": "https://e-truckbus.pl/czas-jazdy-kierowcow-cystern-lpg-11-godzin/",
+                "supported": false,
+                "reason": "The source supports the 11-hour daily limit, the validity period of 6 November to 6 December 2026, domestic LPG carriage only, and the March fuel tanker precedent. It also states the 60-hour weekly limit, the 96-hour limit over two weeks, and the 45-minute break after 5.5 hours. The article omits these and wrongly says the break and rest rules are not stated. The article's vehicle and tachograph framing is also not sourced, and the high-impact legal claim rests on a trade report rather than the official notice."
+              }
+            ]
+          }
+        }
+      ],
+      "outcome": "BLOCKED",
+      "error": "Reviewer rejected every cited source; no safe automatic edition remains"
+    },
+    "versions": [
+      {
+        "name": "attempt-1.md",
+        "candidateMarkdown": "---\ntitle: \"EU Oversize Weekly: Poland extends daily driving time for domestic LPG tanker drivers until 6 December | 23-29 November 2026\"\ndescription: \"European road freight briefing for 23-29 November 2026 in Poland. Reports: Poland extends daily driving time for domestic LPG tanker drivers until 6 December.\"\nslug: \"eu-oversize-weekly-2026-w48\"\ncategory: \"eu-oversize\"\npublishedAt: 2026-11-20T11:47:36.752Z\ntargetWeek: \"2026-W48\"\npreparedAt: \"2026-11-20T11:47:36.752Z\"\nscheduledPublicationAt: \"2026-11-20T11:00:00.000Z\"\nlanguage: \"en\"\nauthor: \"DAJC\"\nstatus: \"published\"\nsources:\n  - name: \"e-truckbus.pl\"\n    url: \"https://e-truckbus.pl/czas-jazdy-kierowcow-cystern-lpg-11-godzin/\"\n---\n\n## Intro\n\nThis edition covers the week of 23-29 November 2026 and reports developments for commercial road freight in Poland, with priority for heavy, oversize and special transport. Reports: Poland extends daily driving time for domestic LPG tanker drivers until 6 December.\n\nThis edition was prepared after its scheduled release on 2026-11-20T11:00:00.000Z. It covers 2026-W48; the publication date above records the delayed release.\n\n## Lead reports\n\n### Poland extends daily driving time for domestic LPG tanker drivers until 6 December\n\nAccording to an industry report, the Polish Minister of Infrastructure has introduced a further temporary derogation from EU rules on driving time, breaks and rest periods for drivers carrying LPG (liquefied petroleum gas). Drivers on these journeys may drive up to 11 hours per day. The report says an earlier similar derogation was issued in March for fuel tanker drivers.\n\n**Category:** Operational development  \n**Where:** Poland, national road transport only. The report states the derogation covers domestic LPG carriage.  \n**Affected vehicles:** Goods vehicles carrying LPG in tanks on domestic journeys in Poland, with drivers subject to EU driving and rest time rules (tachograph-using vehicles). The excerpt does not give a weight threshold.  \n**When:** 6 November 2026 to 6 December 2026\n\n**Impact:** Domestic LPG tanker operations in Poland have more scheduling flexibility, with up to 11 hours of daily driving. Cross-border journeys are not covered according to the report, so the standard EU rules continue to apply there. The report also notes that more flexibility for carriers does not necessarily benefit drivers. Break and rest provisions beyond the 11-hour figure are not stated in the available excerpt.\n\n**Recommended action:** Obtain the official ministerial notice and check the exact conditions (daily limit, breaks, rest, records and documents to carry) before using the derogation. Do not apply it to international journeys or to non-LPG loads. Make sure tachograph records and driver briefings reflect the derogation. Plan a return to standard EU limits after 6 December 2026.\n\n**Exemptions/conditions:** This is itself a derogation from EU driving-time rules. It applies only to domestic LPG carriage per the report. No wider exemption is confirmed. The report does not address oversize or abnormal transport.\n\n*Source: [e-truckbus.pl](https://e-truckbus.pl/czas-jazdy-kierowcow-cystern-lpg-11-godzin/) — Industry report — not an official authority notice*\n\n## Operator checklist\n\n- Poland: Obtain the official ministerial notice and check the exact conditions (daily limit, breaks, rest, records and documents to carry) before using the derogation. Do not apply it to international journeys or to non-LPG loads. Make sure tachograph records and driver briefings reflect the derogation. Plan a return to standard EU limits after 6 December 2026.\n\n## Sources\n\n- [e-truckbus.pl](https://e-truckbus.pl/czas-jazdy-kierowcow-cystern-lpg-11-godzin/)\n\n## Next EU Oversize Weekly\n\nFriday, 27 November 2026 at 12:00 CET.\n"
+      }
+    ]
+  },
+  "articlePath": "src/content/news/eu-oversize/eu-oversize-weekly-2026-w48.md",
+  "sha256": "f0d71865e0d890c12455b756ac7fec78e91e5569bf8d45be266c91afd7e7d01e",
+  "runUrl": "https://github.com/vratadajcm-png/dajc-eu/actions/runs/44729835478",
+  "preparedAt": "2026-11-20T11:48:26.205Z",
+  "candidateMarkdown": "---\ntitle: \"EU Oversize Weekly: Poland extends daily driving time for domestic LPG tanker drivers until 6 December | 23-29 November 2026\"\ndescription: \"European road freight briefing for 23-29 November 2026 in Poland. Reports: Poland extends daily driving time for domestic LPG tanker drivers until 6 December.\"\nslug: \"eu-oversize-weekly-2026-w48\"\ncategory: \"eu-oversize\"\npublishedAt: 2026-11-20T11:47:36.752Z\ntargetWeek: \"2026-W48\"\npreparedAt: \"2026-11-20T11:47:36.752Z\"\nscheduledPublicationAt: \"2026-11-20T11:00:00.000Z\"\nlanguage: \"en\"\nauthor: \"DAJC\"\nstatus: \"published\"\nsources:\n  - name: \"e-truckbus.pl\"\n    url: \"https://e-truckbus.pl/czas-jazdy-kierowcow-cystern-lpg-11-godzin/\"\n---\n\n## Intro\n\nThis edition covers the week of 23-29 November 2026 and reports developments for commercial road freight in Poland, with priority for heavy, oversize and special transport. Reports: Poland extends daily driving time for domestic LPG tanker drivers until 6 December.\n\nThis edition was prepared after its scheduled release on 2026-11-20T11:00:00.000Z. It covers 2026-W48; the publication date above records the delayed release.\n\n## Lead reports\n\n### Poland extends daily driving time for domestic LPG tanker drivers until 6 December\n\nAccording to an industry report, the Polish Minister of Infrastructure has introduced a further temporary derogation from EU rules on driving time, breaks and rest periods for drivers carrying LPG (liquefied petroleum gas). Drivers on these journeys may drive up to 11 hours per day. The report says an earlier similar derogation was issued in March for fuel tanker drivers.\n\n**Category:** Operational development  \n**Where:** Poland, national road transport only. The report states the derogation covers domestic LPG carriage.  \n**Affected vehicles:** Goods vehicles carrying LPG in tanks on domestic journeys in Poland, with drivers subject to EU driving and rest time rules (tachograph-using vehicles). The excerpt does not give a weight threshold.  \n**When:** 6 November 2026 to 6 December 2026\n\n**Impact:** Domestic LPG tanker operations in Poland have more scheduling flexibility, with up to 11 hours of daily driving. Cross-border journeys are not covered according to the report, so the standard EU rules continue to apply there. The report also notes that more flexibility for carriers does not necessarily benefit drivers. Break and rest provisions beyond the 11-hour figure are not stated in the available excerpt.\n\n**Recommended action:** Obtain the official ministerial notice and check the exact conditions (daily limit, breaks, rest, records and documents to carry) before using the derogation. Do not apply it to international journeys or to non-LPG loads. Make sure tachograph records and driver briefings reflect the derogation. Plan a return to standard EU limits after 6 December 2026.\n\n**Exemptions/conditions:** This is itself a derogation from EU driving-time rules. It applies only to domestic LPG carriage per the report. No wider exemption is confirmed. The report does not address oversize or abnormal transport.\n\n*Source: [e-truckbus.pl](https://e-truckbus.pl/czas-jazdy-kierowcow-cystern-lpg-11-godzin/) — Industry report — not an official authority notice*\n\n## Operator checklist\n\n- Poland: Obtain the official ministerial notice and check the exact conditions (daily limit, breaks, rest, records and documents to carry) before using the derogation. Do not apply it to international journeys or to non-LPG loads. Make sure tachograph records and driver briefings reflect the derogation. Plan a return to standard EU limits after 6 December 2026.\n\n## Sources\n\n- [e-truckbus.pl](https://e-truckbus.pl/czas-jazdy-kierowcow-cystern-lpg-11-godzin/)\n\n## Next EU Oversize Weekly\n\nFriday, 27 November 2026 at 12:00 CET.\n",
+  "review": {
+    "verdict": "reject",
+    "blockingReasons": [
+      "The article says break and rest provisions beyond the 11-hour figure are \"not stated in the available excerpt\". The evidence does state them: weekly driving of at most 60 hours, driving over two consecutive weeks of at most 96 hours, and a break of at least 45 minutes after 5.5 hours of driving. The article omits these legally material limits, and that is a factual inaccuracy against the source.",
+      "The derogation is a high-impact legal change. The source is a Polish trade outlet reporting on Minister of Infrastructure notice no. 1107 in Monitor Polski, dated 6 November 2026. The official notice itself is not in the evidence, so the exact scope, conditions and legal basis cannot be verified. The article cannot present this as officially confirmed.",
+      "Parts of the operational guidance go beyond the source. The article says the derogation applies to tachograph-using vehicles, to goods vehicles carrying LPG in tanks, and not to non-LPG loads. It also says tachograph records and driver briefings should reflect the derogation, and that no wider exemption is confirmed. The source only says the rules apply to LPG tanker drivers and to domestic LPG carriage. It does not support the vehicle-type framing or the record-keeping and briefing advice, and the article gives no accurate statement of conditions to follow."
+    ],
+    "sourceChecks": [
+      {
+        "url": "https://e-truckbus.pl/czas-jazdy-kierowcow-cystern-lpg-11-godzin/",
+        "supported": false,
+        "reason": "The source supports the 11-hour daily limit, the validity period of 6 November to 6 December 2026, domestic LPG carriage only, and the March fuel tanker precedent. It also states the 60-hour weekly limit, the 96-hour limit over two weeks, and the 45-minute break after 5.5 hours. The article omits these and wrongly says the break and rest rules are not stated. The article's vehicle and tachograph framing is also not sourced, and the high-impact legal claim rests on a trade report rather than the official notice."
+      }
+    ]
+  },
+  "reason": "Independent editorial rejection"
+}
