@@ -122,6 +122,10 @@ confirmation. Every new candidate
 must pass the same source checks, deterministic eligibility, build and a fresh
 independent Claude review. There is no recovery exception for a critical-news
 floor: an edition missing still-required verified coverage remains blocked.
+Oversize priority orders the edition and its required floor is enforced before
+review; the reviewer must not reject in-scope reports for tachograph-using
+goods vehicles from 3.5 t only because they are not about oversize transport
+(W48, run 44517423552, 20 November 2026). Legal and source checks are unchanged.
 
 A preparation permits at most **three total generations** (the original plus
 two repairs). API/network/build failure is not an editorial veto and must not

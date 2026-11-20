@@ -213,6 +213,21 @@ describe('repair plan and feedback sanitisation', () => {
     const relay = planEditorialRepair({ verdict: 'reject', blockingReasons: ['x'], sourceChecks: [{ url: links[0], supported: false, reason: 'News agency relaying the ministry; not the competent authority' }, { url: links[1], supported: true, reason: 'Confirmed' }] }, links, { attempt: 2 });
     expect(relay.excludeUrls).toEqual([links[0]]);
   });
+  it('W48 regression (run 44517423552): both rejected sources are removed on the first repair, the edition continues from the remaining pool', () => {
+    const pl = 'https://e-truckbus.pl/czas-jazdy-kierowcow-cystern-lpg-11-godzin/';
+    const fr = 'https://www.autonews.fr/actualite/nouvelle-taxe-routiere-150755';
+    const review = { verdict: 'reject', blockingReasons: ['Poland LPG derogation: trade-press relay of a ministerial notice', 'France ECPL: 15 cent/km presented as fixed'],
+      sourceChecks: [
+        { url: pl, supported: false, reason: "The dates match the source. But it is a trade-media relay of a Monitor Polski notice, not the authority's own text." },
+        { url: fr, supported: false, reason: 'The source is a general-interest automotive outlet, not a freight trade publication or the Region.' },
+      ] };
+    const plan = planEditorialRepair(review, [pl, fr], { attempt: 1 });
+    expect(plan).toMatchObject({ ok: true, mode: 'remove-unsupported-sources', allSourcesRejected: true, correctUrls: [] });
+    expect(plan.excludeUrls).toEqual([pl, fr]);
+    // The general-outlet wording alone is a source-quality rejection, not a claim rewrite.
+    const outletOnly = planEditorialRepair({ ...review, sourceChecks: [review.sourceChecks[1]] }, [fr], { attempt: 1 });
+    expect(outletOnly.excludeUrls).toEqual([fr]);
+  });
   it('review finding: per-source correction notes survive the feedback cap ahead of general reasons', () => {
     const many = Array.from({ length: 30 }, (_, i) => `general reason ${i}`);
     const plan = planEditorialRepair({ verdict: 'reject', blockingReasons: many, sourceChecks: [{ url: links[0], supported: false, reason: 'Date misstated' }, { url: links[1], supported: true, reason: 'Confirmed' }] }, links, { attempt: 2 });

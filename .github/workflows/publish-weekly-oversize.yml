@@ -41,7 +41,7 @@ on:
         type: boolean
         default: false
       target_week:
-        description: 'Optional explicit ISO edition, e.g. 2026-W47. Late release retains its original scheduled slot.'
+        description: 'Optional explicit ISO edition, e.g. 2026-W47. A late release is stamped with its actual preparation time; it is never backdated to the missed slot.'
         type: string
         default: ''
       correction:

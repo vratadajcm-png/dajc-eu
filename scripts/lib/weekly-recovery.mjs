@@ -63,7 +63,7 @@ export function sanitizeEditorialFeedback(values) {
 // only because the article misstated it is first given one rewrite.
 export const SOURCE_QUALITY_REJECTION = new RegExp([
   'relay(?:s|ed|ing)?\\b', 'second[- ]?hand', 'third[- ]?hand', 'not (?:a |the )?(?:first[- ]?hand|primary) (?:source|publisher|report)',
-  'not (?:from )?the competent authority', 'not an official (?:source|publisher|notice)', 'general[- ](?:interest|automotive|consumer|news) (?:outlet|site|publication|media)',
+  'not (?:from )?the competent authority', 'not an official (?:source|publisher|notice)', 'general[- ](?:interest|automotive|consumer|news)(?:[ -][a-z]+)? (?:outlet|site|publication|media)',
   'consumer outlet', 'aggregator', 'evergreen', 'guide page', '\\bblog\\b', 'unrelated (?:country|jurisdiction|language|outlet|publication|site)',
   'outdated (?:page|source|article|notice)', 'old (?:page|announcement|article|news)', 'sponsored', 'advertorial', 'promotional',
   'dajc\\.(?:eu|cz)', 'landing page', 'homepage', 'source (?:is |was )?unavailable', 'could not be fetched',
