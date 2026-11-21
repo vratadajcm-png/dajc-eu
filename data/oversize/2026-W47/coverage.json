@@ -1,6 +1,6 @@
 {
   "week": "2026-W47",
-  "checkedAt": "2026-11-20T11:43:11.439Z",
+  "checkedAt": "2026-11-21T14:40:35.560Z",
   "coverageVersion": "2026-10-22.50",
   "jurisdictions": [
     {
@@ -27,8 +27,8 @@
       "code": "AM",
       "name": "Armenia",
       "sourceScope": "AM",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "east",
       "candidateFindings": 0
@@ -37,11 +37,11 @@
       "code": "AT",
       "name": "Austria",
       "sourceScope": "AT",
-      "status": "checked-no-material-development-found",
+      "status": "checked-major-or-short-update-candidates-found",
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "at",
-      "candidateFindings": 0
+      "candidateFindings": 2
     },
     {
       "code": "AZ",
@@ -71,14 +71,14 @@
       "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 3
+      "candidateFindings": 4
     },
     {
       "code": "BG",
       "name": "Bulgaria",
       "sourceScope": "BG",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-no-material-development-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
       "candidateFindings": 0
@@ -101,7 +101,7 @@
       "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "ch-li",
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "CY",
@@ -131,7 +131,7 @@
       "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "de",
-      "candidateFindings": 3
+      "candidateFindings": 5
     },
     {
       "code": "DK",
@@ -147,11 +147,11 @@
       "code": "EE",
       "name": "Estonia",
       "sourceScope": "EE",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "baltics",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "ES",
@@ -161,7 +161,7 @@
       "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "iberia",
-      "candidateFindings": 5
+      "candidateFindings": 6
     },
     {
       "code": "FI",
@@ -221,7 +221,7 @@
       "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "hu",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "IE",
@@ -231,7 +231,7 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "uk-ie",
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "IS",
@@ -257,8 +257,8 @@
       "code": "KZ",
       "name": "Kazakhstan (European transport scope)",
       "sourceScope": "KZ",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "east",
       "candidateFindings": 0
@@ -397,11 +397,11 @@
       "code": "RO",
       "name": "Romania",
       "sourceScope": "RO",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-major-or-short-update-candidates-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "ro-bg-md",
-      "candidateFindings": 5
+      "candidateFindings": 7
     },
     {
       "code": "RS",
@@ -411,7 +411,7 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "balkans",
-      "candidateFindings": 6
+      "candidateFindings": 9
     },
     {
       "code": "RU",
@@ -441,14 +441,14 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "si-hr",
-      "candidateFindings": 4
+      "candidateFindings": 5
     },
     {
       "code": "SK",
       "name": "Slovakia",
       "sourceScope": "SK",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-major-or-short-update-candidates-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "sk",
       "candidateFindings": 4
