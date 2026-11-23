@@ -1,0 +1,161 @@
+---
+interface Props {
+  product: 'platform' | 'tar';
+}
+const { product } = Astro.props;
+const isPlatform = product === 'platform';
+const options = isPlatform
+  ? [
+      ['coordination', 'One coordinated transport record and handovers'],
+      ['permits', 'Route, permit and restriction coordination'],
+      ['documents', 'Documents, evidence and driver updates'],
+      ['integrations', 'Integration with our existing systems'],
+    ]
+  : [
+      ['dispatch', 'One dispatch workflow across a mixed recovery fleet'],
+      ['case', 'One incident record with updates and evidence'],
+      ['partners', 'Assistance and partner network handovers'],
+      ['billing', 'Completion reports and billing'],
+    ];
+---
+<section class="research" id="research" aria-labelledby="research-title">
+  <div class="research-copy">
+    <p class="eyebrow">INDUSTRY RESEARCH · 3–4 MINUTES</p>
+    <h2 id="research-title">Tell us what works — and what does not.</h2>
+    <p>We are validating this proposed product with professionals who do this work every day. Your answers help us understand real software use, problems and priorities. This is research, not a purchase, pilot or testing registration.</p>
+    <p>Please do not include personal data about your customers, drivers or incident victims in free-text answers.</p>
+  </div>
+  <form id="market-research-form" class="research-form" data-product={product}>
+    <input type="hidden" name="product" value={product} />
+    <div class="split">
+      <label><span>Company *</span><input name="company" maxlength="160" autocomplete="organization" required placeholder="Company name" /></label>
+      <label><span>Country *</span><input name="country" maxlength="100" autocomplete="country-name" required placeholder="Country" /></label>
+    </div>
+    <label><span>Your role *</span>
+      <select name="role" required>
+        <option value="">Select your role</option>
+        <option value="owner">Owner / management</option>
+        <option value="dispatcher">Dispatcher / operations</option>
+        <option value="driver">Driver / recovery technician</option>
+        <option value="customer">Transport customer / assistance organisation</option>
+        <option value="other">Other industry role</option>
+      </select>
+    </label>
+    <label><span>1. What software or tools does your company currently use? *</span>
+      <input name="currentSoftware" maxlength="300" required placeholder="Names of systems, spreadsheets, phone, email..." />
+    </label>
+    <label><span>2. What is the biggest operational problem with your current process? *</span>
+      <textarea name="biggestProblem" rows="3" maxlength="1500" required placeholder="A concrete example helps more than a general rating."></textarea>
+    </label>
+    <label><span>3. Which proposed DAJC capability would help you most? *</span>
+      <select name="mostUseful" required>
+        <option value="">Choose one</option>
+        {options.map(([value, label]) => <option value={value}>{label}</option>)}
+        <option value="none">None of the above</option>
+      </select>
+    </label>
+    <label><span>4. If DAJC solved that problem, would you consider using it? *</span>
+      <select name="usageInterest" required>
+        <option value="">Choose one</option>
+        <option value="yes">Yes</option>
+        <option value="maybe">Maybe — I would need to see it work</option>
+        <option value="no">No</option>
+      </select>
+    </label>
+    <label><span>5. Would your company pay for this product if it delivered the promised value? *</span>
+      <select name="paymentInterest" required>
+        <option value="">Choose one</option>
+        <option value="yes">Yes — if the value is proven</option>
+        <option value="maybe">It depends on price and included features</option>
+        <option value="no">No</option>
+      </select>
+    </label>
+    <label><span>What would you change or add to the proposed solution?</span>
+      <textarea name="suggestion" rows="2" maxlength="1200" placeholder="Optional — tell us what we may have missed."></textarea>
+    </label>
+    <div class="contact-block">
+      <label><span>Your email (optional)</span>
+        <input type="email" name="email" maxlength="254" autocomplete="email" placeholder="Only if you want to hear from us" />
+      </label>
+      <label class="check"><input type="checkbox" name="followUp" /><span>DAJC may contact me about my answers or a short research interview. This does not subscribe me to marketing.</span></label>
+    </div>
+    <label class="check"><input type="checkbox" name="privacyAcknowledged" required /><span>I have read the <a href="/privacy" target="_blank" rel="noopener noreferrer">DAJC privacy notice</a> and understand how my research response will be processed. *</span></label>
+    <label class="trap" aria-hidden="true"><span>Website</span><input name="website" tabindex="-1" autocomplete="off" /></label>
+    <button type="submit">Send research feedback</button>
+    <p id="research-status" class="form-status" role="status" aria-live="polite"></p>
+    <p class="small">Answers are reviewed separately for Platform and TAR. Participation is voluntary and does not imply a partnership or commitment to buy.</p>
+  </form>
+</section>
+<script>
+  const form = document.querySelector<HTMLFormElement>('#market-research-form');
+  const status = document.querySelector<HTMLElement>('#research-status');
+  let pendingSubmissionId: string | null = null;
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!status) return;
+    const data = new FormData(form);
+    data.set('submissionId', pendingSubmissionId ??= crypto.randomUUID());
+    if (data.get('followUp') === 'on' && !String(data.get('email') || '').trim()) {
+      status.textContent = 'Please provide an email address if you would like us to contact you.';
+      status.dataset.state = 'error';
+      return;
+    }
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Sending…';
+    }
+    status.textContent = '';
+    status.dataset.state = '';
+    try {
+      const payload = Object.fromEntries(data.entries());
+      const response = await fetch('/api/market-research', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(20000),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.error || 'Unable to send your answer.');
+      form.reset();
+      pendingSubmissionId = null;
+      status.textContent = 'Thank you. Your feedback has been received and will help guide DAJC research.';
+      status.dataset.state = 'success';
+    } catch (error) {
+      status.textContent = error instanceof Error ? error.message : 'Unable to send your answer. Please try again.';
+      status.dataset.state = 'error';
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = 'Send research feedback';
+      }
+    }
+  });
+</script>
+<style>
+  .research {display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(1.6rem,5vw,4rem);align-items:start;margin:4.5rem auto 2rem;padding:3rem 0;border-top:1px solid var(--dajc-line);}
+  .research-copy {position:sticky;top:1.5rem;}
+  .eyebrow {font:500 .72rem 'IBM Plex Mono',monospace;letter-spacing:.13em;color:var(--dajc-orange);}
+  h2 {font:700 clamp(1.8rem,3vw,2.7rem)/1.12 'Space Grotesk',sans-serif;color:var(--dajc-white);margin:.5rem 0 1.2rem;}
+  .research-copy p:not(.eyebrow) {color:var(--dajc-muted);line-height:1.7;}
+  .research-form {display:grid;gap:1.15rem;padding:clamp(1.1rem,3vw,2rem);border:1px solid var(--dajc-line);border-radius:14px;background:rgba(0,22,48,.65);}
+  .research-form label {display:grid;gap:.5rem;}
+  .research-form label>span {font:500 .81rem 'IBM Plex Sans',sans-serif;color:var(--dajc-white);line-height:1.5;}
+  .split {display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  input,select,textarea {font:inherit;width:100%;min-width:0;padding:.85rem;border:1px solid #53677f;border-radius:8px;background:#08182e;color:#f5f7fa;}
+  input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible {outline:2px solid var(--dajc-orange);outline-offset:3px;}
+  textarea {resize:vertical;}
+  .research-form .check {display:flex;gap:.7rem;align-items:flex-start;}
+  .check input {width:auto;margin:.3rem 0 0;accent-color:var(--dajc-orange);}
+  .check span {font-size:.82rem!important;color:#c4cfde!important;}
+  .contact-block {display:grid;gap:1rem;padding:1rem;border:1px solid var(--dajc-line);border-radius:8px;}
+  a {color:var(--dajc-orange);}
+  button {border:0;border-radius:8px;min-height:50px;background:var(--dajc-orange);color:#061A33;cursor:pointer;font:700 .8rem 'IBM Plex Mono',monospace;text-transform:uppercase;}
+  button:disabled {opacity:.6;cursor:wait;}
+  .small,.form-status {font-size:.8rem;margin:0;line-height:1.5;color:var(--dajc-muted);}
+  .form-status[data-state="success"] {color:#80d8a7;}
+  .form-status[data-state="error"] {color:#ffb3a8;}
+  .trap {position:absolute!important;left:-99999px!important;}
+  @media(max-width:800px){.research{grid-template-columns:1fr}.research-copy{position:static}}
+  @media(max-width:520px){.split{grid-template-columns:1fr}}
+</style>
