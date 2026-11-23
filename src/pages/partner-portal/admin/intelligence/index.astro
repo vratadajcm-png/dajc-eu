@@ -1,0 +1,115 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../../../portal/components/PortalLayout.astro';
+import { notFoundIfPortalDisabled, notFoundUnlessIntelligenceAccounts, redirectResponse } from '../../../../portal/lib/guards';
+import { requireAdminPrincipal, ensureCsrfCookie, validateCsrfToken } from '../../../../portal/lib/session';
+import { AccountInputError, createOrganisation, listOpenSubscriptionRequests, listOrganisations, updateSubscriptionRequest } from '../../../../lib/intelligence/accounts';
+
+// DAJC staff manage Intelligence customers here: organisations, and the payments made
+// outside the site (Revolut Pro payment link or invoice) that start a subscription.
+const disabled = notFoundIfPortalDisabled() ?? notFoundUnlessIntelligenceAccounts();
+if (disabled) return disabled;
+
+const admin = await requireAdminPrincipal(Astro.cookies);
+if (!admin) return redirectResponse('/partner-portal/admin/login');
+
+let error: string | null = null;
+let notice: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const csrf = form.get('csrf_token');
+  const action = String(form.get('action') ?? '');
+  const field = (name: string) => String(form.get(name) ?? '');
+  if (!validateCsrfToken(Astro.cookies, typeof csrf === 'string' ? csrf : null)) {
+    error = 'Your session expired, please try again.';
+  } else {
+    try {
+      if (action === 'create_organisation') {
+        const created = await createOrganisation({ legalName: field('legal_name'), country: field('country'), registrationId: field('registration_id'), vatId: field('vat_id') || null, billingEmail: field('billing_email'), ownerEmail: field('owner_email'), actor: admin.email });
+        return redirectResponse(`/partner-portal/admin/intelligence/${created.organisation.id}`);
+      }
+      if (action === 'update_request') {
+        const status = field('status');
+        if (status !== 'INVOICED' && status !== 'PAID' && status !== 'CANCELLED') throw new AccountInputError('Unknown status');
+        const result = await updateSubscriptionRequest({ requestId: field('request_id'), status, paymentReference: field('payment_reference') || null, actor: admin.email });
+        notice = result.entitlement ? `Payment recorded; subscription active until ${result.entitlement.validUntil.toISOString().slice(0, 10)}.` : `Request marked ${status}.`;
+      }
+    } catch (err) {
+      if (err instanceof AccountInputError) error = err.message;
+      else throw err;
+    }
+  }
+}
+
+const [organisations, requests] = await Promise.all([listOrganisations(), listOpenSubscriptionRequests()]);
+const csrfToken = ensureCsrfCookie(Astro.cookies, Astro.url);
+const date = (value: Date | null) => (value ? value.toISOString().slice(0, 10) : '-');
+---
+<PortalLayout title="Admin - Intelligence customers">
+  <h1>DAJC Intelligence customers</h1>
+  <p>Signed in as {admin.email} - <a href="/partner-portal/admin">Partners</a> - <a href="/partner-portal/admin/audit">Audit log</a></p>
+  {error && <p class="flash error">{error}</p>}
+  {notice && <p class="flash success">{notice}</p>}
+
+  <fieldset>
+    <legend>Open subscription requests</legend>
+    <p>Send the payment link (Revolut Pro) or invoice for each request, mark it INVOICED with its reference, and mark it PAID once the money has arrived. Only PAID starts or extends the subscription.</p>
+    {requests.length === 0 && <p>No open requests.</p>}
+    <table>
+      <tbody>
+        {requests.map(({ request, legalName }) => (
+          <tr>
+            <td><a href={`/partner-portal/admin/intelligence/${request.organisationId}`}>{legalName}</a><br />{request.features.join(', ')} - {request.period} - {date(request.createdAt)}</td>
+            <td><span class="badge">{request.status}</span>{request.paymentReference && <><br />{request.paymentReference}</>}</td>
+            <td>
+              <form method="POST">
+                <input type="hidden" name="csrf_token" value={csrfToken} />
+                <input type="hidden" name="action" value="update_request" />
+                <input type="hidden" name="request_id" value={request.id} />
+                <input name="payment_reference" placeholder="Payment link / invoice reference" value={request.paymentReference ?? ''} />
+                <select name="status"><option value="INVOICED">Invoiced (link sent)</option><option value="PAID">Paid</option><option value="CANCELLED">Cancel</option></select>
+                <button type="submit">Update</button>
+              </form>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </fieldset>
+
+  <fieldset>
+    <legend>Organisations</legend>
+    <table>
+      <thead><tr><th>Legal name</th><th>Country</th><th>Status</th><th>Subscription until</th><th></th></tr></thead>
+      <tbody>
+        {organisations.map(o => (
+          <tr>
+            <td>{o.legalName}</td>
+            <td>{o.country}</td>
+            <td><span class="badge">{o.status}</span></td>
+            <td>{date(o.entitlement?.validUntil ?? null)}</td>
+            <td><a href={`/partner-portal/admin/intelligence/${o.id}`}>Manage</a></td>
+          </tr>
+        ))}
+        {organisations.length === 0 && <tr><td colspan="5">No customers yet.</td></tr>}
+      </tbody>
+    </table>
+  </fieldset>
+
+  <fieldset>
+    <legend>New customer organisation</legend>
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value={csrfToken} />
+      <input type="hidden" name="action" value="create_organisation" />
+      <label for="legal_name">Legal name</label><input id="legal_name" name="legal_name" required />
+      <label for="country">Country (ISO code)</label><input id="country" name="country" required maxlength="2" />
+      <label for="registration_id">Registration ID</label><input id="registration_id" name="registration_id" required />
+      <label for="vat_id">VAT ID (optional)</label><input id="vat_id" name="vat_id" />
+      <label for="billing_email">Billing email</label><input id="billing_email" name="billing_email" type="email" required />
+      <label for="owner_email">Owner email (signs in)</label><input id="owner_email" name="owner_email" type="email" required />
+      <button type="submit">Create</button>
+    </form>
+  </fieldset>
+</PortalLayout>

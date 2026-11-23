@@ -12,6 +12,7 @@
 // Both must hold. Neither one alone is enough.
 import { Resend } from 'resend';
 import { isPartnerPortalEnabled } from '../config/gate';
+import { isIntelligenceAccountsEnabled } from '../../lib/intelligence/entitlements';
 import { recordAuditEvent } from './audit';
 
 const DEFAULT_FROM = 'DAJC <team@dajc.eu>';
@@ -131,6 +132,40 @@ export async function sendMagicLinkEmail(params: SendMagicLinkEmailParams): Prom
     metadata: { to: params.to },
     correlationId: params.correlationId,
   });
+}
+
+// --- DAJC Intelligence customer accounts ---------------------------------------
+// Same sender and live-mode rule as the portal, behind the Intelligence accounts gate.
+
+export async function sendCustomerMagicLinkEmail(params: SendMagicLinkEmailParams): Promise<void> {
+  if (!isIntelligenceAccountsEnabled()) {
+    throw new Error('DAJC Intelligence accounts are disabled - sign-in emails cannot be sent.');
+  }
+  const subject = 'DAJC Intelligence - sign-in link';
+  const text =
+    `Sign-in link (expires ${formatExpiry(params.expiresAt)}):\n${params.loginUrl}\n\n` +
+    `This link is single-use. If you did not request this, ignore this message.`;
+  const html =
+    `<p><a href="${escapeHtml(params.loginUrl)}">Sign in to your DAJC Intelligence account</a> (expires ${formatExpiry(params.expiresAt)}).</p>` +
+    `<p>This link is single-use. If you did not request this, ignore this message.</p>`;
+  await resolveSender().send({ to: params.to, subject, html, text });
+  await recordAuditEvent({ actor: 'system', actorType: 'SYSTEM', action: 'login.magic_link_requested', metadata: { to: params.to, area: 'intelligence' }, correlationId: params.correlationId });
+}
+
+// Tells DAJC billing that a customer asked for a subscription, so a payment link or
+// invoice can be sent (DAJC_INTELLIGENCE_BILLING_EMAIL; nothing is sent without it).
+export async function notifySubscriptionRequest(params: { organisation: string; requestedBy: string; features: string[]; period: string; requestId: string }): Promise<boolean> {
+  const to = process.env.DAJC_INTELLIGENCE_BILLING_EMAIL?.trim();
+  if (!isIntelligenceAccountsEnabled() || !to) return false;
+  const subject = `DAJC Intelligence - subscription request from ${params.organisation}`;
+  const text =
+    `${params.organisation} (${params.requestedBy}) requests ${params.features.join(', ')} for one ${params.period.toLowerCase()}.\n` +
+    `Request ${params.requestId}. Send the payment link or invoice, then record it in the admin area.`;
+  const html =
+    `<p><strong>${escapeHtml(params.organisation)}</strong> (${escapeHtml(params.requestedBy)}) requests ${escapeHtml(params.features.join(', '))} for one ${escapeHtml(params.period.toLowerCase())}.</p>` +
+    `<p>Request ${escapeHtml(params.requestId)}. Send the payment link or invoice, then record it in the admin area.</p>`;
+  await resolveSender().send({ to, subject, html, text });
+  return true;
 }
 
 function escapeHtml(value: string): string {

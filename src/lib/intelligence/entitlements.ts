@@ -46,6 +46,19 @@ export const FEATURE_FLAG_ENV: Record<DrivingBansIntelligenceFeature, string> = 
  */
 export const DRIVING_BANS_INTELLIGENCE_RELEASED = false;
 
+/**
+ * Customer accounts (sign-in, subscription requests, calendar management) are a product
+ * area, not an entitlement: they need the release and DAJC_INTELLIGENCE_ACCOUNTS_ENABLED
+ * set to the exact string "true". Off, every account page and API answers 404.
+ */
+export const INTELLIGENCE_ACCOUNTS_FLAG = 'DAJC_INTELLIGENCE_ACCOUNTS_ENABLED';
+export function isIntelligenceAccountsEnabled(
+  env: Record<string, string | undefined> = process.env,
+  released: boolean = DRIVING_BANS_INTELLIGENCE_RELEASED,
+): boolean {
+  return released === true && env[INTELLIGENCE_ACCOUNTS_FLAG] === 'true';
+}
+
 export function isFeatureEnabled(
   feature: DrivingBansIntelligenceFeature,
   env: Record<string, string | undefined> = process.env,

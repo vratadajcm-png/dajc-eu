@@ -5,6 +5,7 @@ import PortalLayout from '../../../portal/components/PortalLayout.astro';
 import { notFoundIfPortalDisabled, redirectResponse } from '../../../portal/lib/guards';
 import { requireAdminPrincipal, ensureCsrfCookie } from '../../../portal/lib/session';
 import { listPartners } from '../../../portal/lib/partners';
+import { isIntelligenceAccountsEnabled } from '../../../lib/intelligence/entitlements';
 
 const disabled = notFoundIfPortalDisabled();
 if (disabled) return disabled;
@@ -17,7 +18,7 @@ const csrfToken = ensureCsrfCookie(Astro.cookies, Astro.url);
 ---
 <PortalLayout title="Admin - Partners">
   <h1>Partners</h1>
-  <p>Signed in as {admin.email} - <a href="/partner-portal/admin/audit">Audit log</a> -
+  <p>Signed in as {admin.email} - <a href="/partner-portal/admin/audit">Audit log</a>{isIntelligenceAccountsEnabled() && <> - <a href="/partner-portal/admin/intelligence">Intelligence customers</a></>} -
     <form class="inline" method="POST" action="/partner-portal/logout">
       <input type="hidden" name="csrf_token" value={csrfToken} />
       <button type="submit">Sign out</button>

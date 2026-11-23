@@ -8,6 +8,13 @@
       "when": 1787199643936,
       "tag": "0000_rare_bug",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793692680760,
+      "tag": "0001_intelligence_accounts",
+      "breakpoints": true
     }
   ]
 }

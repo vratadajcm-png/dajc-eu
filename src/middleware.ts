@@ -9,6 +9,11 @@
 // its own.
 import { defineMiddleware } from 'astro:middleware';
 import { isPartnerPortalEnabled, isPartnerPortalPath } from './portal/config/gate';
+import { isIntelligenceAccountsEnabled } from './lib/intelligence/entitlements';
+
+// The DAJC Intelligence customer area and its API (sign-in, subscriptions, personal
+// calendars). /intelligence itself stays the public product page.
+const isIntelligenceAccountPath = (pathname: string) => /^\/intelligence\/account(?:\/|$)/.test(pathname) || /^\/api\/intelligence(?:\/|$)/.test(pathname);
 
 export const onRequest = defineMiddleware(async (context, next) => {
   // These sections are deliberately private, regardless of navigation or
@@ -30,6 +35,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
     response.headers.set('CDN-Cache-Control', 'no-store');
     response.headers.set('Vercel-CDN-Cache-Control', 'no-store');
     response.headers.set('Referrer-Policy', 'no-referrer');
+    return response;
+  }
+  if (isIntelligenceAccountPath(context.url.pathname)) {
+    if (!isIntelligenceAccountsEnabled()) {
+      return new Response('Not found', {
+        status: 404,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8', 'X-Robots-Tag': 'noindex, nofollow, noarchive', 'Cache-Control': 'no-store' },
+      });
+    }
+    const response = await next();
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    if (!response.headers.has('Cache-Control')) response.headers.set('Cache-Control', 'no-store');
     return response;
   }
   if (isPartnerPortalPath(context.url.pathname)) {

@@ -1,0 +1,39 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../../portal/components/PortalLayout.astro';
+import { notFoundUnlessIntelligenceAccounts, redirectResponse } from '../../../portal/lib/guards';
+import { CUSTOMER_SESSION_SCOPE, setSessionCookies } from '../../../portal/lib/session';
+import { consumeLoginToken, LoginTokenInvalidError } from '../../../portal/lib/magicLink';
+import { checkAndRecordRateLimit } from '../../../portal/lib/rateLimit';
+
+const disabled = notFoundUnlessIntelligenceAccounts();
+if (disabled) return disabled;
+
+const rawToken = Astro.url.searchParams.get('token');
+let error: string | null = null;
+
+if (!rawToken) {
+  error = 'Missing sign-in link token.';
+} else {
+  const rateLimit = await checkAndRecordRateLimit(Astro.clientAddress ?? 'unknown', { action: 'customer_magic_link_callback', windowSeconds: 15 * 60, maxAttempts: 20 });
+  if (!rateLimit.allowed) {
+    error = 'Too many attempts. Please try again later.';
+  } else {
+    try {
+      // Only customer links are redeemed here; admin and partner links are refused.
+      const { rawSessionToken, sessionExpiresAt } = await consumeLoginToken(rawToken, ['CUSTOMER']);
+      setSessionCookies(Astro.cookies, rawSessionToken, sessionExpiresAt, Astro.url, CUSTOMER_SESSION_SCOPE);
+      return redirectResponse('/intelligence/account');
+    } catch (err) {
+      if (err instanceof LoginTokenInvalidError) error = err.message;
+      else throw err;
+    }
+  }
+}
+---
+<PortalLayout title="Sign-in link" brand="DAJC Intelligence">
+  <h1>Sign-in link</h1>
+  <p class="flash error">{error}</p>
+  <p><a href="/intelligence/account/login">Request a new sign-in link</a></p>
+</PortalLayout>
