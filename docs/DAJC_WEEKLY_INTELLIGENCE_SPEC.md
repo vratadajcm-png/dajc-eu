@@ -4,12 +4,14 @@ This is the **single editorial authority** for the automated DAJC.eu weekly Euro
 
 ## 0. Scope
 
-The Weekly covers **commercial road freight and the practical work of European truck drivers, dispatchers, fleets and transport companies**. Vehicles over 12 t (N3) remain the operational core. **Oversize, abnormal and special transport has priority**: it is searched first, ranked first, placed first in the edition (§1) and is the required-coverage floor (§4). Other material road-freight developments follow: truck/route restrictions, tolls, border/customs, ports, freight ferries, plus drivers' working conditions, professional safety, truck parking, training, operational tools, dispatch/routing/telematics, fleet/vehicle services, insurance, fuel/operating costs and transport-company changes that materially affect the job. General consumer car news and unsupported PR are excluded.
+The Weekly covers **commercial road freight and the practical work of European truck drivers, dispatchers, fleets and transport companies**. The operational scope is commercial goods vehicles or vehicle combinations with a maximum permissible mass of **3.5 t or more (including exactly 3.5 t) that use a tachograph**. Relevant N2/N3 trucks and qualifying 3.5-t vehicles are included; not every 3.5-t vehicle is necessarily legally required to use a tachograph. **Oversize, abnormal and special transport has priority**: it is searched first, ranked first, placed first in the edition (§1) and is the required-coverage floor (§4). Other material road-freight developments follow: truck/route restrictions, tolls, border/customs, ports, freight ferries, plus drivers' working conditions, professional safety, truck parking, training, operational tools, dispatch/routing/telematics, fleet/vehicle services, insurance, fuel/operating costs and transport-company changes that materially affect the job. General consumer car news and unsupported PR are excluded.
+
+**Editorial threshold, not law:** the 3.5-t-and-tachograph scope controls what Weekly researches and reports. It must never replace the exact vehicle-mass threshold, exemptions or legal requirements in a source (e.g. an actual >7.5 t or >12 t road restriction remains >7.5 t or >12 t in the report). Since 1 July 2026, certain international/cabotage goods vehicles above 2.5 t and up to 3.5 t also fall under EU tachograph rules; Weekly still does **not** expand its standalone vehicle scope below 3.5 t. News about a wider regulation may be included when its proven impact extends to Weekly's 3.5-t-and-above tachograph-using audience. Never infer tachograph installation or legal applicability from mass alone; preserve the source's exceptions.
 
 ## 1. Geographic research coverage
 
 - Every research cycle checks the complete canonical matrix in `config/europe-coverage.mjs`.
-- The matrix includes the full DAJC-approved state/territory list, MPZ aliases and additional transport-relevant sub-jurisdictions retained by DAJC.
+- The matrix contains exactly the 50 DAJC-approved monitoring jurisdictions. MPZ aliases and regional scope labels do not create additional monitoring identities or transfer legal applicability.
 - A country/territory does not need to appear in the published article when no material development exists.
 - Absence from the article must mean **checked — no material development found**, never **not searched**.
 - `data/oversize/<ISO-WEEK>/coverage.json` records the status of every jurisdiction.
@@ -18,14 +20,14 @@ The Weekly covers **commercial road freight and the practical work of European t
 
 ### Published lead order — Central Europe first
 
-Research coverage remains Europe-wide, but the published lead order is operator-first and **deterministic** (`scripts/lib/edition-order.mjs`): importance first (required critical development → directly exceptional/abnormal-transport change → other developments for goods vehicles over 12 t), then geography — the wider Central-European transport core in the order **Czechia, Germany, Austria, Slovakia, Poland, Hungary, Switzerland, Slovenia**, then directly connected corridors (France, Benelux, Italy, Croatia, Romania), then the rest of Europe, with peripheral jurisdictions such as Madeira, Guernsey, Jersey or Monaco last. Lead reports are published as one list in exactly this order. Geography is an ordering preference only: it never makes weak material publishable, and a critical development from a peripheral jurisdiction still leads a weaker Central-European item.
+Research coverage remains Europe-wide, but the published lead order is operator-first and **deterministic** (`scripts/lib/edition-order.mjs`): importance first (required critical development → directly exceptional/abnormal-transport change → other developments for tachograph-using goods vehicles from 3.5 t), then geography — the wider Central-European transport core in the order **Czechia, Germany, Austria, Slovakia, Poland, Hungary, Switzerland, Slovenia**, then directly connected corridors (France, Benelux, Italy, Croatia, Romania), then the rest of Europe, with peripheral jurisdictions such as Madeira, Guernsey, Jersey or Monaco last. Lead reports are published as one list in exactly this order. Geography is an ordering preference only: it never makes weak material publishable, and a critical development from a peripheral jurisdiction still leads a weaker Central-European item.
 
 ## 2. Source discovery
 
 - **Two-stage open-web discovery** (`scripts/lib/web-search.mjs`, Perplexity Search API with Claude classification; OpenAI is not used): official primary authority sources first for each geographical research group; if fewer than **3** eligible *primary discovery hits* are found in a group, search broadly across **all discoverable European freight, heavy-haul/oversize, driver/dispatcher, trade, fleet, operator, OEM and professional transport websites** without an exhaustive publisher whitelist. Search in local languages, oversize first. The threshold is only a *search-expansion trigger*, not a required published report count.
 - **DAJC's own sites (dajc.eu, dajc.cz) are never a source.** They are excluded from every search request, rejected before any page fetch and rejected again by the eligibility rules (`isOwnPublication`, `scripts/lib/source-policy.mjs`). In the W44 run about 40 % of all Search hits were DAJC editions.
 - **The Perplexity Search API receives short keyword queries in the group's local languages** (`buildSearchQueries`, `buildSearchRequest`), never the long LLM prompt. The official-first pass is restricted to the group's public authority domains (`config/official-authority-domains.mjs` plus the configured official sources); the open-web pass excludes DAJC and general driving-ban aggregators, is limited to the group's languages plus English and to pages from the last 30 days.
-- The search model only finds links. Every hit is fetched and the finding is built from **the page itself** (heading, text, publication date). A date the model reports is kept only when the page text shows it. Unreachable pages, PDFs, and pages whose own text shows no freight-vehicle (>12 t) or oversize context are dropped and logged.
+- The search model only finds links. Every hit is fetched and the finding is built from **the page itself** (heading, text, publication date). A date the model reports is kept only when the page text shows it. Unreachable pages, PDFs, and pages whose own text shows no relevant freight-vehicle (from 3.5 t, tachograph-using) or oversize context are dropped and logged.
 - The previous crawler of configured official authority pages (`config/oversize-sources`, `scripts/lib/fetch-source.mjs`) remains available with `OVERSIZE_DISCOVERY=official` (or `both`).
 - **Official sources always have priority.** Industry news can be included on the evidence of its own readable, dated article without separate official corroboration for routine professional, fleet, driver or company news. It must be clearly attributed as an **industry report**. **No unconfirmed media claim may be stated as an officially binding permit, escort, axle/weight, legal or route restriction**; these claims must be clearly labelled as requiring confirmation with the responsible authority. Repetition of an existing official item does not count as separate news.
 - Generic landing pages, image-only URLs, stale archive pages, unrelated permits/administration, promotional copy and non-operational statistics are excluded. An opened original article (not only an AI-generated snippet), date evidence and concrete professional relevance remain mandatory, but no separate official corroboration is required for ordinary industry reporting.
@@ -36,10 +38,10 @@ Research coverage remains Europe-wide, but the published lead order is operator-
 
 A well-supplied week has room for:
 
-- **Lead reports: typically 20–30, maximum 30.**
-- **Rest of Europe: typically 10–15 concise short updates, maximum 15.**
+- **Lead reports: maximum 30.**
+- **Rest of Europe: maximum 15 concise short updates.**
 
-These numbers are **capacities, never quotas**. An edition contains exactly the items that pass every rule in this specification — 17 + 8, 9 + 0 or 25 + 12 are all correct editions. There is **no minimum** number of lead reports, no Rest-of-Europe minimum and no country/jurisdiction quota.
+These numbers are **capacities, never quotas**. An edition contains exactly the items that pass every rule in this specification — 4 + 0, 17 + 8, 9 + 0 or 25 + 12 are all correct editions. There is **no minimum** number of lead reports, no Rest-of-Europe minimum and no country/jurisdiction quota.
 
 Never satisfy a number with filler. The pipeline has no supplement, repair or retry step that asks for "more" items, never moves items between sections to reach a count, and never relaxes a rule because an edition is short. If nothing qualifies *after official and broader media searches*, no edition is published that week — a weak edition is never published instead.
 
@@ -73,14 +75,14 @@ Other non-closure restrictions such as weight, width, height, axle, permit, esco
 
 ## 7. Relevance, freshness and verification
 
-Every published item must demonstrably relate to European commercial road freight work, preferably heavy vehicles over 12 t and above all oversize/abnormal transport, including driver/dispatcher/company/fleet topics with demonstrable operational significance, routing, permits, costs, working conditions, equipment, borders, project cargo or similar practical intelligence.
+Every published item must demonstrably relate to European commercial road freight work, for tachograph-using commercial goods vehicles from 3.5 t and above all oversize/abnormal transport, including driver/dispatcher/company/fleet topics with demonstrable operational significance, routing, permits, costs, working conditions, equipment, borders, project cargo or similar practical intelligence.
 
 Exclude driver-licence/auto-school administration, environmental/water-law permits unrelated to transport, crime/theft/accident/breakdown incidents, procurement/tender noise, generic authority pages, toll revenue/statistics without an operational rule change, stale historical archive material, ordinary short roadworks/closures, completed school/public-building renovations, generic completed civic projects, and infrastructure announcements whose only claimed relevance is a theoretical future logistics benefit.
 
 Every published item must also prove that it is current:
 
 - **Freshness — discovery is not news.** The pipeline distinguishes DISCOVERY date (`firstSeenAt`, never a freshness signal), SOURCE PUBLICATION date (`publishedAt`), EFFECTIVE date (`validFrom`/`validTo`, read only from explicit wording) and TARGET-WEEK relevance. An item is current only if (a) the source published it within the **7 days** before the edition's Thursday preparation (one week back), (b) it takes effect or ends inside the target week, (c) explicit start and end dates show it is in force during the target week, or (d) it takes effect within **one month (30 days) after the Thursday preparation** (outlook; `FRESHNESS_WINDOW_DAYS`, `FORWARD_HORIZON_DAYS` in `weekly-eligibility.mjs`), or (e) **catch-up:** the previous week's final edition was not published, and the change took effect during that skipped week and is still in force (W43 was never published, so the N307 limit in force since 21 October would otherwise have fallen between two editions). Otherwise it is excluded; undated material without such evidence is never published.
-- **Hard exclusions:** completed projects and openings without a current restriction, pedestrian/cycling facilities, school/civic/public-space projects, PR/event items, financial/market stories with no concrete freight business or driver/dispatcher operational impact, statistics, accidents, breakdowns, crime, procurement, generic landing/roadworks pages and anything without proven relevance for freight vehicles over 12 t or oversize/special transport. A generic mention of road, bridge, tunnel, vehicle or transport is not enough.
+- **Hard exclusions:** completed projects and openings without a current restriction, pedestrian/cycling facilities, school/civic/public-space projects, PR/event items, financial/market stories with no concrete freight business or driver/dispatcher operational impact, statistics, accidents, breakdowns, crime, procurement, generic landing/roadworks pages and anything without proven relevance for tachograph-using freight vehicles from 3.5 t or oversize/special transport. A generic mention of road, bridge, tunnel, vehicle or transport is not enough.
 - **One specific development:** homepages, listing/landing pages, project/programme pages, FAQ pages, organisation pages and bare topic titles are not developments. Neither are evergreen guides and explainers re-dated every season ("Winter Rules for Trucks in Europe 2026/27", "Oversize load permit in Hungary (2026): authority, fees", "Transport to Italy"), nor blog, knowledge-base, country-guide or permit-guide pages of non-official sites.
 - **No repetition:** a source already cited by an earlier edition is not published again unless the source republished it after that edition or the change takes effect or ends in the target week.
 - **Source suitability:** police press feeds contribute only announced enforcement campaigns, never single incidents or one-off local movements.
@@ -92,11 +94,44 @@ These rules are deterministic (`scripts/lib/weekly-eligibility.mjs`) and are app
 
 - Normal final edition: Friday at **12:00 Europe/Prague**, covering the upcoming Monday–Sunday week.
 - The edition is prepared on Thursday and committed with `publishedAt` set to Friday 12:00 Europe/Prague; the site shows it only from that instant. Thursday/Friday-morning retries, the watchdog and a Saturday catch-up are idempotent recovery layers that run only if the final week article is missing.
+- An explicit `--target-week YYYY-Www` (or `OVERSIZE_TARGET_WEEK`) pins a repair to its covered ISO week, even after the default target has advanced. `scheduledPublicationAt` preserves the original Friday slot, `preparedAt` records the real preparation time, and a delayed edition's `publishedAt` cannot precede that late preparation. Its visible delayed-release note distinguishes it from an on-time edition. Actual deployment/public availability is verified separately; no timestamp may create a false claim of an earlier public release.
 - Final publication is idempotent; an existing final week file is not automatically overwritten.
 - A manual **correction** run (workflow input `correction`) regenerates the current target edition from source data and replaces the published file atomically — only after the regenerated edition has passed every gate and the build, stamped with `updatedAt`. If the regenerated edition does not qualify, the published edition is left untouched and the run fails with the blocker.
 - A manually requested **preview** uses the same research, verification, counts, quality gates and article layout, but a separate preview slug. It never consumes or blocks Friday's final slug.
 - The final edition is built from the complete monitoring data available at Thursday preparation. The findings behind a prepared edition are also persisted on `automation/oversize-data`, so closing a rejected PR never discards them.
-- The watchdog fails loudly when an edition PR is still unmerged after its Friday 12:00 slot, and while any edition PR for an already passed week remains open.
+- The watchdog fails loudly when an edition PR is still unmerged after its Friday 12:00 slot, and while any edition PR for an already passed week remains open. Repository existence, editorial approval, protected merge, Vercel deployment and public availability are distinct checks. A file or a green Actions run alone is not publication.
+
+### Editorial Recovery and evidence
+
+An independent Claude rejection is final for the reviewed bytes. Recovery may
+remove only sources explicitly marked unsupported by a complete, structured,
+SHA-bound veto. It must not infer a new fact, change a legal threshold or
+exception, or replace a source with invented corroboration. Every new candidate
+must pass the same source checks, deterministic eligibility, build and a fresh
+independent Claude review. There is no recovery exception for a critical-news
+floor: an edition missing still-required verified coverage remains blocked.
+
+A preparation permits at most **three total generations** (the original plus
+two repairs). API/network/build failure is not an editorial veto and must not
+trigger a paid repair loop. Repeated rejection or no safely removable source
+stops publication and preserves the rejected bytes and reasons for audit. A
+later run may start a new controlled preparation only after source facts have
+actually changed; monitoring timestamps alone do not justify more API calls.
+
+Rejected/unreviewed candidates are archived as data in draft PRs, never as
+publicly routable Markdown articles. An approved replacement gets a new attempt
+identity and requires its own exact-byte receipt and protected CI. Keep the old
+PR as the audit trail and link its replacement; never overwrite a published
+edition or reinterpret a rejection as approval.
+
+Publication lifecycle evidence distinguishes PREPARING, GENERATED,
+EDITORIAL_REJECTED, REPAIRING, EDITORIAL_APPROVED, CI_PENDING, READY_TO_MERGE,
+MERGED, PUBLICATION_SCHEDULED, PUBLISHED_VERIFIED and BLOCKED. Intermediate
+workflow stages are not proof of publication; only independent observation of
+the canonical article, `/news` listing and RSS after the release slot can
+establish PUBLISHED_VERIFIED. Approval and merge evidence must refer to the
+current article hash and PR head, and ordinary main protection must remain in
+force.
 
 ## 9. Article structure
 
@@ -114,7 +149,7 @@ These rules are deterministic (`scripts/lib/weekly-eligibility.mjs`) and are app
 
 Every item must answer:
 
-> Why does this matter **now** to someone planning or executing road freight transport with vehicles over 12 t — and above all oversize, abnormal or special transport?
+> Why does this matter **now** to someone planning or executing road freight transport with vehicles from 3.5 t using tachographs — and above all oversize, abnormal or special transport?
 
 If there is no meaningful current operational answer, exclude it. A newly discovered old page is not news. A short edition is a correct edition; a padded edition is not.
 
@@ -130,7 +165,7 @@ This is a permanent rule: **Perplexity Sonar research and article synthesis → 
 
 - Sonar discovers links in the existing official-first open-European-media search and synthesizes an English article only from verified source candidates. Hard checks on dates, geography, ISO week, duplicate stories, binding weight/permit limits, source provenance and the no-general-Driving-Bans exclusion remain.
 - Claude checks the exact article plus original source excerpts **and the publisher's own current page text, host and source tier**, and emits one structured approve/reject verdict with blocking reasons and coverage of every cited URL. It rejects weight/permit/legal/route claims resting on second- or third-hand relays, general-interest outlets or evergreen guides. A missing/rejecting verdict, unsupported source or altered SHA-256 receipt fails closed.
-- **Autonomous Friday release (owner decision, 24 October 2026).** The final article of a content-only PR is merged by the publishing workflow once Claude has approved it and `application-validate` and `news-validate` pass, within the main ruleset; the site shows it from its Friday 12:00 Europe/Prague slot. Industry-report sources no longer block release (until 24 October only all-official editions could auto-merge); each is labelled in the article and listed in the run summary, and Claude's source-by-source check against the publisher's own page is the gate. A Claude veto or a failed check leaves the edition as a PR for human review and fails the run, so the owner is e-mailed. Corrections, previews, code, security and workflow changes never auto-merge.
+- **Autonomous Friday release (owner decision, 24 October 2026).** The final article of a content-only PR is merged by the publishing workflow once Claude has approved it and `application-validate` and `news-validate` pass, within the main ruleset; the site shows it from its Friday 12:00 Europe/Prague slot. Industry-report sources no longer block release (until 24 October only all-official editions could auto-merge); each is labelled in the article and listed in the run summary, and Claude's source-by-source check against the publisher's own page is the gate. A Claude veto enters bounded Editorial Recovery (§8); exhausted or unsafe recovery archives the rejected candidate as data in a blocked draft PR and fails the run. A failed CI check leaves an approved candidate unmerged. Neither case authorizes a release. Corrections, previews, code, security and workflow changes never auto-merge.
 - Public release means the actual accessible DAJC.eu article; a green CI run or prepared PR is not publication.
 - Once an article is verified public, Claude prepares distinct factual English short copy for X and an industry-oriented post for the DAJC LinkedIn company page, each with the exact URL. The existing persistent ledger blocks duplicate attempts. Buffer is used only with explicitly connected/authorized company channels.
 - Never post unpublished Platform / Integration Ecosystem material. Platform updates require explicit socialPublish=true.
@@ -180,5 +215,9 @@ The owner's standing instruction is to run the Weekly at the lowest cost without
 
 - Research uses the Perplexity Search API with Claude Haiku 5.5 classifying the leads at low effort. OpenAI and Perplexity Sonar are not used (removed 24 October 2026).
 - Focuses share one Search request whenever every language's terms fit (Search bills per request, not per query).
-- The monitor runs on Monday and Wednesday; Thursday's preparation refreshes the data once, and scheduled retries reuse findings written in the last 18 hours. A manual correction or preview run always searches again.
+- The monitor runs on Monday and Wednesday; Thursday's preparation refreshes the data once, and scheduled retries reuse findings written in the last 18 hours. Manual runs also reuse recent source data unless `force_refresh=true` explicitly requests fresh discovery.
 - Writing the edition, the final editorial review and social copy keep the stronger `CLAUDE_REVIEW_MODEL` / `CLAUDE_SOCIAL_MODEL`: they run once or twice a week and decide what readers see.
+
+Approved interrupted releases resume from the pinned PR head without a new research or writing call. The resume path reads PR git objects as data and runs only reviewed main code. Before CI accepts an article, and before resume/public verification, its full independent review must match the immutable `weekly-approval-<run>-<attempt>` artifact from the main publishing workflow. A PR-local JSON assertion alone cannot authorize publication.
+
+A rejected audit PR never represents a prepared publication and imposes no time-only lock on genuine new evidence. The semantic source fingerprint, not an elapsed-hours timer, decides whether another paid preparation is allowed. Summaries are rebuilt from retained report titles, including when a different story from the same country was removed. Operational alerts retain bounded run history, editorial reasons and exact failed steps.

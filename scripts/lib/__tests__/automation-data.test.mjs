@@ -97,6 +97,16 @@ describe('durable automation branches with protected main', () => {
     expect(git(f.remote, ['rev-parse', 'main']).trim()).toBe(f.main);
   });
 
+  it('keeps protected publication receipts out of the untrusted monitoring branch', () => {
+    const f = fixture();
+    loadAutomationData('findings', f.root);
+    put(f.root, 'data/oversize/2026-W42/publication/123-1.json', { state: 'EDITORIAL_APPROVED', sha256: 'audit' });
+    put(f.root, 'data/oversize/2026-W42/findings.json', { findings: [] });
+    saveAutomationData('findings', f.root);
+    expect(() => git(f.remote, ['show', 'automation/oversize-data:data/oversize/2026-W42/publication/123-1.json'])).toThrow();
+    expect(readFileSync(path.join(f.root, 'data/oversize/2026-W42/publication/123-1.json'), 'utf8')).toContain('EDITORIAL_APPROVED');
+  });
+
   it('refuses malformed JSON and unknown data paths before a branch push', () => {
     const f = fixture();
     loadAutomationData('findings', f.root);

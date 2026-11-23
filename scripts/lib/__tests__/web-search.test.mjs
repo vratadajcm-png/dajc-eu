@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildClassifierPrompt, buildSearchRequest, cleanSourceName, cleanUrl, discoverWithWebSearch, parseSearchResponse, SEARCH_GROUPS, verifySearchItem,
+  webDiscoveryFailure,
 } from '../web-search.mjs';
 import { dajcEuropeCoverage } from '../../../config/europe-coverage.mjs';
 
@@ -53,9 +54,9 @@ it('keeps source-backed regional scope inside the tracked country and rejects an
 });
 
 describe('buildClassifierPrompt', () => {
-  it('keeps the >12 t / oversize scope and never classifies DAJC pages or general driving bans', () => {
+  it('keeps the >=3.5 t tachograph / oversize scope and never classifies DAJC pages or general driving bans', () => {
     const prompt = buildClassifierPrompt(SEARCH_GROUPS[0], []);
-    expect(prompt).toMatch(/vehicles over 12 t, oversize\/abnormal transport first/);
+    expect(prompt).toMatch(/at or above 3\.5 t using tachographs, oversize\/abnormal transport first/);
     expect(prompt).toMatch(/Skip pages from dajc\.eu or dajc\.cz, general recurring truck driving bans/);
     expect(prompt).toContain('["Czechia"]');
   });
@@ -122,7 +123,7 @@ describe('verifySearchItem', () => {
     const html = page({ heading: 'Neuer Radweg eröffnet', text: 'Der neue Radweg entlang der Straße wurde heute eröffnet. '.repeat(4) });
     const result = await verifySearchItem(item(), { fetchPage: okPage(html), now });
     expect(result.ok).toBe(false);
-    expect(result.reason).toMatch(/no freight-vehicle \(>12 t\) or oversize-transport context/);
+    expect(result.reason).toMatch(/no relevant road-freight or oversize-transport context/);
   });
 
   it('never trusts a model date that the page does not show', async () => {
@@ -202,5 +203,34 @@ describe('Open Europe-wide source expansion', () => {
     const result = await verifySearchItem(article, { now, fetchPage: okPage(page()) });
     expect(result.ok).toBe(true);
     expect(result.finding.sourceTier).toBe('industry');
+  });
+});
+
+describe('webDiscoveryFailure', () => {
+  const down = (error) => ({ status: 'unavailable', error, hits: 0, kept: 0, rejected: [] });
+
+  it('names the rejected key when every group fails with HTTP 401 (2-5 November 2026)', () => {
+    const groups = [
+      down('oversize+heavy: Provider HTTP 401 from api.anthropic.com; oversize+operations: Provider HTTP 401 from api.anthropic.com'),
+      down('oversize: Provider HTTP 401 from api.anthropic.com'),
+    ];
+    const message = webDiscoveryFailure(groups);
+    expect(message).toContain('api.anthropic.com rejected the API key (HTTP 401)');
+    expect(message).toContain('ANTHROPIC_API_KEY');
+    expect(message).toContain('None of the 2 web search groups could run');
+  });
+
+  it('names the Perplexity secret for a rejected search key', () => {
+    expect(webDiscoveryFailure([down('oversize: Provider HTTP 403 from api.perplexity.ai')])).toContain('PERPLEXITY_API_KEY');
+  });
+
+  it('reports a total outage without an auth error too', () => {
+    expect(webDiscoveryFailure([down('oversize: Provider HTTP 529 from api.anthropic.com')]))
+      .toBe('None of the 1 web search groups could run: oversize: Provider HTTP 529 from api.anthropic.com');
+  });
+
+  it('accepts a run where at least one group searched', () => {
+    expect(webDiscoveryFailure([down('oversize: Provider HTTP 401 from api.anthropic.com'), { status: 'ok', hits: 3, kept: 1, rejected: [] }])).toBeNull();
+    expect(webDiscoveryFailure([])).toBeNull();
   });
 });
