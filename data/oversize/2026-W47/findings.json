@@ -1,6 +1,6 @@
 {
   "week": "2026-W47",
-  "updatedAt": "2026-11-21T14:45:36.598Z",
+  "updatedAt": "2026-11-23T07:53:28.877Z",
   "findings": [
     {
       "id": "2e302c460ed16e97",
@@ -2101,6 +2101,36 @@
       "status": "active",
       "firstSeenAt": "2026-10-14T11:01:12.624Z",
       "lastCheckedAt": "2026-11-21T14:40:35.560Z"
+    },
+    {
+      "id": "pl-mp-2026-1107-lpg-adr",
+      "country": "Poland",
+      "jurisdiction": "PL",
+      "region": null,
+      "location": "Poland (domestic carriage)",
+      "type": "operational_change",
+      "title": "Poland official notice 1107: temporary ADR-qualified domestic LPG tanker driving-time derogation from 6 November to 6 December 2026",
+      "summary": "Primary legal text: Polish Ministry of Infrastructure, Monitor Polski 2026 item 1107, promulgated 6 November 2026. Only drivers with ADR tank-carriage certificates performing domestic road transport of LPG in tankers in Poland may apply the derogation from 6 November to 6 December 2026. Daily driving maximum 11 hours; weekly maximum 60 hours; total in any two consecutive weeks maximum 96 hours. After 5.5 hours of driving an uninterrupted break of at least 45 minutes is required. Eligible drivers may choose to take regular weekly rest in a stationary vehicle equipped with suitable sleeping places for each driver. Each use of the derogation must be recorded by hand on the reverse of an analogue tachograph chart or digital tachograph printout. Working conditions and traffic safety must not deteriorate. The document does not state a separate gross vehicle weight threshold and does not establish a general exemption for other loads or international carriage. Official instrument: Article 14(2) of Regulation (EC) No 561/2006, Polish announcement dated 6 November 2026.",
+      "searchSummary": "Direct original one-page official Polish gazette PDF; legal limits and ADR-domestic LPG scope copied from the numbered paragraphs of Monitor Polski item 1107, not relayed from trade press.",
+      "validFrom": "2026-11-06",
+      "validTo": "2026-12-06",
+      "impact": "Time-limited scheduling rules for ADR-certified drivers operating domestic LPG tankers in Poland; includes explicit limits, break, rest, recording and safety safeguards.",
+      "recommendedAction": "Check the official notice, ADR tank qualification and domestic LPG scope; comply with 11h daily/60h weekly/96h per two weeks, 45min break after 5.5h driving, permitted rest and handwritten tachograph records; do not generalise beyond the notice.",
+      "vehicleScope": "Drivers with ADR tanker qualification carrying LPG domestically by road in Poland; no mass threshold independently stated in the notice.",
+      "exemptions": "Only domestic LPG tanker journeys with the specified ADR-qualified drivers; temporary and conditional, not a general exception for other freight or international transport.",
+      "publishedAt": "2026-11-06",
+      "publishedAtSource": "official-gazette",
+      "sourceName": "Polish Ministry of Infrastructure — Monitor Polski 2026 item 1107",
+      "sourceUrl": "https://eli.gov.pl/api/acts/MP/2026/1107/text/I/M20261107.pdf",
+      "discoveredVia": "manual-official-document-verification",
+      "sourceTier": "official",
+      "oversize": false,
+      "confidence": "verified-original-pdf",
+      "searchGroup": "PL",
+      "discoveryPass": "official",
+      "status": "new",
+      "firstSeenAt": "2026-11-23T07:53:28.877Z",
+      "lastCheckedAt": "2026-11-23T07:53:28.877Z"
     }
   ]
 }
