@@ -1,11 +1,12 @@
 import type { APIRoute } from 'astro';
 import { getDrivingBansSnapshot } from '../../../config/driving-ban-calendars/runtime.mjs';
+import { officialDrivingBansView } from '../../lib/driving-bans/public-view.mjs';
 import { toIcs } from '../../lib/driving-bans/core.mjs';
 export const prerender = false;
 /** rolling=1 remains a compatibility parameter; the feed now uses the same rolling 12-month planning horizon as JSON/web. */
 export const GET: APIRoute = ({ request }) => {
   const url = new URL(request.url);
-  const view = getDrivingBansSnapshot();
+  const view = officialDrivingBansView(getDrivingBansSnapshot());
   const countries = [...new Set((url.searchParams.get('countries') || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean))];
   const type = url.searchParams.get('type') || 'all';
   const headers = { 'X-DAJC-Coverage-Version': view.coverage_version, 'Cache-Control': 'no-store', 'Vercel-CDN-Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };

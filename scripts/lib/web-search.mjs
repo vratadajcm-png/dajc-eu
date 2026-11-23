@@ -11,7 +11,7 @@
 // (publication-date.mjs). A model-reported date is kept only when that exact
 // date appears in the page text. Pages that cannot be fetched, are not
 // specific articles, or whose own text shows no connection to freight
-// vehicles over 12 t / oversize transport are dropped here, before they are
+// tachograph-using freight vehicles from 3.5 t / oversize transport are dropped here, before they are
 // ever recorded. Editorial eligibility is then decided later, unchanged, by
 // weekly-eligibility.mjs.
 
@@ -25,6 +25,7 @@ import { extractPublicationDate, extractValidityPeriod, findDates } from './publ
 import { checkOperationalRelevance } from './relevance-filter.mjs';
 import { checkTransportDomainRelevance } from './transport-domain.mjs';
 import { looksBinary } from './text-quality.mjs';
+import { providerErrorDetail } from './provider-error.mjs';
 import { FRESHNESS_WINDOW_DAYS, FORWARD_HORIZON_DAYS } from './weekly-eligibility.mjs';
 import {
   sourceTier, isOfficialPublisher, isOwnPublication, needsSecondaryDiscovery, officialDomainsFor,
@@ -101,7 +102,7 @@ function isoDay(date) {
 
 /**
  * Focuses of the official-first pass (oversize first, then other changes for
- * goods vehicles over 12 t) and of the open-web fallback pass.
+ * tachograph-using goods vehicles from 3.5 t) and of the open-web fallback pass.
  */
 export const SEARCH_FOCUSES = ['oversize', 'heavy'];
 export const FALLBACK_SEARCH_FOCUSES = ['oversize', 'operations'];
@@ -278,8 +279,8 @@ export function buildClassifierPrompt(group, leads) {
   const corridors = group.codes.some((code) => ['KZ', 'RU', 'TR'].includes(code))
     ? ` For KZ, RU and TR: ${geographicScopePolicy.corridor_scope} ${geographicScopePolicy.corridor_evidence} Classify only these corridors, not their whole territories.`
     : '';
-  return 'Classify these untrusted SEARCH LEADS for the DAJC weekly briefing on road freight with vehicles over 12 t, oversize/abnormal transport first.' +
-    ' These are NOT verified sources. Never invent URLs, publication dates or legal conditions.' +
+  return 'Classify these untrusted SEARCH LEADS for the DAJC weekly briefing on road freight with goods vehicles or vehicle combinations at or above 3.5 t using tachographs, oversize/abnormal transport first.' +
+    ' This is an editorial audience, not a legal weight restriction. Keep actual source thresholds and exemptions unchanged; do not assume all 3.5-t vehicles must use tachographs. These are NOT verified sources. Never invent URLs, publication dates or legal conditions.' +
     ` Only copy URLs exactly from the list; only classify clearly applicable countries within ${JSON.stringify(group.countries)}.` +
     (regions ? ` Keep regional applicability exactly as the lead states it (${regions}).` : '') +
     ' Exclude untracked dependencies, overseas territories and Vatican City; never inherit rules from an administering country.' +
@@ -378,7 +379,7 @@ export async function verifySearchItem(item, { fetchPage = (url) => fetchTextWit
   if (item.region && !evidence.toLocaleLowerCase().includes(item.region.toLocaleLowerCase())) return { ok: false, reason: 'REGIONAL_SCOPE_REQUIRES_REVIEW' };
   if (!checkOperationalRelevance(evidence, { now }).ok) return { ok: false, reason: 'page is not an operational development' };
   if (!checkTransportDomainRelevance({ title, summary: pageText }).ok) {
-    return { ok: false, reason: 'page text shows no freight-vehicle (>12 t) or oversize-transport context' };
+    return { ok: false, reason: 'page text shows no relevant road-freight or oversize-transport context (audience: tachograph-using vehicles >=3.5 t)' };
   }
 
   const country = scope.finding.country;
@@ -467,7 +468,7 @@ export async function searchWithPerplexitySearch(group, request, {
       method: 'POST', headers: { 'content-type': 'application/json', ...headers },
       body: JSON.stringify(payload), signal: AbortSignal.timeout(45000),
     });
-    if (!res.ok) throw new Error('Provider HTTP ' + res.status + ' from ' + new URL(url).hostname);
+    if (!res.ok) throw new Error('Provider HTTP ' + res.status + ' from ' + new URL(url).hostname + await providerErrorDetail(res));
     return res.json();
   };
   const payload = typeof request === 'string' ? { query: request } : request;
@@ -522,6 +523,27 @@ export async function searchGroup(group, { now = new Date(), focuses = SEARCH_FO
   // reported as unavailable.
   if (errors.length === bundles.length) return { status: 'unavailable', error: errors.join('; '), items: [] };
   return { status: 'ok', items, ...(errors.length ? { error: errors.join('; ') } : {}) };
+}
+
+const PROVIDER_SECRETS = { 'api.anthropic.com': 'ANTHROPIC_API_KEY', 'api.perplexity.ai': 'PERPLEXITY_API_KEY' };
+
+/**
+ * Why the whole web discovery failed, or null when at least one group ran.
+ * A run where no group could search is a pipeline failure, not a quiet week:
+ * from 2 to 5 November 2026 a rejected Claude key (HTTP 401) left every group
+ * unavailable while the monitor and the Thursday run reported success.
+ */
+export function webDiscoveryFailure(groups = []) {
+  if (groups.length === 0 || groups.some((entry) => entry.status === 'ok')) return null;
+  const errors = groups.map((entry) => String(entry.error || ''));
+  for (const text of errors) {
+    const rejected = text.match(/Provider HTTP (401|403) from ([a-z0-9.-]+)/i);
+    if (rejected) {
+      const secret = PROVIDER_SECRETS[rejected[2]] || 'the provider API key';
+      return `${rejected[2]} rejected the API key (HTTP ${rejected[1]}): replace the ${secret} repository secret. None of the ${groups.length} web search groups could run.`;
+    }
+  }
+  return `None of the ${groups.length} web search groups could run: ${errors[0] || 'unknown error'}`;
 }
 
 /**

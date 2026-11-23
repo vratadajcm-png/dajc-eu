@@ -1,0 +1,93 @@
+---
+import IntegrationRequestForm from './IntegrationRequestForm.astro';
+interface Props {product:'platform'|'tar'}
+const {product}=Astro.props;
+const platform=product==='platform';
+const content=platform ? {
+  eyebrow:'DAJC PLATFORM / INTEGRATIONS',
+  title:'Your systems. Connected by DAJC.',
+  lead:'DAJC Platform is designed to connect transport management, route and permit workflows, vehicle and driver operations, and transport documentation through a provider-neutral coordination layer.',
+  cards:[
+    {heading:'TMS and ERP',description:'Exchange authorised transport references, milestones and business records without replacing the originating system.'},
+    {heading:'Routes and permits',description:'Connect relevant route assessments, permit requirements, official decisions and time-sensitive restrictions.'},
+    {heading:'Telematics and fleets',description:'Link authorised vehicle status and transport events to the right D-ID context.'},
+    {heading:'Documents and customs',description:'Reference approved transport documents, versions, handovers and required trade data.'},
+  ],
+  steps:['The originating system owns its business record.','A scoped adapter maps authorised data to the DAJC D-ID.','Relevant participants act within defined responsibilities.','Confirmed events and documents return through approved channels.'],
+  subject:'DAJC Platform Integration Architecture',
+} : {
+  eyebrow:'DAJC TAR / INTEGRATIONS',
+  title:'One incident. Connected operations.',
+  lead:'DAJC TAR is designed to connect intake, assistance and insurance case exchanges, mixed-fleet dispatch, specialist recovery evidence and approved financial handovers through one Recovery Passport.',
+  cards:[
+    {heading:'Assistance and insurers',description:'Link approved incident requests, partner references, assignment messages and case updates.'},
+    {heading:'Dispatch and fleets',description:'Coordinate tow vehicles, rotators, workshop vans, equipment, crews and subcontractor assignments.'},
+    {heading:'Field and vehicle data',description:'Capture authorised positioning, diagnostics context, evidence and recovery milestones.'},
+    {heading:'Reports and billing',description:'Connect completion records, signatures, approvals and invoice-ready job data.'},
+  ],
+  steps:['A request enters through an approved source and retains its reference.','DAJC associates it with one Recovery Passport.','Qualified teams record dispatch, field actions and handovers.','Authorised completion evidence supports partners and accounting.'],
+  subject:'DAJC TAR Integration Architecture',
+};
+---
+<main class="integration-landing">
+  <header class="hero">
+    <p class="eyebrow">{content.eyebrow}</p>
+    <h1>{content.title}</h1>
+    <p class="lead">{content.lead}</p>
+    <div class="actions"><a class="primary" href="#request-documentation">Request technical PDF</a><a class="secondary" href="/integrations">Explore all integrations</a></div>
+    <p class="scope">Target integration architecture in development. Interface compatibility and permissions depend on each implementation and relevant agreements.</p>
+  </header>
+
+  <section class="integrations" aria-labelledby="areas-title">
+    <p class="eyebrow">CONNECTED AREAS</p>
+    <h2 id="areas-title">Connect existing tools, not replace them.</h2>
+    <div class="cards">
+      {content.cards.map(item=><article><h3>{item.heading}</h3><p>{item.description}</p></article>)}
+    </div>
+  </section>
+
+  <section class="method" aria-labelledby="method-title">
+    <div>
+      <p class="eyebrow">INTEGRATION PRINCIPLE</p>
+      <h2 id="method-title">One shared operational context.</h2>
+      <p>Where authorised, data can be exchanged using APIs, event notifications, EDI or secure file workflows. DAJC intends to preserve existing records and responsibilities, not claim ownership of data originating from third-party systems.</p>
+    </div>
+    <ol>
+      {content.steps.map((step,i)=><li><span>{String(i+1).padStart(2,'0')}</span><p>{step}</p></li>)}
+    </ol>
+  </section>
+
+  <section class="security" aria-labelledby="security-title">
+    <p class="eyebrow">DATA AND SECURITY</p>
+    <h2 id="security-title">Control remains with the responsible organisation.</h2>
+    <p>Integrations are designed around explicit permissions, separation of organisations, traceability, verified source data and secure technical interfaces. Any real integration requires provider approval, agreed access boundaries and validation.</p>
+    <p>DAJC does not publish prospective partners, confidential discussions or third-party integration configurations.</p>
+  </section>
+  <IntegrationRequestForm product={product}/>
+</main>
+<style>
+ .integration-landing{position:relative;z-index:2;width:min(1130px,calc(100% - 2.8rem));margin:0 auto;padding:clamp(3rem,6vw,5.5rem) 0 5rem}
+ .eyebrow{color:var(--dajc-orange);font:.7rem 'IBM Plex Mono',monospace;letter-spacing:.14em}
+ h1,h2,h3{font-family:'Space Grotesk',sans-serif;color:var(--dajc-white)}
+ h1{font-size:clamp(2.3rem,5vw,4.5rem);line-height:1.07;letter-spacing:-.035em;max-width:15ch;margin:.5rem 0 1.2rem}
+ h2{font-size:clamp(1.7rem,3vw,2.5rem);margin:.5rem 0 1.2rem}
+ .lead{font-size:clamp(1rem,1.45vw,1.2rem);line-height:1.75;color:#ccd9e8;max-width:72ch}
+ .scope,.security p,.method p,.cards p{color:#adbed1;line-height:1.7}
+ .scope{font-size:.79rem;margin-top:1.1rem}
+ .actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.8rem}
+ .actions a{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:.7rem 1.1rem;text-decoration:none;border-radius:8px;font:700 .78rem 'IBM Plex Mono',monospace}
+ .primary{color:#071c35;background:var(--dajc-orange)}
+ .secondary{border:1px solid #66829f;color:#fff}
+ .integrations,.method,.security{padding:clamp(2.5rem,5vw,4rem) 0;border-top:1px solid var(--dajc-line);margin-top:2rem}
+ .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+ .cards article{border:1px solid #385572;border-radius:13px;padding:1.5rem;background:rgba(8,32,61,.7)}
+ .cards h3{margin:0 0 .7rem;font-size:1.15rem}.cards p{font-size:.89rem;margin:0}
+ .method{display:grid;grid-template-columns:1fr 1fr;gap:3rem}
+ .method ol{list-style:none;display:grid;gap:.75rem;margin:0;padding:0}
+ .method li{display:flex;align-items:start;gap:1rem;border-bottom:1px solid #385572;padding:.55rem 0}
+ .method li span{color:var(--dajc-orange);font:700 .8rem 'IBM Plex Mono',monospace}
+ .method li p{font-size:.9rem;margin:0}
+ .security p{max-width:75ch}
+ .integration-landing a:focus-visible{outline:2px solid var(--dajc-orange);outline-offset:3px}
+ @media(max-width:720px){.cards,.method{grid-template-columns:1fr}}
+</style>

@@ -1,5 +1,7 @@
 // Claude rewrites a publicly approved news summary for the selected company
 // social channel. Not an alternative content publication/research pipeline.
+import { providerErrorDetail } from './provider-error.mjs';
+
 const SCHEMA = {
   type: 'object',
   additionalProperties: false,
@@ -74,7 +76,7 @@ export async function createClaudeSocialCopy(channel, article, {
       }),
       signal: AbortSignal.timeout(45000),
     });
-    if (!res.ok) throw new Error('Claude social editor API HTTP ' + res.status);
+    if (!res.ok) throw new Error('Claude social editor API HTTP ' + res.status + await providerErrorDetail(res));
     const data = await res.json();
     if (data.stop_reason !== 'end_turn') throw new Error('Claude social editor response incomplete (stop_reason: ' + data.stop_reason + ')');
     const raw = data.content?.find(x => x.type === 'text')?.text;
