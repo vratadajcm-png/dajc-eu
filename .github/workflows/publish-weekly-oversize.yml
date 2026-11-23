@@ -179,6 +179,18 @@ jobs:
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         run: npm ci
 
+      # Official legal texts frequently exist as PDF only (e.g. Monitor Polski).
+      # Install a deterministic text extractor before paid research/review;
+      # never use AI or unverified media claims as an alternative to the PDF.
+      - name: Ensure official PDF evidence extractor
+        if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
+        run: |
+          if ! command -v pdftotext >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends poppler-utils
+          fi
+          command -v pdftotext
+
       - name: Load latest monitoring data
         if: steps.trigger.outputs.should_run == 'true' && steps.publish-needed.outputs.needed == 'true'
         run: node scripts/automation-data.mjs load findings
