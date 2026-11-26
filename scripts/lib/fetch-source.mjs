@@ -11,6 +11,7 @@ import { coverageName, isTrackedJurisdiction } from '../../config/europe-coverag
 // becomes a finding.
 
 import Parser from 'rss-parser';
+import { extractPdfSourceText, MAX_PDF_SOURCE_BYTES } from './pdf-source-text.mjs';
 import { FINDING_TYPES } from './findings.mjs';
 import { checkOperationalRelevance } from './relevance-filter.mjs';
 import { checkIngestionRoadContext } from './transport-domain.mjs';
@@ -94,7 +95,7 @@ function stripHtml(value = '') {
     .trim();
 }
 
-export function extractDetailText(html) {
+export function extractDetailText(html, maxChars = MAX_SUMMARY_CHARS) {
   const cleaned = html
     .replace(/<nav\b[^>]*>[\s\S]*?<\/nav>/gi, ' ')
     .replace(/<header\b[^>]*>[\s\S]*?<\/header>/gi, ' ')
@@ -111,7 +112,7 @@ export function extractDetailText(html) {
   }
 
   const text = scopes.sort((a, b) => b.length - a.length)[0] || stripHtml(cleaned);
-  return text.slice(0, MAX_SUMMARY_CHARS);
+  return text.slice(0, maxChars);
 }
 
 export function extractDetailHeading(html) {
@@ -298,7 +299,18 @@ export async function fetchTextWithRetry(url, accept) {
   for (let attempt = 1; attempt <= FETCH_RETRIES; attempt += 1) {
     try {
       const res = await fetchWithTimeout(url, FETCH_TIMEOUT_MS, accept);
-      if (res.ok) return { ok: true, text: await res.text(), finalUrl: res.url || url };
+      if (res.ok) {
+        const finalUrl = res.url || url;
+        const mime = res.headers.get('content-type') || '';
+        if (/application\/pdf/i.test(mime) || /\.pdf(?:$|[?#])/i.test(finalUrl)) {
+          const length = Number(res.headers.get('content-length') || 0);
+          if (length > MAX_PDF_SOURCE_BYTES) throw new Error('PDF source exceeds safe size');
+          const bytes = Buffer.from(await res.arrayBuffer());
+          const pdfText = extractPdfSourceText(bytes);
+          return { ok: true, text: pdfText, finalUrl, contentType: 'text/plain; extracted-from=application/pdf' };
+        }
+        return { ok: true, text: await res.text(), finalUrl };
+      }
       lastError = `HTTP ${res.status}`;
       if (res.status < 500 && res.status !== 429) break;
     } catch (err) {

@@ -151,7 +151,7 @@ export async function withOriginalPages(records, fetchPage = (url) => fetchTextW
   return Promise.all(records.map(async (record) => {
     let page = null;
     try { page = await fetchPage(record.url); } catch { page = null; }
-    const text = page?.ok ? extractDetailText(page.text || '').slice(0, ORIGINAL_PAGE_CHARS) : '';
+    const text = page?.ok ? extractDetailText(page.text || '', ORIGINAL_PAGE_CHARS) : '';
     return {
       ...record,
       publisherHost: new URL(record.url).hostname.replace(/^www\./, ''),
