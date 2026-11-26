@@ -3,15 +3,20 @@ import { GET as jsonGet } from '../../pages/api/driving-bans.json';
 import { GET as icsGet } from '../../pages/api/driving-bans.ics';
 import { dajcEuropeCoverage } from '../../../config/europe-coverage.mjs';
 import { getDrivingBansSnapshot } from '../../../config/driving-ban-calendars/runtime.mjs';
+import { officialDrivingBansView } from './public-view.mjs';
 
 afterEach(() => vi.useRealTimers());
 describe('actual JSON and ICS route contract', () => {
-  it('exports the same rolling 12-month registry, verified events and UTC times', async () => {
+  it('exports only officially verified scopes for the rolling 12-month window, with unchanged UTC event times', async () => {
     vi.useFakeTimers(); vi.setSystemTime(new Date('2026-10-22T10:00:00Z'));
     const response = await jsonGet({} as any);
     const json = await response.json();
-    expect(json).toEqual(getDrivingBansSnapshot());
-    expect(json.jurisdictions.map((row: any) => row.jurisdiction)).toEqual(dajcEuropeCoverage.map(([code])=>code));
+    const canonical = getDrivingBansSnapshot();
+    expect(canonical.jurisdictions.map(row => row.jurisdiction)).toEqual(dajcEuropeCoverage.map(([code]) => code));
+    expect(json).toEqual(officialDrivingBansView(canonical));
+    expect(json.tracked_jurisdictions).toBe(50);
+    expect(json.jurisdictions.length).toBeLessThan(50);
+    expect(json.jurisdictions.every((row: any) => json.events.some((event: any) => event.jurisdiction === row.jurisdiction) || (row.ban_state === 'NO_BAN' && row.coverage_complete))).toBe(true);
     expect(json.window).toMatchObject({from:'2026-10-22',to:'2027-10-22'});
     for (const history of [false,true]) {
       const response = await icsGet({request:new Request(`https://example.test/api/driving-bans.ics${history?'?history=1':''}`)} as any);
@@ -26,7 +31,7 @@ describe('actual JSON and ICS route contract', () => {
         expect(event.DTSTART).toBe(stamp(wanted[index].starts_at));
         expect(event.DTEND).toBe(stamp(wanted[index].ends_at));
       }
-      expect(ics).toContain('X-DAJC-JURISDICTIONS:'+dajcEuropeCoverage.map(([code])=>code).join('\\,'));
+      expect(ics).toContain('X-DAJC-JURISDICTIONS:'+json.jurisdictions.map((row: any) => row.jurisdiction).join('\\,'));
       expect(ics).toContain('X-DAJC-COVERAGE-VERSION:'+json.coverage_version);
       expect(response.headers.get('Cache-Control')).toBe('no-store');
     }
