@@ -1,6 +1,6 @@
 {
   "week": "2026-W48",
-  "checkedAt": "2026-11-26T12:40:37.071Z",
+  "checkedAt": "2026-11-27T12:24:48.866Z",
   "coverageVersion": "2026-10-22.50",
   "jurisdictions": [
     {
@@ -71,7 +71,7 @@
       "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 3
+      "candidateFindings": 5
     },
     {
       "code": "BG",
@@ -121,7 +121,7 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "cz",
-      "candidateFindings": 2
+      "candidateFindings": 4
     },
     {
       "code": "DE",
@@ -141,14 +141,14 @@
       "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "nordics",
-      "candidateFindings": 2
+      "candidateFindings": 3
     },
     {
       "code": "EE",
       "name": "Estonia",
       "sourceScope": "EE",
-      "status": "checked-major-or-short-update-candidates-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "baltics",
       "candidateFindings": 4
@@ -177,8 +177,8 @@
       "code": "FR",
       "name": "France",
       "sourceScope": "FR",
-      "status": "checked-major-or-short-update-candidates-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "fr",
       "candidateFindings": 2
@@ -191,7 +191,7 @@
       "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "east",
-      "candidateFindings": 0
+      "candidateFindings": 1
     },
     {
       "code": "GR",
@@ -207,8 +207,8 @@
       "code": "HR",
       "name": "Croatia",
       "sourceScope": "HR",
-      "status": "checked-source-availability-limited",
-      "scopeReviewRequired": true,
+      "status": "checked-major-or-short-update-candidates-found",
+      "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "si-hr",
       "candidateFindings": 7
@@ -361,7 +361,7 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "benelux",
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "NO",
@@ -381,7 +381,7 @@
       "scopeReviewRequired": false,
       "discovery": "web-search",
       "searchGroup": "pl",
-      "candidateFindings": 1
+      "candidateFindings": 2
     },
     {
       "code": "PT",
@@ -411,14 +411,14 @@
       "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "balkans",
-      "candidateFindings": 5
+      "candidateFindings": 6
     },
     {
       "code": "RU",
       "name": "Russia (European transport scope)",
       "sourceScope": "RU",
-      "status": "checked-no-material-development-found",
-      "scopeReviewRequired": false,
+      "status": "checked-source-availability-limited",
+      "scopeReviewRequired": true,
       "discovery": "web-search",
       "searchGroup": "east",
       "candidateFindings": 0
