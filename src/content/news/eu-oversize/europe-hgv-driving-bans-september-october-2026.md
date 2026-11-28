@@ -4,6 +4,7 @@ description: "DAJC operational reference for published HGV driving bans, weekend
 slug: "europe-hgv-driving-bans-september-october-2026"
 category: "eu-oversize"
 publishedAt: 2026-08-31
+validThrough: 2026-10-31
 language: "en"
 author: "DAJC"
 status: "published"

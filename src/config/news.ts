@@ -146,3 +146,36 @@ export function buildNewsRss(entries: FeedEntry[], site: string, limit = 30): st
     '',
   ].join('\n');
 }
+
+const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+
+/**
+ * The date an EU Oversize Weekly announces in its "Next EU Oversize Weekly"
+ * section, as the 12:00 Europe/Prague release instant (CET/CEST resolved by
+ * the formatter), or null when the article has no such section.
+ */
+export function parseNextEditionDate(markdown: string | undefined): Date | null {
+  const section = String(markdown || '').match(/^##\s*Next EU Oversize Weekly\s*\n+([^\n]+)/im)?.[1] || '';
+  const m = section.match(/(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})/i);
+  if (!m) return null;
+  const [day, month, year] = [Number(m[1]), MONTHS.indexOf(m[2].toLowerCase()), Number(m[3])];
+  // 12:00 local time in Prague is 10:00 or 11:00 UTC; take the later bound so
+  // an edition released at the slot always counts as published on time.
+  return new Date(Date.UTC(year, month, day, 11, 0, 0));
+}
+
+/**
+ * True when the announced next edition is overdue and no edition has been
+ * published since: the announcement must then not be shown as current.
+ * A 36-hour grace window covers late Friday/Saturday catch-up releases.
+ */
+export function isAnnouncedEditionMissing(nextEdition: Date | null, publishedAt: Date[], now: Date = new Date()): boolean {
+  if (!nextEdition) return false;
+  if (now.getTime() <= nextEdition.getTime() + 36 * 3600 * 1000) return false;
+  return !publishedAt.some((date) => date.getTime() >= nextEdition.getTime() - 36 * 3600 * 1000);
+}
+
+/** A reference article whose stated period has ended (e.g. a Driving Bans summary). */
+export function isExpiredReference(validThrough: Date | undefined, now: Date = new Date()): boolean {
+  return Boolean(validThrough) && now.getTime() > (validThrough as Date).getTime() + 24 * 3600 * 1000;
+}

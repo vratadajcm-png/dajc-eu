@@ -1,0 +1,5 @@
+---
+// /news/eu-oversize/ had no page (404). The News archive filters by category.
+export const prerender = false;
+return Astro.redirect('/news?category=eu-oversize', 301);
+---
