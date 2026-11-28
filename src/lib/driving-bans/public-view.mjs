@@ -43,3 +43,19 @@ export function officialDrivingBansView(view) {
     publication_policy: 'PRIMARY_SOURCE_VERIFIED_SCOPES_ONLY',
   };
 }
+
+/**
+ * Freshness statement for the public page, using the same evidence as the
+ * Thursday gate (scripts/audit-driving-bans.mjs): only a review-log entry with
+ * full_registry_sweep counts as a full review, and the review is overdue when
+ * there is none within maxAgeDays or any jurisdiction has an unreviewed active
+ * window. A targeted review or a failed source attempt is never a full review.
+ */
+export function reviewFreshness(reviewLog = [], jurisdictions = [], now = new Date(), maxAgeDays = 8) {
+  const at = (rows) => rows.map(row => row.reviewed_at).filter(Boolean).sort().at(-1) || null;
+  const lastFullReview = at(reviewLog.filter(row => row.full_registry_sweep === true));
+  const lastRecordedReview = at(reviewLog);
+  const activeWindowUnreviewed = jurisdictions.some(row => (row.coverage_failures || []).includes('ACTIVE_WINDOW_NOT_REVERIFIED'));
+  const fullAgeDays = lastFullReview ? (now.getTime() - Date.parse(lastFullReview)) / 86400000 : Infinity;
+  return { lastFullReview, lastRecordedReview, activeWindowUnreviewed, overdue: !(fullAgeDays <= maxAgeDays) || activeWindowUnreviewed };
+}

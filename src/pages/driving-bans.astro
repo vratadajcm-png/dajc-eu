@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getDrivingBansSnapshot } from '../../config/driving-ban-calendars/runtime.mjs';
-import { officialDrivingBansView } from '../lib/driving-bans/public-view.mjs';
+import { officialDrivingBansView, reviewFreshness } from '../lib/driving-bans/public-view.mjs';
+import { canonicalDrivingBans } from '../../config/driving-ban-calendars/runtime.mjs';
 import { openItemTexts } from '../lib/driving-bans/public-labels.mjs';
 export const prerender = false;
 const canonical = getDrivingBansSnapshot();
@@ -18,6 +19,9 @@ const eventsByCountry = new Map<string, typeof view.events>(view.jurisdictions.m
 const verifiedRegions = new Map<string, string[]>(view.jurisdictions.map(j => [j.jurisdiction, [...new Set<string>((eventsByCountry.get(j.jurisdiction) || []).flatMap(e => e.regions as string[]).filter(Boolean))]]));
 type Weight = { any_of?: Weight[]; all_of?: Weight[]; operator?: string; value?: number; unit?: string; applies_to?: string };
 const weightText = (w: Weight): string => w.any_of ? w.any_of.map(weightText).join(label(' OR ', ' NEBO ')) : w.all_of ? w.all_of.map(weightText).join(label(' AND ', ' A ')) : w.operator === 'any' ? `${w.applies_to} (${label('any mass', 'bez hmotnostní hranice')})` : `${w.applies_to} ${w.operator} ${w.unit === 'kg' ? `${(w.value ?? 0) / 1000} t` : `${w.value} ${w.unit}`}`;
+// Same evidence as the Thursday freshness gate; see reviewFreshness().
+const freshness = reviewFreshness(canonicalDrivingBans.review_log, canonical.jurisdictions);
+const reviewDate = (value: string | null) => value ? new Intl.DateTimeFormat(cs ? 'cs-CZ' : 'en-GB', { dateStyle: 'long', timeZone: 'Europe/Prague' }).format(new Date(value)) : label('not completed', 'nedokončeno');
 const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO_BAN' ? label('No driving bans (full-period official review)', 'Bez zákazu (úplné úřední ověření období)') : label(`${j.event_count} individually verified restrictions`, `${j.event_count} jednotlivě ověřených omezení`);
 ---
 <BaseLayout title={title} description={label('Only individually official-source verified HGV restrictions and fully verified NO_BAN findings are listed. Unverified areas are hidden.', 'Zobrazujeme jen jednotlivě ověřená omezení z úředních zdrojů a plně ověřené závěry Bez zákazu. Neověřené oblasti jsou skryté.')}>
@@ -32,7 +36,7 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
     <aside class="notice" role="note">
       <strong>{label('Only official-source verified restrictions and their exact geographic scope are published.', 'Zveřejněna jsou pouze omezení ověřená z úředních zdrojů a jejich přesný územní rozsah.')}</strong>
       <p>{label('A verified regional, road or directional restriction does not verify the rest of the country. Unverified jurisdictions and regions are not listed. Missing events never mean unrestricted travel. “No driving bans” requires a completed primary-source review of the full period.', 'Ověřený regionální, silniční nebo směrový zákaz neznamená ověření zbytku země. Neověřené státy a oblasti se nezobrazují. Chybějící události nikdy neznamenají volný průjezd. „Bez zákazu“ vyžaduje úplné ověření celého období z úředních zdrojů.')}</p>
-      <p>{label('The rolling 12-month calendar is checked weekly on Thursday; future annual decrees may not yet have been published. Urgent changes may trigger a targeted recheck. Always confirm the current official source and your transport permit before departure.', 'Klouzavý dvanáctiměsíční kalendář se kontroluje každý čtvrtek; budoucí roční předpisy ještě nemusely vyjít. Naléhavá změna může vyvolat cílené ověření. Před jízdou vždy zkontrolujte aktuální úřední zdroj a své povolení.')}</p>
+      <p data-last-full-review={freshness.lastFullReview ?? ''}>{label(`Last full registry review: ${freshness.lastFullReview ? reviewDate(freshness.lastFullReview) : 'none recorded'}. Latest recorded review: ${reviewDate(freshness.lastRecordedReview)}${freshness.lastRecordedReview && freshness.lastRecordedReview !== freshness.lastFullReview ? ' (targeted, not the whole registry)' : ''}. A full review of the rolling 12-month calendar is scheduled every Thursday${freshness.overdue ? '; it is overdue, so treat this calendar as possibly incomplete' : ''}. Future annual decrees may not yet have been published. Urgent changes may trigger a targeted recheck. Always confirm the current official source and your transport permit before departure.`, `Poslední úplná kontrola registru: ${freshness.lastFullReview ? reviewDate(freshness.lastFullReview) : 'nezaznamenána'}. Poslední zaznamenaná kontrola: ${reviewDate(freshness.lastRecordedReview)}${freshness.lastRecordedReview && freshness.lastRecordedReview !== freshness.lastFullReview ? ' (cílená, ne celý registr)' : ''}. Úplná kontrola klouzavého dvanáctiměsíčního kalendáře je plánována každý čtvrtek${freshness.overdue ? '; je opožděná, kalendář proto nemusí být úplný' : ''}. Budoucí roční předpisy ještě nemusely vyjít. Naléhavá změna může vyvolat cílené ověření. Před jízdou vždy zkontrolujte aktuální úřední zdroj a své povolení.`)}</p>
     </aside>
     <p class="stats">{published} / {tracked} {label('countries with primary-source verified restrictions / fully reviewed no-ban findings', 'států s úředně ověřenými omezeními / úplně ověřeným stavem bez zákazu')} · {view.events.length} {label('individually verified events', 'jednotlivě ověřených událostí')}</p>
     <p class="small">{label('Verification in progress for unlisted areas; only verified events are shown.', 'Ověření probíhá u nezobrazených oblastí; uvádíme jen ověřené události.')}</p>
@@ -53,6 +57,7 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
         <summary><strong>{j.name}</strong> <span class="code">{j.jurisdiction}</span> <span class="status">{statusText(j)}</span></summary>
         <div class="country-body">
           <p>{label('Period', 'Období')}: {j.period.from} — {j.period.to}. <strong>{label('Only the restrictions below are officially verified.', 'Úředně ověřená jsou pouze níže uvedená omezení.')}</strong></p>
+          <p class="small">{label('Last official-source check', 'Poslední kontrola úředních zdrojů')}: {reviewDate(j.last_checked)}{j.last_verified ? ` · ${label('jurisdiction verified', 'jurisdikce ověřena')} ${reviewDate(j.last_verified)}` : ''}</p>
           {(verifiedRegions.get(j.jurisdiction) || []).length > 0 && <p><strong>{label('Regions with verified individual restrictions', 'Regiony s jednotlivě ověřenými omezeními')}:</strong> {(verifiedRegions.get(j.jurisdiction) || []).join('; ')}. {label('Check the exact road and direction at each event.', 'Přesnou silnici a směr ověřujte u jednotlivých událostí.')}</p>}
           {!j.coverage_complete && <p class="notice">{label('Full jurisdiction verification is incomplete. Additional restrictions may exist; do not interpret missing events as “no ban”.', 'Ověření celé jurisdikce není dokončeno. Mohou existovat další omezení; chybějící události neznamenají „Bez zákazu“.')}</p>}
           {j.coverage_failures.length > 0 && <div class="small"><p>{label('Open review items', 'Otevřené body ověření')}:</p><ul>{openItemTexts(j.coverage_failures, cs).map(text => <li>{text}</li>)}</ul></div>}

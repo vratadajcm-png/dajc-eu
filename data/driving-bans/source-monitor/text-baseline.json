@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "normalizer_version": 2,
+  "generated_at": "2026-11-19T11:23:16.900Z",
+  "note": "Normalised-text baselines (normalizer v2) only for sources whose re-fetched bytes were byte-identical to the reviewed canonical content_sha256 (19 Nov 2026). A baseline cannot vouch for unreviewed bytes or another normalizer version; the monitor ignores such entries.",
+  "sources": {
+    "ch-vrv": {
+      "raw_sha256": "d8772688f6736f3fd393c14e5cc4bafe0609f081717369345db25cd290544139",
+      "text_sha256": "beb32fec75b2ce3f7f45553a2c65b9abcf05c9759acdaef7293d38deb6429ade",
+      "normalizer_version": 2,
+      "captured_at": "2026-11-19T11:23:16.852Z",
+      "url": "https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1962/1364_1409_1420/20261001/de/html/fedlex-data-admin-ch-eli-cc-1962-1364_1409_1420-20261001-de-html.html"
+    },
+    "sk-8": {
+      "raw_sha256": "43b227ae8a4cb33bbd655fe90a338830f9811a0debae1219c26d60082604a776",
+      "text_sha256": "76b3780147125896cbc97a495ac5294c80d5afcedec1e30d9ebb1ec013502579",
+      "normalizer_version": 2,
+      "captured_at": "2026-11-19T11:23:16.896Z",
+      "url": "https://static.slov-lex.sk/static/SK/ZZ/2009/8/20261001.html"
+    },
+    "es-cat-isp-1933-2026": {
+      "raw_sha256": "b3f58a469f5237adbba3033ecf248383bf1e7905276a81f0e5c27e1e7f66bfb8",
+      "text_sha256": "1a88490d8b855bc184915130664e4613ea061325aabf568bfd42eca4f6d60d2f",
+      "normalizer_version": 2,
+      "captured_at": "2026-11-19T11:23:16.897Z",
+      "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-16758"
+    },
+    "es-bas-2026": {
+      "raw_sha256": "0d5117bf4b26b550d3c28b4f149a0a942e7e22e02d426948a2791ab2bb5aa098",
+      "text_sha256": "27885ff1cc2f9d5f67d84485c5e1533e2017b0a98a4578a83607aaed5ad771f8",
+      "normalizer_version": 2,
+      "captured_at": "2026-11-19T11:23:16.900Z",
+      "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-2625"
+    }
+  }
+}
