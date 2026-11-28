@@ -1,0 +1,188 @@
+---
+export const prerender = false;
+
+import { ZodError } from 'zod';
+import PortalLayout from '../../../portal/components/PortalLayout.astro';
+import { notFoundUnlessIntelligenceAccounts, redirectResponse } from '../../../portal/lib/guards';
+import { CUSTOMER_SESSION_SCOPE, ensureCsrfCookie, validateCsrfToken } from '../../../portal/lib/session';
+import { notifySubscriptionRequest } from '../../../portal/lib/email';
+import { isFeatureEnabled } from '../../../lib/intelligence/entitlements';
+import { issueCalendarToken, revokeCalendarToken } from '../../../lib/intelligence/driving-bans-calendar';
+import {
+  AccountInputError, SUBSCRIBABLE_FEATURES, createDbCalendarTokenStore, customerSubject, listSubscriptionRequests,
+  requestSubscription, requireCustomerPrincipal, resolveEntitlement,
+} from '../../../lib/intelligence/accounts';
+import { parseCalendarForm, parseSubscriptionForm, webcalUrl } from '../../../lib/intelligence/account-forms';
+
+const disabled = notFoundUnlessIntelligenceAccounts();
+if (disabled) return disabled;
+
+const customer = await requireCustomerPrincipal(Astro.cookies);
+if (!customer) return redirectResponse('/intelligence/account/login');
+
+const store = createDbCalendarTokenStore();
+const subject = customerSubject(customer);
+let error: string | null = null;
+let notice: string | null = null;
+let issued: { url: string; label: string } | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const csrf = form.get('csrf_token');
+  const action = String(form.get('action') ?? '');
+  if (!validateCsrfToken(Astro.cookies, typeof csrf === 'string' ? csrf : null, CUSTOMER_SESSION_SCOPE)) {
+    error = 'Your session expired, please try again.';
+  } else {
+    try {
+      const now = new Date();
+      if (action === 'request_subscription') {
+        const { features, period, note } = parseSubscriptionForm(form);
+        const request = await requestSubscription({ customer, features, period, note });
+        await notifySubscriptionRequest({ organisation: customer.organisationName, requestedBy: customer.email, features: request.features, period: request.period, requestId: request.id });
+        notice = 'Request sent. DAJC will send a payment link or an invoice; the subscription starts once the payment is recorded.';
+      } else if (action === 'issue_calendar') {
+        const result = await issueCalendarToken({ subject, entitlement: await resolveEntitlement(customer.organisationId, now), filter: parseCalendarForm(form), store, now, baseUrl: Astro.url.origin });
+        if (result.status === 'OK') issued = { url: result.url, label: result.filter.label };
+        else error = result.status === 'TOO_MANY_CALENDARS' ? 'You have reached the limit of active calendars; revoke one first.' : 'Your subscription does not include this calendar (or its vehicle or corridor filter).';
+      } else if (action === 'revoke_calendar') {
+        const revoked = await revokeCalendarToken({ subject, tokenId: String(form.get('token_id') ?? ''), store, now });
+        notice = revoked ? 'Calendar revoked: its address no longer works.' : 'Calendar not found.';
+      }
+    } catch (err) {
+      if (err instanceof AccountInputError) error = err.message;
+      else if (err instanceof ZodError) error = `Check the form: ${err.issues.map(issue => `${issue.path.join('.') || 'value'} - ${issue.message}`).slice(0, 4).join('; ')}`;
+      else throw err;
+    }
+  }
+}
+
+const now = new Date();
+const [entitlement, requests, calendars] = await Promise.all([
+  resolveEntitlement(customer.organisationId, now),
+  listSubscriptionRequests(customer.organisationId),
+  store.listForSubject(subject),
+]);
+const active = entitlement && Date.parse(entitlement.validUntil) > now.getTime();
+const openRequest = requests.find(request => request.status === 'REQUESTED' || request.status === 'INVOICED');
+const calendarAvailable = isFeatureEnabled('personal-calendar') && Boolean(active && entitlement?.features.includes('personal-calendar'));
+const has = (feature: string) => Boolean(active && entitlement?.features.includes(feature as never));
+const csrfToken = ensureCsrfCookie(Astro.cookies, Astro.url, CUSTOMER_SESSION_SCOPE);
+const date = (value: Date | string | null) => (value ? new Date(value).toISOString().slice(0, 10) : '-');
+const FEATURE_LABEL: Record<string, string> = { 'personal-calendar': 'Personal calendar', 'vehicle-aware': 'Vehicle filter', 'route-aware': 'Corridor filter' };
+---
+<PortalLayout title="Account" brand="DAJC Intelligence">
+  <h1>{customer.organisationName}</h1>
+  <p>Signed in as {customer.email} ({customer.role}) -
+    <form class="inline" method="POST" action="/intelligence/account/logout">
+      <input type="hidden" name="csrf_token" value={csrfToken} />
+      <button type="submit">Sign out</button>
+    </form>
+  </p>
+  {error && <p class="flash error">{error}</p>}
+  {notice && <p class="flash success">{notice}</p>}
+
+  {issued && (
+    <fieldset>
+      <legend>New calendar: {issued.label}</legend>
+      <p class="flash success">Copy this address now. It is shown only once and works like a password: anyone with it sees this calendar.</p>
+      <input readonly value={issued.url} />
+      <p><a href={webcalUrl(issued.url)}>Open in the calendar app</a> (Apple Calendar, Outlook).</p>
+      <p>Google Calendar: Other calendars - From URL - paste the address. Calendar apps refresh subscribed calendars on their own schedule (Google roughly every 12-24 hours), so urgent changes also come by alert.</p>
+    </fieldset>
+  )}
+
+  <fieldset>
+    <legend>Subscription</legend>
+    {active ? (
+      <p>Active until <strong>{date(entitlement!.validUntil)}</strong>: {entitlement!.features.map(feature => FEATURE_LABEL[feature] ?? feature).join(', ')}.</p>
+    ) : (
+      <p>No active subscription.</p>
+    )}
+    {requests.length > 0 && (
+      <table>
+        <thead><tr><th>Requested</th><th>Features</th><th>Period</th><th>Status</th></tr></thead>
+        <tbody>
+          {requests.map(request => <tr><td>{date(request.createdAt)}</td><td>{request.features.map(feature => FEATURE_LABEL[feature] ?? feature).join(', ')}</td><td>{request.period}</td><td><span class="badge">{request.status}</span></td></tr>)}
+        </tbody>
+      </table>
+    )}
+    {customer.role === 'OWNER' && !openRequest && (
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value={csrfToken} />
+        <input type="hidden" name="action" value="request_subscription" />
+        <p>{active ? 'Renew or extend' : 'Request'} a subscription. DAJC sends a payment link or an invoice to your billing address; the subscription starts when the payment is recorded.</p>
+        {SUBSCRIBABLE_FEATURES.map(feature => (
+          <label><input type="checkbox" name="features" value={feature} checked={feature === 'personal-calendar' || has(feature)} disabled={feature === 'personal-calendar'} style="width:auto" /> {FEATURE_LABEL[feature]}</label>
+        ))}
+        <label for="period">Period</label>
+        <select id="period" name="period"><option value="MONTH">One month</option><option value="YEAR">One year</option></select>
+        <label for="note">Note (optional)</label>
+        <textarea id="note" name="note" maxlength="500"></textarea>
+        <button type="submit">Send request</button>
+      </form>
+    )}
+    {customer.role !== 'OWNER' && !active && <p>Ask the owner of your organisation to request a subscription.</p>}
+  </fieldset>
+
+  <fieldset>
+    <legend>Personal calendars</legend>
+    {calendars.length === 0 && <p>No calendars yet.</p>}
+    {calendars.length > 0 && (
+      <table>
+        <thead><tr><th>Name</th><th>Created</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          {calendars.map(calendar => (
+            <tr>
+              <td>{calendar.filter.label}</td>
+              <td>{date(calendar.created_at)}</td>
+              <td><span class="badge">{calendar.revoked_at ? 'REVOKED' : 'ACTIVE'}</span></td>
+              <td>{!calendar.revoked_at && (
+                <form class="inline" method="POST">
+                  <input type="hidden" name="csrf_token" value={csrfToken} />
+                  <input type="hidden" name="action" value="revoke_calendar" />
+                  <input type="hidden" name="token_id" value={calendar.token_id} />
+                  <button type="submit" class="danger">Revoke</button>
+                </form>
+              )}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+    {calendarAvailable ? (
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value={csrfToken} />
+        <input type="hidden" name="action" value="issue_calendar" />
+        <label for="label">Name</label>
+        <input id="label" name="label" required maxlength="80" placeholder="Fleet CZ-AT" />
+        <label for="jurisdictions">Countries (codes, empty = all)</label>
+        <input id="jurisdictions" name="jurisdictions" placeholder="CZ, AT, DE" />
+        <label for="type">Restrictions</label>
+        <select id="type" name="type"><option value="all">All HGV and exceptional</option><option value="general">General HGV only</option><option value="exceptional">Exceptional, including relevant HGV bans</option></select>
+        {has('vehicle-aware') && (
+          <>
+            <label for="vehicle_configuration">Vehicle (optional)</label>
+            <select id="vehicle_configuration" name="vehicle_configuration"><option value="">No vehicle filter</option><option value="SOLO">Solo truck</option><option value="TRUCK_TRAILER">Truck with trailer</option><option value="ARTICULATED">Articulated</option><option value="TRACTOR_ONLY">Tractor only</option><option value="OTHER">Other</option></select>
+            <label for="motor_vehicle_mass_kg">Max. authorised mass of the motor vehicle (kg)</label><input id="motor_vehicle_mass_kg" name="motor_vehicle_mass_kg" inputmode="numeric" />
+            <label for="trailer_mass_kg">Max. authorised mass of the trailer (kg)</label><input id="trailer_mass_kg" name="trailer_mass_kg" inputmode="numeric" />
+            <label for="combination_mass_kg">Max. authorised mass of the combination (kg)</label><input id="combination_mass_kg" name="combination_mass_kg" inputmode="numeric" />
+            <label for="axle_count">Axles</label><input id="axle_count" name="axle_count" inputmode="numeric" />
+            <label><input type="checkbox" name="adr" style="width:auto" /> ADR load</label>
+            <label><input type="checkbox" name="exceptional_transport" style="width:auto" /> Exceptional transport</label>
+            <p>Bans that clearly do not apply to the vehicle are left out; where it cannot be decided, the event stays and is marked "(check vehicle)". Exceptions are never evaluated.</p>
+          </>
+        )}
+        {has('route-aware') && (
+          <>
+            <label for="corridor">Corridor (optional, one country per line, e.g. "AT: A12, A13" or "DE")</label>
+            <textarea id="corridor" name="corridor"></textarea>
+          </>
+        )}
+        <button type="submit">Create calendar</button>
+      </form>
+    ) : (
+      <p>Creating calendars needs an active subscription with the personal calendar.</p>
+    )}
+  </fieldset>
+  <p>Missing events never mean that there is no ban. Always check the official source and your permit before departure.</p>
+</PortalLayout>

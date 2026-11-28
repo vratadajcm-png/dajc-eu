@@ -20,6 +20,8 @@ export const DRIVING_BANS_INTELLIGENCE_FEATURES = [
   'history',
   'organisation-preferences',
   'ai-assistant',
+  // A personal calendar feed (secret URL per subscriber) filtered by vehicle and corridor.
+  'personal-calendar',
   // The Intelligence Driving Bans query module itself (search, rules, exceptions, sources).
   // It is also the module switch: no Intelligence Driving Bans tool runs without it.
   'driving-bans-query',
@@ -33,6 +35,7 @@ export const FEATURE_FLAG_ENV: Record<DrivingBansIntelligenceFeature, string> = 
   history: 'DAJC_INTELLIGENCE_HISTORY_ENABLED',
   'organisation-preferences': 'DAJC_INTELLIGENCE_PREFERENCES_ENABLED',
   'ai-assistant': 'DAJC_AI_DRIVING_BANS_ENABLED',
+  'personal-calendar': 'DAJC_INTELLIGENCE_CALENDAR_ENABLED',
   'driving-bans-query': 'DAJC_INTELLIGENCE_BANS_ENABLED',
 };
 
@@ -42,6 +45,19 @@ export const FEATURE_FLAG_ENV: Record<DrivingBansIntelligenceFeature, string> = 
  * in a reviewed release change.
  */
 export const DRIVING_BANS_INTELLIGENCE_RELEASED = false;
+
+/**
+ * Customer accounts (sign-in, subscription requests, calendar management) are a product
+ * area, not an entitlement: they need the release and DAJC_INTELLIGENCE_ACCOUNTS_ENABLED
+ * set to the exact string "true". Off, every account page and API answers 404.
+ */
+export const INTELLIGENCE_ACCOUNTS_FLAG = 'DAJC_INTELLIGENCE_ACCOUNTS_ENABLED';
+export function isIntelligenceAccountsEnabled(
+  env: Record<string, string | undefined> = process.env,
+  released: boolean = DRIVING_BANS_INTELLIGENCE_RELEASED,
+): boolean {
+  return released === true && env[INTELLIGENCE_ACCOUNTS_FLAG] === 'true';
+}
 
 export function isFeatureEnabled(
   feature: DrivingBansIntelligenceFeature,

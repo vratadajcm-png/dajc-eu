@@ -1,5 +1,6 @@
 // Shared request-handling helpers for Partner Portal routes.
 import { isPartnerPortalEnabled } from '../config/gate';
+import { isIntelligenceAccountsEnabled } from '../../lib/intelligence/entitlements';
 
 const NOT_FOUND_HEADERS = {
   'Content-Type': 'text/plain; charset=utf-8',
@@ -13,6 +14,15 @@ const NOT_FOUND_HEADERS = {
 // single point of failure for the gate. See docs/PARTNER_PORTAL.md.
 export function notFoundIfPortalDisabled(): Response | null {
   if (!isPartnerPortalEnabled()) {
+    return new Response('Not found', { status: 404, headers: NOT_FOUND_HEADERS });
+  }
+  return null;
+}
+
+// Route-local re-check of the DAJC Intelligence accounts gate (release constant plus
+// DAJC_INTELLIGENCE_ACCOUNTS_ENABLED); src/middleware.ts checks it first.
+export function notFoundUnlessIntelligenceAccounts(): Response | null {
+  if (!isIntelligenceAccountsEnabled()) {
     return new Response('Not found', { status: 404, headers: NOT_FOUND_HEADERS });
   }
   return null;

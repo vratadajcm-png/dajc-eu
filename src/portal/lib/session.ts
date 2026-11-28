@@ -10,11 +10,21 @@ import { sessions, partnerContacts } from '../db/schema';
 import { generateSecureToken, hashToken } from './tokens';
 import { isAllowlistedAdmin } from '../config/adminAllowlist';
 
-const SESSION_COOKIE = 'dajc_portal_session';
-const CSRF_COOKIE = 'dajc_portal_csrf';
 const SESSION_TTL_SECONDS = 12 * 60 * 60; // 12h - short-lived by design; re-auth via magic link, not "remember me"
 
-export type PrincipalType = 'ADMIN' | 'PARTNER_CONTACT';
+export type PrincipalType = 'ADMIN' | 'PARTNER_CONTACT' | 'CUSTOMER';
+
+// Where a session's cookies live and which principals they may carry. The Partner
+// Portal and the DAJC Intelligence customer area share the session table but never a
+// cookie: a customer session is invisible under /partner-portal and the reverse.
+export interface SessionScope {
+  sessionCookie: string;
+  csrfCookie: string;
+  path: string;
+  principalTypes: readonly PrincipalType[];
+}
+export const PORTAL_SESSION_SCOPE: SessionScope = { sessionCookie: 'dajc_portal_session', csrfCookie: 'dajc_portal_csrf', path: '/partner-portal', principalTypes: ['ADMIN', 'PARTNER_CONTACT'] };
+export const CUSTOMER_SESSION_SCOPE: SessionScope = { sessionCookie: 'dajc_customer_session', csrfCookie: 'dajc_customer_csrf', path: '/intelligence/account', principalTypes: ['CUSTOMER'] };
 
 export interface PortalSession {
   id: string;
@@ -32,21 +42,22 @@ export interface PortalSession {
 // request's own protocol is unambiguous regardless of platform env-var
 // behavior, and self-corrects if the site is ever served over both
 // http/https during migration.
-function cookieOptions(maxAgeSeconds: number, httpOnly: boolean, secure: boolean) {
+function cookieOptions(maxAgeSeconds: number, httpOnly: boolean, secure: boolean, path: string) {
   return {
     httpOnly,
     secure,
     sameSite: 'lax' as const,
-    path: '/partner-portal',
+    path,
     maxAge: maxAgeSeconds,
   };
 }
 
+// `db` lets a caller create the session inside its own transaction (login consumption).
 export async function createSession(
   principalType: PrincipalType,
-  principalRef: string
+  principalRef: string,
+  db = getPortalDb()
 ): Promise<{ rawToken: string; expiresAt: Date }> {
-  const db = getPortalDb();
   const rawToken = generateSecureToken();
   const expiresAt = new Date(Date.now() + SESSION_TTL_SECONDS * 1000);
 
@@ -60,24 +71,24 @@ export async function createSession(
   return { rawToken, expiresAt };
 }
 
-export function setSessionCookies(cookies: AstroCookies, rawToken: string, expiresAt: Date, requestUrl: URL): void {
+export function setSessionCookies(cookies: AstroCookies, rawToken: string, expiresAt: Date, requestUrl: URL, scope: SessionScope = PORTAL_SESSION_SCOPE): void {
   const maxAge = Math.max(1, Math.floor((expiresAt.getTime() - Date.now()) / 1000));
   const secure = requestUrl.protocol === 'https:';
-  cookies.set(SESSION_COOKIE, rawToken, cookieOptions(maxAge, true, secure));
+  cookies.set(scope.sessionCookie, rawToken, cookieOptions(maxAge, true, secure, scope.path));
   // CSRF cookie is deliberately NOT httpOnly - the double-submit pattern
   // requires same-origin JS/form code to be able to read it and echo it
   // back on state-changing requests. It carries no session authority by
   // itself.
-  cookies.set(CSRF_COOKIE, generateSecureToken(), cookieOptions(maxAge, false, secure));
+  cookies.set(scope.csrfCookie, generateSecureToken(), cookieOptions(maxAge, false, secure, scope.path));
 }
 
-export function clearSessionCookies(cookies: AstroCookies): void {
-  cookies.delete(SESSION_COOKIE, { path: '/partner-portal' });
-  cookies.delete(CSRF_COOKIE, { path: '/partner-portal' });
+export function clearSessionCookies(cookies: AstroCookies, scope: SessionScope = PORTAL_SESSION_SCOPE): void {
+  cookies.delete(scope.sessionCookie, { path: scope.path });
+  cookies.delete(scope.csrfCookie, { path: scope.path });
 }
 
-export async function getCurrentSession(cookies: AstroCookies): Promise<PortalSession | null> {
-  const rawToken = cookies.get(SESSION_COOKIE)?.value;
+export async function getCurrentSession(cookies: AstroCookies, scope: SessionScope = PORTAL_SESSION_SCOPE): Promise<PortalSession | null> {
+  const rawToken = cookies.get(scope.sessionCookie)?.value;
   if (!rawToken) return null;
 
   const db = getPortalDb();
@@ -90,6 +101,8 @@ export async function getCurrentSession(cookies: AstroCookies): Promise<PortalSe
 
   if (!row) return null;
   if (row.expiresAt.getTime() <= Date.now()) return null;
+  // A session only counts in the area it was issued for.
+  if (!scope.principalTypes.includes(row.principalType)) return null;
 
   await db.update(sessions).set({ lastSeenAt: new Date() }).where(eq(sessions.id, row.id));
 
@@ -101,20 +114,20 @@ export async function getCurrentSession(cookies: AstroCookies): Promise<PortalSe
   };
 }
 
-export async function revokeSession(cookies: AstroCookies): Promise<void> {
-  const rawToken = cookies.get(SESSION_COOKIE)?.value;
+export async function revokeSession(cookies: AstroCookies, scope: SessionScope = PORTAL_SESSION_SCOPE): Promise<void> {
+  const rawToken = cookies.get(scope.sessionCookie)?.value;
   if (rawToken) {
     const db = getPortalDb();
     await db.update(sessions).set({ revokedAt: new Date() }).where(eq(sessions.tokenHash, hashToken(rawToken)));
   }
-  clearSessionCookies(cookies);
+  clearSessionCookies(cookies, scope);
 }
 
 // CSRF: double-submit cookie check for every state-changing (non-GET)
 // portal request. Cross-site requests cannot read the CSRF cookie's value
 // (browser same-origin policy), so they cannot supply a matching token.
-export function validateCsrfToken(cookies: AstroCookies, submittedToken: string | null | undefined): boolean {
-  const cookieValue = cookies.get(CSRF_COOKIE)?.value;
+export function validateCsrfToken(cookies: AstroCookies, submittedToken: string | null | undefined, scope: SessionScope = PORTAL_SESSION_SCOPE): boolean {
+  const cookieValue = cookies.get(scope.csrfCookie)?.value;
   if (!cookieValue || !submittedToken) return false;
   return cookieValue === submittedToken;
 }
@@ -126,12 +139,12 @@ export function validateCsrfToken(cookies: AstroCookies, submittedToken: string 
 // it in when it's still missing.
 const CSRF_STANDALONE_TTL_SECONDS = 60 * 60; // 1h - long enough to fill in a form, short-lived by default
 
-export function ensureCsrfCookie(cookies: AstroCookies, requestUrl: URL): string {
-  const existing = cookies.get(CSRF_COOKIE)?.value;
+export function ensureCsrfCookie(cookies: AstroCookies, requestUrl: URL, scope: SessionScope = PORTAL_SESSION_SCOPE): string {
+  const existing = cookies.get(scope.csrfCookie)?.value;
   if (existing) return existing;
 
   const token = generateSecureToken();
-  cookies.set(CSRF_COOKIE, token, cookieOptions(CSRF_STANDALONE_TTL_SECONDS, false, requestUrl.protocol === 'https:'));
+  cookies.set(scope.csrfCookie, token, cookieOptions(CSRF_STANDALONE_TTL_SECONDS, false, requestUrl.protocol === 'https:', scope.path));
   return token;
 }
 

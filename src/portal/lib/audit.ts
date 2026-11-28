@@ -5,7 +5,7 @@ import { desc, eq } from 'drizzle-orm';
 import { getPortalDb } from '../db/client';
 import { auditLog } from '../db/schema';
 
-export type ActorType = 'ADMIN' | 'PARTNER_CONTACT' | 'SYSTEM';
+export type ActorType = 'ADMIN' | 'PARTNER_CONTACT' | 'SYSTEM' | 'CUSTOMER';
 
 // Every audit action recognized by the portal (section 9 of the spec).
 // Keeping this a closed union catches typos at compile time and gives a
@@ -32,7 +32,18 @@ export type AuditAction =
   | 'grant.revoked'
   | 'api_client.created'
   | 'api_client.rotated'
-  | 'api_client.revoked';
+  | 'api_client.revoked'
+  // DAJC Intelligence customer accounts (src/lib/intelligence/accounts.ts).
+  | 'intelligence.organisation_created'
+  | 'intelligence.organisation_status_changed'
+  | 'intelligence.member_added'
+  | 'intelligence.member_status_changed'
+  | 'intelligence.subscription_requested'
+  | 'intelligence.subscription_request_updated'
+  | 'intelligence.entitlement_granted'
+  | 'intelligence.entitlement_revoked'
+  | 'intelligence.calendar_issued'
+  | 'intelligence.calendar_revoked';
 
 // Defense-in-depth: even if a caller accidentally passes a secret-shaped
 // field, strip it before it ever reaches the database. Callers must still

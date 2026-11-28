@@ -66,9 +66,10 @@ describe('feature flags and entitlements', () => {
     expect(tenantRecords(records, 'org-a')).toEqual([{ organizationId: 'org-a', id: 1 }]);
     expect(() => requireSameTenant(records[1], 'org-a')).toThrow(/Cross-tenant/);
     for (const file of ['src/pages/api/driving-bans.json.ts', 'src/pages/api/driving-bans.ics.ts', 'src/pages/driving-bans.astro']) expect(readFileSync(file, 'utf8')).not.toMatch(/entitlement|authorizeFeature/);
-    // Any future paid Driving Bans endpoint must go through the shared guard.
+    // Any future paid Driving Bans endpoint must go through a shared guard: the session guard, or for
+    // calendar apps (which cannot sign in) the personal calendar handler, which authorises every fetch.
     const apiDir = 'src/pages/api';
-    for (const file of readdirSync(apiDir, { recursive: true }).map(String).filter(name => /intelligence|ai/i.test(name) && /\.(ts|js|mjs)$/.test(name))) expect(readFileSync(join(apiDir, file), 'utf8')).toContain('handleEntitledRequest');
+    for (const file of readdirSync(apiDir, { recursive: true }).map(String).filter(name => /intelligence|ai/i.test(name) && /\.(ts|js|mjs)$/.test(name))) expect(readFileSync(join(apiDir, file), 'utf8')).toMatch(/handleEntitledRequest|handleCalendarFeedRequest/);
   });
 });
 

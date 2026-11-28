@@ -63,9 +63,11 @@ export const environmentEnum = pgEnum('portal_environment', ['SANDBOX', 'PRODUCT
 // is active, it just refreshes when it was last rotated.
 export const apiClientStatusEnum = pgEnum('api_client_status', ['PENDING', 'ACTIVE', 'REVOKED']);
 
-export const principalTypeEnum = pgEnum('portal_principal_type', ['ADMIN', 'PARTNER_CONTACT']);
+// CUSTOMER: a member of a DAJC Intelligence customer organisation (src/portal/db/intelligenceSchema.ts),
+// signing in through the same magic-link mechanism; it never resolves to a partner principal.
+export const principalTypeEnum = pgEnum('portal_principal_type', ['ADMIN', 'PARTNER_CONTACT', 'CUSTOMER']);
 
-export const actorTypeEnum = pgEnum('portal_actor_type', ['ADMIN', 'PARTNER_CONTACT', 'SYSTEM']);
+export const actorTypeEnum = pgEnum('portal_actor_type', ['ADMIN', 'PARTNER_CONTACT', 'SYSTEM', 'CUSTOMER']);
 
 // --- Partner registry --------------------------------------------------------
 

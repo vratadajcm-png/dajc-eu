@@ -12,9 +12,16 @@ for (const file of ['src/pages/driving-bans.astro','src/pages/api/driving-bans.i
   assert(code.includes('driving-ban-calendars/runtime.mjs'),`${file}: missing canonical boundary`);
   assert(!/from\s+['"][^'"]*(?:driving-bans-legacy|verified-sep-oct-2026|current-exceptions|public-holidays|tests\/fixtures|driving-bans\/staging|evidence-store|review-workflow)/.test(code),`${file}: archived, test or unapproved staging evidence imported at runtime`);
 }
-// Intelligence and AI contracts stay unreleased: no public page or API route may import them.
+// Intelligence and AI contracts stay unreleased. Research and AI modules never reach a page or
+// API route. The other Intelligence modules only reach the gated customer and admin areas
+// (sign-in, subscriptions, personal calendars), and only in a file that checks the gate.
+const UNRELEASED_INTELLIGENCE=/from\s+['"][^'"]*(?:driving-bans-relevance|driving-bans-calendar|driving-bans-query|driving-bans-alerts|intelligence\/entitlements|intelligence\/accounts|intelligence\/account-forms)/;
+const NEVER_IN_ROUTES=/from\s+['"][^'"]*(?:driving-bans-ai-contract|driving-bans-ai-explain|driving-bans-intelligence-api|driving-ban-connectors|driving-bans\/research\/|lib\/ai\/)/;
+const GATED_ROUTES=/^src\/pages\/(?:intelligence\/account\/|api\/intelligence\/|partner-portal\/admin\/intelligence\/|partner-portal\/admin\/index\.astro$)/;
 for (const file of execFileSync('git',['ls-files','src/pages'],{encoding:'utf8'}).split('\n').filter(name=>/\.(astro|ts|mjs|js)$/.test(name))) {
-  assert(!/from\s+['"][^'"]*(?:driving-bans-relevance|driving-bans-ai-contract|driving-bans-query|driving-bans-intelligence-api|driving-ban-connectors|driving-bans-alerts|intelligence\/entitlements|driving-bans\/research\/|lib\/ai\/)/.test(readFileSync(file,'utf8')),`${file}: unreleased Driving Bans Intelligence, research or AI module imported by a public route`);
+  const code=readFileSync(file,'utf8');
+  assert(!NEVER_IN_ROUTES.test(code),`${file}: unreleased Driving Bans Intelligence, research or AI module imported by a route`);
+  if (UNRELEASED_INTELLIGENCE.test(code)) assert(GATED_ROUTES.test(file)&&/(?:notFoundUnlessIntelligenceAccounts|isIntelligenceAccountsEnabled)\(\)/.test(code),`${file}: unreleased Driving Bans Intelligence module imported outside a gated customer or admin route`);
 }
 // Research prepares drafts only: syntax of every research module, and none writes the canonical dataset.
 for (const file of ['src/lib/ai/providers.mjs','src/lib/ai/orchestrator.mjs','src/lib/ai/model-profile.mjs','scripts/ai-benchmark-consolidate.mjs','scripts/driving-bans-research-live.mjs','scripts/ai-lab-live-evidence.mjs','src/lib/driving-bans/research/safe-fetch.mjs','src/lib/driving-bans/research/documents.mjs','src/lib/driving-bans/research/discovery.mjs','src/lib/driving-bans/research/extraction.mjs','src/lib/driving-bans/research/cross-check.mjs','src/lib/driving-bans/research/proposal.mjs','src/lib/driving-bans/research/pipeline.mjs','src/lib/driving-bans/research/promote.mjs','src/lib/driving-bans/research/config.mjs','scripts/driving-bans-research.mjs']) execFileSync(process.execPath,['--check',file],{stdio:'inherit'});

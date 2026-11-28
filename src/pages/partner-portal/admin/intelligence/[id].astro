@@ -1,0 +1,146 @@
+---
+export const prerender = false;
+
+import PortalLayout from '../../../../portal/components/PortalLayout.astro';
+import { notFoundIfPortalDisabled, notFoundUnlessIntelligenceAccounts, redirectResponse } from '../../../../portal/lib/guards';
+import { requireAdminPrincipal, ensureCsrfCookie, validateCsrfToken } from '../../../../portal/lib/session';
+import { DRIVING_BANS_INTELLIGENCE_FEATURES } from '../../../../lib/intelligence/entitlements';
+import {
+  AccountInputError, addMember, getOrganisationDetail, grantEntitlement, revokeEntitlement, setMemberStatus, setOrganisationStatus,
+} from '../../../../lib/intelligence/accounts';
+
+const disabled = notFoundIfPortalDisabled() ?? notFoundUnlessIntelligenceAccounts();
+if (disabled) return disabled;
+
+const admin = await requireAdminPrincipal(Astro.cookies);
+if (!admin) return redirectResponse('/partner-portal/admin/login');
+
+const organisationId = Astro.params.id ?? '';
+if (!/^[0-9a-f-]{36}$/.test(organisationId)) return redirectResponse('/partner-portal/admin/intelligence');
+
+let error: string | null = null;
+let notice: string | null = null;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const csrf = form.get('csrf_token');
+  const action = String(form.get('action') ?? '');
+  const field = (name: string) => String(form.get(name) ?? '').trim();
+  if (!validateCsrfToken(Astro.cookies, typeof csrf === 'string' ? csrf : null)) {
+    error = 'Your session expired, please try again.';
+  } else {
+    try {
+      if (action === 'organisation_status') {
+        await setOrganisationStatus(organisationId, field('status') as 'ACTIVE' | 'SUSPENDED' | 'CLOSED', admin.email);
+        notice = 'Organisation status updated.';
+      } else if (action === 'add_member') {
+        await addMember({ organisationId, email: field('email'), role: field('role') === 'OWNER' ? 'OWNER' : 'MEMBER', actor: admin.email });
+        notice = 'Member added; they can request a sign-in link.';
+      } else if (action === 'member_status') {
+        await setMemberStatus(field('member_id'), field('status') as 'ACTIVE' | 'SUSPENDED' | 'REMOVED', admin.email);
+        notice = 'Member updated.';
+      } else if (action === 'grant') {
+        const validFrom = new Date(`${field('valid_from')}T00:00:00Z`), validUntil = new Date(`${field('valid_until')}T00:00:00Z`);
+        if (!Number.isFinite(validFrom.getTime()) || !Number.isFinite(validUntil.getTime())) throw new AccountInputError('Enter valid dates');
+        await grantEntitlement({ organisationId, features: form.getAll('features').map(String), validFrom, validUntil, paymentReference: field('payment_reference') || null, actor: admin.email });
+        notice = 'Entitlement granted; it replaces the previous one.';
+      } else if (action === 'revoke') {
+        notice = (await revokeEntitlement(organisationId, admin.email)) ? 'Entitlement revoked.' : 'No current entitlement.';
+      }
+    } catch (err) {
+      if (err instanceof AccountInputError) error = err.message;
+      else throw err;
+    }
+  }
+}
+
+const detail = await getOrganisationDetail(organisationId);
+if (!detail) return redirectResponse('/partner-portal/admin/intelligence');
+const { organisation, members, entitlements, requests, activeCalendars } = detail;
+const current = entitlements.find(row => !row.revokedAt) ?? null;
+const csrfToken = ensureCsrfCookie(Astro.cookies, Astro.url);
+const date = (value: Date | null) => (value ? value.toISOString().slice(0, 10) : '-');
+const today = new Date().toISOString().slice(0, 10);
+---
+<PortalLayout title={`Admin - ${organisation.legalName}`}>
+  <p><a href="/partner-portal/admin/intelligence">All Intelligence customers</a></p>
+  <h1>{organisation.legalName} <span class="badge">{organisation.status}</span></h1>
+  <p>{organisation.country} - {organisation.registrationId}{organisation.vatId && ` - VAT ${organisation.vatId}`} - billing {organisation.billingEmail} - {activeCalendars} active calendars</p>
+  {error && <p class="flash error">{error}</p>}
+  {notice && <p class="flash success">{notice}</p>}
+
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value={csrfToken} />
+    <input type="hidden" name="action" value="organisation_status" />
+    <select name="status">{['ACTIVE', 'SUSPENDED', 'CLOSED'].map(status => <option value={status} selected={status === organisation.status}>{status}</option>)}</select>
+    <button type="submit">Set status</button>
+  </form>
+
+  <fieldset>
+    <legend>Members</legend>
+    <table>
+      <tbody>
+        {members.map(member => (
+          <tr>
+            <td>{member.email}</td><td>{member.role}</td><td><span class="badge">{member.status}</span></td><td>last sign-in {date(member.lastLoginAt)}</td>
+            <td>
+              <form class="inline" method="POST">
+                <input type="hidden" name="csrf_token" value={csrfToken} />
+                <input type="hidden" name="action" value="member_status" />
+                <input type="hidden" name="member_id" value={member.id} />
+                <select name="status">{['ACTIVE', 'SUSPENDED', 'REMOVED'].map(status => <option value={status} selected={status === member.status}>{status}</option>)}</select>
+                <button type="submit">Set</button>
+              </form>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value={csrfToken} />
+      <input type="hidden" name="action" value="add_member" />
+      <label for="email">Email</label><input id="email" name="email" type="email" required />
+      <label for="role">Role</label><select id="role" name="role"><option value="MEMBER">Member</option><option value="OWNER">Owner (may request subscriptions)</option></select>
+      <button type="submit">Add member</button>
+    </form>
+  </fieldset>
+
+  <fieldset>
+    <legend>Entitlement</legend>
+    {current ? (
+      <p>{current.features.join(', ')} from {date(current.validFrom)} until <strong>{date(current.validUntil)}</strong>{current.paymentReference && ` - payment ${current.paymentReference}`}</p>
+    ) : <p>No current entitlement.</p>}
+    {current && (
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value={csrfToken} />
+        <input type="hidden" name="action" value="revoke" />
+        <button type="submit" class="danger">Revoke now</button>
+      </form>
+    )}
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value={csrfToken} />
+      <input type="hidden" name="action" value="grant" />
+      <p>Grant manually (replaces the current entitlement), e.g. for a payment recorded outside a request.</p>
+      {DRIVING_BANS_INTELLIGENCE_FEATURES.map(feature => <label><input type="checkbox" name="features" value={feature} checked={current?.features.includes(feature) ?? feature === 'personal-calendar'} style="width:auto" /> {feature}</label>)}
+      <label for="valid_from">Valid from</label><input id="valid_from" name="valid_from" type="date" value={today} required />
+      <label for="valid_until">Valid until</label><input id="valid_until" name="valid_until" type="date" required />
+      <label for="payment_reference">Payment reference</label><input id="payment_reference" name="payment_reference" />
+      <button type="submit">Grant</button>
+    </form>
+    {entitlements.length > 0 && (
+      <table>
+        <thead><tr><th>Granted</th><th>Features</th><th>Until</th><th>By</th><th>Revoked</th></tr></thead>
+        <tbody>{entitlements.map(row => <tr><td>{date(row.grantedAt)}</td><td>{row.features.join(', ')}</td><td>{date(row.validUntil)}</td><td>{row.grantedBy}</td><td>{date(row.revokedAt)}</td></tr>)}</tbody>
+      </table>
+    )}
+  </fieldset>
+
+  <fieldset>
+    <legend>Subscription requests</legend>
+    {requests.length === 0 && <p>None.</p>}
+    <table>
+      <tbody>{requests.map(request => <tr><td>{date(request.createdAt)}</td><td>{request.features.join(', ')}</td><td>{request.period}</td><td><span class="badge">{request.status}</span></td><td>{request.paymentReference ?? ''}</td></tr>)}</tbody>
+    </table>
+    <p>Open requests are handled on the <a href="/partner-portal/admin/intelligence">customer overview</a>.</p>
+  </fieldset>
+</PortalLayout>

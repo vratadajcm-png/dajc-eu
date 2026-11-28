@@ -1,0 +1,18 @@
+---
+export const prerender = false;
+
+import { notFoundUnlessIntelligenceAccounts, redirectResponse } from '../../../portal/lib/guards';
+import { CUSTOMER_SESSION_SCOPE, revokeSession, validateCsrfToken } from '../../../portal/lib/session';
+
+const disabled = notFoundUnlessIntelligenceAccounts();
+if (disabled) return disabled;
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const csrf = form.get('csrf_token');
+  if (validateCsrfToken(Astro.cookies, typeof csrf === 'string' ? csrf : null, CUSTOMER_SESSION_SCOPE)) {
+    await revokeSession(Astro.cookies, CUSTOMER_SESSION_SCOPE);
+  }
+}
+return redirectResponse('/intelligence/account/login');
+---
