@@ -91,10 +91,15 @@ describe('Public Driving Bans review freshness (live audit 28 Nov 2026)', () => 
     expect(reviewFreshness(recent, [{ coverage_failures: ['ACTIVE_WINDOW_NOT_REVERIFIED'] }], now).overdue).toBe(true);
     expect(reviewFreshness([{ reviewed_at: '2026-11-12T09:00:00.000Z', full_registry_sweep: true }], [], now).overdue).toBe(true);
   });
-  it('the real registry has no recorded full sweep, so the page must say the review is overdue', () => {
-    const f = reviewFreshness(canonicalDrivingBans.review_log, original().jurisdictions, now);
-    expect(f.lastFullReview).toBeNull();
-    expect(f.overdue).toBe(true);
+  it('on the real registry, every snapshot row carries coverage_failures and no full sweep means overdue', () => {
+    // The page passes snapshot rows (not raw canonical.json rows); a missing field would hide the warning.
+    const rows = original().jurisdictions;
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) expect(Array.isArray(row.coverage_failures)).toBe(true);
+    const f = reviewFreshness(canonicalDrivingBans.review_log, rows, now);
+    expect(f.activeWindowUnreviewed).toBe(rows.some((row: any) => row.coverage_failures.includes('ACTIVE_WINDOW_NOT_REVERIFIED')));
+    // Data-independent: stays valid after the first recorded full sweep.
+    if (f.lastFullReview === null) expect(f.overdue).toBe(true);
   });
   it('the page uses the shared freshness rule, never an unconditional weekly promise', () => {
     const page = readFileSync('src/pages/driving-bans.astro', 'utf8');
