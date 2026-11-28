@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "dataset_version": "2026-11-02.r5-es-de-targeted.geo50",
+ "dataset_version": "2026-11-28.r8-new-year-eves-pt.geo50",
  "window": {
   "from": "2026-09-01",
   "to": "2026-12-31"
@@ -260,7 +260,8 @@
    "last_checked": "2026-10-27T11:20:00.000Z",
    "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
-    "lu-police"
+    "lu-police",
+    "lu-police-2026-11-28"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [],
@@ -350,7 +351,7 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": "November window added: France-bound Armistice Day (10-11 Nov). Review 2026-10-27: the weekend rules had a published window ending 31 Oct although the restriction applies all year; extended through 31 Dec.",
+   "notes": "November window added: France-bound Armistice Day (10-11 Nov). Review 2026-10-27: the weekend rules had a published window ending 31 Oct although the restriction applies all year; extended through 31 Dec. Review 2026-11-28.r8-new-year-eves-pt: New Year's Day France- and Germany-bound transit bans from 31 Dec added.",
    "review_log": [
     {
      "review_id": "2026-10-27.r4-nov-dec-priority",
@@ -360,6 +361,15 @@
       "to": "2026-12-31"
      },
      "scope": "FULL_SCOPE_PRIMARY"
+    },
+    {
+     "review_id": "2026-11-28.r8-new-year-eves-pt",
+     "reviewed_at": "2026-11-28T10:00:00.000Z",
+     "period": {
+      "from": "2026-12-01",
+      "to": "2026-12-31"
+     },
+     "scope": "INDIVIDUAL_RULES_ONLY"
     }
    ]
   },
@@ -558,14 +568,17 @@
     "es-cat-isp-300-2026",
     "es-cat-isp-1933-2026",
     "es-cat-sct-2026",
-    "es-bas-2026"
+    "es-bas-2026",
+    "es-boe-2026-11-20",
+    "es-cat-isp-300-2026-11-20",
+    "cat-labour-holidays-2026",
+    "es-bas-2026-11-20"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [
     "ES_ANNEX_V_EXCEPTIONAL_ADR_RESTRICTIONS_NOT_EVENT_ENCODED",
     "ES_REGIONAL_HOLIDAY_VARIANTS_NOT_ENCODED",
     "NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED",
-    "ES_DECEMBER_2026_ANNEX_II_AND_REGIONAL_ROWS_NOT_ENCODED",
     "ES_CATALONIA_EUROMODULAR_SPECIAL_AND_ADR_RESTRICTIONS_NOT_ENCODED",
     "ES_BASQUE_ADR_AND_SPECIAL_TRANSPORT_RESTRICTIONS_NOT_ENCODED",
     "ES_CATALONIA_ANNUAL_ROW_DIRECTION_NOT_INTERPRETED"
@@ -583,7 +596,7 @@
      "evidence_ids": [
       "es-boe"
      ],
-     "note": "All Annex II dated tables in the span encoded."
+     "note": "All Annex II dated tables in the span encoded. December 2026 Annex II tables encoded 2026-11-20."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
@@ -612,9 +625,11 @@
       "es-cat-isp-300-2026",
       "es-cat-isp-1933-2026",
       "es-cat-sct-2026",
-      "es-bas-2026"
+      "es-bas-2026",
+      "es-cat-isp-300-2026-11-20",
+      "cat-labour-holidays-2026"
      ],
-     "note": "Catalonia and Basque Country run their own calendars within ES, with separate regional applicability. November 2026 general-goods rows of both regions encoded on 2026-11-02; ADR, special-transport, euromodular and December rows are not; autonomous-community holidays for Annex V not encoded."
+     "note": "Catalonia and Basque Country run their own calendars within ES, with separate regional applicability. November 2026 general-goods rows of both regions encoded on 2026-11-02; ADR, special-transport, euromodular and December rows are not; autonomous-community holidays for Annex V not encoded. 2026-11-20: December 2026 general-goods rows of Catalonia (Annex A, Aran 7.1) and the Basque Country (Annex II items 1-2) encoded."
     },
     "corridors": {
      "state": "UNVERIFIED",
@@ -622,7 +637,7 @@
       "es-boe-2026-11-02",
       "es-cat-isp-300-2026"
      ],
-     "note": "Corrected 2026-11-02: the earlier PRIMARY_VERIFIED state did not cover Annex VII. Annex VII (N-340, N-124, N-232) and the Catalan permanent restrictions (sections 8-9) are now encoded for November; Catalan AP-7 euromodular restrictions and the Val d'Aran N-230/C-28 calendar are not."
+     "note": "Corrected 2026-11-02: the earlier PRIMARY_VERIFIED state did not cover Annex VII. Annex VII (N-340, N-124, N-232) and the Catalan permanent restrictions (sections 8-9) are now encoded for November; Catalan AP-7 euromodular restrictions and the Val d'Aran N-230/C-28 calendar are not. 2026-11-20: Annex VII and Catalan sections 8-9 re-read for December; Aran N-230/C-28 December rows encoded."
     },
     "directional": {
      "state": "PRIMARY_VERIFIED",
@@ -661,7 +676,7 @@
      "note": "Annex V restrictions for complementary-authorisation vehicles not encoded as events."
     }
    },
-   "notes": "Corrected in this sweep: previous data held only 14 October rows; the full Annex II tables (6 Sep, 8-12 Oct, 30 Oct-2 Nov, 27-29 Nov) are now encoded and the 14 legacy rows are SUPERSEDED. Review 2026-11-02.r5-es-de-targeted: BOE-A-2026-1255 Annex II November rows re-read and matched 44/44; Annex VII, Catalonia (ISP/300/2026) and Basque Country (BOE-A-2026-2625) November general-goods restrictions added. December 2026 not reviewed.",
+   "notes": "Corrected in this sweep: previous data held only 14 October rows; the full Annex II tables (6 Sep, 8-12 Oct, 30 Oct-2 Nov, 27-29 Nov) are now encoded and the 14 legacy rows are SUPERSEDED. Review 2026-11-02.r5-es-de-targeted: BOE-A-2026-1255 Annex II November rows re-read and matched 44/44; Annex VII, Catalonia (ISP/300/2026) and Basque Country (BOE-A-2026-2625) November general-goods restrictions added. December 2026 not reviewed. Review 2026-11-20.r7-es-dec-cat-bas: December 2026 Annex II (72 row-dates, 63 rules), Catalonia (Annex A La Inmaculada, Pyrenees winter Sundays/holidays, Aran 7.1) and Basque Country (Annex II items 1-2) general-goods rows encoded; Annex VII and Catalan permanent rules re-read.",
    "review_log": [
     {
      "review_id": "2026-11-02.r5-es-de-targeted",
@@ -669,6 +684,15 @@
      "period": {
       "from": "2026-11-01",
       "to": "2026-11-30"
+     },
+     "scope": "INDIVIDUAL_RULES_ONLY"
+    },
+    {
+     "review_id": "2026-11-20.r7-es-dec-cat-bas",
+     "reviewed_at": "2026-11-20T12:30:00.000Z",
+     "period": {
+      "from": "2026-12-01",
+      "to": "2026-12-31"
      },
      "scope": "INDIVIDUAL_RULES_ONLY"
     }
@@ -843,14 +867,14 @@
      "evidence_ids": [
       "fr-arrete-2021"
      ],
-     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 11 Nov and 25 Dec (eve 22:00 to day 22:00); 1 Nov is a Sunday."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 11 Nov and 25 Dec (eve 22:00 to day 22:00); 1 Nov is a Sunday. Corrected 2026-11-19.r6-thursday-hu-fr-gr (2026-11-19): New Year eve 31 Dec 22:00 to 1 Jan 2027 22:00 was missing and is now encoded."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
      "evidence_ids": [
       "fr-arrete-2021"
      ],
-     "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
+     "note": "Île-de-France Art. 3 II a) holiday-eve 16:00-22:00 on 10 Nov, 24 Dec and (added 2026-11-19.r6-thursday-hu-fr-gr) 31 Dec 2026."
     },
     "seasonal": {
      "state": "PRIMARY_VERIFIED",
@@ -1534,7 +1558,10 @@
    "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
     "hu-190",
-    "hu-mt"
+    "hu-act-2026-72",
+    "hu-mt",
+    "hu-190-2026-11-28",
+    "hu-mt-2026-11-28"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [],
@@ -1551,9 +1578,10 @@
      "state": "PRIMARY_VERIFIED",
      "evidence_ids": [
       "hu-190",
-      "hu-mt"
+      "hu-mt",
+      "hu-act-2026-72"
      ],
-     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026: 1 Nov (Sunday), 25 and 26 Dec (continuous 24 Dec 22:00 to 27 Dec 22:00); 24 Dec is not a public holiday."
+     "note": "Reviewed 2026-10-27.r4-nov-dec-priority for 1 Nov-31 Dec 2026; corrected 2026-11-19.r6-thursday-hu-fr-gr (2026-11-19): 1 Nov (Sunday); 24, 25 and 26 Dec are public holidays (24 Dec since Act LXXII of 2026, in force 14 Nov 2026) -> continuous ban 23 Dec 22:00 to 27 Dec 22:00."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
@@ -1635,7 +1663,7 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": "",
+   "notes": "Review 2026-11-28.r8-new-year-eves-pt: New Year's Day ban from 31 Dec 22:00 added.",
    "review_log": [
     {
      "review_id": "2026-10-27.r4-nov-dec-priority",
@@ -1645,6 +1673,15 @@
       "to": "2026-12-31"
      },
      "scope": "FULL_SCOPE_PRIMARY"
+    },
+    {
+     "review_id": "2026-11-28.r8-new-year-eves-pt",
+     "reviewed_at": "2026-11-28T10:00:00.000Z",
+     "period": {
+      "from": "2026-12-01",
+      "to": "2026-12-31"
+     },
+     "scope": "INDIVIDUAL_RULES_ONLY"
     }
    ]
   },
@@ -1798,7 +1835,9 @@
    "source_ids": [
     "hr-naredba",
     "hr-hak",
-    "hr-blagdani"
+    "hr-blagdani",
+    "hr-naredba-2026-11-28",
+    "hr-blagdani-2026-11-28"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [],
@@ -1890,7 +1929,7 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": "Holiday dates follow the Croatian holidays act (1 Nov, 18 Nov); point II Sunday/Monday rule applied.",
+   "notes": "Holiday dates follow the Croatian holidays act (1 Nov, 18 Nov); point II Sunday/Monday rule applied. Review 2026-11-28.r8-new-year-eves-pt: New Year's Eve 15:00-23:00 (point II) added.",
    "review_log": [
     {
      "review_id": "2026-10-27.r4-nov-dec-priority",
@@ -1900,6 +1939,15 @@
       "to": "2026-12-31"
      },
      "scope": "FULL_SCOPE_PRIMARY"
+    },
+    {
+     "review_id": "2026-11-28.r8-new-year-eves-pt",
+     "reviewed_at": "2026-11-28T10:00:00.000Z",
+     "period": {
+      "from": "2026-12-01",
+      "to": "2026-12-31"
+     },
+     "scope": "INDIVIDUAL_RULES_ONLY"
     }
    ]
   },
@@ -1910,7 +1958,9 @@
    "last_checked": "2026-09-26T15:25:00.000Z",
    "last_verified": null,
    "source_ids": [
-    "pt-dl-155a-2026"
+    "pt-dl-155a-2026",
+    "pt-dl-155a-2026-11-28",
+    "pt-lei-8-2016"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [
@@ -1984,7 +2034,18 @@
      "note": "Not reviewed from a primary source in this sweep."
     }
    },
-   "notes": "New corridor ban from 15 Sep 2026 found and encoded; the rest of the national regime is not yet primary-reviewed."
+   "notes": "New corridor ban from 15 Sep 2026 found and encoded; the rest of the national regime is not yet primary-reviewed. Review 2026-11-28.r8-new-year-eves-pt: Porto VCI December re-read; 1, 8 and 25 Dec excluded.",
+   "review_log": [
+    {
+     "review_id": "2026-11-28.r8-new-year-eves-pt",
+     "reviewed_at": "2026-11-28T10:00:00.000Z",
+     "period": {
+      "from": "2026-12-01",
+      "to": "2026-12-31"
+     },
+     "scope": "INDIVIDUAL_RULES_ONLY"
+    }
+   ]
   },
   "GR": {
    "verification_state": "UNVERIFIED",
@@ -2014,7 +2075,7 @@
      "evidence_ids": [
       "gr-fek-912b-2026"
      ],
-     "note": "ΦΕΚ Β΄ 912/2026 reviewed."
+     "note": "ΦΕΚ Β΄ 912/2026 reviewed; B8 December 2026 dates (24, 27, 31 Dec) re-read from the official PDF and encoded 2026-11-19.r6-thursday-hu-fr-gr. Jurisdiction remains incomplete (see coverage_failures)."
     },
     "holiday_eves": {
      "state": "PRIMARY_VERIFIED",
@@ -4807,9 +4868,9 @@
    "authority": "Journal officiel / Arrêté du 16 avril 2021 (TRAT2031119A)",
    "role": "PRIMARY",
    "version": "JO 24 April 2021, texte 37 (official PDF via Bison Futé), retrieved 2026-10-27",
-   "checked_at": "2026-10-27T11:03:21.000Z",
+   "checked_at": "2026-11-19T11:19:47.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Art.1: >7.5t GVW goods vehicles banned Saturday/holiday-eve 22:00 to Sunday/holiday 22:00 on the whole network. Art.3 Ile-de-France motorway sections. Art.4 exemptions. | Review 2026-10-27.r4-nov-dec-priority: Art. 1: Christmas 2026 ban from Thursday 24 Dec 22:00 to Friday 25 Dec 22:00. Art. 3 II: Île-de-France holiday-eve 16:00-22:00 (24 Dec), holiday 22:00-24:00 both directions (25 Dec), day after holiday 06:00-10:00 province-Paris (26 Dec).",
+   "findings": "Art.1: >7.5t GVW goods vehicles banned Saturday/holiday-eve 22:00 to Sunday/holiday 22:00 on the whole network. Art.3 Ile-de-France motorway sections. Art.4 exemptions. | Review 2026-10-27.r4-nov-dec-priority: Art. 1: Christmas 2026 ban from Thursday 24 Dec 22:00 to Friday 25 Dec 22:00. Art. 3 II: Île-de-France holiday-eve 16:00-22:00 (24 Dec), holiday 22:00-24:00 both directions (25 Dec), day after holiday 06:00-10:00 province-Paris (26 Dec). | Review 2026-11-19.r6-thursday-hu-fr-gr: re-read 2026-11-19 (same SHA-256). 1 January 2027 (Friday) is a jour férié: Art. 1 ban from Thursday 31 Dec 2026 22:00 to Friday 1 Jan 2027 22:00; Art. 3 II a) Île-de-France Paris-province veille 31 Dec 16:00-22:00. Art. 3 II 1 Jan 22:00-24:00 (both directions) and II b) Saturday 2 Jan 06:00-10:00 lie after the reviewed span (2026-12-31) and are not yet published.",
    "content_sha256": "7e9a0a0c19f06e8721367681c9289c03eac6be1181d023237a9a22acf954d26c"
   },
   {
@@ -4938,9 +4999,9 @@
    "authority": "Nemzeti Jogszabálytár / Govt. Decree 190/2008 (VII.29.)",
    "role": "PRIMARY",
    "version": "Consolidated state 2025.01.01 (in force), retrieved 2026-10-27",
-   "checked_at": "2026-10-27T11:03:53.000Z",
+   "checked_at": "2026-11-19T11:19:45.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "§2(1)(b) Sep 1-Jun 30: from 22:00 the day before to 22:00 on Sundays and public holidays, >7.5t. §2(3): from 4 Nov to 1 Mar not applicable to international-traffic trucks of at least environmental class 7 (EURO 3). | Review 2026-10-27.r4-nov-dec-priority: §2(1)(b) and §2(2): 25 Dec (Fri) and 26 Dec (Sat) are public holidays; the ban runs from 24 Dec 22:00 continuously to Sunday 27 Dec 22:00. §2(3): from 4 Nov to 1 Mar not applicable to international-traffic trucks of environmental class >= 7 (EURO 3).",
+   "findings": "§2(1)(b) Sep 1-Jun 30: from 22:00 the day before to 22:00 on Sundays and public holidays, >7.5t. §2(3): from 4 Nov to 1 Mar not applicable to international-traffic trucks of at least environmental class 7 (EURO 3). | Review 2026-10-27.r4-nov-dec-priority: §2(1)(b) and §2(2): 25 Dec (Fri) and 26 Dec (Sat) are public holidays; the ban runs from 24 Dec 22:00 continuously to Sunday 27 Dec 22:00. §2(3): from 4 Nov to 1 Mar not applicable to international-traffic trucks of environmental class >= 7 (EURO 3). | Review 2026-11-19.r6-thursday-hu-fr-gr: re-read 2026-11-19 (content unchanged, same SHA-256). With 24, 25, 26 Dec 2026 (Thu-Sat) public holidays and 27 Dec a Sunday, §2(1)(b) bans from 23 Dec 22:00 continuously to 27 Dec 22:00. §2(2) wording \"a korlátozott időszak első nap 8 órától\" read as in the 27 Oct review (first restricted day = first holiday, so 08:00 on 24 Dec is already inside the interval).",
    "content_sha256": "4b3cd0e4d19d508dcbbf769e9549feb1b96601c85d4a0c84b74ccb93d681b313"
   },
   {
@@ -4948,11 +5009,11 @@
    "url": "https://njt.jog.gov.hu/jogszabaly/2012-1-00-00",
    "authority": "Nemzeti Jogszabálytár / Labour Code (Act I of 2012) §102(1)",
    "role": "PRIMARY",
-   "version": "Mt. §102(1), retrieved 2026-10-27",
-   "checked_at": "2026-10-27T11:03:56.000Z",
+   "version": "Mt. §102(1) as amended by Act LXXII of 2026 §3 (consolidated state in force from 2026-11-14), retrieved 2026-11-19",
+   "checked_at": "2026-11-19T11:19:46.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": "Public holidays in window: 23 October, 1 November. | Review 2026-10-27.r4-nov-dec-priority: Public holidays (munkaszüneti nap) in the window: 1 November, 25 and 26 December; 24 December is not a public holiday.",
-   "content_sha256": "cd04286e7d9402ec86808ac24554704faacf1df1c3936b6afd22a9d623f96bc2"
+   "findings": "Public holidays in window: 23 October, 1 November. | Review 2026-10-27.r4-nov-dec-priority: Public holidays (munkaszüneti nap) in the window: 1 November, 25 and 26 December; 24 December is not a public holiday. | Review 2026-11-19.r6-thursday-hu-fr-gr: §102(1) now reads \"január 1., március 15., nagypéntek, húsvéthétfő, május 1., pünkösdhétfő, augusztus 20., október 23., november 1. és december 24–26.\" (text established by Act LXXII of 2026 §3). 24 December is a public holiday from 2026; the earlier note that it is not is superseded.",
+   "content_sha256": "10a8bdef3ba758694273614c01355f4228ec8c3f5db9100940701aaabae3857c"
   },
   {
    "source_id": "si-odredba-2011",
@@ -5024,9 +5085,10 @@
    "authority": "Εθνικό Τυπογραφείο / ΦΕΚ Β΄ 912/18.02.2026 (ΚΥΑ Δ30/Δ5α/27316)",
    "role": "PRIMARY",
    "version": "Official gazette PDF",
-   "checked_at": "2026-09-26T15:25:00.000Z",
+   "checked_at": "2026-11-19T11:21:15.000Z",
    "retrieval_method": "direct-retrieval",
-   "findings": ">3.5t. B9 summer Fridays 16-21 (A1 roads) and Sundays 16-23 (A2 roads) until 6 Sep; B11 Thessaloniki ring and EO18 until 6 Sep; B7 27 Oct 16-22 (A1) and 28 Oct 16-23 (A2)."
+   "findings": ">3.5t. B9 summer Fridays 16-21 (A1 roads) and Sundays 16-23 (A2 roads) until 6 Sep; B11 Thessaloniki ring and EO18 until 6 Sep; B7 27 Oct 16-22 (A1) and 28 Oct 16-23 (A2). | Review 2026-11-19.r6-thursday-hu-fr-gr: B8 (Christmas/New Year/Epiphany 2026-2027): Thu 24 Dec 2026 16:00-22:00 Chapter A1; Sun 27 Dec 2026 15:00-22:00 Chapter A2; Thu 31 Dec 2026 15:00-21:00 Chapter A1; Fri 1 Jan 2027 16:00-22:00 A1; Sun 3 Jan 2027 15:00-21:00 A2; Wed 6 Jan 2027 15:00-21:00 A2 (January dates after the reviewed span, not yet published). No amending ΚΥΑ found by the 2026-11-19 morning et.gr search (evidence only, search lag possible).",
+   "content_sha256": "31404788b69181136c1e4715dfb53aec864bc2e3d36fd502ddc6e3301ee150b3"
   },
   {
    "source_id": "ro-cnair-note",
@@ -5248,6 +5310,138 @@
    "retrieval_method": "direct-retrieval",
    "findings": "Point 8: the conference proposes extending the suspension of the Sunday and public-holiday HGV ban until and including 20 December 2026 and asks for monitoring of the low-water situation. This is a recommendation to the Länder, not a Land decree. On 2026-11-02 the official BW (28 Sep), RP (28 Sep) and NRW (28 Sep) pages still end the exemptions on 31 Oct 2026; an NRW decree to 20 Dec is reported only by dpa (23 Oct). saarland.de returns HTTP 403 to automated clients.",
    "content_sha256": "9f2fb667cf18b7f76e846309fcd783b45f33ec607cfda2a7a96242f3212eeec6"
+  },
+  {
+   "source_id": "hu-act-2026-72",
+   "url": "https://njt.jog.gov.hu/jogszabaly/2026-72-00-00",
+   "authority": "Nemzeti Jogszabálytár / Act LXXII of 2026 (2026. évi LXXII. törvény)",
+   "role": "PRIMARY",
+   "version": "Adopted 2026-11-03, promulgated 2026-11-13, in force 2026-11-14 (amending act; spent provisions repealed 2026-11-16 under Act CXXX of 2010 §12, amendments remain in the consolidated Mt.), retrieved 2026-11-19",
+   "checked_at": "2026-11-19T11:19:45.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "§3 amends Mt. §102(1): 24 December becomes a permanent public holiday (munkaszüneti nap). §10: in force the day after promulgation.",
+   "content_sha256": "0f5e415cf4454f54f10963c6946fba41cb85f4505a1482252736f30422d2b866"
+  },
+  {
+   "source_id": "es-boe-2026-11-20",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-1255",
+   "authority": "BOE / DGT Resolución 14 enero 2026 (BOE-A-2026-1255)",
+   "role": "PRIMARY",
+   "version": "Full text retrieved 2026-11-20 04:09 UTC; byte-identical to the 19 Nov 2026 sweep copy",
+   "checked_at": "2026-11-20T04:09:15.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Annex II December tables: generic N-230 Fridays 4-18 Dec and Sundays 6-27 Dec; 4, 5, 6 and 8 Dec (Constitución e Inmaculada); 24 and 31 Dec. 72 row-date entries encoded as 63 rules. Annex VII unchanged (N-340 x2, N-124, N-232).",
+   "content_sha256": "15c4c06f5694b30de8b13ceaf5d8ea6a5efe65bbf01e14d05d56199a0804553a"
+  },
+  {
+   "source_id": "es-cat-isp-300-2026-11-20",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-6095",
+   "authority": "Servei Català de Trànsit – Resolución ISP/300/2026, de 6 de febrero (BOE-A-2026-6095)",
+   "role": "PRIMARY",
+   "version": "BOE text retrieved 2026-11-20 04:09 UTC (byte-identical to the 19 Nov 2026 sweep copy); in force to 31 Dec 2026",
+   "checked_at": "2026-11-20T04:09:17.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Annex A calendar: La Inmaculada 4/12 T, 5/12 M, 8/12 T on AP-7, A-2 (L, L, B), C-31, C-32, B-23, A-2 Martorell-Cornellà; winter Saturdays 28/11-26/12 M and Sundays/holidays 6/12-27/12 T on N-145, C-14, N-260; N-II Saturdays M / Sundays T all year. Section 7.1 Aran (N-230 km 116-187, C-28 km 23-34): Fridays 4-18/12 17-24 France, Sundays 13-20 Lleida, 8/12 13-20 Lleida, 24 and 31/12 17-24 France. Sections 8-9 unchanged.",
+   "content_sha256": "a78de69c053889b3ac3731b822a0ea39f2f7770bb3a1b04696f8c68dbd43e08a"
+  },
+  {
+   "source_id": "cat-labour-holidays-2026",
+   "url": "https://treball.gencat.cat/ca/ambits/relacions_laborals/ci/calendari_laboral/calendari-festes-2026/",
+   "authority": "Generalitat de Catalunya, Departament d’Empresa i Treball – calendari oficial de festes laborals 2026 (Ordre EMT/66/2025, DOGC 9406)",
+   "role": "PRIMARY",
+   "version": "Official page retrieved 2026-11-20 11:50 UTC",
+   "checked_at": "2026-11-20T11:50:43.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Catalan 2026 labour holidays include 8 Dec (Tue), 25 Dec (Fri) and 26 Dec (Sat); in Aran 26 Dec is replaced by 17 Jun.",
+   "content_sha256": "770867b3c3b8a777d91b614817a656a1e946700611832ee9ba13692b62dff738"
+  },
+  {
+   "source_id": "es-bas-2026-11-20",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-2625",
+   "authority": "Dirección de Tráfico, Gobierno Vasco – Resolución de 9 de enero de 2026 (BOPV 5 Feb 2026; BOE-A-2026-2625)",
+   "role": "PRIMARY",
+   "version": "BOE text retrieved 2026-11-20 04:09 UTC; byte-identical to the 2 Nov 2026 copy",
+   "checked_at": "2026-11-20T04:09:17.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Annex II 2.º item 1: 4 Dec 17-21 and 5 Dec 11-14 towards Cantabria (A-8 km 119.5-139.21, N-634 km 107-120.69, BI-3724 km 120.69-128.12, BI-734 km 128.12-136.14); item 2: 6 and 8 Dec 16-21 towards Bilbao (same sections). Point 4.1 (special transport: Sundays/holidays 08-24, non-Saturday holiday eves 16-24, CAPV) and 2.1 (ADR) not encoded. Annex I is the sporting-events calendar, not a goods-vehicle ban.",
+   "content_sha256": "0d5117bf4b26b550d3c28b4f149a0a942e7e22e02d426948a2791ab2bb5aa098"
+  },
+  {
+   "source_id": "hu-mt-2026-11-28",
+   "url": "https://njt.jog.gov.hu/jogszabaly/2012-1-00-00",
+   "authority": "Nemzeti Jogszabálytár / Act I of 2012 (Labour Code)",
+   "role": "PRIMARY",
+   "version": "Consolidated text retrieved 2026-11-28",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "§102(1): public holidays include 1 January and 24-26 December.",
+   "content_sha256": "1bc890c17b84cf5244937d28fd9f890483907eef0bd47f979f3b71d5c3760b49"
+  },
+  {
+   "source_id": "hu-190-2026-11-28",
+   "url": "https://njt.jog.gov.hu/jogszabaly/2008-190-20-22",
+   "authority": "Nemzeti Jogszabálytár / Govt. Decree 190/2008",
+   "role": "PRIMARY",
+   "version": "Retrieved 2026-11-28; extracted text identical to the 19 Nov 2026 retrieval (source hu-190, SHA-256 4b3cd0e4…): 479 text lines, 0 changed; only the HTML markup differs",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "§2(1)(b): from 22:00 on the preceding day to 22:00 on Sundays and public holidays (1 Sep-30 Jun); §2(2) continuity; §2(3) EURO 3+ international exemption 4 Nov-1 Mar.",
+   "content_sha256": "8b4239eb9bbdef42243392d9878e82e51895441591db44bc74bf3de066b9a82c"
+  },
+  {
+   "source_id": "hr-naredba-2026-11-28",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2009_06_64_1440.html",
+   "authority": "Narodne novine / Naredba NN 64/2009",
+   "role": "PRIMARY",
+   "version": "Retrieved 2026-11-28",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Point II: Good Friday and eves of holidays of the Republic of Croatia 15:00-23:00; last day of a holiday 14:00-23:00; holiday on Friday/Saturday moves the restriction to Sunday 12:00-23:00.",
+   "content_sha256": "f71eeea4b99c08c3dffa3eef189a3fb20f0e3c1232b0fb9d545d309118484b0c"
+  },
+  {
+   "source_id": "hr-blagdani-2026-11-28",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+   "authority": "Narodne novine / Zakon o blagdanima NN 110/2019",
+   "role": "PRIMARY",
+   "version": "Retrieved 2026-11-28",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Art. 1: holidays include 1 January (Nova godina), 25 and 26 December.",
+   "content_sha256": "648c7b8a410ce3cc4566394a652ffdb55cdea89b147fcf18d0ff97a8b76c24fc"
+  },
+  {
+   "source_id": "lu-police-2026-11-28",
+   "url": "https://police.public.lu/en/legislation/code-de-la-route/routiers-poids-lourds1.html",
+   "authority": "Luxembourg Police Grand-Ducale (Grand-Ducal regulation of 19 July 1997)",
+   "role": "PRIMARY",
+   "version": "Retrieved 2026-11-28",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Transit >7,500 kg: towards France from 21:30, towards Germany from 23:30 on Saturdays and holiday eves to 21:45 on Sundays/holidays; New Year's Day listed for both directions.",
+   "content_sha256": "8f3700b16add41fe3b2ebb247fcf551e900ba6b1de4d331c14b07453c462bc0c"
+  },
+  {
+   "source_id": "pt-dl-155a-2026-11-28",
+   "url": "https://files.diariodarepublica.pt/1s/2026/07/14703/0000200005.pdf",
+   "authority": "Diário da República / Decreto-Lei 155-A/2026",
+   "role": "PRIMARY",
+   "version": "PDF retrieved 2026-11-28",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Art. 2: heavy goods vehicles (>3,500 kg, >=3 axles, first-axle height >=1.1 m) banned on the Porto VCI on working days 07:00-21:00; exceptions art. 2(4)-(5); in force from 15 Sep 2026 (art. 6), no end date.",
+   "content_sha256": "466c269ef65fcc7a32fec367922cb0d334503b267e43f8868f0c774742698f84"
+  },
+  {
+   "source_id": "pt-lei-8-2016",
+   "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+   "authority": "Diário da República / Lei 8/2016 (amends Código do Trabalho art. 234)",
+   "role": "PRIMARY",
+   "version": "PDF retrieved 2026-11-28; consolidated art. 234 page is script-rendered",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Art. 234(1): mandatory holidays include 1, 8 and 25 December.",
+   "content_sha256": "bf0b778d994f07bc323f90d0770da5ed91c84d6d31a933682e13df6d007a48de"
   }
  ],
  "rule_profiles": {
@@ -6327,10 +6521,10 @@
   },
   "pt-vci": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-11-28T10:00:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -6347,9 +6541,10 @@
    "exceptional_relevance": "Vehicles with an IMT autorização especial de trânsito are exempt (art.2(4)(b)).",
    "jurisdiction": "PT",
    "timezone": "Europe/Lisbon",
-   "source_id": "pt-dl-155a-2026",
+   "source_id": "pt-dl-155a-2026-11-28",
    "evidence_ids": [
-    "pt-dl-155a-2026"
+    "pt-dl-155a-2026-11-28",
+    "pt-lei-8-2016"
    ],
    "legal_basis": "Decreto-Lei 155-A/2026 art. 2",
    "vehicle_scope": "Goods vehicles >3,500 kg gross weight with three or more axles and height at the first axle >= 1.1 m.",
@@ -6383,7 +6578,7 @@
     "Art.2(4): vehicles with origin/destination in Porto or Vila Nova de Gaia for loading/unloading, if enabled on the platform (art.3); vehicles with an IMT special transit authorisation.",
     "Art.2(5): State and Porto/Gaia municipal vehicles."
    ],
-   "notes": "Alternative: A41/IC24 CREP is toll-free for these vehicles (art.5). Working days exclude public holidays (5 Oct 2026)."
+   "notes": "Alternative: A41/IC24 CREP is toll-free for these vehicles (art.5). Working days exclude public holidays (5 Oct 2026). Review 2026-11-28.r8-new-year-eves-pt: reviewed span extended to 31 Dec 2026 after re-reading DL 155-A/2026 and the national holiday list."
   },
   "gr-kya": {
    "verification_state": "PRIMARY_VERIFIED",
@@ -6438,10 +6633,10 @@
   },
   "es-annex7": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-11-02T15:20:00.000Z",
+   "verified_at": "2026-11-20T12:30:00.000Z",
    "review_window": {
     "from": "2026-11-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -6458,9 +6653,10 @@
    "direction": "Ambos sentidos",
    "adr_relevance": "Annex VII applies to the listed vehicle classes regardless of cargo; ADR Annex V restrictions apply in addition and are not encoded.",
    "exceptional_relevance": "Vehicles with a special circulation authorisation whose itinerary includes the section are exempt (D.2.2).",
-   "notes": "Annex VII year-round restrictions (D.2.1), every day 00:00-24:00. Encoded in review 2026-11-02.r5-es-de-targeted; published only for the reviewed November window.",
-   "source_id": "es-boe-2026-11-02",
+   "notes": "Annex VII year-round restrictions (D.2.1), every day 00:00-24:00. Encoded in review 2026-11-02.r5-es-de-targeted; Review 2026-11-20.r7-es-dec-cat-bas: re-read for December 2026 (same instrument in force to 31 Dec 2026); reviewed span extended to 31 Dec.",
+   "source_id": "es-boe-2026-11-20",
    "evidence_ids": [
+    "es-boe-2026-11-20",
     "es-boe-2026-11-02"
    ],
    "legal_basis": "DGT 2026 resolution D.2.1, Annex VII",
@@ -6474,10 +6670,10 @@
   },
   "es-cat-2026": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-11-02T15:20:00.000Z",
+   "verified_at": "2026-11-20T12:30:00.000Z",
    "review_window": {
     "from": "2026-11-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -6497,9 +6693,10 @@
    "direction": "Not specified in the Annex A table for these rows (no B/L marker)",
    "adr_relevance": "ADR vehicles with orange plates have additional restrictions (sections 3-4, Annex C/D) that are not encoded.",
    "exceptional_relevance": "Special transport and special vehicles have additional restrictions (section 2) that are not encoded.",
-   "notes": "Catalonia (Servei Català de Trànsit) regional restrictions within ES. Encoded in review 2026-11-02.r5-es-de-targeted; published only for the reviewed November window.",
-   "source_id": "es-cat-isp-300-2026",
+   "notes": "Catalonia (Servei Català de Trànsit) regional restrictions within ES. Encoded in review 2026-11-02.r5-es-de-targeted; Review 2026-11-20.r7-es-dec-cat-bas: re-read for December 2026 (same instrument in force to 31 Dec 2026); reviewed span extended to 31 Dec.",
+   "source_id": "es-cat-isp-300-2026-11-20",
    "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
     "es-cat-isp-300-2026",
     "es-cat-isp-1933-2026",
     "es-cat-sct-2026"
@@ -6515,10 +6712,10 @@
   },
   "es-cat-permanent-2026": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-11-02T15:20:00.000Z",
+   "verified_at": "2026-11-20T12:30:00.000Z",
    "review_window": {
     "from": "2026-11-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -6537,9 +6734,10 @@
    "direction": "Ambos sentidos",
    "adr_relevance": "Applies by mass/vehicle class regardless of cargo; ADR route obligations (section 4) are separate and not encoded.",
    "exceptional_relevance": "Section 9.1 (C-153 Olot) also covers special transport and special vehicles; section 8 exempts >26 t vehicles with a special circulation authorisation.",
-   "notes": "Catalonia permanent restrictions (sections 8 and 9). Encoded in review 2026-11-02.r5-es-de-targeted; published only for the reviewed November window.",
-   "source_id": "es-cat-isp-300-2026",
+   "notes": "Catalonia permanent restrictions (sections 8 and 9). Encoded in review 2026-11-02.r5-es-de-targeted; Review 2026-11-20.r7-es-dec-cat-bas: re-read for December 2026 (same instrument in force to 31 Dec 2026); reviewed span extended to 31 Dec.",
+   "source_id": "es-cat-isp-300-2026-11-20",
    "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
     "es-cat-isp-300-2026",
     "es-cat-sct-2026"
    ],
@@ -6554,10 +6752,10 @@
   },
   "es-bas-2026": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-11-02T15:20:00.000Z",
+   "verified_at": "2026-11-20T12:30:00.000Z",
    "review_window": {
     "from": "2026-11-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -6577,12 +6775,53 @@
    "direction": "As stated per road section",
    "adr_relevance": "ADR vehicles: Sundays/holidays 08-24 and non-Saturday eves 16-24 across the CAPV (point 2.1) - not encoded; >7,500 kg ADR vehicles are also subject to Annex II.",
    "exceptional_relevance": "Vehicles needing a complementary circulation authorisation: Sundays/holidays 08-24 and non-Saturday eves 16-24 (point 4.1) - not encoded; Annex II also applies to them.",
-   "notes": "Basque Country (Dirección de Tráfico del Gobierno Vasco) regional restrictions within ES. Encoded in review 2026-11-02.r5-es-de-targeted; published only for the reviewed November window.",
-   "source_id": "es-bas-2026",
+   "notes": "Basque Country (Dirección de Tráfico del Gobierno Vasco) regional restrictions within ES. Encoded in review 2026-11-02.r5-es-de-targeted; Review 2026-11-20.r7-es-dec-cat-bas: re-read for December 2026 (same instrument in force to 31 Dec 2026); reviewed span extended to 31 Dec.",
+   "source_id": "es-bas-2026-11-20",
    "evidence_ids": [
+    "es-bas-2026-11-20",
     "es-bas-2026"
    ],
    "legal_basis": "Resolución de 9 de enero de 2026 de la Dirección de Tráfico, point 3.1 and Annex II",
+   "vehicle_scope": "Goods vehicles/combinations above 7,500 kg MMA/MMC.",
+   "weight_threshold": {
+    "operator": ">",
+    "value": 7500,
+    "unit": "kg",
+    "applies_to": "maximum authorised mass of goods vehicle / combination"
+   }
+  },
+  "es-cat-aran-2026": {
+   "verification_state": "PRIMARY_VERIFIED",
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "status": "ACTIVE",
+   "sequence": 0,
+   "restriction_types": [
+    "general"
+   ],
+   "supersedes": [],
+   "jurisdiction": "ES",
+   "timezone": "Europe/Madrid",
+   "exceptions": [
+    "Section 7.2 a): the exemptions of Annex B.",
+    "Section 7.2 c): vehicles carrying perishable goods under ATP Annex 3 (I raw milk; II red meat and large game, except red offal; III meat products, pasteurised milk, fresh dairy products (yoghurt, kefir, cream, fresh cheese), ready meals (meat, fish, vegetables), ready-to-eat raw vegetables and vegetable preparations, concentrated fruit juices and fish products not listed below; IV game (except large game), poultry and rabbits; V red offal; VI minced meat; VII untreated fish, molluscs and crustaceans) and fresh fruit and vegetables under ATP Annex 1, provided this cargo is at least half of the vehicle's load capacity or occupies half of its useful load volume."
+   ],
+   "regions": [
+    "Catalonia"
+   ],
+   "direction": "Per rule (Francia / Lleida)",
+   "adr_relevance": "ADR vehicles with orange plates have additional restrictions (sections 3-4, Annex C/D) that are not encoded.",
+   "exceptional_relevance": "Special transport and special vehicles have additional restrictions (section 2) that are not encoded.",
+   "notes": "Encoded in review 2026-11-20.r7-es-dec-cat-bas for December 2026 only (no Aran rows in the reviewed November span).",
+   "source_id": "es-cat-isp-300-2026-11-20",
+   "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
+    "es-cat-isp-1933-2026"
+   ],
+   "legal_basis": "Resolución ISP/300/2026, section 7.1 (accesses to Aran: N-230 and C-28)",
    "vehicle_scope": "Goods vehicles/combinations above 7,500 kg MMA/MMC.",
    "weight_threshold": {
     "operator": ">",
@@ -8511,22 +8750,33 @@
   {
    "ban_id": "hu-holiday-2026-12-25-26",
    "profile": "hu-standing",
-   "title": "Public-holiday driving ban (25-26 December)",
-   "valid_from": "2026-12-24",
+   "title": "Public-holiday driving ban (24-26 December)",
+   "valid_from": "2026-12-23",
    "valid_to": "2026-12-26",
    "schedule": {
     "kind": "dates",
     "start_time": "22:00",
     "end_time": "22:00",
-    "end_day_offset": 2,
+    "end_day_offset": 4,
     "dates": [
      {
-      "date": "2026-12-24",
+      "date": "2026-12-23",
       "occurrence_id": "2026-12-24"
      }
     ]
    },
-   "notes": "Govt. Decree 190/2008 §2(1)(b) and §2(2): from 24 December 22:00; the Saturday-Sunday rule continues it to Sunday 27 December 22:00. §2(3) EURO 3+ international-traffic exemption applies (4 Nov-1 Mar)."
+   "notes": "Correction 2026-11-19.r6-thursday-hu-fr-gr: Act LXXII of 2026 (in force 14 Nov 2026) makes 24 December a public holiday. Govt. Decree 190/2008 §2(1)(b): ban from 23 December 22:00 continuously to Sunday 27 December 22:00 (24, 25, 26 December holidays, 27 December Sunday; §2(2)). §2(3) EURO 3+ international-traffic exemption applies (4 Nov-1 Mar). Ban and occurrence IDs kept stable; previous start 24 December 22:00 (sequence 0).",
+   "sequence": 1,
+   "verified_at": "2026-11-19T11:25:00.000Z",
+   "evidence_ids": [
+    "hu-190",
+    "hu-mt",
+    "hu-act-2026-72"
+   ],
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-12-31"
+   }
   },
   {
    "ban_id": "si-sunday",
@@ -11346,9 +11596,14 @@
      5
     ],
     "excluded_dates": [
-     "2026-10-05"
+     "2026-10-05",
+     "2026-12-01",
+     "2026-12-08",
+     "2026-12-25"
     ]
-   }
+   },
+   "sequence": 1,
+   "notes": "Correction 2026-11-28.r8-new-year-eves-pt: December 2026 reviewed; working days exclude the national holidays 1, 8 and 25 December (Código do Trabalho art. 234(1) as amended by Lei 8/2016). DL 155-A/2026 is in force from 15 Sep 2026 without an end date (art. 6)."
   },
   {
    "ban_id": "gr-summer-friday-2026-09-04",
@@ -11808,6 +12063,3278 @@
    ],
    "direction": "As stated per road section (towards France / Irún / Behobia, Vitoria-Gasteiz, Andoain, Donostia)",
    "vehicle_scope": "Goods vehicles/combinations above 7,500 kg MMA/MMC in cross-border transport only (\"Esta restricción sólo afecta al transporte transfronterizo\")."
+  },
+  {
+   "ban_id": "fr-holiday-2027-01-01",
+   "profile": "fr-general",
+   "title": "Public-holiday driving ban (New Year's Day)",
+   "valid_from": "2026-12-31",
+   "valid_to": "2027-01-01",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "22:00",
+    "end_time": "22:00",
+    "end_day_offset": 1,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-19T11:25:00.000Z",
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-12-31"
+   },
+   "notes": "Added 2026-11-19.r6-thursday-hu-fr-gr: omitted from the 27 Oct priority review. Holiday eve Thursday 31 Dec 2026 22:00 to Friday 1 Jan 2027 22:00 (Arrêté du 16 avril 2021, art. 1). The weekend ban follows from Saturday 2 Jan 22:00 (outside the reviewed span)."
+  },
+  {
+   "ban_id": "fr-idf-out-eve-2026-12-31",
+   "profile": "fr-idf",
+   "title": "Ile-de-France Paris-province holiday-eve restriction (New Year's Eve)",
+   "valid_from": "2026-12-31",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "direction": "Paris to province",
+   "legal_basis": "Arrêté du 16 avril 2021, art. 3 II a) veilles de jours fériés",
+   "sequence": 0,
+   "verified_at": "2026-11-19T11:25:00.000Z",
+   "review_window": {
+    "from": "2026-09-01",
+    "to": "2026-12-31"
+   },
+   "notes": "Added 2026-11-19.r6-thursday-hu-fr-gr. The 1 Jan 2027 22:00-24:00 (both directions) and 2 Jan 06:00-10:00 province-Paris restrictions are after the reviewed span and are not published yet."
+  },
+  {
+   "ban_id": "gr-christmas-eve-outbound-2026",
+   "profile": "gr-kya",
+   "title": "Christmas Eve outbound restriction (Chapter A1 roads)",
+   "valid_from": "2026-12-24",
+   "valid_to": "2026-12-24",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-24",
+      "occurrence_id": "2026-12-24"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-19T11:25:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "legal_basis": "ΦΕΚ Β΄ 912/2026 B8(a)",
+   "notes": "Added 2026-11-19.r6-thursday-hu-fr-gr from the official ΦΕΚ PDF (B8 already published 18 Feb 2026; previously not encoded). GR remains incomplete: permanent 2017 network decision and exceptional-transport regime not reviewed.",
+   "direction": "Outbound, per Chapter A1 segment"
+  },
+  {
+   "ban_id": "gr-christmas-return-2026",
+   "profile": "gr-kya",
+   "title": "Christmas return restriction (Chapter A2 roads)",
+   "valid_from": "2026-12-27",
+   "valid_to": "2026-12-27",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "15:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-27",
+      "occurrence_id": "2026-12-27"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-19T11:25:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "legal_basis": "ΦΕΚ Β΄ 912/2026 B8(b)",
+   "notes": "Added 2026-11-19.r6-thursday-hu-fr-gr from the official ΦΕΚ PDF (B8 already published 18 Feb 2026; previously not encoded). GR remains incomplete: permanent 2017 network decision and exceptional-transport regime not reviewed.",
+   "direction": "Return, per Chapter A2 segment",
+   "roads": [
+    "A8 Rio toll - Elefsina toll (to Athens)",
+    "A1 Leptokarya - Makrychori and Rachon - Ag. Stefanos (to Athens)",
+    "N. Moudania - Thermi (to Thessaloniki)",
+    "A11 Chalkida - A1 junction (to Athens)",
+    "Kavala - Thessaloniki: Leon Amfipolis - km 11.34 (to Thessaloniki)",
+    "A5 Ionia Odos km 200.99 - Rio-Antirrio bridge (to Rio)",
+    "A7 Sparti - Korinthos (to Athens)",
+    "A71 Sparti - Leuktro (to Leuktro)",
+    "Ioannina - Arta - Antirrio (to Antirrio)",
+    "EO16 Ag. Anastasia - Thermi (to Thessaloniki)",
+    "A3 Kalambaka - A1 (to Lamia/Athens)",
+    "A52 Aktio - Amvrakia (to Ionia Odos)"
+   ]
+  },
+  {
+   "ban_id": "gr-new-year-eve-outbound-2026",
+   "profile": "gr-kya",
+   "title": "New Year's Eve outbound restriction (Chapter A1 roads)",
+   "valid_from": "2026-12-31",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "15:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-19T11:25:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "legal_basis": "ΦΕΚ Β΄ 912/2026 B8(c)",
+   "notes": "Added 2026-11-19.r6-thursday-hu-fr-gr from the official ΦΕΚ PDF (B8 already published 18 Feb 2026; previously not encoded). GR remains incomplete: permanent 2017 network decision and exceptional-transport regime not reviewed.",
+   "direction": "Outbound, per Chapter A1 segment"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-230-149-2-133-6-13002000-benabarre",
+   "profile": "es-annex2",
+   "title": "Annex II: N-230 km 149,2 Aneto - km 133,6 Ginaste",
+   "valid_from": "2026-12-06",
+   "valid_to": "2026-12-27",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "13:00",
+    "end_time": "20:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-06",
+      "occurrence_id": "2026-12-06"
+     },
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     },
+     {
+      "date": "2026-12-13",
+      "occurrence_id": "2026-12-13"
+     },
+     {
+      "date": "2026-12-20",
+      "occurrence_id": "2026-12-20"
+     },
+     {
+      "date": "2026-12-27",
+      "occurrence_id": "2026-12-27"
+     }
+    ]
+   },
+   "roads": [
+    "N-230 km 149,2 Aneto - km 133,6 Ginaste",
+    "km 120,9 Bonansa - km 119,5 Buira",
+    "km 116,1 Santoréns - km 64,1 Benabarre"
+   ],
+   "direction": "Benabarre",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Todos los domingos comprendidos entre enero y marzo, y entre el 6 y 27 de diciembre; Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-6-ap-6-11-65-61-3-16002200-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-6/AP-6 km 11,65 Madrid (enlace M-40) - km 61,3 San Rafael",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "A-6/AP-6 km 11,65 Madrid (enlace M-40) - km 61,3 San Rafael"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-ap-6-a-6-61-3-182-16002200-a-coruna",
+   "profile": "es-annex2",
+   "title": "Annex II: AP-6/A-6 km 61,3 San Rafael - km 182 Tordesillas (enlace A-62)",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "AP-6/A-6 km 61,3 San Rafael - km 182 Tordesillas (enlace A-62)"
+   ],
+   "direction": "A Coruña",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-1-11-8-50-16002200-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-1 km 11,8 Madrid (enlace M-40) - km 50 Venturada",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "A-1 km 11,8 Madrid (enlace M-40) - km 50 Venturada"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-2-18-3-38-7-16002200-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-2 km 18,3 Madrid (enlace M-45) - km 38,7 Meco",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "A-2 km 18,3 Madrid (enlace M-45) - km 38,7 Meco"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-r-2-17-1-37-5-16002200-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: R-2 km 17,1 Madrid (enlace M-50) - km 37,5 Meco",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "R-2 km 17,1 Madrid (enlace M-50) - km 37,5 Meco"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-3-13-80-4-16002200-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-3 km 13 Madrid (enlace M-50) - km 80,4 Tarancón",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "A-3 km 13 Madrid (enlace M-50) - km 80,4 Tarancón"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-r-3-7-3-29-4-16002200-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: R-3 km 7,3 Madrid (enlace M-50) - km 29,4 Arganda",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "R-3 km 7,3 Madrid (enlace M-50) - km 29,4 Arganda"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-4-17-3-62-16002200-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-4 km 17,3 Madrid (enlace M-50) - km 62 Ocaña",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "A-4 km 17,3 Madrid (enlace M-50) - km 62 Ocaña"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-r-4-0-52-5-16002200-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: R-4 km 0 Madrid (enlace M-50) - km 52,5 Dosbarrios",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "R-4 km 0 Madrid (enlace M-50) - km 52,5 Dosbarrios"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-5-15-6-106-16002200-ambos-sentidos",
+   "profile": "es-annex2",
+   "title": "Annex II: A-5 km 15,6 Madrid (enlace M-50) - km 106 Talavera de la Reina",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "A-5 km 15,6 Madrid (enlace M-50) - km 106 Talavera de la Reina"
+   ],
+   "direction": "Ambos sentidos",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-r-5-15-30-5-16002200-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: R-5 km 15 Arroyomolinos (enlace AP-41) - km 30,5 Navalcarnero",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "R-5 km 15 Arroyomolinos (enlace AP-41) - km 30,5 Navalcarnero"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-6-42-5-62-5-16002200-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: N-6 km 42,5 Collado Villalba - km 62,5 San Rafael",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "N-6 km 42,5 Collado Villalba - km 62,5 San Rafael"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-m-501-4-59-5-16002200-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: M-501 km 4 Madrid (enlace M-50) - km 59,5 San Martín de Valdeiglesias",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "M-501 km 4 Madrid (enlace M-50) - km 59,5 San Martín de Valdeiglesias"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-62-113-151-15002300-frontera-portugal",
+   "profile": "es-annex2",
+   "title": "Annex II: A-62 km 113 Cabezón de Pisuerga - km 151 Tordesillas",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "15:00",
+    "end_time": "23:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "A-62 km 113 Cabezón de Pisuerga - km 151 Tordesillas"
+   ],
+   "direction": "frontera Portugal",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-631-0-0-57-0-15002400-ambos-sentidos",
+   "profile": "es-annex2",
+   "title": "Annex II: N-631 km 0,0 S. Cebrián de Castro (N-630) - km 57,0 Rionegro del Puente (N-525)",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "15:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "N-631 km 0,0 S. Cebrián de Castro (N-630) - km 57,0 Rionegro del Puente (N-525)"
+   ],
+   "direction": "Ambos sentidos",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-3-275-352-15002200-entrada-valencia",
+   "profile": "es-annex2",
+   "title": "Annex II: A-3 km 275 Utiel - km 352 Valencia",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "15:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "A-3 km 275 Utiel - km 352 Valencia"
+   ],
+   "direction": "Entrada Valencia",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-8-139-2-169-17002100-santander",
+   "profile": "es-annex2",
+   "title": "Annex II: A-8 km 139,2 Castro-Urdiales - km 169 Laredo",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "A-8 km 139,2 Castro-Urdiales - km 169 Laredo"
+   ],
+   "direction": "Santander",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Viernes 4 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-6-ap-6-11-65-61-3-08001500-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-6/AP-6 km 11,65 Madrid (enlace M-40) - km 61,3 San Rafael",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "15:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "A-6/AP-6 km 11,65 Madrid (enlace M-40) - km 61,3 San Rafael"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-ap-6-a-6-61-3-182-08001500-a-coruna",
+   "profile": "es-annex2",
+   "title": "Annex II: AP-6/A-6 km 61,3 San Rafael - km 182 Tordesillas (enlace A-62)",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "15:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "AP-6/A-6 km 61,3 San Rafael - km 182 Tordesillas (enlace A-62)"
+   ],
+   "direction": "A Coruña",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-1-11-8-50-08001500-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-1 km 11,8 Madrid (enlace M-40) - km 50 Venturada",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "15:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "A-1 km 11,8 Madrid (enlace M-40) - km 50 Venturada"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-2-18-3-38-7-08001300-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-2 km 18,3 Madrid (enlace M-45) - km 38,7 Meco",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "13:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "A-2 km 18,3 Madrid (enlace M-45) - km 38,7 Meco"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-r-2-17-1-37-5-08001300-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: R-2 km 17,1 Madrid (enlace M-50) - km 37,5 Meco",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "13:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "R-2 km 17,1 Madrid (enlace M-50) - km 37,5 Meco"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-3-13-80-4-08001300-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-3 km 13 Madrid (enlace M-50) - km 80,4 Tarancón",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "13:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "A-3 km 13 Madrid (enlace M-50) - km 80,4 Tarancón"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-r-3-7-3-29-4-08001300-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: R-3 km 7,3 Madrid (enlace M-50) - km 29,4 Arganda",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "13:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "R-3 km 7,3 Madrid (enlace M-50) - km 29,4 Arganda"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-4-17-3-62-08001300-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-4 km 17,3 Madrid (enlace M-50) - km 62 Ocaña",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "13:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "A-4 km 17,3 Madrid (enlace M-50) - km 62 Ocaña"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-r-4-0-52-5-08001300-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: R-4 km 0 Madrid (enlace M-50) - km 52,5 Dosbarrios",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "13:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "R-4 km 0 Madrid (enlace M-50) - km 52,5 Dosbarrios"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-5-15-6-106-08001500-ambos-sentidos",
+   "profile": "es-annex2",
+   "title": "Annex II: A-5 km 15,6 Madrid (enlace M-50) - km 106 Talavera de la Reina",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "15:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "A-5 km 15,6 Madrid (enlace M-50) - km 106 Talavera de la Reina"
+   ],
+   "direction": "Ambos sentidos",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-r-5-15-30-5-08001500-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: R-5 km 15 Arroyomolinos (enlace AP-41) - km 30,5 Navalcarnero",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "15:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "R-5 km 15 Arroyomolinos (enlace AP-41) - km 30,5 Navalcarnero"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-6-42-5-62-5-08001500-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: N-6 km 42,5 Collado Villalba - km 62,5 San Rafael",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "15:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "N-6 km 42,5 Collado Villalba - km 62,5 San Rafael"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-m-501-4-59-5-08001300-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: M-501 km 4 Madrid (enlace M-50) - km 59,5 San Martín de Valdeiglesias",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "13:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "M-501 km 4 Madrid (enlace M-50) - km 59,5 San Martín de Valdeiglesias"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-62-113-151-08001500-frontera-portugal",
+   "profile": "es-annex2",
+   "title": "Annex II: A-62 km 113 Cabezón de Pisuerga - km 151 Tordesillas",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "08:00",
+    "end_time": "15:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "A-62 km 113 Cabezón de Pisuerga - km 151 Tordesillas"
+   ],
+   "direction": "frontera Portugal",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-8-139-2-169-11001400-santander",
+   "profile": "es-annex2",
+   "title": "Annex II: A-8 km 139,2 Castro-Urdiales - km 169 Laredo",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "11:00",
+    "end_time": "14:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "A-8 km 139,2 Castro-Urdiales - km 169 Laredo"
+   ],
+   "direction": "Santander",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Sábado 5 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-8-169-139-2-16002100-bilbao",
+   "profile": "es-annex2",
+   "title": "Annex II: A-8 km 169 Laredo - km 139,2 Castro-Urdiales",
+   "valid_from": "2026-12-06",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-06",
+      "occurrence_id": "2026-12-06"
+     },
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-8 km 169 Laredo - km 139,2 Castro-Urdiales"
+   ],
+   "direction": "Bilbao",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Domingo 6 de diciembre (festividad Constitución e Inmaculada); Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-1-118-3-11-8-16002200-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-1 km 118,3 Boceguillas - km 11,8 Madrid (enlace M-40)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-1 km 118,3 Boceguillas - km 11,8 Madrid (enlace M-40)"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-2-107-10-8-16002200-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-2 km 107 Mirabueno - km 10,8 Madrid (enlace M-40)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-2 km 107 Mirabueno - km 10,8 Madrid (enlace M-40)"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-3-177-6-9-16002400-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-3 km 177 Atalaya del Cañavate - km 6,9 Madrid (enlace M-40)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-3 km 177 Atalaya del Cañavate - km 6,9 Madrid (enlace M-40)"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-3-25-80-4-16002400-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-3 km 25 Arganda (salida 25) - km 80,4 Tarancón",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-3 km 25 Arganda (salida 25) - km 80,4 Tarancón"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-4-122-6-7-16002200-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-4 km 122 Madridejos - km 6,7 Madrid (enlace M-40)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-4 km 122 Madridejos - km 6,7 Madrid (enlace M-40)"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-5-126-11-8-16002400-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-5 km 126 Talavera de la Reina - km 11,8 Madrid (enlace M-40)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-5 km 126 Talavera de la Reina - km 11,8 Madrid (enlace M-40)"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-5-15-6-126-16002400-salida-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-5 km 15,6 Madrid (enlace M-50) - km 126 Talavera de la Reina",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-5 km 15,6 Madrid (enlace M-50) - km 126 Talavera de la Reina"
+   ],
+   "direction": "Salida Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-6-184-123-16002300-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-6 km 184 Tordesillas (enlace A-62) - km 123 Arévalo",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "23:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-6 km 184 Tordesillas (enlace A-62) - km 123 Arévalo"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-6-123-110-16002400-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-6 km 123 Arévalo - km 110 Adanero",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-6 km 123 Arévalo - km 110 Adanero"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-ap-6-110-60-5-16002400-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: AP-6 km 110 Adanero - km 60,5 San Rafael",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "AP-6 km 110 Adanero - km 60,5 San Rafael"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-6-22-3-6-8-16002400-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-6 km 22,3 Las Rozas (enlace M-50) - km 6,8 Madrid",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-6 km 22,3 Las Rozas (enlace M-50) - km 6,8 Madrid"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-6-110-42-5-16002400-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: N-6 km 110 Adanero - km 42,5 Collado Villalba",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "N-6 km 110 Adanero - km 42,5 Collado Villalba"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-ap-51-104-8-81-8-16002400-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: AP-51 km 104,8 Ávila - km 81,8 Villacastín (enlace AP-6)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "AP-51 km 104,8 Ávila - km 81,8 Villacastín (enlace AP-6)"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-ap-61-88-55-61-50-16002400-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: AP-61 km 88,55 Segovia - km 61,50 San Rafael (enlace AP-6)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "AP-61 km 88,55 Segovia - km 61,50 San Rafael (enlace AP-6)"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-110-246-228-16002400-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: N-110 km 246 Berrocalejo Aragona - km 228 Villacastín (enlace AP-6)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "N-110 km 246 Berrocalejo Aragona - km 228 Villacastín (enlace AP-6)"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-603-74-9-64-16002400-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: N-603 km 74,9 Otero de Herreros - km 64 San Rafael (enlace AP-6)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "N-603 km 74,9 Otero de Herreros - km 64 San Rafael (enlace AP-6)"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-m-501-59-5-0-16002200-entrada-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: M-501 km 59,5 S. Martín de Valdeiglesias - km 0 Madrid (enlace M-40)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "M-501 km 59,5 S. Martín de Valdeiglesias - km 0 Madrid (enlace M-40)"
+   ],
+   "direction": "Entrada Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-62-155-125-16002300-burgos",
+   "profile": "es-annex2",
+   "title": "Annex II: A-62 km 155 Tordesillas (enlace A-6) - km 125 Valladolid",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "23:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-62 km 155 Tordesillas (enlace A-6) - km 125 Valladolid"
+   ],
+   "direction": "Burgos",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-3-352-292-13002100-salida-valencia",
+   "profile": "es-annex2",
+   "title": "Annex II: A-3 km 352 Valencia - km 292 Requena",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "13:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-3 km 352 Valencia - km 292 Requena"
+   ],
+   "direction": "Salida Valencia",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-3-275-352-17002100-entrada-valencia",
+   "profile": "es-annex2",
+   "title": "Annex II: A-3 km 275 Utiel - km 352 Valencia",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-3 km 275 Utiel - km 352 Valencia"
+   ],
+   "direction": "Entrada Valencia",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-4-323-230-09002200-sentido-madrid",
+   "profile": "es-annex2",
+   "title": "Annex II: A-4 km 323 Andújar - km 230 Almuradiel",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "09:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-4 km 323 Andújar - km 230 Almuradiel"
+   ],
+   "direction": "Sentido Madrid",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-4-230-300-09002200-sentido-sevilla",
+   "profile": "es-annex2",
+   "title": "Annex II: A-4 km 230 Almuradiel - km 300 Bailén",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "09:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-4 km 230 Almuradiel - km 300 Bailén"
+   ],
+   "direction": "Sentido Sevilla",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-44-36-0-09002200-sentido-bailen",
+   "profile": "es-annex2",
+   "title": "Annex II: A-44 km 36 Jaén - km 0 Bailén",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "09:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-44 km 36 Jaén - km 0 Bailén"
+   ],
+   "direction": "Sentido Bailén",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-a-1-242-249-16002100-vitoria",
+   "profile": "es-annex2",
+   "title": "Annex II: A-1 km 242 Burgos-Castañares - km 249 Rubena",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-1 km 242 Burgos-Castañares - km 249 Rubena"
+   ],
+   "direction": "Vitoria",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-ap-1-0-77-16002100-vitoria",
+   "profile": "es-annex2",
+   "title": "Annex II: AP-1 km 0 Burgos-Castañares - km 77 Miranda de Ebro",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "AP-1 km 0 Burgos-Castañares - km 77 Miranda de Ebro"
+   ],
+   "direction": "Vitoria",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-1-249-321-45-16002100-vitoria",
+   "profile": "es-annex2",
+   "title": "Annex II: N-1 km 249 Rubena - km 321,45 Límite provincias Burgos-Álava",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "N-1 km 249 Rubena - km 321,45 Límite provincias Burgos-Álava"
+   ],
+   "direction": "Vitoria",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-1-329-4-336-2-16002100-vitoria",
+   "profile": "es-annex2",
+   "title": "Annex II: N-1 km 329,4 Límite provincias Álava-Burgos - km 336,2 Treviño",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "N-1 km 329,4 Límite provincias Álava-Burgos - km 336,2 Treviño"
+   ],
+   "direction": "Vitoria",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-631-0-0-57-0-07002400-ambos-sentidos",
+   "profile": "es-annex2",
+   "title": "Annex II: N-631 km 0,0 S. Cebrián de Castro (N-630) - km 57,0 Rionegro del Puente (N-525)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "07:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "N-631 km 0,0 S. Cebrián de Castro (N-630) - km 57,0 Rionegro del Puente (N-525)"
+   ],
+   "direction": "Ambos sentidos",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II, December 2026 table(s): Martes 8 de diciembre (festividad Constitución e Inmaculada). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-cat-inmaculada-2026-12-t",
+   "profile": "es-cat-2026",
+   "title": "Catalonia Annex A: La Inmaculada afternoon restriction (T)",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     },
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "AP-7 km 84,5 Maçanet - km 281 L’Hospitalet de l’Infant (red internacional)",
+    "C-31 km 135 El Vendrell - km 176 Garraf (red de accesos a Barcelona)",
+    "C-32 km 0 El Vendrell - km 63 Barcelona and km 85 Montgat - km 131 Palafolls (red de accesos a Barcelona; one C-32 column in the Annex A calendar)",
+    "B-23 km 0 Barcelona - km 15 El Papiol (red de accesos a Barcelona)",
+    "A-2 km 585 Martorell - km 609 Cornellà de Llobregat (red de accesos a Barcelona)"
+   ],
+   "direction": "Not specified in the Annex A table for these cells (no B/L marker)",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
+    "es-cat-isp-1933-2026"
+   ],
+   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
+  },
+  {
+   "ban_id": "es-cat-inmaculada-2026-12-m",
+   "profile": "es-cat-2026",
+   "title": "Catalonia Annex A: La Inmaculada morning restriction (M)",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "AP-7 km 84,5 Maçanet - km 281 L’Hospitalet de l’Infant (red internacional)",
+    "C-31 km 135 El Vendrell - km 176 Garraf (red de accesos a Barcelona)",
+    "C-32 km 0 El Vendrell - km 63 Barcelona and km 85 Montgat - km 131 Palafolls (red de accesos a Barcelona; one C-32 column in the Annex A calendar)",
+    "B-23 km 0 Barcelona - km 15 El Papiol (red de accesos a Barcelona)",
+    "A-2 km 585 Martorell - km 609 Cornellà de Llobregat (red de accesos a Barcelona)"
+   ],
+   "direction": "Not specified in the Annex A table for these cells (no B/L marker)",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
+    "es-cat-isp-1933-2026"
+   ],
+   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
+  },
+  {
+   "ban_id": "es-cat-inmaculada-2026-12-a2-lleida-t",
+   "profile": "es-cat-2026",
+   "title": "Catalonia Annex A: A-2 Cervera-Martorell towards Lleida (T)",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "A-2 km 520 Cervera - km 585 Martorell (red internacional)"
+   ],
+   "direction": "Hacia Lleida (L)",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
+    "es-cat-isp-1933-2026"
+   ],
+   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
+  },
+  {
+   "ban_id": "es-cat-inmaculada-2026-12-a2-lleida-m",
+   "profile": "es-cat-2026",
+   "title": "Catalonia Annex A: A-2 Cervera-Martorell towards Lleida (M)",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "A-2 km 520 Cervera - km 585 Martorell (red internacional)"
+   ],
+   "direction": "Hacia Lleida (L)",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
+    "es-cat-isp-1933-2026"
+   ],
+   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
+  },
+  {
+   "ban_id": "es-cat-inmaculada-2026-12-a2-barcelona-t",
+   "profile": "es-cat-2026",
+   "title": "Catalonia Annex A: A-2 Cervera-Martorell towards Barcelona (T)",
+   "valid_from": "2026-12-08",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-2 km 520 Cervera - km 585 Martorell (red internacional)"
+   ],
+   "direction": "Hacia Barcelona (B)",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
+    "es-cat-isp-1933-2026"
+   ],
+   "notes": "ISP/300/2026 Annex A calendar row \"La Inmaculada Concepción\" (M 10-14, T 17-22); ISP/1933/2026 changes only the euromodular note. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
+  },
+  {
+   "ban_id": "es-cat-pyrenees-winter-sundays-holidays-2026-12",
+   "profile": "es-cat-2026",
+   "title": "Catalonia Annex A: Pyrenees access network, winter Sundays and holidays (T)",
+   "valid_from": "2026-12-06",
+   "valid_to": "2026-12-27",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "22:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-06",
+      "occurrence_id": "2026-12-06"
+     },
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     },
+     {
+      "date": "2026-12-13",
+      "occurrence_id": "2026-12-13"
+     },
+     {
+      "date": "2026-12-20",
+      "occurrence_id": "2026-12-20"
+     },
+     {
+      "date": "2026-12-25",
+      "occurrence_id": "2026-12-25"
+     },
+     {
+      "date": "2026-12-26",
+      "occurrence_id": "2026-12-26"
+     },
+     {
+      "date": "2026-12-27",
+      "occurrence_id": "2026-12-27"
+     }
+    ]
+   },
+   "roads": [
+    "N-145 km 0 La Seu d'Urgell - km 10 Límite Andorra",
+    "C-14 km 116 Ponts - km 178 Adrall",
+    "N-260 km 193 Bellver de Cerdanya - km 234 Adrall"
+   ],
+   "direction": "Not specified in the Annex A table for these cells (no B/L marker)",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
+    "es-cat-isp-1933-2026",
+    "cat-labour-holidays-2026"
+   ],
+   "notes": "ISP/300/2026 Annex A row \"Invierno: Domingos y festivos del 4/01 al 29/03 y del 6/12 al 27/12\" (T 17-22). Holidays per Ordre EMT/66/2025 (Catalan 2026 calendar): 8, 25 and 26 Dec (26 Dec is replaced only in Aran, outside this network). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
+  },
+  {
+   "ban_id": "es-cat-aran-2026-12-lleida",
+   "profile": "es-cat-aran-2026",
+   "title": "Catalonia section 7.1: accesses to Aran towards Lleida",
+   "valid_from": "2026-12-06",
+   "valid_to": "2026-12-27",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "13:00",
+    "end_time": "20:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-06",
+      "occurrence_id": "2026-12-06"
+     },
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     },
+     {
+      "date": "2026-12-13",
+      "occurrence_id": "2026-12-13"
+     },
+     {
+      "date": "2026-12-20",
+      "occurrence_id": "2026-12-20"
+     },
+     {
+      "date": "2026-12-27",
+      "occurrence_id": "2026-12-27"
+     }
+    ]
+   },
+   "roads": [
+    "N-230 km 116 - km 187 Bausen (frontera francesa), whole Catalan section",
+    "C-28 km 23 Vielha e Mijaran - km 34 Salardú"
+   ],
+   "direction": "Lleida",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
+    "es-cat-isp-1933-2026"
+   ],
+   "notes": "ISP/300/2026 section 7.1 table, row \"Diciembre\". Exemptions section 7.2 a) and c) (7.2 b) applies only towards France). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-cat-isp-300-2026-11-20"
+  },
+  {
+   "ban_id": "es-bas-a2-2026-12-04-cantabria",
+   "profile": "es-bas-2026",
+   "title": "Basque Country Annex II: towards Cantabria (4 Dec afternoon)",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-04",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     }
+    ]
+   },
+   "roads": [
+    "A-8 km 119,5 - km 139,21 (Cantabria)",
+    "N-634 km 107 - km 120,690",
+    "BI-3724 km 120,690 - km 128,120",
+    "BI-734 km 128,120 - km 136,140 (Cantabria)"
+   ],
+   "direction": "Cantabria",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-bas-2026-11-20"
+   ],
+   "notes": "Resolución de 9 de enero de 2026 (BOE-A-2026-2625), Annex II 2.º item 1. Re-read 2026-11-20, unchanged bytes since 2 Nov (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-bas-2026-11-20"
+  },
+  {
+   "ban_id": "es-bas-a2-2026-12-05-cantabria",
+   "profile": "es-bas-2026",
+   "title": "Basque Country Annex II: towards Cantabria (5 Dec late morning)",
+   "valid_from": "2026-12-05",
+   "valid_to": "2026-12-05",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "11:00",
+    "end_time": "14:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-05",
+      "occurrence_id": "2026-12-05"
+     }
+    ]
+   },
+   "roads": [
+    "A-8 km 119,5 - km 139,21 (Cantabria)",
+    "N-634 km 107 - km 120,690",
+    "BI-3724 km 120,690 - km 128,120",
+    "BI-734 km 128,120 - km 136,140 (Cantabria)"
+   ],
+   "direction": "Cantabria",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-bas-2026-11-20"
+   ],
+   "notes": "Resolución de 9 de enero de 2026 (BOE-A-2026-2625), Annex II 2.º item 1. Re-read 2026-11-20, unchanged bytes since 2 Nov (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-bas-2026-11-20"
+  },
+  {
+   "ban_id": "es-bas-a2-2026-12-06-08-bilbao",
+   "profile": "es-bas-2026",
+   "title": "Basque Country Annex II: towards Bilbao (6 and 8 Dec)",
+   "valid_from": "2026-12-06",
+   "valid_to": "2026-12-08",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "16:00",
+    "end_time": "21:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-06",
+      "occurrence_id": "2026-12-06"
+     },
+     {
+      "date": "2026-12-08",
+      "occurrence_id": "2026-12-08"
+     }
+    ]
+   },
+   "roads": [
+    "A-8 km 139,21 (Cantabria) - km 119,5",
+    "BI-734 km 136,140 (Cantabria) - km 128,120",
+    "BI-3724 km 128,120 - km 120,690",
+    "N-634 km 120,690 - km 107"
+   ],
+   "direction": "Bilbao",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-bas-2026-11-20"
+   ],
+   "notes": "Resolución de 9 de enero de 2026 (BOE-A-2026-2625), Annex II 2.º item 2. Re-read 2026-11-20, unchanged bytes since 2 Nov (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-bas-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-230-64-1-116-1-17002400-frontera-francia-fridays",
+   "profile": "es-annex2",
+   "title": "Annex II: N-230 km 64,1 Benabarre - km 116,1 Santoréns",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-18",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     },
+     {
+      "date": "2026-12-11",
+      "occurrence_id": "2026-12-11"
+     },
+     {
+      "date": "2026-12-18",
+      "occurrence_id": "2026-12-18"
+     }
+    ]
+   },
+   "roads": [
+    "N-230 km 64,1 Benabarre - km 116,1 Santoréns",
+    "km 119,5 Buira - km 120,9 Bonansa",
+    "km 133,6 Ginaste - km 149,2 Aneto"
+   ],
+   "direction": "Frontera Francia",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II generic table \"Todos los viernes ... entre el 4 y 18 de diciembre\" with its residence/base exception. Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "exceptions": [
+    "B.1.2: live livestock; qualifying ATP perishable goods or fresh fruit/vegetables occupying at least half payload capacity or cargo volume in compliant vehicles; universal postal service Monday-Friday; winter road-treatment supply; roadside assistance.",
+    "B.3.2: urgent fire/environment/road/life-saving operations require the specified notification; special roadside-assistance vehicles are exempt. Agricultural/work machinery and <=5-axle crane exemptions are limited to the stated Annex V provisions, NOT a blanket Annex II exemption.",
+    "Annex II generic Friday table (N-230): except trips whose destination is the driver's habitual residence, the vehicle's registered base or the company base."
+   ],
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-a2-2026-12-n-230-64-1-116-1-17002400-frontera-francia-24-31-dec",
+   "profile": "es-annex2",
+   "title": "Annex II: N-230 km 64,1 Benabarre - km 116,1 Santoréns",
+   "valid_from": "2026-12-24",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-24",
+      "occurrence_id": "2026-12-24"
+     },
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "roads": [
+    "N-230 km 64,1 Benabarre - km 116,1 Santoréns",
+    "km 119,5 Buira - km 120,9 Bonansa",
+    "km 133,6 Ginaste - km 149,2 Aneto"
+   ],
+   "direction": "Frontera Francia",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-boe-2026-11-20",
+    "es-correction-feb",
+    "es-correction-mar",
+    "es-amendment-jun"
+   ],
+   "notes": "BOE-A-2026-1255 Annex II table \"Jueves 24 y 31 de diciembre\" (no residence/base exception printed). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "source_id": "es-boe-2026-11-20"
+  },
+  {
+   "ban_id": "es-cat-aran-2026-12-france-fridays",
+   "profile": "es-cat-aran-2026",
+   "title": "Catalonia section 7.1: accesses to Aran towards France (winter Fridays)",
+   "valid_from": "2026-12-04",
+   "valid_to": "2026-12-18",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-04",
+      "occurrence_id": "2026-12-04"
+     },
+     {
+      "date": "2026-12-11",
+      "occurrence_id": "2026-12-11"
+     },
+     {
+      "date": "2026-12-18",
+      "occurrence_id": "2026-12-18"
+     }
+    ]
+   },
+   "roads": [
+    "N-230 km 116 - km 187 Bausen (frontera francesa), whole Catalan section",
+    "C-28 km 23 Vielha e Mijaran - km 34 Salardú"
+   ],
+   "direction": "Francia",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
+    "es-cat-isp-1933-2026"
+   ],
+   "notes": "ISP/300/2026 section 7.1 table, row \"Diciembre\". Exemptions section 7.2 a)-c). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "exceptions": [
+    "Section 7.2 a): the exemptions of Annex B.",
+    "Section 7.2 b): on winter Fridays 17-24 on the N-230 towards France, also trips whose destination is the driver's habitual residence, the vehicles' registered base or the transport company's base.",
+    "Section 7.2 c): vehicles carrying perishable goods under ATP Annex 3 (I raw milk; II red meat and large game, except red offal; III meat products, pasteurised milk, fresh dairy products (yoghurt, kefir, cream, fresh cheese), ready meals (meat, fish, vegetables), ready-to-eat raw vegetables and vegetable preparations, concentrated fruit juices and fish products not listed below; IV game (except large game), poultry and rabbits; V red offal; VI minced meat; VII untreated fish, molluscs and crustaceans) and fresh fruit and vegetables under ATP Annex 1, provided this cargo is at least half of the vehicle's load capacity or occupies half of its useful load volume."
+   ],
+   "source_id": "es-cat-isp-300-2026-11-20"
+  },
+  {
+   "ban_id": "es-cat-aran-2026-12-france-24-31-dec",
+   "profile": "es-cat-aran-2026",
+   "title": "Catalonia section 7.1: accesses to Aran towards France (24 and 31 Dec)",
+   "valid_from": "2026-12-24",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "17:00",
+    "end_time": "24:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-24",
+      "occurrence_id": "2026-12-24"
+     },
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "roads": [
+    "N-230 km 116 - km 187 Bausen (frontera francesa), whole Catalan section",
+    "C-28 km 23 Vielha e Mijaran - km 34 Salardú"
+   ],
+   "direction": "Francia",
+   "supersedes": [],
+   "sequence": 0,
+   "verified_at": "2026-11-20T12:30:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "es-cat-isp-300-2026-11-20",
+    "es-cat-isp-1933-2026"
+   ],
+   "notes": "ISP/300/2026 section 7.1 table, row \"Diciembre\". Exemptions section 7.2 a) and c) (7.2 b) covers only winter Fridays). Re-read 2026-11-20 (review 2026-11-20.r7-es-dec-cat-bas).",
+   "exceptions": [
+    "Section 7.2 a): the exemptions of Annex B.",
+    "Section 7.2 c): vehicles carrying perishable goods under ATP Annex 3 (I raw milk; II red meat and large game, except red offal; III meat products, pasteurised milk, fresh dairy products (yoghurt, kefir, cream, fresh cheese), ready meals (meat, fish, vegetables), ready-to-eat raw vegetables and vegetable preparations, concentrated fruit juices and fish products not listed below; IV game (except large game), poultry and rabbits; V red offal; VI minced meat; VII untreated fish, molluscs and crustaceans) and fresh fruit and vegetables under ATP Annex 1, provided this cargo is at least half of the vehicle's load capacity or occupies half of its useful load volume."
+   ],
+   "source_id": "es-cat-isp-300-2026-11-20"
+  },
+  {
+   "ban_id": "hu-holiday-2027-01-01",
+   "profile": "hu-standing",
+   "title": "Public-holiday driving ban (New Year's Day)",
+   "valid_from": "2026-12-31",
+   "valid_to": "2027-01-01",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "22:00",
+    "end_time": "22:00",
+    "end_day_offset": 1,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-28T10:00:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "hu-190-2026-11-28",
+    "hu-mt-2026-11-28"
+   ],
+   "source_id": "hu-190-2026-11-28",
+   "notes": "Added 2026-11-28.r8-new-year-eves-pt: 1 January is a public holiday (Mt. §102(1)); Govt. Decree 190/2008 §2(1)(b): from 22:00 on the preceding day to 22:00 on the holiday -> Thursday 31 Dec 2026 22:00 to Friday 1 Jan 2027 22:00. §2(2) does not apply (1 Jan is not the day before a Sunday). §2(3) EURO 3+ international-traffic exemption applies (4 Nov-1 Mar). Omitted by the 27 Oct and 19 Nov reviews although it starts inside the reviewed span."
+  },
+  {
+   "ban_id": "hr-holiday-eve-2026-12-31",
+   "profile": "hr-season",
+   "title": "Holiday-eve restriction (coastal roads, New Year's Eve)",
+   "valid_from": "2026-12-31",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "15:00",
+    "end_time": "23:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-28T10:00:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "hr-naredba-2026-11-28",
+    "hr-blagdani-2026-11-28"
+   ],
+   "source_id": "hr-naredba-2026-11-28",
+   "notes": "Added 2026-11-28.r8-new-year-eves-pt: Naredba NN 64/2009 point II: eve of a holiday of the Republic of Croatia 15:00-23:00; 1 January (Nova godina) is a holiday under Zakon o blagdanima NN 110/2019 art. 1. Because 1 Jan 2027 is a Friday, point II moves the last-day restriction to Sunday 3 Jan 2027 12:00-23:00 (outside the reviewed span, not published)."
+  },
+  {
+   "ban_id": "lu-france-new-year-2027",
+   "profile": "lu-transit",
+   "title": "France-bound transit restriction for New Year's Day",
+   "valid_from": "2026-12-31",
+   "valid_to": "2027-01-01",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "21:30",
+    "end_time": "21:45",
+    "end_day_offset": 1,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-28T10:00:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "lu-police-2026-11-28"
+   ],
+   "source_id": "lu-police-2026-11-28",
+   "notes": "Added 2026-11-28.r8-new-year-eves-pt: Grand-Ducal regulation of 19 July 1997 as stated by the Police Grand-Ducale: New Year's Day is a ban day for transit towards France, from 21:30 on the eve to 21:45 on the day.",
+   "direction": "Transit toward France"
+  },
+  {
+   "ban_id": "lu-germany-new-year-2027",
+   "profile": "lu-transit",
+   "title": "Germany-bound transit restriction for New Year's Day",
+   "valid_from": "2026-12-31",
+   "valid_to": "2027-01-01",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "23:30",
+    "end_time": "21:45",
+    "end_day_offset": 1,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-28T10:00:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "lu-police-2026-11-28"
+   ],
+   "source_id": "lu-police-2026-11-28",
+   "notes": "Added 2026-11-28.r8-new-year-eves-pt: Grand-Ducal regulation of 19 July 1997 as stated by the Police Grand-Ducale: New Year's Day is a ban day for transit towards Germany, from 23:30 on the eve to 21:45 on the day.",
+   "direction": "Transit toward Germany"
   }
  ],
  "coverage_version": "2026-10-22.50",
@@ -11855,6 +15382,59 @@
     "ES"
    ],
    "evidence_log": "data/driving-bans/source-reviews/2026-11-02-es-de.json"
+  },
+  {
+   "review_id": "2026-11-19.r6-thursday-hu-fr-gr",
+   "reviewed_at": "2026-11-19T11:25:00.000Z",
+   "kind": "TARGETED_PRIMARY_REVIEW",
+   "full_registry_sweep": false,
+   "period": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "full_scope_jurisdictions": [],
+   "individual_rule_jurisdictions": [
+    "FR",
+    "GR",
+    "HU"
+   ],
+   "evidence_log": "data/driving-bans/source-reviews/2026-11-19-thursday/",
+   "notes": "Thursday sweep 19 Nov 2026 (manual re-run after PR #45 closed). Corrections only; window.to unchanged; jurisdiction last_verified/last_checked dates not refreshed."
+  },
+  {
+   "review_id": "2026-11-20.r7-es-dec-cat-bas",
+   "reviewed_at": "2026-11-20T12:30:00.000Z",
+   "kind": "TARGETED_PRIMARY_REVIEW",
+   "full_registry_sweep": false,
+   "period": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "full_scope_jurisdictions": [],
+   "individual_rule_jurisdictions": [
+    "ES"
+   ],
+   "evidence_log": "data/driving-bans/source-reviews/2026-11-20-es-december.json",
+   "notes": "Independent re-check of PR #144 (HU, FR, GR: same primary bytes, no change needed) and December 2026 Spanish general-goods rows (DGT, Catalonia, Basque Country). window.to unchanged; jurisdiction last_verified dates not refreshed."
+  },
+  {
+   "review_id": "2026-11-28.r8-new-year-eves-pt",
+   "reviewed_at": "2026-11-28T10:00:00.000Z",
+   "kind": "TARGETED_PRIMARY_REVIEW",
+   "full_registry_sweep": false,
+   "period": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "full_scope_jurisdictions": [],
+   "individual_rule_jurisdictions": [
+    "HR",
+    "HU",
+    "LU",
+    "PT"
+   ],
+   "evidence_log": "data/driving-bans/source-reviews/2026-11-28-new-year-eves-pt.json",
+   "notes": "Audit 28 Nov 2026: New Year eve bans starting 31 Dec were missing in jurisdictions marked complete for December; Porto VCI December reviewed. window.to and jurisdiction last_checked/last_verified unchanged."
   }
  ]
 }

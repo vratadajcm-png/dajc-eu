@@ -1,0 +1,1874 @@
+{
+ "review_id": "2026-11-19.ev-west",
+ "reviewed_at": "2026-11-19T06:05:00Z",
+ "kind": "EVIDENCE_ONLY_PRIMARY_REVIEW",
+ "horizon": {
+  "from": "2026-11-19",
+  "to": "2027-11-19"
+ },
+ "dataset_compared": {
+  "path": "data/driving-bans/canonical.json",
+  "dataset_version": "2026-11-02.r5-es-de-targeted.geo50",
+  "reviewed_span_to": "2026-12-31"
+ },
+ "method": "curl via configured proxy with TLS verification; SHA-256 of downloaded body; HTML hashes identify retrieved copy only. No bot protection bypassed. Secondary sources (ANTRAM PDF, web search results) used only as discovery leads and are labelled.",
+ "classification_legend": [
+  "PROMULGATED_RECURRING_LAW",
+  "ANNUAL_PUBLISHED",
+  "AWAITING_PUBLICATION",
+  "UNVERIFIED",
+  "SOURCE_UNAVAILABLE"
+ ],
+ "secondary_leads": [
+  {
+   "url": "https://antram.pt/attachments/upload/Legisla%C3%A7%C3%A3o/Portaria%20281-2019_consolidada.pdf",
+   "role": "SECONDARY (association consolidated text)"
+  },
+  {
+   "url": "https://www.aiccopn.pt/wp-content/uploads/2021/11/0007000073.pdf",
+   "role": "SECONDARY host; byte-identical to official DR PDF"
+  },
+  {
+   "url": "WebSearch results (trans.info, nakordoni.eu, weblex, cremona.ance.it, certifico)",
+   "role": "SECONDARY discovery only; nothing encoded from them"
+  }
+ ],
+ "findings": [
+  {
+   "id": "es-dgt-annex2-dec-2026",
+   "jurisdiction": "ES",
+   "region": "national (DGT territory: excl. Catalonia, Basque Country, Navarra)",
+   "authority": "BOE / DGT Resolución 14 enero 2026 (BOE-A-2026-1255)",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-1255",
+   "version": "BOE-A-2026-1255, publ. 20/01/2026, in force 30/01/2026; BOE \"Referencias posteriores\" on 2026-11-19 list only BOE-A-2026-13892 (mod. Annex I,II,IV,VIII), BOE-A-2026-7127 and BOE-A-2026-4377 (corrections) - unchanged since 2026-11-02 review",
+   "retrievals": [
+    {
+     "file": "es-boe-1255.html",
+     "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-1255",
+     "retrieved_at": "2026-11-19T05:50:14Z",
+     "http_status": 200,
+     "bytes": 515172,
+     "sha256": "15c4c06f5694b30de8b13ceaf5d8ea6a5efe65bbf01e14d05d56199a0804553a"
+    },
+    {
+     "file": "es-dgt-nov-dic-2026.xlsx",
+     "url": "https://www.dgt.es/export/sites/web-DGT/.galleries/downloads/estado-del-trafico/restricciones/2026/Restricciones_Noviembre-y-Diciembre.xlsx",
+     "retrieved_at": "2026-11-19T05:53:51Z",
+     "http_status": 200,
+     "bytes": 24131,
+     "sha256": "02ffc02a086be99eac53595191bc1367d3970020f902f3f0afae5a58637079f1"
+    },
+    {
+     "file": "es-dgt-restricciones.html",
+     "url": "https://www.dgt.es/conoce-el-estado-del-trafico/restricciones-a-la-circulacion/",
+     "retrieved_at": "2026-11-19T05:53:36Z",
+     "http_status": 200,
+     "bytes": 258009,
+     "sha256": "1debb5275b7396b21b202cac1e32bbc39b4b5a4fda2c037b87e4130b34ae5389"
+    }
+   ],
+   "finding": "Annex II (>7.5t MMA, vehicles needing complementary authorisation, special vehicles) December 2026: Fri 4 Dec 17 rows (Madrid radials outbound 16-22 e.g. A-1 km11.8-50, A-2, R-2, A-3, R-3, A-4, R-4, A-5 both dirs, R-5, N-6, M-501, A-6/AP-6 to Tordesillas; A-62 km113-151 15-23 to Portugal; N-631 15-24 both; A-3 km275-352 15-22 into Valencia; A-8 km139.2-169 17-21 to Santander). Sat 5 Dec 15 rows (Madrid outbound 08-15 or 08-13; A-62 08-15; A-8 11-14 to Santander). Sun 6 Dec: A-8 km169-139.2 16-21 to Bilbao (+ generic N-230 Sunday row). Tue 8 Dec 30 rows (Madrid inbound 16-22/16-23/16-24 incl. A-1, A-2, A-3 x2, A-4, A-5 x2, A-6 x3, AP-6, N-6, AP-51, AP-61, N-110, N-603, M-501; A-62 155-125 16-23 to Burgos; A-3 Valencia 13-21 out/17-21 in; A-4 Despeñaperros 09-22 both; A-44 Jaén-Bailén 09-22; A-1/AP-1/N-1 Burgos-Vitoria 16-21; N-631 07-24; A-8 16-21 to Bilbao; N-230 13-20). Generic: N-230 km64.1-149.2 (Benabarre-Aneto, 4 sub-sections) every Friday 4-18 Dec 17-24 towards France (exempt: trips to driver residence/vehicle base) and every Sunday 6-27 Dec 13-20 towards Benabarre; Thu 24 and 31 Dec N-230 17-24 towards France. No Annex II rows for 25/26 Dec other than generic N-230 Sunday 27 Dec. DGT official Nov-Dec xlsx (page updated 04/11/2026) reproduces the same rows. Annex VI rows (works suspension) and Annex V s.3 AP-1 8 Dec row are overtaking/works measures, not bans.",
+   "applicability_months": [
+    "2026-12"
+   ],
+   "classification_by_month": {
+    "2026-12": "ANNUAL_PUBLISHED"
+   },
+   "change_vs_dataset": "NEW_BAN",
+   "change_note": "Dataset es-annex2 profile review_window ends 2026-11-30; coverage failure ES_DECEMBER_2026_ANNEX_II_AND_REGIONAL_ROWS_NOT_ENCODED. All December rows are absent from dataset (not a change in law)."
+  },
+  {
+   "id": "es-dgt-annex5-adr-dec-2026",
+   "jurisdiction": "ES",
+   "region": "national (DGT territory)",
+   "authority": "BOE / DGT (BOE-A-2026-1255 Annex V s.1) + DGT official xlsx",
+   "url": "https://www.dgt.es/export/sites/web-DGT/.galleries/downloads/estado-del-trafico/restricciones/2026/Restricciones_Noviembre-y-Diciembre.xlsx",
+   "version": "Annex V common restrictions; DGT file \"Restricciones noviembre y diciembre 2026\" (page date 04/11/2026)",
+   "retrievals": [
+    {
+     "file": "es-dgt-nov-dic-2026.xlsx",
+     "url": "https://www.dgt.es/export/sites/web-DGT/.galleries/downloads/estado-del-trafico/restricciones/2026/Restricciones_Noviembre-y-Diciembre.xlsx",
+     "retrieved_at": "2026-11-19T05:53:51Z",
+     "http_status": 200,
+     "bytes": 24131,
+     "sha256": "02ffc02a086be99eac53595191bc1367d3970020f902f3f0afae5a58637079f1"
+    },
+    {
+     "file": "es-boe-1255.html",
+     "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-1255",
+     "retrieved_at": "2026-11-19T05:50:14Z",
+     "http_status": 200,
+     "bytes": 515172,
+     "sha256": "15c4c06f5694b30de8b13ceaf5d8ea6a5efe65bbf01e14d05d56199a0804553a"
+    }
+   ],
+   "finding": "ADR (orange-plate) and complementary-authorisation vehicles, December 2026 per DGT: 6 Dec 08-15 all CCAA, 15-24 Illes Balears, Canarias, Castilla-La Mancha, Galicia, C. Valenciana; 8 Dec 08-24 all; 13 and 20 Dec 08-24 all; 24 Dec 16-24 all; 25 Dec 08-15 all, 15-24 all except Illes Balears; 27 Dec 08-24 all; 31 Dec 16-24 all. Legal rule (Annex V 1.º): Sundays and national/regional holidays 08-24; Wed/Thu eves of national holidays 16-24; consecutive holidays: first day 08-15, last day full, intermediate free. Specific: N-433 km35.4-104.2 Saturdays Nov-Dec 11-22.",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "ANNUAL_PUBLISHED",
+    "2026-12": "ANNUAL_PUBLISHED",
+    "2027-01": "PROMULGATED_RECURRING_LAW",
+    "2027-02": "PROMULGATED_RECURRING_LAW",
+    "2027-03": "PROMULGATED_RECURRING_LAW",
+    "2027-04": "PROMULGATED_RECURRING_LAW",
+    "2027-05": "PROMULGATED_RECURRING_LAW",
+    "2027-06": "PROMULGATED_RECURRING_LAW",
+    "2027-07": "PROMULGATED_RECURRING_LAW",
+    "2027-08": "PROMULGATED_RECURRING_LAW",
+    "2027-09": "PROMULGATED_RECURRING_LAW",
+    "2027-10": "PROMULGATED_RECURRING_LAW",
+    "2027-11": "PROMULGATED_RECURRING_LAW"
+   },
+   "classification_note": "Final provision: resolution prorogued until the 2027 resolution enters into force EXCEPT date-specific restrictions of Annexes I, II, V, VI, VIII. The generic Sunday/holiday ADR rule therefore continues in 2027; dated items (and regional holiday lists) for 2027 await the 2027 resolution.",
+   "change_vs_dataset": "NEW_BAN",
+   "change_note": "Coverage failure ES_ANNEX_V_EXCEPTIONAL_ADR_RESTRICTIONS_NOT_EVENT_ENCODED; not encoded in dataset."
+  },
+  {
+   "id": "es-dgt-annex7-2026-12",
+   "jurisdiction": "ES",
+   "region": "national (DGT territory)",
+   "authority": "BOE / DGT (BOE-A-2026-1255 Annex VII, D.2.1)",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-1255",
+   "version": "as published; no later reference modifies Annex VII",
+   "retrievals": [
+    {
+     "file": "es-boe-1255.html",
+     "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-1255",
+     "retrieved_at": "2026-11-19T05:50:14Z",
+     "http_status": 200,
+     "bytes": 515172,
+     "sha256": "15c4c06f5694b30de8b13ceaf5d8ea6a5efe65bbf01e14d05d56199a0804553a"
+    }
+   ],
+   "finding": "Every day 00-24 both directions: N-340 km957-997 (MMA>7.5t); N-340 km1012.2-1058.44, N-124 km45.99-39 (except Haro origin/destination), N-232 km446.71-330.875 (4+ axles). Unchanged.",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "ANNUAL_PUBLISHED",
+    "2026-12": "ANNUAL_PUBLISHED",
+    "2027-01": "PROMULGATED_RECURRING_LAW",
+    "2027-02": "PROMULGATED_RECURRING_LAW",
+    "2027-03": "PROMULGATED_RECURRING_LAW",
+    "2027-04": "PROMULGATED_RECURRING_LAW",
+    "2027-05": "PROMULGATED_RECURRING_LAW",
+    "2027-06": "PROMULGATED_RECURRING_LAW",
+    "2027-07": "PROMULGATED_RECURRING_LAW",
+    "2027-08": "PROMULGATED_RECURRING_LAW",
+    "2027-09": "PROMULGATED_RECURRING_LAW",
+    "2027-10": "PROMULGATED_RECURRING_LAW",
+    "2027-11": "PROMULGATED_RECURRING_LAW"
+   },
+   "classification_note": "Annex VII is not in the list of date-specific annexes excluded from prorogation, so it continues until the 2027 resolution (content of 2027 resolution AWAITING_PUBLICATION).",
+   "change_vs_dataset": "NO_CHANGE",
+   "change_note": "Dataset es-annex7 rules valid_to 2026-12-31 (profile review_window Nov only) match text; consider extending past 2026-12-31 under prorogation."
+  },
+  {
+   "id": "es-dgt-2027-resolution-status",
+   "jurisdiction": "ES",
+   "region": "national (DGT territory)",
+   "authority": "BOE daily summaries (open-data API) / DGT restrictions page",
+   "url": "https://www.boe.es/datosabiertos/api/boe/sumario/{YYYYMMDD} (2026-11-02..2026-11-18)",
+   "version": "BOE summaries 2026-11-02..2026-11-18; 2026-11-19 not yet available at 05:51Z (404); DGT page dated 04/11/2026",
+   "retrievals": [
+    {
+     "file": "es-dgt-restricciones.html",
+     "url": "https://www.dgt.es/conoce-el-estado-del-trafico/restricciones-a-la-circulacion/",
+     "retrieved_at": "2026-11-19T05:53:36Z",
+     "http_status": 200,
+     "bytes": 258009,
+     "sha256": "1debb5275b7396b21b202cac1e32bbc39b4b5a4fda2c037b87e4130b34ae5389"
+    },
+    {
+     "file": "boesum/*.json",
+     "url": "https://www.boe.es/datosabiertos/api/boe/sumario/2026110[2-9]..20261118",
+     "retrieved_at": "2026-11-19T05:51:12Z..05:51:26Z",
+     "http_status": "200 (404 for 20261108, 20261115 Sundays, 20261119 not yet published)",
+     "sha256": "see dl/boesum/SHA256SUMS"
+    }
+   ],
+   "finding": "No DGT \"medidas especiales de regulación de tráfico durante el año 2027\" resolution, and no correction/modification of BOE-A-2026-1255, published in BOE 2026-11-02..2026-11-18 (only unrelated DGT items: BOE-A-2026-23075 emplazamiento re staff competition; contract notices). BOE-A-2026-23528 (ADR multilateral agreement M 371, trailers per transport unit) is not a driving restriction. DGT page lists only 2026 instruments. Historic pattern: 2026 resolution dated 14 Jan, BOE 20 Jan 2026.",
+   "applicability_months": [
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2027-01": "AWAITING_PUBLICATION",
+    "2027-02": "AWAITING_PUBLICATION",
+    "2027-03": "AWAITING_PUBLICATION",
+    "2027-04": "AWAITING_PUBLICATION",
+    "2027-05": "AWAITING_PUBLICATION",
+    "2027-06": "AWAITING_PUBLICATION",
+    "2027-07": "AWAITING_PUBLICATION",
+    "2027-08": "AWAITING_PUBLICATION",
+    "2027-09": "AWAITING_PUBLICATION",
+    "2027-10": "AWAITING_PUBLICATION",
+    "2027-11": "AWAITING_PUBLICATION"
+   },
+   "change_vs_dataset": "NO_CHANGE",
+   "change_note": "Nothing to encode for 2027 date-specific rows; do not infer absence of 2027 bans."
+  },
+  {
+   "id": "es-dgt-navarra-scope",
+   "jurisdiction": "ES",
+   "region": "Navarra (Comunidad Foral)",
+   "authority": "DGT restrictions page",
+   "url": "https://www.dgt.es/conoce-el-estado-del-trafico/restricciones-a-la-circulacion/",
+   "version": "page dated 04/11/2026",
+   "retrievals": [
+    {
+     "file": "es-dgt-restricciones.html",
+     "url": "https://www.dgt.es/conoce-el-estado-del-trafico/restricciones-a-la-circulacion/",
+     "retrieved_at": "2026-11-19T05:53:36Z",
+     "http_status": 200,
+     "bytes": 258009,
+     "sha256": "1debb5275b7396b21b202cac1e32bbc39b4b5a4fda2c037b87e4130b34ae5389"
+    }
+   ],
+   "finding": "DGT states its restrictions apply to all national territory EXCEPT Catalonia, Basque Country and Comunidad Foral de Navarra, which apply their own restrictions. Navarra own restriction instrument NOT reviewed in this task.",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "UNVERIFIED",
+    "2026-12": "UNVERIFIED",
+    "2027-01": "UNVERIFIED",
+    "2027-02": "UNVERIFIED",
+    "2027-03": "UNVERIFIED",
+    "2027-04": "UNVERIFIED",
+    "2027-05": "UNVERIFIED",
+    "2027-06": "UNVERIFIED",
+    "2027-07": "UNVERIFIED",
+    "2027-08": "UNVERIFIED",
+    "2027-09": "UNVERIFIED",
+    "2027-10": "UNVERIFIED",
+    "2027-11": "UNVERIFIED"
+   },
+   "change_vs_dataset": "UNKNOWN",
+   "change_note": "Dataset ES source list has no Navarra instrument; coverage gap to flag."
+  },
+  {
+   "id": "es-cat-dec-2026",
+   "jurisdiction": "ES",
+   "region": "Catalonia (Servei Català de Trànsit)",
+   "authority": "Resolución ISP/300/2026 (DOGC 9602; BOE-A-2026-6095) as amended by ISP/1933/2026 (BOE-A-2026-16758)",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-6095",
+   "version": "BOE text identical (same SHA-256) to 2026-11-02 retrieval; effects to 31 Dec 2026, then automatically prorogued \"con la aplicación análoga que corresponda por fechas\" until the 2027 resolution takes effect",
+   "retrievals": [
+    {
+     "file": "es-cat-isp300.html",
+     "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-6095",
+     "retrieved_at": "2026-11-19T05:51:48Z",
+     "http_status": 200,
+     "bytes": 151103,
+     "sha256": "a78de69c053889b3ac3731b822a0ea39f2f7770bb3a1b04696f8c68dbd43e08a"
+    },
+    {
+     "file": "es-cat-isp1933.html",
+     "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-16758",
+     "retrieved_at": "2026-11-19T05:51:48Z",
+     "http_status": 200,
+     "bytes": 31422,
+     "sha256": "b3f58a469f5237adbba3033ecf248383bf1e7905276a81f0e5c27e1e7f66bfb8"
+    },
+    {
+     "file": "es-cat-sct.html",
+     "url": "https://transit.gencat.cat/ca/informacio-viaria/professionals-transport/mesures-especials/",
+     "retrieved_at": "2026-11-19T05:51:48Z",
+     "http_status": 200,
+     "bytes": 264605,
+     "sha256": "69fe45179086aa2d738806ff3f1fe532695d5b57590c3382eb9ed72fe3c72d8d"
+    },
+    {
+     "file": "es-cat-consulta.html",
+     "url": "https://transit.gencat.cat/ca/informacio-viaria/professionals-transport/mesures-especials/consulta-restriccions/",
+     "retrieved_at": "2026-11-19T05:53:13Z",
+     "http_status": 200,
+     "bytes": 250160,
+     "sha256": "919c9f09d26449c9f522aece27a5327b74a73861739d1a7421126f65189ef59b"
+    },
+    {
+     "file": "es-cat-calendari-2026.pdf",
+     "url": "https://transit.gencat.cat/web/.content/documents/informacio-viaria/d-2026-calendari-operacions-especials-proves-esportives-i-esdeveniments.pdf",
+     "retrieved_at": "2026-11-19T05:53:13Z",
+     "http_status": 200,
+     "bytes": 248401,
+     "sha256": "973095a27837a82d4268cae36710a07420ee2c41e2c247b30c03bf87bd7c505e"
+    }
+   ],
+   "finding": "Annex A (>7.5t MMA/MMC; M=10-14, T=17-22, D=10-22): Inmaculada - Fri 4/12 T and Sat 5/12 M and Tue 8/12 T on AP-7 km84.5-281, A-2 km520-585 (4/12, 5/12 direction Lleida; 8/12 direction Barcelona), C-31 km135-176, C-32 km0-63, B-23 km0-15, A-2 km585-609 (blank for AP-2, A-7, other networks). Winter Pyrenees (N-145 km0-10, C-14 km116-178, N-260 km193-234): Saturdays 28/11-26/12 M; Sundays and holidays 6/12-27/12 T (=6, 8, 13, 20, 25?, 26?, 27 Dec - holidays per Catalan calendar not enumerated in text). Annual N-II km630-682.2: every Saturday M, every Sunday T. Section 7.1 Aran access N-230 km116-187 (Bausen) and C-28 km23-34 (>7.5t): Fridays 4/12-18/12 17-24 towards France (exempt trips to driver residence/vehicle base/company base); December Sundays 13-20 towards Lleida; Tue 8/12 13-20 towards Lleida; Thu 24/12 and 31/12 17-24 towards France. Sections 2.1/3.1 (special transport and ADR orange-plate): eves (Wed/Thu) of holidays 16-24; Sundays and holidays 8-24; consecutive holidays first day 8-15, last 8-24, eve 16-24. Section 1.2 euromodular AP-7 km84.5-281 Fri 17-22, Sat 10-14, Sun 17-22 and analogous on bridges/holidays/eves. gencat transit page lists no new instrument after ISP/2853/2026 (5 Aug 2026); no separate monthly TE/VE calendar for Dec 2026 was found - only the annual 2026 operations calendar PDF (4-8 Dec \"Operació Especial La Constitució-Immaculada\").",
+   "applicability_months": [
+    "2026-11",
+    "2026-12"
+   ],
+   "classification_by_month": {
+    "2026-11": "ANNUAL_PUBLISHED",
+    "2026-12": "ANNUAL_PUBLISHED"
+   },
+   "change_vs_dataset": "NEW_BAN",
+   "change_note": "Dataset encodes only N-II annual rows, winter Saturdays (28 Nov-26 Dec) and permanent ss.8-9. Missing for Dec: Inmaculada rows 4/5/8 Dec, winter Sunday/holiday T rows 6-27 Dec, section 7 N-230/C-28 Aran rows, ADR/special-transport rows, euromodular rows."
+  },
+  {
+   "id": "es-cat-isp-2853-2026",
+   "jurisdiction": "ES",
+   "region": "Catalonia",
+   "authority": "DOGC - Resolució ISP/2853/2026, de 5 d'agost",
+   "url": "https://dogc.gencat.cat/ca/document-del-dogc/?documentId=1052172",
+   "version": "DOGC page is JavaScript-rendered; text not obtainable by direct retrieval",
+   "retrievals": [
+    {
+     "file": "es-cat-dogc-2853.html",
+     "url": "https://dogc.gencat.cat/ca/document-del-dogc/?documentId=1052172",
+     "retrieved_at": "2026-11-19T05:53:13Z",
+     "http_status": 200,
+     "bytes": 77335,
+     "sha256": "b2d0a7eced11795a9f3feaf0d30bd0deb0da701b8614700eb248b664ce1efc37"
+    },
+    {
+     "file": "es-dogc-2853-es.html",
+     "url": "https://dogc.gencat.cat/es/document-del-dogc/index.html?documentId=1052172",
+     "retrieved_at": "2026-11-19T05:53:36Z",
+     "http_status": 200,
+     "bytes": 77294,
+     "sha256": "1e1a985303ca8008e9f655f591d4dae4e2b40a3e83efd07165f6f9a0dac05688"
+    }
+   ],
+   "finding": "Instrument modifying ISP/300/2026 listed on transit.gencat.cat; content NOT read (page shell only). Not in BOE references of ISP/300. Whether it affects Nov 2026-2027 rows is UNVERIFIED.",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "UNVERIFIED",
+    "2026-12": "UNVERIFIED",
+    "2027-01": "UNVERIFIED",
+    "2027-02": "UNVERIFIED",
+    "2027-03": "UNVERIFIED",
+    "2027-04": "UNVERIFIED",
+    "2027-05": "UNVERIFIED",
+    "2027-06": "UNVERIFIED",
+    "2027-07": "UNVERIFIED",
+    "2027-08": "UNVERIFIED",
+    "2027-09": "UNVERIFIED",
+    "2027-10": "UNVERIFIED",
+    "2027-11": "UNVERIFIED"
+   },
+   "change_vs_dataset": "UNKNOWN"
+  },
+  {
+   "id": "es-cat-2027-status",
+   "jurisdiction": "ES",
+   "region": "Catalonia",
+   "authority": "Servei Català de Trànsit / BOE summaries",
+   "url": "https://transit.gencat.cat/ca/informacio-viaria/professionals-transport/mesures-especials/",
+   "version": "retrieved 2026-11-19",
+   "retrievals": [
+    {
+     "file": "es-cat-sct.html",
+     "url": "https://transit.gencat.cat/ca/informacio-viaria/professionals-transport/mesures-especials/",
+     "retrieved_at": "2026-11-19T05:51:48Z",
+     "http_status": 200,
+     "bytes": 264605,
+     "sha256": "69fe45179086aa2d738806ff3f1fe532695d5b57590c3382eb9ed72fe3c72d8d"
+    },
+    {
+     "file": "es-cat-consulta.html",
+     "url": "https://transit.gencat.cat/ca/informacio-viaria/professionals-transport/mesures-especials/consulta-restriccions/",
+     "retrieved_at": "2026-11-19T05:53:13Z",
+     "http_status": 200,
+     "bytes": 250160,
+     "sha256": "919c9f09d26449c9f522aece27a5327b74a73861739d1a7421126f65189ef59b"
+    }
+   ],
+   "finding": "No 2027 Catalan restriction resolution listed (2026 resolution dated 6 Feb 2026, DOGC 11 Feb). Until it takes effect ISP/300/2026 is prorogued with analogous application by dates.",
+   "applicability_months": [
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2027-01": "AWAITING_PUBLICATION",
+    "2027-02": "AWAITING_PUBLICATION",
+    "2027-03": "AWAITING_PUBLICATION",
+    "2027-04": "AWAITING_PUBLICATION",
+    "2027-05": "AWAITING_PUBLICATION",
+    "2027-06": "AWAITING_PUBLICATION",
+    "2027-07": "AWAITING_PUBLICATION",
+    "2027-08": "AWAITING_PUBLICATION",
+    "2027-09": "AWAITING_PUBLICATION",
+    "2027-10": "AWAITING_PUBLICATION",
+    "2027-11": "AWAITING_PUBLICATION"
+   },
+   "classification_note": "Recurring parts (annual N-II rows, permanent ss.8-9, ADR/special-transport Sunday/holiday rule, euromodular weekly rule) continue as PROMULGATED_RECURRING_LAW under prorogation; date-specific 2027 rows depend on \"analogous application\" and are AWAITING_PUBLICATION/UNVERIFIED.",
+   "change_vs_dataset": "NO_CHANGE"
+  },
+  {
+   "id": "es-bas-dec-2026",
+   "jurisdiction": "ES",
+   "region": "Basque Country (Dirección de Tráfico, Gobierno Vasco)",
+   "authority": "Resolución de 9 de enero de 2026 (BOPV 5 Feb 2026; BOE-A-2026-2625)",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-2625",
+   "version": "BOE publ. 05/02/2026, in force 17/02/2026; valid 2026, prorogued until 2027 resolution except date-specific restrictions of Annexes I and II",
+   "retrievals": [
+    {
+     "file": "es-bas-2625.html",
+     "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-2625",
+     "retrieved_at": "2026-11-19T05:51:48Z",
+     "http_status": 200,
+     "bytes": 94924,
+     "sha256": "0d5117bf4b26b550d3c28b4f149a0a942e7e22e02d426948a2791ab2bb5aa098"
+    }
+   ],
+   "finding": "Annex II (>7.5t MMA) 2.º item 1: Fri 4 Dec 17-21 and Sat 5 Dec 11-14 towards Cantabria on A-8 km119.5-139.21, N-634 km107-120.69, BI-3724 km120.69-128.12, BI-734 km128.12-136.14. Item 2: Sun 6 Dec and Tue 8 Dec 16-21 towards Bilbao on A-8 km139.21-119.5, BI-734, BI-3724, N-634 km120.69-107. Item 6 cross-border list (22:00 eve to 22:00) contains NO December date (6 Apr, 8/14/25 May, 14 Jul, 11 Nov only). Point 2.1 ADR orange-plate vehicles: Sundays and holidays (whole CAPV) 08-24; eves of holidays not Saturday 16-24. Point 4.1 complementary-authorisation vehicles: same. Dec 2026 holidays in CAPV per text not enumerated (national: 6, 8, 25 Dec).",
+   "applicability_months": [
+    "2026-12"
+   ],
+   "classification_by_month": {
+    "2026-12": "ANNUAL_PUBLISHED"
+   },
+   "change_vs_dataset": "NEW_BAN",
+   "change_note": "Dataset es-bas-2026 profile window Nov only; Dec rows (4, 5, 6, 8 Dec) not encoded; ADR rule not encoded (coverage failure ES_BASQUE_ADR...)."
+  },
+  {
+   "id": "es-bas-jan-2027-listed-dates",
+   "jurisdiction": "ES",
+   "region": "Basque Country",
+   "authority": "BOE-A-2026-2625 Annex II",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-2625",
+   "version": "as above",
+   "retrievals": [
+    {
+     "file": "es-bas-2625.html",
+     "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-2625",
+     "retrieved_at": "2026-11-19T05:51:48Z",
+     "http_status": 200,
+     "bytes": 94924,
+     "sha256": "0d5117bf4b26b550d3c28b4f149a0a942e7e22e02d426948a2791ab2bb5aa098"
+    }
+   ],
+   "finding": "The 2026 resolution itself lists 2 Jan 2027 11-14 (towards Cantabria, item 1 roads) and 6 Jan 2027 16-21 (towards Bilbao, item 2 roads). Final provision says the resolution is valid for 2026 and prorogation excludes date-specific Annex II restrictions, so applicability of these 2027 dates is legally ambiguous.",
+   "applicability_months": [
+    "2027-01"
+   ],
+   "classification_by_month": {
+    "2027-01": "UNVERIFIED"
+   },
+   "change_vs_dataset": "UNKNOWN",
+   "change_note": "OWNER_DECISION or later 2027 Basque resolution needed before encoding."
+  },
+  {
+   "id": "es-bas-2027-status",
+   "jurisdiction": "ES",
+   "region": "Basque Country",
+   "authority": "BOE daily summaries 2026-11-02..18; trafikoa.euskadi.eus",
+   "url": "https://www.trafikoa.euskadi.eus/restricciones/webtraf00-contrest/es/",
+   "version": "trafikoa URL returned 404 (wrong/retired path); BOE summaries show no Basque traffic resolution",
+   "retrievals": [
+    {
+     "file": "es-bas-trafikoa.html",
+     "url": "https://www.trafikoa.euskadi.eus/restricciones/webtraf00-contrest/es/",
+     "retrieved_at": "2026-11-19T05:53:36Z",
+     "http_status": 404,
+     "bytes": 40,
+     "sha256": null
+    }
+   ],
+   "finding": "No 2027 Basque resolution found (2026 one dated 9 Jan 2026, BOE 5 Feb 2026). Recurring ADR/special-transport Sunday/holiday rules continue under prorogation.",
+   "applicability_months": [
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2027-01": "AWAITING_PUBLICATION",
+    "2027-02": "AWAITING_PUBLICATION",
+    "2027-03": "AWAITING_PUBLICATION",
+    "2027-04": "AWAITING_PUBLICATION",
+    "2027-05": "AWAITING_PUBLICATION",
+    "2027-06": "AWAITING_PUBLICATION",
+    "2027-07": "AWAITING_PUBLICATION",
+    "2027-08": "AWAITING_PUBLICATION",
+    "2027-09": "AWAITING_PUBLICATION",
+    "2027-10": "AWAITING_PUBLICATION",
+    "2027-11": "AWAITING_PUBLICATION"
+   },
+   "change_vs_dataset": "NO_CHANGE"
+  },
+  {
+   "id": "pt-adr-portaria-281-2019",
+   "jurisdiction": "PT",
+   "region": "mainland",
+   "authority": "Diário da República - Portaria n.º 281/2019 (30 Aug 2019, DR 1.ª série n.º 166, pp.70-73), amended by Portaria n.º 163/2021 (29 Jul 2021)",
+   "url": "https://files.diariodarepublica.pt/1s/2019/08/16600/0007000073.pdf",
+   "version": "Original 2019 text retrieved from DR (official). Consolidated text incl. 163/2021 read only from ANTRAM PDF (SECONDARY, association) - official consolidated page diariodarepublica.pt is JS-only.",
+   "retrievals": [
+    {
+     "file": "pt-dr-281-2019.pdf",
+     "url": "https://files.diariodarepublica.pt/1s/2019/08/16600/0007000073.pdf",
+     "retrieved_at": "2026-11-19T05:56:16Z",
+     "http_status": 200,
+     "bytes": 473580,
+     "sha256": "57c0b8f60fb55e8f5039091e30b7f784c4f9c620687d2fbf326c7b892e6176f1"
+    },
+    {
+     "file": "pt-antram-281-consolidada.pdf",
+     "url": "https://antram.pt/attachments/upload/Legisla%C3%A7%C3%A3o/Portaria%20281-2019_consolidada.pdf",
+     "retrieved_at": "2026-11-19T05:56:03Z",
+     "http_status": 200,
+     "bytes": 166671,
+     "sha256": "f6c2b7459e485e9ac1a04756653757f7fc59da1cffd0b1a80b8e4c49b3ed07c7"
+    },
+    {
+     "file": "pt-portaria-281.html",
+     "url": "https://diariodarepublica.pt/dr/detalhe/portaria/281-2019-124392162",
+     "retrieved_at": "2026-11-19T05:50:14Z",
+     "http_status": 200,
+     "bytes": 2346,
+     "sha256": "0794abe5f8088cfd34e8e50bb5f9f7828b20a3c505f702e4b51be3bbb0631b57"
+    }
+   ],
+   "finding": "Art.2: tank vehicles carrying dangerous goods banned 00-24 on Sundays and national holidays on the whole mainland public road network; [163/2021, secondary consolidated:] not applicable to national holidays falling on Saturday or Monday. Art.3: other orange-plated heavy DG vehicles banned 18-21 on Fridays, Sundays, national holidays and holiday eves on EN6 Lisboa-Cascais, EN10 Infantado-VFX, EN14 Maia-Braga, IC1 Coimbrões-Miramar, EN209 Porto-Gondomar, EN1 Carvalhos-Gaia, EN101 Braga-Vila Verde, IC4/EN125 S.João da Venda-Faro, EN125 Faro-Olhão; art.3(2) tank vehicles also 18-21 Fridays and holiday eves on these roads. Art.4: Mondays 07-10 (except Jul/Aug) inbound Lisbon/Porto on A1, A5, A8, IC19, EN6, EN10, IC22, A3, A4, A28, EN13, EN209, EN222, A20. Art.5: Ponte 25 de Abril only 02-05. Art.7 exemptions (health units, armed forces/police, airport/port fuel, ANEPC air bases [163/2021], refineries/ships, LNG UAG, strategic reserves; strikes, civil-protection alert, energy crisis). Art.8 IMT special authorisations. Dec 2026 national holidays (Tue 1 Dec, Tue 8 Dec, Fri 25 Dec - holiday list from Código do Trabalho art.234, NOT retrieved) -> full-day art.2 bans + Sundays; eves 30 Nov, 7 Dec, 24 Dec 18-21 on art.3 roads.",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "PROMULGATED_RECURRING_LAW",
+    "2026-12": "PROMULGATED_RECURRING_LAW",
+    "2027-01": "PROMULGATED_RECURRING_LAW",
+    "2027-02": "PROMULGATED_RECURRING_LAW",
+    "2027-03": "PROMULGATED_RECURRING_LAW",
+    "2027-04": "PROMULGATED_RECURRING_LAW",
+    "2027-05": "PROMULGATED_RECURRING_LAW",
+    "2027-06": "PROMULGATED_RECURRING_LAW",
+    "2027-07": "PROMULGATED_RECURRING_LAW",
+    "2027-08": "PROMULGATED_RECURRING_LAW",
+    "2027-09": "PROMULGATED_RECURRING_LAW",
+    "2027-10": "PROMULGATED_RECURRING_LAW",
+    "2027-11": "PROMULGATED_RECURRING_LAW"
+   },
+   "classification_note": "Base 2019 text official; the 163/2021 Saturday/Monday holiday carve-out is UNVERIFIED from a primary source.",
+   "change_vs_dataset": "NEW_BAN",
+   "change_note": "Dataset coverage failure PT_ADR_RESTRICTIONS_NOT_REVIEWED; none encoded."
+  },
+  {
+   "id": "pt-vci-porto",
+   "jurisdiction": "PT",
+   "region": "Porto VCI",
+   "authority": "Diário da República - Decreto-Lei n.º 155-A/2026 (31 Jul 2026, Suplemento n.º 147)",
+   "url": "https://files.diariodarepublica.pt/1s/2026/07/14703/0000200005.pdf",
+   "version": "in force 15 Sep 2026; SHA-256 re-computed this run",
+   "retrievals": [
+    {
+     "file": "pt-dl-155a-2026.pdf",
+     "url": "https://files.diariodarepublica.pt/1s/2026/07/14703/0000200005.pdf",
+     "retrieved_at": "2026-11-19T05:56:17Z",
+     "http_status": 200,
+     "bytes": 118245,
+     "sha256": "466c269ef65fcc7a32fec367922cb0d334503b267e43f8868f0c774742698f84"
+    }
+   ],
+   "finding": "Art.2(1): HGV (>3500 kg gross, >=3 axles, height at first axle >=1.1 m, goods) banned on VCI (A1/IC1, A20/IC23, A28/IC1, A44/IC23) on \"dias úteis\" 07:00-21:00. Exceptions: loading/unloading in Porto or Vila Nova de Gaia with platform habilitation (art.3); IMT special transit authorisation; State/municipal vehicles. No end date.",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "PROMULGATED_RECURRING_LAW",
+    "2026-12": "PROMULGATED_RECURRING_LAW",
+    "2027-01": "PROMULGATED_RECURRING_LAW",
+    "2027-02": "PROMULGATED_RECURRING_LAW",
+    "2027-03": "PROMULGATED_RECURRING_LAW",
+    "2027-04": "PROMULGATED_RECURRING_LAW",
+    "2027-05": "PROMULGATED_RECURRING_LAW",
+    "2027-06": "PROMULGATED_RECURRING_LAW",
+    "2027-07": "PROMULGATED_RECURRING_LAW",
+    "2027-08": "PROMULGATED_RECURRING_LAW",
+    "2027-09": "PROMULGATED_RECURRING_LAW",
+    "2027-10": "PROMULGATED_RECURRING_LAW",
+    "2027-11": "PROMULGATED_RECURRING_LAW"
+   },
+   "change_vs_dataset": "CHANGED",
+   "change_note": "Dataset rule pt-vci-porto (valid_to 2026-12-31) excludes only 2026-10-05; if, as dataset note says, working days exclude public holidays, it must also exclude 2026-12-01, 2026-12-08, 2026-12-25 (and 2027 holidays). Text does not define \"dias úteis\"; holiday list not primary-retrieved -> UNVERIFIED interpretation. Also valid_to 2026-12-31 is a dataset artefact: the law has no end date."
+  },
+  {
+   "id": "pt-holiday-period-hgv",
+   "jurisdiction": "PT",
+   "region": "mainland",
+   "authority": "IMT (imt-ip.pt)",
+   "url": "https://www.imt-ip.pt/rodoviario/transporte-de-mercadorias-perigosas/",
+   "version": "retrieved 2026-11-19",
+   "retrievals": [
+    {
+     "file": "pt-imt-mp.html",
+     "url": "https://www.imt-ip.pt/rodoviario/transporte-de-mercadorias-perigosas/",
+     "retrieved_at": "2026-11-19T05:56:45Z",
+     "http_status": 200,
+     "bytes": 118572,
+     "sha256": "a6607817adea2ca962015dbfe63dd94ade91e42edf864c2fbe219f2fae3e7cf3"
+    },
+    {
+     "file": "pt-imt-mp-restricoes.html",
+     "url": "https://www.imt-ip.pt/sites/IMTT/Portugues/TransportesRodoviarios/MercadoriasPerigosas/Paginas/RestricoesCirculacao.aspx",
+     "retrieved_at": "2026-11-19T05:56:36Z",
+     "http_status": 200,
+     "bytes": 106221,
+     "sha256": "7dc711a1177cfd54c601276f73e2ed9cab1c1e3c55bbef5e14f738da96271182"
+    },
+    {
+     "file": "pt-imt-home.html",
+     "url": "https://www.imt-ip.pt/",
+     "retrieved_at": "2026-11-19T05:56:38Z",
+     "http_status": 200,
+     "bytes": 152608,
+     "sha256": "82c4ee1a09e71311bb126013da9e9889767dab3bfb0f981a3343ff49ca98d5b6"
+    }
+   ],
+   "finding": "No Dec 2026/2027 holiday-period general HGV restriction instrument found on reviewed IMT pages; ANSR not reviewed. This is NOT a NO_BAN finding.",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "UNVERIFIED",
+    "2026-12": "UNVERIFIED",
+    "2027-01": "UNVERIFIED",
+    "2027-02": "UNVERIFIED",
+    "2027-03": "UNVERIFIED",
+    "2027-04": "UNVERIFIED",
+    "2027-05": "UNVERIFIED",
+    "2027-06": "UNVERIFIED",
+    "2027-07": "UNVERIFIED",
+    "2027-08": "UNVERIFIED",
+    "2027-09": "UNVERIFIED",
+    "2027-10": "UNVERIFIED",
+    "2027-11": "UNVERIFIED"
+   },
+   "change_vs_dataset": "UNKNOWN"
+  },
+  {
+   "id": "fr-arrete-2021-dec-2026-jan-2027",
+   "jurisdiction": "FR",
+   "region": "metropolitan",
+   "authority": "JORF - Arrêté du 16 avril 2021 (NOR TRAT2031119A), official JO PDF via Bison Futé",
+   "url": "https://www.bison-fute.gouv.fr/IMG/pdf/Arrete_joe_20210424_0097_0037.pdf",
+   "version": "JO 24 Apr 2021 texte 37; Bison Futé page still cites it as the general regime (2026-11-19). Légifrance consolidated version not retrievable (Cloudflare challenge 403).",
+   "retrievals": [
+    {
+     "file": "fr-arrete-2021.pdf",
+     "url": "https://www.bison-fute.gouv.fr/IMG/pdf/Arrete_joe_20210424_0097_0037.pdf",
+     "retrieved_at": "2026-11-19T05:54:31Z",
+     "http_status": 200,
+     "bytes": 182436,
+     "sha256": "7e9a0a0c19f06e8721367681c9289c03eac6be1181d023237a9a22acf954d26c"
+    },
+    {
+     "file": "fr-bf-regime.html",
+     "url": "https://www.bison-fute.gouv.fr/regime-general,10852.html",
+     "retrieved_at": "2026-11-19T05:50:14Z",
+     "http_status": 200,
+     "bytes": 60309,
+     "sha256": "b04c820f64f59d25bfd88b6639130769c223fe34b6ea17dae0fe2318f783ecbb"
+    },
+    {
+     "file": "fr-arrete-2021-lf.html",
+     "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000043420557",
+     "retrieved_at": "2026-11-19T05:50:14Z",
+     "http_status": 403,
+     "bytes": 5571,
+     "sha256": null
+    }
+   ],
+   "finding": "Art.1: >7.5t PTAC goods vehicles banned on whole network Saturdays and holiday eves from 22:00 to 22:00 Sundays and holidays. Dec 2026: every Sat 22:00-Sun 22:00; Thu 24 Dec 22:00-Fri 25 Dec 22:00; Thu 31 Dec 22:00-Fri 1 Jan 2027 22:00. Art.3 IdF (A6A/A6B, A106, A6, A10, A13, A12 sections): Paris-province Fri 16-21, holiday eves 16-22, Sat 10-18, Sun/holidays 22-24; province-Paris Sun/holidays 22-24, Mon/day after holiday 06-10 -> 31 Dec 16-22 outbound, 1 Jan 22-24 both, Sat 2 Jan 2027 06-10 inbound (day after holiday). Art.4 exemptions (perishables >=50% load, etc.; not for art.3).",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "PROMULGATED_RECURRING_LAW",
+    "2026-12": "PROMULGATED_RECURRING_LAW",
+    "2027-01": "PROMULGATED_RECURRING_LAW",
+    "2027-02": "PROMULGATED_RECURRING_LAW",
+    "2027-03": "PROMULGATED_RECURRING_LAW",
+    "2027-04": "PROMULGATED_RECURRING_LAW",
+    "2027-05": "PROMULGATED_RECURRING_LAW",
+    "2027-06": "PROMULGATED_RECURRING_LAW",
+    "2027-07": "PROMULGATED_RECURRING_LAW",
+    "2027-08": "PROMULGATED_RECURRING_LAW",
+    "2027-09": "PROMULGATED_RECURRING_LAW",
+    "2027-10": "PROMULGATED_RECURRING_LAW",
+    "2027-11": "PROMULGATED_RECURRING_LAW"
+   },
+   "change_vs_dataset": "NEW_BAN",
+   "change_note": "Dataset has fr-holiday-2026-12-25 and IdF 24-26 Dec but NO New Year occurrence: ban starting Thu 31 Dec 2026 22:00 (inside reviewed span ending 2026-12-31) and IdF 31 Dec 16-22 outbound eve are missing. Christmas rules match (NO_CHANGE)."
+  },
+  {
+   "id": "fr-2027-complementary",
+   "jurisdiction": "FR",
+   "region": "metropolitan",
+   "authority": "Bison Futé (official) / JORF",
+   "url": "https://www.bison-fute.gouv.fr/regime-general,10852.html",
+   "version": "Bison Futé régime général page retrieved 2026-11-19 lists only arrêté du 26 décembre 2025 (2026, NOR TRAT2529272A, JO 8 Jan 2026)",
+   "retrievals": [
+    {
+     "file": "fr-bf-regime.html",
+     "url": "https://www.bison-fute.gouv.fr/regime-general,10852.html",
+     "retrieved_at": "2026-11-19T05:50:14Z",
+     "http_status": 200,
+     "bytes": 60309,
+     "sha256": "b04c820f64f59d25bfd88b6639130769c223fe34b6ea17dae0fe2318f783ecbb"
+    },
+    {
+     "file": "fr-arrete-2026.pdf",
+     "url": "https://www.bison-fute.gouv.fr/IMG/pdf/joe_arrete_interdictions_complementaires_TRM_2026.pdf",
+     "retrieved_at": "2026-11-19T05:54:32Z",
+     "http_status": 200,
+     "bytes": 145747,
+     "sha256": "ba7ed529d2dafb414bfbc12c8aa2238730ed6f7be883ee68894fa7b40525db54"
+    }
+   ],
+   "finding": "No 2027 complementary-ban arrêté (Saturdays: up to 5 winter AURA, up to 7 summer) published as of 2026-11-19. Prior: 2025 arrêté 20 Dec 2024; 2026 arrêté 26 Dec 2025. 2026 complementary dates (Feb-Mar, Jul-Aug) none in Nov-Dec 2026. Exceptional convoys: banned Saturday/holiday eve 12:00 to Monday/day after holiday 06:00 and during goods-vehicle ban periods (Bison Futé).",
+   "applicability_months": [
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2027-01": "PROMULGATED_RECURRING_LAW",
+    "2027-02": "AWAITING_PUBLICATION",
+    "2027-03": "AWAITING_PUBLICATION",
+    "2027-04": "PROMULGATED_RECURRING_LAW",
+    "2027-05": "PROMULGATED_RECURRING_LAW",
+    "2027-06": "PROMULGATED_RECURRING_LAW",
+    "2027-07": "AWAITING_PUBLICATION",
+    "2027-08": "AWAITING_PUBLICATION",
+    "2027-09": "PROMULGATED_RECURRING_LAW",
+    "2027-10": "PROMULGATED_RECURRING_LAW",
+    "2027-11": "PROMULGATED_RECURRING_LAW"
+   },
+   "classification_note": "Months 2027-02/03/07/08 have expected complementary Saturdays pending the 2027 arrêté; art.1/3 rules apply all months.",
+   "change_vs_dataset": "NO_CHANGE"
+  },
+  {
+   "id": "fr-arrete-20260806",
+   "jurisdiction": "FR",
+   "region": "metropolitan",
+   "authority": "JORF - Arrêté du 6 août 2026 (NOR TRAT2621637A), JO 7 Aug 2026 texte 47",
+   "url": "https://www3.bison-fute.gouv.fr/IMG/pdf/joe_20260807_0183_0047.pdf",
+   "version": "discovered via search; official JO PDF",
+   "retrievals": [
+    {
+     "file": "fr-joe-20260807.pdf",
+     "url": "https://www3.bison-fute.gouv.fr/IMG/pdf/joe_20260807_0183_0047.pdf",
+     "retrieved_at": "2026-11-19T05:54:30Z",
+     "http_status": 200,
+     "bytes": 138220,
+     "sha256": "57b28b6893d88650de9e96125e2eee073d8ad45c3a64aec8fcfa7f5d67b95c84"
+    }
+   ],
+   "finding": "Temporary lifting of art.1 2021/2026 bans for firefighting-supply transports until Mon 31 Aug 2026 inclusive. Expired; no effect on horizon.",
+   "applicability_months": [],
+   "classification_by_month": {},
+   "change_vs_dataset": "NO_CHANGE"
+  },
+  {
+   "id": "it-dm-2026-dec",
+   "jurisdiction": "IT",
+   "region": "national",
+   "authority": "MIT DM 12 dicembre 2025 n. 325 (GU n. 302, 31 Dec 2025) - signed copy published by Prefettura di Asti",
+   "url": "https://prefettura.interno.gov.it/sites/default/files/26/2025-12/calendario-circolazione-anno-2026_firmato.pdf",
+   "version": "signed 31/12/2025",
+   "retrievals": [
+    {
+     "file": "it-calendar-asti.pdf",
+     "url": "https://prefettura.interno.gov.it/sites/default/files/26/2025-12/calendario-circolazione-anno-2026_firmato.pdf",
+     "retrieved_at": "2026-11-19T05:54:57Z",
+     "http_status": 200,
+     "bytes": 599655,
+     "sha256": "c9b15eed82e1adc047af7e70d26976064aba48bfce88aa8c032f4cfa618118fd"
+    },
+    {
+     "file": "it-gu-2026.html",
+     "url": "https://www.gazzettaufficiale.it/eli/id/2025/12/31/25A07055/sg",
+     "retrieved_at": "2026-11-19T05:50:14Z",
+     "http_status": 200,
+     "bytes": 17372,
+     "sha256": "dbfed1a63de72c9adcbdfbba1916b5ad0275f8ec24c02900d9fbddac8d7bb914"
+    }
+   ],
+   "finding": "Art.2 December 2026: 6 (Sun), 8 (Tue), 13, 20 (Sun), 25 (Fri), 26 (Sat), 27 (Sun) 09:00-22:00; >7.5t goods vehicles on extra-urban roads; art.1(3) also exceptional vehicles/transports; arts 3-8 deferrals/exemptions.",
+   "applicability_months": [
+    "2026-11",
+    "2026-12"
+   ],
+   "classification_by_month": {
+    "2026-11": "ANNUAL_PUBLISHED",
+    "2026-12": "ANNUAL_PUBLISHED"
+   },
+   "change_vs_dataset": "NO_CHANGE",
+   "change_note": "Matches it-sundays-holidays-dec-2026 rule."
+  },
+  {
+   "id": "it-2027-status",
+   "jurisdiction": "IT",
+   "region": "national",
+   "authority": "Gazzetta Ufficiale serie generale (last-30-days index) / MIT",
+   "url": "https://www.gazzettaufficiale.it/30giorni/serie_generale",
+   "version": "GU issues 2026-10-21..2026-11-18 scanned (25 sommari); mit.gov.it failed TLS verification via proxy (curl 60) and 503 via WebFetch",
+   "retrievals": [
+    {
+     "file": "it-gu-30giorni.html",
+     "url": "https://www.gazzettaufficiale.it/30giorni/serie_generale",
+     "retrieved_at": "2026-11-19T05:55:15Z",
+     "http_status": 200,
+     "bytes": 55803,
+     "sha256": "343e1591c6ef0b7a77ac1a3aeb7cd7a73b9053c0ddf02eb98adc7dc47b7cb6f4"
+    },
+    {
+     "file": "it-mit-node-21641.html",
+     "url": "https://www.mit.gov.it/node/21641",
+     "retrieved_at": "2026-11-19T05:54:57Z",
+     "http_status": 0,
+     "bytes": 0,
+     "sha256": null
+    },
+    {
+     "file": "it-mit-autotrasporto-news.html",
+     "url": "https://www.mit.gov.it/taxonomy/term/141?page=0",
+     "retrieved_at": "2026-11-19T05:54:57Z",
+     "http_status": 0,
+     "bytes": 0,
+     "sha256": null
+    },
+    {
+     "file": "gu/*.html",
+     "url": "https://www.gazzettaufficiale.it/gazzetta/serie_generale/caricaDettaglio?...",
+     "retrieved_at": "2026-11-19T05:55Z",
+     "http_status": 200,
+     "sha256": "see dl/gu/SHA256SUMS"
+    }
+   ],
+   "finding": "No 2027 calendar decree (divieti di circolazione veicoli >7.5t) in GU through 2026-11-18 (only MIT delibera on autotrasporto quote 2027 and DL 193/2026 support measures). 2026 decree was published 31 Dec 2025.",
+   "applicability_months": [
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2027-01": "AWAITING_PUBLICATION",
+    "2027-02": "AWAITING_PUBLICATION",
+    "2027-03": "AWAITING_PUBLICATION",
+    "2027-04": "AWAITING_PUBLICATION",
+    "2027-05": "AWAITING_PUBLICATION",
+    "2027-06": "AWAITING_PUBLICATION",
+    "2027-07": "AWAITING_PUBLICATION",
+    "2027-08": "AWAITING_PUBLICATION",
+    "2027-09": "AWAITING_PUBLICATION",
+    "2027-10": "AWAITING_PUBLICATION",
+    "2027-11": "AWAITING_PUBLICATION"
+   },
+   "change_vs_dataset": "NO_CHANGE"
+  },
+  {
+   "id": "be-fl-kb-2010-art30",
+   "jurisdiction": "BE",
+   "region": "Flanders (and federal text; Brussels applicability UNVERIFIED)",
+   "authority": "Belgisch Staatsblad / Justel - KB 2 juni 2010 betreffende het wegverkeer van uitzonderlijke voertuigen, art.30 (as replaced by KB 27 Feb 2013)",
+   "url": "https://www.ejustice.just.fgov.be/eli/besluit/2010/06/02/2010014111/justel",
+   "version": "Justel consolidated retrieved 2026-11-19; art.30 last amended KB 2013-02-27 (in force 10-04-2013); AWV (Flanders) cites this KB as current law",
+   "retrievals": [
+    {
+     "file": "be-kb-2010-justel.html",
+     "url": "https://www.ejustice.just.fgov.be/eli/besluit/2010/06/02/2010014111/justel",
+     "retrieved_at": "2026-11-19T05:57:47Z",
+     "http_status": 200,
+     "bytes": 119364,
+     "sha256": "651e296292150998622457dfdf6e25c4308c38615e46c8d58e6a1d2e25489a54"
+    },
+    {
+     "file": "be-awv-uv.html",
+     "url": "https://wegenenverkeer.be/zakelijk/uitzonderlijk-vervoer",
+     "retrieved_at": "2026-11-19T05:57:26Z",
+     "http_status": 200,
+     "bytes": 53756,
+     "sha256": "ec13dfbd054300c71a9b1a7a5dffee7c2877f30bd1485ba211cbb3bb73d6e030"
+    },
+    {
+     "file": "be-awv-feestdagen.pdf",
+     "url": "https://wegenenverkeer.be/sites/default/files/uploads/documenten/uitzonderlijk%20vervoer/20221220_Afwijking%20rijtijden_%20feestdagen.pdf",
+     "retrieved_at": "2026-11-19T05:57:47Z",
+     "http_status": 200,
+     "bytes": 120745,
+     "sha256": "90992ee1eaf1ee50c7c51f119060adb215c6eb86a3eb7c7a79e4deb79f0ca612"
+    }
+   ],
+   "finding": "Exceptional vehicles only: Saturday 12:00 to Sunday 24:00 on all roads (except crane vehicles <=96 t or <=3.00 m wide); holidays 1 Jan, Easter Monday, 1 May, Ascension, Whit Monday, 21 Jul, 15 Aug, 1 Nov, 11 Nov, 25 Dec from 16:00 the day before to 24:00 on the day; width >4.00 m (or >3.50 m on motorways <3 lanes) and length >30 m banned 06-21; 07-09 and 16-18 (days unspecified) except <=60 t, <=3.50 m, <=27 m; snow/ice/fog/visibility <200 m. Permit may derogate (art.30 §2). AWV note (20/12/2022, Flanders only): holiday ban is lifted when this note is attached to the permit. Dec 2026: 24 Dec 16:00-25 Dec 24:00; 31 Dec 16:00-1 Jan 2027 24:00.",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "PROMULGATED_RECURRING_LAW",
+    "2026-12": "PROMULGATED_RECURRING_LAW",
+    "2027-01": "PROMULGATED_RECURRING_LAW",
+    "2027-02": "PROMULGATED_RECURRING_LAW",
+    "2027-03": "PROMULGATED_RECURRING_LAW",
+    "2027-04": "PROMULGATED_RECURRING_LAW",
+    "2027-05": "PROMULGATED_RECURRING_LAW",
+    "2027-06": "PROMULGATED_RECURRING_LAW",
+    "2027-07": "PROMULGATED_RECURRING_LAW",
+    "2027-08": "PROMULGATED_RECURRING_LAW",
+    "2027-09": "PROMULGATED_RECURRING_LAW",
+    "2027-10": "PROMULGATED_RECURRING_LAW",
+    "2027-11": "PROMULGATED_RECURRING_LAW"
+   },
+   "change_vs_dataset": "NEW_BAN",
+   "change_note": "BE has no sources in dataset (ban_state UNKNOWN)."
+  },
+  {
+   "id": "be-wal-agw-2024-art35",
+   "jurisdiction": "BE",
+   "region": "Wallonia",
+   "authority": "Wallex - Arrêté du Gouvernement wallon du 21 mars 2024 relatif à la circulation routière des véhicules exceptionnels (modifié par AGW 22 janvier 2026), art.35",
+   "url": "https://wallex.wallonie.be/files/pdfs/22/106334_Arr%C3%AAt%C3%A9_du_Gouvernement_wallon_relatif_%C3%A0_la_circulation_routi%C3%A8re_des_v%C3%A9hicules_exceptionnels_et_fixant_les_modalit%C3%A9s_et_conditions_de_d%C3%A9livrance_d'autorisation_pour_le_transport_exceptionnel_13-02-2026-31-12-2027.pdf",
+   "version": "Consolidated version \"en vigueur du 13/02/26 au 31/12/27\" (next version from 01/01/2028 has identical art.35 wording)",
+   "retrievals": [
+    {
+     "file": "be-wal-agw-te-2026-2027.pdf",
+     "url": "https://wallex.wallonie.be/files/pdfs/22/106334_Arr%C3%AAt%C3%A9_du_Gouvernement_wallon_relatif_%C3%A0_la_circulation_routi%C3%A8re_des_v%C3%A9hicules_exceptionnels_et_fixant_les_modalit%C3%A9s_et_conditions_de_d%C3%A9livrance_d'autorisation_pour_le_transport_exceptionnel_13-02-2026-31-12-2027.pdf",
+     "retrieved_at": "2026-11-19T05:57:08Z",
+     "http_status": 200,
+     "bytes": 391682,
+     "sha256": "97f58e636697d2752ee8e4493d05c1d601f55f107dab722cb17bb817682c485c"
+    },
+    {
+     "file": "be-wal-agw-te-2028.pdf",
+     "url": "https://wallex.wallonie.be/files/pdfs/22/106334_Arr%C3%AAt%C3%A9_du_Gouvernement_wallon_relatif_%C3%A0_la_circulation_routi%C3%A8re_des_v%C3%A9hicules_exceptionnels_et_fixant_les_modalit%C3%A9s_et_conditions_de_d%C3%A9livrance_d'autorisation_pour_le_transport_exceptionnel_01-01-2028-.pdf",
+     "retrieved_at": "2026-11-19T05:57:08Z",
+     "http_status": 200,
+     "bytes": 391623,
+     "sha256": "e2d19ef9f44fa921f1062d5fb6155606dcdcc89a0f86e40b7b6abab09982eedf"
+    }
+   ],
+   "finding": "Exceptional vehicles: Saturday 22:00 to Sunday 24:00 (except cranes <=108 t or <=3.00 m wide and accessory vehicles); width >4.00 m (>3.50 m on motorways <3 lanes) and length >30 m banned 06-21; working days 07-09 and 16-18 except <=60 t, <=3.50 m, <=27 m; IRM orange/red slippery/fog or red wind/rain/storm. No public-holiday ban found in art.35 text. Permit may derogate (§6); director may derogate (§8).",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "PROMULGATED_RECURRING_LAW",
+    "2026-12": "PROMULGATED_RECURRING_LAW",
+    "2027-01": "PROMULGATED_RECURRING_LAW",
+    "2027-02": "PROMULGATED_RECURRING_LAW",
+    "2027-03": "PROMULGATED_RECURRING_LAW",
+    "2027-04": "PROMULGATED_RECURRING_LAW",
+    "2027-05": "PROMULGATED_RECURRING_LAW",
+    "2027-06": "PROMULGATED_RECURRING_LAW",
+    "2027-07": "PROMULGATED_RECURRING_LAW",
+    "2027-08": "PROMULGATED_RECURRING_LAW",
+    "2027-09": "PROMULGATED_RECURRING_LAW",
+    "2027-10": "PROMULGATED_RECURRING_LAW",
+    "2027-11": "PROMULGATED_RECURRING_LAW"
+   },
+   "change_vs_dataset": "NEW_BAN",
+   "change_note": "BE not in dataset."
+  },
+  {
+   "id": "be-general-hgv",
+   "jurisdiction": "BE",
+   "region": "Flanders / Wallonia / Brussels",
+   "authority": "n/a",
+   "url": null,
+   "version": null,
+   "retrievals": [],
+   "finding": "No official source reviewed establishes a general weekend/holiday ban for ordinary HGVs in Belgium; Brussels-Capital exceptional-transport rules and local/temporary orders (e.g. tunnel works) not reviewed. Not a NO_BAN finding.",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "UNVERIFIED",
+    "2026-12": "UNVERIFIED",
+    "2027-01": "UNVERIFIED",
+    "2027-02": "UNVERIFIED",
+    "2027-03": "UNVERIFIED",
+    "2027-04": "UNVERIFIED",
+    "2027-05": "UNVERIFIED",
+    "2027-06": "UNVERIFIED",
+    "2027-07": "UNVERIFIED",
+    "2027-08": "UNVERIFIED",
+    "2027-09": "UNVERIFIED",
+    "2027-10": "UNVERIFIED",
+    "2027-11": "UNVERIFIED"
+   },
+   "change_vs_dataset": "UNKNOWN"
+  },
+  {
+   "id": "uk-stgo-2003-notice",
+   "jurisdiction": "UK",
+   "region": "England, Wales, Scotland",
+   "authority": "legislation.gov.uk - SI 2003/1998 Road Vehicles (Authorisation of Special Types) (General) Order 2003, Schedule 5",
+   "url": "https://www.legislation.gov.uk/uksi/2003/1998/schedule/5",
+   "version": "revised; \"no known outstanding effects\" on Sch.5",
+   "retrievals": [
+    {
+     "file": "uk-stgo-sch5.html",
+     "url": "https://www.legislation.gov.uk/uksi/2003/1998/schedule/5",
+     "retrieved_at": "2026-11-19T05:58:52Z",
+     "http_status": 200,
+     "bytes": 44404,
+     "sha256": "3c7eddc91eda07a8b84f1255d40267b841f36db57183217e4157acf7d26988bb"
+    },
+    {
+     "file": "uk-si-2003-1998.html",
+     "url": "https://www.legislation.gov.uk/uksi/2003/1998/contents/made",
+     "retrieved_at": "2026-11-19T05:58:06Z",
+     "http_status": 200,
+     "bytes": 139842,
+     "sha256": "ba9668669178e7c3e09985f1c2c95de94f63264b325a28d3f28adb3306fbad8b"
+    }
+   ],
+   "finding": "Sch.5 requires notice to chief officer of police for each area (2 days, or 24 h for certain articles; police may accept shorter). No statutory weekend/holiday time ban in Sch.5. Any police-imposed abnormal-load timing restrictions are case-by-case and were NOT verified from official force sources.",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "UNVERIFIED",
+    "2026-12": "UNVERIFIED",
+    "2027-01": "UNVERIFIED",
+    "2027-02": "UNVERIFIED",
+    "2027-03": "UNVERIFIED",
+    "2027-04": "UNVERIFIED",
+    "2027-05": "UNVERIFIED",
+    "2027-06": "UNVERIFIED",
+    "2027-07": "UNVERIFIED",
+    "2027-08": "UNVERIFIED",
+    "2027-09": "UNVERIFIED",
+    "2027-10": "UNVERIFIED",
+    "2027-11": "UNVERIFIED"
+   },
+   "change_vs_dataset": "UNKNOWN"
+  },
+  {
+   "id": "uk-national-highways-abnormal",
+   "jurisdiction": "UK",
+   "region": "England (strategic road network)",
+   "authority": "National Highways - Abnormal loads and the ESDAL system / Advice for hauliers",
+   "url": "https://nationalhighways.co.uk/roads-and-travel/freight-and-professional-drivers/abnormal-loads-and-the-esdal-system/advice-for-hauliers/",
+   "version": "retrieved 2026-11-19",
+   "retrievals": [
+    {
+     "file": "uk-govuk-abnormal-loads.html",
+     "url": "https://www.gov.uk/esdal-and-abnormal-loads",
+     "retrieved_at": "2026-11-19T05:58:06Z",
+     "http_status": 200,
+     "bytes": 46510,
+     "sha256": "1c7ba5b0993e3d301af40a21273b2a7bed5e3815effef86b84346bf31de6842f"
+    },
+    {
+     "file": "uk-nh-hauliers.html",
+     "url": "https://nationalhighways.co.uk/roads-and-travel/freight-and-professional-drivers/abnormal-loads-and-the-esdal-system/advice-for-hauliers/",
+     "retrieved_at": "2026-11-19T05:58:29Z",
+     "http_status": 200,
+     "bytes": 52283,
+     "sha256": "268beda19d68fc1fe70d7df76e388580663a5da2fe6f542ed40f42d66f322e78"
+    },
+    {
+     "file": "uk-nh-abnormal.html",
+     "url": "https://www.gov.uk/government/publications/abnormal-loads-notification-guidance",
+     "retrieved_at": "2026-11-19T05:58:06Z",
+     "http_status": 404,
+     "bytes": 52491,
+     "sha256": null
+    }
+   ],
+   "finding": "Defines abnormal load (>44,000 kg; axle >10,000/11,500 kg; width >2.9 m; rigid length >18.65 m), ESDAL notification; no weekend/holiday movement ban stated on these pages.",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "UNVERIFIED",
+    "2026-12": "UNVERIFIED",
+    "2027-01": "UNVERIFIED",
+    "2027-02": "UNVERIFIED",
+    "2027-03": "UNVERIFIED",
+    "2027-04": "UNVERIFIED",
+    "2027-05": "UNVERIFIED",
+    "2027-06": "UNVERIFIED",
+    "2027-07": "UNVERIFIED",
+    "2027-08": "UNVERIFIED",
+    "2027-09": "UNVERIFIED",
+    "2027-10": "UNVERIFIED",
+    "2027-11": "UNVERIFIED"
+   },
+   "change_vs_dataset": "UNKNOWN"
+  },
+  {
+   "id": "uk-llcs",
+   "jurisdiction": "UK",
+   "region": "Greater London (London Lorry Control Scheme)",
+   "authority": "London Councils",
+   "url": "https://www.londoncouncils.gov.uk/services/london-lorry-control-scheme",
+   "version": null,
+   "retrievals": [
+    {
+     "file": "uk-llcs.html",
+     "url": "https://www.londoncouncils.gov.uk/services/london-lorry-control-scheme",
+     "retrieved_at": "2026-11-19T05:50:14Z",
+     "http_status": 403,
+     "bytes": 919,
+     "sha256": null
+    }
+   ],
+   "finding": "HTTP 403 (CloudFront \"Request blocked\"); not bypassed. LLCS hours NOT recorded from primary source.",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "SOURCE_UNAVAILABLE",
+    "2026-12": "SOURCE_UNAVAILABLE",
+    "2027-01": "SOURCE_UNAVAILABLE",
+    "2027-02": "SOURCE_UNAVAILABLE",
+    "2027-03": "SOURCE_UNAVAILABLE",
+    "2027-04": "SOURCE_UNAVAILABLE",
+    "2027-05": "SOURCE_UNAVAILABLE",
+    "2027-06": "SOURCE_UNAVAILABLE",
+    "2027-07": "SOURCE_UNAVAILABLE",
+    "2027-08": "SOURCE_UNAVAILABLE",
+    "2027-09": "SOURCE_UNAVAILABLE",
+    "2027-10": "SOURCE_UNAVAILABLE",
+    "2027-11": "SOURCE_UNAVAILABLE"
+   },
+   "change_vs_dataset": "UNKNOWN"
+  },
+  {
+   "id": "uk-police-scotland-psni",
+   "jurisdiction": "UK",
+   "region": "Scotland / Northern Ireland",
+   "authority": "Police Scotland / PSNI",
+   "url": "https://www.psni.police.uk/request-or-apply/abnormal-loads",
+   "version": null,
+   "retrievals": [
+    {
+     "file": "uk-psni-al.html",
+     "url": "https://www.psni.police.uk/request-or-apply/abnormal-loads",
+     "retrieved_at": "2026-11-19T05:58:29Z",
+     "http_status": 403,
+     "bytes": 4550,
+     "sha256": null
+    },
+    {
+     "file": "uk-police-scotland-al.html",
+     "url": "https://www.scotland.police.uk/secure-forms/abnormal-loads/",
+     "retrieved_at": "2026-11-19T05:58:29Z",
+     "http_status": 404,
+     "bytes": 24144,
+     "sha256": null
+    }
+   ],
+   "finding": "PSNI 403 (blocked, not bypassed); Police Scotland URL 404 (path not found). NI is outside STGO Sch.5 extent (E+W+S).",
+   "applicability_months": [
+    "2026-11",
+    "2026-12",
+    "2027-01",
+    "2027-02",
+    "2027-03",
+    "2027-04",
+    "2027-05",
+    "2027-06",
+    "2027-07",
+    "2027-08",
+    "2027-09",
+    "2027-10",
+    "2027-11"
+   ],
+   "classification_by_month": {
+    "2026-11": "SOURCE_UNAVAILABLE",
+    "2026-12": "SOURCE_UNAVAILABLE",
+    "2027-01": "SOURCE_UNAVAILABLE",
+    "2027-02": "SOURCE_UNAVAILABLE",
+    "2027-03": "SOURCE_UNAVAILABLE",
+    "2027-04": "SOURCE_UNAVAILABLE",
+    "2027-05": "SOURCE_UNAVAILABLE",
+    "2027-06": "SOURCE_UNAVAILABLE",
+    "2027-07": "SOURCE_UNAVAILABLE",
+    "2027-08": "SOURCE_UNAVAILABLE",
+    "2027-09": "SOURCE_UNAVAILABLE",
+    "2027-10": "SOURCE_UNAVAILABLE",
+    "2027-11": "SOURCE_UNAVAILABLE"
+   },
+   "change_vs_dataset": "UNKNOWN"
+  }
+ ],
+ "failed_sources": [
+  {
+   "file": "uk-llcs.html",
+   "url": "https://www.londoncouncils.gov.uk/services/london-lorry-control-scheme",
+   "retrieved_at": "2026-11-19T05:50:14Z",
+   "http_status": 403,
+   "bytes": 919,
+   "sha256": null
+  },
+  {
+   "file": "fr-arrete-2021-lf.html",
+   "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000043420557",
+   "retrieved_at": "2026-11-19T05:50:14Z",
+   "http_status": 403,
+   "bytes": 5571,
+   "sha256": null
+  },
+  {
+   "file": "es-cat-restriccions.html",
+   "url": "https://transit.gencat.cat/ca/informacio-viaria/professionals-transport/restriccions/",
+   "retrieved_at": "2026-11-19T05:51:48Z",
+   "http_status": 404,
+   "bytes": 7813,
+   "sha256": null
+  },
+  {
+   "file": "es-bas-trafikoa.html",
+   "url": "https://www.trafikoa.euskadi.eus/restricciones/webtraf00-contrest/es/",
+   "retrieved_at": "2026-11-19T05:53:36Z",
+   "http_status": 404,
+   "bytes": 40,
+   "sha256": null
+  },
+  {
+   "file": "it-mit-node-21641.html",
+   "url": "https://www.mit.gov.it/node/21641",
+   "retrieved_at": "2026-11-19T05:54:57Z",
+   "http_status": 0,
+   "bytes": 0,
+   "sha256": null
+  },
+  {
+   "file": "it-mit-autotrasporto-news.html",
+   "url": "https://www.mit.gov.it/taxonomy/term/141?page=0",
+   "retrieved_at": "2026-11-19T05:54:57Z",
+   "http_status": 0,
+   "bytes": 0,
+   "sha256": null
+  },
+  {
+   "file": "uk-nh-abnormal.html",
+   "url": "https://www.gov.uk/government/publications/abnormal-loads-notification-guidance",
+   "retrieved_at": "2026-11-19T05:58:06Z",
+   "http_status": 404,
+   "bytes": 52491,
+   "sha256": null
+  },
+  {
+   "file": "uk-psni-al.html",
+   "url": "https://www.psni.police.uk/request-or-apply/abnormal-loads",
+   "retrieved_at": "2026-11-19T05:58:29Z",
+   "http_status": 403,
+   "bytes": 4550,
+   "sha256": null
+  },
+  {
+   "file": "uk-police-scotland-al.html",
+   "url": "https://www.scotland.police.uk/secure-forms/abnormal-loads/",
+   "retrieved_at": "2026-11-19T05:58:29Z",
+   "http_status": 404,
+   "bytes": 24144,
+   "sha256": null
+  }
+ ],
+ "retrieval_log": [
+  {
+   "file": "uk-llcs.html",
+   "url": "https://www.londoncouncils.gov.uk/services/london-lorry-control-scheme",
+   "retrieved_at": "2026-11-19T05:50:14Z",
+   "http_status": 403,
+   "bytes": 919,
+   "sha256": null
+  },
+  {
+   "file": "pt-portaria-281.html",
+   "url": "https://diariodarepublica.pt/dr/detalhe/portaria/281-2019-124392162",
+   "retrieved_at": "2026-11-19T05:50:14Z",
+   "http_status": 200,
+   "bytes": 2346,
+   "sha256": "0794abe5f8088cfd34e8e50bb5f9f7828b20a3c505f702e4b51be3bbb0631b57"
+  },
+  {
+   "file": "fr-arrete-2021-lf.html",
+   "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000043420557",
+   "retrieved_at": "2026-11-19T05:50:14Z",
+   "http_status": 403,
+   "bytes": 5571,
+   "sha256": null
+  },
+  {
+   "file": "fr-bf-regime.html",
+   "url": "https://www.bison-fute.gouv.fr/regime-general,10852.html",
+   "retrieved_at": "2026-11-19T05:50:14Z",
+   "http_status": 200,
+   "bytes": 60309,
+   "sha256": "b04c820f64f59d25bfd88b6639130769c223fe34b6ea17dae0fe2318f783ecbb"
+  },
+  {
+   "file": "it-gu-2026.html",
+   "url": "https://www.gazzettaufficiale.it/eli/id/2025/12/31/25A07055/sg",
+   "retrieved_at": "2026-11-19T05:50:14Z",
+   "http_status": 200,
+   "bytes": 17372,
+   "sha256": "dbfed1a63de72c9adcbdfbba1916b5ad0275f8ec24c02900d9fbddac8d7bb914"
+  },
+  {
+   "file": "es-boe-1255.html",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-1255",
+   "retrieved_at": "2026-11-19T05:50:14Z",
+   "http_status": 200,
+   "bytes": 515172,
+   "sha256": "15c4c06f5694b30de8b13ceaf5d8ea6a5efe65bbf01e14d05d56199a0804553a"
+  },
+  {
+   "file": "es-boe-13892.html",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-13892",
+   "retrieved_at": "2026-11-19T05:51:01Z",
+   "http_status": 200,
+   "bytes": 36322,
+   "sha256": "30c0526aed2f927b0565f0e51b1b25d2d4d91881948c8e812ecd97c35d002ee9"
+  },
+  {
+   "file": "es-boe-search-1255refs.html",
+   "url": "https://www.boe.es/buscar/boe.php?campo%5B0%5D=TXT&dato%5B0%5D=BOE-A-2026-1255&accion=Buscar&sort_field%5B0%5D=FPU&sort_order%5B0%5D=desc&page_hits=50",
+   "retrieved_at": "2026-11-19T05:51:01Z",
+   "http_status": 200,
+   "bytes": 8589,
+   "sha256": "d677a09471c26621d2ef6f9f0c2570d6390a3412541ad741a8d7fb36a92a60a7"
+  },
+  {
+   "file": "es-boe-search-2027.html",
+   "url": "https://www.boe.es/buscar/boe.php?campo%5B0%5D=TIT&dato%5B0%5D=medidas+especiales+de+regulaci%C3%B3n+de+tr%C3%A1fico&operador%5B0%5D=and&accion=Buscar&sort_field%5B0%5D=FPU&sort_order%5B0%5D=desc&page_hits=50",
+   "retrieved_at": "2026-11-19T05:51:01Z",
+   "http_status": 200,
+   "bytes": 8589,
+   "sha256": "d677a09471c26621d2ef6f9f0c2570d6390a3412541ad741a8d7fb36a92a60a7"
+  },
+  {
+   "file": "es-boe-23075.html",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-23075",
+   "retrieved_at": "2026-11-19T05:51:38Z",
+   "http_status": 200,
+   "bytes": 15407,
+   "sha256": "05c1be861bb1e099c055465044c117d751e826e1efce807c73e02d95362e2b2f"
+  },
+  {
+   "file": "es-cat-restriccions.html",
+   "url": "https://transit.gencat.cat/ca/informacio-viaria/professionals-transport/restriccions/",
+   "retrieved_at": "2026-11-19T05:51:48Z",
+   "http_status": 404,
+   "bytes": 7813,
+   "sha256": null
+  },
+  {
+   "file": "es-cat-isp1933.html",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-16758",
+   "retrieved_at": "2026-11-19T05:51:48Z",
+   "http_status": 200,
+   "bytes": 31422,
+   "sha256": "b3f58a469f5237adbba3033ecf248383bf1e7905276a81f0e5c27e1e7f66bfb8"
+  },
+  {
+   "file": "es-bas-2625.html",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-2625",
+   "retrieved_at": "2026-11-19T05:51:48Z",
+   "http_status": 200,
+   "bytes": 94924,
+   "sha256": "0d5117bf4b26b550d3c28b4f149a0a942e7e22e02d426948a2791ab2bb5aa098"
+  },
+  {
+   "file": "es-cat-isp300.html",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-6095",
+   "retrieved_at": "2026-11-19T05:51:48Z",
+   "http_status": 200,
+   "bytes": 151103,
+   "sha256": "a78de69c053889b3ac3731b822a0ea39f2f7770bb3a1b04696f8c68dbd43e08a"
+  },
+  {
+   "file": "es-cat-sct.html",
+   "url": "https://transit.gencat.cat/ca/informacio-viaria/professionals-transport/mesures-especials/",
+   "retrieved_at": "2026-11-19T05:51:48Z",
+   "http_status": 200,
+   "bytes": 264605,
+   "sha256": "69fe45179086aa2d738806ff3f1fe532695d5b57590c3382eb9ed72fe3c72d8d"
+  },
+  {
+   "file": "es-cat-dogc-2853.html",
+   "url": "https://dogc.gencat.cat/ca/document-del-dogc/?documentId=1052172",
+   "retrieved_at": "2026-11-19T05:53:13Z",
+   "http_status": 200,
+   "bytes": 77335,
+   "sha256": "b2d0a7eced11795a9f3feaf0d30bd0deb0da701b8614700eb248b664ce1efc37"
+  },
+  {
+   "file": "es-cat-calendari-2026.pdf",
+   "url": "https://transit.gencat.cat/web/.content/documents/informacio-viaria/d-2026-calendari-operacions-especials-proves-esportives-i-esdeveniments.pdf",
+   "retrieved_at": "2026-11-19T05:53:13Z",
+   "http_status": 200,
+   "bytes": 248401,
+   "sha256": "973095a27837a82d4268cae36710a07420ee2c41e2c247b30c03bf87bd7c505e"
+  },
+  {
+   "file": "es-cat-consulta.html",
+   "url": "https://transit.gencat.cat/ca/informacio-viaria/professionals-transport/mesures-especials/consulta-restriccions/",
+   "retrieved_at": "2026-11-19T05:53:13Z",
+   "http_status": 200,
+   "bytes": 250160,
+   "sha256": "919c9f09d26449c9f522aece27a5327b74a73861739d1a7421126f65189ef59b"
+  },
+  {
+   "file": "es-dogc-2853-es.html",
+   "url": "https://dogc.gencat.cat/es/document-del-dogc/index.html?documentId=1052172",
+   "retrieved_at": "2026-11-19T05:53:36Z",
+   "http_status": 200,
+   "bytes": 77294,
+   "sha256": "1e1a985303ca8008e9f655f591d4dae4e2b40a3e83efd07165f6f9a0dac05688"
+  },
+  {
+   "file": "es-bas-trafikoa.html",
+   "url": "https://www.trafikoa.euskadi.eus/restricciones/webtraf00-contrest/es/",
+   "retrieved_at": "2026-11-19T05:53:36Z",
+   "http_status": 404,
+   "bytes": 40,
+   "sha256": null
+  },
+  {
+   "file": "es-dgt-restricciones.html",
+   "url": "https://www.dgt.es/conoce-el-estado-del-trafico/restricciones-a-la-circulacion/",
+   "retrieved_at": "2026-11-19T05:53:36Z",
+   "http_status": 200,
+   "bytes": 258009,
+   "sha256": "1debb5275b7396b21b202cac1e32bbc39b4b5a4fda2c037b87e4130b34ae5389"
+  },
+  {
+   "file": "es-dgt-nov-dic-2026.xlsx",
+   "url": "https://www.dgt.es/export/sites/web-DGT/.galleries/downloads/estado-del-trafico/restricciones/2026/Restricciones_Noviembre-y-Diciembre.xlsx",
+   "retrieved_at": "2026-11-19T05:53:51Z",
+   "http_status": 200,
+   "bytes": 24131,
+   "sha256": "02ffc02a086be99eac53595191bc1367d3970020f902f3f0afae5a58637079f1"
+  },
+  {
+   "file": "fr-joe-20260807.pdf",
+   "url": "https://www3.bison-fute.gouv.fr/IMG/pdf/joe_20260807_0183_0047.pdf",
+   "retrieved_at": "2026-11-19T05:54:30Z",
+   "http_status": 200,
+   "bytes": 138220,
+   "sha256": "57b28b6893d88650de9e96125e2eee073d8ad45c3a64aec8fcfa7f5d67b95c84"
+  },
+  {
+   "file": "fr-arrete-2021.pdf",
+   "url": "https://www.bison-fute.gouv.fr/IMG/pdf/Arrete_joe_20210424_0097_0037.pdf",
+   "retrieved_at": "2026-11-19T05:54:31Z",
+   "http_status": 200,
+   "bytes": 182436,
+   "sha256": "7e9a0a0c19f06e8721367681c9289c03eac6be1181d023237a9a22acf954d26c"
+  },
+  {
+   "file": "fr-arrete-2026.pdf",
+   "url": "https://www.bison-fute.gouv.fr/IMG/pdf/joe_arrete_interdictions_complementaires_TRM_2026.pdf",
+   "retrieved_at": "2026-11-19T05:54:32Z",
+   "http_status": 200,
+   "bytes": 145747,
+   "sha256": "ba7ed529d2dafb414bfbc12c8aa2238730ed6f7be883ee68894fa7b40525db54"
+  },
+  {
+   "file": "it-calendar-asti.pdf",
+   "url": "https://prefettura.interno.gov.it/sites/default/files/26/2025-12/calendario-circolazione-anno-2026_firmato.pdf",
+   "retrieved_at": "2026-11-19T05:54:57Z",
+   "http_status": 200,
+   "bytes": 599655,
+   "sha256": "c9b15eed82e1adc047af7e70d26976064aba48bfce88aa8c032f4cfa618118fd"
+  },
+  {
+   "file": "it-mit-node-21641.html",
+   "url": "https://www.mit.gov.it/node/21641",
+   "retrieved_at": "2026-11-19T05:54:57Z",
+   "http_status": 0,
+   "bytes": 0,
+   "sha256": null
+  },
+  {
+   "file": "it-mit-autotrasporto-news.html",
+   "url": "https://www.mit.gov.it/taxonomy/term/141?page=0",
+   "retrieved_at": "2026-11-19T05:54:57Z",
+   "http_status": 0,
+   "bytes": 0,
+   "sha256": null
+  },
+  {
+   "file": "it-gu-30giorni.html",
+   "url": "https://www.gazzettaufficiale.it/30giorni/serie_generale",
+   "retrieved_at": "2026-11-19T05:55:15Z",
+   "http_status": 200,
+   "bytes": 55803,
+   "sha256": "343e1591c6ef0b7a77ac1a3aeb7cd7a73b9053c0ddf02eb98adc7dc47b7cb6f4"
+  },
+  {
+   "file": "pt-antram-281-consolidada.pdf",
+   "url": "https://antram.pt/attachments/upload/Legisla%C3%A7%C3%A3o/Portaria%20281-2019_consolidada.pdf",
+   "retrieved_at": "2026-11-19T05:56:03Z",
+   "http_status": 200,
+   "bytes": 166671,
+   "sha256": "f6c2b7459e485e9ac1a04756653757f7fc59da1cffd0b1a80b8e4c49b3ed07c7"
+  },
+  {
+   "file": "pt-aiccopn-163-2021.pdf",
+   "url": "https://www.aiccopn.pt/wp-content/uploads/2021/11/0007000073.pdf",
+   "retrieved_at": "2026-11-19T05:56:04Z",
+   "http_status": 200,
+   "bytes": 473580,
+   "sha256": "57c0b8f60fb55e8f5039091e30b7f784c4f9c620687d2fbf326c7b892e6176f1"
+  },
+  {
+   "file": "pt-dr-281-2019.pdf",
+   "url": "https://files.diariodarepublica.pt/1s/2019/08/16600/0007000073.pdf",
+   "retrieved_at": "2026-11-19T05:56:16Z",
+   "http_status": 200,
+   "bytes": 473580,
+   "sha256": "57c0b8f60fb55e8f5039091e30b7f784c4f9c620687d2fbf326c7b892e6176f1"
+  },
+  {
+   "file": "pt-dl-155a-2026.pdf",
+   "url": "https://files.diariodarepublica.pt/1s/2026/07/14703/0000200005.pdf",
+   "retrieved_at": "2026-11-19T05:56:17Z",
+   "http_status": 200,
+   "bytes": 118245,
+   "sha256": "466c269ef65fcc7a32fec367922cb0d334503b267e43f8868f0c774742698f84"
+  },
+  {
+   "file": "pt-imt-mp-restricoes.html",
+   "url": "https://www.imt-ip.pt/sites/IMTT/Portugues/TransportesRodoviarios/MercadoriasPerigosas/Paginas/RestricoesCirculacao.aspx",
+   "retrieved_at": "2026-11-19T05:56:36Z",
+   "http_status": 200,
+   "bytes": 106221,
+   "sha256": "7dc711a1177cfd54c601276f73e2ed9cab1c1e3c55bbef5e14f738da96271182"
+  },
+  {
+   "file": "pt-imt-home.html",
+   "url": "https://www.imt-ip.pt/",
+   "retrieved_at": "2026-11-19T05:56:38Z",
+   "http_status": 200,
+   "bytes": 152608,
+   "sha256": "82c4ee1a09e71311bb126013da9e9889767dab3bfb0f981a3343ff49ca98d5b6"
+  },
+  {
+   "file": "pt-imt-mp.html",
+   "url": "https://www.imt-ip.pt/rodoviario/transporte-de-mercadorias-perigosas/",
+   "retrieved_at": "2026-11-19T05:56:45Z",
+   "http_status": 200,
+   "bytes": 118572,
+   "sha256": "a6607817adea2ca962015dbfe63dd94ade91e42edf864c2fbe219f2fae3e7cf3"
+  },
+  {
+   "file": "be-vl-uv.html",
+   "url": "https://www.vlaanderen.be/mobiliteit-en-openbare-werken/vrachtverkeer/uitzonderlijk-vervoer",
+   "retrieved_at": "2026-11-19T05:57:08Z",
+   "http_status": 200,
+   "bytes": 60660,
+   "sha256": "5e321a1a9d3958fd26a20008a9fea1a5732bb1ac90324d11f836c27ee5b26cb2"
+  },
+  {
+   "file": "be-wal-agw-te-2028.pdf",
+   "url": "https://wallex.wallonie.be/files/pdfs/22/106334_Arr%C3%AAt%C3%A9_du_Gouvernement_wallon_relatif_%C3%A0_la_circulation_routi%C3%A8re_des_v%C3%A9hicules_exceptionnels_et_fixant_les_modalit%C3%A9s_et_conditions_de_d%C3%A9livrance_d'autorisation_pour_le_transport_exceptionnel_01-01-2028-.pdf",
+   "retrieved_at": "2026-11-19T05:57:08Z",
+   "http_status": 200,
+   "bytes": 391623,
+   "sha256": "e2d19ef9f44fa921f1062d5fb6155606dcdcc89a0f86e40b7b6abab09982eedf"
+  },
+  {
+   "file": "be-wal-agw-te-2026-2027.pdf",
+   "url": "https://wallex.wallonie.be/files/pdfs/22/106334_Arr%C3%AAt%C3%A9_du_Gouvernement_wallon_relatif_%C3%A0_la_circulation_routi%C3%A8re_des_v%C3%A9hicules_exceptionnels_et_fixant_les_modalit%C3%A9s_et_conditions_de_d%C3%A9livrance_d'autorisation_pour_le_transport_exceptionnel_13-02-2026-31-12-2027.pdf",
+   "retrieved_at": "2026-11-19T05:57:08Z",
+   "http_status": 200,
+   "bytes": 391682,
+   "sha256": "97f58e636697d2752ee8e4493d05c1d601f55f107dab722cb17bb817682c485c"
+  },
+  {
+   "file": "be-awv-uv.html",
+   "url": "https://wegenenverkeer.be/zakelijk/uitzonderlijk-vervoer",
+   "retrieved_at": "2026-11-19T05:57:26Z",
+   "http_status": 200,
+   "bytes": 53756,
+   "sha256": "ec13dfbd054300c71a9b1a7a5dffee7c2877f30bd1485ba211cbb3bb73d6e030"
+  },
+  {
+   "file": "be-awv-feestdagen.pdf",
+   "url": "https://wegenenverkeer.be/sites/default/files/uploads/documenten/uitzonderlijk%20vervoer/20221220_Afwijking%20rijtijden_%20feestdagen.pdf",
+   "retrieved_at": "2026-11-19T05:57:47Z",
+   "http_status": 200,
+   "bytes": 120745,
+   "sha256": "90992ee1eaf1ee50c7c51f119060adb215c6eb86a3eb7c7a79e4deb79f0ca612"
+  },
+  {
+   "file": "be-kb-2010-justel.html",
+   "url": "https://www.ejustice.just.fgov.be/eli/besluit/2010/06/02/2010014111/justel",
+   "retrieved_at": "2026-11-19T05:57:47Z",
+   "http_status": 200,
+   "bytes": 119364,
+   "sha256": "651e296292150998622457dfdf6e25c4308c38615e46c8d58e6a1d2e25489a54"
+  },
+  {
+   "file": "uk-nh-abnormal.html",
+   "url": "https://www.gov.uk/government/publications/abnormal-loads-notification-guidance",
+   "retrieved_at": "2026-11-19T05:58:06Z",
+   "http_status": 404,
+   "bytes": 52491,
+   "sha256": null
+  },
+  {
+   "file": "uk-si-2003-1998.html",
+   "url": "https://www.legislation.gov.uk/uksi/2003/1998/contents/made",
+   "retrieved_at": "2026-11-19T05:58:06Z",
+   "http_status": 200,
+   "bytes": 139842,
+   "sha256": "ba9668669178e7c3e09985f1c2c95de94f63264b325a28d3f28adb3306fbad8b"
+  },
+  {
+   "file": "uk-govuk-abnormal-loads.html",
+   "url": "https://www.gov.uk/esdal-and-abnormal-loads",
+   "retrieved_at": "2026-11-19T05:58:06Z",
+   "http_status": 200,
+   "bytes": 46510,
+   "sha256": "1c7ba5b0993e3d301af40a21273b2a7bed5e3815effef86b84346bf31de6842f"
+  },
+  {
+   "file": "uk-psni-al.html",
+   "url": "https://www.psni.police.uk/request-or-apply/abnormal-loads",
+   "retrieved_at": "2026-11-19T05:58:29Z",
+   "http_status": 403,
+   "bytes": 4550,
+   "sha256": null
+  },
+  {
+   "file": "uk-nh-hauliers.html",
+   "url": "https://nationalhighways.co.uk/roads-and-travel/freight-and-professional-drivers/abnormal-loads-and-the-esdal-system/advice-for-hauliers/",
+   "retrieved_at": "2026-11-19T05:58:29Z",
+   "http_status": 200,
+   "bytes": 52283,
+   "sha256": "268beda19d68fc1fe70d7df76e388580663a5da2fe6f542ed40f42d66f322e78"
+  },
+  {
+   "file": "uk-police-scotland-al.html",
+   "url": "https://www.scotland.police.uk/secure-forms/abnormal-loads/",
+   "retrieved_at": "2026-11-19T05:58:29Z",
+   "http_status": 404,
+   "bytes": 24144,
+   "sha256": null
+  },
+  {
+   "file": "uk-stgo-sch5.html",
+   "url": "https://www.legislation.gov.uk/uksi/2003/1998/schedule/5",
+   "retrieved_at": "2026-11-19T05:58:52Z",
+   "http_status": 200,
+   "bytes": 44404,
+   "sha256": "3c7eddc91eda07a8b84f1255d40267b841f36db57183217e4157acf7d26988bb"
+  }
+ ]
+}

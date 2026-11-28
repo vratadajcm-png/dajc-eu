@@ -1,0 +1,302 @@
+{
+ "review_id": "2026-11-20.r7-es-dec-cat-bas",
+ "kind": "TARGETED_PRIMARY_REVIEW",
+ "full_registry_sweep": false,
+ "base": {
+  "branch": "claude/driving-bans-sweep-2026-11-19",
+  "head": "00f42d46e72f8bd90aee595ad1ecaa75a9c65df6",
+  "main": "34bb8837bd54a0490a1e54adba5dd6a0b1b8c3d6"
+ },
+ "pre_change_canonical_sha256": "d18097b0e02321e6f5d76fa0099803e10f90075e1e94d4964575b94406bda128",
+ "reviewed_span": {
+  "from": "2026-12-01",
+  "to": "2026-12-31"
+ },
+ "method": "Independent re-check of PR #144 and of the December 2026 Spanish rows. Each official document was retrieved directly (no secondary source creates or removes a ban); tables were parsed from the official HTML and cross-read. window.to and jurisdiction last_checked/last_verified are not changed: this is not a full-registry or full-jurisdiction review.",
+ "retrievals": [
+  {
+   "source_id": "hu-190",
+   "url": "https://njt.jog.gov.hu/jogszabaly/2008-190-20-22",
+   "retrieved_utc": "2026-11-20T04:09:09Z",
+   "http_status": 200,
+   "bytes": 84858,
+   "sha256": "4b3cd0e4d19d508dcbbf769e9549feb1b96601c85d4a0c84b74ccb93d681b313",
+   "same_as_19_nov": true
+  },
+  {
+   "source_id": "hu-act-2026-72",
+   "url": "https://njt.jog.gov.hu/jogszabaly/2026-72-00-00",
+   "retrieved_utc": "2026-11-20T04:09:11Z",
+   "http_status": 200,
+   "bytes": 53610,
+   "sha256": "0f5e415cf4454f54f10963c6946fba41cb85f4505a1482252736f30422d2b866",
+   "same_as_19_nov": true
+  },
+  {
+   "source_id": "fr-arrete-2021",
+   "url": "https://www.bison-fute.gouv.fr/IMG/pdf/Arrete_joe_20210424_0097_0037.pdf",
+   "retrieved_utc": "2026-11-20T04:09:12Z",
+   "http_status": 200,
+   "bytes": 182436,
+   "sha256": "7e9a0a0c19f06e8721367681c9289c03eac6be1181d023237a9a22acf954d26c",
+   "same_as_19_nov": true
+  },
+  {
+   "source_id": "fr-arrete-2026",
+   "url": "https://www.bison-fute.gouv.fr/IMG/pdf/joe_arrete_interdictions_complementaires_TRM_2026.pdf",
+   "retrieved_utc": "2026-11-20T04:09:13Z",
+   "http_status": 200,
+   "bytes": 145747,
+   "sha256": "ba7ed529d2dafb414bfbc12c8aa2238730ed6f7be883ee68894fa7b40525db54",
+   "same_as_19_nov": true
+  },
+  {
+   "source_id": "gr-fek-912b-2026",
+   "url": "https://ia37rg02wpsa01.blob.core.windows.net/fek/02/2026/20260200912.pdf",
+   "retrieved_utc": "2026-11-20T04:09:14Z",
+   "http_status": 200,
+   "bytes": 739347,
+   "sha256": "31404788b69181136c1e4715dfb53aec864bc2e3d36fd502ddc6e3301ee150b3",
+   "same_as_19_nov": true
+  },
+  {
+   "source_id": "es-boe-2026-11-20",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-1255",
+   "retrieved_utc": "2026-11-20T04:09:15Z",
+   "http_status": 200,
+   "bytes": 515172,
+   "sha256": "15c4c06f5694b30de8b13ceaf5d8ea6a5efe65bbf01e14d05d56199a0804553a"
+  },
+  {
+   "source_id": "es-cat-isp-300-2026-11-20",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-6095",
+   "retrieved_utc": "2026-11-20T04:09:17Z",
+   "http_status": 200,
+   "bytes": 151103,
+   "sha256": "a78de69c053889b3ac3731b822a0ea39f2f7770bb3a1b04696f8c68dbd43e08a"
+  },
+  {
+   "source_id": "es-cat-isp-1933-2026",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-16758",
+   "retrieved_utc": "2026-11-20T04:09:18Z",
+   "http_status": 200,
+   "bytes": 31422,
+   "sha256": "b3f58a469f5237adbba3033ecf248383bf1e7905276a81f0e5c27e1e7f66bfb8"
+  },
+  {
+   "source_id": "es-bas-2026-11-20",
+   "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-2625",
+   "retrieved_utc": "2026-11-20T04:09:17Z",
+   "http_status": 200,
+   "bytes": 94924,
+   "sha256": "0d5117bf4b26b550d3c28b4f149a0a942e7e22e02d426948a2791ab2bb5aa098",
+   "same_as_2_nov": true
+  },
+  {
+   "source_id": "cat-labour-holidays-2026",
+   "url": "https://treball.gencat.cat/ca/ambits/relacions_laborals/ci/calendari_laboral/calendari-festes-2026/",
+   "retrieved_utc": "2026-11-20T11:50:43Z",
+   "http_status": 200,
+   "bytes": 332598,
+   "sha256": "770867b3c3b8a777d91b614817a656a1e946700611832ee9ba13692b62dff738"
+  }
+ ],
+ "pr_144_check": [
+  {
+   "jurisdiction": "HU",
+   "result": "CONFIRMED",
+   "rule": "hu-holiday-2026-12-25-26",
+   "legal_source": "Act LXXII of 2026 §3 (Mt. §102(1): 24 Dec public holiday; in force 14 Nov 2026) + Govt. Decree 190/2008 §2(1)(b), §2(2), §2(3)",
+   "effect": "23 Dec 2026 22:00 - 27 Dec 2026 22:00 continuous",
+   "timezone": "Europe/Budapest",
+   "section_direction": "All public roads, both directions",
+   "vehicles": ">7.5 t MAM trucks, tractors, combinations",
+   "limit": "No circulation",
+   "exceptions": "§5 categories, §4 permits; §2(3): 4 Nov-1 Mar international traffic EURO 3+ exempt",
+   "open_question": "OWNER_DECISION_REQUIRED (legal interpretation): §2(2) 'első nap 8 órától' - whether the continuous regime from 08:00 on the first day replaces or adds to the §2(1)(b) start (22:00 on 23 Dec). The encoded start (23 Dec 22:00) is the earliest start directly stated by §2(1)(b); an official ÉKM/police notice for Christmas 2026 would settle it. Not changed."
+  },
+  {
+   "jurisdiction": "FR",
+   "result": "CONFIRMED",
+   "rules": [
+    "fr-holiday-2027-01-01",
+    "fr-idf-out-eve-2026-12-31"
+   ],
+   "legal_source": "Arrêté du 16 avril 2021 art. 1 and art. 3 II a); arrêté du 26 décembre 2025 (2026 complementary dates: no December Saturdays)",
+   "effect": "31 Dec 2026 22:00 - 1 Jan 2027 22:00; Île-de-France 31 Dec 16:00-22:00",
+   "timezone": "Europe/Paris",
+   "section_direction": "Whole network; IdF listed motorway sections Paris -> province",
+   "vehicles": ">7.5 t PTAC goods vehicles (not specialised/agricultural)",
+   "limit": "No circulation",
+   "exceptions": "Art. 4 categories (not for art. 3 IdF)"
+  },
+  {
+   "jurisdiction": "GR",
+   "result": "CONFIRMED",
+   "rules": [
+    "gr-christmas-eve-outbound-2026",
+    "gr-christmas-return-2026",
+    "gr-new-year-eve-outbound-2026"
+   ],
+   "legal_source": "ΦΕΚ Β΄ 912/2026 Article 1, B8(a)-(c)",
+   "effect": "24 Dec 16-22 (A1), 27 Dec 15-22 (A2), 31 Dec 15-21 (A1)",
+   "timezone": "Europe/Athens",
+   "section_direction": "Chapter A1 (outbound) / A2 (return) listed motorway and national-road sections",
+   "vehicles": ">3.5 t maximum permitted weight goods vehicles",
+   "limit": "No circulation",
+   "exceptions": "Section C list; local police suspension/extension (Art. 1(3))"
+  }
+ ],
+ "es_december_encoded": [
+  {
+   "group": "DGT Annex II",
+   "rules": 64,
+   "row_dates": 72,
+   "legal_source": "Resolución DGT 14 Jan 2026 (BOE-A-2026-1255) B.1.1/B.3.1, Annex II December tables",
+   "effect": "4, 5, 6, 8, 11, 13, 18, 20, 24, 27, 31 Dec 2026 per row",
+   "timezone": "Europe/Madrid",
+   "section_direction": "Per row: road, km section, direction as printed",
+   "vehicles": ">7,500 kg MMA/MMC; also special vehicles and vehicles needing complementary authorisation (B.3.1)",
+   "limit": "No circulation in the stated hours",
+   "exceptions": "B.1.2 and B.3.2; generic Friday N-230 table (4, 11, 18 Dec): trips to the driver's habitual residence, vehicle base or company base (not on 24/31 Dec)"
+  },
+  {
+   "group": "Catalonia Annex A (La Inmaculada, Pyrenees winter)",
+   "rules": 6,
+   "legal_source": "Resolución ISP/300/2026 section 1.1 and Annex A (ISP/1933/2026 changes only the euromodular note); holidays per Ordre EMT/66/2025",
+   "effect": "4 and 8 Dec 17-22, 5 Dec 10-14 (AP-7, A-2, C-31, C-32, B-23, A-2 Martorell-Cornellà); Pyrenees N-145/C-14/N-260 6, 8, 13, 20, 25, 26, 27 Dec 17-22",
+   "timezone": "Europe/Madrid",
+   "section_direction": "No B/L marker = not specified; A-2 Cervera-Martorell L (4, 5 Dec) and B (8 Dec)",
+   "vehicles": ">7,500 kg MMA/MMC goods vehicles",
+   "limit": "No circulation",
+   "exceptions": "Annex B",
+   "interpretation_note": "The Annex A calendar has one C-32 column while the network lists two C-32 sections; both are listed with that note."
+  },
+  {
+   "group": "Catalonia section 7.1 (Aran)",
+   "rules": 3,
+   "legal_source": "Resolución ISP/300/2026 section 7.1",
+   "effect": "Fridays 4, 11, 18 Dec (7.2 b) residence/base exemption) and 24, 31 Dec (without it) 17-24 towards France; Sundays 6, 13, 20, 27 Dec and 8 Dec 13-20 towards Lleida",
+   "timezone": "Europe/Madrid",
+   "section_direction": "N-230 km 116 - km 187 Bausen; C-28 km 23 Vielha - km 34 Salardú",
+   "vehicles": ">7,500 kg MMA/MMC goods vehicles",
+   "limit": "No circulation",
+   "exceptions": "Section 7.2 a) Annex B and c) ATP Annex 3 perishables / ATP Annex 1 fresh fruit and vegetables filling at least half the load capacity or volume; 7.2 b) residence/base trips only on winter Fridays towards France"
+  },
+  {
+   "group": "Basque Country Annex II",
+   "rules": 3,
+   "legal_source": "Resolución de 9 de enero de 2026, Dirección de Tráfico (BOE-A-2026-2625), Annex II 2.º items 1-2",
+   "effect": "4 Dec 17-21 and 5 Dec 11-14 towards Cantabria; 6 and 8 Dec 16-21 towards Bilbao",
+   "timezone": "Europe/Madrid",
+   "section_direction": "A-8, N-634, BI-3724, BI-734 sections as listed",
+   "vehicles": ">7,500 kg MMA",
+   "limit": "No circulation",
+   "exceptions": "Annex IV"
+  },
+  {
+   "group": "Re-read, reviewed span extended to 31 Dec",
+   "profiles": [
+    "es-annex7",
+    "es-cat-2026",
+    "es-cat-permanent-2026",
+    "es-bas-2026"
+   ],
+   "note": "Same instruments in force to 31 Dec 2026; Annex VII and Catalan sections 8-9 unchanged."
+  }
+ ],
+ "not_encoded": [
+  "ES Annex V (ADR and complementary-authorisation vehicles) and autonomous-community holiday variants",
+  "Catalonia sections 2-4 (special transport, ADR) and AP-7 euromodular rows",
+  "Basque Country point 4.1 (special transport: Sundays/holidays 08-24, non-Saturday holiday eves 16-24, CAPV) and 2.1 (ADR); Annex I is the sporting-events calendar, not a goods-vehicle ban",
+  "January 2027 rows (outside the reviewed span)"
+ ],
+ "december_rules": [
+  "es-a2-2026-12-a-1-11-8-50-08001500-salida-madrid",
+  "es-a2-2026-12-a-1-11-8-50-16002200-salida-madrid",
+  "es-a2-2026-12-a-1-118-3-11-8-16002200-entrada-madrid",
+  "es-a2-2026-12-a-1-242-249-16002100-vitoria",
+  "es-a2-2026-12-a-2-107-10-8-16002200-entrada-madrid",
+  "es-a2-2026-12-a-2-18-3-38-7-08001300-salida-madrid",
+  "es-a2-2026-12-a-2-18-3-38-7-16002200-salida-madrid",
+  "es-a2-2026-12-a-3-13-80-4-08001300-salida-madrid",
+  "es-a2-2026-12-a-3-13-80-4-16002200-salida-madrid",
+  "es-a2-2026-12-a-3-177-6-9-16002400-entrada-madrid",
+  "es-a2-2026-12-a-3-25-80-4-16002400-salida-madrid",
+  "es-a2-2026-12-a-3-275-352-15002200-entrada-valencia",
+  "es-a2-2026-12-a-3-275-352-17002100-entrada-valencia",
+  "es-a2-2026-12-a-3-352-292-13002100-salida-valencia",
+  "es-a2-2026-12-a-4-122-6-7-16002200-entrada-madrid",
+  "es-a2-2026-12-a-4-17-3-62-08001300-salida-madrid",
+  "es-a2-2026-12-a-4-17-3-62-16002200-salida-madrid",
+  "es-a2-2026-12-a-4-230-300-09002200-sentido-sevilla",
+  "es-a2-2026-12-a-4-323-230-09002200-sentido-madrid",
+  "es-a2-2026-12-a-44-36-0-09002200-sentido-bailen",
+  "es-a2-2026-12-a-5-126-11-8-16002400-entrada-madrid",
+  "es-a2-2026-12-a-5-15-6-106-08001500-ambos-sentidos",
+  "es-a2-2026-12-a-5-15-6-106-16002200-ambos-sentidos",
+  "es-a2-2026-12-a-5-15-6-126-16002400-salida-madrid",
+  "es-a2-2026-12-a-6-123-110-16002400-entrada-madrid",
+  "es-a2-2026-12-a-6-184-123-16002300-entrada-madrid",
+  "es-a2-2026-12-a-6-22-3-6-8-16002400-entrada-madrid",
+  "es-a2-2026-12-a-6-ap-6-11-65-61-3-08001500-salida-madrid",
+  "es-a2-2026-12-a-6-ap-6-11-65-61-3-16002200-salida-madrid",
+  "es-a2-2026-12-a-62-113-151-08001500-frontera-portugal",
+  "es-a2-2026-12-a-62-113-151-15002300-frontera-portugal",
+  "es-a2-2026-12-a-62-155-125-16002300-burgos",
+  "es-a2-2026-12-a-8-139-2-169-11001400-santander",
+  "es-a2-2026-12-a-8-139-2-169-17002100-santander",
+  "es-a2-2026-12-a-8-169-139-2-16002100-bilbao",
+  "es-a2-2026-12-ap-1-0-77-16002100-vitoria",
+  "es-a2-2026-12-ap-51-104-8-81-8-16002400-entrada-madrid",
+  "es-a2-2026-12-ap-6-110-60-5-16002400-entrada-madrid",
+  "es-a2-2026-12-ap-6-a-6-61-3-182-08001500-a-coruna",
+  "es-a2-2026-12-ap-6-a-6-61-3-182-16002200-a-coruna",
+  "es-a2-2026-12-ap-61-88-55-61-50-16002400-entrada-madrid",
+  "es-a2-2026-12-m-501-4-59-5-08001300-salida-madrid",
+  "es-a2-2026-12-m-501-4-59-5-16002200-salida-madrid",
+  "es-a2-2026-12-m-501-59-5-0-16002200-entrada-madrid",
+  "es-a2-2026-12-n-1-249-321-45-16002100-vitoria",
+  "es-a2-2026-12-n-1-329-4-336-2-16002100-vitoria",
+  "es-a2-2026-12-n-110-246-228-16002400-entrada-madrid",
+  "es-a2-2026-12-n-230-149-2-133-6-13002000-benabarre",
+  "es-a2-2026-12-n-230-64-1-116-1-17002400-frontera-francia-24-31-dec",
+  "es-a2-2026-12-n-230-64-1-116-1-17002400-frontera-francia-fridays",
+  "es-a2-2026-12-n-6-110-42-5-16002400-entrada-madrid",
+  "es-a2-2026-12-n-6-42-5-62-5-08001500-salida-madrid",
+  "es-a2-2026-12-n-6-42-5-62-5-16002200-salida-madrid",
+  "es-a2-2026-12-n-603-74-9-64-16002400-entrada-madrid",
+  "es-a2-2026-12-n-631-0-0-57-0-07002400-ambos-sentidos",
+  "es-a2-2026-12-n-631-0-0-57-0-15002400-ambos-sentidos",
+  "es-a2-2026-12-r-2-17-1-37-5-08001300-salida-madrid",
+  "es-a2-2026-12-r-2-17-1-37-5-16002200-salida-madrid",
+  "es-a2-2026-12-r-3-7-3-29-4-08001300-salida-madrid",
+  "es-a2-2026-12-r-3-7-3-29-4-16002200-salida-madrid",
+  "es-a2-2026-12-r-4-0-52-5-08001300-salida-madrid",
+  "es-a2-2026-12-r-4-0-52-5-16002200-salida-madrid",
+  "es-a2-2026-12-r-5-15-30-5-08001500-salida-madrid",
+  "es-a2-2026-12-r-5-15-30-5-16002200-salida-madrid",
+  "es-a7-n-124-45-39-axles-4",
+  "es-a7-n-232-446-330-axles-4",
+  "es-a7-n-340-1012-1058-axles-4",
+  "es-a7-n-340-957-997-mma-7500",
+  "es-bas-a2-2026-12-04-cantabria",
+  "es-bas-a2-2026-12-05-cantabria",
+  "es-bas-a2-2026-12-06-08-bilbao",
+  "es-cat-aran-2026-12-france-24-31-dec",
+  "es-cat-aran-2026-12-france-fridays",
+  "es-cat-aran-2026-12-lleida",
+  "es-cat-c-153-olot-permanent",
+  "es-cat-gt26t-n-ii-n-240-n-340-permanent",
+  "es-cat-inmaculada-2026-12-a2-barcelona-t",
+  "es-cat-inmaculada-2026-12-a2-lleida-m",
+  "es-cat-inmaculada-2026-12-a2-lleida-t",
+  "es-cat-inmaculada-2026-12-m",
+  "es-cat-inmaculada-2026-12-t",
+  "es-cat-n-ii-630-682-saturdays",
+  "es-cat-n-ii-630-682-sundays",
+  "es-cat-pyrenees-winter-saturdays-2026-11-12",
+  "es-cat-pyrenees-winter-sundays-holidays-2026-12"
+ ],
+ "independent_review": "Fresh-context review of 8aa2fd8 found the Aran 7.2 c) half-load condition, the N-230 Friday residence/base exception, December provenance of extended profiles and the Basque Annex I label; all corrected in the follow-up commit."
+}
