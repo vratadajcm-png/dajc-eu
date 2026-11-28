@@ -17,8 +17,8 @@ const VERIFICATION_STATES = {
 // Ordered: the first matching category wins; anything unmatched is an incomplete review.
 const OPEN_ITEM_CATEGORIES = [
   { key: 'window', match: /^ACTIVE_WINDOW_NOT_REVERIFIED$/,
-    en: 'The current period has not yet been re-verified against official sources.',
-    cs: 'Aktuální období zatím nebylo znovu ověřeno z úředních zdrojů.' },
+    en: 'Not every month of the 12-month period is verified yet.',
+    cs: 'Ne všechny měsíce dvanáctiměsíčního období jsou zatím ověřené.' },
   { key: 'exemptions', match: /EXEMPTION|EXCEPTION(?!AL)|EASING|LOW_WATER/,
     en: 'The validity of some exemptions or relaxations is not confirmed by an official source.',
     cs: 'Platnost některých výjimek nebo úlev není potvrzena úředním zdrojem.' },

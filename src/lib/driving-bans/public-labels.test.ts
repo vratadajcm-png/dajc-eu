@@ -41,7 +41,7 @@ describe('public driving-bans wording', () => {
     expect(openItemCategory('EXCEPTIONAL_TRANSPORT_PERMIT_REGIME_NOT_REVIEWED').key).toBe('review');
     expect(openItemCategory('SOME_FUTURE_CODE').key).toBe('review');
     expect(openItemTexts(['FULL_SCOPE_PRIMARY_REVIEW_NOT_COMPLETED', 'ACTIVE_WINDOW_NOT_REVERIFIED'], true)).toEqual([
-      'Aktuální období zatím nebylo znovu ověřeno z úředních zdrojů.',
+      'Ne všechny měsíce dvanáctiměsíčního období jsou zatím ověřené.',
       'Kontrola úředních zdrojů pro tuto jurisdikci zatím není úplná.',
     ]);
   });
