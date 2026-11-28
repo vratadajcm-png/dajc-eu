@@ -21,7 +21,15 @@
    "url": "https://njt.jog.gov.hu/jogszabaly/2008-190-20-22",
    "retrieved_utc": "2026-11-28T09:40:00.000Z",
    "http_status": 200,
-   "sha256": "8b4239eb9bbdef42243392d9878e82e51895441591db44bc74bf3de066b9a82c"
+   "sha256": "8b4239eb9bbdef42243392d9878e82e51895441591db44bc74bf3de066b9a82c",
+   "text_comparison": {
+    "compared_with": "hu-190",
+    "previous_sha256": "4b3cd0e4d19d508dcbbf769e9549feb1b96601c85d4a0c84b74ccb93d681b313",
+    "method": "HTML tags, scripts and styles stripped; non-empty trimmed lines compared",
+    "lines_previous": 479,
+    "lines_current": 479,
+    "changed_lines": 0
+   }
   },
   {
    "source_id": "hr-naredba-2026-11-28",

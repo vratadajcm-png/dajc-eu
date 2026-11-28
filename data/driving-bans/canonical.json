@@ -1663,7 +1663,7 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": " Review 2026-11-28.r8-new-year-eves-pt: New Year's Day ban from 31 Dec 22:00 added.",
+   "notes": "Review 2026-11-28.r8-new-year-eves-pt: New Year's Day ban from 31 Dec 22:00 added.",
    "review_log": [
     {
      "review_id": "2026-10-27.r4-nov-dec-priority",
@@ -5382,7 +5382,7 @@
    "url": "https://njt.jog.gov.hu/jogszabaly/2008-190-20-22",
    "authority": "Nemzeti Jogszabálytár / Govt. Decree 190/2008",
    "role": "PRIMARY",
-   "version": "Retrieved 2026-11-28; text identical to the 20 Nov copy (markup differs)",
+   "version": "Retrieved 2026-11-28; extracted text identical to the 19 Nov 2026 retrieval (source hu-190, SHA-256 4b3cd0e4…): 479 text lines, 0 changed; only the HTML markup differs",
    "checked_at": "2026-11-28T09:40:00.000Z",
    "retrieval_method": "direct-retrieval",
    "findings": "§2(1)(b): from 22:00 on the preceding day to 22:00 on Sundays and public holidays (1 Sep-30 Jun); §2(2) continuity; §2(3) EURO 3+ international exemption 4 Nov-1 Mar.",
