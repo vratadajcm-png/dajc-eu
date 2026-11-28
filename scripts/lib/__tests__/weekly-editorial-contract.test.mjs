@@ -79,3 +79,19 @@ describe('Driving Bans isolation', () => {
     expect(existsSync(path.join(ROOT, 'scripts', 'lib', 'driving-ban-calendar.mjs'))).toBe(false);
   });
 });
+
+describe('independent reviewer scope (W48 regression, run 44517423552)', () => {
+  it('treats oversize as ranking priority, never as an admission requirement, without relaxing legal or source checks', async () => {
+    const { reviewerPrompt } = await import('../../claude-weekly-review.mjs');
+    const prompt = reviewerPrompt({ week: '2026-W48' }, []);
+    expect(prompt).toMatch(/PRIORITY IS NOT ADMISSION/);
+    expect(prompt).toMatch(/require only fresh official or primary oversize regulatory changes/);
+    expect(prompt).toMatch(/Never reject an edition, a report or a source only because it is not about oversize transport/);
+    expect(prompt).toMatch(/3\.5 t inclusive using a tachograph/);
+    // Legal and source strictness stays unchanged.
+    expect(prompt).toMatch(/Preserve the exact statutory thresholds \(including >3\.5 t vs >=3\.5 t, >7\.5 t, >12 t/);
+    expect(prompt).toMatch(/high-impact permit and legal limits must not be presented as officially confirmed on second-hand media alone/);
+    expect(prompt).toMatch(/REJECT when a weight, axle, dimension, permit, escort, legal or route claim rests on a source that only relays another outlet/);
+    expect(prompt).toMatch(/If source excerpts are insufficient to validate the associated claims, REJECT instead of guessing/);
+  });
+});

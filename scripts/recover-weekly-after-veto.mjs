@@ -1,13 +1,23 @@
 #!/usr/bin/env node
 // At most three total editorial generations per preparation (initial + two repairs).
-// Every repair removes only exact unsupported URLs, reruns source verification,
-// deterministic gates/build and a fresh independent review. No claim is waived.
+// A rejected report is repaired or removed; the edition is not abandoned:
+//   - first repair: a source rejected only because the article misstated it
+//     stays, with the reviewer's reasons as correction constraints; a source
+//     rejected for its quality (relay, general outlet, old page...) goes;
+//   - later repairs: sources the reviewer marked unsupported are excluded (even when that is
+//     every cited source) and the writer works only from the REMAINING
+//     verified pool; nothing left = blocked edition, never padding;
+//   - without an unsupported source, the bounded blocking reasons become
+//     correction constraints for one rewrite of the same verified pool.
+// Every repair reruns source verification, deterministic gates (including the
+// legal-claim guard), the build and a fresh independent review of the exact
+// new bytes. No claim is waived and no approval is reused.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync, unlinkSync, mkdirSync } from 'node:fs';
 import { resolve, relative, isAbsolute, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MAX_EDITION_ATTEMPTS, selectRejectedSourceUrls } from './lib/weekly-recovery.mjs';
+import { MAX_EDITION_ATTEMPTS, planEditorialRepair, sanitizeEditorialFeedback } from './lib/weekly-recovery.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -51,18 +61,24 @@ export function recoverEditorialEdition({ articlePath, root = ROOT, runnerTemp =
   archive(1, before, firstVeto);
   persist();
   const excluded = new Set();
+  let feedback = [];
   let lastError = new Error('Editorial recovery budget exhausted');
   try {
     while (ledger.attempts.length < maxAttempts) {
       const veto = boundVeto();
-      const blocked = selectRejectedSourceUrls(veto.review, veto.sourceUrls);
-      if (!blocked.length) throw new Error('Reviewer gave no unambiguously unsupported source URL; fail closed for human review');
-      if (blocked.length === veto.sourceUrls.length) throw new Error('Reviewer rejected every cited source; no safe automatic edition remains');
-      for (const url of blocked) excluded.add(url);
+      const plan = planEditorialRepair(veto.review, veto.sourceUrls, { attempt: ledger.attempts.length + 1 });
+      if (!plan.ok) throw new Error('Editorial veto cannot be repaired automatically (' + plan.reason + '); fail closed for human review');
+      for (const url of plan.excludeUrls) excluded.add(url);
+      // Feedback accumulates across attempts so a later rewrite cannot
+      // reintroduce a claim an earlier review already rejected.
+      // Newest findings first so the cap drops the oldest, never the latest veto.
+      feedback = sanitizeEditorialFeedback([...plan.feedback, ...feedback]);
       const number = ledger.attempts.length + 1;
-      const record = { attempt: number, state: 'REPAIRING', excludedSourceUrls: [...excluded], blockingReasons: veto.review.blockingReasons, startedAt: new Date().toISOString() };
+      const record = { attempt: number, state: 'REPAIRING', mode: plan.mode, allSourcesRejected: plan.allSourcesRejected, correctedSourceUrls: plan.correctUrls,
+        excludedSourceUrls: [...excluded], editorialFeedback: feedback, blockingReasons: veto.review.blockingReasons, startedAt: new Date().toISOString() };
       ledger.attempts.push(record); persist();
-      console.log(`Editorial recovery attempt ${number}/${maxAttempts}: excluding ${excluded.size} explicitly unsupported source URL(s).`);
+      console.log(`Editorial recovery attempt ${number}/${maxAttempts} (${plan.mode}): excluding ${excluded.size} unsupported source URL(s), ${feedback.length} correction constraint(s).` +
+        (plan.allSourcesRejected ? ' Every cited source was rejected; only the remaining verified candidates may be used.' : ''));
       unlinkSync(target);
       unlinkSync(vetoPath); // only a newly completed review can authorize another repair
       // The exact week is derived from the already SHA-bound article path,
@@ -70,10 +86,21 @@ export function recoverEditorialEdition({ articlePath, root = ROOT, runnerTemp =
       const targetWeek = articlePath.match(/(\d{4}-w\d{2})\.md$/)[1].toUpperCase();
       try {
         run(process.execPath, ['scripts/generate-weekly-article.mjs', '--target-week', targetWeek], {
-          cwd: root, stdio: 'inherit', env: { ...env, OVERSIZE_TARGET_WEEK: targetWeek, OVERSIZE_EXCLUDE_SOURCE_URLS: JSON.stringify([...excluded]) }, timeout: 900000,
+          cwd: root, stdio: 'inherit', timeout: 900000,
+          env: { ...env, OVERSIZE_TARGET_WEEK: targetWeek, OVERSIZE_EXCLUDE_SOURCE_URLS: JSON.stringify([...excluded]), OVERSIZE_EDITORIAL_FEEDBACK: JSON.stringify(feedback) },
         });
-        if (!existsSync(target)) throw new Error('Regeneration produced no article');
-        record.sha256 = hash(readFileSync(target));
+        if (!existsSync(target)) {
+          record.state = 'NO_QUALIFIED_CONTENT';
+          throw new Error('No verified report remains after removing rejected content; edition blocked without padding');
+        }
+        const repairedSha = hash(readFileSync(target));
+        // Re-reviewing identical rejected bytes would spend money for a known veto.
+        if (ledger.attempts.some((attempt) => attempt !== record && attempt.sha256 === repairedSha)) {
+          record.sha256 = repairedSha;
+          record.state = 'DUPLICATE_DRAFT';
+          throw new Error('Repair reproduced an already rejected draft; no duplicate review');
+        }
+        record.sha256 = repairedSha;
         archive(number, readFileSync(target));
         run(process.execPath, ['scripts/claude-weekly-review.mjs', articlePath], {
           cwd: root, stdio: 'inherit', env: { ...env, OVERSIZE_TARGET_WEEK: targetWeek }, timeout: 420000,
@@ -87,7 +114,8 @@ export function recoverEditorialEdition({ articlePath, root = ROOT, runnerTemp =
         return { ok: true, ledgerPath, attempts: ledger.attempts.length };
       } catch (error) {
         lastError = error;
-        record.state = 'BLOCKED'; record.error = error.message; record.completedAt = new Date().toISOString();
+        if (!['NO_QUALIFIED_CONTENT', 'DUPLICATE_DRAFT'].includes(record.state)) record.state = 'BLOCKED';
+        record.error = error.message; record.completedAt = new Date().toISOString();
         if (existsSync(approvalPath)) unlinkSync(approvalPath);
         // API/network/build errors are not editorial verdicts and must never
         // cause another paid generation. A complete fresh veto alone can retry.

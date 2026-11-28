@@ -90,6 +90,10 @@ const hasPublishedPlatform = platform.length > 0;
       }
     });
   });
+
+  // /news/<category>/ redirects here with ?category=<category>.
+  const requested = new URLSearchParams(window.location.search).get('category');
+  if (requested) Array.from(filters).find((btn) => btn.dataset.filter === requested)?.click();
 </script>
 
 <style>

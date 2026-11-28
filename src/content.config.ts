@@ -12,6 +12,8 @@ const newsSchema = z.object({
   category: z.enum(['eu-oversize', 'platform']),
   publishedAt: z.coerce.date(),
   updatedAt: z.coerce.date().optional(),
+  // Last day a reference article (e.g. a Driving Bans summary) describes; after it the page shows an archive notice.
+  validThrough: z.coerce.date().optional(),
   targetWeek: z.string().regex(/^\d{4}-W\d{2}$/).optional(),
   preparedAt: z.coerce.date().optional(),
   scheduledPublicationAt: z.coerce.date().optional(),

@@ -1,7 +1,7 @@
 ---
-import { render, type CollectionEntry } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { formatNewsDate } from '../config/news';
+import { formatNewsDate, isAnnouncedEditionMissing, isExpiredReference, isNewsEntryPublic, parseNextEditionDate } from '../config/news';
 import { socialImageForNews } from '../config/social-image';
 import { canonicalSiteUrl } from '../lib/site/canonical';
 
@@ -15,6 +15,17 @@ const { data } = entry;
 const { Content } = await render(entry);
 
 const publishedLabel = formatNewsDate(data.publishedAt);
+const now = new Date();
+// An overdue "Next EU Oversize Weekly" announcement is not shown as current
+// when no edition has been published since (W46 promised 13 Nov 2026).
+const nextEdition = entry.collection === 'eu-oversize' ? parseNextEditionDate(entry.body) : null;
+const weeklyEditions = nextEdition
+  ? (await getCollection('eu-oversize', ({ data: d }) => isNewsEntryPublic(d, now) && d.slug.startsWith('eu-oversize-weekly-') && d.slug !== data.slug))
+      .map((e) => e.data.publishedAt)
+  : [];
+const nextEditionMissing = isAnnouncedEditionMissing(nextEdition, data.publishedAt, weeklyEditions, now);
+// Only the on-demand eu-oversize pages can evaluate a date at request time.
+const archivedReference = entry.collection === 'eu-oversize' && isExpiredReference(data.validThrough, now);
 const updatedLabel = data.updatedAt ? formatNewsDate(data.updatedAt) : undefined;
 const articleStructuredData = {
   '@context': 'https://schema.org',
@@ -42,7 +53,7 @@ const articleStructuredData = {
   },
 };
 ---
-<BaseLayout title={`${data.title} - DAJC`} description={data.description} socialImage={socialImageForNews(categoryLabel)}>
+<BaseLayout title={`${data.title} - DAJC`} description={data.description} socialImage={socialImageForNews(categoryLabel)} ogType="article" publishedTime={data.publishedAt.toISOString()} modifiedTime={(data.updatedAt ?? data.publishedAt).toISOString()}>
   <script type="application/ld+json" set:html={JSON.stringify(articleStructuredData)}></script>
   <main class="article">
     <div class="article__meta">
@@ -54,9 +65,23 @@ const articleStructuredData = {
     <h1>{data.title}</h1>
     <p class="article__description">{data.description}</p>
 
-    <div class="article__content">
+    {archivedReference && data.validThrough && (
+      <p class="article__notice" role="note">
+        Archived reference: this page describes the period up to {formatNewsDate(data.validThrough)} and is no longer maintained.
+        For current, officially verified restrictions see <a href="/driving-bans">Driving Bans</a>.
+      </p>
+    )}
+
+    <div class:list={['article__content', { 'article__content--next-missing': nextEditionMissing }]}>
       <Content />
     </div>
+
+    {nextEditionMissing && nextEdition && (
+      <p class="article__notice" role="note">
+        The edition announced for {formatNewsDate(nextEdition)} has not been published. An edition is released only
+        after its sources pass independent verification; see <a href="/news">News</a> for the latest briefing.
+      </p>
+    )}
 
     {data.sources && data.sources.length > 0 && (
       <div class="article__sources">
@@ -87,6 +112,19 @@ const articleStructuredData = {
 </BaseLayout>
 
 <style>
+  /* The generator always renders this section last (scripts/lib/render-article.mjs). */
+  .article__content--next-missing :global(#next-eu-oversize-weekly),
+  .article__content--next-missing :global(#next-eu-oversize-weekly ~ *) {
+    display: none;
+  }
+
+  .article__notice {
+    border-left: 3px solid var(--dajc-orange);
+    padding: 0.6rem 0.9rem;
+    margin: 1.2rem 0;
+    color: var(--dajc-muted);
+  }
+
   .article {
     position: relative;
     z-index: 2;

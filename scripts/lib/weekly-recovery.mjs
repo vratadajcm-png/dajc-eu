@@ -25,6 +25,122 @@ export function selectRejectedSourceUrls(review, allowedUrls) {
   return seen.size === known.size ? rejected : [];
 }
 
+// Reviewer findings are untrusted model text derived from untrusted source
+// pages. They are passed to the writer only as bounded, inert data describing
+// what to REMOVE or CORRECT; they can never add a source, fact or exception.
+// Only control/invisible characters are stripped: '>12 t' must survive intact.
+export const MAX_FEEDBACK_ITEMS = 16;
+export const MAX_FEEDBACK_CHARS = 600;
+export function sanitizeEditorialFeedback(values) {
+  if (!Array.isArray(values)) return [];
+  const out = [];
+  for (const value of values) {
+    if (typeof value !== 'string') continue;
+    const text = value
+      .replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, MAX_FEEDBACK_CHARS);
+    if (text.length >= 4 && !out.includes(text)) out.push(text);
+    if (out.length >= MAX_FEEDBACK_ITEMS) break;
+  }
+  return out;
+}
+
+/**
+ * Turns one complete, structured Claude veto into a bounded repair plan.
+ * - Every cited URL must have exactly one check; anything else fails closed.
+ * - URLs marked unsupported are excluded, even when that is every cited
+ *   source: the writer then works only from the REMAINING verified pool and
+ *   an empty result is a blocked edition, never padding.
+ * - Without an unsupported URL, the blocking reasons become correction
+ *   constraints for a rewrite of the same verified pool (claim-level repair).
+ * A repair is only ever a new draft: deterministic gates, live source checks,
+ * the build and a fresh independent review still decide.
+ */
+// A source the reviewer rejects for its QUALITY (relay, general outlet, old or
+// evergreen page, own publication...) is removed at once. A source rejected
+// only because the article misstated it is first given one rewrite.
+// Phrases that are themselves a negative finding ("not the competent authority").
+const QUALITY_NEGATIVE_FORMS = [
+  'not (?:a |the )?(?:first[- ]?hand|primary) (?:source|publisher|report)', 'not (?:from )?the competent authority',
+  'not an official (?:source|publisher|notice)', 'source (?:is |was )?unavailable', 'could not be fetched',
+];
+// Positive descriptions of a low-quality source; they count only when the same
+// clause does not negate them ("a trade outlet, not a general-interest outlet",
+// "neither a relay nor an aggregator").
+const QUALITY_POSITIVE_FORMS = [
+  'relay(?:s|ed|ing)?\\b', 'second[- ]?hand', 'third[- ]?hand',
+  'aggregator', 'evergreen', 'guide page', '\\bblog\\b', 'unrelated (?:country|jurisdiction|language|outlet|publication|site)',
+  'outdated (?:page|source|article|notice)', 'old (?:page|announcement|article|news)', 'sponsored', 'advertorial', 'promotional',
+  'dajc\\.(?:eu|cz)', 'landing page', 'homepage',
+];
+// Outlet types describe the source only when introduced as such ("is a ...",
+// "a ...", or at the start of the clause), never "the mainstream press reported".
+const OUTLET_FORM = /(?:general[- ](?:interest|audience|automotive|consumer|news)(?:[ -][a-z]+){0,3}?|mainstream|non[- ]?specialist|consumer(?:[ -][a-z]+)?) (?:outlet|site|publication|media|press|newspaper|magazine)/gi;
+const NEGATIVE_FORM = new RegExp(QUALITY_NEGATIVE_FORMS.join('|'), 'i');
+const POSITIVE_FORM = new RegExp(QUALITY_POSITIVE_FORMS.join('|'), 'gi');
+const NEGATION = /(?:\bnot|\bno|\bnever|n't|\bneither|\bnor|\brather than|\binstead of|\bunlike)\b/gi;
+const ASSERTION_BREAK = /\b(?:but|however|yet|although|though|whereas|is|are|was|were)\b/i;
+const OUTLET_INTRO = /(?:^|\b(?:a|an|is|was|are|were|as|from|by|on)\s+)$/i;
+
+function clauseBefore(text, index) { return text.slice(0, index).split(/[.;:!?,()\n]/).at(-1); }
+function negated(clause) {
+  const hits = [...clause.matchAll(NEGATION)];
+  if (!hits.length) return false;
+  const last = hits.at(-1);
+  // "not a blog or a relay": the negation carries over a coordinated list,
+  // but not over a new assertion ("not first-hand but a relay").
+  return !ASSERTION_BREAK.test(clause.slice(last.index + last[0].length));
+}
+
+/** True when a reviewer reason rejects the source itself (not a misstatement of it). */
+export function isSourceQualityRejection(reason) {
+  const text = String(reason || '');
+  if (NEGATIVE_FORM.test(text)) return true;
+  for (const match of text.matchAll(POSITIVE_FORM)) if (!negated(clauseBefore(text, match.index))) return true;
+  for (const match of text.matchAll(OUTLET_FORM)) {
+    const clause = clauseBefore(text, match.index);
+    if (OUTLET_INTRO.test(clause.trim() ? clause : '') && !negated(clause)) return true;
+  }
+  return false;
+}
+
+export function planEditorialRepair(review, allowedUrls, { attempt = 2 } = {}) {
+  const fail = (reason) => ({ ok: false, reason, excludeUrls: [], feedback: [] });
+  if (!review || review.verdict !== 'reject') return fail('not a structured editorial rejection');
+  if (!Array.isArray(review.blockingReasons) || review.blockingReasons.length === 0 ||
+      review.blockingReasons.some((reason) => typeof reason !== 'string' || !reason.trim())) return fail('rejection lacks concrete blocking reasons');
+  const known = new Set(Array.isArray(allowedUrls) ? allowedUrls : []);
+  if (!known.size || !Array.isArray(review.sourceChecks) || review.sourceChecks.length !== known.size) return fail('rejection does not check every cited source exactly once');
+  const seen = new Set();
+  const excludeUrls = [];
+  const correctUrls = [];
+  const sourceNotes = [];
+  for (const item of review.sourceChecks) {
+    if (!item || !known.has(item.url) || seen.has(item.url) || typeof item.supported !== 'boolean' ||
+        typeof item.reason !== 'string' || item.reason.trim().length < 4) return fail('rejection contains an incomplete, duplicate or unknown source check');
+    seen.add(item.url);
+    if (item.supported !== false) continue;
+    // Only the first repair may keep a source whose content was misstated;
+    // on the final repair every source that is still rejected is removed.
+    if (attempt <= 2 && !isSourceQualityRejection(item.reason)) {
+      correctUrls.push(item.url);
+      sourceNotes.push('Correct the report citing ' + item.url + ' strictly to its evidence: ' + item.reason);
+    } else {
+      excludeUrls.push(item.url);
+      sourceNotes.push('Removed source ' + item.url + ': ' + item.reason);
+    }
+  }
+  if (seen.size !== known.size) return fail('rejection does not check every cited source');
+  // Per-source notes first: the feedback cap must never cut the concrete
+  // instruction attached to a cited URL.
+  const feedback = sanitizeEditorialFeedback([...sourceNotes, ...review.blockingReasons]);
+  if (!excludeUrls.length && !feedback.length) return fail('rejection gives nothing concrete to repair');
+  return { ok: true, mode: excludeUrls.length ? 'remove-unsupported-sources' : 'correct-claims', excludeUrls, correctUrls, feedback,
+    allSourcesRejected: excludeUrls.length === known.size };
+}
+
 export function shouldReplaceBlockedEditionPr(pending, allPulls, now, {
   minHours = RETRY_AFTER_HOURS, maxAttempts = MAX_EDITION_ATTEMPTS,
 } = {}) {

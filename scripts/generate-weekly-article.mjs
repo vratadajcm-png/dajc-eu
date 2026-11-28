@@ -55,6 +55,7 @@ import { FRESHNESS_WINDOW_DAYS, editionFreshSince } from './lib/weekly-eligibili
 import { capSection, criticalGroupOwners, orderEditionItems } from './lib/edition-order.mjs';
 import { alignEditionSummary } from './lib/edition-summary.mjs';
 import { oversizeSources } from '../config/oversize-sources/index.mjs';
+import { MAX_FEEDBACK_CHARS, MAX_FEEDBACK_ITEMS, sanitizeEditorialFeedback } from './lib/weekly-recovery.mjs';
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -224,6 +225,16 @@ async function main() {
     throw new Error('Invalid editorial-recovery source exclusions');
   }
   const excludedSourceUrls = new Set(excludedInput);
+  // Correction constraints from the same SHA-bound veto (bounded, inert data):
+  // they can only make the writer remove or qualify a claim. Deterministic
+  // gates and a fresh independent review of the new bytes still decide.
+  const feedbackInput = JSON.parse(process.env.OVERSIZE_EDITORIAL_FEEDBACK || '[]');
+  if (!Array.isArray(feedbackInput) || feedbackInput.length > MAX_FEEDBACK_ITEMS ||
+      feedbackInput.some((value) => typeof value !== 'string' || value.length > MAX_FEEDBACK_CHARS)) {
+    throw new Error('Invalid editorial-recovery correction constraints');
+  }
+  const editorialFeedback = sanitizeEditorialFeedback(feedbackInput);
+  if (editorialFeedback.length > 0) console.log(`Editorial repair: ${editorialFeedback.length} correction constraint(s) from the previous independent review.`);
   const findings = [...findingsMap.values()].filter((f) => !excludedSourceUrls.has(f.sourceUrl) &&
     // A retrospective edition cannot import news first published after its covered week.
     (!f.publishedAt || f.publishedAt.slice(0, 10) <= targetWeekEndIso));
@@ -315,6 +326,7 @@ async function main() {
           weekRangeLabel,
           targetWeekStart: targetWeekStartIso,
           targetWeekEnd: targetWeekEndIso,
+          editorialFeedback,
           apiKey,
         });
   } catch (err) {
@@ -354,6 +366,7 @@ async function main() {
             candidates: missing.flatMap((group) => group.candidates),
             targetWeekStart: targetWeekStartIso,
             targetWeekEnd: targetWeekEndIso,
+            editorialFeedback,
             apiKey,
           });
       const requiredValidation = crossValidateDevelopments(written, verified);

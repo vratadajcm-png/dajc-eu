@@ -41,7 +41,7 @@ on:
         type: boolean
         default: false
       target_week:
-        description: 'Optional explicit ISO edition, e.g. 2026-W47. Late release retains its original scheduled slot.'
+        description: 'Optional explicit ISO edition, e.g. 2026-W47. A late release is stamped with its actual preparation time; it is never backdated to the missed slot.'
         type: string
         default: ''
       correction:
@@ -60,14 +60,24 @@ permissions:
   issues: write
 
 concurrency:
-  group: oversize-data
+  # Production runs share oversize-data with the monitor. A branch dry run gets
+  # its own group: GitHub keeps one pending run per group, so a queued dry run
+  # must never displace a pending scheduled preparation or retry. (A branch
+  # dispatch runs that branch's code with the repository secrets, as any
+  # workflow_dispatch does; the job gate below is a safety rail, not a
+  # security boundary against users with write access.)
+  group: ${{ github.ref == 'refs/heads/main' && 'oversize-data' || format('oversize-dry-run-{0}', github.ref) }}
   # Let an in-flight primary publication finish. Later recovery schedules wait
   # and then become cheap idempotent no-ops once the target article exists.
   cancel-in-progress: false
 
 jobs:
   publish:
-    if: ${{ github.ref == 'refs/heads/main' }}
+    # Publication runs only from main. A manual dry run may also run from a
+    # repair branch so a fix can be exercised live BEFORE merge: dry runs skip
+    # every persist/commit/push/PR/merge/alert-issue step below, and preview
+    # or correction (which can publish) stay main-only.
+    if: ${{ github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && inputs.dry_run == true && inputs.preview != true && inputs.correction != true) }}
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
@@ -234,9 +244,13 @@ jobs:
             echo "::warning::No qualified article generated this week; no approval or publication."
           fi
 
-      # A rejected edition may receive at most two source-safe repairs that
-      # excludes ONLY URLs the reviewer marked unsupported. All deterministic
-      # gates, live-source verification, build and independent review repeat.
+      # A rejected edition may receive at most two repairs (three drafts in
+      # total). A repair excludes the URLs the reviewer marked unsupported -
+      # even all of them, leaving only the remaining verified pool - or, with
+      # no unsupported URL, rewrites under the bounded blocking reasons. All
+      # deterministic gates, the legal-claim guard, live-source verification,
+      # build and a fresh independent review of the new bytes repeat. Nothing
+      # left to publish blocks the edition; it is never padded.
       - name: Bounded source-safe regeneration after structured Claude veto
         id: recovery
         continue-on-error: true
@@ -331,8 +345,10 @@ jobs:
           if-no-files-found: ignore
           retention-days: 90
 
+      # A dry run is a simulation: its outcome stays in this run's log and
+      # artifacts and must never edit the edition's operational alert issue.
       - name: Report blocked publication
-        if: failure()
+        if: failure() && inputs.dry_run != true
         env:
           TARGET_WEEK: ${{ steps.publish-needed.outputs.week }}
         run: node scripts/report-weekly-failure.mjs

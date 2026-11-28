@@ -103,18 +103,36 @@ These rules are deterministic (`scripts/lib/weekly-eligibility.mjs`) and are app
 
 ### Editorial Recovery and evidence
 
-An independent Claude rejection is final for the reviewed bytes. Recovery may
-remove only sources explicitly marked unsupported by a complete, structured,
-SHA-bound veto. It must not infer a new fact, change a legal threshold or
-exception, or replace a source with invented corroboration. Every new candidate
+An independent Claude rejection is final for the reviewed bytes, not for the
+edition. A rejected report is repaired or removed and the edition continues
+(18 November 2026, after W47): the first repair keeps a source the reviewer
+rejected only because the article misstated it and rewrites that report under
+the reviewer's reasons; a source rejected for its quality (relay, general
+outlet, old/evergreen page) and any source rejected again is excluded -
+including all cited sources, in which case only the remaining verified pool
+may be used - and
+passes the bounded blocking reasons to the writer as inert correction
+constraints (remove or qualify; never add). A veto with no unsupported source
+gets one rewrite of the same verified pool under those constraints. Recovery
+must not infer a new fact, change a legal threshold or exception, or replace a
+source with invented corroboration. A deterministic legal-claim guard removes a
+report that presents a draft/proposal as adopted law, claims legal finality its
+evidence does not state, or presents an industry report as official
+confirmation. Every new candidate
 must pass the same source checks, deterministic eligibility, build and a fresh
 independent Claude review. There is no recovery exception for a critical-news
 floor: an edition missing still-required verified coverage remains blocked.
+Oversize priority orders the edition and its required floor is enforced before
+review; the reviewer must not reject in-scope reports for tachograph-using
+goods vehicles from 3.5 t only because they are not about oversize transport
+(W48, run 44517423552, 20 November 2026). Legal and source checks are unchanged.
 
 A preparation permits at most **three total generations** (the original plus
 two repairs). API/network/build failure is not an editorial veto and must not
-trigger a paid repair loop. Repeated rejection or no safely removable source
-stops publication and preserves the rejected bytes and reasons for audit. A
+trigger a paid repair loop. A repair that reproduces already rejected bytes is
+not reviewed again. Repeated rejection, an incomplete veto, or no verified
+report left after removal stops publication (never padding) and preserves the
+rejected bytes and reasons for audit. A
 later run may start a new controlled preparation only after source facts have
 actually changed; monitoring timestamps alone do not justify more API calls.
 

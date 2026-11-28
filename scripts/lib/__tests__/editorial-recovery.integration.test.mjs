@@ -21,7 +21,7 @@ function harness(mode) {
   const calls = [];
   let generation = 1;
   const veto = (sources, bytes) => ({ articlePath, sha256: hash(bytes), sourceUrls: sources, review: {
-    verdict: 'reject', blockingReasons: ['Unsupported date'], sourceChecks: sources.map((url, i) => ({ url, supported: i !== 0, reason: i ? 'Confirmed' : 'Date not supported' })),
+    verdict: 'reject', blockingReasons: ['Unsupported date'], sourceChecks: sources.map((url, i) => ({ url, supported: i !== 0, reason: i ? 'Confirmed' : 'Second-hand relay; date not supported by a first-hand source' })),
   } });
   writeFileSync(target, 'initial rejected article');
   const originalVeto = JSON.stringify(veto(urls, 'initial rejected article')); writeFileSync(vetoPath, originalVeto);

@@ -422,12 +422,21 @@ commit always proceeds to a normal build+deploy).
 The binding recovery policy is in [the canonical specification, §8](DAJC_WEEKLY_INTELLIGENCE_SPEC.md#8-publication-schedule-and-preview).
 `recover-weekly-after-veto.mjs` permits at most three total generations per
 preparation: the initial candidate and two repairs. It consumes a complete
-structured Claude veto bound to the exact article SHA-256 and removes only
-exact cited URLs with `supported=false`. Each repair reruns the ordinary
-generator, source verification, deterministic gates, build and an independent
-Claude review. It cannot repair by inventing claims or lowering source quality.
-All sources rejected, an ambiguous veto, or API/network/build failure stops
-recovery. Nothing asks the model for more reports to reach a count.
+structured Claude veto bound to the exact article SHA-256, excludes the exact
+cited URLs with `supported=false` (all of them if necessary, leaving only the
+remaining verified pool) and hands the bounded, sanitised blocking reasons to
+the writer as correction constraints (`OVERSIZE_EDITORIAL_FEEDBACK`). Each
+repair reruns the ordinary generator, source verification, deterministic gates
+(including `legal-claim-guard.mjs`), build and an independent Claude review of
+the new bytes. It cannot repair by inventing claims or lowering source quality.
+An ambiguous/incomplete veto, a repair identical to a rejected draft
+(`DUPLICATE_DRAFT`), no verified report left (`NO_QUALIFIED_CONTENT`) or an
+API/network/build failure stops recovery. Nothing asks the model for more
+reports to reach a count.
+
+A manual `dry_run` dispatch may run from a repair branch (never preview or
+correction): it simulates research, writing, review and repair in the runner
+and skips every persist/commit/push/PR/merge and alert-issue step.
 
 The runner archive is `RUNNER_TEMP/dajc-weekly-recovery/manifest.json` plus
 `attempt-N.md` and `attempt-N-veto.json`. The manifest records attempt numbers,
