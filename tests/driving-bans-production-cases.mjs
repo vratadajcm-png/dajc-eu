@@ -158,7 +158,7 @@ export function registerProductionDrivingBanTests(test, a) {
     a.ok(v.events.every(e => projected.has(e.uid)), 'every published event is visible to the config projection');
     a.deepEqual(uids(toIcs(v, {upcoming: false})).sort(), v.events.map(e => e.uid).sort());
     const page = readFileSync(new URL('../src/pages/driving-bans.astro', import.meta.url), 'utf8');
-    a.match(page, /Ověření probíhá/); a.match(page, /Bez zákazu/);
+    a.match(page, /Ověření probíhá/); a.match(page, /Bez zákazu/); a.match(page, /officialDrivingBansView\(canonical\)/);
   });
   test('rolling 12-month horizon shifts automatically; unreviewed future months remain fail-closed', () => {
     a.deepEqual(publicationWindow(new Date('2026-09-30T22:30:00Z')), {from: '2026-10-01', to: '2027-10-01', timezone: 'Europe/Prague'});
