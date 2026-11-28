@@ -1,0 +1,946 @@
+{
+  "review_id": "2026-11-19.at-de-ch-li-primary",
+  "generated_at_utc": "2026-11-19T05:57:57Z",
+  "horizon": {
+    "from": "2026-11-19",
+    "to": "2027-11-19"
+  },
+  "dataset_compared": "data/driving-bans/canonical.json dataset_version 2026-11-02.r5-es-de-targeted.geo50 (window to 2026-12-31)",
+  "method": "curl via configured HTTPS proxy, TLS verification on; AT exclusively via RIS OGD API data.bka.gv.at/ris/api/v2.6 and ogd.ris.bka.gv.at document URLs (www.ris.bka.gv.at web UI not used). Downloads stored in dl/ next to this file. Holiday weekday mapping computed (Easter 2027-03-28).",
+  "classification_legend": {
+    "PROMULGATED_RECURRING_LAW": "law in force and published, applies recurrently",
+    "AWAITING_PUBLICATION": "instrument expected by pattern but not yet published",
+    "UNVERIFIED": "not confirmed by primary source",
+    "SOURCE_UNAVAILABLE": "primary source not retrievable"
+  },
+  "findings": [
+    {
+      "id": "AT-01",
+      "jurisdiction": "AT",
+      "topic": "StVO 1960 §42 weekend/holiday ban and §42(6) night ban",
+      "source_url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Gesetzesnummer=10011336&Abschnitt.Typ=Paragraph&Abschnitt.Von=42&Abschnitt.Bis=42&Fassung.FassungVom=2026-11-19",
+      "document_url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40276972/NOR40276972.html",
+      "eli": "https://ris.bka.gv.at/eli/bgbl/1960/159/P42/NOR40276972",
+      "authority": "Bundeskanzleramt – RIS OGD API v2.6 (Bundesrecht konsolidiert)",
+      "document_version": "StVO 1960 §42 idF BGBl. I Nr. 17/2026, Inkrafttretensdatum 2026-04-24 (RIS doc NOR40276972, veröffentlicht/geändert 2026-04-23); same document returned for FassungVom=2027-11-19",
+      "downloads": [
+        {
+          "file": "dl/at_stvo42_q.json",
+          "retrieved_at_utc": "2026-11-19T05:50:08Z",
+          "http_status": 200,
+          "sha256": "c60eb85d96691b0b747b5e00ed5caef8d12affbbfc11fee746ac6fa06bdd8286",
+          "bytes": 1848,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Gesetzesnummer=10011336&Abschnitt.Typ=Paragraph&Abschnitt.Von=42&Abschnitt.Bis=42&Fassung.FassungVom=2026-11-19"
+        },
+        {
+          "file": "dl/at_stvo42_2027.json",
+          "retrieved_at_utc": "2026-11-19T05:50:18Z",
+          "http_status": 200,
+          "sha256": "c60eb85d96691b0b747b5e00ed5caef8d12affbbfc11fee746ac6fa06bdd8286",
+          "bytes": 1848,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Gesetzesnummer=10011336&Abschnitt.Typ=Paragraph&Abschnitt.Von=42&Abschnitt.Bis=42&Fassung.FassungVom=2027-11-19"
+        },
+        {
+          "file": "dl/at_stvo42.html",
+          "retrieved_at_utc": "2026-11-19T05:50:17Z",
+          "http_status": 200,
+          "sha256": "5cad29b8320aa9f6d0c72828832a604c1ce4c6151d5d37fd16ece5444de260cd",
+          "bytes": 57113,
+          "url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40276972/NOR40276972.html"
+        }
+      ],
+      "finding": "§42(1): Sat 15:00-24:00 and Sundays + statutory public holidays 00:00-22:00 ban on lorries with trailer where MAM of lorry OR trailer >3.5 t. §42(2): same times for lorries, articulated vehicles and self-propelled work machines MAM >7.5 t. §42(2a) airport/combined-transport (65 km radius) exemptions; §42(3) enumerated exemptions incl. slaughter cattle, post, periodicals, beverage supply to excursion areas, urgent repairs, towing/breakdown, disaster, road maintenance, refuse, scheduled-line vehicles, showmen, army, humanitarian, and journeys within built-up areas on the last two Saturdays before 24 Dec. §42(5) minister may decree route-specific calendar bans (e.g. Ferienreiseverkehr). §42(6): night ban 22:00-05:00 for lorries MAM >7.5 t, exemptions road service, army, low-noise vehicles with §8b(4) KDV certificate. Body SHA-256 identical to dataset at-stvo42 content_sha256 (5cad29b8...).",
+      "applicability": "2026-11-19..2027-11-19 (open-ended statute)",
+      "classification_by_month": {
+        "2026-11": "PROMULGATED_RECURRING_LAW",
+        "2026-12": "PROMULGATED_RECURRING_LAW",
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW"
+      },
+      "change_vs_dataset": "NO_CHANGE",
+      "notes": "Dataset rules at-saturday/at-sunday/at-night end valid_to 2026-12-31 only because of the review span; the statute itself continues into 2027. Dataset encodes the >7.5t thresholds; the §42(1) >3.5t lorry-or-trailer combination threshold is described in source findings but should be checked in the rule vehicle scope."
+    },
+    {
+      "id": "AT-02",
+      "jurisdiction": "AT",
+      "topic": "Amendments to StVO after BGBl. I 17/2026",
+      "source_url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BgblAuth&Titel=Stra%C3%9Fenverkehrsordnung&ImRisSeit=SechsMonaten&DokumenteProSeite=OneHundred",
+      "authority": "Bundeskanzleramt – RIS OGD API v2.6 (BGBl authentisch)",
+      "document_version": "Search result 36 hits (filter ImRisSeit did not restrict; all-years list)",
+      "downloads": [
+        {
+          "file": "dl/at_bgbl_stvo.json",
+          "retrieved_at_utc": "2026-11-19T05:50:35Z",
+          "http_status": 200,
+          "sha256": "374ef51278004caabc20f48a49ad487e66476cc9e57c06ee0e1b0f4de0d57cff",
+          "bytes": 78148,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BgblAuth&Titel=Stra%C3%9Fenverkehrsordnung&ImRisSeit=SechsMonaten&DokumenteProSeite=OneHundred"
+        }
+      ],
+      "finding": "BGBl. items with \"Straßenverkehrsordnung\" in title published after I 17/2026 (2026-04-23): II 208/2026 Anonymverfügungsverordnung Straßenpolizei (2026-07-13, fines procedure) and I 62/2026 Budgetbegleitgesetz 2027-2028 (2026-07-29). Consolidated §42 for FassungVom 2027-11-19 is still idF I 17/2026, so neither changes §42.",
+      "applicability": "2026-11..2027-11",
+      "classification_by_month": {
+        "2026-11": "PROMULGATED_RECURRING_LAW",
+        "2026-12": "PROMULGATED_RECURRING_LAW",
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW"
+      },
+      "change_vs_dataset": "NO_CHANGE",
+      "notes": "Title search only; an amendment published in a differently-titled Sammelgesetz would still surface in the consolidated §42 query (AT-01), which shows no change."
+    },
+    {
+      "id": "AT-03",
+      "jurisdiction": "AT",
+      "topic": "Feiertagsruhegesetz 1957 §1 (statutory holidays for §42)",
+      "source_url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Gesetzesnummer=10008168&Fassung.FassungVom=2026-11-19",
+      "document_url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40213432/NOR40213432.html",
+      "authority": "Bundeskanzleramt – RIS OGD API v2.6",
+      "document_version": "§1 idF BGBl. I Nr. 22/2019, in force 2019-03-22; body hash identical to dataset at-ftrg (e551cca9...)",
+      "downloads": [
+        {
+          "file": "dl/at_ftrg_q.json",
+          "retrieved_at_utc": "2026-11-19T05:51:50Z",
+          "http_status": 200,
+          "sha256": "800f334a1c40a5dd7141e08ab1479d358578b6538e79bdcf3b5869cdfd54b947",
+          "bytes": 11890,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Gesetzesnummer=10008168&Fassung.FassungVom=2026-11-19"
+        },
+        {
+          "file": "dl/at_ftrg1.html",
+          "retrieved_at_utc": "2026-11-19T05:52:37Z",
+          "http_status": 200,
+          "sha256": "e551cca9b81143b058eb0b1fc469dd144e37c565eb1bef5553087e434493e35e",
+          "bytes": 44418,
+          "url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40213432/NOR40213432.html"
+        }
+      ],
+      "finding": "Holidays: 1 Jan, 6 Jan, Easter Monday, 1 May, Ascension, Whit Monday, Corpus Christi, 15 Aug, 26 Oct, 1 Nov, 8 Dec, 25 Dec, 26 Dec. Dates in horizon: 2026-12-08 (Tue), 2026-12-25 (Fri), 2026-12-26 (Sat); 2027-01-01 (Fri), 2027-01-06 (Wed), 2027-03-29 (Mon), 2027-05-01 (Sat), 2027-05-06 (Thu), 2027-05-17 (Mon), 2027-05-27 (Thu), 2027-08-15 (Sun), 2027-10-26 (Tue), 2027-11-01 (Mon). (Easter 2027 = 28 Mar, computed.) No AT holiday 2026-11-19..2026-12-07.",
+      "applicability": "2026-12..2027-11",
+      "classification_by_month": {
+        "2026-11": "PROMULGATED_RECURRING_LAW",
+        "2026-12": "PROMULGATED_RECURRING_LAW",
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW"
+      },
+      "change_vs_dataset": "NO_CHANGE",
+      "notes": "2026 Dec dates match dataset rule at-holidays-2026-12. 2027 holiday dates are NOT yet encoded (dataset span ends 2026-12-31) — needed for horizon extension, not a legal change."
+    },
+    {
+      "id": "AT-04",
+      "jurisdiction": "AT",
+      "topic": "Tyrol IG-L A12 night ban (LGBl. 64/2010 §3)",
+      "source_url": "https://data.bka.gv.at/ris/api/v2.6/Landesrecht?Applikation=LrKons&Gesetzesnummer=20000313&Fassung.FassungVom=2026-11-19",
+      "document_url": "https://ogd.ris.bka.gv.at/Dokumente/Landesnormen/LTI40045051/LTI40045051.html",
+      "authority": "Land Tirol (Landeshauptmann) via RIS OGD Landesrecht",
+      "document_version": "§3 idF LGBl. 121/2020 (in RIS since 2020-11-20); ordinance last amended LGBl. 141/2021; body hash identical to dataset at-igl-a12 (c4e73445...)",
+      "downloads": [
+        {
+          "file": "dl/at_lr_igl_q.json",
+          "retrieved_at_utc": "2026-11-19T05:51:59Z",
+          "http_status": 200,
+          "sha256": "55006199ba6cf5426658df2f96b860876cb70e381d8a82cfc37d54e00b894697",
+          "bytes": 32719,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Landesrecht?Applikation=LrKons&Gesetzesnummer=20000313&Fassung.FassungVom=2026-11-19"
+        },
+        {
+          "file": "dl/at_LTI40045051.html",
+          "retrieved_at_utc": "2026-11-19T05:52:02Z",
+          "http_status": 200,
+          "sha256": "c4e7344565c5e97a48a57a731872ec5f5f2bdff602e25edfccee2be555c8267e",
+          "bytes": 45208,
+          "url": "https://ogd.ris.bka.gv.at/Dokumente/Landesnormen/LTI40045051/LTI40045051.html"
+        }
+      ],
+      "finding": "A12 km 6.35 (Langkampfen) – km 90.00 (Zirl), both directions, lorries/articulated/self-propelled MAM >7.5 t and combos sum >7.5 t, unless pure battery-electric or hydrogen fuel cell: 1 May–31 Oct working days 22:00-05:00, Sun/holidays 23:00-05:00; 1 Nov–30 Apr working days 20:00-05:00, Sun/holidays 23:00-05:00. Recurring every year.",
+      "applicability": "2026-11..2027-11 (winter regime Nov–Apr, summer regime May–Oct 2027)",
+      "classification_by_month": {
+        "2026-11": "PROMULGATED_RECURRING_LAW",
+        "2026-12": "PROMULGATED_RECURRING_LAW",
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW"
+      },
+      "change_vs_dataset": "NO_CHANGE",
+      "notes": "Dataset winter rules run to 2027-04-30; summer 2027 (from 2027-05-01) and 2027 holiday exclusions not yet encoded. Exceptions in §4 not re-read this pass."
+    },
+    {
+      "id": "AT-05",
+      "jurisdiction": "AT",
+      "topic": "Tyrol sectoral driving ban A12 (Sektorales Fahrverbot-Verordnung LGBl. 44/2016)",
+      "source_url": "https://data.bka.gv.at/ris/api/v2.6/Landesrecht?Applikation=LrKons&Bundesland.SucheInTirol=true&Titel=Fahrverbot&Fassung.FassungVom=2026-11-19&DokumenteProSeite=OneHundred",
+      "document_url": "https://ogd.ris.bka.gv.at/Dokumente/Landesnormen/LTI40042511/LTI40042511.html",
+      "authority": "Land Tirol via RIS OGD Landesrecht",
+      "document_version": "§3 idF LGBl. 81/2019; §4 idF LGBl. 54/2026 (Inkrafttreten 2026-08-03 per RIS)",
+      "downloads": [
+        {
+          "file": "dl/at_lr_tirol_igl.json",
+          "retrieved_at_utc": "2026-11-19T05:51:50Z",
+          "http_status": 200,
+          "sha256": "482b826a8f591b95248ebc56852cd1759ebb49e7b07d9ddec2fd585c8d91b61d",
+          "bytes": 34550,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Landesrecht?Applikation=LrKons&Bundesland.SucheInTirol=true&Titel=Fahrverbot&Fassung.FassungVom=2026-11-19&DokumenteProSeite=OneHundred"
+        },
+        {
+          "file": "dl/at_LTI40042511.html",
+          "retrieved_at_utc": "2026-11-19T05:52:09Z",
+          "http_status": 200,
+          "sha256": "3c5999c67b5ba20d5ddf4bd0f87466de80383ca7f0fd26cc9ef04160d66670cb",
+          "bytes": 48322,
+          "url": "https://ogd.ris.bka.gv.at/Dokumente/Landesnormen/LTI40042511/LTI40042511.html"
+        },
+        {
+          "file": "dl/at_LTI40055048.html",
+          "retrieved_at_utc": "2026-11-19T05:52:01Z",
+          "http_status": 200,
+          "sha256": "27c1f0e77f73b3d4122bac17469729541d23db963c0247f7526e888455b79d1a",
+          "bytes": 53173,
+          "url": "https://ogd.ris.bka.gv.at/Dokumente/Landesnormen/LTI40055048/LTI40055048.html"
+        },
+        {
+          "file": "dl/at_lgbl_t.json",
+          "retrieved_at_utc": "2026-11-19T05:52:17Z",
+          "http_status": 200,
+          "sha256": "198cf87a08bf41d988be7924eaa61bb04835167592aa4e5dccca1c792a9e0f7b",
+          "bytes": 33785,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Landesrecht?Applikation=LgblAuth&Bundesland=Tirol&Titel=Fahrverbot&DokumenteProSeite=OneHundred"
+        },
+        {
+          "file": "dl/at_lgbl_ti_54_2026.html",
+          "retrieved_at_utc": "2026-11-19T05:52:27Z",
+          "http_status": 200,
+          "sha256": "d48e40fd8d9bb688ed1d23d4154b1c062732b74a85e7c764eac1707005e7cef0",
+          "bytes": 44339,
+          "url": "https://ogd.ris.bka.gv.at/Dokumente/LgblAuth/LGBLA_TI_20260707_54/LGBLA_TI_20260707_54.html"
+        }
+      ],
+      "finding": "§3: A12 km 6.35 (Langkampfen) – km 72.00 (Ampass), both directions, lorries/articulated MAM >7.5 t and lorry+trailer sum >7.5 t banned (all hours, no time window) when carrying: waste (EWC), stones/earth/spoil, round timber/cork, vehicles L1e-L7e/M1/M2/N1, non-ferrous & iron ores, steel (except rebar/structural steel for construction sites), marble/travertine, ceramic tiles; from 2020 also paper/cardboard, liquid mineral-oil products, cement/lime/burnt gypsum, pipes/hollow sections, cereals. §4 exemptions: core-zone (Imst, Innsbruck-Land/Stadt, Kufstein, Schwaz) source or destination with Euro VI; extended-zone source AND destination with Euro VI; rail-terminal pre/on-carriage Hall/Wörgl; Euro VI first registered after 31 Aug 2018 (with document); battery-electric/H2; army/aid. LGBl. 54/2026 (kundgemacht 2026-07-07) only added a temporary lit. h Euro VI exemption for the Mühltaltunnel works 23 Jul–2 Aug 2026 and expired with 2026-08-02.",
+      "applicability": "2026-11..2027-11 (standing ordinance)",
+      "classification_by_month": {
+        "2026-11": "PROMULGATED_RECURRING_LAW",
+        "2026-12": "PROMULGATED_RECURRING_LAW",
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW"
+      },
+      "change_vs_dataset": "NO_CHANGE",
+      "notes": "Dataset already flags AT_TYROL_SECTORAL_BAN_GOODS_LIST_NOT_ENCODED; this evidence supplies the goods list. The only 2026 amendment has lapsed."
+    },
+    {
+      "id": "AT-06",
+      "jurisdiction": "AT",
+      "topic": "Federal route-calendar ordinances 2026 (Fahrverbotskalender 2026, A10 spring/summer 2026, Luegbrücke 2026)",
+      "source_url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Titel=Fahrverbot&Fassung.FassungVom=2026-11-19&DokumenteProSeite=OneHundred",
+      "authority": "BMIMI ordinances via RIS OGD API v2.6",
+      "document_version": "BGBl. II 77/2026 (§1 hash identical to dataset at-cal e8144933...), II 121/2026, II 190/2026, II 338/2025 idF II 70/2026 — all with Außerkrafttretensdatum 2026-12-31",
+      "downloads": [
+        {
+          "file": "dl/at_brkons_fahrverbot.json",
+          "retrieved_at_utc": "2026-11-19T05:51:02Z",
+          "http_status": 200,
+          "sha256": "7dae79e631f26469437558d263ef69dcdd731ac6b8701284d0a7627561c9f3f5",
+          "bytes": 18127,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Titel=Fahrverbot&Fassung.FassungVom=2026-11-19&DokumenteProSeite=OneHundred"
+        },
+        {
+          "file": "dl/at_g20013143.json",
+          "retrieved_at_utc": "2026-11-19T05:51:12Z",
+          "http_status": 200,
+          "sha256": "fa2afb7f9de72ccf68b7fde1b3191e9a43a69160d8e8145ca363a930b84e192c",
+          "bytes": 7112,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Gesetzesnummer=20013143&Fassung.FassungVom=2026-11-19"
+        },
+        {
+          "file": "dl/at_g20013174.json",
+          "retrieved_at_utc": "2026-11-19T05:51:12Z",
+          "http_status": 200,
+          "sha256": "bc9976c8445df705eb7570e56a3cf1199b52b97c138de65d9a6efa3348932f88",
+          "bytes": 7252,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Gesetzesnummer=20013174&Fassung.FassungVom=2026-11-19"
+        },
+        {
+          "file": "dl/at_g20013081.json",
+          "retrieved_at_utc": "2026-11-19T05:51:13Z",
+          "http_status": 200,
+          "sha256": "6d718d705b75a39ce92b95bf3b6fdd9d0f5f1cb52605d551ba7149ac1c46bc0e",
+          "bytes": 7582,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Gesetzesnummer=20013081&Fassung.FassungVom=2026-11-19"
+        },
+        {
+          "file": "dl/at_g20013230.json",
+          "retrieved_at_utc": "2026-11-19T05:51:14Z",
+          "http_status": 200,
+          "sha256": "bd6097e2318f4e338fd65c10a1e22fbb7f98dd1b9832ad6d2117827f8c8edf45",
+          "bytes": 7211,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Gesetzesnummer=20013230&Fassung.FassungVom=2026-11-19"
+        },
+        {
+          "file": "dl/at_NOR40276924.html",
+          "retrieved_at_utc": "2026-11-19T05:51:23Z",
+          "http_status": 200,
+          "sha256": "e8144933a442837a3f76999a7c581298f422e300fa8f529174314225b6d752f0",
+          "bytes": 47200,
+          "url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40276924/NOR40276924.html"
+        },
+        {
+          "file": "dl/at_NOR40277822.html",
+          "retrieved_at_utc": "2026-11-19T05:51:24Z",
+          "http_status": 200,
+          "sha256": "2f2c62a8855af2dd94ed20bbf975c57baacbd00ab1341d019f2ca966f21b9127",
+          "bytes": 43388,
+          "url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40277822/NOR40277822.html"
+        },
+        {
+          "file": "dl/at_NOR40279329.html",
+          "retrieved_at_utc": "2026-11-19T05:51:25Z",
+          "http_status": 200,
+          "sha256": "c40d894f2657e2c67ef9eaee145751965eee8abb3f4e05f4034cc0335041efdf",
+          "bytes": 44374,
+          "url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40279329/NOR40279329.html"
+        },
+        {
+          "file": "dl/at_NOR40276795.html",
+          "retrieved_at_utc": "2026-11-19T05:51:21Z",
+          "http_status": 200,
+          "sha256": "3411c7394ab9df4e77189a2d9952cdcbcda3dfa05f89d0a1e3c70c8fe9b4e0dc",
+          "bytes": 46424,
+          "url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40276795/NOR40276795.html"
+        }
+      ],
+      "finding": "None of the four 2026 calendar ordinances contains any date in November or December 2026 (last dates: Lueg 3 Oct 2026 07-15 / 2 Oct 07-22; Fahrverbotskalender 3 Oct 2026 00-15; A10 summer 19 Sep 2026). All expire 2026-12-31.",
+      "applicability": "2026-11..2026-12",
+      "classification_by_month": {
+        "2026-11": "PROMULGATED_RECURRING_LAW",
+        "2026-12": "PROMULGATED_RECURRING_LAW"
+      },
+      "change_vs_dataset": "NO_CHANGE",
+      "notes": "Resolves coverage failure AT_LUEG_A10_ROUTE_ORDINANCES_NOT_REVIEWED_FOR_DECEMBER_2026 for the published 2026 ordinances: no Dec 2026 entries in them. Does not exclude a not-yet-published winter ordinance (see AT-07)."
+    },
+    {
+      "id": "AT-07",
+      "jurisdiction": "AT",
+      "topic": "2027 route-calendar ordinances (Fahrverbotskalender 2027 incl. summer Ferienreise Saturdays, A10 2027, Luegbrücke 2027, Winterfahrverbotskalender 2026/27)",
+      "source_url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BgblAuth&Titel=Fahrverbot&DokumenteProSeite=OneHundred",
+      "authority": "RIS OGD API v2.6 (BGBl authentisch)",
+      "document_version": "Search 2026-11-19: 58 hits, newest BGBl. II 190/2026 (2026-07-10)",
+      "downloads": [
+        {
+          "file": "dl/at_bgbl_fvk.json",
+          "retrieved_at_utc": "2026-11-19T05:50:49Z",
+          "http_status": 200,
+          "sha256": "c27b4acc5b92663a48fe8355eb8ccf9afbb5d8e97dd6f8b3a132642b382ab60d",
+          "bytes": 90617,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BgblAuth&Titel=Fahrverbot&DokumenteProSeite=OneHundred"
+        },
+        {
+          "file": "dl/at_bgbl_fahrv.json",
+          "retrieved_at_utc": "2026-11-19T05:50:50Z",
+          "http_status": 200,
+          "sha256": "0b917909e6369ad47c85ef14fb29d30fb37f5b4b0e75549da136a1e7522d7748",
+          "bytes": 46954,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BgblAuth&Suchworte=Fahrverbotskalender&DokumenteProSeite=OneHundred"
+        }
+      ],
+      "finding": "No BGBl. II ordinance for 2027 (Fahrverbotskalender 2027, A10 calendar 2027, Luegbrücke 2027) and no Winterfahrverbotskalender for 2026/27 published as of 2026-11-19. Historical pattern: Luegbrücke ordinances published 2024-12-27 (II 409/2024) and 2025-12-30 (II 338/2025); winter calendars published Dec/Jan (II 383/2024 A10 2024/25, II 2/2024, II 3/2023); summer Fahrverbotskalender published Mar–Jun (II 77/2026 on 2026-03-31). Pattern is a discovery lead only, not evidence of future content.",
+      "applicability": "2026-12..2027-11",
+      "classification_by_month": {
+        "2026-11": "UNVERIFIED",
+        "2026-12": "AWAITING_PUBLICATION",
+        "2027-01": "AWAITING_PUBLICATION",
+        "2027-02": "AWAITING_PUBLICATION",
+        "2027-03": "AWAITING_PUBLICATION",
+        "2027-04": "AWAITING_PUBLICATION",
+        "2027-05": "AWAITING_PUBLICATION",
+        "2027-06": "AWAITING_PUBLICATION",
+        "2027-07": "AWAITING_PUBLICATION",
+        "2027-08": "AWAITING_PUBLICATION",
+        "2027-09": "AWAITING_PUBLICATION",
+        "2027-10": "AWAITING_PUBLICATION",
+        "2027-11": "AWAITING_PUBLICATION"
+      },
+      "change_vs_dataset": "UNKNOWN",
+      "notes": "Summer 2027 weekend Ferienreise ban regulation: NOT published. Do not infer absence of 2027 calendar bans; Lueg works and summer calendars have been issued every year 2005–2026."
+    },
+    {
+      "id": "AT-08",
+      "jurisdiction": "AT",
+      "topic": "Standing BMIMI ramp bans A12 AS Wattens and A13 AS Innsbruck Süd (BGBl. II 289/2020, 290/2020)",
+      "source_url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Gesetzesnummer=20011207&Fassung.FassungVom=2026-11-19",
+      "document_url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40224238/NOR40224238.html",
+      "authority": "BMK/BMIMI ordinances via RIS OGD API v2.6",
+      "document_version": "BGBl. II 289/2020 and II 290/2020, in force 2020-07-01, no expiry",
+      "downloads": [
+        {
+          "file": "dl/at_g20011207.json",
+          "retrieved_at_utc": "2026-11-19T05:51:10Z",
+          "http_status": 200,
+          "sha256": "61f7ed0268e0228efe7221a7764476151729f79a4cc93409e8545ea559296862",
+          "bytes": 5125,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Gesetzesnummer=20011207&Fassung.FassungVom=2026-11-19"
+        },
+        {
+          "file": "dl/at_g20011208.json",
+          "retrieved_at_utc": "2026-11-19T05:51:11Z",
+          "http_status": 200,
+          "sha256": "7c83efd769f43864755bca95aec50a2c5437268d3b1ad95b24c3046c25201c49",
+          "bytes": 5157,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BrKons&Gesetzesnummer=20011208&Fassung.FassungVom=2026-11-19"
+        },
+        {
+          "file": "dl/at_NOR40224238.html",
+          "retrieved_at_utc": "2026-11-19T05:51:19Z",
+          "http_status": 200,
+          "sha256": "2c73c9cea58569d18d49e0f2dd3132f7d45e9b827ad804e0237b3eb8205fd56f",
+          "bytes": 42981,
+          "url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40224238/NOR40224238.html"
+        },
+        {
+          "file": "dl/at_NOR40224241.html",
+          "retrieved_at_utc": "2026-11-19T05:51:20Z",
+          "http_status": 200,
+          "sha256": "bfb18a8b221f96c7494ce602a36ed096e00490664107b6e9632db935505fa24a",
+          "bytes": 43022,
+          "url": "https://ogd.ris.bka.gv.at/Dokumente/Bundesnormen/NOR40224241/NOR40224241.html"
+        }
+      ],
+      "finding": "Exit ramps (both carriageways) A12 Wattens: Mon–Sat 06:00-10:00; A13 Innsbruck Süd: Mon–Sat 07:00-11:00 and 15:00-18:00; banned for lorries where vehicle, trailer or combination length >12 m (length criterion, not weight). §2 exceptions not read this pass.",
+      "applicability": "2026-11..2027-11",
+      "classification_by_month": {
+        "2026-11": "PROMULGATED_RECURRING_LAW",
+        "2026-12": "PROMULGATED_RECURRING_LAW",
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW"
+      },
+      "change_vs_dataset": "NEW_BAN",
+      "notes": "Not newly enacted (in force since 2020) but not encoded in dataset (no rule/source). Local ramp restriction; owner may treat as signposted-local scope."
+    },
+    {
+      "id": "AT-09",
+      "jurisdiction": "AT",
+      "topic": "Tyrol B179 Fernpass and B312 Loferer Straße lorry bans (LGBl. 95/2009; 57/1993, 58/1993)",
+      "source_url": "https://ogd.ris.bka.gv.at/Dokumente/Landesnormen/LTI40028075/LTI40028075.html",
+      "authority": "Land Tirol via RIS OGD Landesrecht",
+      "document_version": "LGBl. 95/2009 in force 2010-01-01 (B179); B312 LGBl. 57/1993 and 58/1993 listed in force",
+      "downloads": [
+        {
+          "file": "dl/at_LTI40028075.html",
+          "retrieved_at_utc": "2026-11-19T05:52:39Z",
+          "http_status": 200,
+          "sha256": "c99748cf0734d6f1df2c8a1f954bae80b716ee4111f41cf5cd272a4b812426c9",
+          "bytes": 42137,
+          "url": "https://ogd.ris.bka.gv.at/Dokumente/Landesnormen/LTI40028075/LTI40028075.html"
+        },
+        {
+          "file": "dl/at_lr_tirol_igl.json",
+          "retrieved_at_utc": "2026-11-19T05:51:50Z",
+          "http_status": 200,
+          "sha256": "482b826a8f591b95248ebc56852cd1759ebb49e7b07d9ddec2fd585c8d91b61d",
+          "bytes": 34550,
+          "url": "https://data.bka.gv.at/ris/api/v2.6/Landesrecht?Applikation=LrKons&Bundesland.SucheInTirol=true&Titel=Fahrverbot&Fassung.FassungVom=2026-11-19&DokumenteProSeite=OneHundred"
+        }
+      ],
+      "finding": "B179 Fernpass-Straße km 0.00 (Nassereith) – km 47.957 (Vils): lorries MAM >7.5 t banned (exceptions in §2, not read). B312 Loferer Straße sectoral/other bans exist (texts not read).",
+      "applicability": "2026-11..2027-11",
+      "classification_by_month": {
+        "2026-11": "UNVERIFIED",
+        "2026-12": "UNVERIFIED",
+        "2027-01": "UNVERIFIED",
+        "2027-02": "UNVERIFIED",
+        "2027-03": "UNVERIFIED",
+        "2027-04": "UNVERIFIED",
+        "2027-05": "UNVERIFIED",
+        "2027-06": "UNVERIFIED",
+        "2027-07": "UNVERIFIED",
+        "2027-08": "UNVERIFIED",
+        "2027-09": "UNVERIFIED",
+        "2027-10": "UNVERIFIED",
+        "2027-11": "UNVERIFIED"
+      },
+      "change_vs_dataset": "UNKNOWN",
+      "notes": "Regional secondary-road orders; dataset coverage failure AT_LAENDER_SECONDARY_ROAD_ORDERS_NOT_ENUMERATED remains. Tyrol Euroklassenfahrverbote-Verordnung (referenced in LGBl. 141/2021) did not surface in LrKons title search \"Euroklassen\" (0 hits) — UNVERIFIED."
+    },
+    {
+      "id": "DE-01",
+      "jurisdiction": "DE",
+      "topic": "StVO §30(3)-(4) Sunday/holiday ban",
+      "source_url": "https://www.gesetze-im-internet.de/stvo_2013/__30.html",
+      "authority": "Bundesministerium der Justiz – gesetze-im-internet.de",
+      "document_version": "StVO 2013 Stand: zuletzt geändert durch Art. 4 V v. 30.1.2026 I Nr. 32 (xml.zip standangabe); §30 body hash identical to dataset de-stvo30 (7fb4b1b1...)",
+      "downloads": [
+        {
+          "file": "dl/de_stvo30.html",
+          "retrieved_at_utc": "2026-11-19T05:52:47Z",
+          "http_status": 200,
+          "sha256": "7fb4b1b15a0a387073faefd92362a68ad5c601232b9459eb37eac7dad30a683d",
+          "bytes": 8760,
+          "url": "https://www.gesetze-im-internet.de/stvo_2013/__30.html"
+        },
+        {
+          "file": "dl/de_stvo_xml.zip",
+          "retrieved_at_utc": "2026-11-19T05:52:57Z",
+          "http_status": 200,
+          "sha256": "8090c13b0c98132798a7db5b482c0604dfee73ef8685ce09ede28501a3514e93",
+          "bytes": 742431,
+          "url": "https://www.gesetze-im-internet.de/stvo_2013/xml.zip"
+        },
+        {
+          "file": "dl/de_stvo_index.html",
+          "retrieved_at_utc": "2026-11-19T05:52:48Z",
+          "http_status": 200,
+          "sha256": "4506f474d521d31d0298caa7bd539bbda6fd382087768399b9fdb64106cee476",
+          "bytes": 15458,
+          "url": "https://www.gesetze-im-internet.de/stvo_2013/index.html"
+        }
+      ],
+      "finding": "§30(3): Sundays and holidays 00:00-22:00, commercial goods carriage incl. empty runs, lorries MAM >7.5 t and trailers behind lorries. Exemptions: combined rail-road to/from nearest station ≤200 km; port-road ≤150 km; fresh milk/meat/fish, perishable fruit & veg; ABP cat.1/2; recovery/towing; live bees; related empty runs; Bundesleistungsgesetz; Bundeswehr/NATO/EU forces. §30(4) holidays: Neujahr, Karfreitag, Ostermontag, 1 May, Christi Himmelfahrt, Pfingstmontag, Fronleichnam (BW, BY, HE, NW, RP, SL only), 3 Oct, Reformationstag 31 Oct (BB, HB, HH, MV, NI, SN, ST, SH, TH only), Allerheiligen 1 Nov (BW, BY, NW, RP, SL only), 1st and 2nd Christmas Day. Horizon dates: 2026-12-25 (Fri), 2026-12-26 (Sat) nationwide; 2027-01-01 (Fri), 2027-03-26 (Fri), 2027-03-29 (Mon), 2027-05-01 (Sat), 2027-05-06 (Thu), 2027-05-17 (Mon), 2027-05-27 (Thu, BW/BY/HE/NW/RP/SL), 2027-10-03 (Sun), 2027-10-31 (Sun, 9 Länder), 2027-11-01 (Mon, BW/BY/NW/RP/SL). Buß- und Bettag, 6 Jan, 15 Aug, 8 Mar, 20 Sep are NOT §30(4) days. No §30(4) day 2026-11-19..2026-12-24.",
+      "applicability": "2026-11..2027-11",
+      "classification_by_month": {
+        "2026-11": "PROMULGATED_RECURRING_LAW",
+        "2026-12": "PROMULGATED_RECURRING_LAW",
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW"
+      },
+      "change_vs_dataset": "NO_CHANGE",
+      "notes": "Dec 2026 dates match dataset de-holiday-2026-12-25-26. 2027 dates not encoded (span ends 2026-12-31)."
+    },
+    {
+      "id": "DE-02",
+      "jurisdiction": "DE",
+      "topic": "Ferienreiseverordnung §1 (summer Saturday ban)",
+      "source_url": "https://www.gesetze-im-internet.de/ferreisev_1985/__1.html",
+      "authority": "Bundesministerium der Justiz – gesetze-im-internet.de",
+      "document_version": "FerReiseV 1985 Stand: zuletzt geändert durch Art. 1 V v. 17.6.2026 I Nr. 180 (xml.zip standangabe)",
+      "downloads": [
+        {
+          "file": "dl/de_ferreisev1.html",
+          "retrieved_at_utc": "2026-11-19T05:52:48Z",
+          "http_status": 200,
+          "sha256": "9d561222a6c55ce051112c0e7407896017f958a3e78afeff7508fe6e012a8564",
+          "bytes": 12204,
+          "url": "https://www.gesetze-im-internet.de/ferreisev_1985/__1.html"
+        },
+        {
+          "file": "dl/de_ferreisev_index.html",
+          "retrieved_at_utc": "2026-11-19T05:52:48Z",
+          "http_status": 200,
+          "sha256": "bbd5aa22eaf911cadc9f7b2b180a0ae54c2a678cf9be46b2a73edfad36009761",
+          "bytes": 6285,
+          "url": "https://www.gesetze-im-internet.de/ferreisev_1985/index.html"
+        },
+        {
+          "file": "dl/de_ferreisev_xml.zip",
+          "retrieved_at_utc": "2026-11-19T05:52:57Z",
+          "http_status": 200,
+          "sha256": "9944816a30c5244728da525c1041b10f63004eb59470d5dc6868b118344ac010",
+          "bytes": 4647,
+          "url": "https://www.gesetze-im-internet.de/ferreisev_1985/xml.zip"
+        }
+      ],
+      "finding": "§1(1): lorries MAM >7.5 t and lorries with trailer, commercial goods carriage incl. empty runs, banned on listed motorway sections (§1(2), 18+ entries incl. A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A45, A61, A67, A81…) and federal roads B31 (Stockach-Ost – Sigmarszell) and B96/E251 (Berlin border – Neubrandenburg), every Saturday 1 Jul–31 Aug, 07:00-20:00. §2/§3 exemptions mirror §30(3) list; §4 permits. 2027 Saturdays: 3, 10, 17, 24, 31 Jul; 7, 14, 21, 28 Aug 2027.",
+      "applicability": "2027-07..2027-08 (no effect Nov 2026–Jun 2027, Sep–Nov 2027)",
+      "classification_by_month": {
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW"
+      },
+      "change_vs_dataset": "UNKNOWN",
+      "notes": "Amended by V v. 17.6.2026 (BGBl. 2026 I Nr. 180); dataset de-ferienreisev has no version/hash (retrieved 2026-09-26) so whether its route list reflects this amendment cannot be confirmed — re-encode route list from this text before encoding 2027. Not a ban in the current 2026 window."
+    },
+    {
+      "id": "DE-03",
+      "jurisdiction": "DE",
+      "topic": "Baden-Württemberg low-water exemption from §30(3) after 31 Oct 2026",
+      "source_url": "https://vm.baden-wuerttemberg.de/de/service/presse/pressemitteilung/pid/baden-wuerttemberg-verlaengert-erleichterungen-fuer-lkw-transporte",
+      "authority": "Ministerium für Verkehr Baden-Württemberg",
+      "document_version": "Press release 28.09.2026 (latest low-water item in press listing 2026-11-19)",
+      "downloads": [
+        {
+          "file": "dl/de_bw_pm.html",
+          "retrieved_at_utc": "2026-11-19T05:53:18Z",
+          "http_status": 200,
+          "sha256": "a4f221346ad6b49dc92312c22a70e5391560eb3c260af3eed06b913284fbf992",
+          "bytes": 651667,
+          "url": "https://vm.baden-wuerttemberg.de/de/service/presse/pressemitteilung/pid/baden-wuerttemberg-verlaengert-erleichterungen-fuer-lkw-transporte"
+        },
+        {
+          "file": "dl/de_bw_presse.html",
+          "retrieved_at_utc": "2026-11-19T05:53:23Z",
+          "http_status": 200,
+          "sha256": "5f8162e14cf20ddd0d2fb2c1a5f3bfb2c55fb1e4fdb0141fc8dd70358e13bf9e",
+          "bytes": 690647,
+          "url": "https://vm.baden-wuerttemberg.de/de/service/presse"
+        }
+      ],
+      "finding": "Exemption (low-water related transports and empty runs, incl. Großraum-/Schwertransporte; indivisibility waived up to 44 t) extended \"bis Ende Oktober\" 2026. No official BW publication extending it beyond 31 Oct 2026 found in the ministry press listing (2026-11-19).",
+      "applicability": "2026-11..2026-12",
+      "classification_by_month": {
+        "2026-11": "UNVERIFIED",
+        "2026-12": "UNVERIFIED"
+      },
+      "change_vs_dataset": "UNKNOWN",
+      "notes": "Base §30 ban unaffected. Status of exemption after 31 Oct: no primary extension found; VMK 8.6 (Oct 2026) only recommended extension to 20 Dec 2026. Do not encode an exemption for Nov–Dec; do not treat absence as cancellation of any unpublished Allgemeinverfügung."
+    },
+    {
+      "id": "DE-04",
+      "jurisdiction": "DE",
+      "topic": "Rheinland-Pfalz low-water exemption after 31 Oct 2026",
+      "source_url": "https://mdi.rlp.de/service/pressemitteilungen/detail/rheinland-pfalz-verlaengert-aussetzung-des-sonn-und-feiertagsverbots-fuer-lkw-transporte",
+      "authority": "Ministerium des Innern und für Sport Rheinland-Pfalz; Landesbetrieb Mobilität RP",
+      "document_version": "Press release 28.09.2026; MDI press pages 1–3 covering 24.09.2026–18.11.2026 and LBM press pages 1–2 reviewed",
+      "downloads": [
+        {
+          "file": "dl/de_rp_pm.html",
+          "retrieved_at_utc": "2026-11-19T05:53:24Z",
+          "http_status": 200,
+          "sha256": "52f805b341b5fbe135a3e7b8917bdacdde7797df73a0fac3c32328655fb2c7c9",
+          "bytes": 102798,
+          "url": "https://mdi.rlp.de/service/pressemitteilungen/detail/rheinland-pfalz-verlaengert-aussetzung-des-sonn-und-feiertagsverbots-fuer-lkw-transporte"
+        },
+        {
+          "file": "dl/de_rp_presse.html",
+          "retrieved_at_utc": "2026-11-19T05:53:25Z",
+          "http_status": 200,
+          "sha256": "b722f5f941293a483b27ceab3bb19b06559a70d25e274f7c479b82d7c0919362",
+          "bytes": 117419,
+          "url": "https://mdi.rlp.de/service/pressemitteilungen"
+        },
+        {
+          "file": "dl/de_rp_presse2.html",
+          "retrieved_at_utc": "2026-11-19T05:53:58Z",
+          "http_status": 200,
+          "sha256": "8b526ef3ccb43d36531229494dc3bb10f167a6115e87fa28df459e5e7e20b624",
+          "bytes": 119477,
+          "url": "https://mdi.rlp.de/service/pressemitteilungen/seite-2"
+        },
+        {
+          "file": "dl/de_rp_presse3.html",
+          "retrieved_at_utc": "2026-11-19T05:53:59Z",
+          "http_status": 200,
+          "sha256": "ca4fbcd25b4b62cf56abf605558962a2550acfc39e712599bab0e93acf723fb3",
+          "bytes": 118383,
+          "url": "https://mdi.rlp.de/service/pressemitteilungen/seite-3"
+        },
+        {
+          "file": "dl/de_lbm_presse.html",
+          "retrieved_at_utc": "2026-11-19T05:53:26Z",
+          "http_status": 200,
+          "sha256": "f881f6ab1a93b5767e42de4d3a1dee8505245dc08c81955b8a32a125e0e7c6ca",
+          "bytes": 234779,
+          "url": "https://lbm.rlp.de/service/presse-aktuelles"
+        },
+        {
+          "file": "dl/de_lbm_presse2.html",
+          "retrieved_at_utc": "2026-11-19T05:54:00Z",
+          "http_status": 200,
+          "sha256": "91f57f9754f0b44ef38d8d4a99c601ca7cd1312b9a00b7eae6a6f19d73729e4f",
+          "bytes": 208869,
+          "url": "https://lbm.rlp.de/service/presse-aktuelles/seite-2"
+        }
+      ],
+      "finding": "Exemption extended to 31 Oct 2026 (previous limit 30 Sep). No MDI/LBM press release between 01.10.2026 and 18.11.2026 announces any further extension.",
+      "applicability": "2026-11..2026-12",
+      "classification_by_month": {
+        "2026-11": "UNVERIFIED",
+        "2026-12": "UNVERIFIED"
+      },
+      "change_vs_dataset": "UNKNOWN",
+      "notes": "Same caveat as DE-03."
+    },
+    {
+      "id": "DE-05",
+      "jurisdiction": "DE",
+      "topic": "Nordrhein-Westfalen low-water exemption after 31 Oct 2026",
+      "source_url": "https://www.umwelt.nrw.de/presse/aktuelle-meldungen?volltext=Feiertagsfahrverbot",
+      "authority": "Ministerium für Umwelt, Naturschutz und Verkehr NRW (MUNV)",
+      "document_version": "Press search 2026-11-19: 2 hits (07.08.2026, 28.09.2026); \"Niedrigwasser\" search: latest 28.09.2026",
+      "downloads": [
+        {
+          "file": "dl/de_nrw_search.html",
+          "retrieved_at_utc": "2026-11-19T05:54:43Z",
+          "http_status": 200,
+          "sha256": "d9fb2716a9fd3bfc26205c0975258ed4692183fd776e3ae601134f0e91b53eb7",
+          "bytes": 105372,
+          "url": "https://www.umwelt.nrw.de/presse/aktuelle-meldungen?volltext=Feiertagsfahrverbot"
+        },
+        {
+          "file": "dl/de_nrw_search2.html",
+          "retrieved_at_utc": "2026-11-19T05:54:51Z",
+          "http_status": 200,
+          "sha256": "0dee9c3ce13881b350b032075c0a70920766e4a5b1f2f71c3ccaa80677a59a6e",
+          "bytes": 109198,
+          "url": "https://www.umwelt.nrw.de/presse/aktuelle-meldungen?volltext=Niedrigwasser"
+        },
+        {
+          "file": "dl/de_nrw_pm_oct.html",
+          "retrieved_at_utc": "2026-11-19T05:54:29Z",
+          "http_status": 200,
+          "sha256": "299accf94bfa199727644b33ac3cd9063368977de4fd9434f69c6e0bd002df9e",
+          "bytes": 104860,
+          "url": "https://www.umwelt.nrw.de/nordrhein-westfalen-verlaengert-ausnahme-vom-sonn-und-feiertagsfahrverbot-bis-ende-oktober"
+        },
+        {
+          "file": "dl/de_nrw_gv.html",
+          "retrieved_at_utc": "2026-11-19T05:53:28Z",
+          "http_status": 200,
+          "sha256": "0a5facfe9da1957d6a4b69a7e4acba41466bc33bf0ad0f1b5404872e7e896add",
+          "bytes": 152432,
+          "url": "https://www.umwelt.nrw.de/themen/verkehr/strasse/strassenverkehr/gueterverkehr"
+        },
+        {
+          "file": "dl/de_nrw_aktuell.html",
+          "retrieved_at_utc": "2026-11-19T05:54:30Z",
+          "http_status": 200,
+          "sha256": "8ef06cf9248682a20727eea324ed5916fa7a7836c52b0db104431f7790965593",
+          "bytes": 122462,
+          "url": "https://www.umwelt.nrw.de/presse/aktuelle-meldungen"
+        }
+      ],
+      "finding": "Official MUNV press: exemption extended to 31 Oct 2026 (28.09.2026). No MUNV press release or topic-page update extending to 20 Dec 2026 or beyond. The dpa-reported NRW extension to 20 Dec (noted in dataset) remains without primary confirmation.",
+      "applicability": "2026-11..2026-12",
+      "classification_by_month": {
+        "2026-11": "UNVERIFIED",
+        "2026-12": "UNVERIFIED"
+      },
+      "change_vs_dataset": "UNKNOWN",
+      "notes": "URL https://www.umwelt.nrw.de/presse/pressemitteilungen returned HTTP 404 (wrong path; replaced by /presse/aktuelle-meldungen)."
+    },
+    {
+      "id": "DE-06",
+      "jurisdiction": "DE",
+      "topic": "Saarland low-water exemption",
+      "source_url": "https://www.saarland.de/mwide/DE/home/home_node.html",
+      "authority": "Saarland Ministerium für Wirtschaft, Innovation, Digitales und Energie",
+      "document_version": "n/a",
+      "downloads": [
+        {
+          "file": "dl/de_saar.html",
+          "retrieved_at_utc": "2026-11-19T05:53:30Z",
+          "http_status": 403,
+          "sha256": "7543f409960e06d4223819e89ec0ed525bd84ae35b5480cbdf542cc6e22e69a7",
+          "bytes": 2181,
+          "url": "https://www.saarland.de/mwide/DE/home/home_node.html"
+        }
+      ],
+      "finding": "HTTP 403 to automated client; not bypassed. No primary Saarland status available.",
+      "applicability": "2026-11..2026-12",
+      "classification_by_month": {
+        "2026-11": "SOURCE_UNAVAILABLE",
+        "2026-12": "SOURCE_UNAVAILABLE"
+      },
+      "change_vs_dataset": "UNKNOWN",
+      "notes": "Secondary saarnews report (to 31 Oct 2026) remains the only lead."
+    },
+    {
+      "id": "CH-01",
+      "jurisdiction": "CH",
+      "topic": "VRV (SR 741.11) Art. 91-92 Sunday/night ban",
+      "source_url": "https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1962/1364_1409_1420/20261001/de/html/fedlex-data-admin-ch-eli-cc-1962-1364_1409_1420-20261001-de-html.html",
+      "authority": "Swiss Federal Chancellery – Fedlex",
+      "document_version": "Stand 1 Oct 2026; body hash identical to dataset ch-vrv (d8772688...). Fedlex SPARQL consolidations with dateApplicability ≥2026-01-01: 20260401, 20260701, 20261001, 20310101 (none between 2026-10-02 and 2027-11-19)",
+      "downloads": [
+        {
+          "file": "dl/ch_vrv_20261001.html",
+          "retrieved_at_utc": "2026-11-19T05:54:59Z",
+          "http_status": 200,
+          "sha256": "d8772688f6736f3fd393c14e5cc4bafe0609f081717369345db25cd290544139",
+          "bytes": 368964,
+          "url": "https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1962/1364_1409_1420/20261001/de/html/fedlex-data-admin-ch-eli-cc-1962-1364_1409_1420-20261001-de-html.html"
+        },
+        {
+          "file": "dl/ch_sparql.json",
+          "retrieved_at_utc": "2026-11-19T05:55:12Z",
+          "http_status": 200,
+          "sha256": "5a746c0238f5a1e1f26cde38035e84776e3bb7a25e42d68ca13b209cfad46ac9",
+          "bytes": 968,
+          "url": "https://fedlex.data.admin.ch/sparqlendpoint (consolidations of eli/cc/1962/1364_1409_1420 since 2026-01-01)"
+        },
+        {
+          "file": "dl/ch_vrv_20261101.html",
+          "retrieved_at_utc": "2026-11-19T05:55:00Z",
+          "http_status": 200,
+          "sha256": "67ef6948509ab1827f885d4e4890d72fdd864e8d0e7ea1c41de2deffdd6dc8b6",
+          "bytes": 9148,
+          "url": "https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1962/1364_1409_1420/20261101/de/html/fedlex-data-admin-ch-eli-cc-1962-1364_1409_1420-20261101-de-html.html"
+        },
+        {
+          "file": "dl/ch_vrv_20270101.html",
+          "retrieved_at_utc": "2026-11-19T05:55:03Z",
+          "http_status": 200,
+          "sha256": "67ef6948509ab1827f885d4e4890d72fdd864e8d0e7ea1c41de2deffdd6dc8b6",
+          "bytes": 9148,
+          "url": "https://fedlex.data.admin.ch/filestore/fedlex.data.admin.ch/eli/cc/1962/1364_1409_1420/20270101/de/html/fedlex-data-admin-ch-eli-cc-1962-1364_1409_1420-20270101-de-html.html"
+        }
+      ],
+      "finding": "Art. 91(1): Sunday ban all Sundays + Neujahr, Karfreitag, Ostermontag, Auffahrt, Pfingstmontag, 1 Aug, Weihnachten, and 26 Dec only when Christmas is not Monday or Friday; canton may disapply a day not celebrated locally. Art. 91(2): night 22:00-05:00. Art. 91(3): heavy motor vehicles (>3.5 t), commercial tractors/work vehicles, articulated MAM-train >5 t, vehicles towing trailer >3.5 t. Art. 91a exemptions incl. emission-free ≤4250 kg / ≤5750 kg. Horizon dates: 2026-12-25 (Fri) ban; 2026-12-26 NOT a ban day (Christmas Fri); no Nov 2026 holiday. 2027: 01-01 (Fri), 03-26 (Fri), 03-29 (Mon), 05-06 (Thu), 05-17 (Mon), 08-01 (Sun), 12-25 (Sat), 12-26 (Sun; applies, Christmas Sat) — 2027-12 is outside horizon end 2027-11-19.",
+      "applicability": "2026-11..2027-11",
+      "classification_by_month": {
+        "2026-11": "PROMULGATED_RECURRING_LAW",
+        "2026-12": "PROMULGATED_RECURRING_LAW",
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW"
+      },
+      "change_vs_dataset": "NO_CHANGE",
+      "notes": "filestore paths 20261101/20261115/20261201/20270101/20270201 return HTTP 200 with a 9148-byte placeholder page (not a consolidation). A future consolidation 20310101 exists (amendment effective 2031, outside horizon; Art. 91 content not compared). Amendments adopted but not yet consolidated cannot be fully excluded."
+    },
+    {
+      "id": "LI-01",
+      "jurisdiction": "LI",
+      "topic": "VRV (LR 741.11) Art. 89-91a Sunday/night ban",
+      "source_url": "https://www.gesetze.li/konso/pdf/1978019000?version=59",
+      "authority": "Regierung des Fürstentums Liechtenstein – Lilex/gesetze.li",
+      "document_version": "NEW consolidated version 59, Fassung 01.11.2026 (dataset cites v58, Fassung 01.09.2025); version=60 returns HTTP 500 (not published)",
+      "downloads": [
+        {
+          "file": "dl/li_vrv_v59.pdf",
+          "retrieved_at_utc": "2026-11-19T05:55:32Z",
+          "http_status": 200,
+          "sha256": "36e39da89f51f671d8fda03f98e7529b392e1be356b31c5ec0defac9b1432338",
+          "bytes": 681221,
+          "url": "https://www.gesetze.li/konso/pdf/1978019000?version=59"
+        },
+        {
+          "file": "dl/li_vrv_v58.pdf",
+          "retrieved_at_utc": "2026-11-19T05:55:30Z",
+          "http_status": 200,
+          "sha256": "49ef8358e20da609567e8676567a90c7a1a43134a7268065c205308d84ad1191",
+          "bytes": 679727,
+          "url": "https://www.gesetze.li/konso/pdf/1978019000?version=58"
+        },
+        {
+          "file": "dl/li_vrv_v60.pdf",
+          "retrieved_at_utc": "2026-11-19T05:55:34Z",
+          "http_status": 500,
+          "sha256": "19f5bcb0a7d4e670b2d5db30c6489d464fb246a1f739d228af475101dfb558e4",
+          "bytes": 7621,
+          "url": "https://www.gesetze.li/konso/pdf/1978019000?version=60"
+        },
+        {
+          "file": "dl/li_vrv_page.html",
+          "retrieved_at_utc": "2026-11-19T05:55:35Z",
+          "http_status": 200,
+          "sha256": "55c4da6de0f3a4c024eb8d55fe840a22ab0d5f9c443e20e1fd23f3a2542577fd",
+          "bytes": 18388,
+          "url": "https://www.gesetze.li/konso/1978019000"
+        }
+      ],
+      "finding": "Text diff v58→v59: Art. 89, 89a, 90, 91, 91a unchanged (only pagination; footnotes unchanged, latest Art. 89 amendment LGBl. 2022 Nr. 88). v59 changes concern tachograph rules (Art. on Fahrtschreiber, new Abs. 5-6) and new Art. 40c (zero-emission heavy vehicles ≤4250 kg drive under light-vehicle rules). Art. 89(1): Sunday ban all Sundays + Neujahr, Hl. Drei Könige, Ostermontag, 1 Mai, Auffahrt, Pfingstmontag, Fronleichnam, Mariä Himmelfahrt, Mariä Geburt, Allerheiligen, Mariä Empfängnis, Weihnachten, Stefanstag; applies to transit. Art. 89(2): night 22:00-05:00. Art. 89(3) scope as CH. Horizon dates: 2026-12-08 (Tue), 12-25 (Fri), 12-26 (Sat); 2027-01-01, 01-06, 03-29, 05-01 (Sat), 05-06, 05-17, 05-27, 08-15 (Sun), 09-08 (Wed), 11-01 (Mon). No Karfreitag in LI list.",
+      "applicability": "2026-11..2027-11",
+      "classification_by_month": {
+        "2026-11": "PROMULGATED_RECURRING_LAW",
+        "2026-12": "PROMULGATED_RECURRING_LAW",
+        "2027-01": "PROMULGATED_RECURRING_LAW",
+        "2027-02": "PROMULGATED_RECURRING_LAW",
+        "2027-03": "PROMULGATED_RECURRING_LAW",
+        "2027-04": "PROMULGATED_RECURRING_LAW",
+        "2027-05": "PROMULGATED_RECURRING_LAW",
+        "2027-06": "PROMULGATED_RECURRING_LAW",
+        "2027-07": "PROMULGATED_RECURRING_LAW",
+        "2027-08": "PROMULGATED_RECURRING_LAW",
+        "2027-09": "PROMULGATED_RECURRING_LAW",
+        "2027-10": "PROMULGATED_RECURRING_LAW",
+        "2027-11": "PROMULGATED_RECURRING_LAW"
+      },
+      "change_vs_dataset": "NO_CHANGE",
+      "notes": "Source version should be updated v58→v59 in dataset; no ban content change."
+    }
+  ],
+  "source_failures": [
+    {
+      "url": "https://www.saarland.de/mwide/DE/home/home_node.html",
+      "http_status": 403,
+      "note": "bot block; not bypassed"
+    },
+    {
+      "url": "https://www.umwelt.nrw.de/presse/pressemitteilungen",
+      "http_status": 404,
+      "note": "wrong path; equivalent /presse/aktuelle-meldungen used"
+    },
+    {
+      "url": "https://www.gesetze.li/konso/pdf/1978019000?version=60",
+      "http_status": 500,
+      "note": "version not published"
+    },
+    {
+      "url": "https://data.bka.gv.at/ris/api/v2.6/Bundesrecht?Applikation=BgblAuth&...Kundmachung.Periode...",
+      "http_status": 200,
+      "note": "API schema validation error for my date filter; replaced by title search"
+    }
+  ],
+  "not_verified": [
+    "Tyrol Euroklassenfahrverbote-Verordnung (A12) current text",
+    "Exceptions sections of AT ramp bans and B179/B312",
+    "Other AT Länder secondary-road orders",
+    "Länder low-water exemption status after 31 Oct 2026 for any Land (BW/RP/NRW: no primary extension found; SL: 403; others not checked)",
+    "Whether the 17.6.2026 FerReiseV amendment changed the route list vs the dataset",
+    "Unconsolidated Swiss VRV amendments with 2027 effect",
+    "www.ris.bka.gv.at web UI (not used by instruction)"
+  ]
+}

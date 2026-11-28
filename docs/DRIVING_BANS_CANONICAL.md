@@ -46,6 +46,10 @@ Legal edge cases encoded from the text: CH 26 December is no ban day when Christ
 
 Corrected defects: LI, LU and AT weekend/night rules had published windows ending 31 October although the law applies all year; extended with an increased `sequence`. AT weekend exceptions updated to the current §42(2a), (3) and (3a). Sources now carry `content_sha256` of the retrieved document.
 
+## Thursday corrections of 19 November 2026 (dataset 2026-11-19.r6-thursday-hu-fr-gr.geo50)
+
+Targeted primary corrections inside the existing reviewed span (window.to unchanged, `full_registry_sweep: false`, jurisdiction `last_verified` not refreshed): HU 24 December became a public holiday (Act LXXII of 2026, in force 14 Nov), so the Christmas block starts 23 Dec 22:00 (`hu-holiday-2026-12-25-26`, sequence 1, stable UID); FR New Year ban 31 Dec 22:00-1 Jan 22:00 and Île-de-France eve restriction were missing; GR ΦΕΚ Β΄ 912/2026 B8 December dates encoded with rule-level December review windows. Evidence: `data/driving-bans/source-reviews/2026-11-19-thursday/` and `docs/DRIVING_BANS_SWEEP_2026-11-19.md`.
+
 ## Thursday operation and urgent exceptions
 
 The existing DAJC Daily Intelligence automation owns the semantic review. Its HGV branch is Thursday-only, Europe/Prague; other daily DAJC topics are unchanged. Each Thursday it must read all identities from the shared registry, determine the rolling 12-month window, review current primary legislation/amendments and relevant secondary sources, update canonical reviews/rules with evidence, compare old/new states, run all quality gates, prepare supported changes for review; publishing and deployment require explicit approval. Outside Thursday only a sourced urgent recheck of one already-published jurisdiction/rule is allowed.
