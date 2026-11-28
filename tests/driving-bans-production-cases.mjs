@@ -249,7 +249,9 @@ export function registerProductionDrivingBanTests(test, a) {
     const grB8 = new Set(['gr-christmas-eve-outbound-2026', 'gr-christmas-return-2026', 'gr-new-year-eve-outbound-2026']);
     // 20 Nov 2026: Spanish December rules re-read row by row (review 2026-11-20.r7-es-dec-cat-bas) carry their own December review window.
     const esDec = new Set(JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-11-20-es-december.json', import.meta.url), 'utf8')).december_rules);
-    a.ok(!v.events.some(e => !reviewed.has(e.jurisdiction) && e.date >= '2026-12-01' && !grB8.has(e.ban_id) && !esDec.has(e.ban_id)));
+    // 28 Nov 2026: Porto VCI December re-read (review 2026-11-28.r8-new-year-eves-pt).
+    const ptDec = new Set(['pt-vci-porto']);
+    a.ok(!v.events.some(e => !reviewed.has(e.jurisdiction) && e.date >= '2026-12-01' && !grB8.has(e.ban_id) && !esDec.has(e.ban_id) && !ptDec.has(e.ban_id)));
     for (const j of v.jurisdictions.filter(row => !reviewed.has(row.jurisdiction))) a.ok(j.coverage_failures.includes('NOV_DEC_2026_PRIORITY_REVIEW_NOT_PERFORMED'), j.jurisdiction);
     const log = JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-10-27-nov-dec.json', import.meta.url), 'utf8'));
     a.equal(log.full_registry_sweep, false);
@@ -365,5 +367,24 @@ export function registerProductionDrivingBanTests(test, a) {
     const sources = new Map(current.sources.map(s => [s.source_id, s]));
     for (const id of ['es-boe-2026-11-20', 'es-cat-isp-300-2026-11-20', 'cat-labour-holidays-2026', 'es-bas-2026-11-20', 'es-cat-isp-1933-2026']) a.equal(sources.get(id)?.content_sha256, log.retrievals.find(r => r.source_id === id).sha256, id);
     for (const r of log.retrievals.filter(row => row.same_as_19_nov)) a.equal(sources.get(r.source_id)?.content_sha256, r.sha256, `${r.source_id}: PR #144 evidence re-read byte-identical`);
+  });
+  // 28 Nov 2026 audit: New Year eve bans that start on 31 Dec inside the reviewed span (data/driving-bans/source-reviews/2026-11-28-new-year-eves-pt.json).
+  test('28 Nov 2026 — New Year eve bans starting 31 Dec (HU, HR, LU) and Porto VCI December holidays', () => {
+    const v = at(new Date('2026-11-28T12:00:00Z'));
+    const hu = ev(v, 'hu-holiday-2027-01-01');
+    a.deepEqual(hu.map(e => [e.starts_at, e.ends_at]), [['2026-12-31T21:00:00.000Z', '2027-01-01T21:00:00.000Z']]);
+    a.deepEqual(ev(v, 'hr-holiday-eve-2026-12-31').map(e => [e.starts_at, e.ends_at]), [['2026-12-31T14:00:00.000Z', '2026-12-31T22:00:00.000Z']]);
+    a.deepEqual(ev(v, 'lu-france-new-year-2027').map(e => [e.starts_at, e.ends_at, e.direction]), [['2026-12-31T20:30:00.000Z', '2027-01-01T20:45:00.000Z', 'Transit toward France']]);
+    a.deepEqual(ev(v, 'lu-germany-new-year-2027').map(e => [e.starts_at, e.ends_at, e.direction]), [['2026-12-31T22:30:00.000Z', '2027-01-01T20:45:00.000Z', 'Transit toward Germany']]);
+    const vci = ev(v, 'pt-vci-porto').map(e => e.date).filter(d => d >= '2026-12-01');
+    a.ok(vci.length > 0, 'Porto VCI publishes December working days');
+    for (const holiday of ['2026-12-01', '2026-12-08', '2026-12-25']) a.ok(!vci.includes(holiday), holiday);
+    a.ok(!vci.some(d => [0, 6].includes(new Date(d + 'T12:00:00Z').getUTCDay())), 'working days only');
+    a.ok(!v.events.some(e => e.date > '2026-12-31'), 'nothing is published after the reviewed span');
+    for (const j of ['HU', 'HR', 'LU', 'PT']) a.notEqual(v.jurisdictions.find(x => x.jurisdiction === j)?.ban_state, 'NO_BAN');
+    a.equal(current.jurisdiction_reviews.HU.last_checked, '2026-10-27T11:20:00.000Z', 'targeted reviews never refresh the full-sweep date');
+    const log = JSON.parse(readFileSync(new URL('../data/driving-bans/source-reviews/2026-11-28-new-year-eves-pt.json', import.meta.url), 'utf8'));
+    const sources = new Map(current.sources.map(s => [s.source_id, s]));
+    for (const r of log.retrievals) a.equal(sources.get(r.source_id)?.content_sha256, r.sha256, r.source_id);
   });
 }

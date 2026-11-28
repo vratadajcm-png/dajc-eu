@@ -88,3 +88,12 @@ Důkazy: `data/driving-bans/source-reviews/2026-11-20-es-december.json` (SHA-256
 - Nezakódováno: příloha V (ADR a vozidla se zvláštním povolením), katalánské body 2–4 a euromodulární AP-7,
   baskický bod 4.1 (zvláštní přeprava) a 2.1 (ADR; příloha I je kalendář sportovních akcí), leden 2027. ES zůstává `UNVERIFIED` a neúplné; `window.to` ani `last_checked`
   se neposouvají (cílená kontrola není úplný sweep).
+
+## Audit 28. 11. 2026 (`2026-11-28.r8-new-year-eves-pt`)
+
+Živý audit zjistil, že chybí zákazy začínající 31. 12. (Nový rok), přestože prosinec byl u dotčených zemí
+veden jako úplný. Doplněno z primárních zdrojů (`data/driving-bans/source-reviews/2026-11-28-new-year-eves-pt.json`):
+HU 31. 12. 22:00 – 1. 1. 22:00 (nař. 190/2008 §2(1)(b), Mt. §102(1)); HR 31. 12. 15–23 (Naredba NN 64/2009 bod II);
+LU tranzit do Francie 31. 12. 21:30 a do Německa 31. 12. 23:30, oba do 1. 1. 21:45 (Police Grand-Ducale, reg. 19. 7. 1997).
+PT VCI Porto: prosinec ověřen, svátky 1., 8. a 25. 12. vyloučeny (DL 155-A/2026, Lei 8/2016). `window.to` ani
+`last_checked` se neposouvají.

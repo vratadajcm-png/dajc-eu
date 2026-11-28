@@ -1,0 +1,128 @@
+{
+ "review_id": "2026-11-28.r8-new-year-eves-pt",
+ "kind": "TARGETED_PRIMARY_REVIEW",
+ "full_registry_sweep": false,
+ "pre_change_canonical_sha256": "70daa6f13705eee9eacd30320c5fe45e4d66c5bd321e3d803bb56b68899e3b10",
+ "reviewed_span": {
+  "from": "2026-12-01",
+  "to": "2026-12-31"
+ },
+ "method": "Live audit of dajc.eu Driving Bans (28 Nov 2026) found New Year eve bans starting on 31 Dec missing in jurisdictions shown complete for December. Each instrument was re-retrieved directly; window.to and jurisdiction last_checked/last_verified are not changed.",
+ "retrievals": [
+  {
+   "source_id": "hu-mt-2026-11-28",
+   "url": "https://njt.jog.gov.hu/jogszabaly/2012-1-00-00",
+   "retrieved_utc": "2026-11-28T09:40:00.000Z",
+   "http_status": 200,
+   "sha256": "1bc890c17b84cf5244937d28fd9f890483907eef0bd47f979f3b71d5c3760b49"
+  },
+  {
+   "source_id": "hu-190-2026-11-28",
+   "url": "https://njt.jog.gov.hu/jogszabaly/2008-190-20-22",
+   "retrieved_utc": "2026-11-28T09:40:00.000Z",
+   "http_status": 200,
+   "sha256": "8b4239eb9bbdef42243392d9878e82e51895441591db44bc74bf3de066b9a82c"
+  },
+  {
+   "source_id": "hr-naredba-2026-11-28",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2009_06_64_1440.html",
+   "retrieved_utc": "2026-11-28T09:40:00.000Z",
+   "http_status": 200,
+   "sha256": "f71eeea4b99c08c3dffa3eef189a3fb20f0e3c1232b0fb9d545d309118484b0c"
+  },
+  {
+   "source_id": "hr-blagdani-2026-11-28",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+   "retrieved_utc": "2026-11-28T09:40:00.000Z",
+   "http_status": 200,
+   "sha256": "648c7b8a410ce3cc4566394a652ffdb55cdea89b147fcf18d0ff97a8b76c24fc"
+  },
+  {
+   "source_id": "lu-police-2026-11-28",
+   "url": "https://police.public.lu/en/legislation/code-de-la-route/routiers-poids-lourds1.html",
+   "retrieved_utc": "2026-11-28T09:40:00.000Z",
+   "http_status": 200,
+   "sha256": "8f3700b16add41fe3b2ebb247fcf551e900ba6b1de4d331c14b07453c462bc0c"
+  },
+  {
+   "source_id": "pt-dl-155a-2026-11-28",
+   "url": "https://files.diariodarepublica.pt/1s/2026/07/14703/0000200005.pdf",
+   "retrieved_utc": "2026-11-28T09:40:00.000Z",
+   "http_status": 200,
+   "sha256": "466c269ef65fcc7a32fec367922cb0d334503b267e43f8868f0c774742698f84"
+  },
+  {
+   "source_id": "pt-lei-8-2016",
+   "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+   "retrieved_utc": "2026-11-28T09:40:00.000Z",
+   "http_status": 200,
+   "sha256": "bf0b778d994f07bc323f90d0770da5ed91c84d6d31a933682e13df6d007a48de"
+  }
+ ],
+ "changes": [
+  {
+   "jurisdiction": "HU",
+   "rule": "hu-holiday-2027-01-01",
+   "type": "NEW_BAN",
+   "legal_source": "Govt. Decree 190/2008 §2(1)(b); Mt. §102(1)",
+   "effect": "31 Dec 2026 22:00 - 1 Jan 2027 22:00",
+   "timezone": "Europe/Budapest",
+   "section_direction": "All public roads, both directions",
+   "vehicles": ">7.5 t MAM",
+   "limit": "No circulation",
+   "exceptions": "§5 categories, §4 permits; §2(3) EURO 3+ international traffic exempt 4 Nov-1 Mar"
+  },
+  {
+   "jurisdiction": "HR",
+   "rule": "hr-holiday-eve-2026-12-31",
+   "type": "NEW_BAN",
+   "legal_source": "Naredba NN 64/2009 point II; Zakon o blagdanima NN 110/2019 art. 1",
+   "effect": "31 Dec 2026 15:00-23:00 (3 Jan 2027 12:00-23:00 outside span)",
+   "timezone": "Europe/Zagreb",
+   "section_direction": "Point I state roads and ferry ports (hr-season roads)",
+   "vehicles": ">7.5 t MAM or >14 m, tractors, slow vehicles",
+   "limit": "No circulation",
+   "exceptions": "Point IV"
+  },
+  {
+   "jurisdiction": "LU",
+   "rule": "lu-france-new-year-2027",
+   "type": "NEW_BAN",
+   "legal_source": "Grand-Ducal regulation of 19 July 1997 (Police Grand-Ducale page)",
+   "effect": "31 Dec 2026 21:30 - 1 Jan 2027 21:45",
+   "timezone": "Europe/Luxembourg",
+   "section_direction": "Transit toward France",
+   "vehicles": ">7,500 kg MAM transit",
+   "limit": "No circulation",
+   "exceptions": "Live animals, perishables, flowers and listed categories"
+  },
+  {
+   "jurisdiction": "LU",
+   "rule": "lu-germany-new-year-2027",
+   "type": "NEW_BAN",
+   "legal_source": "Grand-Ducal regulation of 19 July 1997 (Police Grand-Ducale page)",
+   "effect": "31 Dec 2026 23:30 - 1 Jan 2027 21:45",
+   "timezone": "Europe/Luxembourg",
+   "section_direction": "Transit toward Germany",
+   "vehicles": ">7,500 kg MAM transit",
+   "limit": "No circulation",
+   "exceptions": "Live animals, perishables, flowers and listed categories"
+  },
+  {
+   "jurisdiction": "PT",
+   "rule": "pt-vci-porto",
+   "type": "CHANGED (sequence +1)",
+   "legal_source": "DL 155-A/2026 art. 2 and 6; Código do Trabalho art. 234(1) (Lei 8/2016)",
+   "effect": "December 2026 working days 07:00-21:00 except 1, 8, 25 Dec",
+   "timezone": "Europe/Lisbon",
+   "section_direction": "Porto VCI (A1/IC1, A20/IC23, A28/IC1, A44/IC23)",
+   "vehicles": ">3,500 kg, >=3 axles, first-axle height >=1.1 m",
+   "limit": "No circulation",
+   "exceptions": "Art. 2(4)-(5)"
+  }
+ ],
+ "checked_no_change": [
+  "PL: per the existing 27 Oct review note, the §2(2) eve restriction covers only §2(1)(b)-(j), so 1 Jan has no eve restriction (not re-read today).",
+  "CZ, SK, SI, IT, AT, DE: per their existing reviewed rules the 1 Jan restriction starts on 1 Jan, outside the reviewed span (not re-read today); CH/LI night bans of 31 Dec are already encoded."
+ ]
+}

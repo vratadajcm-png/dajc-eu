@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "dataset_version": "2026-11-20.r7-es-dec-cat-bas.geo50",
+ "dataset_version": "2026-11-28.r8-new-year-eves-pt.geo50",
  "window": {
   "from": "2026-09-01",
   "to": "2026-12-31"
@@ -260,7 +260,8 @@
    "last_checked": "2026-10-27T11:20:00.000Z",
    "last_verified": "2026-10-27T11:20:00.000Z",
    "source_ids": [
-    "lu-police"
+    "lu-police",
+    "lu-police-2026-11-28"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [],
@@ -350,7 +351,7 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": "November window added: France-bound Armistice Day (10-11 Nov). Review 2026-10-27: the weekend rules had a published window ending 31 Oct although the restriction applies all year; extended through 31 Dec.",
+   "notes": "November window added: France-bound Armistice Day (10-11 Nov). Review 2026-10-27: the weekend rules had a published window ending 31 Oct although the restriction applies all year; extended through 31 Dec. Review 2026-11-28.r8-new-year-eves-pt: New Year's Day France- and Germany-bound transit bans from 31 Dec added.",
    "review_log": [
     {
      "review_id": "2026-10-27.r4-nov-dec-priority",
@@ -360,6 +361,15 @@
       "to": "2026-12-31"
      },
      "scope": "FULL_SCOPE_PRIMARY"
+    },
+    {
+     "review_id": "2026-11-28.r8-new-year-eves-pt",
+     "reviewed_at": "2026-11-28T10:00:00.000Z",
+     "period": {
+      "from": "2026-12-01",
+      "to": "2026-12-31"
+     },
+     "scope": "INDIVIDUAL_RULES_ONLY"
     }
    ]
   },
@@ -1549,7 +1559,9 @@
    "source_ids": [
     "hu-190",
     "hu-act-2026-72",
-    "hu-mt"
+    "hu-mt",
+    "hu-190-2026-11-28",
+    "hu-mt-2026-11-28"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [],
@@ -1651,7 +1663,7 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": "",
+   "notes": " Review 2026-11-28.r8-new-year-eves-pt: New Year's Day ban from 31 Dec 22:00 added.",
    "review_log": [
     {
      "review_id": "2026-10-27.r4-nov-dec-priority",
@@ -1661,6 +1673,15 @@
       "to": "2026-12-31"
      },
      "scope": "FULL_SCOPE_PRIMARY"
+    },
+    {
+     "review_id": "2026-11-28.r8-new-year-eves-pt",
+     "reviewed_at": "2026-11-28T10:00:00.000Z",
+     "period": {
+      "from": "2026-12-01",
+      "to": "2026-12-31"
+     },
+     "scope": "INDIVIDUAL_RULES_ONLY"
     }
    ]
   },
@@ -1814,7 +1835,9 @@
    "source_ids": [
     "hr-naredba",
     "hr-hak",
-    "hr-blagdani"
+    "hr-blagdani",
+    "hr-naredba-2026-11-28",
+    "hr-blagdani-2026-11-28"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [],
@@ -1906,7 +1929,7 @@
      "note": "Reviewed in the primary instrument(s); no additional restriction of this type found for the window."
     }
    },
-   "notes": "Holiday dates follow the Croatian holidays act (1 Nov, 18 Nov); point II Sunday/Monday rule applied.",
+   "notes": "Holiday dates follow the Croatian holidays act (1 Nov, 18 Nov); point II Sunday/Monday rule applied. Review 2026-11-28.r8-new-year-eves-pt: New Year's Eve 15:00-23:00 (point II) added.",
    "review_log": [
     {
      "review_id": "2026-10-27.r4-nov-dec-priority",
@@ -1916,6 +1939,15 @@
       "to": "2026-12-31"
      },
      "scope": "FULL_SCOPE_PRIMARY"
+    },
+    {
+     "review_id": "2026-11-28.r8-new-year-eves-pt",
+     "reviewed_at": "2026-11-28T10:00:00.000Z",
+     "period": {
+      "from": "2026-12-01",
+      "to": "2026-12-31"
+     },
+     "scope": "INDIVIDUAL_RULES_ONLY"
     }
    ]
   },
@@ -1926,7 +1958,9 @@
    "last_checked": "2026-09-26T15:25:00.000Z",
    "last_verified": null,
    "source_ids": [
-    "pt-dl-155a-2026"
+    "pt-dl-155a-2026",
+    "pt-dl-155a-2026-11-28",
+    "pt-lei-8-2016"
    ],
    "no_ban_evidence": [],
    "coverage_failures": [
@@ -2000,7 +2034,18 @@
      "note": "Not reviewed from a primary source in this sweep."
     }
    },
-   "notes": "New corridor ban from 15 Sep 2026 found and encoded; the rest of the national regime is not yet primary-reviewed."
+   "notes": "New corridor ban from 15 Sep 2026 found and encoded; the rest of the national regime is not yet primary-reviewed. Review 2026-11-28.r8-new-year-eves-pt: Porto VCI December re-read; 1, 8 and 25 Dec excluded.",
+   "review_log": [
+    {
+     "review_id": "2026-11-28.r8-new-year-eves-pt",
+     "reviewed_at": "2026-11-28T10:00:00.000Z",
+     "period": {
+      "from": "2026-12-01",
+      "to": "2026-12-31"
+     },
+     "scope": "INDIVIDUAL_RULES_ONLY"
+    }
+   ]
   },
   "GR": {
    "verification_state": "UNVERIFIED",
@@ -5320,6 +5365,83 @@
    "retrieval_method": "direct-retrieval",
    "findings": "Annex II 2.º item 1: 4 Dec 17-21 and 5 Dec 11-14 towards Cantabria (A-8 km 119.5-139.21, N-634 km 107-120.69, BI-3724 km 120.69-128.12, BI-734 km 128.12-136.14); item 2: 6 and 8 Dec 16-21 towards Bilbao (same sections). Point 4.1 (special transport: Sundays/holidays 08-24, non-Saturday holiday eves 16-24, CAPV) and 2.1 (ADR) not encoded. Annex I is the sporting-events calendar, not a goods-vehicle ban.",
    "content_sha256": "0d5117bf4b26b550d3c28b4f149a0a942e7e22e02d426948a2791ab2bb5aa098"
+  },
+  {
+   "source_id": "hu-mt-2026-11-28",
+   "url": "https://njt.jog.gov.hu/jogszabaly/2012-1-00-00",
+   "authority": "Nemzeti Jogszabálytár / Act I of 2012 (Labour Code)",
+   "role": "PRIMARY",
+   "version": "Consolidated text retrieved 2026-11-28",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "§102(1): public holidays include 1 January and 24-26 December.",
+   "content_sha256": "1bc890c17b84cf5244937d28fd9f890483907eef0bd47f979f3b71d5c3760b49"
+  },
+  {
+   "source_id": "hu-190-2026-11-28",
+   "url": "https://njt.jog.gov.hu/jogszabaly/2008-190-20-22",
+   "authority": "Nemzeti Jogszabálytár / Govt. Decree 190/2008",
+   "role": "PRIMARY",
+   "version": "Retrieved 2026-11-28; text identical to the 20 Nov copy (markup differs)",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "§2(1)(b): from 22:00 on the preceding day to 22:00 on Sundays and public holidays (1 Sep-30 Jun); §2(2) continuity; §2(3) EURO 3+ international exemption 4 Nov-1 Mar.",
+   "content_sha256": "8b4239eb9bbdef42243392d9878e82e51895441591db44bc74bf3de066b9a82c"
+  },
+  {
+   "source_id": "hr-naredba-2026-11-28",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2009_06_64_1440.html",
+   "authority": "Narodne novine / Naredba NN 64/2009",
+   "role": "PRIMARY",
+   "version": "Retrieved 2026-11-28",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Point II: Good Friday and eves of holidays of the Republic of Croatia 15:00-23:00; last day of a holiday 14:00-23:00; holiday on Friday/Saturday moves the restriction to Sunday 12:00-23:00.",
+   "content_sha256": "f71eeea4b99c08c3dffa3eef189a3fb20f0e3c1232b0fb9d545d309118484b0c"
+  },
+  {
+   "source_id": "hr-blagdani-2026-11-28",
+   "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2019_11_110_2212.html",
+   "authority": "Narodne novine / Zakon o blagdanima NN 110/2019",
+   "role": "PRIMARY",
+   "version": "Retrieved 2026-11-28",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Art. 1: holidays include 1 January (Nova godina), 25 and 26 December.",
+   "content_sha256": "648c7b8a410ce3cc4566394a652ffdb55cdea89b147fcf18d0ff97a8b76c24fc"
+  },
+  {
+   "source_id": "lu-police-2026-11-28",
+   "url": "https://police.public.lu/en/legislation/code-de-la-route/routiers-poids-lourds1.html",
+   "authority": "Luxembourg Police Grand-Ducale (Grand-Ducal regulation of 19 July 1997)",
+   "role": "PRIMARY",
+   "version": "Retrieved 2026-11-28",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Transit >7,500 kg: towards France from 21:30, towards Germany from 23:30 on Saturdays and holiday eves to 21:45 on Sundays/holidays; New Year's Day listed for both directions.",
+   "content_sha256": "8f3700b16add41fe3b2ebb247fcf551e900ba6b1de4d331c14b07453c462bc0c"
+  },
+  {
+   "source_id": "pt-dl-155a-2026-11-28",
+   "url": "https://files.diariodarepublica.pt/1s/2026/07/14703/0000200005.pdf",
+   "authority": "Diário da República / Decreto-Lei 155-A/2026",
+   "role": "PRIMARY",
+   "version": "PDF retrieved 2026-11-28",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Art. 2: heavy goods vehicles (>3,500 kg, >=3 axles, first-axle height >=1.1 m) banned on the Porto VCI on working days 07:00-21:00; exceptions art. 2(4)-(5); in force from 15 Sep 2026 (art. 6), no end date.",
+   "content_sha256": "466c269ef65fcc7a32fec367922cb0d334503b267e43f8868f0c774742698f84"
+  },
+  {
+   "source_id": "pt-lei-8-2016",
+   "url": "https://files.diariodarepublica.pt/1s/2016/04/06400/0111201116.pdf",
+   "authority": "Diário da República / Lei 8/2016 (amends Código do Trabalho art. 234)",
+   "role": "PRIMARY",
+   "version": "PDF retrieved 2026-11-28; consolidated art. 234 page is script-rendered",
+   "checked_at": "2026-11-28T09:40:00.000Z",
+   "retrieval_method": "direct-retrieval",
+   "findings": "Art. 234(1): mandatory holidays include 1, 8 and 25 December.",
+   "content_sha256": "bf0b778d994f07bc323f90d0770da5ed91c84d6d31a933682e13df6d007a48de"
   }
  ],
  "rule_profiles": {
@@ -6399,10 +6521,10 @@
   },
   "pt-vci": {
    "verification_state": "PRIMARY_VERIFIED",
-   "verified_at": "2026-09-26T15:25:00.000Z",
+   "verified_at": "2026-11-28T10:00:00.000Z",
    "review_window": {
     "from": "2026-09-01",
-    "to": "2026-11-30"
+    "to": "2026-12-31"
    },
    "status": "ACTIVE",
    "sequence": 0,
@@ -6419,9 +6541,10 @@
    "exceptional_relevance": "Vehicles with an IMT autorização especial de trânsito are exempt (art.2(4)(b)).",
    "jurisdiction": "PT",
    "timezone": "Europe/Lisbon",
-   "source_id": "pt-dl-155a-2026",
+   "source_id": "pt-dl-155a-2026-11-28",
    "evidence_ids": [
-    "pt-dl-155a-2026"
+    "pt-dl-155a-2026-11-28",
+    "pt-lei-8-2016"
    ],
    "legal_basis": "Decreto-Lei 155-A/2026 art. 2",
    "vehicle_scope": "Goods vehicles >3,500 kg gross weight with three or more axles and height at the first axle >= 1.1 m.",
@@ -6455,7 +6578,7 @@
     "Art.2(4): vehicles with origin/destination in Porto or Vila Nova de Gaia for loading/unloading, if enabled on the platform (art.3); vehicles with an IMT special transit authorisation.",
     "Art.2(5): State and Porto/Gaia municipal vehicles."
    ],
-   "notes": "Alternative: A41/IC24 CREP is toll-free for these vehicles (art.5). Working days exclude public holidays (5 Oct 2026)."
+   "notes": "Alternative: A41/IC24 CREP is toll-free for these vehicles (art.5). Working days exclude public holidays (5 Oct 2026). Review 2026-11-28.r8-new-year-eves-pt: reviewed span extended to 31 Dec 2026 after re-reading DL 155-A/2026 and the national holiday list."
   },
   "gr-kya": {
    "verification_state": "PRIMARY_VERIFIED",
@@ -11473,9 +11596,14 @@
      5
     ],
     "excluded_dates": [
-     "2026-10-05"
+     "2026-10-05",
+     "2026-12-01",
+     "2026-12-08",
+     "2026-12-25"
     ]
-   }
+   },
+   "sequence": 1,
+   "notes": "Correction 2026-11-28.r8-new-year-eves-pt: December 2026 reviewed; working days exclude the national holidays 1, 8 and 25 December (Código do Trabalho art. 234(1) as amended by Lei 8/2016). DL 155-A/2026 is in force from 15 Sep 2026 without an end date (art. 6)."
   },
   {
    "ban_id": "gr-summer-friday-2026-09-04",
@@ -15083,6 +15211,130 @@
     "Section 7.2 c): vehicles carrying perishable goods under ATP Annex 3 (I raw milk; II red meat and large game, except red offal; III meat products, pasteurised milk, fresh dairy products (yoghurt, kefir, cream, fresh cheese), ready meals (meat, fish, vegetables), ready-to-eat raw vegetables and vegetable preparations, concentrated fruit juices and fish products not listed below; IV game (except large game), poultry and rabbits; V red offal; VI minced meat; VII untreated fish, molluscs and crustaceans) and fresh fruit and vegetables under ATP Annex 1, provided this cargo is at least half of the vehicle's load capacity or occupies half of its useful load volume."
    ],
    "source_id": "es-cat-isp-300-2026-11-20"
+  },
+  {
+   "ban_id": "hu-holiday-2027-01-01",
+   "profile": "hu-standing",
+   "title": "Public-holiday driving ban (New Year's Day)",
+   "valid_from": "2026-12-31",
+   "valid_to": "2027-01-01",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "22:00",
+    "end_time": "22:00",
+    "end_day_offset": 1,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-28T10:00:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "hu-190-2026-11-28",
+    "hu-mt-2026-11-28"
+   ],
+   "source_id": "hu-190-2026-11-28",
+   "notes": "Added 2026-11-28.r8-new-year-eves-pt: 1 January is a public holiday (Mt. §102(1)); Govt. Decree 190/2008 §2(1)(b): from 22:00 on the preceding day to 22:00 on the holiday -> Thursday 31 Dec 2026 22:00 to Friday 1 Jan 2027 22:00. §2(2) does not apply (1 Jan is not the day before a Sunday). §2(3) EURO 3+ international-traffic exemption applies (4 Nov-1 Mar). Omitted by the 27 Oct and 19 Nov reviews although it starts inside the reviewed span."
+  },
+  {
+   "ban_id": "hr-holiday-eve-2026-12-31",
+   "profile": "hr-season",
+   "title": "Holiday-eve restriction (coastal roads, New Year's Eve)",
+   "valid_from": "2026-12-31",
+   "valid_to": "2026-12-31",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "15:00",
+    "end_time": "23:00",
+    "end_day_offset": 0,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-28T10:00:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "hr-naredba-2026-11-28",
+    "hr-blagdani-2026-11-28"
+   ],
+   "source_id": "hr-naredba-2026-11-28",
+   "notes": "Added 2026-11-28.r8-new-year-eves-pt: Naredba NN 64/2009 point II: eve of a holiday of the Republic of Croatia 15:00-23:00; 1 January (Nova godina) is a holiday under Zakon o blagdanima NN 110/2019 art. 1. Because 1 Jan 2027 is a Friday, point II moves the last-day restriction to Sunday 3 Jan 2027 12:00-23:00 (outside the reviewed span, not published)."
+  },
+  {
+   "ban_id": "lu-france-new-year-2027",
+   "profile": "lu-transit",
+   "title": "France-bound transit restriction for New Year's Day",
+   "valid_from": "2026-12-31",
+   "valid_to": "2027-01-01",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "21:30",
+    "end_time": "21:45",
+    "end_day_offset": 1,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-28T10:00:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "lu-police-2026-11-28"
+   ],
+   "source_id": "lu-police-2026-11-28",
+   "notes": "Added 2026-11-28.r8-new-year-eves-pt: Grand-Ducal regulation of 19 July 1997 as stated by the Police Grand-Ducale: New Year's Day is a ban day for transit towards France, from 21:30 on the eve to 21:45 on the day.",
+   "direction": "Transit toward France"
+  },
+  {
+   "ban_id": "lu-germany-new-year-2027",
+   "profile": "lu-transit",
+   "title": "Germany-bound transit restriction for New Year's Day",
+   "valid_from": "2026-12-31",
+   "valid_to": "2027-01-01",
+   "schedule": {
+    "kind": "dates",
+    "start_time": "23:30",
+    "end_time": "21:45",
+    "end_day_offset": 1,
+    "dates": [
+     {
+      "date": "2026-12-31",
+      "occurrence_id": "2026-12-31"
+     }
+    ]
+   },
+   "sequence": 0,
+   "verified_at": "2026-11-28T10:00:00.000Z",
+   "review_window": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "evidence_ids": [
+    "lu-police-2026-11-28"
+   ],
+   "source_id": "lu-police-2026-11-28",
+   "notes": "Added 2026-11-28.r8-new-year-eves-pt: Grand-Ducal regulation of 19 July 1997 as stated by the Police Grand-Ducale: New Year's Day is a ban day for transit towards Germany, from 23:30 on the eve to 21:45 on the day.",
+   "direction": "Transit toward Germany"
   }
  ],
  "coverage_version": "2026-10-22.50",
@@ -15164,6 +15416,25 @@
    ],
    "evidence_log": "data/driving-bans/source-reviews/2026-11-20-es-december.json",
    "notes": "Independent re-check of PR #144 (HU, FR, GR: same primary bytes, no change needed) and December 2026 Spanish general-goods rows (DGT, Catalonia, Basque Country). window.to unchanged; jurisdiction last_verified dates not refreshed."
+  },
+  {
+   "review_id": "2026-11-28.r8-new-year-eves-pt",
+   "reviewed_at": "2026-11-28T10:00:00.000Z",
+   "kind": "TARGETED_PRIMARY_REVIEW",
+   "full_registry_sweep": false,
+   "period": {
+    "from": "2026-12-01",
+    "to": "2026-12-31"
+   },
+   "full_scope_jurisdictions": [],
+   "individual_rule_jurisdictions": [
+    "HR",
+    "HU",
+    "LU",
+    "PT"
+   ],
+   "evidence_log": "data/driving-bans/source-reviews/2026-11-28-new-year-eves-pt.json",
+   "notes": "Audit 28 Nov 2026: New Year eve bans starting 31 Dec were missing in jurisdictions marked complete for December; Porto VCI December reviewed. window.to and jurisdiction last_checked/last_verified unchanged."
   }
  ]
 }
