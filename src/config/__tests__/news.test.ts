@@ -68,19 +68,21 @@ describe('buildNewsRss', () => {
 
 describe('overdue next-edition announcements (live audit 28 Nov 2026)', () => {
   const w46 = '## Operator checklist\n\n- x\n\n## Next EU Oversize Weekly\n\nFriday, 13 November 2026 at 12:00 Europe/Prague (CET).\n';
-  it('reads the announced release date', () => {
-    expect(parseNextEditionDate(w46)?.toISOString()).toBe('2026-11-13T11:00:00.000Z');
+  it('reads the announced release date as 12:00 Prague time', () => {
+    expect(parseNextEditionDate(w46)?.toISOString()).toBe('2026-11-13T11:00:00.000Z'); // CET
+    expect(parseNextEditionDate('## Next EU Oversize Weekly\n\nFriday, 4 September 2026 at 12:00 CEST.')?.toISOString()).toBe('2026-09-04T10:00:00.000Z');
     expect(parseNextEditionDate('## Sources\n\n- a')).toBeNull();
     expect(parseNextEditionDate(undefined)).toBeNull();
   });
-  it('hides the announcement only when it is overdue and nothing was published since', () => {
+  it('hides the announcement only when it is overdue and no later Weekly was published', () => {
     const next = parseNextEditionDate(w46);
     const w46Published = new Date('2026-11-06T11:00:00Z');
-    expect(isAnnouncedEditionMissing(next, [w46Published], new Date('2026-11-13T12:00:00Z'))).toBe(false); // grace window
-    expect(isAnnouncedEditionMissing(next, [w46Published], new Date('2026-11-28T08:00:00Z'))).toBe(true);
-    expect(isAnnouncedEditionMissing(next, [w46Published, new Date('2026-11-13T10:00:00Z')], new Date('2026-11-28T08:00:00Z'))).toBe(false);
-    expect(isAnnouncedEditionMissing(next, [w46Published, new Date('2026-11-14T08:00:00Z')], new Date('2026-11-28T08:00:00Z'))).toBe(false); // Saturday catch-up
-    expect(isAnnouncedEditionMissing(null, [], new Date())).toBe(false);
+    expect(isAnnouncedEditionMissing(next, w46Published, [], new Date('2026-11-13T12:00:00Z'))).toBe(false); // grace window
+    expect(isAnnouncedEditionMissing(next, w46Published, [], new Date('2026-11-28T08:00:00Z'))).toBe(true);
+    expect(isAnnouncedEditionMissing(next, w46Published, [new Date('2026-10-30T11:00:00Z')], new Date('2026-11-28T08:00:00Z'))).toBe(true); // earlier edition only
+    expect(isAnnouncedEditionMissing(next, w46Published, [new Date('2026-11-13T11:00:00Z')], new Date('2026-11-28T08:00:00Z'))).toBe(false);
+    expect(isAnnouncedEditionMissing(next, w46Published, [new Date('2026-11-14T08:00:00Z')], new Date('2026-11-28T08:00:00Z'))).toBe(false); // Saturday catch-up
+    expect(isAnnouncedEditionMissing(null, w46Published, [], new Date())).toBe(false);
   });
   it('marks a reference article as archived after its stated period', () => {
     const through = new Date('2026-10-31');
