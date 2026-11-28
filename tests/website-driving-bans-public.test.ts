@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { getDrivingBansSnapshot } from '../config/driving-ban-calendars/runtime.mjs';
 import { officialDrivingBansView } from '../src/lib/driving-bans/public-view.mjs';
 
@@ -75,5 +76,17 @@ describe('Public Driving Bans: primary-source verified areas only', () => {
     expect(website).toContain('officialDrivingBansView(canonical)');
     expect(json).toContain('officialDrivingBansView(getDrivingBansSnapshot())');
     expect(ics).toContain('officialDrivingBansView(getDrivingBansSnapshot())');
+  });
+});
+
+describe('Public Driving Bans page states the real review date (live audit 28 Nov 2026)', () => {
+  it('never promises a weekly check unconditionally and shows the last full review and per-country checks', () => {
+    const page = readFileSync('src/pages/driving-bans.astro', 'utf8');
+    expect(page).not.toMatch(/calendar is checked weekly on Thursday/);
+    expect(page).toMatch(/Last full official-source review/);
+    expect(page).toMatch(/the scheduled review is overdue/);
+    expect(page).toMatch(/Last checked against official sources/);
+    // Same rule as the Thursday freshness gate (scripts/audit-driving-bans.mjs).
+    expect(page).toMatch(/canonical\.jurisdictions\.map\(j => j\.last_checked\)\.filter\(Boolean\)\.sort\(\)\.at\(-1\)/);
   });
 });
