@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getDrivingBansSnapshot } from '../../config/driving-ban-calendars/runtime.mjs';
 import { officialDrivingBansView } from '../lib/driving-bans/public-view.mjs';
-import { openItemTexts } from '../lib/driving-bans/public-labels.mjs';
+import { openItemTexts, monthStatusText, monthName } from '../lib/driving-bans/public-labels.mjs';
 export const prerender = false;
 const canonical = getDrivingBansSnapshot();
 const view = officialDrivingBansView(canonical);
@@ -14,6 +14,9 @@ const cs = Astro.url.searchParams.get('lang') === 'cs';
 const label = (en: string, cz: string) => cs ? cz : en;
 const title = label('European HGV Driving Bans', 'Evropské zákazy jízd nákladních vozidel');
 const format = (value: string | null) => value ? new Intl.DateTimeFormat(cs ? 'cs-CZ' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Prague' }).format(new Date(value)) : label('Not completed', 'Nedokončeno');
+const eventsWord = (n: number) => cs ? (n === 1 ? 'událost' : n <= 4 ? 'události' : 'událostí') : (n === 1 ? 'event' : 'events');
+// The rolling year starts and ends mid-month; show the dates of those partial portions.
+const wholeMonth = (m: { from: string; to: string }) => m.from.endsWith('-01') && m.to === new Date(Date.UTC(Number(m.from.slice(0, 4)), Number(m.from.slice(5, 7)), 0)).toISOString().slice(0, 10);
 const eventsByCountry = new Map<string, typeof view.events>(view.jurisdictions.map(j => [j.jurisdiction, view.events.filter(e => e.jurisdiction === j.jurisdiction)]));
 const verifiedRegions = new Map<string, string[]>(view.jurisdictions.map(j => [j.jurisdiction, [...new Set<string>((eventsByCountry.get(j.jurisdiction) || []).flatMap(e => e.regions as string[]).filter(Boolean))]]));
 type Weight = { any_of?: Weight[]; all_of?: Weight[]; operator?: string; value?: number; unit?: string; applies_to?: string };
@@ -54,6 +57,8 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
         <div class="country-body">
           <p>{label('Period', 'Období')}: {j.period.from} — {j.period.to}. <strong>{label('Only the restrictions below are officially verified.', 'Úředně ověřená jsou pouze níže uvedená omezení.')}</strong></p>
           {(verifiedRegions.get(j.jurisdiction) || []).length > 0 && <p><strong>{label('Regions with verified individual restrictions', 'Regiony s jednotlivě ověřenými omezeními')}:</strong> {(verifiedRegions.get(j.jurisdiction) || []).join('; ')}. {label('Check the exact road and direction at each event.', 'Přesnou silnici a směr ověřujte u jednotlivých událostí.')}</p>}
+          <ul class="months small">{j.monthly_coverage.map(m => <li data-month-status={m.status}>{monthName(m.from.slice(0, 7), cs)}{!wholeMonth(m) && ` (${m.from} — ${m.to})`}: {monthStatusText(m.status, cs)}{m.event_count > 0 && ` · ${m.event_count} ${eventsWord(m.event_count)}`}</li>)}</ul>
+          <p class="small">{label('A future period awaiting publication or review does not mean “No driving bans”.', 'Budoucí období čekající na vydání předpisu nebo ověření neznamená bez zákazu.')}</p>
           {!j.coverage_complete && <p class="notice">{label('Full jurisdiction verification is incomplete. Additional restrictions may exist; do not interpret missing events as “no ban”.', 'Ověření celé jurisdikce není dokončeno. Mohou existovat další omezení; chybějící události neznamenají „Bez zákazu“.')}</p>}
           {j.coverage_failures.length > 0 && <div class="small"><p>{label('Open review items', 'Otevřené body ověření')}:</p><ul>{openItemTexts(j.coverage_failures, cs).map(text => <li>{text}</li>)}</ul></div>}
           {view.geographic_scope.corridor_only.includes(j.jurisdiction) && <p class="small">{label('Monitoring covers European and connected international road freight corridors only, not the entire territory.', 'Monitoring zahrnuje pouze evropské a návazné mezinárodní silniční nákladní koridory, nikoli celé území.')}</p>}
@@ -133,6 +138,7 @@ const statusText = (j: typeof view.jurisdictions[number]) => j.ban_state === 'NO
   .country-body { padding: .75rem .2rem; }
   .ban-event { border-top: 1px solid #71809655; padding: .8rem 0; }
   .ban-event h3 { font-size: 1.1rem; }
+  .months { columns: 2 240px; padding-left: 1.1rem; }
   .sources a { display: inline-block; margin: .25rem .7rem .25rem 0; }
   .calendar-link[aria-disabled=true] { opacity: .5; pointer-events: none; }
   [hidden] { display: none !important; }
