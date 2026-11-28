@@ -180,8 +180,11 @@ describe('re-verification queue on the real registry', () => {
     const report = { results: [{ source_id: hu.sources[0], state: 'CHANGED', jurisdictions: ['HU'] }, { source_id: hu.sources[1], state: 'SOURCE_UNAVAILABLE', jurisdictions: ['HU'] }] };
     const queue = buildReverificationQueue({ canonical: canonicalDrivingBans, report, now });
     expect(queue.items.find((q: any) => q.ban_id === hu.ban_id).kind).toBe('SOURCE_CHANGED_LEGAL_REVIEW_REQUIRED');
-    const pt = queue.items.find((q: any) => q.jurisdiction === 'PT');
-    expect(pt.kind).toBe('EVIDENCE_NOT_REFRESHABLE');
+    // Any other expired rule: its sources are not in this report, so nothing can be refreshed.
+    // (Not tied to one country - registry reviews extend individual review windows.)
+    const other = expired.find((e: any) => e.ban_id && e.jurisdiction !== 'HU')!;
+    expect(other).toBeTruthy();
+    expect(queue.items.find((q: any) => q.ban_id === other.ban_id).kind).toBe('EVIDENCE_NOT_REFRESHABLE');
   });
 
   it('a failed monitor run never turns an unverified jurisdiction into NO_BAN in JSON, ICS or web data', async () => {
