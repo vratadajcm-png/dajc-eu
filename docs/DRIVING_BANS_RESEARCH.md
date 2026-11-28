@@ -10,6 +10,9 @@
 AI aktivně hledá oficiální dokumenty, čte je, extrahuje pravidla, nechá je
 nezávisle zkontrolovat a porovná je s registrem. Výsledkem je **návrh**. Právní
 ověření, schválení a publikace zůstávají na člověku a na schváleném pull requestu.
+Jedinou výjimkou je [automatické schválení z úředních PDF](#automatické-schválení-z-úředních-pdf):
+rozhoduje o něm kód podle pevných podmínek, je ve výchozím stavu vypnuté a každé takové
+pravidlo je označené a do 7 dní ho kontroluje člověk.
 `data/driving-bans/canonical.json` zůstává jediným registrem; výzkum do něj
 nikdy nezapisuje.
 
@@ -48,6 +51,8 @@ mají stejný význam jako v `review-workflow.mjs`.
 | `src/lib/driving-bans/research/proposal.mjs` | porovnání s registrem, operace podání, suchý běh existující validace |
 | `src/lib/driving-bans/research/pipeline.mjs` | běh, úložiště se strážcem zápisu, report |
 | `src/lib/driving-bans/research/promote.mjs` | lidský krok do existujícího schvalování, zamítnutí |
+| `src/lib/driving-bans/research/pdf-text.mjs` | lokální text PDF po stranách (`pdfjs-dist`), citace na straně |
+| `src/lib/driving-bans/research/auto-approve.mjs` | automatické schválení z úředních PDF, potvrzení člověkem |
 | `src/lib/driving-bans/research/config.mjs` | připravenost a vypínač |
 | `scripts/driving-bans-research.mjs` | CLI |
 
@@ -181,8 +186,11 @@ Kontroly (`checkExtractedRule`):
 - hodnota hmotnosti musí být číslem v citaci (`7 500 kg`, `7,5 t`), hodiny časů také;
 - žádná chybějící hodnota se nedoplní (`WEIGHT_INCOMPLETE`, `VALIDITY_MISSING`,
   `TIMEZONE_AMBIGUOUS` u zemí s více pásmy, `CORRIDOR_SCOPE_MISSING` u KZ/RU/TR);
-- u PDF nejde citace ověřit strojově (text se lokálně nevytahuje) → vždy
-  `QUOTES_NOT_MACHINE_VERIFIABLE` a `INSUFFICIENT_EVIDENCE`; přednost mají HTML/ELI verze předpisů.
+- PDF s textovou vrstvou se čte lokálně (`pdf-text.mjs`, `pdfjs-dist` bez spouštění kódu a
+  načítání písem). Modely dostanou text se značkou `[[DAJC PAGE n]]` před každou stranou a
+  u každé citace uvedou stranu; citace se ověřují kódem stejně jako u HTML;
+- PDF bez textové vrstvy (sken) nebo poškozené PDF → `QUOTES_NOT_MACHINE_VERIFIABLE` a
+  `INSUFFICIENT_EVIDENCE`; takový dokument zůstává na člověku.
 
 Platnost a právní účinnost jsou oddělené (`draftRuleOf`, `legalEffectOf`):
 
@@ -240,6 +248,67 @@ Teprve tím dostanou pravidla `PRIMARY_VERIFIED`, `verified_at` a `review_window
 Do `canonical.json` ho přenese člověk samostatným publikačním PR, který projde
 `lint:driving-bans`, `typecheck`, `test`, `build` a `driving-bans:audit`.
 Štítek posuzovatele není důkaz identity; tím je schválení PR na GitHubu.
+
+## Automatické schválení z úředních PDF
+
+Rozhodnutí vlastníka ze 3. 11. 2026: zákazy z oficiálních PDF dokumentů se mohou do
+registru schválit automaticky, ale jen s pevnými pojistkami. Nejsou součástí úplného
+ověření jurisdikce. Rozhoduje kód (`auto-approve.mjs`), ne model. Návrh se schválí jen
+tehdy, když platí všech 13 podmínek; jinak zůstane `REVIEW_REQUIRED` a čeká na člověka.
+
+| Podmínka | Co musí platit |
+| --- | --- |
+| `switch_on` | `DAJC_DRIVING_BANS_AUTO_APPROVAL_ENABLED` má přesně hodnotu `true` |
+| `no_overdue_review` | žádné dřívější automatické schválení není po termínu kontroly člověkem |
+| `draft_ready` | návrh je `REVIEW_REQUIRED` a není syntetický |
+| `pdf_text_layer` | uložené PDF se shodným SHA-256 a s textovou vrstvou |
+| `official_primary_source` | dokument je z oficiálního hostitele jurisdikce a zdroj má roli `PRIMARY` |
+| `independent_check` | nezávislá kontrola jiného dodavatele je `CONSISTENT` |
+| `second_extraction_agrees` | druhá extrakce jiného dodavatele se shoduje pole po poli |
+| `no_open_findings` | žádný nález, který potřebuje lidský úsudek (povolené jsou jen `ESCALATED_EXTRACTION` a `SECOND_EXTRACTION_RETRIED`) |
+| `quotes_on_stated_pages` | každá citace je doslova na straně, kterou model uvedl |
+| `only_new_rules` | návrh jen přidává pravidla (a jejich zdroj); úpravy a zrušení nikdy |
+| `known_verified_pattern` | každé pravidlo opakuje vzor pravidla, které ověřil člověk: stejný druh rozvrhu, hodiny, časové pásmo, hmotnost, silnice, regiony, směr, druhy omezení, počet výjimek a stejný předpis; liší se jen data |
+| `legal_effect_stated` | dokument uvádí účinnost a pravidla v ní leží |
+| `validator_accepts` | existující validace projde proti aktuálnímu registru a změny jsou jen `NEW_RULE` |
+
+Schválení projde existujícím automatem (`IMPORTED → … → READY_FOR_CANONICAL_UPDATE`) pod
+vlastním aktérem `dajc-auto-approval-gate:dba-1`. Pravidlo dostane:
+
+- `verification_state: PRIMARY_VERIFIED`, `review_window` jen na svá data,
+- `verification_method: AUTOMATED` a záznam `auto_approval` (verze brány, čas, termín kontroly,
+  SHA-256 dokumentu, modely, vzorové pravidlo),
+- označení „Ověřeno automaticky z úředního PDF dokumentu; kontrola člověkem do …“ na webu,
+  v ICS (`X-DAJC-VERIFICATION-METHOD:AUTOMATED`) a ve faktech a varováních Intelligence a DAJC AI.
+
+Jurisdikce, ověřené období (`window`), měsíční pokrytí ani `NO_BAN` se nemění: automatické
+pravidlo nikdy neudělá zemi ani měsíc „ověřenými v plném rozsahu“.
+
+**Kontrola člověkem do 7 dní:**
+
+```bash
+npm run driving-bans:research -- confirm-auto <ban_id> --document <stejné PDF> --reviewer "Jméno" --reason "…"
+npm run driving-bans:evidence -- approve prop-… --reviewer "…" --reason "…"
+npm run driving-bans:evidence -- prepare prop-…
+```
+
+`confirm-auto` přijme jen PDF se stejným SHA-256, jaké brána schválila. Pravidlo se
+pak změní na `verification_method: HUMAN` a záznam schválení zůstane jako historie.
+Chybné pravidlo se zruší existujícím `CANCEL_RULE`. Pravidlo po termínu se zobrazuje
+s textem „kontrola člověkem je po termínu“. Čtvrteční audit (`--fail-on-overdue-auto-review`)
+pak selže a brána další automatická schválení odmítne.
+
+**Spuštění a vypínače:**
+
+- `npm run driving-bans:research -- auto-approve [ID] --candidate-out FILE --report-md FILE`
+  rozhodne návrhy a zapíše kandidátní dataset mimo `canonical.json`.
+- Ve čtvrtečním workflow běží job `auto-approve` jen při proměnných repozitáře
+  `DAJC_DRIVING_BANS_RESEARCH_ENABLED=true` a `DAJC_DRIVING_BANS_AUTO_APPROVAL_ENABLED=true`.
+  Kandidáta zkopíruje do `canonical.json` až samostatný krok. Pak projdou lint, typecheck,
+  testy, build a audit a otevře se PR do `main` s reportem všech podmínek.
+- PR se sloučí sám po povinném CI jen tehdy, když ho otevřel token vlastníka
+  (`DAJC_DRIVING_BANS_PR_TOKEN`, jinak `DAJC_WEEKLY_PR_TOKEN`) a `DAJC_DRIVING_BANS_AUTO_MERGE`
+  není `false`. Jinak čeká na člověka (viz `docs/MAIN_PROTECTION.md`).
 
 ## Čtvrteční kontrola a naplánované úlohy
 
@@ -322,8 +391,11 @@ popisuje vyřazené soubory (`config/driving-ban-calendars/index.mjs`,
 - Opakované sezónní pravidlo (např. letní soboty 1. 7.–31. 8.) nejde ve schématu
   extrakce vyjádřit jednoznačně: modely ho kódovaly jako celoroční týdenní pravidlo
   nebo jako data bez dat. Takové návrhy neprojdou kontrolami a řeší je člověk.
-- PDF citace nejdou ověřit strojově; takové návrhy zůstávají `INSUFFICIENT_EVIDENCE`
-  a vyžadují ruční kontrolu nebo HTML verzi předpisu.
+- Citace z PDF bez textové vrstvy (skeny) nejdou ověřit strojově; takové návrhy zůstávají
+  `INSUFFICIENT_EVIDENCE` a vyžadují ruční kontrolu. Tabulky v PDF ztrácejí při čtení textu
+  rozložení; jejich návrhy obvykle neprojdou kontrolami a řeší je člověk.
+- Automatické schválení z PDF je ověřeno jen synteticky (`research-auto-approve.test.ts`);
+  živý běh s reálným úředním PDF zatím neproběhl.
 - Import (PR 82) přijímá textové dokumenty jen v UTF-8; stránka v jiné znakové sadě
   projde výzkumem, ale `promote` ji odmítne.
 - Hledání (Perplexity) vrací jen kandidáty; úplnost pokrytí jurisdikce určuje
@@ -392,3 +464,20 @@ Všechny testy jsou offline se skriptovanými poskytovateli (syntetické), nejde
 
 `npm run driving-bans:research:demo` projde celý tok synteticky (bez sítě a klíčů)
 a ověří, že se `canonical.json` nezměnil.
+
+### Automatické schválení z úředních PDF (3. 11. 2026)
+
+Všechny testy jsou offline se skriptovanými poskytovateli a syntetickými PDF
+(`tests/fixtures/driving-bans-research/pdf.mjs`, `pdf-scenarios.mjs`).
+
+| Scénář | Test (`research-auto-approve.test.ts`) |
+| --- | --- |
+| text PDF po stranách, sken a poškozené PDF bez textu | „reads each page and finds quotes…“ |
+| PDF s textem dojde do `REVIEW_REQUIRED`, sken ne | „lets the research pipeline check PDF quotes by code…“ |
+| bez vypínače se nic neschválí ani neimportuje | „stays off without the switch…“ |
+| nová data ověřeného zákazu: schválení, označení, pokrytí beze změny, ICS | „approves new dates of a human-verified ban…“ |
+| jiné hodiny, citace na špatné straně | „leaves anything outside the safe pattern to a person“ |
+| rozpor modelů, úprava, sken, syntetický návrh, cizí host, chybějící účinnost | „never approves a disagreement, an amendment…“ |
+| termín kontroly člověkem, audit, zastavení dalších schválení | „stops new approvals while an earlier one is past its review deadline…“ |
+| potvrzení člověkem proti stejnému PDF | „lets a person confirm the rule against the same PDF…“ |
+| více návrhů v jednom běhu, neplatný záznam schválení | „builds one candidate for several approvals…“ |

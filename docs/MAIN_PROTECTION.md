@@ -43,6 +43,7 @@ deploys as before. Autonomous `claude/autonomous-ai-*` branches never deploy
 | Daily raw findings | `automation/oversize-data` | Imported by the weekly generator; never deployed as public content |
 | Prepared weekly article/correction/preview | `automation/weekly-<week>[-preview][-correction]` PR into `main` | Required |
 | X reservation and confirmation | `automation/x-publications`, `data/x-publications.json` only | No code/main write; ambiguous attempts need owner reconciliation |
+| Driving Bans automatically approved from official PDFs (owner decision 3 November 2026) | `automation/driving-bans-auto-<run>` PR into `main` | Required CI; merges itself only when opened with `DAJC_DRIVING_BANS_PR_TOKEN` (or `DAJC_WEEKLY_PR_TOKEN`) and `DAJC_DRIVING_BANS_AUTO_MERGE` is not `false`. Off unless `DAJC_DRIVING_BANS_AUTO_APPROVAL_ENABLED=true`; each rule needs a human review within 7 days (docs/DRIVING_BANS_RESEARCH.md) |
 
 The data importer accepts fixed regular JSON files only. It never runs code
 from a data branch. Each write verifies the branch snapshot loaded by the
